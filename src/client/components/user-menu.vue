@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { faAt, faListUl, faEye, faEyeSlash, faBan, faPencilAlt, faComments, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faAt, faListUl, faEye, faEyeSlash, faBan, faPencilAlt, faComments, faUsers, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { faSnowflake, faEnvelope } from '@fortawesome/free-regular-svg-icons';
 import i18n from '../i18n';
 import XMenu from './menu.vue';
@@ -66,6 +66,14 @@ export default Vue.extend({
 					text: this.user.isSuspended ? this.$t('unsuspend') : this.$t('suspend'),
 					action: this.toggleSuspend
 				}]);
+
+				menu = menu.concat([null, {
+					icon: faExclamationCircle,
+					text: this.$t('reportUser'),
+					action: () => {
+						window.open(`${this.$store.state.instance.meta.reportForm}${url}/@${this.user.username}@${this.user.host || host}`, '_blank');
+					}
+				}])
 			}
 		}
 

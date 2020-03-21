@@ -9,7 +9,7 @@ import { faSnowflake, faEnvelope } from '@fortawesome/free-regular-svg-icons';
 import i18n from '../i18n';
 import XMenu from './menu.vue';
 import copyToClipboard from '../scripts/copy-to-clipboard';
-import { host } from '../config';
+import { url, host } from '../config';
 import getAcct from '../../misc/acct/render';
 
 export default Vue.extend({
@@ -66,16 +66,16 @@ export default Vue.extend({
 					text: this.user.isSuspended ? this.$t('unsuspend') : this.$t('suspend'),
 					action: this.toggleSuspend
 				}]);
-
-				menu = menu.concat([null, {
-					icon: faExclamationCircle,
-					text: this.$t('reportUser'),
-					action: () => {
-						window.open(`${this.$store.state.instance.meta.reportForm}${url}/@${this.user.username}@${this.user.host || host}`, '_blank');
-					}
-				}])
 			}
 		}
+
+		menu = menu.concat([null, {
+			icon: faExclamationCircle,
+			text: this.$t('reportUser'),
+			action: () => {
+				window.open(`${this.$store.state.instance.meta.reportForm}${url}/@${this.user.username}@${this.user.host || host}`, '_blank');
+			}
+		}]);
 
 		if (this.$store.getters.isSignedIn && this.$store.state.i.id === this.user.id) {
 			menu = menu.concat([null, {

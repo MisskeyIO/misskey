@@ -85,7 +85,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { faBolt, faTimes, faBullhorn, faStar, faLink, faExternalLinkSquareAlt, faPlus, faMinus, faRetweet, faReply, faReplyAll, faEllipsisH, faHome, faUnlock, faEnvelope, faThumbtack, faBan, faQuoteRight, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { faBolt, faTimes, faBullhorn, faStar, faLink, faExternalLinkSquareAlt, faPlus, faMinus, faRetweet, faReply, faReplyAll, faEllipsisH, faHome, faUnlock, faEnvelope, faThumbtack, faBan, faQuoteRight, faInfoCircle, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { faCopy, faTrashAlt, faEye, faEyeSlash } from '@fortawesome/free-regular-svg-icons';
 import { parse } from '../../mfm/parse';
 import { sum, unique } from '../../prelude/array';
@@ -535,7 +535,14 @@ export default Vue.extend({
 					icon: faThumbtack,
 					text: this.$t('pin'),
 					action: () => this.togglePin(true)
-				} : undefined,
+				} : undefined, {
+						icon: faExclamationCircle,
+						text: this.$t('reportNote'),
+						action: () => {
+							window.open(`${this.$store.state.instance.meta.reportForm}${url}/notes/${this.appearNote.id}`, '_blank');
+						}
+					},
+
 				...(this.$store.state.i.isModerator || this.$store.state.i.isAdmin ? [
 					null,
 					{

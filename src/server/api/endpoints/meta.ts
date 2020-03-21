@@ -115,6 +115,8 @@ export default define(meta, async (ps, me) => {
 
 		secure: config.https != null,
 
+		reportForm: config.reportForm,
+
 		disableRegistration: instance.disableRegistration,
 		disableLocalTimeline: instance.disableLocalTimeline,
 		disableGlobalTimeline: instance.disableGlobalTimeline,

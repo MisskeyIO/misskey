@@ -56,6 +56,7 @@ export type Source = {
 	};
 
 	mediaProxy?: string;
+	reportForm?: string;
 };
 
 /**

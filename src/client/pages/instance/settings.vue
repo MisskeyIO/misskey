@@ -258,6 +258,7 @@ export default Vue.extend({
 			enableDiscordIntegration: false,
 			discordClientId: null,
 			discordClientSecret: null,
+			reportFrom: null,
 			faPencilAlt, faTwitter, faDiscord, faGithub, faShareAlt, faTrashAlt, faGhost, faCog, faPlus, faCloud, faInfoCircle, faBan, faSave, faServer, faLink, faEnvelope, faThumbtack, faUser, faShieldAlt, faKey, faBolt
 		}
 	},
@@ -312,6 +313,7 @@ export default Vue.extend({
 		this.enableDiscordIntegration = this.meta.enableDiscordIntegration;
 		this.discordClientId = this.meta.discordClientId;
 		this.discordClientSecret = this.meta.discordClientSecret;
+		this.reportFrom = this.meta.reportForm;
 
 		if (this.proxyAccountId) {
 			this.$root.api('users/show', { userId: this.proxyAccountId }).then(proxyAccount => {
@@ -406,6 +408,7 @@ export default Vue.extend({
 				enableDiscordIntegration: this.enableDiscordIntegration,
 				discordClientId: this.discordClientId,
 				discordClientSecret: this.discordClientSecret,
+				reportForm: this.reportForm,
 			}).then(() => {
 				this.$store.dispatch('instance/fetch');
 				if (withDialog) {

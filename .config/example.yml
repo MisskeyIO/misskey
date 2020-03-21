@@ -147,3 +147,6 @@ id: 'aid'
 
 # Media Proxy
 #mediaProxy: https://example.com/proxy
+
+# Report Form URL
+reportForm: '';

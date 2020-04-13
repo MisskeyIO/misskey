@@ -2,6 +2,8 @@ import autobind from 'autobind-decorator';
 import * as seedrandom from 'seedrandom';
 import { Variable, PageVar, envVarsDef, funcDefs, Block, isFnBlock } from '.';
 import { version } from '../../config';
+import { AiScript, utils, parse, values } from '@syuilo/aiscript';
+import { createAiScriptEnv } from '../create-aiscript-env';
 
 type Fn = {
 	slots: string[];
@@ -9,21 +11,51 @@ type Fn = {
 };
 
 /**
- * AiScript evaluator
+ * AoiScript evaluator
  */
 export class ASEvaluator {
 	private variables: Variable[];
 	private pageVars: PageVar[];
 	private envVars: Record<keyof typeof envVarsDef, any>;
+	public aiscript: AiScript | undefined;
+	private pageVarUpdatedCallback;
 
 	private opts: {
 		randomSeed: string; visitor?: any; page?: any; url?: string;
+		enableAiScript: boolean;
 	};
 
-	constructor(variables: Variable[], pageVars: PageVar[], opts: ASEvaluator['opts']) {
+	constructor(vm: any, variables: Variable[], pageVars: PageVar[], opts: ASEvaluator['opts']) {
 		this.variables = variables;
 		this.pageVars = pageVars;
 		this.opts = opts;
+
+		if (this.opts.enableAiScript) {
+			this.aiscript = new AiScript({ ...createAiScriptEnv(vm, {
+				storageKey: 'pages:' + opts.page.id
+			}), ...{
+				'MkPages:updated': values.FN_NATIVE(([callback]) => {
+					this.pageVarUpdatedCallback = callback;
+				})
+			}}, {
+				in: (q) => {
+					return new Promise(ok => {
+						vm.$root.dialog({
+							title: q,
+							input: {}
+						}).then(({ canceled, result: a }) => {
+							ok(a);
+						});
+					});
+				},
+				out: (value) => {
+					console.log(value);
+				},
+				log: (type, params) => {
+				},
+				maxStep: 16384
+			});
+		}
 
 		const date = new Date();
 
@@ -50,8 +82,11 @@ export class ASEvaluator {
 		const pageVar = this.pageVars.find(v => v.name === name);
 		if (pageVar !== undefined) {
 			pageVar.value = value;
+			if (this.pageVarUpdatedCallback) {
+				if (this.aiscript) this.aiscript.execFn(this.pageVarUpdatedCallback, [values.STR(name), utils.jsToVal(value)]);
+			}
 		} else {
-			throw new AiScriptError(`No such page var '${name}'`);
+			throw new AoiScriptError(`No such page var '${name}'`);
 		}
 	}
 
@@ -108,6 +143,14 @@ export class ASEvaluator {
 
 		if (block.type === 'ref') {
 			return scope.getState(block.value);
+		}
+
+		if (block.type === 'aiScriptVar') {
+			if (this.aiscript) {
+				return utils.valToJs(this.aiscript.scope.get(block.value));
+			} else {
+				return null;
+			}
 		}
 
 		if (isFnBlock(block)) { // ユーザー関数定義
@@ -206,14 +249,14 @@ export class ASEvaluator {
 		const fnName = block.type;
 		const fn = (funcs as any)[fnName];
 		if (fn == null) {
-			throw new AiScriptError(`No such function '${fnName}'`);
+			throw new AoiScriptError(`No such function '${fnName}'`);
 		} else {
 			return fn(...block.args.map(x => this.evaluate(x, scope)));
 		}
 	}
 }
 
-class AiScriptError extends Error {
+class AoiScriptError extends Error {
 	public info?: any;
 
 	constructor(message: string, info?: any) {
@@ -223,7 +266,7 @@ class AiScriptError extends Error {
 
 		// Maintains proper stack trace for where our error was thrown (only available on V8)
 		if (Error.captureStackTrace) {
-			Error.captureStackTrace(this, AiScriptError);
+			Error.captureStackTrace(this, AoiScriptError);
 		}
 	}
 }
@@ -256,7 +299,7 @@ class Scope {
 			}
 		}
 
-		throw new AiScriptError(
+		throw new AoiScriptError(
 			`No such variable '${name}' in scope '${this.name}'`, {
 				scope: this.layerdStates
 			});

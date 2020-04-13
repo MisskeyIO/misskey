@@ -1,14 +1,12 @@
 <template>
-<div class="icozogqfvdetwohsdglrbswgrejoxbdj" v-if="video.isSensitive && hide && !$store.state.device.alwaysShowNsfw" @click="hide = false">
+<div class="icozogqfvdetwohsdglrbswgrejoxbdj" v-if="hide" @click="hide = false">
 	<div>
 		<b><fa :icon="faExclamationTriangle"/> {{ $t('sensitive') }}</b>
 		<span>{{ $t('clickToShow') }}</span>
 	</div>
 </div>
 <div class="kkjnbbplepmiyuadieoenjgutgcmtsvu" v-else>
-	<i v-if="video.isSensitive && !hide && !$store.state.device.alwaysShowNsfw">
-		<fa :icon="faEyeSlash" @click="hide = true"/>
-	</i>
+	<i><fa :icon="faEyeSlash" @click="hide = true"/></i>
 	<a
 		:href="video.url"
 		rel="nofollow noopener"
@@ -49,7 +47,10 @@ export default Vue.extend({
 				'background-image': `url(${this.video.thumbnailUrl})`
 			};
 		}
-	}
+	},
+	created() {
+		this.hide = this.video.isSensitive && !this.$store.state.device.alwaysShowNsfw;
+	},
 });
 </script>
 

@@ -26,6 +26,8 @@ export function convertLegacyReactions(reactions: Record<string, number>) {
 	const _reactions = {} as Record<string, number>;
 
 	for (const reaction of Object.keys(reactions)) {
+		if (reactions[reaction] <= 0) continue;
+
 		if (Object.keys(legacies).includes(reaction)) {
 			if (_reactions[legacies[reaction]]) {
 				_reactions[legacies[reaction]] += reactions[reaction];
@@ -68,7 +70,7 @@ export async function toDbReaction(reaction?: string | null, reacterHost?: strin
 		return unicode.match('\u200d') ? unicode : unicode.replace(/\ufe0f/g, '');
 	}
 
-	const custom = reaction.match(/^:([\w+-]+):$/);
+	const custom = reaction.match(/^:([\w+-]+)(?:@\.)?:$/);
 	if (custom) {
 		const name = custom[1];
 		const emoji = await Emojis.findOne({

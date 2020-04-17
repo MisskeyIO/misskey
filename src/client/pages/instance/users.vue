@@ -221,19 +221,8 @@ export default Vue.extend({
 			});
 		},
 
-		async show(user, info) {
-			if (info == null) info = await this.$root.api('admin/show-user', { userId: user.id });
-			this.$root.new(MkUserModerateDialog, {
-				user: { ...user, ...info }
-			});
-		},
-
-		search() {
-			this.$root.new(MkUserSelect, {}).$once('selected', user => {
-				this.$root.api('admin/show-user', { userId: user.id }).then(info => {
-					this.show(user, info);
-				});
-			});
+		async show(user) {
+			this.$router.push('./users/' + user.id);
 		}
 	}
 });

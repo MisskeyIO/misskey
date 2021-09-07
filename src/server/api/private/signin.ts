@@ -2,9 +2,9 @@ import * as Koa from 'koa';
 import * as bcrypt from 'bcryptjs';
 import * as speakeasy from 'speakeasy';
 import signin from '../common/signin';
-import config from '@/config';
-import { Users, Signins, UserProfiles, UserSecurityKeys, AttestationChallenges } from '../../../models';
-import { ILocalUser } from '../../../models/entities/user';
+import config from '@/config/index';
+import { Users, Signins, UserProfiles, UserSecurityKeys, AttestationChallenges } from '@/models/index';
+import { ILocalUser } from '@/models/entities/user';
 import { genId } from '@/misc/gen-id';
 import { verifyLogin, hash } from '../2fa';
 import { randomBytes } from 'crypto';
@@ -42,6 +42,13 @@ export default async (ctx: Koa.Context) => {
 	if (user == null) {
 		ctx.throw(404, {
 			error: 'user not found'
+		});
+		return;
+	}
+
+	if (user.isSuspended) {
+		ctx.throw(403, {
+			error: 'user is suspended'
 		});
 		return;
 	}

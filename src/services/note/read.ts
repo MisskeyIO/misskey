@@ -1,12 +1,13 @@
-import { publishMainStream } from '../stream';
-import { Note } from '../../models/entities/note';
-import { User } from '../../models/entities/user';
-import { NoteUnreads, AntennaNotes, Users, Followings, ChannelFollowings } from '../../models';
+import { publishMainStream } from '@/services/stream';
+import { Note } from '@/models/entities/note';
+import { User } from '@/models/entities/user';
+import { NoteUnreads, AntennaNotes, Users, Followings, ChannelFollowings } from '@/models/index';
 import { Not, IsNull, In } from 'typeorm';
-import { Channel } from '../../models/entities/channel';
+import { Channel } from '@/models/entities/channel';
 import { checkHitAntenna } from '@/misc/check-hit-antenna';
 import { getAntennas } from '@/misc/antenna-cache';
-import { PackedNote } from '../../models/repositories/note';
+import { PackedNote } from '@/models/repositories/note';
+import { readNotificationByQuery } from '@/server/api/common/read-notification';
 
 /**
  * Mark notes as read
@@ -95,6 +96,10 @@ export default async function(
 				// 全て既読になったイベントを発行
 				publishMainStream(userId, 'readAllChannels');
 			}
+		});
+
+		readNotificationByQuery(userId, {
+			noteId: In([...readMentions.map(n => n.id), ...readSpecifiedNotes.map(n => n.id)]),
 		});
 	}
 

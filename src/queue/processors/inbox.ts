@@ -1,19 +1,19 @@
 import { URL } from 'url';
 import * as Bull from 'bull';
 import * as httpSignature from 'http-signature';
-import perform from '../../remote/activitypub/perform';
-import Logger from '../../services/logger';
-import { registerOrFetchInstanceDoc } from '../../services/register-or-fetch-instance-doc';
-import { Instances } from '../../models';
-import { instanceChart } from '../../services/chart';
+import perform from '@/remote/activitypub/perform';
+import Logger from '@/services/logger';
+import { registerOrFetchInstanceDoc } from '@/services/register-or-fetch-instance-doc';
+import { Instances } from '@/models/index';
+import { instanceChart } from '@/services/chart/index';
 import { fetchMeta } from '@/misc/fetch-meta';
 import { toPuny, extractDbHost } from '@/misc/convert-host';
-import { getApId } from '../../remote/activitypub/type';
-import { fetchInstanceMetadata } from '../../services/fetch-instance-metadata';
+import { getApId } from '@/remote/activitypub/type';
+import { fetchInstanceMetadata } from '@/services/fetch-instance-metadata';
 import { InboxJobData } from '../types';
-import DbResolver from '../../remote/activitypub/db-resolver';
-import { resolvePerson } from '../../remote/activitypub/models/person';
-import { LdSignature } from '../../remote/activitypub/misc/ld-signature';
+import DbResolver from '@/remote/activitypub/db-resolver';
+import { resolvePerson } from '@/remote/activitypub/models/person';
+import { LdSignature } from '@/remote/activitypub/misc/ld-signature';
 
 const logger = new Logger('inbox');
 
@@ -65,6 +65,11 @@ export default async (job: Bull.Job<InboxJobData>): Promise<string> => {
 		return `skip: failed to resolve user`;
 	}
 
+	// publicKey がなくても終了
+	if (authUser.key == null) {
+		return `skip: failed to resolve user publicKey`;
+	}
+
 	// HTTP-Signatureの検証
 	const httpSignatureValidated = httpSignature.verifySignature(signature, authUser.key.keyPem);
 
@@ -87,6 +92,10 @@ export default async (job: Bull.Job<InboxJobData>): Promise<string> => {
 			authUser = await dbResolver.getAuthUserFromKeyId(activity.signature.creator);
 			if (authUser == null) {
 				return `skip: LD-Signatureのユーザーが取得できませんでした`;
+			}
+
+			if (authUser.key == null) {
+				return `skip: LD-SignatureのユーザーはpublicKeyを持っていませんでした`;
 			}
 
 			// LD-Signature検証

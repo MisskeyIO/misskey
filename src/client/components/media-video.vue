@@ -6,18 +6,12 @@
 	</div>
 </div>
 <div class="kkjnbbplepmiyuadieoenjgutgcmtsvu" v-else>
-	<video
-		:poster="video.thumbnailUrl"
-		:title="video.name"
-		crossorigin="anonymous"
-		preload="none"
-		controls
-	>
-		<source 
-			:src="video.url" 
-			:type="video.type"
-		>
-	</video>
+	<iframe
+		:src="'https://s3encode.arkjp.net/?video=' + video.url"
+		frameborder="0"
+		allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+		allowfullscreen="true"
+	></iframe>
 	<i class="fas fa-eye-slash" @click="hide = true"></i>
 </div>
 </template>
@@ -63,7 +57,7 @@ export default defineComponent({
 		right: 12px;
 	}
 
-	> video {
+	> iframe {
 		display: flex;
 		justify-content: center;
 		align-items: center;

@@ -60,8 +60,6 @@
 		? `?salt=${localStorage.getItem('salt')}`
 		: '';
 
-	const head = document.getElementsByTagName('head')[0];
-
 	const script = document.createElement('script');
 	script.setAttribute('src', `/assets/app.${v}.js${salt}`);
 	script.setAttribute('async', 'true');
@@ -70,7 +68,7 @@
 		renderError('APP_FETCH_FAILED');
 		checkUpdate();
 	});
-	head.appendChild(script);
+	document.head.appendChild(script);
 	//#endregion
 
 	//#region Theme
@@ -105,6 +103,13 @@
 	const wallpaper = localStorage.getItem('wallpaper');
 	if (wallpaper) {
 		document.documentElement.style.backgroundImage = `url(${wallpaper})`;
+	}
+
+	const customCss = localStorage.getItem('customCss');
+	if (customCss && customCss.length > 0) {
+		const style = document.createElement('style');
+		style.innerHTML = customCss;
+		document.head.appendChild(style);
 	}
 
 	// eslint-disable-next-line no-inner-declarations

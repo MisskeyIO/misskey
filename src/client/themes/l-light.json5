@@ -11,11 +11,9 @@
 		bg: '#f9f9f9',
 		fg: '#676767',
 		divider: '#e8e8e8',
-		header: ':alpha<0.7<@panel',
+		header: ':alpha<0.95<@panel',
 		navBg: '#fff',
 		panel: '#fff',
-		panelShadow: '" 0 8px 24px rgb(21 43 75 / 8%)',
 		panelHeaderDivider: '@divider',
-		messageBg: '#dedede',
 	},
 }

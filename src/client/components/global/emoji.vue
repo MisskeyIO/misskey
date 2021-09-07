@@ -1,6 +1,6 @@
 <template>
-<img v-if="customEmoji" class="mk-emoji custom" :class="{ normal, noStyle }" :src="url" :alt="alt" :title="alt" decoding="async"/>
-<img v-else-if="char && !useOsNativeEmojis" class="mk-emoji" :src="url" :alt="alt" :title="alt" decoding="async"/>
+<img v-if="customEmoji" class="mk-emoji custom" :class="{ normal, noStyle }" :src="url" :alt="alt" :title="alt" loading="lazy"/>
+<img v-else-if="char && !useOsNativeEmojis" class="mk-emoji" :src="url" :alt="alt" :title="alt" loading="lazy"/>
 <span v-else-if="char && useOsNativeEmojis">{{ char }}</span>
 <span v-else>{{ emoji }}</span>
 </template>

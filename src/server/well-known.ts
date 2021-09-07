@@ -1,12 +1,11 @@
 import * as Router from '@koa/router';
 
-import config from '@/config';
-import parseAcct from '@/misc/acct/parse';
-import Acct from '@/misc/acct/type';
+import config from '@/config/index';
+import { parseAcct, Acct } from '@/misc/acct';
 import { links } from './nodeinfo';
-import { escapeAttribute, escapeValue } from '../prelude/xml';
-import { Users } from '../models';
-import { User } from '../models/entities/user';
+import { escapeAttribute, escapeValue } from '@/prelude/xml';
+import { Users } from '@/models/index';
+import { User } from '@/models/entities/user';
 
 // Init router
 const router = new Router();

@@ -1,6 +1,6 @@
 <template>
 <div
-	class="note _block"
+	class="lxwezrsl _block"
 	v-if="!muted"
 	v-show="!isDeleted"
 	:tabindex="!isDeleted ? '-1' : null"
@@ -66,6 +66,13 @@
 						<MkA class="reply" v-if="appearNote.replyId" :to="`/notes/${appearNote.replyId}`"><i class="fas fa-reply"></i></MkA>
 						<Mfm v-if="appearNote.text" :text="appearNote.text" :author="appearNote.user" :i="$i" :custom-emojis="appearNote.emojis"/>
 						<a class="rp" v-if="appearNote.renote != null">RN:</a>
+						<div class="translation" v-if="translating || translation">
+							<MkLoading v-if="translating" mini/>
+							<div class="translated" v-else>
+								<b>{{ $t('translatedFrom', { x: translation.sourceLang }) }}:</b>
+								{{ translation.text }}
+							</div>
+						</div>
 					</div>
 					<div class="files" v-if="appearNote.files.length > 0">
 						<XMediaList :media-list="appearNote.files"/>
@@ -78,8 +85,8 @@
 			</div>
 			<footer class="footer">
 				<div class="info">
-					<span class="mobile" v-if="note.viaMobile"><i class="fas fa-mobile-alt"></i></span>
-					<MkTime class="created-at" :time="note.createdAt" mode="detail"/>
+					<span class="mobile" v-if="appearNote.viaMobile"><i class="fas fa-mobile-alt"></i></span>
+					<MkTime class="created-at" :time="appearNote.createdAt" mode="detail"/>
 				</div>
 				<XReactionsViewer :note="appearNote" ref="reactionsViewer"/>
 				<button @click="reply()" class="button _button">
@@ -177,6 +184,8 @@ export default defineComponent({
 			showContent: false,
 			isDeleted: false,
 			muted: false,
+			translation: null,
+			translating: false,
 		};
 	},
 
@@ -453,7 +462,7 @@ export default defineComponent({
 		renote(viaKeyboard = false) {
 			pleaseLogin();
 			this.blur();
-			os.modalMenu([{
+			os.popupMenu([{
 				text: this.$ts.renote,
 				icon: 'fas fa-retweet',
 				action: () => {
@@ -618,6 +627,11 @@ export default defineComponent({
 					text: this.$ts.share,
 					action: this.share
 				},
+				this.$instance.translatorAvailable ? {
+					icon: 'fas fa-language',
+					text: this.$ts.translate,
+					action: this.translate
+				} : undefined,
 				null,
 				statePromise.then(state => state.isFavorited ? {
 					icon: 'fas fa-star',
@@ -742,14 +756,14 @@ export default defineComponent({
 		},
 
 		menu(viaKeyboard = false) {
-			os.modalMenu(this.getMenu(), this.$refs.menuButton, {
+			os.popupMenu(this.getMenu(), this.$refs.menuButton, {
 				viaKeyboard
 			}).then(this.focus);
 		},
 
 		showRenoteMenu(viaKeyboard = false) {
 			if (!this.isMyRenote) return;
-			os.modalMenu([{
+			os.popupMenu([{
 				text: this.$ts.unrenote,
 				icon: 'fas fa-trash-alt',
 				danger: true,
@@ -793,7 +807,7 @@ export default defineComponent({
 
 		async clip() {
 			const clips = await os.api('clips/list');
-			os.modalMenu([{
+			os.popupMenu([{
 				icon: 'fas fa-plus',
 				text: this.$ts.createNew,
 				action: async () => {
@@ -851,6 +865,17 @@ export default defineComponent({
 			});
 		},
 
+		async translate() {
+			if (this.translation != null) return;
+			this.translating = true;
+			const res = await os.api('notes/translate', {
+				noteId: this.appearNote.id,
+				targetLang: localStorage.getItem('lang') || navigator.language,
+			});
+			this.translating = false;
+			this.translation = res;
+		},
+
 		focus() {
 			this.$el.focus();
 		},
@@ -873,7 +898,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.note {
+.lxwezrsl {
 	position: relative;
 	transition: box-shadow 0.1s ease;
 	overflow: hidden;
@@ -1048,6 +1073,13 @@ export default defineComponent({
 							margin-left: 4px;
 							font-style: oblique;
 							color: var(--renote);
+						}
+
+						> .translation {
+							border: solid 0.5px var(--divider);
+							border-radius: var(--radius);
+							padding: 12px;
+							margin-top: 8px;
 						}
 					}
 

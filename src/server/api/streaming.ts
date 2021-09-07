@@ -1,12 +1,12 @@
 import * as http from 'http';
 import * as websocket from 'websocket';
 
-import MainStreamConnection from './stream';
+import MainStreamConnection from './stream/index';
 import { ParsedUrlQuery } from 'querystring';
 import authenticate from './authenticate';
 import { EventEmitter } from 'events';
 import { subsdcriber as redisClient } from '../../db/redis';
-import { Users } from '@/models';
+import { Users } from '@/models/index';
 
 module.exports = (server: http.Server) => {
 	// Init websocket server
@@ -21,6 +21,11 @@ module.exports = (server: http.Server) => {
 		// コネクション切断するなりエラーメッセージ返すなりする
 		// (現状はエラーがキャッチされておらずサーバーのログに流れて邪魔なので)
 		const [user, app] = await authenticate(q.i as string);
+
+		if (user?.isSuspended) {
+			request.reject(400);
+			return;
+		}
 
 		const connection = request.accept();
 

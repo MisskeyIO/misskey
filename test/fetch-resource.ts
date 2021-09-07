@@ -1,18 +1,8 @@
-/*
- * Tests for Fetch resource
- *
- * How to run the tests:
- * > npx cross-env TS_NODE_FILES=true TS_NODE_TRANSPILE_ONLY=true npx mocha test/fetch-resource.ts --require ts-node/register
- *
- * To specify test:
- * > npx cross-env TS_NODE_FILES=true TS_NODE_TRANSPILE_ONLY=true npx mocha test/fetch-resource.ts --require ts-node/register -g 'test name'
- */
-
 process.env.NODE_ENV = 'test';
 
 import * as assert from 'assert';
 import * as childProcess from 'child_process';
-import { async, launchServer, signup, post, request, simpleGet, port, shutdownServer } from './utils';
+import { async, startServer, signup, post, request, simpleGet, port, shutdownServer } from './utils';
 import * as openapi from '@redocly/openapi-core';
 
 // Request Accept
@@ -32,12 +22,13 @@ describe('Fetch resource', () => {
 	let alice: any;
 	let alicesPost: any;
 
-	before(launchServer(g => p = g, async () => {
+	before(async () => {
+		p = await startServer();
 		alice = await signup({ username: 'alice' });
 		alicesPost = await post(alice, {
 			text: 'test'
 		});
-	}));
+	});
 
 	after(async () => {
 		await shutdownServer(p);

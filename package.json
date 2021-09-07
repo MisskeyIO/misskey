@@ -131,7 +131,7 @@
 		"dateformat": "4.5.1",
 		"escape-regexp": "0.0.1",
 		"eslint": "7.32.0",
-		"eslint-plugin-vue": "7.16.0",
+		"eslint-plugin-vue": "7.17.0",
 		"eventemitter3": "4.0.7",
 		"feed": "4.2.2",
 		"file-type": "16.5.3",

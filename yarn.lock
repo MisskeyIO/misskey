@@ -1060,10 +1060,10 @@
   resolved "https://registry.yarnpkg.com/@types/tinycolor2/-/tinycolor2-1.4.3.tgz#ed4a0901f954b126e6a914b4839c77462d56e706"
   integrity sha512-Kf1w9NE5HEgGxCRyIcRXR/ZYtDv0V8FVPtYHwLxl0O+maGX0erE77pQlD0gpP+/KByMZ87mOA79SjifhSB3PjQ==
 
-"@types/tmp@0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@types/tmp/-/tmp-0.2.1.tgz#83ecf4ec22a8c218c71db25f316619fe5b986011"
-  integrity sha512-7cTXwKP/HLOPVgjg+YhBdQ7bMiobGMuoBmrGmqwIWJv8elC6t1DfVc/mn4fD9UE1IjhwmhaQ5pGVXkmXbH0rhg==
+"@types/tmp@0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@types/tmp/-/tmp-0.2.2.tgz#424537a3b91828cb26aaf697f21ae3cd1b69f7e7"
+  integrity sha512-MhSa0yylXtVMsyT8qFpHA1DLHj4DvQGH5ntxrhHSh8PxUVNi35Wk+P5hVgqbO2qZqOotqr9jaoPRL+iRjWYm/A==
 
 "@types/tough-cookie@*":
   version "4.0.0"

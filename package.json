@@ -237,7 +237,7 @@
 		"v-debounce": "0.1.2",
 		"vanilla-tilt": "1.7.2",
 		"vue": "3.2.20",
-		"vue-loader": "16.7.0",
+		"vue-loader": "16.8.2",
 		"vue-prism-editor": "2.0.0-alpha.2",
 		"vue-router": "4.0.5",
 		"vue-style-loader": "4.1.3",

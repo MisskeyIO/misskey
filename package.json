@@ -90,7 +90,7 @@
 		"@types/rename": "1.0.4",
 		"@types/request-stats": "3.0.0",
 		"@types/rimraf": "3.0.2",
-		"@types/seedrandom": "2.4.28",
+		"@types/seedrandom": "3.0.1",
 		"@types/sharp": "0.29.2",
 		"@types/sinonjs__fake-timers": "6.0.4",
 		"@types/speakeasy": "2.0.6",

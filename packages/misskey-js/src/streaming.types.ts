@@ -56,6 +56,13 @@ export type Channels = {
 		};
 		receives: null;
 	};
+	mediaTimeline: {
+		params: null;
+		events: {
+			note: (payload: Note) => void;
+		};
+		receives: null;
+	};
 	hybridTimeline: {
 		params: null;
 		events: {

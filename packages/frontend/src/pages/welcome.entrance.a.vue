@@ -45,7 +45,7 @@ import MkVisitorDashboard from '@/components/MkVisitorDashboard.vue';
 let meta = $ref<Instance>();
 let instances = $ref<any[]>();
 
-os.api('meta', { detail: true }).then(_meta => {
+os.apiGet('meta', { detail: true }).then(_meta => {
 	meta = _meta;
 });
 

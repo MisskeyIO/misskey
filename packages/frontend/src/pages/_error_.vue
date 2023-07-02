@@ -41,7 +41,7 @@ let loaded = $ref(false);
 let serverIsDead = $ref(false);
 let meta = $ref<misskey.entities.LiteInstanceMetadata | null>(null);
 
-os.api('meta', {
+os.apiGet('meta', {
 	detail: false,
 }).then(res => {
 	loaded = true;

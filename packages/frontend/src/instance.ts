@@ -1,6 +1,6 @@
 import { computed, reactive } from 'vue';
 import * as Misskey from 'misskey-js';
-import { api } from './os';
+import { apiGet } from './os';
 import { miLocalStorage } from './local-storage';
 import { DEFAULT_INFO_IMAGE_URL, DEFAULT_NOT_FOUND_IMAGE_URL, DEFAULT_SERVER_ERROR_IMAGE_URL } from '@/const';
 
@@ -21,7 +21,7 @@ export const infoImageUrl = computed(() => instance.infoImageUrl ?? DEFAULT_INFO
 export const notFoundImageUrl = computed(() => instance.notFoundImageUrl ?? DEFAULT_NOT_FOUND_IMAGE_URL);
 
 export async function fetchInstance() {
-	const meta = await api('meta', {
+	const meta = await apiGet('meta', {
 		detail: false,
 	});
 

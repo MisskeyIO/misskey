@@ -14,6 +14,8 @@ export const meta = {
 	tags: ['meta'],
 
 	requireCredential: false,
+	allowGet: true,
+	cacheSec: 60 * 1,
 
 	res: {
 		type: 'object',

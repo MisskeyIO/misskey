@@ -9,7 +9,7 @@ import * as os from '@/os';
 
 const meta = ref<Misskey.entities.DetailedInstanceMetadata>();
 
-os.api('meta', { detail: true }).then(gotMeta => {
+os.apiGet('meta', { detail: true }).then(gotMeta => {
 	meta.value = gotMeta;
 });
 </script>

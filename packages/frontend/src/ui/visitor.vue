@@ -115,7 +115,7 @@ const keymap = $computed(() => {
 
 const root = $computed(() => mainRouter.currentRoute.value.name === 'index');
 
-os.api('meta', { detail: true }).then(res => {
+os.apiGet('meta', { detail: true }).then(res => {
 	meta = res;
 });
 

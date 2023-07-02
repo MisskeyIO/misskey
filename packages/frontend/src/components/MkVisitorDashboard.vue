@@ -65,7 +65,7 @@ import XActiveUsersChart from '@/components/MkVisitorDashboard.ActiveUsersChart.
 let meta = $ref<Instance>();
 let stats = $ref(null);
 
-os.api('meta', { detail: true }).then(_meta => {
+os.apiGet('meta', { detail: true }).then(_meta => {
 	meta = _meta;
 });
 

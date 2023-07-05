@@ -64,8 +64,9 @@ export class QueueService {
 	public async deliverMany(user: ThinUser, content: IActivity | null, inboxes: Map<string, boolean>) {
 		const opts = {
 			attempts: this.config.deliverJobMaxAttempts ?? 12,
+			timeout: 1 * 60 * 1000,	// 1min
 			backoff: {
-				type: 'custom',
+				type: 'apBackoff',
 			},
 			removeOnComplete: true,
 			removeOnFail: true,

@@ -3,7 +3,7 @@
 	<template #header><MkPageHeader :actions="headerActions" :tabs="headerTabs"/></template>
 	<MkSpacer :contentMax="800">
 		<MkPagination v-slot="{items}" :pagination="pagination" class="ruryvtyk _gaps_m">
-			<section v-for="(announcement, i) in items" :key="announcement.id" :class="{ announcement: true, _panel: true, private: !!announcement.userId }">
+			<section v-for="(announcement, i) in items" :key="announcement.id" :class="{ announcement: true, _panel: true, private: announcement.isPrivate }">
 				<div class="header"><span v-if="$i && !announcement.isRead"><span class="ti ti-speakerphone"></span></span><Mfm :text="announcement.title"/></div>
 				<div class="content">
 					<Mfm :text="announcement.text"/>
@@ -55,9 +55,6 @@ definePageMetadata({
 .ruryvtyk {
 
 	> .private {
-		/*--c: rgb(255 196 0 / 15%);
-		background-image: linear-gradient(45deg, var(--c) 16.67%, transparent 16.67%, transparent 50%, var(--c) 50%, var(--c) 66.67%, transparent 66.67%, transparent 100%);
-		background-size: 16px 16px;*/
 		border-left: 4px solid olivedrab;
 	}
 
@@ -84,18 +81,14 @@ definePageMetadata({
 }
 
 @keyframes fade {
-  0% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-.fade-blink {
-  animation: fade 1s infinite;
+	0% {
+		opacity: 0;
+	}
+	50% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
 }
 </style>

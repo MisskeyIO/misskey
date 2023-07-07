@@ -34,7 +34,8 @@ export class Announcement {
 	public imageUrl: string | null;
 
 	@Column('varchar', {
-		length: 64, nullable: true,
+		...id(),
+		nullable: true,
 	})
 	public userId: string | null;
 

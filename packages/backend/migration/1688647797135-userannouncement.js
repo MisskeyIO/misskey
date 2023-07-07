@@ -6,6 +6,6 @@ export class Userannouncement1688647797135 {
     }
 
     async down(queryRunner) {
-        await queryRunner.query(`ALTER TABLE "announcement" DROP COLUMN "userId"`);  
+        await queryRunner.query(`ALTER TABLE "announcement" DROP COLUMN "userId"`);
     }
 }

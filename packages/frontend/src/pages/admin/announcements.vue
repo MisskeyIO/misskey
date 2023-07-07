@@ -30,7 +30,6 @@
 					<MkInput v-model="announcement.imageUrl">
 						<template #label>{{ i18n.ts.imageUrl }}</template>
 					</MkInput>
-					
 					<p v-if="announcement.reads">{{ i18n.t('nUsersRead', { n: announcement.reads }) }}</p>
 					<MkUserCardMini v-if="announcement.userId" :user="announcement.user" @click="editUser(announcement)"></MkUserCardMini>
 					<MkButton v-else class="button" inline primary @click="editUser(announcement)">{{ i18n.ts.specifyUser }}</MkButton>
@@ -46,8 +45,8 @@
 </template>
 
 <script lang="ts" setup>
-import { Ref, ref, watch } from 'vue';
-import { UserDetailed } from 'misskey-js/built/entities';
+import { ref, watch } from 'vue';
+import { UserLite } from 'misskey-js/built/entities';
 import XHeader from './_header_.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
@@ -60,7 +59,7 @@ import { definePageMetadata } from '@/scripts/page-metadata';
 
 let announcements: any[] = $ref([]);
 
-const user: Ref<UserDetailed | null> = ref(null);
+const user = ref<UserLite>(null);
 const announceTitleEl = $shallowRef<HTMLInputElement | null>(null);
 
 function selectUserFilter() {

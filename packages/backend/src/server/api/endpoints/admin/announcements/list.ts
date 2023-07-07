@@ -86,7 +86,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 
 		@Inject(DI.announcementReadsRepository)
 		private announcementReadsRepository: AnnouncementReadsRepository,
-		
+
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
 
@@ -100,7 +100,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 			} else {
 				builder.where('"userId" IS NULL');
 			}
-			
+
 			const query = this.queryService.makePaginationQuery(builder, ps.sinceId, ps.untilId);
 
 			const announcements = await query.take(ps.limit).getMany();

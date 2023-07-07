@@ -26,9 +26,9 @@ export const paramDef = {
 		title: { type: 'string', minLength: 1 },
 		text: { type: 'string', minLength: 1 },
 		imageUrl: { type: 'string', nullable: true, minLength: 0 },
-		userId: { type: 'string', nullable: true },
+		userId: { type: 'string', nullable: true, format: 'misskey:id' },
 	},
-	required: ['id', 'title', 'text', 'imageUrl', 'userId'],
+	required: ['id', 'title', 'text', 'imageUrl'],
 } as const;
 
 // eslint-disable-next-line import/no-default-export
@@ -45,7 +45,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 			const announcement = await this.announcementsRepository.findOneBy({ id: ps.id });
 
 			if (announcement == null) throw new ApiError(meta.errors.noSuchAnnouncement);
-			
+
 			if (announcement.userId && announcement.userId !== ps.userId) {
 				await this.announcementsReadsRepository.delete({ id: announcement.id, userId: announcement.userId });
 			}
@@ -56,6 +56,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 				text: ps.text,
 				/* eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- 空の文字列の場合、nullを渡すようにするため */
 				imageUrl: ps.imageUrl || null, 
+				userId: ps.userId ?? null,
 			});
 		});
 	}

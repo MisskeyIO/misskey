@@ -56,7 +56,7 @@ export const paramDef = {
 		title: { type: 'string', minLength: 1 },
 		text: { type: 'string', minLength: 1 },
 		imageUrl: { type: 'string', nullable: true, minLength: 1 },
-		userId: { type: 'string', nullable: true },
+		userId: { type: 'string', nullable: true, format: 'misskey:id' },
 	},
 	required: ['title', 'text', 'imageUrl'],
 } as const;
@@ -78,7 +78,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 				title: ps.title,
 				text: ps.text,
 				imageUrl: ps.imageUrl,
-				userId: ps.userId,
+				userId: ps.userId ?? null,
 			}).then(x => this.announcementsRepository.findOneByOrFail(x.identifiers[0]));
 
 			return Object.assign({}, announcement, { createdAt: announcement.createdAt.toISOString(), updatedAt: null });

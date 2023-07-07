@@ -80,7 +80,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 				imageUrl: ps.imageUrl,
 				userId: ps.userId,
 			}).then(x => this.announcementsRepository.findOneByOrFail(x.identifiers[0]));
-			
 			return Object.assign({}, announcement, { createdAt: announcement.createdAt.toISOString(), updatedAt: null });
 		});
 	}

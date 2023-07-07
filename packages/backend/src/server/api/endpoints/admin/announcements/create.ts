@@ -3,7 +3,6 @@ import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { AnnouncementsRepository } from '@/models/index.js';
 import { IdService } from '@/core/IdService.js';
 import { DI } from '@/di-symbols.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
 
 export const meta = {
 	tags: ['admin'],

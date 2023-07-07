@@ -13,7 +13,7 @@
 					<div style="text-align: center;" class="_gaps">
 						<div v-if="user">@{{ user.username }}</div>
 						<div>
-							<MkButton v-if="user == null" primary rounded inline @click="selectUser">{{ i18n.ts.selectUser }}</MkButton>
+							<MkButton v-if="user == null" primary rounded inline @click="selectUserFilter">{{ i18n.ts.selectUser }}</MkButton>
 							<MkButton v-else danger rounded inline @click="user = null">{{ i18n.ts.remove }}</MkButton>
 						</div>
 					</div>
@@ -32,8 +32,8 @@
 					</MkInput>
 					
 					<p v-if="announcement.reads">{{ i18n.t('nUsersRead', { n: announcement.reads }) }}</p>
-					<MkUserCardMini v-if="announcement.userId" :user="announcement.user" @click="selectUser2(announcement)"></MkUserCardMini>
-					<MkButton v-else class="button" inline primary @click="selectUser2(announcement)">{{ i18n.ts.specifyUser }}</MkButton>
+					<MkUserCardMini v-if="announcement.userId" :user="announcement.user" @click="editUser(announcement)"></MkUserCardMini>
+					<MkButton v-else class="button" inline primary @click="editUser(announcement)">{{ i18n.ts.specifyUser }}</MkButton>
 					<div class="buttons _buttons">
 						<MkButton class="button" inline primary @click="save(announcement)"><i class="ti ti-device-floppy"></i> {{ i18n.ts.save }}</MkButton>
 						<MkButton class="button" inline danger @click="remove(announcement)"><i class="ti ti-trash"></i> {{ i18n.ts.remove }}</MkButton>
@@ -46,7 +46,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import { Ref, ref, watch } from 'vue';
+import { UserDetailed } from 'misskey-js/built/entities';
 import XHeader from './_header_.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
@@ -59,16 +60,16 @@ import { definePageMetadata } from '@/scripts/page-metadata';
 
 let announcements: any[] = $ref([]);
 
-const user = ref(null);
+const user: Ref<UserDetailed | null> = ref(null);
 const announceTitleEl = $shallowRef<HTMLInputElement | null>(null);
 
-function selectUser() {
+function selectUserFilter() {
 	os.selectUser().then(_user => {
 		user.value = _user;
 	});
 }
 
-function selectUser2(an) {
+function editUser(an) {
 	os.selectUser().then(_user => {
 		an.userId = _user.id;
 		an.user = _user;
@@ -135,15 +136,9 @@ function save(announcement) {
 }
 
 function refresh() {
-	if (user.value) {
-		os.api('admin/announcements/list', { userId: user.value.id }).then(announcementResponse => {
-			announcements = announcementResponse;
-		});
-	} else {
-		os.api('admin/announcements/list').then(announcementResponse => {
-			announcements = announcementResponse;
-		});
-	}
+	os.api('admin/announcements/list', { userId: user.value?.id }).then(announcementResponse => {
+		announcements = announcementResponse;
+	});
 }
 
 watch(user, refresh);

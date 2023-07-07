@@ -48,12 +48,8 @@ export const meta = {
 					type: 'boolean',
 					optional: true, nullable: false,
 				},
-				userId: {
+				isPrivate: {
 					type: 'boolean',
-					optional: false, nullable: true,
-				},
-				user: {
-					type: 'object',
 					optional: false, nullable: true,
 				},
 			},
@@ -89,10 +85,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 			const builder = this.announcementsRepository.createQueryBuilder('announcement');
 			if (me) {
 				if (ps.privateOnly) {
-					builder.where({ userId: me.id });
+					builder.where('"userId" = :userId', { userId: me.id });
 				} else {
 					builder.where('"userId" IS NULL');
-					builder.orWhere({ userId: me.id });
+					builder.orWhere('"userId" = :userId', { userId: me.id });
 				}
 			} else {
 				builder.where('"userId" IS NULL');
@@ -115,6 +111,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 				...a,
 				createdAt: a.createdAt.toISOString(),
 				updatedAt: a.updatedAt?.toISOString() ?? null,
+				isPrivate: !!a.userId,
 			}));
 		});
 	}

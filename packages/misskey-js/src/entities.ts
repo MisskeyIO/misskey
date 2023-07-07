@@ -395,7 +395,6 @@ export type Announcement = {
 	imageUrl: string | null;
 	isRead?: boolean;
 	userId: string | null;
-	user: User;
 };
 
 export type Antenna = {

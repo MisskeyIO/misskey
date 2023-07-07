@@ -88,7 +88,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 		super(meta, paramDef, async (ps, me) => {
 			const builder = this.announcementsRepository.createQueryBuilder('announcement');
 			if (ps.userId) {
-				builder.where({ userId: ps.userId });
+				builder.where('"userId" = :userId', { userId: ps.userId });
 			} else {
 				builder.where('"userId" IS NULL');
 			}

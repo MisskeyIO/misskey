@@ -394,7 +394,7 @@ export type Announcement = {
 	title: string;
 	imageUrl: string | null;
 	isRead?: boolean;
-	userId: string | null;
+	isPrivate: boolean;
 };
 
 export type Antenna = {

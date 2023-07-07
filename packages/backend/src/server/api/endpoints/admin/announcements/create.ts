@@ -69,7 +69,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 		private announcementsRepository: AnnouncementsRepository,
 
 		private idService: IdService,
-		private globalEventService: GlobalEventService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const announcement = await this.announcementsRepository.insert({

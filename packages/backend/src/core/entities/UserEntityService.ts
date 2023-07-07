@@ -217,16 +217,11 @@ export class UserEntityService implements OnModuleInit {
 			userId: userId,
 		});
 
-		const count1 = await this.announcementsRepository.countBy(reads.length > 0 ? {
-			id: Not(In(reads.map(read => read.announcementId))),
-			userId: IsNull(),
-		} : { userId: IsNull() });
-		const count2 = await this.announcementsRepository.countBy(reads.length > 0 ? {
-			id: Not(In(reads.map(read => read.announcementId))),
-			userId: userId,
-		} : { userId: userId });
-
-		const count = count1 + count2;
+		const id = reads.length > 0 ? Not(In(reads.map(read => read.announcementId))) : undefined;
+		const count = await this.announcementsRepository.countBy([
+			{ id, userId: IsNull() },
+			{ id, userId: userId },
+		]);
 
 		return count > 0;
 	}

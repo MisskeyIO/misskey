@@ -1,8 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { In } from 'typeorm';
 import type { AnnouncementsRepository, AnnouncementReadsRepository, UsersRepository } from '@/models/index.js';
 import type { Announcement } from '@/models/entities/Announcement.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { QueryService } from '@/core/QueryService.js';
+import { UserEntityService } from '@/core/entities/UserEntityService';
 import { DI } from '@/di-symbols.js';
 
 export const meta = {
@@ -50,6 +52,11 @@ export const meta = {
 					type: 'string',
 					optional: false, nullable: true,
 				},
+				user: {
+					type: 'object',
+					optional: true, nullable: false,
+					ref: 'UserLite',
+				},
 				reads: {
 					type: 'number',
 					optional: false, nullable: false,
@@ -84,6 +91,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 		private usersRepository: UsersRepository,
 
 		private queryService: QueryService,
+		private userEntityService: UserEntityService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const builder = this.announcementsRepository.createQueryBuilder('announcement');
@@ -105,7 +113,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 				}));
 			}
 
-			return await Promise.all(announcements.map(async announcement => ({
+			const users = await this.usersRepository.findBy({
+				id: In(announcements.map(a => a.userId).filter(id => id != null)),
+			});
+			const packedUsers = await this.userEntityService.packMany(users, me, {
+				detail: false,
+			});
+
+			return announcements.map(announcement => ({
 				id: announcement.id,
 				createdAt: announcement.createdAt.toISOString(),
 				updatedAt: announcement.updatedAt?.toISOString() ?? null,
@@ -113,9 +128,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 				text: announcement.text,
 				imageUrl: announcement.imageUrl,
 				userId: announcement.userId,
-				user: announcement.userId ? await this.usersRepository.findOneBy({ id: announcement.userId }) : null,
+				user: packedUsers.find(user => user.id === announcement.userId),
 				reads: reads.get(announcement)!,
-			})));
+			}));
 		});
 	}
 }

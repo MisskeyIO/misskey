@@ -33,6 +33,11 @@ export class Announcement {
 	})
 	public imageUrl: string | null;
 
+	@Column('varchar', {
+		length: 64, nullable: true,
+	})
+	public userId: string | null;
+
 	constructor(data: Partial<Announcement>) {
 		if (data == null) return;
 

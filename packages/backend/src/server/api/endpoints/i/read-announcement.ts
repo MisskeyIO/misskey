@@ -49,7 +49,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 			// Check if announcement exists
 			const announcement = await this.announcementsRepository.findOneBy({ id: ps.announcementId });
 
-			if (announcement == null) {
+			if (announcement == null || (announcement.userId && announcement.userId !== me.id)) {
 				throw new ApiError(meta.errors.noSuchAnnouncement);
 			}
 

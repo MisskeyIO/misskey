@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { AnnouncementsRepository, AnnouncementReadsRepository } from '@/models/index.js';
+import type { AnnouncementsRepository, AnnouncementReadsRepository, UsersRepository } from '@/models/index.js';
 import type { Announcement } from '@/models/entities/Announcement.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { QueryService } from '@/core/QueryService.js';
@@ -46,6 +46,10 @@ export const meta = {
 					type: 'string',
 					optional: false, nullable: true,
 				},
+				userId: {
+					type: 'string',
+					optional: false, nullable: true,
+				},
 				reads: {
 					type: 'number',
 					optional: false, nullable: false,
@@ -61,6 +65,7 @@ export const paramDef = {
 		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
 		sinceId: { type: 'string', format: 'misskey:id' },
 		untilId: { type: 'string', format: 'misskey:id' },
+		userId: { type: 'string', format: 'misskey:id' },
 	},
 	required: [],
 } as const;
@@ -74,11 +79,21 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 
 		@Inject(DI.announcementReadsRepository)
 		private announcementReadsRepository: AnnouncementReadsRepository,
+		
+		@Inject(DI.usersRepository)
+		private usersRepository: UsersRepository,
 
 		private queryService: QueryService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.announcementsRepository.createQueryBuilder('announcement'), ps.sinceId, ps.untilId);
+			const builder = this.announcementsRepository.createQueryBuilder('announcement');
+			if (ps.userId) {
+				builder.where({ userId: ps.userId });
+			} else {
+				builder.where('"userId" IS NULL');
+			}
+			
+			const query = this.queryService.makePaginationQuery(builder, ps.sinceId, ps.untilId);
 
 			const announcements = await query.take(ps.limit).getMany();
 
@@ -90,15 +105,17 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 				}));
 			}
 
-			return announcements.map(announcement => ({
+			return await Promise.all(announcements.map(async announcement => ({
 				id: announcement.id,
 				createdAt: announcement.createdAt.toISOString(),
 				updatedAt: announcement.updatedAt?.toISOString() ?? null,
 				title: announcement.title,
 				text: announcement.text,
 				imageUrl: announcement.imageUrl,
+				userId: announcement.userId,
+				user: announcement.userId ? await this.usersRepository.findOneBy({ id: announcement.userId }) : null,
 				reads: reads.get(announcement)!,
-			}));
+			})));
 		});
 	}
 }

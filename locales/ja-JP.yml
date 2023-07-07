@@ -1063,6 +1063,8 @@ goToMisskey: "Misskeyへ"
 additionalEmojiDictionary: "絵文字の追加辞書"
 installed: "インストール済み"
 branding: "ブランディング"
+newUserAnnouncementAvailable: "新着のあなた宛てのお知らせがあります"
+viewAnnouncement: "お知らせを見る"
 
 _initialAccountSetting:
   accountCreated: "アカウントの作成が完了しました！"

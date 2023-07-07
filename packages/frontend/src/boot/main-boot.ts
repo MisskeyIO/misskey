@@ -2,7 +2,7 @@ import { computed, createApp, watch, markRaw, version as vueVersion, defineAsync
 import { common } from './common';
 import { version, ui, lang, updateLocale } from '@/config';
 import { i18n, updateI18n } from '@/i18n';
-import { confirm, alert, post, popup, toast } from '@/os';
+import { confirm, alert, post, popup, toast, api } from '@/os';
 import { useStream } from '@/stream';
 import * as sound from '@/scripts/sound';
 import { $i, refreshAccount, login, updateAccount, signout } from '@/account';
@@ -245,6 +245,11 @@ export async function mainBoot() {
 		main.on('myTokenRegenerated', () => {
 			signout();
 		});
+
+		const unreadUserAnnouncementsList = await api('announcements', { privateOnly: true, withUnreads: true, limit: 1 });
+		if (unreadUserAnnouncementsList.length > 0) {
+			popup(defineAsyncComponent(() => import('@/components/MkNewUserAnnouncementModal.vue')), {}, {}, 'closed');
+		}
 	}
 
 	// shortcut

@@ -108,6 +108,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 				const reads = (await this.announcementReadsRepository.findBy({
 					userId: me.id,
 				})).map(x => x.announcementId);
+				
 				for (const announcement of announcements) {
 					(announcement as any).isRead = reads.includes(announcement.id);
 				}

@@ -27,8 +27,9 @@ export const paramDef = {
 		text: { type: 'string', minLength: 1 },
 		imageUrl: { type: 'string', nullable: true, minLength: 0 },
 		userId: { type: 'string', nullable: true, format: 'misskey:id' },
+		closeDuration: { type: 'number', nullable: false },
 	},
-	required: ['id', 'title', 'text', 'imageUrl'],
+	required: ['id', 'title', 'text', 'imageUrl', 'closeDuration'],
 } as const;
 
 // eslint-disable-next-line import/no-default-export
@@ -57,6 +58,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 				/* eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- 空の文字列の場合、nullを渡すようにするため */
 				imageUrl: ps.imageUrl || null, 
 				userId: ps.userId ?? null,
+				closeDuration: ps.closeDuration,
 			});
 		});
 	}

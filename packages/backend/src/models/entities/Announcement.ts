@@ -39,6 +39,11 @@ export class Announcement {
 	})
 	public userId: string | null;
 
+	@Column('integer', {
+		nullable: false,
+	})
+	public closeDuration: number;
+
 	constructor(data: Partial<Announcement>) {
 		if (data == null) return;
 

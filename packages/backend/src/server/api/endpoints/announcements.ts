@@ -52,6 +52,10 @@ export const meta = {
 					type: 'boolean',
 					optional: false, nullable: true,
 				},
+				closeDuration: {
+					type: 'number',
+					optional: false, nullable: false,
+				},
 			},
 		},
 	},

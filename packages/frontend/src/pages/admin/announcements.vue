@@ -30,6 +30,10 @@
 					<MkInput v-model="announcement.imageUrl">
 						<template #label>{{ i18n.ts.imageUrl }}</template>
 					</MkInput>
+					<MkInput v-model="announcement.closeDuration" type="number">
+						<template #label>{{ i18n.ts.dialogCloseDuration }}</template>
+						<template #suffix>{{ i18n.ts._time.second }}</template>
+					</MkInput>
 					<p v-if="announcement.reads">{{ i18n.t('nUsersRead', { n: announcement.reads }) }}</p>
 					<MkUserCardMini v-if="announcement.userId" :user="announcement.user" @click="editUser(announcement)"></MkUserCardMini>
 					<MkButton v-else class="button" inline primary @click="editUser(announcement)">{{ i18n.ts.specifyUser }}</MkButton>
@@ -91,6 +95,7 @@ function add() {
 		imageUrl: null,
 		userId: null,
 		user: null,
+		closeDuration: 10,
 	});
 }
 

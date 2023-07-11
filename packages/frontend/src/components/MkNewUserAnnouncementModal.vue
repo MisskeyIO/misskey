@@ -2,7 +2,7 @@
 <MkModal ref="modal" :zPriority="'middle'" @click="$refs.modal.close()" @closed="$emit('closed')">
 	<div :class="$style.root">
 		<div :class="$style.title">{{ i18n.ts.newUserAnnouncementAvailable }}</div>
-		<MkButton :class="$style.gotIt" primary full @click="jumpTo">{{ i18n.ts.viewAnnouncement }}</MkButton>
+		<MkButton :class="$style.gotIt" primary full :disabled="gotItDisabled" @click="gotIt">{{ i18n.ts.gotIt }}</MkButton>
 	</div>
 </MkModal>
 </template>
@@ -13,9 +13,20 @@ import MkModal from '@/components/MkModal.vue';
 import MkButton from '@/components/MkButton.vue';
 import { i18n } from '@/i18n';
 import { useRouter } from '@/router';
+import { api } from '@/os';
 const router = useRouter();
 const modal = shallowRef<InstanceType<typeof MkModal>>();
 
+const props = defineProps<{
+	title: string;
+	text: string;
+	announcementId: string;
+}>();
+
+async function gotIt() {
+	await api('i/read-announcement', { announcementId: props.announcementId });
+}
+ 
 function jumpTo() {
 	modal.value.close();
 	router.push('/announcements');

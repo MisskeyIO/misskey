@@ -33,13 +33,13 @@ export class Announcement {
 	})
 	public imageUrl: string | null;
 
+	@Index()
 	@Column('varchar', {
 		...id(),
 		nullable: true,
 	})
 	public userId: string | null;
 
-	@Index()
 	@Column('integer', {
 		nullable: false,
 		default: 0,

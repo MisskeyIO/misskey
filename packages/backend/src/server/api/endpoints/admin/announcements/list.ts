@@ -107,7 +107,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 
 			const query = this.queryService.makePaginationQuery(builder, ps.sinceId, ps.untilId);
 
-			const announcements = await query.take(ps.limit).getMany();
+			const announcements = await query.limit(ps.limit).getMany();
 
 			const reads = new Map<Announcement, number>();
 

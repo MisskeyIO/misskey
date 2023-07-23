@@ -246,9 +246,9 @@ export async function mainBoot() {
 			signout();
 		});
 
-		const unreadUserAnnouncementsList = await api('announcements', { privateOnly: true, withUnreads: true, limit: 1 });
+		const unreadUserAnnouncementsList = await api('announcements', { privateOnly: true, withUnreads: true });
 		if (unreadUserAnnouncementsList.length > 0) {
-			popup(defineAsyncComponent(() => import('@/components/MkNewUserAnnouncementModal.vue')), {}, {}, 'closed');
+			unreadUserAnnouncementsList.forEach((v) => popup(defineAsyncComponent(() => import('@/components/MkUserAnnouncementModal.vue')), { title: v.title, text: v.text, closeDuration: v.closeDuration, announcementId: v.id }, {}, 'closed'));
 		}
 	}
 

@@ -4,7 +4,7 @@ import type { AnnouncementsRepository, AnnouncementReadsRepository, UsersReposit
 import type { Announcement } from '@/models/entities/Announcement.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { QueryService } from '@/core/QueryService.js';
-import { UserEntityService } from '@/core/entities/UserEntityService';
+import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
 
 export const meta = {
@@ -58,6 +58,10 @@ export const meta = {
 					ref: 'UserLite',
 				},
 				reads: {
+					type: 'number',
+					optional: false, nullable: false,
+				},
+				closeDuration: {
 					type: 'number',
 					optional: false, nullable: false,
 				},
@@ -130,6 +134,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 				userId: announcement.userId,
 				user: packedUsers.find(user => user.id === announcement.userId),
 				reads: reads.get(announcement)!,
+				closeDuration: announcement.closeDuration,
 			}));
 		});
 	}

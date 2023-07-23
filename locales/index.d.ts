@@ -1068,6 +1068,7 @@ export interface Locale {
     "branding": string;
     "newUserAnnouncementAvailable": string;
     "viewAnnouncement": string;
+    "dialogCloseDuration": string;
     "_initialAccountSetting": {
         "accountCreated": string;
         "letsStartAccountSetup": string;

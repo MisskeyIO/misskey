@@ -27,6 +27,7 @@ type Announcement = {
     imageUrl: string | null;
     isRead?: boolean;
     isPrivate: boolean;
+    closeDuration: number;
 };
 
 // @public (undocumented)

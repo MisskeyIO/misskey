@@ -39,8 +39,10 @@ export class Announcement {
 	})
 	public userId: string | null;
 
+	@Index()
 	@Column('integer', {
 		nullable: false,
+		default: 0,
 	})
 	public closeDuration: number;
 

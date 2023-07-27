@@ -1,5 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import ms from 'ms';
+import RE2 from 're2';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
@@ -86,21 +87,21 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 		super(meta, paramDef, async (ps, me) => {
 			if (ps.targetUserPattern) {
 				try {
-					new RegExp(ps.targetUserPattern);
+					new RE2(ps.targetUserPattern);
 				} catch (e) {
 					throw new ApiError(meta.errors.invalidRegularExpressionForTargetUser);
 				}
 			}
 			if (ps.reporterPattern) {
 				try {
-					new RegExp(ps.reporterPattern);
+					new RE2(ps.reporterPattern);
 				} catch (e) {
 					throw new ApiError(meta.errors.invalidRegularExpressionForReporter);
 				}
 			}
 			if (ps.reportContentPattern) {
 				try {
-					new RegExp(ps.reportContentPattern);
+					new RE2(ps.reportContentPattern);
 				} catch (e) {
 					throw new ApiError(meta.errors.invalidRegularExpressionForReportContent);
 				}
@@ -112,7 +113,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 				ps.expiresAt === '12hours' ? function () { expirationDate!.setTime(expirationDate!.getTime() + ms('12 hours')); } :
 				ps.expiresAt === '1day' ? function () { expirationDate!.setTime(expirationDate!.getTime() + ms('1 day')); } :
 				ps.expiresAt === '1week' ? function () { expirationDate!.setTime(expirationDate!.getTime() + ms('1 week')); } :
-				ps.expiresAt === '1month' ? function () { expirationDate!.setUTCMonth((expirationDate!.getUTCMonth() + 1 + 1) % 12 - 1); expirationDate!.setUTCFullYear(expirationDate!.getUTCFullYear() + (Math.floor((expirationDate!.getUTCMonth() + 1 + 1) / 12))); } : 
+				ps.expiresAt === '1month' ? function () { expirationDate!.setUTCMonth((expirationDate!.getUTCMonth() + 1 + 1) % 12 - 1); expirationDate!.setUTCFullYear(expirationDate!.getUTCFullYear() + (Math.floor((expirationDate!.getUTCMonth() + 1 + 1) / 12))); } :
 				ps.expiresAt === '3months' ? function () {expirationDate!.setUTCMonth((expirationDate!.getUTCMonth() + 3 + 1) % 12 - 1); expirationDate!.setUTCFullYear(expirationDate!.getUTCFullYear() + (Math.floor((expirationDate!.getUTCMonth() + 3 + 1) / 12 ))); } :
 				ps.expiresAt === '6months' ? function () { expirationDate!.setUTCMonth((expirationDate!.getUTCMonth() + 6 + 1) % 12 - 1); expirationDate!.setUTCFullYear(expirationDate!.getUTCFullYear() + (Math.floor((expirationDate!.getUTCMonth() + 6 + 1) / 12))); } :
 				ps.expiresAt === '1year' ? function () { expirationDate!.setTime(expirationDate!.getTime() + ms('1 year')); } : function () { expirationDate = null; })();

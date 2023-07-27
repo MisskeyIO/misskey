@@ -12,11 +12,6 @@
 
 -->
 
-## 13.x.x (unreleased)
-
-### General
-- 通報の即時解決機能を追加
-
 ## 13.14.1
 
 ### General

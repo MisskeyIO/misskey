@@ -108,7 +108,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 			}
 			const now = new Date();
 			let expirationDate: Date | null = new Date();
-
 			const previousMonth = expirationDate.getUTCMonth();
 			(ps.expiresAt === '1hour' ? function () { expirationDate!.setTime(expirationDate!.getTime() + ms('1 hour')); } :
 				ps.expiresAt === '12hours' ? function () { expirationDate!.setTime(expirationDate!.getTime() + ms('12 hours')); } :

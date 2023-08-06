@@ -49,9 +49,11 @@ export const paramDef = {
 		localOnly: { type: 'boolean' },
 		roleIdsThatCanBeUsedThisEmojiAsReaction: { type: 'array', items: {
 			type: 'string',
+			format: 'misskey:id',
 		} },
 		roleIdsThatCanNotBeUsedThisEmojiAsReaction: { type: 'array', items: {
 			type: 'string',
+			format: 'misskey:id',
 		} },
 	},
 	required: ['id', 'name', 'aliases'],

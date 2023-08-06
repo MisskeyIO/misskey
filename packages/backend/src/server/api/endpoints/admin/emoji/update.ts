@@ -50,6 +50,9 @@ export const paramDef = {
 		roleIdsThatCanBeUsedThisEmojiAsReaction: { type: 'array', items: {
 			type: 'string',
 		} },
+		roleIdsThatCanNotBeUsedThisEmojiAsReaction: { type: 'array', items: {
+			type: 'string',
+		} },
 	},
 	required: ['id', 'name', 'aliases'],
 } as const;
@@ -80,6 +83,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 				isSensitive: ps.isSensitive,
 				localOnly: ps.localOnly,
 				roleIdsThatCanBeUsedThisEmojiAsReaction: ps.roleIdsThatCanBeUsedThisEmojiAsReaction,
+				roleIdsThatCanNotBeUsedThisEmojiAsReaction: ps.roleIdsThatCanNotBeUsedThisEmojiAsReaction,
 			});
 		});
 	}

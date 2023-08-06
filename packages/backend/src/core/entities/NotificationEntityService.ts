@@ -2,7 +2,13 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
-import type { AccessTokensRepository, FollowRequestsRepository, NoteReactionsRepository, NotesRepository, User, UsersRepository } from '@/models/index.js';
+import type {
+	AccessTokensRepository,
+	FollowRequestsRepository,
+	NoteReactionsRepository,
+	NotesRepository,
+	UsersRepository,
+} from '@/models/index.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { Notification } from '@/models/entities/Notification.js';
 import type { Note } from '@/models/entities/Note.js';
@@ -10,6 +16,7 @@ import type { Packed } from '@/misc/json-schema.js';
 import { bindThis } from '@/decorators.js';
 import { isNotNull } from '@/misc/is-not-null.js';
 import { notificationTypes } from '@/types.js';
+import type { User } from '@/models/entities/User.js';
 import type { OnModuleInit } from '@nestjs/common';
 import type { CustomEmojiService } from '../CustomEmojiService.js';
 import type { UserEntityService } from './UserEntityService.js';

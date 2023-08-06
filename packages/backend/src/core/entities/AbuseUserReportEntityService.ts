@@ -5,6 +5,7 @@ import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { AbuseUserReport } from '@/models/entities/AbuseUserReport.js';
 import { bindThis } from '@/decorators.js';
 import { Packed } from '@/misc/json-schema.js';
+import type { User } from '@/models/entities/User.js';
 import { UserEntityService } from './UserEntityService.js';
 
 @Injectable()
@@ -20,6 +21,7 @@ export class AbuseUserReportEntityService {
 	@bindThis
 	public async pack(
 		src: AbuseUserReport['id'] | AbuseUserReport,
+		me?: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'AbuseUserReport'>> {
 		const report = typeof src === 'object' ? src : await this.abuseUserReportsRepository.findOneByOrFail({ id: src });
 
@@ -31,13 +33,13 @@ export class AbuseUserReportEntityService {
 			reporterId: report.reporterId,
 			targetUserId: report.targetUserId,
 			assigneeId: report.assigneeId,
-			reporter: this.userEntityService.pack(report.reporter ?? report.reporterId, null, {
+			reporter: this.userEntityService.pack(report.reporter ?? report.reporterId, me, {
 				detail: true,
 			}),
-			targetUser: this.userEntityService.pack(report.targetUser ?? report.targetUserId, null, {
+			targetUser: this.userEntityService.pack(report.targetUser ?? report.targetUserId, me, {
 				detail: true,
 			}),
-			assignee: report.assigneeId ? this.userEntityService.pack(report.assignee ?? report.assigneeId, null, {
+			assignee: report.assigneeId ? this.userEntityService.pack(report.assignee ?? report.assigneeId, me, {
 				detail: true,
 			}) : null,
 			forwarded: report.forwarded,
@@ -47,8 +49,9 @@ export class AbuseUserReportEntityService {
 	@bindThis
 	public async packMany(
 		reports: (AbuseUserReport['id'] | AbuseUserReport)[],
+		me?: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'AbuseUserReport'>[]> {
-		return (await Promise.allSettled(reports.map(x => this.pack(x))))
+		return (await Promise.allSettled(reports.map(x => this.pack(x, me))))
 			.filter(result => result.status === 'fulfilled')
 			.map(result => (result as PromiseFulfilledResult<Packed<'AbuseUserReport'>>).value);
 	}

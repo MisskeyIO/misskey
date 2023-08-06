@@ -1,11 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { GalleryLikesRepository } from '@/models/index.js';
-import type { } from '@/models/entities/Blocking.js';
 import type { GalleryLike } from '@/models/entities/GalleryLike.js';
 import { bindThis } from '@/decorators.js';
 import { Packed } from '@/misc/json-schema.js';
-import { User } from '@/models/index.js';
+import type { User } from '@/models/entities/User.js';
 import { GalleryPostEntityService } from './GalleryPostEntityService.js';
 
 @Injectable()
@@ -34,7 +33,7 @@ export class GalleryLikeEntityService {
 	@bindThis
 	public async packMany(
 		likes: (GalleryLike['id'] | GalleryLike)[],
-		me: { id: User['id'] },
+		me?: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'GalleryLike'>[]> {
 		return (await Promise.allSettled(likes.map(x => this.pack(x, me))))
 			.filter(result => result.status === 'fulfilled')

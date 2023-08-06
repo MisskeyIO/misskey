@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { NoteFavoritesRepository } from '@/models/index.js';
-import type { } from '@/models/entities/Blocking.js';
 import type { User } from '@/models/entities/User.js';
 import type { NoteFavorite } from '@/models/entities/NoteFavorite.js';
 import { bindThis } from '@/decorators.js';
@@ -36,7 +35,7 @@ export class NoteFavoriteEntityService {
 	@bindThis
 	public async packMany(
 		favorites: (NoteFavorite['id'] | NoteFavorite)[],
-		me: { id: User['id'] },
+		me?: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'NoteFavorite'>[]> {
 		return (await Promise.allSettled(favorites.map(x => this.pack(x, me))))
 			.filter(result => result.status === 'fulfilled')

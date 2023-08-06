@@ -3,7 +3,6 @@ import { DI } from '@/di-symbols.js';
 import type { ClipFavoritesRepository, ClipsRepository, User } from '@/models/index.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { Packed } from '@/misc/json-schema.js';
-import type { } from '@/models/entities/Blocking.js';
 import type { Clip } from '@/models/entities/Clip.js';
 import { bindThis } from '@/decorators.js';
 import { UserEntityService } from './UserEntityService.js';
@@ -34,7 +33,7 @@ export class ClipEntityService {
 			createdAt: clip.createdAt.toISOString(),
 			lastClippedAt: clip.lastClippedAt ? clip.lastClippedAt.toISOString() : null,
 			userId: clip.userId,
-			user: this.userEntityService.pack(clip.user ?? clip.userId),
+			user: this.userEntityService.pack(clip.user ?? clip.userId, me),
 			name: clip.name,
 			description: clip.description,
 			isPublic: clip.isPublic,

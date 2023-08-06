@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { PageLikesRepository } from '@/models/index.js';
-import type { } from '@/models/entities/Blocking.js';
 import type { User } from '@/models/entities/User.js';
 import type { PageLike } from '@/models/entities/PageLike.js';
 import { bindThis } from '@/decorators.js';
@@ -34,7 +33,7 @@ export class PageLikeEntityService {
 	@bindThis
 	public async packMany(
 		likes: (PageLike['id'] | PageLike)[],
-		me: { id: User['id'] },
+		me?: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'PageLike'>[]> {
 		return (await Promise.allSettled(likes.map(x => this.pack(x, me))))
 			.filter(result => result.status === 'fulfilled')

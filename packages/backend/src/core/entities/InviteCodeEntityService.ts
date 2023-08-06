@@ -45,7 +45,7 @@ export class InviteCodeEntityService {
 	@bindThis
 	public async packMany(
 		targets: (RegistrationTicket['id'] | RegistrationTicket)[],
-		me: { id: User['id'] },
+		me?: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'InviteCode'>[]> {
 		return (await Promise.allSettled(targets.map(x => this.pack(x, me))))
 			.filter(result => result.status === 'fulfilled')

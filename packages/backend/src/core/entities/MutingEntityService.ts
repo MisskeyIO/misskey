@@ -3,7 +3,6 @@ import { DI } from '@/di-symbols.js';
 import type { MutingsRepository } from '@/models/index.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { Packed } from '@/misc/json-schema.js';
-import type { } from '@/models/entities/Blocking.js';
 import type { User } from '@/models/entities/User.js';
 import type { Muting } from '@/models/entities/Muting.js';
 import { bindThis } from '@/decorators.js';
@@ -40,7 +39,7 @@ export class MutingEntityService {
 	@bindThis
 	public async packMany(
 		mutings: (Muting['id'] | Muting)[],
-		me: { id: User['id'] },
+		me?: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'Muting'>[]> {
 		return (await Promise.allSettled(mutings.map(x => this.pack(x, me))))
 			.filter(result => result.status === 'fulfilled')

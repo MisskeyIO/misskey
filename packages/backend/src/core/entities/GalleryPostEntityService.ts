@@ -3,7 +3,6 @@ import { DI } from '@/di-symbols.js';
 import type { GalleryLikesRepository, GalleryPostsRepository } from '@/models/index.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { Packed } from '@/misc/json-schema.js';
-import type { } from '@/models/entities/Blocking.js';
 import type { User } from '@/models/entities/User.js';
 import type { GalleryPost } from '@/models/entities/GalleryPost.js';
 import { bindThis } from '@/decorators.js';
@@ -42,7 +41,7 @@ export class GalleryPostEntityService {
 			description: post.description,
 			fileIds: post.fileIds,
 			// TODO: packMany causes N+1 queries
-			files: this.driveFileEntityService.packManyByIds(post.fileIds),
+			files: this.driveFileEntityService.packManyByIds(post.fileIds, me),
 			tags: post.tags.length > 0 ? post.tags : undefined,
 			isSensitive: post.isSensitive,
 			likedCount: post.likedCount,

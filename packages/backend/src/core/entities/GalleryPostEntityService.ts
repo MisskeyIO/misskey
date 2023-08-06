@@ -51,11 +51,12 @@ export class GalleryPostEntityService {
 	}
 
 	@bindThis
-	public packMany(
-		posts: GalleryPost[],
+	public async packMany(
+		posts: (GalleryPost['id'] | GalleryPost)[],
 		me?: { id: User['id'] } | null | undefined,
-	) {
-		return Promise.all(posts.map(x => this.pack(x, me)));
+	) : Promise<Packed<'GalleryPost'>[]> {
+		return (await Promise.allSettled(posts.map(x => this.pack(x, me))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'GalleryPost'>>).value);
 	}
 }
-

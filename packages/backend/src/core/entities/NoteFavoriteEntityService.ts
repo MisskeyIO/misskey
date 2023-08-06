@@ -5,6 +5,7 @@ import type { } from '@/models/entities/Blocking.js';
 import type { User } from '@/models/entities/User.js';
 import type { NoteFavorite } from '@/models/entities/NoteFavorite.js';
 import { bindThis } from '@/decorators.js';
+import { Packed } from '@/misc/json-schema.js';
 import { NoteEntityService } from './NoteEntityService.js';
 
 @Injectable()
@@ -21,7 +22,7 @@ export class NoteFavoriteEntityService {
 	public async pack(
 		src: NoteFavorite['id'] | NoteFavorite,
 		me?: { id: User['id'] } | null | undefined,
-	) {
+	) : Promise<Packed<'NoteFavorite'>> {
 		const favorite = typeof src === 'object' ? src : await this.noteFavoritesRepository.findOneByOrFail({ id: src });
 
 		return {
@@ -33,10 +34,12 @@ export class NoteFavoriteEntityService {
 	}
 
 	@bindThis
-	public packMany(
-		favorites: any[],
+	public async packMany(
+		favorites: (NoteFavorite['id'] | NoteFavorite)[],
 		me: { id: User['id'] },
-	) {
-		return Promise.all(favorites.map(x => this.pack(x, me)));
+	) : Promise<Packed<'NoteFavorite'>[]> {
+		return (await Promise.allSettled(favorites.map(x => this.pack(x, me))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'NoteFavorite'>>).value);
 	}
 }

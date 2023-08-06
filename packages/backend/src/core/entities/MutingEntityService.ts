@@ -38,11 +38,12 @@ export class MutingEntityService {
 	}
 
 	@bindThis
-	public packMany(
-		mutings: any[],
+	public async packMany(
+		mutings: (Muting['id'] | Muting)[],
 		me: { id: User['id'] },
-	) {
-		return Promise.all(mutings.map(x => this.pack(x, me)));
+	) : Promise<Packed<'Muting'>[]> {
+		return (await Promise.allSettled(mutings.map(x => this.pack(x, me))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'Muting'>>).value);
 	}
 }
-

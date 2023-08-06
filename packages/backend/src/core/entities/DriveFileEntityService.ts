@@ -257,8 +257,9 @@ export class DriveFileEntityService {
 		files: DriveFile[],
 		options?: PackOptions,
 	): Promise<Packed<'DriveFile'>[]> {
-		const items = await Promise.all(files.map(f => this.packNullable(f, options)));
-		return items.filter((x): x is Packed<'DriveFile'> => x != null);
+		return (await Promise.allSettled(files.map(f => this.packNullable(f, options))))
+			.filter(result => result.status === 'fulfilled' && result.value != null)
+			.map(result => (result as PromiseFulfilledResult<Packed<'DriveFile'>>).value);
 	}
 
 	@bindThis

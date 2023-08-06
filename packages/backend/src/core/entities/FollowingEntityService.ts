@@ -91,15 +91,16 @@ export class FollowingEntityService {
 	}
 
 	@bindThis
-	public packMany(
-		followings: any[],
+	public async packMany(
+		followings: (Following['id'] | Following)[],
 		me?: { id: User['id'] } | null | undefined,
 		opts?: {
 			populateFollowee?: boolean;
 			populateFollower?: boolean;
 		},
-	) {
-		return Promise.all(followings.map(x => this.pack(x, me, opts)));
+	) : Promise<Packed<'Following'>[]> {
+		return (await Promise.allSettled(followings.map(x => this.pack(x, me, opts))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'Following'>>).value);
 	}
 }
-

@@ -36,10 +36,12 @@ export class BlockingEntityService {
 	}
 
 	@bindThis
-	public packMany(
-		blockings: any[],
+	public async packMany(
+		blockings: (Blocking['id'] | Blocking)[],
 		me: { id: User['id'] },
-	) {
-		return Promise.all(blockings.map(x => this.pack(x, me)));
+	) : Promise<Packed<'Blocking'>[]> {
+		return (await Promise.allSettled(blockings.map(x => this.pack(x, me))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'Blocking'>>).value);
 	}
 }

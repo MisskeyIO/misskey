@@ -108,7 +108,7 @@ export class NotificationEntityService implements OnModuleInit {
 	public async packMany(
 		notifications: Notification[],
 		meId: User['id'],
-	) {
+	): Promise<Packed<'Notification'>[]> {
 		if (notifications.length === 0) return [];
 
 		let validNotifications = notifications;
@@ -143,9 +143,8 @@ export class NotificationEntityService implements OnModuleInit {
 			validNotifications = validNotifications.filter(x => (x.type !== 'receiveFollowRequest') || reqs.some(r => r.followerId === x.notifierId));
 		}
 
-		return await Promise.all(validNotifications.map(x => this.pack(x, meId, {}, {
-			packedNotes,
-			packedUsers,
-		})));
+		return (await Promise.allSettled(validNotifications.map(x => this.pack(x, meId, {}, { packedNotes, packedUsers }))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'Notification'>>).value);
 	}
 }

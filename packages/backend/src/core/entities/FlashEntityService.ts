@@ -45,11 +45,12 @@ export class FlashEntityService {
 	}
 
 	@bindThis
-	public packMany(
-		flashs: Flash[],
+	public async packMany(
+		flashs: (Flash['id'] | Flash)[],
 		me?: { id: User['id'] } | null | undefined,
-	) {
-		return Promise.all(flashs.map(x => this.pack(x, me)));
+	) : Promise<Packed<'Flash'>[]> {
+		return (await Promise.allSettled(flashs.map(x => this.pack(x, me))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'Flash'>>).value);
 	}
 }
-

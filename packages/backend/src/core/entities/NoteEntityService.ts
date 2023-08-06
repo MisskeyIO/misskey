@@ -392,7 +392,7 @@ export class NoteEntityService implements OnModuleInit {
 			detail?: boolean;
 			skipHide?: boolean;
 		},
-	) {
+	) : Promise<Packed<'Note'>[]> {
 		if (notes.length === 0) return [];
 
 		const meId = me ? me.id : null;
@@ -416,13 +416,15 @@ export class NoteEntityService implements OnModuleInit {
 		const fileIds = notes.map(n => [n.fileIds, n.renote?.fileIds, n.reply?.fileIds]).flat(2).filter(isNotNull);
 		const packedFiles = fileIds.length > 0 ? await this.driveFileEntityService.packManyByIdsMap(fileIds) : new Map();
 
-		return await Promise.all(notes.map(n => this.pack(n, me, {
+		return (await Promise.allSettled(notes.map(n => this.pack(n, me, {
 			...options,
 			_hint_: {
 				myReactions: myReactionsMap,
 				packedFiles,
 			},
-		})));
+		}))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'Note'>>).value);
 	}
 
 	@bindThis

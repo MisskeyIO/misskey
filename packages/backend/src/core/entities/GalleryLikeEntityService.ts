@@ -4,6 +4,8 @@ import type { GalleryLikesRepository } from '@/models/index.js';
 import type { } from '@/models/entities/Blocking.js';
 import type { GalleryLike } from '@/models/entities/GalleryLike.js';
 import { bindThis } from '@/decorators.js';
+import { Packed } from '@/misc/json-schema.js';
+import { User } from '@/models/index.js';
 import { GalleryPostEntityService } from './GalleryPostEntityService.js';
 
 @Injectable()
@@ -19,8 +21,8 @@ export class GalleryLikeEntityService {
 	@bindThis
 	public async pack(
 		src: GalleryLike['id'] | GalleryLike,
-		me?: any,
-	) {
+		me?: { id: User['id'] } | null | undefined,
+	) : Promise<Packed<'GalleryLike'>> {
 		const like = typeof src === 'object' ? src : await this.galleryLikesRepository.findOneByOrFail({ id: src });
 
 		return {
@@ -30,11 +32,13 @@ export class GalleryLikeEntityService {
 	}
 
 	@bindThis
-	public packMany(
-		likes: any[],
-		me: any,
-	) {
-		return Promise.all(likes.map(x => this.pack(x, me)));
+	public async packMany(
+		likes: (GalleryLike['id'] | GalleryLike)[],
+		me: { id: User['id'] },
+	) : Promise<Packed<'GalleryLike'>[]> {
+		return (await Promise.allSettled(likes.map(x => this.pack(x, me))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'GalleryLike'>>).value);
 	}
 }
 

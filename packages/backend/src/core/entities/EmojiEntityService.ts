@@ -32,10 +32,12 @@ export class EmojiEntityService {
 	}
 
 	@bindThis
-	public packSimpleMany(
-		emojis: any[],
-	) {
-		return Promise.all(emojis.map(x => this.packSimple(x)));
+	public async packSimpleMany(
+		emojis: (Emoji['id'] | Emoji)[],
+	) : Promise<Packed<'EmojiSimple'>[]> {
+		return (await Promise.allSettled(emojis.map(x => this.packSimple(x))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'EmojiSimple'>>).value);
 	}
 
 	@bindThis
@@ -60,10 +62,11 @@ export class EmojiEntityService {
 	}
 
 	@bindThis
-	public packDetailedMany(
-		emojis: any[],
-	) {
-		return Promise.all(emojis.map(x => this.packDetailed(x)));
+	public async packDetailedMany(
+		emojis: (Emoji['id'] | Emoji)[],
+	) : Promise<Packed<'EmojiDetailed'>[]> {
+		return (await Promise.allSettled(emojis.map(x => this.packDetailed(x))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'EmojiDetailed'>>).value);
 	}
 }
-

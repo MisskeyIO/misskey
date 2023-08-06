@@ -43,10 +43,12 @@ export class InviteCodeEntityService {
 	}
 
 	@bindThis
-	public packMany(
-		targets: any[],
+	public async packMany(
+		targets: (RegistrationTicket['id'] | RegistrationTicket)[],
 		me: { id: User['id'] },
-	) {
-		return Promise.all(targets.map(x => this.pack(x, me)));
+	) : Promise<Packed<'InviteCode'>[]> {
+		return (await Promise.allSettled(targets.map(x => this.pack(x, me))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'InviteCode'>>).value);
 	}
 }

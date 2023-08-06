@@ -51,10 +51,11 @@ export class InstanceEntityService {
 	}
 
 	@bindThis
-	public packMany(
+	public async packMany(
 		instances: Instance[],
-	) {
-		return Promise.all(instances.map(x => this.pack(x)));
+	) : Promise<Packed<'FederationInstance'>[]> {
+		return (await Promise.allSettled(instances.map(x => this.pack(x))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'FederationInstance'>>).value);
 	}
 }
-

@@ -102,11 +102,12 @@ export class PageEntityService {
 	}
 
 	@bindThis
-	public packMany(
-		pages: Page[],
+	public async packMany(
+		pages: (Page['id'] | Page)[],
 		me?: { id: User['id'] } | null | undefined,
-	) {
-		return Promise.all(pages.map(x => this.pack(x, me)));
+	) : Promise<Packed<'Page'>[]> {
+		return (await Promise.allSettled(pages.map(x => this.pack(x, me))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'Page'>>).value);
 	}
 }
-

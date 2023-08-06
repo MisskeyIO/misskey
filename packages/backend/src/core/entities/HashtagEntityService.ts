@@ -33,10 +33,11 @@ export class HashtagEntityService {
 	}
 
 	@bindThis
-	public packMany(
+	public async packMany(
 		hashtags: Hashtag[],
-	) {
-		return Promise.all(hashtags.map(x => this.pack(x)));
+	) : Promise<Packed<'Hashtag'>[]> {
+		return (await Promise.allSettled(hashtags.map(x => this.pack(x))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'Hashtag'>>).value);
 	}
 }
-

@@ -4,6 +4,7 @@ import type { AbuseUserReportsRepository } from '@/models/index.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { AbuseUserReport } from '@/models/entities/AbuseUserReport.js';
 import { bindThis } from '@/decorators.js';
+import { Packed } from '@/misc/json-schema.js';
 import { UserEntityService } from './UserEntityService.js';
 
 @Injectable()
@@ -19,7 +20,7 @@ export class AbuseUserReportEntityService {
 	@bindThis
 	public async pack(
 		src: AbuseUserReport['id'] | AbuseUserReport,
-	) {
+	) : Promise<Packed<'AbuseUserReport'>> {
 		const report = typeof src === 'object' ? src : await this.abuseUserReportsRepository.findOneByOrFail({ id: src });
 
 		return await awaitAll({
@@ -44,9 +45,11 @@ export class AbuseUserReportEntityService {
 	}
 
 	@bindThis
-	public packMany(
-		reports: any[],
-	) {
-		return Promise.all(reports.map(x => this.pack(x)));
+	public async packMany(
+		reports: (AbuseUserReport['id'] | AbuseUserReport)[],
+	) : Promise<Packed<'AbuseUserReport'>[]> {
+		return (await Promise.allSettled(reports.map(x => this.pack(x))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'AbuseUserReport'>>).value);
 	}
 }

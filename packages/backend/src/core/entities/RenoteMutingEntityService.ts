@@ -37,11 +37,12 @@ export class RenoteMutingEntityService {
 	}
 
 	@bindThis
-	public packMany(
-		mutings: any[],
+	public async packMany(
+		mutings: (RenoteMuting['id'] | RenoteMuting)[],
 		me: { id: User['id'] },
-	) {
-		return Promise.all(mutings.map(x => this.pack(x, me)));
+	) : Promise<Packed<'RenoteMuting'>[]> {
+		return (await Promise.allSettled(mutings.map(u => this.pack(u, me))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'RenoteMuting'>>).value);
 	}
 }
-

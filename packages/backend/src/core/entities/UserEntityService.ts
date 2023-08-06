@@ -16,6 +16,7 @@ import { bindThis } from '@/decorators.js';
 import { RoleService } from '@/core/RoleService.js';
 import { ApPersonService } from '@/core/activitypub/models/ApPersonService.js';
 import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
+import { IdentifiableError } from '@/misc/identifiable-error.js';
 import type { OnModuleInit } from '@nestjs/common';
 import type { AntennaService } from '../AntennaService.js';
 import type { CustomEmojiService } from '../CustomEmojiService.js';
@@ -332,6 +333,7 @@ export class UserEntityService implements OnModuleInit {
 		const meId = me ? me.id : null;
 		const isMe = meId === user.id;
 		const iAmModerator = me ? await this.roleService.isModerator(me as User) : false;
+		if (user.isSuspended && !iAmModerator) throw new IdentifiableError('8ca4f428-b32e-4f83-ac43-406ed7cd0452', 'This user is suspended.');
 
 		const relation = meId && !isMe && opts.detail ? await this.getRelation(meId, user.id) : null;
 		const pins = opts.detail ? await this.userNotePiningsRepository.createQueryBuilder('pin')
@@ -511,7 +513,7 @@ export class UserEntityService implements OnModuleInit {
 		return await awaitAll(packed);
 	}
 
-	public packMany<D extends boolean = false>(
+	public async packMany<D extends boolean = false>(
 		users: (User['id'] | User)[],
 		me?: { id: User['id'] } | null | undefined,
 		options?: {
@@ -519,6 +521,8 @@ export class UserEntityService implements OnModuleInit {
 			includeSecrets?: boolean,
 		},
 	): Promise<IsUserDetailed<D>[]> {
-		return Promise.all(users.map(u => this.pack(u, me, options)));
+		return (await Promise.allSettled(users.map(u => this.pack(u, me, options))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<IsUserDetailed<D>>).value);
 	}
 }

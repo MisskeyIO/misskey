@@ -5,6 +5,7 @@ import type { } from '@/models/entities/Blocking.js';
 import type { User } from '@/models/entities/User.js';
 import type { PageLike } from '@/models/entities/PageLike.js';
 import { bindThis } from '@/decorators.js';
+import { Packed } from '@/misc/json-schema.js';
 import { PageEntityService } from './PageEntityService.js';
 
 @Injectable()
@@ -21,7 +22,7 @@ export class PageLikeEntityService {
 	public async pack(
 		src: PageLike['id'] | PageLike,
 		me?: { id: User['id'] } | null | undefined,
-	) {
+	) : Promise<Packed<'PageLike'>> {
 		const like = typeof src === 'object' ? src : await this.pageLikesRepository.findOneByOrFail({ id: src });
 
 		return {
@@ -31,11 +32,12 @@ export class PageLikeEntityService {
 	}
 
 	@bindThis
-	public packMany(
-		likes: any[],
+	public async packMany(
+		likes: (PageLike['id'] | PageLike)[],
 		me: { id: User['id'] },
-	) {
-		return Promise.all(likes.map(x => this.pack(x, me)));
+	) : Promise<Packed<'PageLike'>[]> {
+		return (await Promise.allSettled(likes.map(x => this.pack(x, me))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'PageLike'>>).value);
 	}
 }
-

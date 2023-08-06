@@ -44,11 +44,13 @@ export class ClipEntityService {
 	}
 
 	@bindThis
-	public packMany(
-		clips: Clip[],
+	public async packMany(
+		clips: (Clip['id'] | Clip)[],
 		me?: { id: User['id'] } | null | undefined,
-	) {
-		return Promise.all(clips.map(x => this.pack(x, me)));
+	) : Promise<Packed<'Clip'>[]> {
+		return (await Promise.allSettled(clips.map(x => this.pack(x, me))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'Clip'>>).value);
 	}
 }
 

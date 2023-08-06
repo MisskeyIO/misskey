@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { ModerationLogsRepository } from '@/models/index.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
-import type { } from '@/models/entities/Blocking.js';
 import type { ModerationLog } from '@/models/entities/ModerationLog.js';
 import { bindThis } from '@/decorators.js';
+import { Packed } from '@/misc/json-schema.js';
 import { UserEntityService } from './UserEntityService.js';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class ModerationLogEntityService {
 	@bindThis
 	public async pack(
 		src: ModerationLog['id'] | ModerationLog,
-	) {
+	) : Promise<Packed<'ModerationLog'>> {
 		const log = typeof src === 'object' ? src : await this.moderationLogsRepository.findOneByOrFail({ id: src });
 
 		return await awaitAll({
@@ -36,10 +36,12 @@ export class ModerationLogEntityService {
 	}
 
 	@bindThis
-	public packMany(
-		reports: any[],
-	) {
-		return Promise.all(reports.map(x => this.pack(x)));
+	public async packMany(
+		reports: (ModerationLog['id'] | ModerationLog)[],
+	) : Promise<Packed<'ModerationLog'>[]> {
+		return (await Promise.allSettled(reports.map(x => this.pack(x))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'ModerationLog'>>).value);
 	}
 }
 

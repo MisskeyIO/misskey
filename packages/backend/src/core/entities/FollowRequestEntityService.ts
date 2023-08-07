@@ -19,7 +19,7 @@ export class FollowRequestEntityService {
 	@bindThis
 	public async pack(
 		src: FollowRequest['id'] | FollowRequest,
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 	) {
 		const request = typeof src === 'object' ? src : await this.followRequestsRepository.findOneByOrFail({ id: src });
 

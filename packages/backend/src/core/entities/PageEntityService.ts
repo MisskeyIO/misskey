@@ -30,7 +30,7 @@ export class PageEntityService {
 	@bindThis
 	public async pack(
 		src: Page['id'] | Page,
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 	): Promise<Packed<'Page'>> {
 		const meId = me ? me.id : null;
 		const page = typeof src === 'object' ? src : await this.pagesRepository.findOneByOrFail({ id: src });
@@ -103,7 +103,7 @@ export class PageEntityService {
 	@bindThis
 	public async packMany(
 		pages: (Page['id'] | Page)[],
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'Page'>[]> {
 		return (await Promise.allSettled(pages.map(x => this.pack(x, me))))
 			.filter(result => result.status === 'fulfilled')

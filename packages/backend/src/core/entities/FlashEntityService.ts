@@ -24,7 +24,7 @@ export class FlashEntityService {
 	@bindThis
 	public async pack(
 		src: Flash['id'] | Flash,
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 	): Promise<Packed<'Flash'>> {
 		const meId = me ? me.id : null;
 		const flash = typeof src === 'object' ? src : await this.flashsRepository.findOneByOrFail({ id: src });
@@ -46,7 +46,7 @@ export class FlashEntityService {
 	@bindThis
 	public async packMany(
 		flashs: (Flash['id'] | Flash)[],
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'Flash'>[]> {
 		return (await Promise.allSettled(flashs.map(x => this.pack(x, me))))
 			.filter(result => result.status === 'fulfilled')

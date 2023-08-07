@@ -21,7 +21,7 @@ export class AbuseUserReportEntityService {
 	@bindThis
 	public async pack(
 		src: AbuseUserReport['id'] | AbuseUserReport,
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'AbuseUserReport'>> {
 		const report = typeof src === 'object' ? src : await this.abuseUserReportsRepository.findOneByOrFail({ id: src });
 
@@ -49,7 +49,7 @@ export class AbuseUserReportEntityService {
 	@bindThis
 	public async packMany(
 		reports: (AbuseUserReport['id'] | AbuseUserReport)[],
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'AbuseUserReport'>[]> {
 		return (await Promise.allSettled(reports.map(x => this.pack(x, me))))
 			.filter(result => result.status === 'fulfilled')

@@ -20,7 +20,7 @@ export class FlashLikeEntityService {
 	@bindThis
 	public async pack(
 		src: FlashLike['id'] | FlashLike,
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'FlashLike'>> {
 		const like = typeof src === 'object' ? src : await this.flashLikesRepository.findOneByOrFail({ id: src });
 
@@ -33,7 +33,7 @@ export class FlashLikeEntityService {
 	@bindThis
 	public async packMany(
 		likes: (FlashLike['id'] | FlashLike)[],
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'FlashLike'>[]> {
 		return (await Promise.allSettled(likes.map(x => this.pack(x, me))))
 			.filter(result => result.status === 'fulfilled')

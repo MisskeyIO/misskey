@@ -20,7 +20,7 @@ export class GalleryLikeEntityService {
 	@bindThis
 	public async pack(
 		src: GalleryLike['id'] | GalleryLike,
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'GalleryLike'>> {
 		const like = typeof src === 'object' ? src : await this.galleryLikesRepository.findOneByOrFail({ id: src });
 
@@ -33,7 +33,7 @@ export class GalleryLikeEntityService {
 	@bindThis
 	public async packMany(
 		likes: (GalleryLike['id'] | GalleryLike)[],
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'GalleryLike'>[]> {
 		return (await Promise.allSettled(likes.map(x => this.pack(x, me))))
 			.filter(result => result.status === 'fulfilled')

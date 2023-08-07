@@ -324,7 +324,7 @@ export class UserEntityService implements OnModuleInit {
 
 	public async pack<ExpectsMe extends boolean | null = null, D extends boolean = false>(
 		src: User['id'] | User,
-		me?: { id: User['id']; } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 		options?: {
 			detail?: D,
 			includeSecrets?: boolean,
@@ -541,7 +541,7 @@ export class UserEntityService implements OnModuleInit {
 
 	public async packMany<D extends boolean = false>(
 		users: (User['id'] | User)[],
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 		options?: {
 			detail?: D,
 			includeSecrets?: boolean,

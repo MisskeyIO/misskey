@@ -21,7 +21,7 @@ export class MutingEntityService {
 	@bindThis
 	public async pack(
 		src: Muting['id'] | Muting,
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 	): Promise<Packed<'Muting'>> {
 		const muting = typeof src === 'object' ? src : await this.mutingsRepository.findOneByOrFail({ id: src });
 
@@ -39,7 +39,7 @@ export class MutingEntityService {
 	@bindThis
 	public async packMany(
 		mutings: (Muting['id'] | Muting)[],
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'Muting'>[]> {
 		return (await Promise.allSettled(mutings.map(x => this.pack(x, me))))
 			.filter(result => result.status === 'fulfilled')

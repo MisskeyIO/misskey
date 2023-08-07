@@ -26,7 +26,7 @@ export class RoleEntityService {
 	@bindThis
 	public async pack(
 		src: Role['id'] | Role,
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'Role'>> {
 		const role = typeof src === 'object' ? src : await this.rolesRepository.findOneByOrFail({ id: src });
 
@@ -72,7 +72,7 @@ export class RoleEntityService {
 	@bindThis
 	public async packMany(
 		roles: (Role['id'] | Role)[],
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'Role'>[]> {
 		return (await Promise.allSettled(roles.map(x => this.pack(x, me))))
 			.filter(result => result.status === 'fulfilled')

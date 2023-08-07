@@ -38,7 +38,7 @@ export class NoteReactionEntityService implements OnModuleInit {
 	@bindThis
 	public async pack(
 		src: NoteReaction['id'] | NoteReaction,
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 		options?: {
 			withNote: boolean;
 		},

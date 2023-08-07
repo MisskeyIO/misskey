@@ -21,7 +21,7 @@ export class ModerationLogEntityService {
 	@bindThis
 	public async pack(
 		src: ModerationLog['id'] | ModerationLog,
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'ModerationLog'>> {
 		const log = typeof src === 'object' ? src : await this.moderationLogsRepository.findOneByOrFail({ id: src });
 
@@ -40,7 +40,7 @@ export class ModerationLogEntityService {
 	@bindThis
 	public async packMany(
 		reports: (ModerationLog['id'] | ModerationLog)[],
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'ModerationLog'>[]> {
 		return (await Promise.allSettled(reports.map(x => this.pack(x, me))))
 			.filter(result => result.status === 'fulfilled')

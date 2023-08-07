@@ -186,7 +186,7 @@ export class DriveFileEntityService {
 	@bindThis
 	public async pack(
 		src: DriveFile['id'] | DriveFile,
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 		options?: PackOptions,
 	): Promise<Packed<'DriveFile'>> {
 		const opts = Object.assign({
@@ -221,7 +221,7 @@ export class DriveFileEntityService {
 	@bindThis
 	public async packNullable(
 		src: DriveFile['id'] | DriveFile,
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 		options?: PackOptions,
 	): Promise<Packed<'DriveFile'> | null> {
 		const opts = Object.assign({
@@ -257,7 +257,7 @@ export class DriveFileEntityService {
 	@bindThis
 	public async packMany(
 		files: DriveFile[],
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 		options?: PackOptions,
 	): Promise<Packed<'DriveFile'>[]> {
 		return (await Promise.allSettled(files.map(f => this.packNullable(f, me, options))))
@@ -268,7 +268,7 @@ export class DriveFileEntityService {
 	@bindThis
 	public async packManyByIdsMap(
 		fileIds: DriveFile['id'][],
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 		options?: PackOptions,
 	): Promise<Map<Packed<'DriveFile'>['id'], Packed<'DriveFile'> | null>> {
 		if (fileIds.length === 0) return new Map();
@@ -284,7 +284,7 @@ export class DriveFileEntityService {
 	@bindThis
 	public async packManyByIds(
 		fileIds: DriveFile['id'][],
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 		options?: PackOptions,
 	): Promise<Packed<'DriveFile'>[]> {
 		if (fileIds.length === 0) return [];

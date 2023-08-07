@@ -265,7 +265,7 @@ export class NoteEntityService implements OnModuleInit {
 	public async packAttachedFiles(
 		fileIds: Note['fileIds'],
 		packedFiles: Map<Note['fileIds'][number], Packed<'DriveFile'> | null>,
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 	): Promise<Packed<'DriveFile'>[]> {
 		const missingIds = [];
 		for (const id of fileIds) {
@@ -283,7 +283,7 @@ export class NoteEntityService implements OnModuleInit {
 	@bindThis
 	public async pack(
 		src: Note['id'] | Note,
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 		options?: {
 			detail?: boolean;
 			skipHide?: boolean;
@@ -400,7 +400,7 @@ export class NoteEntityService implements OnModuleInit {
 	@bindThis
 	public async packMany(
 		notes: Note[],
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 		options?: {
 			detail?: boolean;
 			skipHide?: boolean;

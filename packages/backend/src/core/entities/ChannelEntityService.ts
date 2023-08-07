@@ -45,7 +45,7 @@ export class ChannelEntityService {
 	@bindThis
 	public async pack(
 		src: Channel['id'] | Channel,
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 		detailed?: boolean,
 	): Promise<Packed<'Channel'>> {
 		const channel = typeof src === 'object' ? src : await this.channelsRepository.findOneByOrFail({ id: src });

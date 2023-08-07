@@ -20,7 +20,7 @@ export class PageLikeEntityService {
 	@bindThis
 	public async pack(
 		src: PageLike['id'] | PageLike,
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'PageLike'>> {
 		const like = typeof src === 'object' ? src : await this.pageLikesRepository.findOneByOrFail({ id: src });
 
@@ -33,7 +33,7 @@ export class PageLikeEntityService {
 	@bindThis
 	public async packMany(
 		likes: (PageLike['id'] | PageLike)[],
-		me?: { id: User['id'] } | null | undefined,
+		me: { id: User['id'] } | null | undefined,
 	) : Promise<Packed<'PageLike'>[]> {
 		return (await Promise.allSettled(likes.map(x => this.pack(x, me))))
 			.filter(result => result.status === 'fulfilled')

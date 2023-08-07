@@ -46,12 +46,12 @@ export const packedFollowRequestSchema = {
 		},
 		follower: {
 			type: 'object',
-			optional: true, nullable: false,
+			optional: false, nullable: false,
 			ref: 'UserLite',
 		},
 		followee: {
 			type: 'object',
-			optional: true, nullable: false,
+			optional: false, nullable: false,
 			ref: 'UserLite',
 		},
 	},

@@ -490,7 +490,7 @@ export class ClientServerService {
 
 			if (note) {
 				try {
-					const _note = await this.noteEntityService.pack(note);
+					const _note = await this.noteEntityService.pack(note, null);
 					const profile = await this.userProfilesRepository.findOneByOrFail({ userId: note.userId });
 					const meta = await this.metaService.fetch();
 					reply.header('Cache-Control', 'public, max-age=15');
@@ -534,7 +534,7 @@ export class ClientServerService {
 
 			if (page) {
 				try {
-					const _page = await this.pageEntityService.pack(page);
+					const _page = await this.pageEntityService.pack(page, null);
 					const profile = await this.userProfilesRepository.findOneByOrFail({ userId: page.userId });
 					const meta = await this.metaService.fetch();
 					if (['public'].includes(page.visibility)) {
@@ -571,7 +571,7 @@ export class ClientServerService {
 
 			if (flash) {
 				try {
-					const _flash = await this.flashEntityService.pack(flash);
+					const _flash = await this.flashEntityService.pack(flash, null);
 					const profile = await this.userProfilesRepository.findOneByOrFail({ userId: flash.userId });
 					const meta = await this.metaService.fetch();
 					reply.header('Cache-Control', 'public, max-age=15');
@@ -604,7 +604,7 @@ export class ClientServerService {
 
 			if (clip && clip.isPublic) {
 				try {
-					const _clip = await this.clipEntityService.pack(clip);
+					const _clip = await this.clipEntityService.pack(clip, null);
 					const profile = await this.userProfilesRepository.findOneByOrFail({ userId: clip.userId });
 					const meta = await this.metaService.fetch();
 					reply.header('Cache-Control', 'public, max-age=15');
@@ -635,7 +635,7 @@ export class ClientServerService {
 
 			if (post) {
 				try {
-					const _post = await this.galleryPostEntityService.pack(post);
+					const _post = await this.galleryPostEntityService.pack(post, null);
 					const profile = await this.userProfilesRepository.findOneByOrFail({ userId: post.userId });
 					const meta = await this.metaService.fetch();
 					reply.header('Cache-Control', 'public, max-age=15');
@@ -667,7 +667,7 @@ export class ClientServerService {
 			});
 
 			if (channel) {
-				const _channel = await this.channelEntityService.pack(channel);
+				const _channel = await this.channelEntityService.pack(channel, null);
 				const meta = await this.metaService.fetch();
 				reply.header('Cache-Control', 'public, max-age=15');
 				return await reply.view('channel', {

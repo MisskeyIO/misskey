@@ -18,7 +18,7 @@ import { packedDriveFolderSchema } from '@/models/json-schema/drive-folder.js';
 import { packedEmojiDetailedSchema, packedEmojiSimpleSchema } from '@/models/json-schema/emoji.js';
 import { packedFederationInstanceSchema } from '@/models/json-schema/federation-instance.js';
 import { packedFlashLikeSchema, packedFlashSchema } from '@/models/json-schema/flash.js';
-import { packedFollowingSchema } from '@/models/json-schema/following.js';
+import { packedFollowRequestSchema, packedFollowingSchema } from '@/models/json-schema/following.js';
 import { packedGalleryLikeSchema, packedGalleryPostSchema } from '@/models/json-schema/gallery.js';
 import { packedHashtagSchema } from '@/models/json-schema/hashtag.js';
 import { packedInviteCodeSchema } from '@/models/json-schema/invite-code.js';
@@ -52,6 +52,7 @@ export const refs = {
 	DriveFile: packedDriveFileSchema,
 	DriveFolder: packedDriveFolderSchema,
 	Following: packedFollowingSchema,
+	FollowRequest: packedFollowRequestSchema,
 	Muting: packedMutingSchema,
 	RenoteMuting: packedRenoteMutingSchema,
 	Blocking: packedBlockingSchema,

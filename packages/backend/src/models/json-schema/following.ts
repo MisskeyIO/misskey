@@ -34,3 +34,25 @@ export const packedFollowingSchema = {
 		},
 	},
 } as const;
+
+export const packedFollowRequestSchema = {
+	type: 'object',
+	properties: {
+		id: {
+			type: 'string',
+			optional: false, nullable: false,
+			format: 'id',
+			example: 'xxxxxxxxxx',
+		},
+		follower: {
+			type: 'object',
+			optional: true, nullable: false,
+			ref: 'UserLite',
+		},
+		followee: {
+			type: 'object',
+			optional: true, nullable: false,
+			ref: 'UserLite',
+		},
+	},
+} as const;

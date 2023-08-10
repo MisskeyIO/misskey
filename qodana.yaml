@@ -27,8 +27,6 @@ bootstrap: |+
   set -eu
 
   # Sets the node version to be used
-  nodenv install 18
-  nodenv global 18
   corepack enable
   corepack prepare pnpm@latest --activate
 

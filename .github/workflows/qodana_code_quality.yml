@@ -11,8 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+          with:
+            fetch-depth: 0
+          submodules: true
+      - uses: actions/setup-node@v3.6.0
         with:
-          fetch-depth: 0
+          node-version-file: '.node-version'
+          cache: 'pnpm'
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
+      - run: corepack enable
+      - run: pnpm i --frozen-lockfile
       - name: 'Qodana Scan'
         uses: JetBrains/qodana-action@v2022.3.4
         env:

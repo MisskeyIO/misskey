@@ -23,15 +23,7 @@ include:
 #These options are ignored during local run
 
 #Execute shell command before Qodana execution
-bootstrap: |+
-  set -eu
-
-  # Sets the node version to be used
-  corepack enable
-  corepack prepare pnpm@latest --activate
-
-  # Install project dependencies
-  pnpm install
+#bootstrap: sh ./prepare-qodana.sh
 
 #Install IDE plugins before Qodana execution
 #plugins:

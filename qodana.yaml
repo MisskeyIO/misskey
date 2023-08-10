@@ -6,11 +6,12 @@ version: "1.0"
 
 #Specify inspection profile for code analysis
 profile:
-  name: qodana.starter
+  name: qodana.recommended
 
 #Enable inspections
-#include:
-#  - name: <SomeEnabledInspectionId>
+include:
+  - name: Eslint
+  - name: VulnerableLibrariesGlobal
 
 #Disable inspections
 #exclude:
@@ -22,7 +23,17 @@ profile:
 #These options are ignored during local run
 
 #Execute shell command before Qodana execution
-#bootstrap: sh ./prepare-qodana.sh
+bootstrap: |+
+  set -eu
+
+  # Sets the node version to be used
+  nodenv install 18
+  nodenv global 18
+  corepack enable
+  corepack prepare pnpm@latest --activate
+
+  # Install project dependencies
+  pnpm install
 
 #Install IDE plugins before Qodana execution
 #plugins:

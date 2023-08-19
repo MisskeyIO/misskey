@@ -11,6 +11,7 @@ import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import Fastify, { FastifyInstance } from 'fastify';
 import fastifyStatic from '@fastify/static';
 import { IsNull } from 'typeorm';
+import fastifyGracefulShutdown from 'fastify-graceful-shutdown';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
 import type { Config } from '@/config.js';
 import type { EmojisRepository, UserProfilesRepository, UsersRepository } from '@/models/index.js';
@@ -75,6 +76,9 @@ export class ServerService implements OnApplicationShutdown {
 			logger: !['production', 'test'].includes(process.env.NODE_ENV ?? ''),
 		});
 		this.#fastify = fastify;
+
+		// Graceful shutdown
+		fastify.register(fastifyGracefulShutdown);
 
 		// HSTS
 		// 6months (15552000sec)

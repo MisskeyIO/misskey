@@ -52,7 +52,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 	<FormSection>
 		<div class="_buttons">
-			<MkButton inline @click="preview"><i class="ti ti-eye"></i> {{ i18n.ts.preview }}</MkButton>
+			<MkButton inline @click="preview"><i class="ti ti-layout-collage"></i> {{ i18n.ts.preview }}</MkButton>
 			<MkButton inline danger @click="setDefault"><i class="ti ti-reload"></i> {{ i18n.ts.default }}</MkButton>
 		</div>
 	</FormSection>
@@ -134,7 +134,7 @@ definePageMetadata({
 	title: i18n.ts.reaction,
 	icon: 'ti ti-mood-happy',
 	action: {
-		icon: 'ti ti-eye',
+		icon: 'ti ti-layout-collage',
 		handler: preview,
 	},
 });

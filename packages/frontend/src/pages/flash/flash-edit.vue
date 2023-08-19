@@ -20,7 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkTextarea>
 			<div class="_buttons">
 				<MkButton primary @click="save"><i class="ti ti-check"></i> {{ i18n.ts.save }}</MkButton>
-				<MkButton @click="show"><i class="ti ti-eye"></i> {{ i18n.ts.show }}</MkButton>
+				<MkButton @click="show"><i class="ti ti-layout-collage"></i> {{ i18n.ts.show }}</MkButton>
 				<MkButton v-if="flash" danger @click="del"><i class="ti ti-trash"></i> {{ i18n.ts.delete }}</MkButton>
 			</div>
 		</div>

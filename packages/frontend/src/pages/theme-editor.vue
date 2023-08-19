@@ -215,7 +215,7 @@ watch($$(theme), apply, { deep: true });
 
 const headerActions = $computed(() => [{
 	asFullButton: true,
-	icon: 'ti ti-eye',
+	icon: 'ti ti-layout-collage',
 	text: i18n.ts.preview,
 	handler: showPreview,
 }, {

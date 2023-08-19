@@ -112,6 +112,7 @@ onMounted(() => {
 }
 
 .header {
+	font-weight: bold;
 	font-size: 120%;
 }
 

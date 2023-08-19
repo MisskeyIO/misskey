@@ -136,6 +136,7 @@ watch(() => $i?.unreadAnnouncements.length ?? 0, () => {
 
 .header {
 	margin-bottom: 16px;
+	font-weight: bold;
 	font-size: 120%;
 }
 

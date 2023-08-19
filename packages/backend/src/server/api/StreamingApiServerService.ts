@@ -180,6 +180,7 @@ export class StreamingApiServerService {
 		}
 		return new Promise((resolve) => {
 			this.#wss.close(() => resolve());
+			this.#wss.clients.forEach(client => client.close());
 		});
 	}
 }

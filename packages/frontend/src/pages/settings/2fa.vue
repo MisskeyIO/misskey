@@ -35,9 +35,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template #icon><i class="ti ti-key"></i></template>
 			<template #label>{{ i18n.ts.securityKeyAndPasskey }}</template>
 			<div class="_gaps_s">
-				<MkInfo>
-					{{ i18n.ts._2fa.securityKeyInfo }}<br>
-				</MkInfo>
+				<MkInfo>{{ i18n.ts._2fa.securityKeyInfo }}</MkInfo>
 
 				<MkInfo v-if="!supportsCredentials" warn>
 					{{ i18n.ts._2fa.securityKeyNotSupported }}

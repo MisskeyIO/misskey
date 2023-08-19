@@ -25,7 +25,7 @@ export const meta = {
 		},
 
 		accessDenied: {
-			message: 'You do not have edit privilege of the channel.',
+			message: 'You do not have edit privilege of this key.',
 			code: 'ACCESS_DENIED',
 			id: '1fb7cb09-d46a-4fff-b8df-057708cce513',
 		},
@@ -47,9 +47,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 	constructor(
 		@Inject(DI.userSecurityKeysRepository)
 		private userSecurityKeysRepository: UserSecurityKeysRepository,
-
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
 
 		private userEntityService: UserEntityService,
 		private globalEventService: GlobalEventService,

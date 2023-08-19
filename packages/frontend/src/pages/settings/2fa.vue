@@ -37,11 +37,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div class="_gaps_s">
 				<MkInfo>{{ i18n.ts._2fa.securityKeyInfo }}</MkInfo>
 
-				<MkInfo v-if="!supportsCredentials" warn>
+				<MkInfo v-if="!WebAuthnSupported()" warn>
 					{{ i18n.ts._2fa.securityKeyNotSupported }}
 				</MkInfo>
 
-				<MkInfo v-else-if="supportsCredentials && !$i.twoFactorEnabled" warn>
+				<MkInfo v-else-if="WebAuthnSupported() && !$i.twoFactorEnabled" warn>
 					{{ i18n.ts._2fa.registerTOTPBeforeKey }}
 				</MkInfo>
 
@@ -68,8 +68,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, defineAsyncComponent } from 'vue';
-import { create as WebAuthnCreate, parseCreationOptionsFromJSON } from '@github/webauthn-json/browser-ponyfill';
+import { defineAsyncComponent } from 'vue';
+import { supported as WebAuthnSupported, create as WebAuthnCreate, parseCreationOptionsFromJSON } from '@github/webauthn-json/browser-ponyfill';
 import MkButton from '@/components/MkButton.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
@@ -87,7 +87,6 @@ withDefaults(defineProps<{
 	first: false,
 });
 
-const supportsCredentials = ref(!!navigator.credentials);
 const usePasswordLessLogin = $computed(() => $i?.usePasswordLessLogin ?? false);
 let twoFactorData = $ref<{ qr: string; url: string; secret: string; label: string; issuer: string } | null>(null);
 

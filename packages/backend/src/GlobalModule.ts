@@ -103,5 +103,6 @@ export class GlobalModule implements OnApplicationShutdown {
 
 	async onApplicationShutdown(signal: string): Promise<void> {
 		await this.dispose();
+		process.emit('exit', 0);
 	}
 }

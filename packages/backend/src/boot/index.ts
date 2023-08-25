@@ -9,7 +9,7 @@
 
 import cluster from 'node:cluster';
 import { EventEmitter } from 'node:events';
-import { exit } from 'node:process';
+import process from 'node:process';
 import chalk from 'chalk';
 import Xev from 'xev';
 import Logger from '@/logger.js';
@@ -79,8 +79,13 @@ process.on('uncaughtException', err => {
 // Dying away...
 process.on('exit', code => {
 	logger.warn(chalk.yellow(`The process is going to exit with code ${code}`));
+});
+
+process.on('warning', warning => {
+	if ((warning as never)['code'] !== 'MISSKEY_SHUTDOWN') return;
+	logger.warn(chalk.yellow(`${warning.message}: ${(warning as never)['detail']}`));
 	for (const id in cluster.workers) cluster.workers[id]?.process.kill('SIGTERM');
-	exit(code);
+	process.exit();
 });
 
 //#endregion

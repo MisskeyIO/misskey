@@ -50,11 +50,11 @@ stream.on('emojiDeleted', emojiData => {
 export async function fetchCustomEmojis(force = false) {
 	const now = Date.now();
 
-	const emojiCacheExist = await exist('emojis');
 	let res;
 	if (force) {
 		res = await api('emojis', {});
 	} else {
+		const emojiCacheExist = await exist('emojis');
 		const lastFetchedAt = await get('lastEmojisFetchedAt');
 		if (lastFetchedAt && (now - lastFetchedAt) < 1000 * 60 * 60 && emojiCacheExist) return;
 		res = await apiGet('emojis', {});

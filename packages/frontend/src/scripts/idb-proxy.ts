@@ -45,11 +45,7 @@ export async function del(key: string) {
 export async function exist(key: string) {
 	if (idbAvailable) {
 		const keys = await ikeys();
-		return (keys.indexOf(key) !== -1);
+		return keys.includes(key);
 	}
-	const targetKey = fallbackName(key);
-	for (let index = 0, len = window.localStorage.length; index < len; index++) {
-		if (window.localStorage.key(index) === targetKey) return true; 
-	}
-	return false;
+	return window.localStorage.getItem(fallbackName(key)) !== null;
 }

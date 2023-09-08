@@ -7,7 +7,7 @@ import { shallowRef, computed, markRaw, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import { api, apiGet } from './os';
 import { useStream } from '@/stream';
-import { get, set } from '@/scripts/idb-proxy';
+import { get, set, exist } from '@/scripts/idb-proxy';
 
 const storageCache = await get('emojis');
 export const customEmojis = shallowRef<Misskey.entities.CustomEmoji[]>(Array.isArray(storageCache) ? storageCache : []);
@@ -50,12 +50,13 @@ stream.on('emojiDeleted', emojiData => {
 export async function fetchCustomEmojis(force = false) {
 	const now = Date.now();
 
+	const emojiCacheExist = await exist('emojis');
 	let res;
 	if (force) {
 		res = await api('emojis', {});
 	} else {
 		const lastFetchedAt = await get('lastEmojisFetchedAt');
-		if (lastFetchedAt && (now - lastFetchedAt) < 1000 * 60 * 60) return;
+		if (lastFetchedAt && (now - lastFetchedAt) < 1000 * 60 * 60 && emojiCacheExist) return;
 		res = await apiGet('emojis', {});
 	}
 

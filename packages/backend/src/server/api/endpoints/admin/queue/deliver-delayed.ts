@@ -7,7 +7,7 @@ import { URL } from 'node:url';
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { DeliverQueue } from '@/core/QueueModule.js';
-import { ApiLoggerService } from "@/server/api/ApiLoggerService.js";
+import { ApiLoggerService } from '@/server/api/ApiLoggerService.js';
 
 export const meta = {
 	tags: ['admin'],

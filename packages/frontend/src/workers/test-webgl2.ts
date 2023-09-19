@@ -4,7 +4,7 @@
  */
 
 const canvas = typeof OffscreenCanvas !== 'undefined'
-	? (globalThis.OffscreenCanvas && new OffscreenCanvas(1, 1))
+	? new OffscreenCanvas(1, 1)
 	: undefined;
 const gl = canvas?.getContext('webgl2');
 if (gl) {

@@ -166,6 +166,7 @@ export class RedisSingleCache<T> {
 		const cachedValue = await this.get();
 		if (cachedValue !== undefined) {
 			// Cache HIT
+      this.memoryCache.set(cachedValue);
 			return cachedValue;
 		}
 

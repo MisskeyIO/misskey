@@ -34,7 +34,6 @@
 
 	//#region Detect language & fetch translations
 	if (!localStorage.hasOwnProperty('locale')) {
-		const supportedLangs = LANGS;
 		let lang = localStorage.getItem('lang');
 		if (lang == null || lang.toString == null || lang.toString() === 'null') {
 			lang = 'ja-JP';

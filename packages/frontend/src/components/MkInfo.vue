@@ -20,8 +20,6 @@ const props = withDefaults(defineProps<{
 }>(), {
 	rounded: true,
 });
-
-console.log(props.rounded);
 </script>
 
 <style lang="scss" module>

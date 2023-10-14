@@ -190,7 +190,7 @@ let recentHashtags = $ref(JSON.parse(miLocalStorage.getItem('hashtags') ?? '[]')
 let imeText = $ref('');
 let showingOptions = $ref(false);
 
-const nsfwGuideUrl = 'https://support.misskey.io/hc/ja/articles/6657417016463';
+const nsfwGuideUrl = 'https://go.misskey.io/media-guideline';
 
 const draftKey = $computed((): string => {
 	let key = props.channel ? `channel:${props.channel.id}` : '';

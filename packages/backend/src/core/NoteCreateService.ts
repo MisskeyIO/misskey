@@ -160,6 +160,9 @@ export class NoteCreateService implements OnApplicationShutdown {
 		@Inject(DI.db)
 		private db: DataSource,
 
+		@Inject(DI.redis)
+		private redisClient: Redis.Redis,
+
 		@Inject(DI.redisForTimelines)
 		private redisForTimelines: Redis.Redis,
 
@@ -354,6 +357,14 @@ export class NoteCreateService implements OnApplicationShutdown {
 		}
 
 		const note = await this.insertNote(user, data, tags, emojis, mentionedUsers);
+
+		if (data.channel) {
+			this.redisClient.xadd(
+				`channelTimeline:${data.channel.id}`,
+				'MAXLEN', '~', '1000',
+				'*',
+				'note', note.id);
+		}
 
 		setImmediate('post created', { signal: this.#shutdownController.signal }).then(
 			() => this.postNoteCreated(note, user, data, silent, tags!, mentionedUsers!),

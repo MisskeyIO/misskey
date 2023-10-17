@@ -44,4 +44,11 @@ export class MiUserListJoining {
 	})
 	@JoinColumn()
 	public userList: MiUserList | null;
+
+	//#region Denormalized fields
+	@Column({
+		...id(),
+	})
+	public userListUserId: MiUser['id'];
+	//#endregion
 }

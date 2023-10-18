@@ -32,7 +32,7 @@ export const meta = {
 		notAssigned: {
 			message: 'User was not assigned to this role.',
 			code: 'NOT_ASSIGNED',
-			id: 'efbdff43-4e7d-40d7-84c4-8346eb5f55db',
+			id: 'b9060ac7-5c94-4da4-9f55-2047c953df44',
 		},
 
 		accessDenied: {

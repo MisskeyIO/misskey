@@ -8,7 +8,7 @@ import * as Redis from 'ioredis';
 import { In } from 'typeorm';
 import type { MiRole, MiRoleAssignment, RoleAssignmentsRepository, RolesRepository, UsersRepository } from '@/models/index.js';
 import { MemoryKVCache, MemorySingleCache } from '@/misc/cache.js';
-import { IdentifiableError } from "@/misc/identifiable-error.js";
+import { IdentifiableError } from '@/misc/identifiable-error.js';
 import type { MiUser } from '@/models/entities/User.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
@@ -384,10 +384,7 @@ export class RoleService implements OnApplicationShutdown {
 	public async assign(userId: MiUser['id'], roleId: MiRole['id'], expiresAt: Date | null = null): Promise<void> {
 		const now = new Date();
 
-		let existing = await this.roleAssignmentsRepository.findOneBy({
-			roleId: roleId,
-			userId: userId,
-		});
+		let existing = await this.roleAssignmentsRepository.findOneBy({ roleId, userId });
 		if (existing?.expiresAt && (existing.expiresAt.getTime() < now.getTime())) {
 			await this.roleAssignmentsRepository.delete({
 				roleId: roleId,
@@ -423,10 +420,7 @@ export class RoleService implements OnApplicationShutdown {
 	public async unassign(userId: MiUser['id'], roleId: MiRole['id']): Promise<void> {
 		const now = new Date();
 
-		let existing = await this.roleAssignmentsRepository.findOneBy({
-			roleId: roleId,
-			userId: userId,
-		});
+		let existing = await this.roleAssignmentsRepository.findOneBy({ roleId, userId });
 		if (existing?.expiresAt && (existing.expiresAt.getTime() < now.getTime())) {
 			await this.roleAssignmentsRepository.delete({
 				roleId: roleId,
@@ -436,15 +430,16 @@ export class RoleService implements OnApplicationShutdown {
 		}
 
 		if (!existing) {
-			throw new IdentifiableError('efbdff43-4e7d-40d7-84c4-8346eb5f55db', 'User was not assigned to this role.');
+			throw new IdentifiableError('b9060ac7-5c94-4da4-9f55-2047c953df44', 'User was not assigned to this role.');
 		}
 
 		await this.roleAssignmentsRepository.delete(existing.id);
-		this.globalEventService.publishInternalEvent('userRoleUnassigned', existing);
 
 		this.rolesRepository.update(roleId, {
 			lastUsedAt: now,
 		});
+
+		this.globalEventService.publishInternalEvent('userRoleUnassigned', existing);
 	}
 
 	@bindThis

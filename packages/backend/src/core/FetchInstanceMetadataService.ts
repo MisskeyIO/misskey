@@ -52,14 +52,14 @@ export class FetchInstanceMetadataService {
 
 	@bindThis
 	public async tryLock(host: string): Promise<boolean> {
-		const mutex = await this.redisClient.set(`fetchInstanceMetadata:mutex:${host}`, '1', 'GET');
+		const mutex = await this.redisClient.set(`fetchInstanceMetadata:mutex:${host}`, '1', 'EX', 60 * 5, 'NX', 'GET');
 		await this.redisClient.expire(`fetchInstanceMetadata:mutex:${host}`, 60 * 5, 'NX');
 		return mutex !== '1';
 	}
 
 	@bindThis
-	public unlock(host: string): Promise<'OK'> {
-		return this.redisClient.set(`fetchInstanceMetadata:mutex:${host}`, '0');
+	public unlock(host: string): Promise<number> {
+		return this.redisClient.del(`fetchInstanceMetadata:mutex:${host}`);
 	}
 
 	@bindThis

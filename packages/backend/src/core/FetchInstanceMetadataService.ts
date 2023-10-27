@@ -53,7 +53,9 @@ export class FetchInstanceMetadataService {
 	@bindThis
 	public async tryLock(host: string): Promise<boolean> {
 		try {
-			return null !== await this.redisClient.set(`fetchInstanceMetadata:mutex:${host}`, '1', 'EX', 60 * 5, 'NX');
+			const result = await this.redisClient.set(`fetchInstanceMetadata:mutex:${host}`, Date.now(), 'NX');
+			await this.redisClient.expire(`fetchInstanceMetadata:mutex:${host}`, 60 * 5, 'NX');
+			return result !== null;
 		} catch (e) {
 			return false;
 		}

@@ -65,7 +65,7 @@ export class FetchInstanceMetadataService {
 	public async fetchInstanceMetadata(instance: MiInstance, force = false): Promise<void> {
 		const host = instance.host;
 		// Acquire mutex to ensure no parallel runs
-		if (!force || !await this.tryLock(host)) return;
+		if (!await this.tryLock(host) && !force) return;
 		try {
 			if (!force) {
 				const _instance = await this.federatedInstanceService.fetch(host);

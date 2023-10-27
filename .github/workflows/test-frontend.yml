@@ -62,8 +62,8 @@ jobs:
         env:
           POSTGRES_DB: test-misskey
           POSTGRES_HOST_AUTH_METHOD: trust
-      redis:
-        image: redis:7
+      keydb:
+        image: eqalpha/keydb:latest
         ports:
           - 56312:6379
 

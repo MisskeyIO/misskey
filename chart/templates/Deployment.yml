@@ -37,8 +37,8 @@ spec:
               value: "misskey"
           ports:
             - containerPort: 5432
-        - name: redis
-          image: redis:alpine
+        - name: keydb
+          image: eqalpha/keydb:latest
           ports:
             - containerPort: 6379
       volumes:

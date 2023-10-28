@@ -15,15 +15,15 @@ services:
       - internal_network
       - external_network
 
-  keydb:
+  redis:
     restart: unless-stopped
-    image: eqalpha/keydb:latest
+    image: redis:7-alpine
     networks:
       - internal_network
     volumes:
-      - keydb-data:/data
+      - redis-data:/data
     healthcheck:
-      test: "keydb-cli ping"
+      test: "redis-cli ping"
       interval: 5s
       retries: 20
 
@@ -45,7 +45,7 @@ services:
 
 volumes:
   postgres-data:
-  keydb-data:
+  redis-data:
 
 networks:
   internal_network:

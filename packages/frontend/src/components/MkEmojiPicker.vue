@@ -156,7 +156,7 @@ const tab = ref<'index' | 'custom' | 'unicode' | 'tags'>('index');
 const customEmojiFolderRoot: CustomEmojiFolderTree = { value: "", category: "", children: [] };
 
 function parseAndMergeCategories(input: string, root: CustomEmojiFolderTree): CustomEmojiFolderTree {
-	const parts = input.split('/');
+	const parts = (input && input !== 'null' ? input : '').split('/');
 	let currentNode: CustomEmojiFolderTree = root;
 
 	for (const part of parts) {

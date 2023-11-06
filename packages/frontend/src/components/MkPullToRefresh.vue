@@ -24,7 +24,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import MkLoading from '@/components/global/MkLoading.vue';
-import { onMounted, onUnmounted, watch } from 'vue';
+import { onMounted, onUnmounted } from 'vue';
 import { i18n } from '@/i18n.js';
 import { getScrollContainer } from '@/scripts/scroll.js';
 

@@ -31,6 +31,7 @@ import { getScrollContainer } from '@/scripts/scroll.js';
 const SCROLL_STOP = 10;
 const MAX_PULL_DISTANCE = Infinity;
 const FIRE_THRESHOLD = 230;
+const FIRE_THRESHOLD_RATIO = 0.99;
 const RELEASE_TRANSITION_DURATION = 200;
 const PULL_BRAKE_BASE = 1.5;
 const PULL_BRAKE_FACTOR = 170;
@@ -39,9 +40,11 @@ let isPullStart = $ref(false);
 let isPullEnd = $ref(false);
 let isRefreshing = $ref(false);
 let pullDistance = $ref(0);
+let moveRatio = $ref(0);
 
 let supportPointerDesktop = false;
 let startScreenY: number | null = null;
+let startScreenX: number | null = null;
 
 const rootEl = $shallowRef<HTMLDivElement>();
 let scrollEl: HTMLElement | null = null;
@@ -63,11 +66,20 @@ function getScreenY(event) {
 	return event.touches[0].screenY;
 }
 
+function getScreenX(event) {
+	if (supportPointerDesktop) {
+		return event.screenX;
+	}
+	return event.touches[0].screenX;
+}
+
 function moveStart(event) {
 	if (!isPullStart && !isRefreshing && !disabled) {
 		isPullStart = true;
 		startScreenY = getScreenY(event);
+		startScreenX = getScreenX(event);
 		pullDistance = 0;
+		moveRatio = 0;
 	}
 }
 
@@ -135,19 +147,23 @@ function moving(event: TouchEvent | PointerEvent) {
 		return;
 	}
 
-	if (startScreenY === null) {
+	if (startScreenY === null || startScreenX === null) {
 		startScreenY = getScreenY(event);
+		startScreenX = getScreenX(event);
 	}
 	const moveScreenY = getScreenY(event);
+	const moveScreenX = getScreenX(event);
 
 	const moveHeight = moveScreenY - startScreenY!;
+	const moveWidth = moveScreenX - startScreenX!;
 	pullDistance = Math.min(Math.max(moveHeight, 0), MAX_PULL_DISTANCE);
+	moveRatio = Math.min(Math.abs(moveHeight), 1) / Math.max(Math.abs(moveWidth), 1);
 
-	if (pullDistance > 0) {
+	if (pullDistance > 0 && moveRatio > FIRE_THRESHOLD_RATIO) {
 		if (event.cancelable) event.preventDefault();
 	}
 
-	isPullEnd = pullDistance >= FIRE_THRESHOLD;
+	isPullEnd = pullDistance >= FIRE_THRESHOLD && moveRatio > FIRE_THRESHOLD_RATIO;
 }
 
 /**

@@ -365,7 +365,7 @@ async function deleteUserAvatar() {
       text: err.toString(),
     });
   });
-  await refreshUser();
+  refreshUser();
 }
 
 async function deleteUserBanner() {
@@ -384,7 +384,7 @@ async function deleteUserBanner() {
       text: err.toString(),
     });
   });
-  await refreshUser();
+  refreshUser();
 }
 
 async function deleteAllFiles() {

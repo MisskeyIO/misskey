@@ -122,6 +122,7 @@ async function closeContent() {
 function moveEnd() {
 	if (isPullStart && !isRefreshing) {
 		startScreenY = null;
+		startScreenX = null;
 		if (isPullEnd) {
 			isPullEnd = false;
 			isRefreshing = true;

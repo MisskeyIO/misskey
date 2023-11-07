@@ -74,7 +74,7 @@ function getClientX(event) {
 }
 
 function moveStart(event) {
-	if (!isPullStart && !isRefreshing && !disabled) {
+	if (!isPullStart && !isRefreshing && !disabled && scrollEl?.scrollTop === 0) {
 		isPullStart = true;
 		startScreenY = getScreenY(event);
 		startClientX = getClientX(event);
@@ -160,7 +160,6 @@ function moving(event: TouchEvent | PointerEvent) {
 	const moveWidth = moveClientX - startClientX!;
 	pullDistance = Math.min(Math.max(moveHeight, 0), MAX_PULL_DISTANCE);
 	moveRatio = Math.max(Math.abs(moveHeight), 1) / Math.max(Math.abs(moveWidth), 1);
-	console.log(`moveHeight: ${moveHeight}, moveWidth: ${moveWidth}, pullDistance: ${pullDistance}, moveRatio: ${moveRatio}`);
 
 	if (pullDistance > 0 && moveRatio > FIRE_THRESHOLD_RATIO) {
 		if (event.cancelable) event.preventDefault();

@@ -37,7 +37,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 				throw new Error('user not found');
 			}
 
-			await this.usersRepository.update(user.id,{
+			await this.usersRepository.update(user.id, {
 				banner: null,
 				bannerId: null,
 				bannerUrl: null,

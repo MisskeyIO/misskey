@@ -24,8 +24,16 @@ const props = withDefaults(defineProps<{
 function loadShader(gl, type, source) {
 	const shader = gl.createShader(type);
 
-	gl.shaderSource(shader, source);
-	gl.compileShader(shader);
+	try {
+		gl.shaderSource(shader, source);
+		gl.compileShader(shader);
+	} catch (e) {
+		alert(
+			`failed to compile shader: ${gl.getShaderInfoLog(shader)}`,
+		);
+		gl.deleteShader(shader);
+		return null;
+	}
 
 	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
 		alert(

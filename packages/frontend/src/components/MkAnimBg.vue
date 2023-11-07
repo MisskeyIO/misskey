@@ -27,9 +27,9 @@ function loadShader(gl, type, source) {
 	try {
 		gl.shaderSource(shader, source);
 		gl.compileShader(shader);
-	} catch (e) {
+	} catch (error) {
 		alert(
-			`failed to compile shader: ${gl.getShaderInfoLog(shader)}`,
+			`failed to compile shader: ${error} ${gl.getShaderInfoLog(shader)}`,
 		);
 		gl.deleteShader(shader);
 		return null;

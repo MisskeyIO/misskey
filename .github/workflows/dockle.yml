@@ -10,12 +10,14 @@ on:
 jobs:
   dockle:
     runs-on: ubuntu-latest
+    env:
+      DOCKER_CONTENT_TRUST: 1
     steps:
       - name: Checkout code
         uses: actions/checkout@v3.2.0
       - name: Build an image from Dockerfile
         run: |
-          docker build -t misskey:scan .
+          docker build --cache-from ghcr.io/misskeyio/misskey:io-buildcache -t misskey:scan .
       - name: Run dockle
         uses: goodwithtech/dockle-action@main
         with:

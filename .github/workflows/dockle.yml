@@ -1,0 +1,25 @@
+name: Dockle
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+
+jobs:
+  dockle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3.2.0
+      - name: Build an image from Dockerfile
+        run: |
+          docker build -t misskey:scan .
+      - name: Run dockle
+        uses: goodwithtech/dockle-action@main
+        with:
+          image: 'misskey:scan'
+          format: 'list'
+          exit-code: '1'
+          exit-level: 'warn'

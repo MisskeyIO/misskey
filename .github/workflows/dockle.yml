@@ -18,7 +18,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
         with:
           platforms: linux/amd64
-      - name: Build and Push to GitHub Container Registry
+      - name: Build an image from Dockerfile
         uses: docker/build-push-action@v4
         with:
           builder: ${{ steps.buildx.outputs.name }}

@@ -12,10 +12,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3.2.0
-      - name: Build an image from Dockerfile
-        run: |
-          docker build --cache-from type=registry,ref=ghcr.io/misskeyio/misskey:io-buildcache -t misskey:scan .
+        uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          platforms: linux/amd64
+      - name: Build and Push to GitHub Container Registry
+        uses: docker/build-push-action@v4
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          context: .
+          push: false
+          platforms: ${{ steps.buildx.outputs.platforms }}
+          provenance: false
+          cache-from: type=registry,ref=ghcr.io/misskeyio/misskey:io-buildcache
+          tags: |
+            misskey:scan
       - name: Run dockle
         uses: goodwithtech/dockle-action@main
         with:

@@ -74,7 +74,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			}
 
 			const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId);
-			query.andWhere(`'{"${file.id}"}' <@ note.fileIds`);
+			query.andWhere(':file <@ note.fileIds', { file: [file.id] });
 
 			const notes = await query.limit(ps.limit).getMany();
 

@@ -61,8 +61,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId)
 				.andWhere(new Brackets(qb => {
 					qb
-						.where(`'{"${me.id}"}' <@ note.mentions`)
-						.orWhere(`'{"${me.id}"}' <@ note.visibleUserIds`);
+						.where(':meIdAsList <@ note.mentions', { meIdAsList: [me.id] })
+						.orWhere(':meIdAsList <@ note.visibleUserIds', { meIdAsList: [me.id] });
 				}))
 				// Avoid scanning primary key index
 				.orderBy('CONCAT(note.id)', 'DESC')

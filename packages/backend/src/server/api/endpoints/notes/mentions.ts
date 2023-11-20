@@ -60,9 +60,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId)
 				.andWhere(new Brackets(qb => {
-					qb
-						.where(':meIdAsList <@ note.mentions', { meIdAsList: [me.id] })
-						.orWhere(':meIdAsList <@ note.visibleUserIds', { meIdAsList: [me.id] });
+					qb // このmeIdAsListパラメータはqueryServiceのgenerateVisibilityQueryでセットされる
+						.where(':meIdAsList <@ note.mentions')
+						.orWhere(':meIdAsList <@ note.visibleUserIds');
 				}))
 				// Avoid scanning primary key index
 				.orderBy('CONCAT(note.id)', 'DESC')

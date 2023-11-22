@@ -88,8 +88,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				const [noteIdsRes, repliesNoteIdsRes, channelNoteIdsRes] = ps.withFiles
 					? await Promise.all([
 						this.funoutTimelineService.get(`userTimelineWithFiles:${ps.userId}`, untilId, sinceId),
-						ps.withReplies ? this.funoutTimelineService.get(`userTimelineWithRepliesFiles:${ps.userId}`, untilId, sinceId) : Promise.resolve([]),
-						ps.withChannelNotes ? this.funoutTimelineService.get(`userTimelineWithChannelFiles:${ps.userId}`, untilId, sinceId) : Promise.resolve([]),
+						ps.withReplies ? this.funoutTimelineService.get(`userTimelineWithRepliesWithFiles:${ps.userId}`, untilId, sinceId) : Promise.resolve([]),
+						ps.withChannelNotes ? this.funoutTimelineService.get(`userTimelineWithChannelWithFiles:${ps.userId}`, untilId, sinceId) : Promise.resolve([]),
 					])
 					: await Promise.all([
 						this.funoutTimelineService.get(`userTimeline:${ps.userId}`, untilId, sinceId),

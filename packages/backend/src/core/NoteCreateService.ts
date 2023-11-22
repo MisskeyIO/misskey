@@ -891,7 +891,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 			this.funoutTimelineService.push(`userTimelineWithChannel:${user.id}`, note.id, note.userHost == null ? meta.perLocalUserUserTimelineCacheMax : meta.perRemoteUserUserTimelineCacheMax, r);
 			if (note.fileIds.length > 0) {
-				this.funoutTimelineService.push(`userTimelineWithChannelFiles:${user.id}`, note.id, note.userHost == null ? meta.perLocalUserUserTimelineCacheMax / 2 : meta.perRemoteUserUserTimelineCacheMax / 2, r);
+				this.funoutTimelineService.push(`userTimelineWithChannelWithFiles:${user.id}`, note.id, note.userHost == null ? meta.perLocalUserUserTimelineCacheMax / 2 : meta.perRemoteUserUserTimelineCacheMax / 2, r);
 			}
 
 			const channelFollowings = await this.channelFollowingsRepository.find({
@@ -935,7 +935,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 			if (note.replyId && note.replyUserId !== note.userId) {
 				this.funoutTimelineService.push(`userTimelineWithReplies:${user.id}`, note.id, note.userHost == null ? meta.perLocalUserUserTimelineCacheMax : meta.perRemoteUserUserTimelineCacheMax, r);
 				if (note.fileIds.length > 0) {
-					this.funoutTimelineService.push(`userTimelineWithRepliesFiles:${user.id}`, note.id, note.userHost == null ? meta.perLocalUserUserTimelineCacheMax / 2 : meta.perRemoteUserUserTimelineCacheMax / 2, r);
+					this.funoutTimelineService.push(`userTimelineWithRepliesWithFiles:${user.id}`, note.id, note.userHost == null ? meta.perLocalUserUserTimelineCacheMax / 2 : meta.perRemoteUserUserTimelineCacheMax / 2, r);
 				}
 
 				if (note.visibility === 'public' && note.userHost == null) {

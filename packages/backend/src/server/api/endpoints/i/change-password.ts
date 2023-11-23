@@ -9,7 +9,7 @@ import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { UserProfilesRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { UserAuthService } from '@/core/UserAuthService.js';
-import { ApiError } from "@/server/api/error.js";
+import { ApiError } from '@/server/api/error.js';
 
 export const meta = {
 	requireCredential: true,

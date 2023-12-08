@@ -11,6 +11,7 @@ export const pendingApiRequestsCount = ref(0);
 
 // Implements Misskey.api.ApiClient.request
 export function api<E extends keyof Misskey.Endpoints, P extends Misskey.Endpoints[E]['req']>(endpoint: E, data: P = {} as any, token?: string | null | undefined, signal?: AbortSignal): Promise<Misskey.Endpoints[E]['res']> {
+	if (endpoint.includes('://')) throw new Error('invalid endpoint');
 	pendingApiRequestsCount.value++;
 
 	const onFinally = () => {
@@ -23,7 +24,7 @@ export function api<E extends keyof Misskey.Endpoints, P extends Misskey.Endpoin
 		if (token !== undefined) (data as any).i = token;
 
 		// Send request
-		window.fetch(endpoint.indexOf('://') > -1 ? endpoint : `${apiUrl}/${endpoint}`, {
+		window.fetch(`${apiUrl}/${endpoint}`, {
 			method: 'POST',
 			body: JSON.stringify(data),
 			credentials: 'omit',

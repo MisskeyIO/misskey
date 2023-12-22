@@ -67,6 +67,11 @@ export class MiAbuseUserReport {
 	})
 	public comment: string;
 
+	@Column('varchar', {
+		length: 20,
+	})
+	public category: string;
+
 	//#region Denormalized fields
 	@Index()
 	@Column('varchar', {

@@ -15,7 +15,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</template>
 	<MkSpacer :marginMin="20" :marginMax="28">
 		<div class="_gaps_m" :class="$style.root">
-			<div class="">
+			<div>
 				<MkSelect v-model="category" :required="true">
 					<template #label>{{ i18n.ts.abuseReportCategory }}</template>
 					<option value="" selected disabled>{{ i18n.ts.selectCategory }}</option>
@@ -53,12 +53,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</template>
 	<MkSpacer :marginMin="20" :marginMax="28">
 		<div class="_gaps_m" :class="$style.root">
-			<center>
+			<div>
 				<p style="margin-bottom: 20px;">{{ i18n.ts.abuseReported }}</p>
 				<MkButton @click="blockUser" :disabled="fullUserInfo?.isBlocking">{{ i18n.ts.blockThisUser }}</MkButton>
 				<br>
 				<MkButton @click="muteUser" :disabled="fullUserInfo?.isMuted">{{ i18n.ts.muteThisUser }}</MkButton>
-			</center>
+			</div>
 		</div>
 	</MkSpacer>
 </MkWindow>
@@ -73,7 +73,6 @@ import MkButton from '@/components/MkButton.vue';
 import MkSelect from '@/components/MkSelect.vue';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
-import { UserDetailed } from 'misskey-js/built/entities.js';
 
 const props = defineProps<{
 	user: Misskey.entities.User;
@@ -89,7 +88,7 @@ const uiWindow2 = shallowRef<InstanceType<typeof MkWindow>>();
 const comment = ref(props.initialComment ?? '');
 const category = ref('');
 const page = ref(1);
-const fullUserInfo: Ref<UserDetailed | null> = ref(null);
+const fullUserInfo: Ref<Misskey.entities.UserDetailed | null> = ref(null);
 
 function blockUser() {
 	os.confirm({
@@ -132,17 +131,12 @@ function send() {
 		comment: comment.value,
 		category: category.value,
 	}, undefined).then(res => {
-		/*os.alert({
-			type: 'success',
-			text: i18n.ts.abuseReported,
-		});*/
 		os.api('users/show', { userId: props.user.id })
 		.then((res) => {
 			fullUserInfo.value = res;
 			uiWindow.value?.close();
 			page.value = 2;
 		});
-		//emit('closed');
 	});
 }
 </script>

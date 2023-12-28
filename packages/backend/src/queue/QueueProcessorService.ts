@@ -5,7 +5,6 @@
 
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import * as Bull from 'bullmq';
-import * as Redis from 'ioredis';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import type Logger from '@/logger.js';
@@ -85,9 +84,6 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		@Inject(DI.config)
 		private config: Config,
 
-		@Inject(DI.redisForJobQueue)
-		private redisForJobQueue: Redis.Redis,
-
 		private queueLoggerService: QueueLoggerService,
 		private webhookDeliverProcessorService: WebhookDeliverProcessorService,
 		private endedPollNotificationProcessorService: EndedPollNotificationProcessorService,
@@ -150,7 +146,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 				default: throw new Error(`unrecognized job type ${job.name} for system`);
 			}
 		}, {
-			...baseQueueOptions(this.config, QUEUE.SYSTEM, this.redisForJobQueue),
+			...baseQueueOptions(this.config, QUEUE.SYSTEM),
 			autorun: false,
 		});
 
@@ -159,8 +155,8 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		this.systemQueueWorker
 			.on('active', (job) => systemLogger.debug(`active id=${job.id}`))
 			.on('completed', (job, result) => systemLogger.debug(`completed(${result}) id=${job.id}`))
-			.on('failed', (job, err) => systemLogger.warn(`failed(${err}) id=${job ? job.id : '-'}`, { job, e: renderError(err) }))
-			.on('error', (err: Error) => systemLogger.error(`error ${err}`, { e: renderError(err) }))
+			.on('failed', (job, err) => systemLogger.warn(`failed(${err.stack}) id=${job ? job.id : '-'}`, { job, e: renderError(err) }))
+			.on('error', (err: Error) => systemLogger.error(`error ${err.stack}`, { e: renderError(err) }))
 			.on('stalled', (jobId) => systemLogger.warn(`stalled id=${jobId}`));
 		//#endregion
 
@@ -189,7 +185,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 				default: throw new Error(`unrecognized job type ${job.name} for db`);
 			}
 		}, {
-			...baseQueueOptions(this.config, QUEUE.DB, this.redisForJobQueue),
+			...baseQueueOptions(this.config, QUEUE.DB),
 			autorun: false,
 		});
 
@@ -198,14 +194,14 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		this.dbQueueWorker
 			.on('active', (job) => dbLogger.debug(`active id=${job.id}`))
 			.on('completed', (job, result) => dbLogger.debug(`completed(${result}) id=${job.id}`))
-			.on('failed', (job, err) => dbLogger.warn(`failed(${err}) id=${job ? job.id : '-'}`, { job, e: renderError(err) }))
-			.on('error', (err: Error) => dbLogger.error(`error ${err}`, { e: renderError(err) }))
+			.on('failed', (job, err) => dbLogger.warn(`failed(${err.stack}) id=${job ? job.id : '-'}`, { job, e: renderError(err) }))
+			.on('error', (err: Error) => dbLogger.error(`error ${err.stack}`, { e: renderError(err) }))
 			.on('stalled', (jobId) => dbLogger.warn(`stalled id=${jobId}`));
 		//#endregion
 
 		//#region deliver
 		this.deliverQueueWorker = new Bull.Worker(QUEUE.DELIVER, (job) => this.deliverProcessorService.process(job), {
-			...baseQueueOptions(this.config, QUEUE.DELIVER, this.redisForJobQueue),
+			...baseQueueOptions(this.config, QUEUE.DELIVER),
 			autorun: false,
 			concurrency: this.config.deliverJobConcurrency ?? 128,
 			limiter: {
@@ -222,18 +218,18 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		this.deliverQueueWorker
 			.on('active', (job) => deliverLogger.debug(`active ${getJobInfo(job, true)} to=${job.data.to}`))
 			.on('completed', (job, result) => deliverLogger.debug(`completed(${result}) ${getJobInfo(job, true)} to=${job.data.to}`))
-			.on('failed', (job, err) => deliverLogger.warn(`failed(${err}) ${getJobInfo(job)} to=${job ? job.data.to : '-'}`))
-			.on('error', (err: Error) => deliverLogger.error(`error ${err}`, { e: renderError(err) }))
+			.on('failed', (job, err) => deliverLogger.warn(`failed(${err.stack}) ${getJobInfo(job)} to=${job ? job.data.to : '-'}`))
+			.on('error', (err: Error) => deliverLogger.error(`error ${err.stack}`, { e: renderError(err) }))
 			.on('stalled', (jobId) => deliverLogger.warn(`stalled id=${jobId}`));
 		//#endregion
 
 		//#region inbox
 		this.inboxQueueWorker = new Bull.Worker(QUEUE.INBOX, (job) => this.inboxProcessorService.process(job), {
-			...baseQueueOptions(this.config, QUEUE.INBOX, this.redisForJobQueue),
+			...baseQueueOptions(this.config, QUEUE.INBOX),
 			autorun: false,
 			concurrency: this.config.inboxJobConcurrency ?? 16,
 			limiter: {
-				max: this.config.inboxJobPerSec ?? 16,
+				max: this.config.inboxJobPerSec ?? 32,
 				duration: 1000,
 			},
 			settings: {
@@ -246,14 +242,14 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		this.inboxQueueWorker
 			.on('active', (job) => inboxLogger.debug(`active ${getJobInfo(job, true)}`))
 			.on('completed', (job, result) => inboxLogger.debug(`completed(${result}) ${getJobInfo(job, true)}`))
-			.on('failed', (job, err) => inboxLogger.warn(`failed(${err}) ${getJobInfo(job)} activity=${job ? (job.data.activity ? job.data.activity.id : 'none') : '-'}`, { job, e: renderError(err) }))
-			.on('error', (err: Error) => inboxLogger.error(`error ${err}`, { e: renderError(err) }))
+			.on('failed', (job, err) => inboxLogger.warn(`failed(${err.stack}) ${getJobInfo(job)} activity=${job ? (job.data.activity ? job.data.activity.id : 'none') : '-'}`, { job, e: renderError(err) }))
+			.on('error', (err: Error) => inboxLogger.error(`error ${err.stack}`, { e: renderError(err) }))
 			.on('stalled', (jobId) => inboxLogger.warn(`stalled id=${jobId}`));
 		//#endregion
 
 		//#region webhook deliver
 		this.webhookDeliverQueueWorker = new Bull.Worker(QUEUE.WEBHOOK_DELIVER, (job) => this.webhookDeliverProcessorService.process(job), {
-			...baseQueueOptions(this.config, QUEUE.WEBHOOK_DELIVER, this.redisForJobQueue),
+			...baseQueueOptions(this.config, QUEUE.WEBHOOK_DELIVER),
 			autorun: false,
 			concurrency: 64,
 			limiter: {
@@ -270,8 +266,8 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		this.webhookDeliverQueueWorker
 			.on('active', (job) => webhookLogger.debug(`active ${getJobInfo(job, true)} to=${job.data.to}`))
 			.on('completed', (job, result) => webhookLogger.debug(`completed(${result}) ${getJobInfo(job, true)} to=${job.data.to}`))
-			.on('failed', (job, err) => webhookLogger.warn(`failed(${err}) ${getJobInfo(job)} to=${job ? job.data.to : '-'}`))
-			.on('error', (err: Error) => webhookLogger.error(`error ${err}`, { e: renderError(err) }))
+			.on('failed', (job, err) => webhookLogger.warn(`failed(${err.stack}) ${getJobInfo(job)} to=${job ? job.data.to : '-'}`))
+			.on('error', (err: Error) => webhookLogger.error(`error ${err.stack}`, { e: renderError(err) }))
 			.on('stalled', (jobId) => webhookLogger.warn(`stalled id=${jobId}`));
 		//#endregion
 
@@ -285,7 +281,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 				default: throw new Error(`unrecognized job type ${job.name} for relationship`);
 			}
 		}, {
-			...baseQueueOptions(this.config, QUEUE.RELATIONSHIP, this.redisForJobQueue),
+			...baseQueueOptions(this.config, QUEUE.RELATIONSHIP),
 			autorun: false,
 			concurrency: this.config.relashionshipJobConcurrency ?? 16,
 			limiter: {
@@ -299,8 +295,8 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		this.relationshipQueueWorker
 			.on('active', (job) => relationshipLogger.debug(`active id=${job.id}`))
 			.on('completed', (job, result) => relationshipLogger.debug(`completed(${result}) id=${job.id}`))
-			.on('failed', (job, err) => relationshipLogger.warn(`failed(${err}) id=${job ? job.id : '-'}`, { job, e: renderError(err) }))
-			.on('error', (err: Error) => relationshipLogger.error(`error ${err}`, { e: renderError(err) }))
+			.on('failed', (job, err) => relationshipLogger.warn(`failed(${err.stack}) id=${job ? job.id : '-'}`, { job, e: renderError(err) }))
+			.on('error', (err: Error) => relationshipLogger.error(`error ${err.stack}`, { e: renderError(err) }))
 			.on('stalled', (jobId) => relationshipLogger.warn(`stalled id=${jobId}`));
 		//#endregion
 
@@ -312,7 +308,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 				default: throw new Error(`unrecognized job type ${job.name} for objectStorage`);
 			}
 		}, {
-			...baseQueueOptions(this.config, QUEUE.OBJECT_STORAGE, this.redisForJobQueue),
+			...baseQueueOptions(this.config, QUEUE.OBJECT_STORAGE),
 			autorun: false,
 			concurrency: 16,
 		});
@@ -322,14 +318,14 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		this.objectStorageQueueWorker
 			.on('active', (job) => objectStorageLogger.debug(`active id=${job.id}`))
 			.on('completed', (job, result) => objectStorageLogger.debug(`completed(${result}) id=${job.id}`))
-			.on('failed', (job, err) => objectStorageLogger.warn(`failed(${err}) id=${job ? job.id : '-'}`, { job, e: renderError(err) }))
-			.on('error', (err: Error) => objectStorageLogger.error(`error ${err}`, { e: renderError(err) }))
+			.on('failed', (job, err) => objectStorageLogger.warn(`failed(${err.stack}) id=${job ? job.id : '-'}`, { job, e: renderError(err) }))
+			.on('error', (err: Error) => objectStorageLogger.error(`error ${err.stack}`, { e: renderError(err) }))
 			.on('stalled', (jobId) => objectStorageLogger.warn(`stalled id=${jobId}`));
 		//#endregion
 
 		//#region ended poll notification
 		this.endedPollNotificationQueueWorker = new Bull.Worker(QUEUE.ENDED_POLL_NOTIFICATION, (job) => this.endedPollNotificationProcessorService.process(job), {
-			...baseQueueOptions(this.config, QUEUE.ENDED_POLL_NOTIFICATION, this.redisForJobQueue),
+			...baseQueueOptions(this.config, QUEUE.ENDED_POLL_NOTIFICATION),
 			autorun: false,
 		});
 		//#endregion

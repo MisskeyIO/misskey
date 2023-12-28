@@ -55,9 +55,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div class="_gaps_m" :class="$style.root">
 			<div>
 				<p style="margin-bottom: 20px;">{{ i18n.ts.abuseReported }}</p>
-				<MkButton @click="blockUser" :disabled="fullUserInfo?.isBlocking">{{ i18n.ts.blockThisUser }}</MkButton>
+				<MkButton :disabled="fullUserInfo?.isBlocking" @click="blockUser">{{ i18n.ts.blockThisUser }}</MkButton>
 				<br>
-				<MkButton @click="muteUser" :disabled="fullUserInfo?.isMuted">{{ i18n.ts.muteThisUser }}</MkButton>
+				<MkButton :disabled="fullUserInfo?.isMuted" @click="muteUser">{{ i18n.ts.muteThisUser }}</MkButton>
 			</div>
 		</div>
 	</MkSpacer>

@@ -116,12 +116,12 @@ export class QueueService {
 
 		await this.deliverQueue.addBulk(Array.from(inboxes.entries(), d => ({
 			name: d[0],
-			data: {
+			data: <DeliverJobData> {
 				user,
 				content,
 				to: d[0],
 				isSharedInbox: d[1],
-			} as DeliverJobData,
+			},
 			opts,
 		})));
 

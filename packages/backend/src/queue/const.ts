@@ -38,8 +38,8 @@ export function baseWorkerOptions(config: RedisOptions & RedisOptionsSource, que
 		},
 		prefix: config.prefix ? `${config.prefix}:queue:${queueName}` : `queue:${queueName}`,
 		skipLockRenewal: false,
-		lockDuration: 60 * 1000,
-		lockRenewTime: 30 * 1000,
+		lockDuration: 90 * 1000,
+		lockRenewTime: 10 * 1000,
 		stalledInterval: 90 * 1000,
 	};
 }

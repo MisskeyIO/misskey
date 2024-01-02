@@ -25,6 +25,13 @@ export function baseQueueOptions(config: RedisOptions & RedisOptionsSource, queu
 			...config,
 			maxRetriesPerRequest: null,
 			keyPrefix: undefined,
+			reconnectOnError: (err: Error) => {
+				if ( err.message.includes('READONLY')
+					|| err.message.includes('ETIMEDOUT')
+					|| err.message.includes('Command timed out')
+				) return 2;
+				return 1;
+			},
 		},
 		prefix: config.prefix ? `${config.prefix}:queue:${queueName}` : `queue:${queueName}`,
 	};
@@ -37,6 +44,13 @@ export function baseWorkerOptions(config: RedisOptions & RedisOptionsSource, wor
 			...config,
 			maxRetriesPerRequest: null,
 			keyPrefix: undefined,
+			reconnectOnError: (err: Error) => {
+				if ( err.message.includes('READONLY')
+					|| err.message.includes('ETIMEDOUT')
+					|| err.message.includes('Command timed out')
+				) return 2;
+				return 1;
+			},
 		},
 		prefix: config.prefix ? `${config.prefix}:queue:${queueName}` : `queue:${queueName}`,
 	};

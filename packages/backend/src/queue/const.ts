@@ -18,8 +18,9 @@ export const QUEUE = {
 	WEBHOOK_DELIVER: 'webhookDeliver',
 };
 
-export function baseQueueOptions(config: RedisOptions & RedisOptionsSource, queueName: typeof QUEUE[keyof typeof QUEUE]): Bull.QueueOptions {
+export function baseQueueOptions(config: RedisOptions & RedisOptionsSource, queueOptions: Partial<Bull.QueueOptions>, queueName: typeof QUEUE[keyof typeof QUEUE]): Bull.QueueOptions {
 	return {
+		...queueOptions,
 		connection: {
 			...config,
 			maxRetriesPerRequest: null,
@@ -29,17 +30,14 @@ export function baseQueueOptions(config: RedisOptions & RedisOptionsSource, queu
 	};
 }
 
-export function baseWorkerOptions(config: RedisOptions & RedisOptionsSource, queueName: typeof QUEUE[keyof typeof QUEUE]): Bull.WorkerOptions {
+export function baseWorkerOptions(config: RedisOptions & RedisOptionsSource, workerOptions: Partial<Bull.WorkerOptions>, queueName: typeof QUEUE[keyof typeof QUEUE]): Bull.WorkerOptions {
 	return {
+		...workerOptions,
 		connection: {
 			...config,
 			maxRetriesPerRequest: null,
 			keyPrefix: undefined,
 		},
 		prefix: config.prefix ? `${config.prefix}:queue:${queueName}` : `queue:${queueName}`,
-		skipLockRenewal: false,
-		lockDuration: 90 * 1000,
-		lockRenewTime: 10 * 1000,
-		stalledInterval: 90 * 1000,
 	};
 }

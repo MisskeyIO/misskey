@@ -18,7 +18,7 @@ RUN corepack enable
 
 WORKDIR /misskey
 
-COPY --link pnpm-lock.yaml ./
+COPY pnpm-lock.yaml ./
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
 	pnpm fetch
 
@@ -51,7 +51,7 @@ RUN corepack enable
 
 WORKDIR /misskey
 
-COPY --link pnpm-lock.yaml ./
+COPY pnpm-lock.yaml ./
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
 	pnpm fetch
 

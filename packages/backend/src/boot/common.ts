@@ -9,7 +9,6 @@ import { QueueProcessorService } from '@/queue/QueueProcessorService.js';
 import { NestLogger } from '@/NestLogger.js';
 import { QueueProcessorModule } from '@/queue/QueueProcessorModule.js';
 import { QueueStatsService } from '@/daemons/QueueStatsService.js';
-import { ServerStatsService } from '@/daemons/ServerStatsService.js';
 import { ServerService } from '@/server/ServerService.js';
 import { MainModule } from '@/MainModule.js';
 
@@ -25,7 +24,6 @@ export async function server() {
 	if (process.env.NODE_ENV !== 'test') {
 		app.get(ChartManagementService).start();
 		app.get(QueueStatsService).start();
-		// app.get(ServerStatsService).start();
 	}
 
 	return app;

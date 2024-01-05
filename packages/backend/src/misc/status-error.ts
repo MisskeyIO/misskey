@@ -15,6 +15,6 @@ export class StatusError extends Error {
 		this.statusCode = statusCode;
 		this.statusMessage = statusMessage;
 		this.isClientError = typeof this.statusCode === 'number' && this.statusCode >= 400 && this.statusCode < 500;
-		this.isRetryable = typeof this.statusCode === 'number' && (this.statusCode >= 500 && this.statusCode < 600) || this.statusCode === 429;
+		this.isRetryable = !this.isClientError || this.statusCode === 429;
 	}
 }

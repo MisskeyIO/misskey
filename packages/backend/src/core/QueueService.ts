@@ -17,6 +17,7 @@ import type { DbQueue, DeliverQueue, EndedPollNotificationQueue, InboxQueue, Obj
 import type { DbJobData, DeliverJobData, RelationshipJobData, ThinUser } from '../queue/types.js';
 import type httpSignature from '@peertube/http-signature';
 import type * as Bull from 'bullmq';
+import { ApRequestCreator } from '@/core/activitypub/ApRequestService.js';
 
 @Injectable()
 export class QueueService {
@@ -75,11 +76,14 @@ export class QueueService {
 		if (content == null) return null;
 		if (to == null) return null;
 
+		const contentBody = JSON.stringify(content);
+
 		const data: DeliverJobData = {
 			user: {
 				id: user.id,
 			},
-			content,
+			content: contentBody,
+			digest: ApRequestCreator.createDigest(contentBody),
 			to,
 			isSharedInbox,
 		};
@@ -104,6 +108,7 @@ export class QueueService {
 	@bindThis
 	public async deliverMany(user: ThinUser, content: IActivity | null, inboxes: Map<string, boolean>) {
 		if (content == null) return null;
+		const contentBody = JSON.stringify(content);
 
 		const opts = {
 			attempts: this.config.deliverJobMaxAttempts ?? 12,
@@ -118,7 +123,8 @@ export class QueueService {
 			name: d[0],
 			data: {
 				user,
-				content,
+				content: contentBody,
+				digest: ApRequestCreator.createDigest(contentBody),
 				to: d[0],
 				isSharedInbox: d[1],
 			},

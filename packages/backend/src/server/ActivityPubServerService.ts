@@ -100,8 +100,8 @@ export class ActivityPubServerService {
 	}
 
 	@bindThis
-	private async inbox(request: FastifyRequest<{ Params: { user?: string; }; }>, reply: FastifyReply) {
-		const userId = request.params.user;
+	private async inbox(request: FastifyRequest, reply: FastifyReply) {
+		const userId = (request.params as { user: string; } | undefined)?.user;
 		let signature;
 
 		try {
@@ -562,7 +562,7 @@ export class ActivityPubServerService {
 
 		//#region Routing
 		// inbox (limit: 64kb)
-		fastify.post<{ Params: { }; }>('/inbox', { config: { rawBody: true }, bodyLimit: 1024 * 64 }, async (request, reply) => await this.inbox(request, reply));
+		fastify.post('/inbox', { config: { rawBody: true }, bodyLimit: 1024 * 64 }, async (request, reply) => await this.inbox(request, reply));
 		fastify.post<{ Params: { user: string; }; }>('/users/:user/inbox', { config: { rawBody: true }, bodyLimit: 1024 * 64 }, async (request, reply) => await this.inbox(request, reply));
 
 		// note

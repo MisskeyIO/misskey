@@ -82,7 +82,7 @@ export class Storage<T extends StateDef> {
 	}
 
 	private isPureObject(value: unknown): value is Record<string, unknown> {
-		return value !== null && typeof value === 'object' && !Array.isArray(value)
+		return value !== null && typeof value === 'object' && !Array.isArray(value);
 	}
 
 	private mergeState<T>(value: T, def: T): T {

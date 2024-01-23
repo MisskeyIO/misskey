@@ -16,7 +16,6 @@ import { MetaService } from '@/core/MetaService.js';
 import { MiLocalUser } from '@/models/User.js';
 import { FanoutTimelineEndpointService } from '@/core/FanoutTimelineEndpointService.js';
 import { FanoutTimelineName } from '@/core/FanoutTimelineService.js';
-import { ApiError } from '@/server/api/error.js';
 
 export const meta = {
 	tags: ['users', 'notes'],

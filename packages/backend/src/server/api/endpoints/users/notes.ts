@@ -37,12 +37,6 @@ export const meta = {
 			code: 'NO_SUCH_USER',
 			id: '27e494ba-2ac2-48e8-893b-10d4d8c2387b',
 		},
-
-		bothWithRepliesAndWithFiles: {
-			message: 'Specifying both withReplies and withFiles is not supported',
-			code: 'BOTH_WITH_REPLIES_AND_WITH_FILES',
-			id: '91c8cb9f-36ed-46e7-9ca2-7df96ed6e222',
-		},
 	},
 } as const;
 
@@ -83,8 +77,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const isSelf = me && (me.id === ps.userId);
 
 			const serverSettings = await this.metaService.fetch();
-
-			if (ps.withReplies && ps.withFiles) throw new ApiError(meta.errors.bothWithRepliesAndWithFiles);
 
 			// early return if me is blocked by requesting user
 			if (me != null) {

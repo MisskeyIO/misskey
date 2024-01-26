@@ -116,7 +116,7 @@ export class ApNoteService {
 	 * Noteを作成します。
 	 */
 	@bindThis
-	public async createNote(value: string | IObject, resolver?: Resolver, silent = false, additionalTo?: MiLocalUser['id']): Promise<MiNote | null> {
+	public async createNote(value: string | IObject, resolver?: Resolver, silent = false): Promise<MiNote | null> {
 		// eslint-disable-next-line no-param-reassign
 		if (resolver == null) resolver = this.apResolverService.createResolver();
 
@@ -165,13 +165,6 @@ export class ApNoteService {
 		const noteAudience = await this.apAudienceService.parseAudience(actor, note.to, note.cc, resolver);
 		let visibility = noteAudience.visibility;
 		const visibleUsers = noteAudience.visibleUsers;
-
-		if (additionalTo) {
-			const additionalUser = await this.usersRepository.findOneBy({ id: additionalTo, host: IsNull() });
-			if (additionalUser && !visibleUsers.some(x => x.id === additionalUser.id)) {
-				visibleUsers.push(additionalUser);
-			}
-		}
 
 		// Audience (to, cc) が指定されてなかった場合
 		if (visibility === 'specified' && visibleUsers.length === 0) {

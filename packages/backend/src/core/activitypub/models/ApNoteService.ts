@@ -5,11 +5,11 @@
 
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import promiseLimit from 'promise-limit';
-import { In, IsNull } from 'typeorm';
+import { In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { UsersRepository, PollsRepository, EmojisRepository } from '@/models/_.js';
 import type { Config } from '@/config.js';
-import type { MiLocalUser, MiRemoteUser } from '@/models/User.js';
+import type { MiRemoteUser } from '@/models/User.js';
 import type { MiNote } from '@/models/Note.js';
 import { toArray, toSingle, unique } from '@/misc/prelude/array.js';
 import type { MiEmoji } from '@/models/Emoji.js';

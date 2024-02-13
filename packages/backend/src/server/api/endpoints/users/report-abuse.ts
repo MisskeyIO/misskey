@@ -34,7 +34,6 @@ export const meta = {
 			code: 'CANNOT_REPORT_YOURSELF',
 			id: '1e13149e-b1e8-43cf-902e-c01dbfcb202f',
 		},
-
 	},
 } as const;
 

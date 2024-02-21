@@ -188,6 +188,7 @@ export class InboxProcessorService {
 				if (e.id === 'e11b3a16-f543-4885-8eb1-66cad131dbfd') return 'blocked mentions from unfamiliar user';
 				if (e.id === '057d8d3e-b7ca-4f8b-b38c-dcdcbf34dc30') return 'blocked notes with prohibited words';
 			}
+			throw e;
 		}
 		return 'ok';
 	}

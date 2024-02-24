@@ -81,8 +81,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw new ApiError(meta.errors.processing);
 			}
 
-			// すでに同じリクエストが処理されている場合、そのノートを返す
-			// ただし、記録されているノート見つからない場合は、新規として処理を続行
+			// すでに同じリクエストが処理されている場合、そのファイルを返す
+			// ただし、記録されているファイルが見つからない場合は、新規として処理を続行
 			if (idempotent) {
 				const file = await this.driveFilesRepository.findOneBy({ id: idempotent });
 				if (file) {

@@ -272,7 +272,7 @@ export function inputText(props: {
 	default?: string | null;
 	minLength?: number;
 	maxLength?: number;
-}): Promise<{ canceled: true; result?: undefined; } | {
+}): Promise<{ canceled: true; result: undefined; } | {
 	canceled: false; result: string;
 }> {
 	return new Promise((resolve, reject) => {
@@ -289,7 +289,7 @@ export function inputText(props: {
 			},
 		}, {
 			done: result => {
-				resolve(typeof result.result === 'string' ? result : { canceled: true });
+				resolve(typeof result.result === 'string' ? result : { canceled: true, result: undefined });
 			},
 		}, 'closed');
 	});

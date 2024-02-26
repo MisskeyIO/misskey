@@ -387,7 +387,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 				|| (data.visibility === 'specified' && data.visibleUsers?.some(u => u.id !== user.id))
 				|| (this.isQuote(data) && data.renote.userId !== user.id)
 			) {
-				this.logger.error('Request rejected because user has no permission to mention', { user: user.id, note: data });
+				this.logger.error('Request rejected because user has no permission to initiate conversation', { user: user.id, note: data });
 				throw new IdentifiableError('332dd91b-6a00-430a-ac39-620cf60ad34b', 'Notes including mentions, replies, or renotes are not allowed.');
 			}
 		}

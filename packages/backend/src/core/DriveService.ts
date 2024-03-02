@@ -459,10 +459,13 @@ export class DriveService {
 	}: AddFileArgs): Promise<MiDriveFile> {
 		let skipNsfwCheck = false;
 		const instance = await this.metaService.fetch();
-		const userRoleNSFW = user && (await this.roleService.getUserPolicies(user.id)).alwaysMarkNsfw;
+		const policies = user && await this.roleService.getUserPolicies(user.id);
+		const userRoleNSFW = policies?.alwaysMarkNsfw;
 		if (user == null) {
 			skipNsfwCheck = true;
 		} else if (userRoleNSFW) {
+			skipNsfwCheck = true;
+		} else if (policies?.skipNsfwDetection) {
 			skipNsfwCheck = true;
 		}
 		if (instance.sensitiveMediaDetection === 'none') skipNsfwCheck = true;

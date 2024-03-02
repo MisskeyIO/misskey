@@ -55,6 +55,7 @@ export type RolePolicies = {
 	canHideAds: boolean;
 	driveCapacityMb: number;
 	alwaysMarkNsfw: boolean;
+	skipNsfwDetection: boolean;
 	pinLimit: number;
 	antennaLimit: number;
 	wordMuteLimit: number;
@@ -90,6 +91,7 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	canHideAds: false,
 	driveCapacityMb: 100,
 	alwaysMarkNsfw: false,
+	skipNsfwDetection: false,
 	pinLimit: 5,
 	antennaLimit: 5,
 	wordMuteLimit: 200,
@@ -364,6 +366,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			canHideAds: calc('canHideAds', vs => vs.some(v => v === true)),
 			driveCapacityMb: calc('driveCapacityMb', vs => Math.max(...vs)),
 			alwaysMarkNsfw: calc('alwaysMarkNsfw', vs => vs.some(v => v === true)),
+			skipNsfwDetection: calc('skipNsfwDetection', vs => vs.some(v => v === true)),
 			pinLimit: calc('pinLimit', vs => Math.max(...vs)),
 			antennaLimit: calc('antennaLimit', vs => Math.max(...vs)),
 			wordMuteLimit: calc('wordMuteLimit', vs => Math.max(...vs)),

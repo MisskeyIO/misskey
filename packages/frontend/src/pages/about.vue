@@ -25,7 +25,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 				<div style="display:flex;flex-direction:column;align-items:center;justify-content:center">
 					<div>© {{ new Date().getFullYear() }} MisskeyHQ Inc.</div>
-					<a href="https://support.misskey.io/hc/ja/articles/7767990164111" target="_blank">特定商取引法に基づく表記</a>
+					<a href="https://support.misskey.io/hc/ja/articles/7767990164111" target="_blank"><u>特定商取引法に基づく表記</u></a>
 				</div>
 
 				<FormSection>
@@ -95,8 +95,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</FormLink>
 							<FormLink v-if="instance.feedbackUrl" :to="instance.feedbackUrl" external>
 								<template #icon><i class="ti ti-message"></i></template>
-								{{ i18n.ts.feedback }}
-								<template #suffix>Helpdesk</template>
+								{{ i18n.ts.support }}
 							</FormLink>
 							<FormLink to="https://misskeyhq.fanbox.cc" external>
 								<template #icon><i class="ti ti-pig-money"></i></template>

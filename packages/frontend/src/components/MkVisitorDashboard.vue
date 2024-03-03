@@ -28,12 +28,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 		</div>
 	</div>
-	<div :class="[$style.sponsors, $style.panel]">
-		<div :class="$style.sponsorsHeader"><Mfm text="$[jelly ❤]"/> Sponsored by</div>
-		<div :class="$style.sponsorsBody">
-			<a title="Skeb" href="https://skeb.jp/" target="_blank"><img src="https://media.misskeyusercontent.com/misskey-io/sponsors/skeb.png" alt="Skeb" width="140"></a>
-		</div>
-	</div>
 	<div v-if="stats" :class="$style.stats">
 		<div :class="[$style.statsItem, $style.panel]">
 			<div :class="$style.statsItemLabel">{{ i18n.ts.users }}</div>
@@ -53,9 +47,23 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div :class="$style.panel">
 		<XActiveUsersChart/>
 	</div>
-	<div :class="[$style.legalNotice, $style.panel]">
-		<div>© {{ new Date().getFullYear() }} MisskeyHQ Inc.</div>
-		<a href="https://support.misskey.io/hc/ja/articles/7767990164111" target="_blank">特定商取引法に基づく表記</a>
+	<div :class="[$style.footer, $style.panel]">
+		<div :class="$style.sponsors">
+			<div><Mfm text="$[jelly ❤]"/> Sponsored by</div>
+			<a title="Skeb" href="https://skeb.jp/" target="_blank"><img src="https://media.misskeyusercontent.com/misskey-io/sponsors/skeb.png" alt="Skeb" width="140"></a>
+		</div>
+		<div :class="$style.legalNotice">
+			<div>© {{ new Date().getFullYear() }} MisskeyHQ Inc.</div>
+			<a href="https://support.misskey.io/hc/ja/articles/7767990164111" target="_blank"><u>特定商取引法に基づく表記</u></a>
+		</div>
+		<div :class="$style.links">
+			<a href="#" @click="os.pageWindow('/about')"><u>{{ instanceName }}</u></a>
+			<a href="#" @click="os.pageWindow('/about-misskey')"><u>{{ i18n.ts.aboutMisskey }}</u></a>
+			<a v-if="instance.tosUrl" :href="instance.tosUrl" target="_blank" rel="noopener"><u>{{ i18n.ts.termsOfService }}</u></a>
+			<a v-if="instance.privacyPolicyUrl" :href="instance.privacyPolicyUrl" target="_blank" rel="noopener"><u>{{ i18n.ts.privacyPolicy }}</u></a>
+			<a v-if="instance.impressumUrl" :href="instance.impressumUrl" target="_blank" rel="noopener"><u>{{ i18n.ts.impressum }}</u></a>
+			<a v-if="instance.feedbackUrl" :href="instance.feedbackUrl" target="_blank" rel="noopener"><u>{{ i18n.ts.support }}</u></a>
+		</div>
 	</div>
 </div>
 </template>
@@ -251,21 +259,12 @@ function exploreOtherServers() {
 	overflow: auto;
 }
 
-.sponsors {
-	display: block;
-}
-
-.sponsorsHeader {
-	padding: 12px 16px;
-	border-bottom: solid 1px var(--divider);
-}
-
-.sponsorsBody {
+.footer {
 	display: flex;
-	flex-wrap: wrap;
+	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	padding: 8px 8px;
+	padding: 12px 16px;
 	gap: 8px 8px;
 }
 
@@ -274,6 +273,21 @@ function exploreOtherServers() {
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	padding: 8px 8px;
+}
+
+.sponsors {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 8px 8px;
+}
+
+.links {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 8px 8px;
 }
 </style>

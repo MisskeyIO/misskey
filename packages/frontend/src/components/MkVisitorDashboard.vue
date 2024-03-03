@@ -54,7 +54,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 		<div :class="$style.legalNotice">
 			<div>© {{ new Date().getFullYear() }} MisskeyHQ Inc.</div>
-			<a href="https://support.misskey.io/hc/ja/articles/7767990164111" target="_blank"><u>特定商取引法に基づく表記</u></a>
+			<a href="https://go.misskey.io/legal-notice" target="_blank" rel="noopener"><u>特定商取引法に基づく表記</u></a>
 		</div>
 		<div :class="$style.links">
 			<a href="#" @click="os.pageWindow('/about')"><u>{{ instanceName }}</u></a>

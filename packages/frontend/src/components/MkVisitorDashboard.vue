@@ -28,6 +28,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 		</div>
 	</div>
+	<div :class="[$style.sponsors, $style.panel]">
+		<div :class="$style.sponsorsHeader"><Mfm text="$[jelly ❤]"/> Sponsored by</div>
+		<div :class="$style.sponsorsBody">
+			<a title="Skeb" href="https://skeb.jp/" target="_blank"><img src="https://media.misskeyusercontent.com/misskey-io/sponsors/skeb.png" alt="Skeb" width="140"></a>
+		</div>
+	</div>
 	<div v-if="stats" :class="$style.stats">
 		<div :class="[$style.statsItem, $style.panel]">
 			<div :class="$style.statsItemLabel">{{ i18n.ts.users }}</div>
@@ -46,6 +52,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 	<div :class="$style.panel">
 		<XActiveUsersChart/>
+	</div>
+	<div :class="[$style.legalNotice, $style.panel]">
+		<div>© {{ new Date().getFullYear() }} MisskeyHQ Inc.</div>
+		<a href="https://support.misskey.io/hc/ja/articles/7767990164111" target="_blank">特定商取引法に基づく表記</a>
 	</div>
 </div>
 </template>
@@ -239,5 +249,31 @@ function exploreOtherServers() {
 .tlBody {
 	height: 350px;
 	overflow: auto;
+}
+
+.sponsors {
+	display: block;
+}
+
+.sponsorsHeader {
+	padding: 12px 16px;
+	border-bottom: solid 1px var(--divider);
+}
+
+.sponsorsBody {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	padding: 8px 8px;
+	gap: 8px 8px;
+}
+
+.legalNotice {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 8px 8px;
 }
 </style>

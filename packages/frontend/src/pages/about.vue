@@ -23,6 +23,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<template #value><div v-html="instance.description"></div></template>
 				</MkKeyValue>
 
+				<div style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+					<div>© {{ new Date().getFullYear() }} MisskeyHQ Inc.</div>
+					<a href="https://support.misskey.io/hc/ja/articles/7767990164111" target="_blank">特定商取引法に基づく表記</a>
+				</div>
+
+				<FormSection>
+					<template #label><Mfm text="$[jelly ❤]"/> Sponsored by</template>
+					<div style="display:flex;flex-wrap:wrap;gap:8px 8px;align-items:center;justify-content:center;">
+						<a title="Skeb" href="https://skeb.jp/" target="_blank"><img src="https://media.misskeyusercontent.com/misskey-io/sponsors/skeb.png" alt="Skeb" width="140"></a>
+					</div>
+				</FormSection>
+
 				<FormSection>
 					<div class="_gaps_m">
 						<MkKeyValue :copy="version">

@@ -19,6 +19,11 @@ export type RedisOptionsSource = Partial<RedisOptions> & {
 	prefix?: string;
 };
 
+export type MemoryCacheOptions = {
+	max?: number;
+	ttl?: number;
+};
+
 /**
  * 設定ファイルの型
  */
@@ -64,6 +69,20 @@ type Source = {
 		ssl?: boolean;
 		index: string;
 		scope?: 'local' | 'global' | string[];
+	};
+
+	memoryCache?: {
+		database?: MemoryCacheOptions;
+		user?: MemoryCacheOptions;
+		userProfile?: MemoryCacheOptions;
+		notification?: MemoryCacheOptions;
+		relation?: MemoryCacheOptions;
+		role?: MemoryCacheOptions;
+		channel?: MemoryCacheOptions;
+		driveFile?: MemoryCacheOptions;
+		note?: MemoryCacheOptions;
+		poll?: MemoryCacheOptions;
+		page?: MemoryCacheOptions;
 	};
 
 	proxy?: string;
@@ -137,6 +156,19 @@ export type Config = {
 		index: string;
 		scope?: 'local' | 'global' | string[];
 	} | undefined;
+	memoryCache: {
+		database: MemoryCacheOptions;
+		user: MemoryCacheOptions;
+		userProfile: MemoryCacheOptions;
+		notification: MemoryCacheOptions;
+		relation: MemoryCacheOptions;
+		role: MemoryCacheOptions;
+		channel: MemoryCacheOptions;
+		driveFile: MemoryCacheOptions;
+		note: MemoryCacheOptions;
+		poll: MemoryCacheOptions;
+		page: MemoryCacheOptions;
+	};
 	proxy: string | undefined;
 	proxySmtp: string | undefined;
 	proxyBypassHosts: string[] | undefined;
@@ -261,6 +293,19 @@ export function loadConfig(): Config {
 		redisForObjectStorageQueue: config.redisForObjectStorageQueue ? convertRedisOptions(config.redisForObjectStorageQueue, host) : redisForJobQueue,
 		redisForWebhookDeliverQueue: config.redisForWebhookDeliverQueue ? convertRedisOptions(config.redisForWebhookDeliverQueue, host) : redisForJobQueue,
 		redisForTimelines: config.redisForTimelines ? convertRedisOptions(config.redisForTimelines, host) : redis,
+		memoryCache: {
+			database: config.memoryCache?.database ?? { max: undefined, ttl: undefined },
+			user: config.memoryCache?.user ?? { max: undefined, ttl: undefined },
+			userProfile: config.memoryCache?.userProfile ?? { max: undefined, ttl: undefined },
+			notification: config.memoryCache?.notification ?? { max: undefined, ttl: undefined },
+			relation: config.memoryCache?.relation ?? { max: undefined, ttl: undefined },
+			role: config.memoryCache?.role ?? { max: undefined, ttl: undefined },
+			channel: config.memoryCache?.channel ?? { max: undefined, ttl: undefined },
+			driveFile: config.memoryCache?.driveFile ?? { max: undefined, ttl: undefined },
+			note: config.memoryCache?.note ?? { max: undefined, ttl: undefined },
+			poll: config.memoryCache?.poll ?? { max: undefined, ttl: undefined },
+			page: config.memoryCache?.page ?? { max: undefined, ttl: undefined },
+		},
 		id: config.id,
 		proxy: config.proxy,
 		proxySmtp: config.proxySmtp,

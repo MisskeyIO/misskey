@@ -5,19 +5,27 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { Brackets } from 'typeorm';
+import { LRUCache } from 'lru-cache';
 import { DI } from '@/di-symbols.js';
 import type { RoleAssignmentsRepository, RolesRepository } from '@/models/_.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
+import { Packed } from '@/misc/json-schema.js';
+import type { Config } from '@/config.js';
 import type { MiUser } from '@/models/User.js';
 import type { MiRole } from '@/models/Role.js';
 import { bindThis } from '@/decorators.js';
 import { DEFAULT_POLICIES } from '@/core/RoleService.js';
-import { Packed } from '@/misc/json-schema.js';
+import { cacheFetchOrFail } from '@/misc/cache-fetch.js';
 import { IdService } from '@/core/IdService.js';
 
 @Injectable()
 export class RoleEntityService {
+	private readonly roleCache: LRUCache<string, MiRole>;
+
 	constructor(
+		@Inject(DI.config)
+		private config: Config,
+
 		@Inject(DI.rolesRepository)
 		private rolesRepository: RolesRepository,
 
@@ -26,6 +34,16 @@ export class RoleEntityService {
 
 		private idService: IdService,
 	) {
+		this.roleCache = new LRUCache({
+			max: this.config.memoryCache.role.max ?? 1,
+			ttl: this.config.memoryCache.role.ttl ?? 100,
+
+			ignoreFetchAbort: true,
+			ttlResolution: 1000 * 30,
+			fetchMethod: async (id: string) => {
+				return await this.rolesRepository.findOneByOrFail({ id });
+			},
+		});
 	}
 
 	@bindThis
@@ -33,7 +51,7 @@ export class RoleEntityService {
 		src: MiRole['id'] | MiRole,
 		me: { id: MiUser['id'] } | null | undefined,
 	) : Promise<Packed<'Role'>> {
-		const role = typeof src === 'object' ? src : await this.rolesRepository.findOneByOrFail({ id: src });
+		const role = typeof src === 'object' ? src : await cacheFetchOrFail(this.roleCache, src);
 
 		const assignedCount = await this.roleAssignmentsRepository.createQueryBuilder('assign')
 			.where('assign.roleId = :roleId', { roleId: role.id })
@@ -42,6 +60,7 @@ export class RoleEntityService {
 					.where('assign.expiresAt IS NULL')
 					.orWhere('assign.expiresAt > :now', { now: new Date() });
 			}))
+			.cache(this.config.memoryCache.role.ttl ?? false)
 			.getCount();
 
 		const policies = { ...role.policies };

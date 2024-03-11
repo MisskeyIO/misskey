@@ -7,6 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import _Ajv from 'ajv';
 import { ModuleRef } from '@nestjs/core';
+import { LRUCache } from 'lru-cache';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import type { Packed } from '@/misc/json-schema.js';
@@ -15,7 +16,6 @@ import { awaitAll } from '@/misc/prelude/await-all.js';
 import { USER_ACTIVE_THRESHOLD, USER_ONLINE_THRESHOLD } from '@/const.js';
 import type { MiLocalUser, MiPartialLocalUser, MiPartialRemoteUser, MiRemoteUser, MiUser } from '@/models/User.js';
 import { birthdaySchema, descriptionSchema, localUsernameSchema, locationSchema, nameSchema, passwordSchema } from '@/models/User.js';
-import { MiNotification } from '@/models/Notification.js';
 import type { UsersRepository, UserSecurityKeysRepository, FollowingsRepository, FollowRequestsRepository, BlockingsRepository, MutingsRepository, DriveFilesRepository, NoteUnreadsRepository, UserNotePiningsRepository, UserProfilesRepository, AnnouncementReadsRepository, AnnouncementsRepository, MiUserProfile, RenoteMutingsRepository, UserMemoRepository } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { RoleService } from '@/core/RoleService.js';
@@ -27,6 +27,7 @@ import type { AnnouncementService } from '@/core/AnnouncementService.js';
 import type { CustomEmojiService } from '@/core/CustomEmojiService.js';
 import { AvatarDecorationService } from '@/core/AvatarDecorationService.js';
 import { isNotNull } from '@/misc/is-not-null.js';
+import { cacheFetchOrFail } from '@/misc/cache-fetch.js';
 import type { OnModuleInit } from '@nestjs/common';
 import type { NoteEntityService } from './NoteEntityService.js';
 import type { DriveFileEntityService } from './DriveFileEntityService.js';
@@ -49,6 +50,9 @@ function isRemoteUser(user: MiUser | { host: MiUser['host'] }): boolean {
 
 @Injectable()
 export class UserEntityService implements OnModuleInit {
+	private readonly userCache: LRUCache<string, MiUser>;
+	private readonly profileCache: LRUCache<string, MiUserProfile>;
+
 	private apPersonService: ApPersonService;
 	private noteEntityService: NoteEntityService;
 	private driveFileEntityService: DriveFileEntityService;
@@ -111,6 +115,27 @@ export class UserEntityService implements OnModuleInit {
 		@Inject(DI.userMemosRepository)
 		private userMemosRepository: UserMemoRepository,
 	) {
+		this.userCache = new LRUCache({
+			max: this.config.memoryCache.user.max ?? 1,
+			ttl: this.config.memoryCache.user.ttl ?? 100,
+
+			ignoreFetchAbort: true,
+			ttlResolution: 1000 * 30,
+			fetchMethod: async (id: string) => {
+				return await this.usersRepository.findOneByOrFail({ id });
+			},
+		});
+
+		this.profileCache = new LRUCache({
+			max: this.config.memoryCache.userProfile.max ?? 1,
+			ttl: this.config.memoryCache.userProfile.ttl ?? 100,
+
+			ignoreFetchAbort: true,
+			ttlResolution: 1000 * 30,
+			fetchMethod: async (id: string) => {
+				return await this.userProfilesRepository.findOneByOrFail({ userId: id });
+			},
+		});
 	}
 
 	onModuleInit() {
@@ -139,6 +164,13 @@ export class UserEntityService implements OnModuleInit {
 	public isRemoteUser = isRemoteUser;
 
 	@bindThis
+	public async purgeCache(userId: MiUser['id']) {
+		this.userCache.delete(userId);
+		this.profileCache.delete(userId);
+		await this.userSecurityKeysRepository.metadata.connection.queryResultCache?.remove([`securityKeysList:${userId}`]);
+	}
+
+	@bindThis
 	public async getRelation(me: MiUser['id'], target: MiUser['id']) {
 		const [
 			following,
@@ -150,51 +182,61 @@ export class UserEntityService implements OnModuleInit {
 			isMuted,
 			isRenoteMuted,
 		] = await Promise.all([
-			this.followingsRepository.findOneBy({
-				followerId: me,
-				followeeId: target,
+			this.followingsRepository.findOne({
+				where: {
+					followerId: me,
+					followeeId: target,
+				},
+				cache: this.config.memoryCache.relation.ttl,
 			}),
 			this.followingsRepository.exists({
 				where: {
 					followerId: target,
 					followeeId: me,
 				},
+				cache: this.config.memoryCache.relation.ttl,
 			}),
 			this.followRequestsRepository.exists({
 				where: {
 					followerId: me,
 					followeeId: target,
 				},
+				cache: this.config.memoryCache.relation.ttl,
 			}),
 			this.followRequestsRepository.exists({
 				where: {
 					followerId: target,
 					followeeId: me,
 				},
+				cache: this.config.memoryCache.relation.ttl,
 			}),
 			this.blockingsRepository.exists({
 				where: {
 					blockerId: me,
 					blockeeId: target,
 				},
+				cache: this.config.memoryCache.relation.ttl,
 			}),
 			this.blockingsRepository.exists({
 				where: {
 					blockerId: target,
 					blockeeId: me,
 				},
+				cache: this.config.memoryCache.relation.ttl,
 			}),
 			this.mutingsRepository.exists({
 				where: {
 					muterId: me,
 					muteeId: target,
 				},
+				cache: this.config.memoryCache.relation.ttl,
 			}),
 			this.renoteMutingsRepository.exists({
 				where: {
 					muterId: me,
 					muteeId: target,
 				},
+				cache: this.config.memoryCache.relation.ttl,
 			}),
 		]);
 
@@ -311,7 +353,7 @@ export class UserEntityService implements OnModuleInit {
 			includeSecrets: false,
 		}, options);
 
-		const user = typeof src === 'object' ? src : await this.usersRepository.findOneByOrFail({ id: src });
+		const user = typeof src === 'object' ? src : await cacheFetchOrFail(this.userCache, src);
 
 		const isDetailed = opts.schema !== 'UserLite';
 		const meId = me ? me.id : null;
@@ -324,8 +366,9 @@ export class UserEntityService implements OnModuleInit {
 			.where('pin.userId = :userId', { userId: user.id })
 			.innerJoinAndSelect('pin.note', 'note')
 			.orderBy('pin.id', 'DESC')
+			.cache(this.config.memoryCache.userProfile.ttl ?? false)
 			.getMany() : [];
-		const profile = isDetailed ? (opts.userProfile ?? await this.userProfilesRepository.findOneByOrFail({ userId: user.id })) : null;
+		const profile = isDetailed ? (opts.userProfile ?? await cacheFetchOrFail(this.profileCache, user.id)) : null;
 
 		const followingCount = profile == null ? null :
 			(profile.followingVisibility === 'public') || isMe ? user.followingCount :
@@ -432,11 +475,14 @@ export class UserEntityService implements OnModuleInit {
 						isModerator: role.isModerator,
 						isAdministrator: role.isAdministrator,
 						displayOrder: role.displayOrder,
-					}))
+					})),
 				),
-				memo: meId == null ? null : await this.userMemosRepository.findOneBy({
-					userId: meId,
-					targetUserId: user.id,
+				memo: meId == null ? null : await this.userMemosRepository.findOne({
+					where: {
+						userId: meId,
+						targetUserId: user.id,
+					},
+					cache: this.config.memoryCache.relation.ttl,
 				}).then(row => row?.memo ?? null),
 				moderationNote: iAmModerator ? (profile!.moderationNote ?? '') : undefined,
 			} : {}),
@@ -458,14 +504,14 @@ export class UserEntityService implements OnModuleInit {
 				isDeleted: user.isDeleted,
 				twoFactorBackupCodesStock: profile?.twoFactorBackupSecret?.length === 20 ? 'full' : (profile?.twoFactorBackupSecret?.length ?? 0) > 0 ? 'partial' : 'none',
 				hideOnlineStatus: user.hideOnlineStatus,
-				hasUnreadSpecifiedNotes: this.noteUnreadsRepository.count({
+				hasUnreadSpecifiedNotes: this.noteUnreadsRepository.exists({
 					where: { userId: user.id, isSpecified: true },
-					take: 1,
-				}).then(count => count > 0),
-				hasUnreadMentions: this.noteUnreadsRepository.count({
+					cache: this.config.memoryCache.notification.ttl,
+				}),
+				hasUnreadMentions: this.noteUnreadsRepository.exists({
 					where: { userId: user.id, isMentioned: true },
-					take: 1,
-				}).then(count => count > 0),
+					cache: this.config.memoryCache.notification.ttl,
+				}),
 				hasUnreadAnnouncement: (unreadAnnouncements?.length ?? 0) > 0,
 				unreadAnnouncements,
 				hasUnreadAntenna: this.getHasUnreadAntenna(user.id),
@@ -488,14 +534,15 @@ export class UserEntityService implements OnModuleInit {
 				emailVerified: profile!.emailVerified,
 				securityKeysList: profile!.twoFactorEnabled
 					? this.userSecurityKeysRepository.find({
-						where: {
-							userId: user.id,
-						},
 						select: {
 							id: true,
 							name: true,
 							lastUsed: true,
 						},
+						where: {
+							userId: user.id,
+						},
+						cache: this.config.memoryCache.user.ttl ? { id: `securityKeysList:${user.id}`, milliseconds: this.config.memoryCache.user.ttl } : false,
 					})
 					: [],
 			} : {}),

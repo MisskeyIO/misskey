@@ -131,6 +131,7 @@ export class CacheService implements OnApplicationShutdown {
 				case 'userChangeDeletedState':
 				case 'remoteUserUpdated':
 				case 'localUserUpdated': {
+					this.userEntityService.purgeCache(body.id);
 					const user = await this.usersRepository.findOneBy({ id: body.id });
 					if (user == null) {
 						this.userByIdCache.delete(body.id);
@@ -155,6 +156,7 @@ export class CacheService implements OnApplicationShutdown {
 					break;
 				}
 				case 'userTokenRegenerated': {
+					this.userEntityService.purgeCache(body.id);
 					const user = await this.usersRepository.findOneByOrFail({ id: body.id }) as MiLocalUser;
 					this.localUserByNativeTokenCache.delete(body.oldToken);
 					this.localUserByNativeTokenCache.set(body.newToken, user);
@@ -166,6 +168,29 @@ export class CacheService implements OnApplicationShutdown {
 					const followee = this.userByIdCache.get(body.followeeId);
 					if (followee) followee.followersCount++;
 					this.userFollowingsCache.delete(body.followerId);
+					break;
+				}
+				default:
+					break;
+			}
+		} else if (obj.channel.startsWith('mainStream:')) {
+			const { type } = obj.message as GlobalEvents['main']['payload'];
+			switch (type) {
+				case 'meUpdated':
+				case 'readAllNotifications':
+				case 'unreadNotification':
+				case 'unreadMention':
+				case 'readAllUnreadMentions':
+				case 'unreadSpecifiedNote':
+				case 'readAllUnreadSpecifiedNotes':
+				case 'readAllAntennas':
+				case 'unreadAntenna':
+				case 'readAllAnnouncements':
+				case 'readAntenna':
+				case 'receiveFollowRequest':
+				case 'announcementCreated': {
+					const userId = obj.channel.slice(11);
+					this.userEntityService.purgeCache(userId);
 					break;
 				}
 				default:

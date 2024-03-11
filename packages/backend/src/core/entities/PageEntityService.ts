@@ -4,22 +4,31 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
+import { LRUCache } from 'lru-cache';
 import { DI } from '@/di-symbols.js';
 import type { DriveFilesRepository, PagesRepository, PageLikesRepository } from '@/models/_.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { Packed } from '@/misc/json-schema.js';
+import type { Config } from '@/config.js';
 import type { MiUser } from '@/models/User.js';
 import type { MiPage } from '@/models/Page.js';
 import type { MiDriveFile } from '@/models/DriveFile.js';
 import { bindThis } from '@/decorators.js';
 import { IdService } from '@/core/IdService.js';
 import { isNotNull } from '@/misc/is-not-null.js';
+import { cacheFetch, cacheFetchOrFail } from '@/misc/cache-fetch.js';
 import { UserEntityService } from './UserEntityService.js';
 import { DriveFileEntityService } from './DriveFileEntityService.js';
 
 @Injectable()
 export class PageEntityService {
+	private readonly pageCache: LRUCache<string, MiPage>;
+	private readonly driveFileCache: LRUCache<string, MiDriveFile, string>;
+
 	constructor(
+		@Inject(DI.config)
+		private config: Config,
+
 		@Inject(DI.pagesRepository)
 		private pagesRepository: PagesRepository,
 
@@ -33,6 +42,27 @@ export class PageEntityService {
 		private driveFileEntityService: DriveFileEntityService,
 		private idService: IdService,
 	) {
+		this.pageCache = new LRUCache({
+			max: this.config.memoryCache.page.max ?? 1,
+			ttl: this.config.memoryCache.page.ttl ?? 100,
+
+			ignoreFetchAbort: true,
+			ttlResolution: 1000 * 30,
+			fetchMethod: async (id: string) => {
+				return await this.pagesRepository.findOneByOrFail({ id });
+			},
+		});
+
+		this.driveFileCache = new LRUCache({
+			max: this.config.memoryCache.driveFile.max ?? 1,
+			ttl: this.config.memoryCache.driveFile.ttl ?? 100,
+
+			ignoreFetchAbort: true,
+			ttlResolution: 1000 * 30,
+			fetchMethod: async (id: string, _staleValue, { context }) => {
+				return await this.driveFilesRepository.findOneByOrFail({ id, userId: context });
+			},
+		});
 	}
 
 	@bindThis
@@ -41,16 +71,13 @@ export class PageEntityService {
 		me: { id: MiUser['id'] } | null | undefined,
 	): Promise<Packed<'Page'>> {
 		const meId = me ? me.id : null;
-		const page = typeof src === 'object' ? src : await this.pagesRepository.findOneByOrFail({ id: src });
+		const page = typeof src === 'object' ? src : await cacheFetchOrFail(this.pageCache, src);
 
 		const attachedFiles: Promise<MiDriveFile | null>[] = [];
 		const collectFile = (xs: any[]) => {
 			for (const x of xs) {
 				if (x.type === 'image') {
-					attachedFiles.push(this.driveFilesRepository.findOneBy({
-						id: x.fileId,
-						userId: page.userId,
-					}));
+					attachedFiles.push(cacheFetch(this.driveFileCache, x.fileId, page.userId));
 				}
 				if (x.children) {
 					collectFile(x.children);

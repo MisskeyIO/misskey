@@ -5,11 +5,12 @@
 
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
+import { LRUCache } from 'lru-cache';
 import { DI } from '@/di-symbols.js';
 import type { DriveFilesRepository } from '@/models/_.js';
-import type { Config } from '@/config.js';
-import type { Packed } from '@/misc/json-schema.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
+import type { Packed } from '@/misc/json-schema.js';
+import type { Config } from '@/config.js';
 import type { MiUser } from '@/models/User.js';
 import type { MiDriveFile } from '@/models/DriveFile.js';
 import { appendQuery, query } from '@/misc/prelude/url.js';
@@ -18,6 +19,7 @@ import { bindThis } from '@/decorators.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
 import { isNotNull } from '@/misc/is-not-null.js';
 import { IdService } from '@/core/IdService.js';
+import { cacheFetch, cacheFetchOrFail } from '@/misc/cache-fetch.js';
 import { UtilityService } from '../UtilityService.js';
 import { VideoProcessingService } from '../VideoProcessingService.js';
 import { UserEntityService } from './UserEntityService.js';
@@ -31,6 +33,8 @@ type PackOptions = {
 
 @Injectable()
 export class DriveFileEntityService {
+	private readonly driveFileCache: LRUCache<string, MiDriveFile>;
+
 	constructor(
 		@Inject(DI.config)
 		private config: Config,
@@ -47,6 +51,16 @@ export class DriveFileEntityService {
 		private videoProcessingService: VideoProcessingService,
 		private idService: IdService,
 	) {
+		this.driveFileCache = new LRUCache({
+			max: this.config.memoryCache.driveFile.max ?? 1,
+			ttl: this.config.memoryCache.driveFile.ttl ?? 100,
+
+			ignoreFetchAbort: true,
+			ttlResolution: 1000 * 30,
+			fetchMethod: async (id: string) => {
+				return await this.driveFilesRepository.findOneByOrFail({ id });
+			},
+		});
 	}
 
 	@bindThis
@@ -195,7 +209,7 @@ export class DriveFileEntityService {
 			self: false,
 		}, options);
 
-		const file = typeof src === 'object' ? src : await this.driveFilesRepository.findOneByOrFail({ id: src });
+		const file = typeof src === 'object' ? src : await cacheFetchOrFail(this.driveFileCache, src);
 
 		return await awaitAll<Packed<'DriveFile'>>({
 			id: file.id,
@@ -230,7 +244,7 @@ export class DriveFileEntityService {
 			self: false,
 		}, options);
 
-		const file = typeof src === 'object' ? src : await this.driveFilesRepository.findOneBy({ id: src });
+		const file = typeof src === 'object' ? src : await cacheFetch(this.driveFileCache, src);
 		if (file == null) return null;
 
 		return await awaitAll<Packed<'DriveFile'>>({
@@ -273,7 +287,7 @@ export class DriveFileEntityService {
 		options?: PackOptions,
 	): Promise<Map<Packed<'DriveFile'>['id'], Packed<'DriveFile'> | null>> {
 		if (fileIds.length === 0) return new Map();
-		const files = await this.driveFilesRepository.findBy({ id: In(fileIds) });
+		const files = await this.driveFilesRepository.find({ where: { id: In(fileIds) }, cache: this.config.memoryCache.driveFile.ttl });
 		const packedFiles = await this.packMany(files, me, options);
 		const map = new Map<Packed<'DriveFile'>['id'], Packed<'DriveFile'> | null>(packedFiles.map(f => [f.id, f]));
 		for (const id of fileIds) {

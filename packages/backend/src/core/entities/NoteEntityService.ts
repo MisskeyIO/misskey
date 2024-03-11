@@ -6,17 +6,20 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
 import { ModuleRef } from '@nestjs/core';
+import { LRUCache } from 'lru-cache';
 import { DI } from '@/di-symbols.js';
-import type { Packed } from '@/misc/json-schema.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
+import type { Packed } from '@/misc/json-schema.js';
+import type { Config } from '@/config.js';
 import type { MiUser } from '@/models/User.js';
 import type { MiNote } from '@/models/Note.js';
-import type { MiNoteReaction } from '@/models/NoteReaction.js';
+import type { MiChannel } from '@/models/Channel.js';
+import type { MiPoll } from '@/models/Poll.js';
 import type { UsersRepository, NotesRepository, FollowingsRepository, PollsRepository, PollVotesRepository, NoteReactionsRepository, ChannelsRepository } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { isNotNull } from '@/misc/is-not-null.js';
-import { DebounceLoader } from '@/misc/loader.js';
 import { IdService } from '@/core/IdService.js';
+import { cacheFetch, cacheFetchOrFail } from '@/misc/cache-fetch.js';
 import type { OnModuleInit } from '@nestjs/common';
 import type { CustomEmojiService } from '../CustomEmojiService.js';
 import type { ReactionService } from '../ReactionService.js';
@@ -25,15 +28,23 @@ import type { DriveFileEntityService } from './DriveFileEntityService.js';
 
 @Injectable()
 export class NoteEntityService implements OnModuleInit {
+	private readonly noteCache: LRUCache<string, MiNote>;
+	private readonly userCache: LRUCache<string, MiUser>;
+	private readonly channelCache: LRUCache<string, MiChannel>;
+	private readonly followingsCache: LRUCache<string, boolean, string>;
+	private readonly pollCache: LRUCache<string, MiPoll>;
+
 	private userEntityService: UserEntityService;
 	private driveFileEntityService: DriveFileEntityService;
 	private customEmojiService: CustomEmojiService;
 	private reactionService: ReactionService;
 	private idService: IdService;
-	private noteLoader = new DebounceLoader(this.findNoteOrFail);
 
 	constructor(
 		private moduleRef: ModuleRef,
+
+		@Inject(DI.config)
+		private config: Config,
 
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
@@ -61,6 +72,68 @@ export class NoteEntityService implements OnModuleInit {
 		//private customEmojiService: CustomEmojiService,
 		//private reactionService: ReactionService,
 	) {
+		this.noteCache = new LRUCache({
+			max: this.config.memoryCache.note.max ?? 1,
+			ttl: this.config.memoryCache.note.ttl ?? 100,
+
+			ignoreFetchAbort: true,
+			ttlResolution: 1000 * 30,
+			fetchMethod: async (id: string) => {
+				return await this.notesRepository.findOneOrFail({
+					where: { id },
+					relations: ['user'],
+				});
+			},
+		});
+
+		this.userCache = new LRUCache({
+			max: this.config.memoryCache.user.max ?? 1,
+			ttl: this.config.memoryCache.user.ttl ?? 100,
+
+			ignoreFetchAbort: true,
+			ttlResolution: 1000 * 30,
+			fetchMethod: async (id: string) => {
+				return await this.usersRepository.findOneByOrFail({ id });
+			},
+		});
+
+		this.channelCache = new LRUCache({
+			max: this.config.memoryCache.channel.max ?? 1,
+			ttl: this.config.memoryCache.channel.ttl ?? 100,
+
+			ignoreFetchAbort: true,
+			ttlResolution: 1000 * 30,
+			fetchMethod: async (id: string) => {
+				return await this.channelsRepository.findOneByOrFail({ id });
+			},
+		});
+
+		this.followingsCache = new LRUCache({
+			max: this.config.memoryCache.relation.max ?? 1,
+			ttl: this.config.memoryCache.relation.ttl ?? 100,
+
+			ignoreFetchAbort: true,
+			ttlResolution: 1000 * 30,
+			fetchMethod: async (id: string, _staleValue, { context }) => {
+				return await this.followingsRepository.exists({
+					where: {
+						followeeId: id,
+						followerId: context,
+					},
+				});
+			},
+		});
+
+		this.pollCache = new LRUCache({
+			max: this.config.memoryCache.poll.max ?? 1,
+			ttl: this.config.memoryCache.poll.ttl ?? 100,
+
+			ignoreFetchAbort: true,
+			ttlResolution: 1000 * 30,
+			fetchMethod: async (id: string) => {
+				return await this.pollsRepository.findOneByOrFail({ noteId: id });
+			},
+		});
 	}
 
 	onModuleInit() {
@@ -108,12 +181,7 @@ export class NoteEntityService implements OnModuleInit {
 				hide = false;
 			} else {
 				// フォロワーかどうか
-				const isFollowing = await this.followingsRepository.exists({
-					where: {
-						followeeId: packedNote.userId,
-						followerId: meId,
-					},
-				});
+				const isFollowing = (await cacheFetch(this.followingsCache, packedNote.userId, meId)) ?? false;
 
 				hide = !isFollowing;
 			}
@@ -132,7 +200,7 @@ export class NoteEntityService implements OnModuleInit {
 
 	@bindThis
 	private async populatePoll(note: MiNote, meId: MiUser['id'] | null) {
-		const poll = await this.pollsRepository.findOneByOrFail({ noteId: note.id });
+		const poll = await cacheFetchOrFail(this.pollCache, note.id);
 		const choices = poll.choices.map(c => ({
 			text: c,
 			votes: poll.votes[poll.choices.indexOf(c)],
@@ -239,25 +307,17 @@ export class NoteEntityService implements OnModuleInit {
 				return true;
 			} else {
 				// フォロワーかどうか
-				const [following, user] = await Promise.all([
-					this.followingsRepository.count({
-						where: {
-							followeeId: note.userId,
-							followerId: meId,
-						},
-						take: 1,
-					}),
-					this.usersRepository.findOneByOrFail({ id: meId }),
-				]);
+				const user = await cacheFetchOrFail(this.userCache, meId);
+				const isFollowing = (await cacheFetch(this.followingsCache, note.userId, meId)) ?? false;
 
-				/* If we know the following, everyhting is fine.
+				/* If we know the following, everything is fine.
 
 				But if we do not know the following, it might be that both the
 				author of the note and the author of the like are remote users,
 				in which case we can never know the following. Instead we have
 				to assume that the users are following each other.
 				*/
-				return following > 0 || (note.userHost != null && user.host != null);
+				return isFollowing || (note.userHost != null && user.host != null);
 			}
 		}
 
@@ -304,7 +364,7 @@ export class NoteEntityService implements OnModuleInit {
 		}, options);
 
 		const meId = me ? me.id : null;
-		const note = typeof src === 'object' ? src : await this.noteLoader.load(src);
+		const note = typeof src === 'object' ? src : await cacheFetchOrFail(this.noteCache, src);
 		const host = note.userHost;
 
 		let text = note.text;
@@ -313,11 +373,7 @@ export class NoteEntityService implements OnModuleInit {
 			text = `【${note.name}】\n${(note.text ?? '').trim()}\n\n${note.url ?? note.uri}`;
 		}
 
-		const channel = note.channelId
-			? note.channel
-				? note.channel
-				: await this.channelsRepository.findOneBy({ id: note.channelId })
-			: null;
+		const channel = note.channelId ? note.channel ?? await cacheFetch(this.channelCache, note.channelId) : null;
 
 		const reactionEmojiNames = Object.keys(note.reactions)
 			.filter(x => x.startsWith(':') && x.includes('@') && !x.includes('@.')) // リモートカスタム絵文字のみ
@@ -488,13 +544,5 @@ export class NoteEntityService implements OnModuleInit {
 			}
 		}
 		return emojis.filter(x => x.name != null && x.host != null) as { name: string; host: string; }[];
-	}
-
-	@bindThis
-	private findNoteOrFail(id: string): Promise<MiNote> {
-		return this.notesRepository.findOneOrFail({
-			where: { id },
-			relations: ['user'],
-		});
 	}
 }

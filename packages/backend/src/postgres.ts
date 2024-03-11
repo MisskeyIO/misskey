@@ -11,6 +11,7 @@ import { DataSource, Logger, QueryRunner } from 'typeorm';
 import { QueryResultCache } from 'typeorm/cache/QueryResultCache.js';
 import { QueryResultCacheOptions } from 'typeorm/cache/QueryResultCacheOptions.js';
 import * as highlight from 'cli-highlight';
+import { LRUCache } from 'lru-cache';
 import { entities as charts } from '@/core/chart/entities.js';
 
 import { MiAbuseReportResolver } from '@/models/AbuseReportResolver.js';
@@ -207,24 +208,21 @@ export const entities = [
 ];
 
 const log = process.env.NODE_ENV !== 'production';
-const timeoutFinalizationRegistry = new FinalizationRegistry((reference: { name: string; timeout: NodeJS.Timeout }) => {
-	dbLogger.info(`Finalizing timeout: ${reference.name}`);
-	clearInterval(reference.timeout);
-});
 
 class InMemoryQueryResultCache implements QueryResultCache {
-	private cache: Map<string, QueryResultCacheOptions>;
+	private readonly cache: LRUCache<string, QueryResultCacheOptions>;
 
 	constructor(
+		private config: Config,
 		private dataSource: DataSource,
 	) {
-		this.cache = new Map();
+		this.cache = new LRUCache({
+			max: this.config.memoryCache.database.max ?? 1,
+			ttl: this.config.memoryCache.database.ttl,
 
-		const gcIntervalHandle = setInterval(() => {
-			this.gc();
-		}, 1000 * 60 * 3);
-
-		timeoutFinalizationRegistry.register(this, { name: typeof this, timeout: gcIntervalHandle });
+			ignoreFetchAbort: true,
+			ttlResolution: 1000 * 30,
+		});
 	}
 
 	connect(): Promise<void> {
@@ -290,15 +288,6 @@ class InMemoryQueryResultCache implements QueryResultCache {
 			ok();
 		});
 	}
-
-	gc(): void {
-		const now = Date.now();
-		for (const [key, { time, duration }] of this.cache.entries()) {
-			if ((time ?? 0) + duration < now) {
-				this.cache.delete(key);
-			}
-		}
-	}
 }
 
 export function createPostgresDataSource(config: Config) {
@@ -335,7 +324,7 @@ export function createPostgresDataSource(config: Config) {
 		dropSchema: process.env.NODE_ENV === 'test',
 		cache: !config.db.disableCache && process.env.NODE_ENV !== 'test' ? {
 			provider(dataSource) {
-				return new InMemoryQueryResultCache(dataSource);
+				return new InMemoryQueryResultCache(config, dataSource);
 			},
 		} : false,
 		logging: log,

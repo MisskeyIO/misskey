@@ -36,7 +36,7 @@ import type {
 	AccessTokensRepository,
 	IndieAuthClientsRepository,
 	UserProfilesRepository,
-	UsersRepository
+	UsersRepository,
 } from '@/models/_.js';
 import { IdService } from '@/core/IdService.js';
 import { CacheService } from '@/core/CacheService.js';
@@ -474,6 +474,10 @@ export class OAuth2ProviderService {
 		fastify.use('/decision', this.#server.decision((req, done) => {
 			const { body } = req as OAuth2DecisionRequest;
 			this.#logger.info(`Received the decision. Cancel: ${!!body.cancel}`);
+			if (body.cancel) {
+				done(new AuthorizationError('The user canceled the request', 'access_denied'), undefined);
+				return;
+			}
 			req.user = body.login_token;
 			done(null, undefined);
 		}));
@@ -508,7 +512,7 @@ export class OAuth2ProviderService {
 				return;
 			}
 
-			const accessToken = await this.accessTokensRepository.findOneBy({ token });
+			const accessToken = await this.accessTokensRepository.findOne({ where: { token }, relations: ['user'] });
 			if (!accessToken) {
 				reply.code(401);
 				return;
@@ -525,7 +529,8 @@ export class OAuth2ProviderService {
 				picture: accessToken.user?.avatarUrl,
 				email: user?.email,
 				email_verified: user?.emailVerified,
-				updated_at: (accessToken.lastUsedAt?.getTime() ?? 0) / 1000,
+				mfa_enabled: user?.twoFactorEnabled,
+				updated_at: (accessToken.user?.updatedAt?.getTime() ?? accessToken.user?.createdAt.getTime() ?? 0) / 1000,
 			};
 		});
 	}
@@ -543,7 +548,7 @@ export class OAuth2ProviderService {
 				return;
 			}
 
-			const accessToken = await this.accessTokensRepository.findOneBy({ token });
+			const accessToken = await this.accessTokensRepository.findOne({ where: { token }, relations: ['user'] });
 			reply.code(200);
 
 			if (!accessToken) return { active: false };

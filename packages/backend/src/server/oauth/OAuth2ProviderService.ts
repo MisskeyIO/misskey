@@ -474,11 +474,7 @@ export class OAuth2ProviderService {
 		fastify.use('/decision', this.#server.decision((req, done) => {
 			const { body } = req as OAuth2DecisionRequest;
 			this.#logger.info(`Received the decision. Cancel: ${!!body.cancel}`);
-			if (body.cancel) {
-				done(new AuthorizationError('The user canceled the request', 'access_denied'), undefined);
-				return;
-			}
-			req.user = body.login_token;
+			if (!body.cancel) req.user = body.login_token;
 			done(null, undefined);
 		}));
 		fastify.use('/decision', this.#server.errorHandler());

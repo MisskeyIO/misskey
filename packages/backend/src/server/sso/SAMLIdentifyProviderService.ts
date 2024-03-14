@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import * as jose from 'jose';
 import * as Redis from 'ioredis';
 import * as saml from 'samlify';
-import * as validator from '@authenio/samlify-xsd-schema-validator';
+import * as validator from '@authenio/samlify-node-xmllint';
 import fastifyView from '@fastify/view';
 import fastifyCors from '@fastify/cors';
 import fastifyFormbody from '@fastify/formbody';

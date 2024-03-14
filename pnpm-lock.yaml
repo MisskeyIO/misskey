@@ -61,9 +61,9 @@ importers:
 
   packages/backend:
     dependencies:
-      '@authenio/samlify-xsd-schema-validator':
-        specifier: 1.0.5
-        version: 1.0.5(samlify@2.8.11)
+      '@authenio/samlify-node-xmllint':
+        specifier: 2.0.0
+        version: 2.0.0(samlify@2.8.11)
       '@aws-sdk/client-s3':
         specifier: 3.533.0
         version: 3.533.0
@@ -1299,12 +1299,12 @@ packages:
       is-potential-custom-element-name: 1.0.1
     dev: false
 
-  /@authenio/samlify-xsd-schema-validator@1.0.5(samlify@2.8.11):
-    resolution: {integrity: sha512-HJjmjM1WbeB/z4nVbYEcmtIWTLPKqjrqRGEpC9lu7s03Usc4nxxfrJGjHgh3M8MvBJy4neVUoeM9rP4ym3GLgg==}
+  /@authenio/samlify-node-xmllint@2.0.0(samlify@2.8.11):
+    resolution: {integrity: sha512-V9cQ0CHqu3JwOmbSecGPUnzIES5kHxD00FEZKnWh90ksQUJG5/TscV2r9XLbKp7MlRMOSUfWxecM35xPSLFdSg==}
     peerDependencies:
       samlify: '>= 2.6.0'
     dependencies:
-      '@authenio/xsd-schema-validator': 0.7.3
+      node-xmllint: 1.0.0
       samlify: 2.8.11
     dev: false
 
@@ -1315,11 +1315,6 @@ packages:
       '@xmldom/xmldom': 0.8.10
       escape-html: 1.0.3
       xpath: 0.0.32
-    dev: false
-
-  /@authenio/xsd-schema-validator@0.7.3:
-    resolution: {integrity: sha512-Jhc/Hxv90bacZr0Fv+u+PEb440zPh4mO6rw+bzEAIBiFLKCtRa/BvKGRxPdCAwsGRPuwl2hFqQGF+Lfz6Q8kFg==}
-    requiresBuild: true
     dev: false
 
   /@aw-web-design/x-default-browser@1.4.126:
@@ -15087,6 +15082,10 @@ packages:
     resolution: {integrity: sha512-Jd4cvbJMryN21r5HgxQOpMEqv+ooke/korixNNK3mGqfGJmy0M77WDDzo/05969+OkMy3XW1UuZsSmW9KQm7Fw==}
     dependencies:
       asn1: 0.2.6
+    dev: false
+
+  /node-xmllint@1.0.0:
+    resolution: {integrity: sha512-71UV2HRUP+djvHpdyatiuv+Y1o8hI4ZI7bMfuuoACMLR1JJCErM4WXAclNeHd6BgHXkqeqnnAk3wpDkSQWmFXw==}
     dev: false
 
   /nodemailer@6.9.12:

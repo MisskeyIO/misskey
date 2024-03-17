@@ -58,7 +58,8 @@ function onLogin(res): void {
 }
 
 function onCancel(): void {
-	location.href = '/';
+	if (history.length > 1) history.back();
+	else location.href = '/';
 }
 
 function onAccept(): void {

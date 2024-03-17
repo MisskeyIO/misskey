@@ -39,6 +39,12 @@ export class MiSingleSignOnServiceProvider {
 	})
 	public audience: string[];
 
+	@Column('enum', {
+		enum: ['post', 'redirect'],
+		nullable: true,
+	})
+	public binding: 'post' | 'redirect' | null;
+
 	@Column('varchar', {
 		length: 512,
 	})

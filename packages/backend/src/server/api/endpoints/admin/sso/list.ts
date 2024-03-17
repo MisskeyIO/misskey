@@ -44,6 +44,11 @@ export const meta = {
 					optional: false, nullable: false,
 					items: { type: 'string', nullable: false },
 				},
+				binding: {
+					type: 'string',
+					optional: false, nullable: true,
+					enum: ['post', 'redirect'],
+				},
 				acsUrl: {
 					type: 'string',
 					optional: false, nullable: false,
@@ -103,6 +108,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				type: service.type,
 				issuer: service.issuer,
 				audience: service.audience,
+				binding: service.binding,
 				acsUrl: service.acsUrl,
 				useCertificate: service.privateKey != null,
 				publicKey: service.publicKey,

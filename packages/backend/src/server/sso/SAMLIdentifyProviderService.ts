@@ -81,7 +81,7 @@ export class SAMLIdentifyProviderService {
 		const nodes = {
 			'md:EntityDescriptor': {
 				'@xmlns:md': 'urn:oasis:names:tc:SAML:2.0:metadata',
-				'@entityID': provider.issuer,
+				'@entityID': this.config.url,
 				'@validUntil': tenYearsLater,
 				'md:IDPSSODescriptor': {
 					'@WantAuthnRequestsSigned': provider.wantAuthnRequestsSigned,
@@ -103,6 +103,10 @@ export class SAMLIdentifyProviderService {
 					'md:SingleSignOnService': [
 						{
 							'@Binding': 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+							'@Location': `${this.config.url}/sso/saml/${provider.id}`,
+						},
+						{
+							'@Binding': 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
 							'@Location': `${this.config.url}/sso/saml/${provider.id}`,
 						},
 					],
@@ -185,13 +189,14 @@ export class SAMLIdentifyProviderService {
 					'md:NameIDFormat': {
 						'#text': 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
 					},
-					'md:AssertionConsumerService': [
-						{
-							'@index': 1,
-							'@Binding': 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
-							'@Location': provider.acsUrl,
-						},
-					],
+					'md:AssertionConsumerService': {
+						'@isDefault': 'true',
+						'@index': 0,
+						'@Binding': (provider.binding ?? 'post') === 'post'
+							? 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST'
+							: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+						'@Location': provider.acsUrl,
+					},
 				},
 			},
 		};
@@ -235,7 +240,7 @@ export class SAMLIdentifyProviderService {
 			Body?: { SAMLRequest?: string; RelayState?: string };
 		}>('/:serviceId', async (request, reply) => {
 			const serviceId = request.params.serviceId;
-			const binding = 'redirect'; // 今はリダイレクトのみ対応 request.query?.SAMLRequest ? 'redirect' : 'post';
+			const binding = request.query?.SAMLRequest ? 'redirect' : 'post';
 			const samlRequest = request.query?.SAMLRequest ?? request.body?.SAMLRequest;
 			const relayState = request.query?.RelayState ?? request.body?.RelayState;
 
@@ -284,7 +289,6 @@ export class SAMLIdentifyProviderService {
 					`sso:saml:transaction:${transactionId}`,
 					JSON.stringify({
 						serviceId: serviceId,
-						binding: binding,
 						flowResult: parsed,
 						relayState: relayState,
 					}),
@@ -374,7 +378,7 @@ export class SAMLIdentifyProviderService {
 				return;
 			}
 
-			const { serviceId, binding, flowResult, relayState } = JSON.parse(transaction);
+			const { serviceId, flowResult, relayState } = JSON.parse(transaction);
 
 			const ssoServiceProvider =
 				await this.singleSignOnServiceProviderRepository.findOneBy({ id: serviceId, type: 'saml' });
@@ -439,7 +443,7 @@ export class SAMLIdentifyProviderService {
 				const loginResponse = await idp.createLoginResponse(
 					sp,
 					flowResult,
-					binding,
+					ssoServiceProvider.binding ?? 'post',
 					{},
 					() => {
 						const id = idp.entitySetting.generateID?.() ?? randomUUID();
@@ -655,16 +659,46 @@ export class SAMLIdentifyProviderService {
 					relayState,
 				);
 
-				this.#logger.info(`Redirecting to "${ssoServiceProvider.acsUrl}"`, {
-					userId: user.id,
-					ssoServiceProvider: ssoServiceProvider.id,
-					acsUrl: ssoServiceProvider.acsUrl,
-					relayState: relayState,
-				});
+				switch (ssoServiceProvider.binding ?? 'post') {
+					case 'post':
+						this.#logger.info(`Rendering SAML response for "${ssoServiceProvider.acsUrl}"`, {
+							userId: user.id,
+							ssoServiceProvider: ssoServiceProvider.id,
+							response: {
+								SAMLResponse: loginResponse.context,
+								RelayState: relayState ?? undefined,
+							},
+						});
 
-				reply.header('Cache-Control', 'no-store');
-				reply.redirect(loginResponse.context);
-				return;
+						reply.header('Cache-Control', 'no-store');
+						return await reply.view('sso-saml-post', {
+							action: ssoServiceProvider.acsUrl,
+							context: {
+								SAMLResponse: loginResponse.context,
+								RelayState: relayState ?? undefined,
+							},
+						});
+					case 'redirect':
+						this.#logger.info(`Redirecting to "${ssoServiceProvider.acsUrl}"`, {
+							userId: user.id,
+							ssoServiceProvider: ssoServiceProvider.id,
+							response: loginResponse.context,
+						});
+
+						reply.header('Cache-Control', 'no-store');
+						reply.redirect(loginResponse.context);
+						return;
+					default:
+						reply.status(400).send({
+							error: {
+								message: 'Invalid binding',
+								code: 'INVALID_BINDING',
+								id: '4a39476b-60bd-400f-b494-9a2fe9109c65',
+								kind: 'client',
+							},
+						});
+						return;
+				}
 			} catch (err) {
 				this.#logger.error('Failed to create SAML response', { error: err });
 				const traceableError = err as Error & { code?: string };

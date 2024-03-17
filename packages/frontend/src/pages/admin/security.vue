@@ -197,7 +197,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<MkTextarea v-model="service.audience">
 									<template #label>Audience</template>
 								</MkTextarea>
-								<MkRadios v-if="service.type === 'saml'" v-model="service.binding">
+								<MkRadios v-model="service.binding">
 									<option value="post">POST</option>
 									<option value="redirect">Redirect</option>
 								</MkRadios>
@@ -430,7 +430,7 @@ function ssoServiceAddNew() {
 		type: 'jwt',
 		issuer: '',
 		audience: '',
-		binding: null,
+		binding: 'post',
 		acsUrl: '',
 		useCertificate: false,
 		publicKey: '',
@@ -462,7 +462,7 @@ async function ssoServiceSave(service) {
 		type: service.type,
 		issuer: service.issuer,
 		audience: service.audience.split('\n'),
-		binding: service.type === 'saml' ? service.binding : null,
+		binding: service.binding,
 		acsUrl: service.acsUrl,
 		secret: service.publicKey,
 		signatureAlgorithm: service.signatureAlgorithm,

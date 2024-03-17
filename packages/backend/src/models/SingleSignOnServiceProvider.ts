@@ -41,9 +41,9 @@ export class MiSingleSignOnServiceProvider {
 
 	@Column('enum', {
 		enum: ['post', 'redirect'],
-		nullable: true,
+		nullable: false,
 	})
-	public binding: 'post' | 'redirect' | null;
+	public binding: 'post' | 'redirect';
 
 	@Column('varchar', {
 		length: 512,

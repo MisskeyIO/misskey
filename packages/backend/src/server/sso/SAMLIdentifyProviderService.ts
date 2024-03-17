@@ -192,7 +192,7 @@ export class SAMLIdentifyProviderService {
 					'md:AssertionConsumerService': {
 						'@isDefault': 'true',
 						'@index': 0,
-						'@Binding': (provider.binding ?? 'post') === 'post'
+						'@Binding': provider.binding === 'post'
 							? 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST'
 							: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
 						'@Location': provider.acsUrl,
@@ -354,16 +354,10 @@ export class SAMLIdentifyProviderService {
 		);
 
 		fastify.post<{
-			Body: { transaction_id: string; login_token: string; cancel?: string };
+			Body: { transaction_id: string; login_token: string; };
 		}>('/authorize', async (request, reply) => {
 			const transactionId = request.body.transaction_id;
 			const token = request.body.login_token;
-			const cancel = !!request.body.cancel;
-
-			if (cancel) {
-				reply.redirect('/');
-				return;
-			}
 
 			const transaction = await this.redisClient.get(`sso:saml:transaction:${transactionId}`);
 			if (!transaction) {
@@ -443,7 +437,7 @@ export class SAMLIdentifyProviderService {
 				const loginResponse = await idp.createLoginResponse(
 					sp,
 					flowResult,
-					ssoServiceProvider.binding ?? 'post',
+					ssoServiceProvider.binding,
 					{},
 					() => {
 						const id = idp.entitySetting.generateID?.() ?? randomUUID();
@@ -659,45 +653,26 @@ export class SAMLIdentifyProviderService {
 					relayState,
 				);
 
-				switch (ssoServiceProvider.binding ?? 'post') {
-					case 'post':
-						this.#logger.info(`Rendering SAML response for "${ssoServiceProvider.acsUrl}"`, {
-							userId: user.id,
-							ssoServiceProvider: ssoServiceProvider.id,
-							response: {
-								SAMLResponse: loginResponse.context,
-								RelayState: relayState ?? undefined,
-							},
-						});
-
-						reply.header('Cache-Control', 'no-store');
-						return await reply.view('sso-saml-post', {
+				this.#logger.info(`User "${user.username}" authorized for "${ssoServiceProvider.name ?? ssoServiceProvider.issuer}"`);
+				reply.header('Cache-Control', 'no-store');
+				switch (ssoServiceProvider.binding) {
+					case 'post': return reply
+						.status(200)
+						.send({
+							binding: 'post',
 							action: ssoServiceProvider.acsUrl,
 							context: {
 								SAMLResponse: loginResponse.context,
 								RelayState: relayState ?? undefined,
 							},
 						});
-					case 'redirect':
-						this.#logger.info(`Redirecting to "${ssoServiceProvider.acsUrl}"`, {
-							userId: user.id,
-							ssoServiceProvider: ssoServiceProvider.id,
-							response: loginResponse.context,
-						});
 
-						reply.header('Cache-Control', 'no-store');
-						reply.redirect(loginResponse.context);
-						return;
-					default:
-						reply.status(400).send({
-							error: {
-								message: 'Invalid binding',
-								code: 'INVALID_BINDING',
-								id: '4a39476b-60bd-400f-b494-9a2fe9109c65',
-								kind: 'client',
-							},
+					case 'redirect': return reply
+						.status(200)
+						.send({
+							binding: 'redirect',
+							action: loginResponse.context,
 						});
-						return;
 				}
 			} catch (err) {
 				this.#logger.error('Failed to create SAML response', { error: err });

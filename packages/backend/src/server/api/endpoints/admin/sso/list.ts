@@ -7,7 +7,7 @@ export const meta = {
 	tags: ['admin'],
 
 	requireCredential: true,
-	requireModerator: true,
+	requireAdmin: true,
 	kind: 'read:admin:sso',
 
 	res: {
@@ -46,7 +46,7 @@ export const meta = {
 				},
 				binding: {
 					type: 'string',
-					optional: false, nullable: true,
+					optional: false, nullable: false,
 					enum: ['post', 'redirect'],
 				},
 				acsUrl: {

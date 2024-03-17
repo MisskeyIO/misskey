@@ -187,7 +187,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<MkInput v-model="service.name">
 									<template #label>Name</template>
 								</MkInput>
-								<MkRadios v-model="service.type">
+								<MkRadios v-model="service.type" :disabled="!!service.createdAt">
 									<option value="jwt">JWT</option>
 									<option value="saml">SAML</option>
 								</MkRadios>

@@ -7849,9 +7849,9 @@ export interface Locale extends ILocale {
          */
         "backupCodesExhaustedWarning": string;
         /**
-         * 設定方法でお困りの際は
+         * 設定方法でお困りの際は、{link}を参照してください。
          */
-        "howto2FA": string;
+        "howto2fa": ParameterizedString<"link">;
     };
     "_permissions": {
         /**

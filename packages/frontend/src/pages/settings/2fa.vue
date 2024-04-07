@@ -21,6 +21,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template #caption>{{ i18n.ts.totpDescription }}</template>
 			<template #suffix><i v-if="$i.twoFactorEnabled" class="ti ti-check" style="color: var(--success)"></i></template>
 
+			<MkInfo><Mfm :text="i18n.ts._2fa.howto2FA + '[' + i18n.ts.here + '](https://go.misskey.io/howto-2fa)'" /></MkInfo>
+			<br>
 			<div v-if="$i.twoFactorEnabled" class="_gaps_s">
 				<div v-text="i18n.ts._2fa.alreadyRegistered"/>
 				<template v-if="$i.securityKeysList.length > 0">
@@ -29,7 +31,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</template>
 				<MkButton v-else danger @click="unregisterTOTP">{{ i18n.ts.unregister }}</MkButton>
 			</div>
-
 			<MkButton v-else-if="!$i.twoFactorEnabled" primary gradate @click="registerTOTP">{{ i18n.ts._2fa.registerTOTP }}</MkButton>
 		</MkFolder>
 

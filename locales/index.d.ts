@@ -9484,6 +9484,10 @@ export interface Locale extends ILocale {
              * メンションされたとき
              */
             "mention": string;
+            /**
+             * 通報が自動解決されたとき
+             */
+            "reportAutoResolved": string;
         };
     };
     "_abuse": {

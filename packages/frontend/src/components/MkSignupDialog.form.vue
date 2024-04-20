@@ -46,10 +46,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</template>
 			</MkInput>
 			<MkInput v-model="password" type="password" autocomplete="new-password" required data-cy-signup-password @update:modelValue="onChangePassword">
-				<template #label>{{ i18n.ts.password }}</template>
+				<template #label>
+					{{ i18n.ts.password }} <a href="https://haveibeenpwned.com/Passwords" target="_blank" rel="nofollow noopener"><span :class="$style.hibpLogo">leak checked by <span>';--hibp?</span></span></a>
+				</template>
 				<template #prefix><i class="ti ti-lock"></i></template>
 				<template #caption>
-					<span v-if="passwordStrength == 'low'" style="color: var(--error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.weakPassword }}</span>
+					<span v-if="passwordStrength == 'low' && !isLeaked" style="color: var(--error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.weakPassword }}</span>
+					<span v-else-if="passwordStrength == 'low'" style="color: var(--error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.leakedPassword }}</span>
 					<span v-if="passwordStrength == 'medium'" style="color: var(--warn)"><i class="ti ti-check ti-fw"></i> {{ i18n.ts.normalPassword }}</span>
 					<span v-if="passwordStrength == 'high'" style="color: var(--success)"><i class="ti ti-check ti-fw"></i> {{ i18n.ts.strongPassword }}</span>
 				</template>
@@ -116,6 +119,8 @@ const email = ref('');
 const usernameState = ref<null | 'wait' | 'ok' | 'unavailable' | 'error' | 'invalid-format' | 'min-range' | 'max-range'>(null);
 const emailState = ref<null | 'wait' | 'ok' | 'unavailable:used' | 'unavailable:format' | 'unavailable:disposable' | 'unavailable:banned' | 'unavailable:mx' | 'unavailable:smtp' | 'unavailable' | 'error'>(null);
 const passwordStrength = ref<'' | 'low' | 'medium' | 'high'>('');
+const isLeaked = ref(false);
+const leakedCount = ref(0);
 const passwordRetypeState = ref<null | 'match' | 'not-match'>(null);
 const submitting = ref<boolean>(false);
 const hCaptchaResponse = ref<string | null>(null);
@@ -133,10 +138,11 @@ const shouldDisableSubmitting = computed((): boolean => {
 		instance.enableTurnstile && !turnstileResponse.value ||
 		instance.emailRequiredForSignup && emailState.value !== 'ok' ||
 		usernameState.value !== 'ok' ||
-		passwordRetypeState.value !== 'match';
+		passwordRetypeState.value !== 'match' ||
+		passwordStrength.value === 'low';
 });
 
-function getPasswordStrength(source: string): number {
+async function getPasswordStrength(source: string): Promise<number> {
 	let strength = 0;
 	let power = 0.018;
 
@@ -153,6 +159,26 @@ function getPasswordStrength(source: string): number {
 	// 記号が混ざってたら
 	if (/[!\x22\#$%&@'()*+,-./_]/.test(source)) {
 		power += 0.02;
+	}
+
+	// check HIBP 3 chars or more
+	if (source.length >= 3) {
+		const hash = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(source));
+		const hashHex = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+		const hashPrefix = hashHex.slice(0, 5).toUpperCase();
+		const hashSuffix = hashHex.slice(5).toUpperCase();
+		const res = await fetch(`https://api.pwnedpasswords.com/range/${hashPrefix}`);
+		const text = await res.text();
+		const lines = text.split('\n');
+		const line = lines.find(l => l.startsWith(hashSuffix));
+		if (line) {
+			const count = parseInt(line.split(':')[1]);
+			leakedCount.value = count;
+			isLeaked.value = true;
+			power = 0;
+		} else {
+			isLeaked.value = false;
+		}
 	}
 
 	strength = power * source.length;
@@ -226,13 +252,13 @@ function onChangeEmail(): void {
 	});
 }
 
-function onChangePassword(): void {
+async function onChangePassword(): Promise<void> {
 	if (password.value === '') {
 		passwordStrength.value = '';
 		return;
 	}
 
-	const strength = getPasswordStrength(password.value);
+	const strength = await getPasswordStrength(password.value);
 	passwordStrength.value = strength > 0.7 ? 'high' : strength > 0.3 ? 'medium' : 'low';
 }
 
@@ -303,5 +329,27 @@ async function onSubmit(): Promise<void> {
 
 .captcha {
 	margin: 16px 0;
+}
+
+.hibpLogo {
+	background: linear-gradient(45deg, #616c70, #626262);
+	color: #fefefe;
+	display: inline-flex;
+	padding-left: 10px;
+	margin-left: 1em;
+	font-size: 0.75em;
+	border-radius: 6px;
+	overflow: hidden;
+	align-items: center;
+	transform: translateY(-2px);
+
+	span {
+		background: linear-gradient(45deg, #255e81, #338cac);
+		font-size: 1.6em;
+		padding: 2px 10px;
+		height: auto;
+		margin-left: 8px;
+		font-weight: bold;
+	}
 }
 </style>

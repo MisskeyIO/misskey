@@ -179,6 +179,8 @@ async function getPasswordStrength(source: string): Promise<number> {
 		} else {
 			isLeaked.value = false;
 		}
+	} else {
+		isLeaked.value = false;
 	}
 
 	strength = power * source.length;

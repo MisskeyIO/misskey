@@ -29,6 +29,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkSwitch v-model="event_renote">{{ i18n.ts._webhookSettings._events.renote }}</MkSwitch>
 			<MkSwitch v-model="event_reaction">{{ i18n.ts._webhookSettings._events.reaction }}</MkSwitch>
 			<MkSwitch v-model="event_mention">{{ i18n.ts._webhookSettings._events.mention }}</MkSwitch>
+			<MkSwitch v-if="$i?.isAdmin || $i?.isModerator" v-model="event_reportCreated">{{ i18n.ts._webhookSettings._events.reportCreated }}</MkSwitch>
+			<MkSwitch v-if="$i?.isAdmin || $i?.isModerator" v-model="event_reportResolved">{{ i18n.ts._webhookSettings._events.reportResolved }}</MkSwitch>
 			<MkSwitch v-if="$i?.isAdmin || $i?.isModerator" v-model="event_reportAutoResolved">{{ i18n.ts._webhookSettings._events.reportAutoResolved }}</MkSwitch>
 		</div>
 	</FormSection>
@@ -77,6 +79,8 @@ const event_reply = ref(webhook.on.includes('reply'));
 const event_renote = ref(webhook.on.includes('renote'));
 const event_reaction = ref(webhook.on.includes('reaction'));
 const event_mention = ref(webhook.on.includes('mention'));
+const event_reportCreated = ref(webhook.on.includes('reportCreated'));
+const event_reportResolved = ref(webhook.on.includes('reportResolved'));
 const event_reportAutoResolved = ref(webhook.on.includes('reportAutoResolved'));
 
 async function save(): Promise<void> {
@@ -88,6 +92,8 @@ async function save(): Promise<void> {
 	if (event_renote.value) events.push('renote');
 	if (event_reaction.value) events.push('reaction');
 	if (event_mention.value) events.push('mention');
+	if (event_reportCreated.value) events.push('reportCreated');
+	if (event_reportResolved.value) events.push('reportResolved');
 	if (event_reportAutoResolved.value) events.push('reportAutoResolved');
 
 	os.apiWithDialog('i/webhooks/update', {

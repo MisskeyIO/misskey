@@ -94,8 +94,7 @@ export class ReportAbuseProcessorService {
 						id: webhook.userId,
 					});
 					const isAdmin = await this.roleService.isAdministrator(webhookUser);
-					const isMod = await this.roleService.isModerator(webhookUser);
-					if (webhook.on.includes('reportAutoResolved') && (isAdmin || isMod)) {
+					if (webhook.on.includes('reportAutoResolved') && isAdmin) {
 						this.queueService.webhookDeliver(webhook, 'reportAutoResolved', {
 							resolver: resolver,
 							report: job.data,

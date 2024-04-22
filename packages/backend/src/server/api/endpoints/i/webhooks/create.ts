@@ -96,7 +96,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			}
 
 			if (ps.on.includes('reportCreated') || ps.on.includes('reportResolved') || ps.on.includes('reportAutoResolved')) {
-				if (!await this.roleService.isAdministrator(me) && !await this.roleService.isModerator(me)) {
+				if (!await this.roleService.isAdministrator(me)) {
 					throw new ApiError(meta.errors.youAreNotAdmin);
 				}
 			}

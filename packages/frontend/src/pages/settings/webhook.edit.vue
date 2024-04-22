@@ -29,9 +29,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkSwitch v-model="event_renote">{{ i18n.ts._webhookSettings._events.renote }}</MkSwitch>
 			<MkSwitch v-model="event_reaction">{{ i18n.ts._webhookSettings._events.reaction }}</MkSwitch>
 			<MkSwitch v-model="event_mention">{{ i18n.ts._webhookSettings._events.mention }}</MkSwitch>
-			<MkSwitch v-if="$i?.isAdmin || $i?.isModerator" v-model="event_reportCreated">{{ i18n.ts._webhookSettings._events.reportCreated }}</MkSwitch>
-			<MkSwitch v-if="$i?.isAdmin || $i?.isModerator" v-model="event_reportResolved">{{ i18n.ts._webhookSettings._events.reportResolved }}</MkSwitch>
-			<MkSwitch v-if="$i?.isAdmin || $i?.isModerator" v-model="event_reportAutoResolved">{{ i18n.ts._webhookSettings._events.reportAutoResolved }}</MkSwitch>
+			<MkSwitch v-if="$i?.isAdmin" v-model="event_reportCreated">{{ i18n.ts._webhookSettings._events.reportCreated }}</MkSwitch>
+			<MkSwitch v-if="$i?.isAdmin" v-model="event_reportResolved">{{ i18n.ts._webhookSettings._events.reportResolved }}</MkSwitch>
+			<MkSwitch v-if="$i?.isAdmin" v-model="event_reportAutoResolved">{{ i18n.ts._webhookSettings._events.reportAutoResolved }}</MkSwitch>
 		</div>
 	</FormSection>
 

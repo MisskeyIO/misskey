@@ -106,8 +106,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					id: webhook.userId,
 				});
 				const isAdmin = await this.roleService.isAdministrator(webhookUser);
-				const isMod = await this.roleService.isModerator(webhookUser);
-				if (webhook.on.includes('reportCreated') && (isAdmin || isMod)) {
+				if (webhook.on.includes('reportCreated') && isAdmin) {
 					this.queueService.webhookDeliver(webhook, 'reportCreated', {
 						report,
 					});

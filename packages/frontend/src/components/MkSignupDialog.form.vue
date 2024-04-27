@@ -139,9 +139,9 @@ const shouldDisableSubmitting = computed((): boolean => {
 		instance.enableRecaptcha && !reCaptchaResponse.value ||
 		instance.enableTurnstile && !turnstileResponse.value ||
 		instance.emailRequiredForSignup && emailState.value !== 'ok' ||
+		(passwordStrength.value !== 'medium' && passwordStrength.value !== 'high') ||
 		usernameState.value !== 'ok' ||
-		passwordRetypeState.value !== 'match' ||
-		passwordStrength.value === 'low';
+		passwordRetypeState.value !== 'match';
 });
 
 async function getPasswordStrength(source: string): Promise<number> {
@@ -282,6 +282,8 @@ async function onChangePassword(): Promise<void> {
 
 	const strength = await getPasswordStrength(password.value);
 	passwordStrength.value = strength > 0.7 ? 'high' : strength > 0.3 ? 'medium' : 'low';
+
+	if (passwordRetypeState.value === 'match') onChangePasswordRetype();
 }
 
 function onChangePasswordRetype(): void {

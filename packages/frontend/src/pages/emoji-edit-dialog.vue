@@ -167,7 +167,7 @@ async function changeImage(ev) {
 	file.value = await selectFile(ev.currentTarget ?? ev.target, null);
 	const candidate = file.value.name.replace(/\.(.+)$/, '');
 	if (candidate.match(/^[a-z0-9_]+$/)) {
-		if(!name.value) {
+		if (!name.value) {
 			name.value = candidate;
 		}
 	}

@@ -1965,9 +1965,9 @@ export interface Locale extends ILocale {
      */
     "weakPassword": string;
     /**
-     * このパスワードは既に他のサービスで流出しています
+     * このパスワードは他のサービスで{n}回以上流出しています
      */
-    "leakedPassword": string;
+    "leakedPassword": ParameterizedString<"n">;
     /**
      * 普通のパスワード
      */

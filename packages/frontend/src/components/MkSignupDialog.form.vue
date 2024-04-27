@@ -14,7 +14,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label>{{ i18n.ts.invitationCode }}</template>
 				<template #prefix><i class="ti ti-key"></i></template>
 			</MkInput>
-			<MkInput v-model="username" type="text" pattern="^[a-zA-Z0-9_]{1,20}$" :spellcheck="false" autocomplete="username" required data-cy-signup-username @update:modelValue="onChangeUsername">
+			<MkInput v-model="username" :debounce="true" type="text" pattern="^[a-zA-Z0-9_]{1,20}$" :spellcheck="false" autocomplete="username" required data-cy-signup-username @update:modelValue="onChangeUsername">
 				<template #label>{{ i18n.ts.username }} <div v-tooltip:dialog="i18n.ts.usernameInfo" class="_button _help"><i class="ti ti-help-circle"></i></div></template>
 				<template #prefix>@</template>
 				<template #suffix>@{{ host }}</template>
@@ -45,14 +45,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<span v-else-if="emailState === 'error'" style="color: var(--error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.error }}</span>
 				</template>
 			</MkInput>
-			<MkInput v-model="password" type="password" autocomplete="new-password" required data-cy-signup-password @update:modelValue="onChangePassword">
+			<MkInput v-model="password" :debounce="true" type="password" autocomplete="new-password" required data-cy-signup-password @update:modelValue="onChangePassword">
 				<template #label>
 					{{ i18n.ts.password }} <a href="https://haveibeenpwned.com/Passwords" target="_blank" rel="nofollow noopener"><span :class="$style.hibpLogo">leak checked by <span>';--hibp?</span></span></a>
 				</template>
 				<template #prefix><i class="ti ti-lock"></i></template>
 				<template #caption>
-					<span v-if="passwordStrength == 'low' && !isLeaked" style="color: var(--error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.weakPassword }}</span>
-					<span v-else-if="passwordStrength == 'low'" style="color: var(--error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.leakedPassword }}</span>
+					<span v-if="passwordStrength == 'wait'" style="color:#999"><MkLoading :em="true"/> {{ i18n.ts.checking }}</span>
+					<span v-if="passwordStrength == 'low' && isLeaked" style="color: var(--error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.tsx.leakedPassword({ n: leakedCount }) }}</span>
+					<span v-else-if="passwordStrength == 'low'" style="color: var(--error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.weakPassword }}</span>
 					<span v-if="passwordStrength == 'medium'" style="color: var(--warn)"><i class="ti ti-check ti-fw"></i> {{ i18n.ts.normalPassword }}</span>
 					<span v-if="passwordStrength == 'high'" style="color: var(--success)"><i class="ti ti-check ti-fw"></i> {{ i18n.ts.strongPassword }}</span>
 				</template>
@@ -118,7 +119,7 @@ const invitationCode = ref<string>('');
 const email = ref('');
 const usernameState = ref<null | 'wait' | 'ok' | 'unavailable' | 'error' | 'invalid-format' | 'min-range' | 'max-range'>(null);
 const emailState = ref<null | 'wait' | 'ok' | 'unavailable:used' | 'unavailable:format' | 'unavailable:disposable' | 'unavailable:banned' | 'unavailable:mx' | 'unavailable:smtp' | 'unavailable' | 'error'>(null);
-const passwordStrength = ref<'' | 'low' | 'medium' | 'high'>('');
+const passwordStrength = ref<'' | 'wait' | 'low' | 'medium' | 'high'>('');
 const isLeaked = ref(false);
 const leakedCount = ref(0);
 const passwordRetypeState = ref<null | 'match' | 'not-match'>(null);
@@ -129,6 +130,7 @@ const reCaptchaResponse = ref<string | null>(null);
 const turnstileResponse = ref<string | null>(null);
 const usernameAbortController = ref<null | AbortController>(null);
 const emailAbortController = ref<null | AbortController>(null);
+const passwordAbortController = ref<null | AbortController>(null);
 
 const shouldDisableSubmitting = computed((): boolean => {
 	return submitting.value ||
@@ -161,29 +163,47 @@ async function getPasswordStrength(source: string): Promise<number> {
 		power += 0.02;
 	}
 
+	strength = power * source.length;
+
 	// check HIBP 3 chars or more
+	if (passwordAbortController.value != null) {
+		passwordAbortController.value.abort();
+	}
+
 	if (source.length >= 3) {
+		passwordStrength.value = 'wait';
+		passwordAbortController.value = new AbortController();
+
 		const hash = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(source));
 		const hashHex = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 		const hashPrefix = hashHex.slice(0, 5).toUpperCase();
 		const hashSuffix = hashHex.slice(5).toUpperCase();
-		const res = await fetch(`https://api.pwnedpasswords.com/range/${hashPrefix}`);
-		const text = await res.text();
-		const lines = text.split('\n');
-		const line = lines.find(l => l.startsWith(hashSuffix));
-		if (line) {
-			const count = parseInt(line.split(':')[1]);
-			leakedCount.value = count;
-			isLeaked.value = true;
-			power = 0;
-		} else {
-			isLeaked.value = false;
-		}
+		await fetch(`https://api.pwnedpasswords.com/range/${hashPrefix}`, { signal: passwordAbortController.value.signal })
+			.then(response => {
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`);
+				}
+				return response.text();
+			})
+			.then(text => {
+				const lines = text.split('\n');
+				const line = lines.find(l => l.startsWith(hashSuffix));
+				if (line) {
+					leakedCount.value = parseInt(line.split(':')[1]);
+					isLeaked.value = true;
+					strength = 0;
+				} else {
+					isLeaked.value = false;
+				}
+			})
+			.catch(() => {
+				leakedCount.value = 0;
+				isLeaked.value = false;
+			});
 	} else {
+		leakedCount.value = 0;
 		isLeaked.value = false;
 	}
-
-	strength = power * source.length;
 
 	return Math.max(0, Math.min(1, strength));
 }
@@ -337,18 +357,18 @@ async function onSubmit(): Promise<void> {
 	background: linear-gradient(45deg, #616c70, #626262);
 	color: #fefefe;
 	display: inline-flex;
-	padding-left: 10px;
-	margin-left: 1em;
-	font-size: 0.75em;
+	padding-left: 8px;
+	margin-left: 4px;
+	font-size: 0.8em;
 	border-radius: 6px;
 	overflow: hidden;
 	align-items: center;
-	transform: translateY(-2px);
+	transform: translateY(-1px);
 
 	span {
 		background: linear-gradient(45deg, #255e81, #338cac);
-		font-size: 1.6em;
-		padding: 2px 10px;
+		font-size: 1.4em;
+		padding: 2px 8px;
 		height: auto;
 		margin-left: 8px;
 		font-weight: bold;

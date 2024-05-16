@@ -264,10 +264,11 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 			// 投票の選択肢にセンシティブワードがないかチェック
 			if (data.poll) {
-				for (let pci = 0; pci < data.poll.choices.length; pci++) {
-					if (this.utilityService.isKeyWordIncluded(data.poll.choices[pci], sensitiveWords)) {
+				for (const choice of data.poll.choices) {
+					if (this.utilityService.isKeyWordIncluded(choice, sensitiveWords)) {
 						data.visibility = 'home';
 						this.logger.warn('Visibility changed to home because sensitive words are included in choices of poll', { user: user.id, note: data });
+						break;
 					}
 				}
 			}

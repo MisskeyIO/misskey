@@ -69,23 +69,13 @@ async function init() {
 }
 
 function save() {
-	try {
-		if (discordWebhookUrl.value == null) {
-			alert(i18n.ts.invalidValue);
-		} else {
-			new URL(discordWebhookUrl.value);
-			os.apiWithDialog('admin/update-meta', {
-				deeplAuthKey: deeplAuthKey.value,
-				deeplIsPro: deeplIsPro.value,
-				discordWebhookUrl: discordWebhookUrl.value,
-			}).then(() => {
-				fetchInstance(true);
-			});
-		}
-	} catch {
-		alert(i18n.ts.invalidValue);
-		return;
-	}
+	os.apiWithDialog('admin/update-meta', {
+		deeplAuthKey: deeplAuthKey.value,
+		deeplIsPro: deeplIsPro.value,
+		discordWebhookUrl: discordWebhookUrl.value,
+	}).then(() => {
+		fetchInstance(true);
+	});
 }
 
 const headerActions = computed(() => []);

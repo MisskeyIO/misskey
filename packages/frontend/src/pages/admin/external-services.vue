@@ -69,23 +69,22 @@ async function init() {
 }
 
 function save() {
-	const urlPattern = new RegExp('^(https?:\\/\\/)?' + // protocol
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name and extension
-        '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-        '(\\:\\d+)?' + // port
-        '(\\/[-a-z\\d%_.~+]*)*' + // path
-        '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-        '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
-	if (discordWebhookUrl.value !== null && !urlPattern.test(discordWebhookUrl.value)) {
+	try {
+		if (discordWebhookUrl.value == null) {
+			alert(i18n.ts.invalidValue);
+		} else {
+			new URL(discordWebhookUrl.value);
+			os.apiWithDialog('admin/update-meta', {
+				deeplAuthKey: deeplAuthKey.value,
+				deeplIsPro: deeplIsPro.value,
+				discordWebhookUrl: discordWebhookUrl.value,
+			}).then(() => {
+				fetchInstance(true);
+			});
+		}
+	} catch {
 		alert(i18n.ts.invalidValue);
-	} else {
-		os.apiWithDialog('admin/update-meta', {
-			deeplAuthKey: deeplAuthKey.value,
-			deeplIsPro: deeplIsPro.value,
-			discordWebhookUrl: discordWebhookUrl.value,
-		}).then(() => {
-			fetchInstance(true);
-		});
+		return;
 	}
 }
 

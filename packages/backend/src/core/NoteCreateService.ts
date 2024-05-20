@@ -255,22 +255,11 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 		if (data.visibility === 'public' && data.channel == null) {
 			const sensitiveWords = meta.sensitiveWords;
-			if (this.utilityService.isKeyWordIncluded(data.cw ?? data.text ?? '', sensitiveWords)) {
+			if (this.utilityService.isKeyWordIncluded(data.cw ?? this.utilityService.concatNoteContentsForKeyWordCheck({ text: data.text, pollChoices: data.poll?.choices }), sensitiveWords)) {
 				data.visibility = 'home';
 				this.logger.warn('Visibility changed to home because sensitive words are included', { user: user.id, note: data });
 			} else if (!policies.canPublicNote) {
 				data.visibility = 'home';
-			}
-
-			// 投票の選択肢にセンシティブワードがないかチェック
-			if (data.poll) {
-				for (const choice of data.poll.choices) {
-					if (this.utilityService.isKeyWordIncluded(choice, sensitiveWords)) {
-						data.visibility = 'home';
-						this.logger.warn('Visibility changed to home because sensitive words are included in choices of poll', { user: user.id, note: data });
-						break;
-					}
-				}
 			}
 		}
 

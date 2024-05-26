@@ -178,7 +178,6 @@ function more(ev: MouseEvent) {
 	.instanceIconAlt {
 		display: inline-block;
 		width: 85%;
-		max-width: 100%;
 	}
 
 	.bottom {
@@ -368,7 +367,8 @@ function more(ev: MouseEvent) {
 	}
 
 	.instanceIconAlt {
-		max-width: 100%;
+		display: inline-block;
+		width: 85%;
 	}
 
 	.bottom {

@@ -20,6 +20,7 @@ export class ClipService {
 	public static AlreadyAddedError = class extends Error {};
 	public static TooManyClipNotesError = class extends Error {};
 	public static TooManyClipsError = class extends Error {};
+	public static ClipLimitExceededError = class extends Error {};
 
 	constructor(
 		@Inject(DI.clipsRepository)
@@ -67,6 +68,13 @@ export class ClipService {
 			throw new ClipService.NoSuchClipError();
 		}
 
+		const currentCount = await this.clipsRepository.countBy({
+			userId: me.id,
+		});
+		if (currentCount > (await this.roleService.getUserPolicies(me.id)).clipLimit) {
+			throw new ClipService.ClipLimitExceededError();
+		}
+
 		await this.clipsRepository.update(clip.id, {
 			name: name,
 			description: description,
@@ -99,10 +107,19 @@ export class ClipService {
 			throw new ClipService.NoSuchClipError();
 		}
 
-		const currentCount = await this.clipNotesRepository.countBy({
+		const policies = await this.roleService.getUserPolicies(me.id);
+
+		const currentClipCount = await this.clipsRepository.countBy({
+			userId: me.id,
+		});
+		if (currentClipCount > policies.clipLimit) {
+			throw new ClipService.ClipLimitExceededError();
+		}
+
+		const currentNoteCount = await this.clipNotesRepository.countBy({
 			clipId: clip.id,
 		});
-		if (currentCount >= (await this.roleService.getUserPolicies(me.id)).noteEachClipsLimit) {
+		if (currentNoteCount >= policies.noteEachClipsLimit) {
 			throw new ClipService.TooManyClipNotesError();
 		}
 
@@ -146,6 +163,13 @@ export class ClipService {
 
 		if (note == null) {
 			throw new ClipService.NoSuchNoteError();
+		}
+
+		const currentCount = await this.clipsRepository.countBy({
+			userId: me.id,
+		});
+		if (currentCount > (await this.roleService.getUserPolicies(me.id)).clipLimit) {
+			throw new ClipService.ClipLimitExceededError();
 		}
 
 		await this.clipNotesRepository.delete({

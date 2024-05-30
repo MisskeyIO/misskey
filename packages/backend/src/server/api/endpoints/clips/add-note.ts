@@ -48,6 +48,12 @@ export const meta = {
 			code: 'TOO_MANY_CLIP_NOTES',
 			id: 'f0dba960-ff73-4615-8df4-d6ac5d9dc118',
 		},
+
+		clipLimitExceeded: {
+			message: 'You cannot add a note to the clip because you have exceeded the limit of clips.',
+			code: 'CLIP_LIMIT_EXCEEDED',
+			id: '456cd06d-9f5b-4793-8108-dffe6e257d98',
+		},
 	},
 } as const;
 
@@ -77,6 +83,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					throw new ApiError(meta.errors.alreadyClipped);
 				} else if (e instanceof ClipService.TooManyClipNotesError) {
 					throw new ApiError(meta.errors.tooManyClipNotes);
+				} else if (e instanceof ClipService.ClipLimitExceededError) {
+					throw new ApiError(meta.errors.clipLimitExceeded);
 				} else {
 					throw e;
 				}

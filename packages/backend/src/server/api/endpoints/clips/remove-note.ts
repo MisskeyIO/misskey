@@ -30,6 +30,12 @@ export const meta = {
 			code: 'NO_SUCH_NOTE',
 			id: 'aff017de-190e-434b-893e-33a9ff5049d8',
 		},
+
+		clipLimitExceeded: {
+			message: 'You cannot remove a note from the clip because you have exceeded the limit of clips.',
+			code: 'CLIP_LIMIT_EXCEEDED',
+			id: 'e37131a7-a43f-41e9-8152-b0f91b5d865c',
+		},
 	},
 } as const;
 
@@ -55,6 +61,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					throw new ApiError(meta.errors.noSuchClip);
 				} else if (e instanceof ClipService.NoSuchNoteError) {
 					throw new ApiError(meta.errors.noSuchNote);
+				} else if (e instanceof ClipService.ClipLimitExceededError) {
+					throw new ApiError(meta.errors.clipLimitExceeded);
 				}
 				throw e;
 			}

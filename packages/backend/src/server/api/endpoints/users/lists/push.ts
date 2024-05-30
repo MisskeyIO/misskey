@@ -10,6 +10,7 @@ import { Endpoint } from '@/server/api/endpoint-base.js';
 import { GetterService } from '@/server/api/GetterService.js';
 import { UserListService } from '@/core/UserListService.js';
 import { DI } from '@/di-symbols.js';
+import { RoleService } from '@/core/RoleService.js';
 import { ApiError } from '../../../error.js';
 
 export const meta = {
@@ -59,6 +60,12 @@ export const meta = {
 			code: 'TOO_MANY_USERS',
 			id: '2dd9752e-a338-413d-8eec-41814430989b',
 		},
+
+		listLimitExceeded: {
+			message: 'You cannot add a user to the list because you have exceeded the limit of lists.',
+			code: 'LIST_LIMIT_EXCEEDED',
+			id: '5906ab2d-c164-44bc-a60a-464beba52be9',
+		},
 	},
 } as const;
 
@@ -85,6 +92,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 		private getterService: GetterService,
 		private userListService: UserListService,
+		private roleService: RoleService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			// Fetch the list
@@ -95,6 +103,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (userList == null) {
 				throw new ApiError(meta.errors.noSuchList);
+			}
+
+			// Check the list limit
+			const currentCount = await this.userListsRepository.countBy({
+				userId: me.id,
+			});
+			if (currentCount > (await this.roleService.getUserPolicies(me.id)).userListLimit) {
+				throw new ApiError(meta.errors.listLimitExceeded);
 			}
 
 			// Fetch the user

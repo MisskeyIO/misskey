@@ -37,7 +37,7 @@ export const meta = {
 
 		antennaLimitExceeded: {
 			message: 'You cannot update the antenna because you have exceeded the limit of antennas.',
-			code: 'ANTENNAS_LIMIT_EXCEEDED',
+			code: 'ANTENNA_LIMIT_EXCEEDED',
 			id: '3166a92e-09d9-4c09-afa3-1dbe34a3afcf',
 		},
 	},

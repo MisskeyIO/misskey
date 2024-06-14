@@ -4,7 +4,7 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
-import type { UserListsRepository } from '@/models/_.js';
+import type { UserListMembershipsRepository, UserListsRepository } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { UserListEntityService } from '@/core/entities/UserListEntityService.js';
 import { DI } from '@/di-symbols.js';
@@ -39,6 +39,12 @@ export const meta = {
 			code: 'LIST_LIMIT_EXCEEDED',
 			id: '0a1fa63e-3e4c-4bc2-afd1-1ff853b4560e',
 		},
+
+		listUsersLimitExceeded: {
+			message: 'You cannot update the list because you have exceeded the limit of users in a list.',
+			code: 'LIST_USERS_LIMIT_EXCEEDED',
+			id: '831fd3b2-4ac8-421e-89db-bfd98944e529',
+		},
 	},
 } as const;
 
@@ -58,6 +64,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		@Inject(DI.userListsRepository)
 		private userListsRepository: UserListsRepository,
 
+		@Inject(DI.userListMembershipsRepository)
+		private userListMembershipsRepository: UserListMembershipsRepository,
+
 		private userListEntityService: UserListEntityService,
 		private roleService: RoleService,
 	) {
@@ -71,11 +80,22 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw new ApiError(meta.errors.noSuchList);
 			}
 
+			const policies = await this.roleService.getUserPolicies(me.id);
 			const currentCount = await this.userListsRepository.countBy({
 				userId: me.id,
 			});
-			if (currentCount > (await this.roleService.getUserPolicies(me.id)).userListLimit) {
+			if (currentCount > policies.userListLimit) {
 				throw new ApiError(meta.errors.listLimitExceeded);
+			}
+
+			const currentUserCounts = await this.userListMembershipsRepository
+				.createQueryBuilder('ulm')
+				.select('COUNT(*)')
+				.where('ulm.userListUserId = :userId', { userId: me.id })
+				.groupBy('ulm.userListId')
+				.getRawMany<{ count: number }>();
+			if (currentUserCounts.some((x) => x.count > policies.userEachUserListsLimit)) {
+				throw new ApiError(meta.errors.listUsersLimitExceeded);
 			}
 
 			await this.userListsRepository.update(userList.id, {

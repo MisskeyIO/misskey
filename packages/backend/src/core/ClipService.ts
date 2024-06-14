@@ -21,6 +21,7 @@ export class ClipService {
 	public static TooManyClipNotesError = class extends Error {};
 	public static TooManyClipsError = class extends Error {};
 	public static ClipLimitExceededError = class extends Error {};
+	public static ClipNotesLimitExceededError = class extends Error {};
 
 	constructor(
 		@Inject(DI.clipsRepository)
@@ -39,11 +40,24 @@ export class ClipService {
 
 	@bindThis
 	public async create(me: MiLocalUser, name: string, isPublic: boolean, description: string | null): Promise<MiClip> {
+		const policies = await this.roleService.getUserPolicies(me.id);
+
 		const currentCount = await this.clipsRepository.countBy({
 			userId: me.id,
 		});
-		if (currentCount >= (await this.roleService.getUserPolicies(me.id)).clipLimit) {
+		if (currentCount >= policies.clipLimit) {
 			throw new ClipService.TooManyClipsError();
+		}
+
+		const currentNoteCounts = await this.clipNotesRepository
+			.createQueryBuilder('cn')
+			.select('COUNT(*)')
+			.innerJoin('cn.clip', 'c')
+			.where('c.userId = :userId', { userId: me.id })
+			.groupBy('cn.clipId')
+			.getRawMany<{ count: number }>();
+		if (currentNoteCounts.some((x) => x.count > policies.noteEachClipsLimit)) {
+			throw new ClipService.ClipNotesLimitExceededError();
 		}
 
 		const clip = await this.clipsRepository.insert({
@@ -68,11 +82,24 @@ export class ClipService {
 			throw new ClipService.NoSuchClipError();
 		}
 
+		const policies = await this.roleService.getUserPolicies(me.id);
+
 		const currentCount = await this.clipsRepository.countBy({
 			userId: me.id,
 		});
-		if (currentCount > (await this.roleService.getUserPolicies(me.id)).clipLimit) {
+		if (currentCount > policies.clipLimit) {
 			throw new ClipService.ClipLimitExceededError();
+		}
+
+		const currentNoteCounts = await this.clipNotesRepository
+			.createQueryBuilder('cn')
+			.select('COUNT(*)')
+			.innerJoin('cn.clip', 'c')
+			.where('c.userId = :userId', { userId: me.id })
+			.groupBy('cn.clipId')
+			.getRawMany<{ count: number }>();
+		if (currentNoteCounts.some((x) => x.count > policies.noteEachClipsLimit)) {
+			throw new ClipService.ClipNotesLimitExceededError();
 		}
 
 		await this.clipsRepository.update(clip.id, {
@@ -114,6 +141,17 @@ export class ClipService {
 		});
 		if (currentClipCount > policies.clipLimit) {
 			throw new ClipService.ClipLimitExceededError();
+		}
+
+		const currentNoteCounts = await this.clipNotesRepository
+			.createQueryBuilder('cn')
+			.select('COUNT(*)')
+			.innerJoin('cn.clip', 'c')
+			.where('c.userId = :userId', { userId: me.id })
+			.groupBy('cn.clipId')
+			.getRawMany<{ count: number }>();
+		if (currentNoteCounts.some((x) => x.count > policies.noteEachClipsLimit)) {
+			throw new ClipService.ClipNotesLimitExceededError();
 		}
 
 		const currentNoteCount = await this.clipNotesRepository.countBy({

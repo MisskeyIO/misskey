@@ -9,7 +9,6 @@ import { Endpoint } from '@/server/api/endpoint-base.js';
 import { GetterService } from '@/server/api/GetterService.js';
 import { DI } from '@/di-symbols.js';
 import { UserListService } from '@/core/UserListService.js';
-import { RoleService } from '@/core/RoleService.js';
 import { ApiError } from '../../../error.js';
 
 export const meta = {
@@ -36,12 +35,6 @@ export const meta = {
 			code: 'NO_SUCH_USER',
 			id: '588e7f72-c744-4a61-b180-d354e912bda2',
 		},
-
-		listLimitExceeded: {
-			message: 'You cannot remove a user from the list because you have exceeded the limit of lists.',
-			code: 'LIST_LIMIT_EXCEEDED',
-			id: 'b130fb29-52b1-4897-bb13-8a5eb2e8b4bb',
-		},
 	},
 } as const;
 
@@ -62,7 +55,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 		private userListService: UserListService,
 		private getterService: GetterService,
-		private roleService: RoleService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			// Fetch the list
@@ -73,14 +65,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (userList == null) {
 				throw new ApiError(meta.errors.noSuchList);
-			}
-
-			// Check the list limit
-			const currentCount = await this.userListsRepository.countBy({
-				userId: me.id,
-			});
-			if (currentCount > (await this.roleService.getUserPolicies(me.id)).userListLimit) {
-				throw new ApiError(meta.errors.listLimitExceeded);
 			}
 
 			// Fetch the user

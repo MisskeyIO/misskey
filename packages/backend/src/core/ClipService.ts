@@ -165,13 +165,6 @@ export class ClipService {
 			throw new ClipService.NoSuchNoteError();
 		}
 
-		const currentCount = await this.clipsRepository.countBy({
-			userId: me.id,
-		});
-		if (currentCount > (await this.roleService.getUserPolicies(me.id)).clipLimit) {
-			throw new ClipService.ClipLimitExceededError();
-		}
-
 		await this.clipNotesRepository.delete({
 			noteId: noteId,
 			clipId: clip.id,

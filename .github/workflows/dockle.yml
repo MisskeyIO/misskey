@@ -30,5 +30,6 @@ jobs:
           DOCKLE_EXIT_CODE: 1
           DOCKLE_EXIT_LEVEL: WARN
           DOCKLE_IGNORES: CIS-DI-0005,CIS-DI-0010
+          DOCKLE_DEBUG: true
         with:
           args: 'misskey:scan'

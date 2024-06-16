@@ -72,7 +72,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			}
 
 			switch (ps.sort) {
-				case '+follower': query.orderBy('user.followersCount', 'DESC'); break;
+				case '+follower': query.andWhere('isHibernated = FALSE').orderBy('user.followersCount', 'DESC'); break;
 				case '-follower': query.orderBy('user.followersCount', 'ASC'); break;
 				case '+createdAt': query.orderBy('user.id', 'DESC'); break;
 				case '-createdAt': query.orderBy('user.id', 'ASC'); break;

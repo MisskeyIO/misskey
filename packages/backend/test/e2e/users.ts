@@ -665,7 +665,16 @@ describe('ユーザー', () => {
 				displayOrder: roleBadge.displayOrder,
 			}]);
 		}
-		assert.deepStrictEqual(response.roles, []); // バッヂだからといってrolesが取れるとは限らない
+		assert.deepStrictEqual(response.roles, [{
+			id: roleBadge.id,
+			name: roleBadge.name,
+			color: roleBadge.color,
+			iconUrl: roleBadge.iconUrl,
+			description: roleBadge.description,
+			isModerator: roleBadge.isModerator,
+			isAdministrator: roleBadge.isAdministrator,
+			displayOrder: roleBadge.displayOrder,
+		}]);
 	});
 	test('をID指定のリスト形式で取得することができる（空）', async () => {
 		const parameters = { userIds: [] };

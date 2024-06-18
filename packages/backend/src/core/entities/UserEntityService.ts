@@ -500,7 +500,6 @@ export class UserEntityService implements OnModuleInit {
 			} : undefined) : undefined,
 			emojis: this.customEmojiService.populateEmojis(user.emojis, user.host),
 			onlineStatus: this.getOnlineStatus(user),
-			// パフォーマンス上の理由でローカルユーザーのみ
 			badgeRoles: user.host == null
 				? this.roleService.getUserBadgeRoles(user.id).then((rs) =>
 					rs

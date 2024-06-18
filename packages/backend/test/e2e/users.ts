@@ -231,7 +231,7 @@ describe('ユーザー', () => {
 		rolePublic = await role(root, { isPublic: true, name: 'Public Role' });
 		await api('admin/roles/assign', { userId: userRolePublic.id, roleId: rolePublic.id }, root);
 		userRoleBadge = await signup({ username: 'userRoleBadge' });
-		roleBadge = await role(root, { asBadge: true, name: 'Badge Role' });
+		roleBadge = await role(root, { asBadge: true, name: 'Badge Role', isPublic: true });
 		await api('admin/roles/assign', { userId: userRoleBadge.id, roleId: roleBadge.id }, root);
 		userSilenced = await signup({ username: 'userSilenced' });
 		await post(userSilenced, { text: 'test' });

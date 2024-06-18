@@ -501,16 +501,15 @@ export class UserEntityService implements OnModuleInit {
 			emojis: this.customEmojiService.populateEmojis(user.emojis, user.host),
 			onlineStatus: this.getOnlineStatus(user),
 			badgeRoles: user.host == null
-				? this.roleService.getUserBadgeRoles(user.id).then((rs) =>
-					rs
-						.filter((role) => role.isPublic || iAmModerator)
-						.sort((a, b) => b.displayOrder - a.displayOrder)
-						.map((r) => ({
-							name: r.name,
-							iconUrl: r.iconUrl,
-							displayOrder: r.displayOrder,
-							behavior: r.badgeBehavior ?? undefined,
-						})),
+				? this.roleService.getUserBadgeRoles(user.id).then((rs) => rs
+					.filter((r) => r.isPublic || iAmModerator)
+					.sort((a, b) => b.displayOrder - a.displayOrder)
+					.map((r) => ({
+						name: r.name,
+						iconUrl: r.iconUrl,
+						displayOrder: r.displayOrder,
+						behavior: r.badgeBehavior ?? undefined,
+					})),
 				)
 				: undefined,
 

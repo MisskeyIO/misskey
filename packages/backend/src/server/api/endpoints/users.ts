@@ -72,7 +72,12 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (ps.hostname) {
 				query.andWhere('user.host = :hostname', { hostname: ps.hostname.toLowerCase() });
 			}
-			const chartUsers = await this.perUserPvChart.getChartUsers('hour', 0, null, ps.limit, ps.offset);
+			const chartUsers: { userId: string; count: number; }[] = [];
+			if (ps.sort?.endsWith('pv')) {
+				await this.perUserPvChart.getChartUsers('hour', 0, null, ps.limit, ps.offset).then(users => {
+					chartUsers.push(...users);
+				});
+			}
 			switch (ps.sort) {
 				case '+follower': query.orderBy('user.followersCount', 'DESC'); break;
 				case '-follower': query.orderBy('user.followersCount', 'ASC'); break;

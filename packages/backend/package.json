@@ -11,7 +11,7 @@
 		"start:test": "cross-env NODE_ENV=test bun ./src/boot/entry.ts",
 		"migrate": "bun typeorm migration:run -d ormconfig.js",
 		"revert": "bun typeorm migration:revert -d ormconfig.js",
-		"check:connect": "node ./scripts/check_connect.js",
+		"check:connect": "bun ./scripts/check_connect.js",
 		"build": "swc src -d built -D --strip-leading-paths",
 		"build:test": "swc test-server -d built-test -D --config-file test-server/.swcrc --strip-leading-paths",
 		"watch:swc": "swc src -d built -D -w --strip-leading-paths",

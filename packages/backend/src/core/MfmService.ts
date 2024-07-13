@@ -13,7 +13,7 @@ import { intersperse } from '@/misc/prelude/array.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
 import type { IMentionedRemoteUsers } from '@/models/Note.js';
 import { bindThis } from '@/decorators.js';
-import * as TreeAdapter from '../../node_modules/parse5/dist/tree-adapters/default.js';
+import * as TreeAdapter from '../../../../node_modules/parse5/dist/tree-adapters/default.js';
 import type * as mfm from 'mfm-js';
 
 const treeAdapter = TreeAdapter.defaultTreeAdapter;

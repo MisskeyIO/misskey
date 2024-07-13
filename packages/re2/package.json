@@ -3,6 +3,7 @@
   "name": "re2",
   "version": "0.0.1",
 	"exports": {
-		"default": "./index.js"
+		"default": "./index.js",
+		"types": "./index.d.ts"
 	}
 }

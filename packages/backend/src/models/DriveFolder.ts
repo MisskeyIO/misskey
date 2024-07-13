@@ -37,7 +37,7 @@ export class MiDriveFolder {
 		onDelete: 'CASCADE',
 	})
 	@JoinColumn()
-	public user: MiUser | null;
+	public user: any | null;
 
 	@Index()
 	@Column({

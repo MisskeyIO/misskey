@@ -24,7 +24,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<XRaw v-else-if="tab === 'raw'" key="raw" :user="user"/>
 			</MkHorizontalSwipe>
 		</div>
-		<MkError v-else-if="error" @retry="fetchUser()"/>
+		<div v-else-if="error">
+			<MkUserNotFound v-if="error.value.id === '4362f8dc-731f-4ad8-a694-be5a88922a24'"/>
+			<MkUserSuspended v-else-if="error.value.id === 'c1e1b0d6-2b7c-4c1d-9f1d-2d3d6e8d7e7f'"/>
+			<MkError v-else @retry="fetchUser()"/>
+		</div>
+		<!--
+			<MkError v-else-if="error" @retry="fetchUser()"/>
+			-->
 		<MkLoading v-else/>
 	</div>
 </MkStickyContainer>

@@ -154,7 +154,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					user = await this.usersRepository.findOneBy(q);
 				}
 
-				if (user == null || user.isDeleted) {
+				if (user == null || (user.isDeleted && !isModerator)) {
 					throw new ApiError(meta.errors.noSuchUser);
 				}
 				if (!isModerator && user.isSuspended) {

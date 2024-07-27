@@ -8,7 +8,7 @@ process.env.NODE_ENV = 'test';
 import * as assert from 'assert';
 import { inspect } from 'node:util';
 import { DEFAULT_POLICIES } from '@/core/RoleService.js';
-import { api, post, role, signup, successfulApiCall, uploadFile } from '../utils.js';
+import { api, post, role, signup, successfulApiCall, uploadFile, failedApiCall } from '../utils.js';
 import type * as misskey from 'misskey-js';
 
 describe('ユーザー', () => {
@@ -881,6 +881,31 @@ describe('ユーザー', () => {
 		assert.deepStrictEqual(response, expected);
 	});
 
+	//#endregion
+
+	//#region 凍結/削除ユーザー
+	test('が凍結済みのユーザー情報を取得できない', async () => {
+		const parameters = { userId: userSuspended.id };
+		await failedApiCall({ endpoint: 'users/show', parameters, user: alice },
+			{ status: 404, code: 'USER_SUSPENDED', id: 'c1e1b0d6-2b7c-4c1d-9f1d-2d3d6e8d7e7f' });
+	});
+	test('が削除済みのユーザー情報を取得できない', async () => {
+		const parameters = { userId: userDeletedBySelf.id };
+		await failedApiCall({ endpoint: 'users/show', parameters, user: alice },
+			{ status: 404, code: 'NO_SUCH_USER', id: '4362f8dc-731f-4ad8-a694-be5a88922a24' });
+	});
+	test('(Admin)が凍結済みユーザー情報を取得できる', async () => {
+		const parameters = { userId: userSuspended.id };
+		const response = await successfulApiCall({ endpoint: 'users/show', parameters, user: root });
+		const expected = userSuspended;
+		assert.deepStrictEqual(response, expected);
+	});
+	test('(Admin)が削除済みユーザー情報を取得できる', async () => {
+		const parameters = { userId: userDeletedBySelf.id };
+		const response = await successfulApiCall({ endpoint: 'users/show', parameters, user: root });
+		const expected = userDeletedBySelf;
+		assert.deepStrictEqual(response, expected);
+	});
 	//#endregion
 
 	test.todo('を管理人として確認することができる(admin/show-user)');

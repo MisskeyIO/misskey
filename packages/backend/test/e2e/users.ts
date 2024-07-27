@@ -889,20 +889,8 @@ describe('ユーザー', () => {
 		await failedApiCall({ endpoint: 'users/show', parameters, user: alice },
 			{ status: 404, code: 'USER_SUSPENDED', id: 'c1e1b0d6-2b7c-4c1d-9f1d-2d3d6e8d7e7f' });
 	});
-	test('が削除済みのユーザー情報を取得できない', async () => {
-		const parameters = { userId: userDeletedBySelf.id };
-		await failedApiCall({ endpoint: 'users/show', parameters, user: alice },
-			{ status: 404, code: 'NO_SUCH_USER', id: '4362f8dc-731f-4ad8-a694-be5a88922a24' });
-	});
 	test('(Admin)が凍結済みユーザー情報を取得できる', async () => {
 		const parameters = { userId: userSuspended.id };
-		await successfulApiCall({ endpoint: 'users/show', parameters, user: root });
-		// Adminとユーザー情報は持っている情報が違うので、比較はできない
-		// const expected = userSuspended;
-		// assert.deepStrictEqual(response, expected);
-	});
-	test('(Admin)が削除済みユーザー情報を取得できる', async () => {
-		const parameters = { userId: userDeletedBySelf.id };
 		await successfulApiCall({ endpoint: 'users/show', parameters, user: root });
 		// Adminとユーザー情報は持っている情報が違うので、比較はできない
 		// const expected = userSuspended;

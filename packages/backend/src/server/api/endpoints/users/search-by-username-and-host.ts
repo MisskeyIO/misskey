@@ -108,7 +108,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				if (users.length < ps.limit) {
 					const otherQuery = setUsernameAndHostQuery()
 						.andWhere(`user.id NOT IN (${ followingQuery.getQuery() })`)
-						.andWhere('user.isSuspended = FALSE');
+						.andWhere('user.isSuspended = FALSE')
+						.andWhere('user.updatedAt IS NOT NULL');
 
 					otherQuery.setParameters(followingQuery.getParameters());
 
@@ -121,7 +122,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				}
 			} else {
 				const query = setUsernameAndHostQuery()
-					.andWhere('user.isSuspended = FALSE');
+					.andWhere('user.isSuspended = FALSE')
+					.andWhere('user.updatedAt IS NOT NULL');
 
 				users = await query
 					.orderBy('user.updatedAt', 'DESC')

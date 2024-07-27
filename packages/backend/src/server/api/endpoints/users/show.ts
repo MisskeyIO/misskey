@@ -164,11 +164,13 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				if (user == null) {
 					throw new ApiError(meta.errors.userNotFound);
 				}
-				if (!isModerator && user.isDeleted && user.isSuspended) {
-					throw new ApiError(meta.errors.noSuchUser);
-				}
-				if (!isModerator && user.isSuspended) {
-					throw new ApiError(meta.errors.userSuspended);
+				if (!isModerator) {
+					if (user.isDeleted && user.isSuspended) {
+						throw new ApiError(meta.errors.noSuchUser);
+					}
+					if (user.isSuspended) {
+						throw new ApiError(meta.errors.userSuspended);
+					}
 				}
 
 				if (user.host == null) {

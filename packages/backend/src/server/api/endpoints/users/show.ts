@@ -73,13 +73,6 @@ export const meta = {
 			id: 'c1e1b0d6-2b7c-4c1d-9f1d-2d3d6e8d7e7f',
 			httpStatusCode: 404,
 		},
-
-		userNotFound: {
-			message: 'User not found.',
-			code: 'USER_NOT_FOUND',
-			id: 'b4a5b0d6-2b7c-4c1d-9f1d-2d3d6e8d7e7f',
-			httpStatusCode: 404,
-		},
 	},
 } as const;
 
@@ -162,7 +155,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				}
 
 				if (user == null) {
-					throw new ApiError(meta.errors.userNotFound);
+					throw new ApiError(meta.errors.noSuchUser);
 				}
 				if (!isModerator) {
 					if (user.isDeleted && user.isSuspended) {

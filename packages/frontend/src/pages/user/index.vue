@@ -61,17 +61,17 @@ const XGallery = defineAsyncComponent(() => import('./gallery.vue'));
 const XRaw = defineAsyncComponent(() => import('./raw.vue'));
 
 const props = withDefaults(defineProps<{
-		acct: string;
-		page?: string;
-	}>(), {
+	acct: string;
+	page?: string;
+}>(), {
 	page: 'home',
 });
 
 const tab = ref(props.page);
 
 const user = ref<null | Misskey.entities.UserDetailed>(null);
-const error = ref<null | any >(null);
-const userstatus = ref<null | any >(null);
+const error = ref<null | any>(null);
+const userstatus = ref<null | any>(null);
 
 function fetchUser(): void {
 	if (props.acct == null) return;
@@ -79,11 +79,9 @@ function fetchUser(): void {
 	misskeyApi('users/show', Misskey.acct.parse(props.acct)).then(u => {
 		user.value = u;
 	}).catch(err => {
-		if (err.id && err.id === '4362f8dc-731f-4ad8-a694-be5a88922a24') {
-			// User not found
+		if (err.id && err.id === '4362f8dc-731f-4ad8-a694-be5a88922a24') { // User not found
 			userstatus.value = 'notfound';
-		} else if (err.id && err.id === 'c1e1b0d6-2b7c-4c1d-9f1d-2d3d6e8d7e7f') {
-			// User suspended
+		} else if (err.id && err.id === 'c1e1b0d6-2b7c-4c1d-9f1d-2d3d6e8d7e7f') { // User suspended
 			userstatus.value = 'suspended';
 		} else {
 			error.value = err;

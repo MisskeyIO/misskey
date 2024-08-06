@@ -71,7 +71,7 @@ export const meta = {
 			message: 'User is suspended.',
 			code: 'USER_SUSPENDED',
 			id: 'c1e1b0d6-2b7c-4c1d-9f1d-2d3d6e8d7e7f',
-			httpStatusCode: 404,
+			httpStatusCode: 403,
 		},
 	},
 } as const;
@@ -157,6 +157,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				if (user == null) {
 					throw new ApiError(meta.errors.noSuchUser);
 				}
+
 				if (!isModerator) {
 					if (user.isDeleted && user.isSuspended) {
 						throw new ApiError(meta.errors.noSuchUser);

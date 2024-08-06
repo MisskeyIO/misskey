@@ -889,6 +889,7 @@ describe('ユーザー', () => {
 		await failedApiCall({ endpoint: 'users/show', parameters, user: alice },
 			{ status: 404, code: 'USER_SUSPENDED', id: 'c1e1b0d6-2b7c-4c1d-9f1d-2d3d6e8d7e7f' });
 	});
+
 	test('(Admin)が凍結済みユーザー情報を取得できる', async () => {
 		const parameters = { userId: userSuspended.id };
 		await successfulApiCall({ endpoint: 'users/show', parameters, user: root });

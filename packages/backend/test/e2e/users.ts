@@ -581,8 +581,8 @@ describe('ユーザー', () => {
 		{ label: '承認制ユーザーが含まれる', user: () => userLocking },
 		{ label: 'サイレンスユーザーが含まれる', user: () => userSilenced },
 		{ label: 'サスペンドユーザーが含まれない', user: () => userSuspended, excluded: true },
-		// { label: '削除済ユーザーが含まれる', user: () => userDeletedBySelf },
-		// { label: '削除済(byAdmin)ユーザーが含まれる', user: () => userDeletedByAdmin },
+		{ label: '削除済ユーザーが含まれる', user: () => userDeletedBySelf },
+		{ label: '削除済(byAdmin)ユーザーが含まれる', user: () => userDeletedByAdmin },
 	] as const)('をリスト形式で取得することができ、結果に$label', async ({ user, excluded }) => {
 		const parameters = { limit: 100 };
 		const response = await successfulApiCall({ endpoint: 'users', parameters, user: alice });
@@ -617,12 +617,12 @@ describe('ユーザー', () => {
 		{ label: 'サイレンスになっている', user: () => userSilenced, selector: (user: misskey.entities.UserDetailed) => user.isSilenced },
 		// FIXME: 落ちる
 		//{ label: 'サスペンドになっている', user: () => userSuspended, selector: (user: misskey.entities.UserDetailed) => user.isSuspended },
-		// { label: '削除済みになっている', user: () => userDeletedBySelf, me: () => userDeletedBySelf, selector: (user: misskey.entities.MeDetailed) => user.isDeleted },
-		// // @ts-expect-error UserDetailedNotMe doesn't include isDeleted
-		// { label: '自分以外から見たときは削除済みか判定できない', user: () => userDeletedBySelf, selector: (user: misskey.entities.UserDetailedNotMe) => user.isDeleted, expected: () => undefined },
-		// { label: '削除済み(byAdmin)になっている', user: () => userDeletedByAdmin, me: () => userDeletedByAdmin, selector: (user: misskey.entities.MeDetailed) => user.isDeleted },
-		// // @ts-expect-error UserDetailedNotMe doesn't include isDeleted
-		// { label: '自分以外から見たときは削除済み(byAdmin)か判定できない', user: () => userDeletedByAdmin, selector: (user: misskey.entities.UserDetailedNotMe) => user.isDeleted, expected: () => undefined },
+		{ label: '削除済みになっている', user: () => userDeletedBySelf, me: () => userDeletedBySelf, selector: (user: misskey.entities.MeDetailed) => user.isDeleted },
+		// @ts-expect-error UserDetailedNotMe doesn't include isDeleted
+		{ label: '自分以外から見たときは削除済みか判定できない', user: () => userDeletedBySelf, selector: (user: misskey.entities.UserDetailedNotMe) => user.isDeleted, expected: () => undefined },
+		{ label: '削除済み(byAdmin)になっている', user: () => userDeletedByAdmin, me: () => userDeletedByAdmin, selector: (user: misskey.entities.MeDetailed) => user.isDeleted },
+		// @ts-expect-error UserDetailedNotMe doesn't include isDeleted
+		{ label: '自分以外から見たときは削除済み(byAdmin)か判定できない', user: () => userDeletedByAdmin, selector: (user: misskey.entities.UserDetailedNotMe) => user.isDeleted, expected: () => undefined },
 		{ label: 'フォロー中になっている', user: () => userFollowedByAlice, selector: (user: misskey.entities.UserDetailed) => user.isFollowing },
 		{ label: 'フォローされている', user: () => userFollowingAlice, selector: (user: misskey.entities.UserDetailed) => user.isFollowed },
 		{ label: 'ブロック中になっている', user: () => userBlockedByAlice, selector: (user: misskey.entities.UserDetailed) => user.isBlocking },
@@ -702,8 +702,8 @@ describe('ユーザー', () => {
 		{ label: 'サスペンドユーザーが（モデレーターが見るときは）含まれる', user: () => userSuspended, me: () => root },
 		// BUG サスペンドユーザーを一般ユーザーから見るとrootユーザーが返ってくる
 		//{ label: 'サスペンドユーザーが（一般ユーザーが見るときは）含まれない', user: () => userSuspended, me: () => bob, excluded: true },
-		// { label: '削除済ユーザーが含まれる', user: () => userDeletedBySelf },
-		// { label: '削除済(byAdmin)ユーザーが含まれる', user: () => userDeletedByAdmin },
+		{ label: '削除済ユーザーが含まれる', user: () => userDeletedBySelf },
+		{ label: '削除済(byAdmin)ユーザーが含まれる', user: () => userDeletedByAdmin },
 		// @ts-expect-error excluded は上でコメントアウトされているので
 	] as const)('をID指定のリスト形式で取得することができ、結果に$label', async ({ user, me, excluded }) => {
 		const parameters = { userIds: [user().id] };
@@ -736,8 +736,8 @@ describe('ユーザー', () => {
 		{ label: '承認制ユーザーが含まれる', user: () => userLocking },
 		{ label: 'サイレンスユーザーが含まれる', user: () => userSilenced },
 		{ label: 'サスペンドユーザーが含まれない', user: () => userSuspended, excluded: true },
-		// { label: '削除済ユーザーが含まれる', user: () => userDeletedBySelf },
-		// { label: '削除済(byAdmin)ユーザーが含まれる', user: () => userDeletedByAdmin },
+		{ label: '削除済ユーザーが含まれる', user: () => userDeletedBySelf },
+		{ label: '削除済(byAdmin)ユーザーが含まれる', user: () => userDeletedByAdmin },
 	] as const)('を検索することができ、結果に$labelが含まれる', async ({ user, excluded }) => {
 		const parameters = { query: user().username, limit: 1 };
 		const response = await successfulApiCall({ endpoint: 'users/search', parameters, user: alice });
@@ -773,8 +773,8 @@ describe('ユーザー', () => {
 		{ label: '承認制ユーザーが含まれる', user: () => userLocking },
 		{ label: 'サイレンスユーザーが含まれる', user: () => userSilenced },
 		{ label: 'サスペンドユーザーが含まれない', user: () => userSuspended, excluded: true },
-		// { label: '削除済ユーザーが含まれる', user: () => userDeletedBySelf },
-		// { label: '削除済(byAdmin)ユーザーが含まれる', user: () => userDeletedByAdmin },
+		{ label: '削除済ユーザーが含まれる', user: () => userDeletedBySelf },
+		{ label: '削除済(byAdmin)ユーザーが含まれる', user: () => userDeletedByAdmin },
 	] as const)('をID&ホスト指定で検索でき、結果に$label', async ({ user, excluded }) => {
 		const parameters = { username: user().username };
 		const response = await successfulApiCall({ endpoint: 'users/search-by-username-and-host', parameters, user: alice });
@@ -803,8 +803,8 @@ describe('ユーザー', () => {
 		{ label: '承認制ユーザーが含まれる', user: () => userLocking },
 		{ label: 'サイレンスユーザーが含まれる', user: () => userSilenced },
 		//{ label: 'サスペンドユーザーが含まれない', user: () => userSuspended, excluded: true },
-		// { label: '削除済ユーザーが含まれる', user: () => userDeletedBySelf },
-		// { label: '削除済(byAdmin)ユーザーが含まれる', user: () => userDeletedByAdmin },
+		{ label: '削除済ユーザーが含まれる', user: () => userDeletedBySelf },
+		{ label: '削除済(byAdmin)ユーザーが含まれる', user: () => userDeletedByAdmin },
 	] as const)('がよくリプライをするユーザーのリストを取得でき、結果に$label', async ({ user, excluded }) => {
 		const replyTo = (await successfulApiCall({ endpoint: 'users/notes', parameters: { userId: user().id }, user: undefined }))[0];
 		await post(alice, { text: `@${user().username} test`, replyId: replyTo.id });
@@ -844,8 +844,8 @@ describe('ユーザー', () => {
 		{ label: '承認制ユーザーが含まれる', user: () => userLocking },
 		{ label: 'サイレンスユーザーが含まれる', user: () => userSilenced },
 		{ label: 'サスペンドユーザーが含まれない', user: () => userSuspended, excluded: true },
-		// { label: '削除済ユーザーが含まれる', user: () => userDeletedBySelf },
-		// { label: '削除済(byAdmin)ユーザーが含まれる', user: () => userDeletedByAdmin },
+		{ label: '削除済ユーザーが含まれる', user: () => userDeletedBySelf },
+		{ label: '削除済(byAdmin)ユーザーが含まれる', user: () => userDeletedByAdmin },
 	] as const)('をハッシュタグ指定で取得することができ、結果に$label', async ({ user, excluded }) => {
 		const hashtag = `user_test${user().username}`;
 		if (user() !== userSuspended) {

@@ -38,7 +38,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<div style="font-size: 120%;">{{ i18n.ts._initialAccountSetting.accountCreated }}</div>
 							<div>{{ i18n.ts._initialAccountSetting.letsStartAccountSetup }}</div>
 							<MkButton primary rounded gradate style="margin: 16px auto 0 auto;" data-cy-user-setup-continue @click="page++">{{ i18n.ts._initialAccountSetting.profileSetting }} <i class="ti ti-arrow-right"></i></MkButton>
-							<MkButton style="margin: 0 auto;" transparent rounded @click="later(true)">{{ i18n.ts.later }}</MkButton>
 						</div>
 					</MkSpacer>
 				</div>
@@ -115,7 +114,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</div>
 							<div class="_buttonsCenter">
 								<MkButton rounded data-cy-user-setup-back @click="page--"><i class="ti ti-arrow-left"></i> {{ i18n.ts.goBack }}</MkButton>
-								<MkButton rounded primary data-cy-user-setup-continue @click="setupComplete()">{{ i18n.ts.close }}</MkButton>
 							</div>
 						</div>
 					</MkSpacer>

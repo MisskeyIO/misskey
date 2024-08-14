@@ -5344,7 +5344,7 @@ export interface Locale extends ILocale {
          */
         "haveFun": ParameterizedString<"name">;
         /**
-         * このまま{name}(Misskey)の使い方についてのチュートリアルに進むこともできますが、ここで中断してすぐに使い始めることもできます。
+         * このまま{name}(Misskey)の使い方についてのチュートリアルに進みます。
          */
         "youCanContinueTutorial": ParameterizedString<"name">;
         /**

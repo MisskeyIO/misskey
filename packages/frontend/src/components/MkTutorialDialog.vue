@@ -8,6 +8,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 	ref="dialog"
 	:width="600"
 	:height="650"
+	:withCloseButton="false"
+	:escKeyDisabled="true"
 	@closed="emit('closed')"
 >
 	<template v-if="page === 1" #header><i class="ti ti-pencil"></i> {{ i18n.ts._initialTutorial._note.title }}</template>

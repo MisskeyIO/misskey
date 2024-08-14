@@ -8,7 +8,7 @@ import promiseLimit from 'promise-limit';
 import { DataSource } from 'typeorm';
 import { ModuleRef } from '@nestjs/core';
 import { DI } from '@/di-symbols.js';
-import type { FollowingsRepository, InstancesRepository, UserProfilesRepository, UserPublickeysRepository, UsersRepository } from '@/models/_.js';
+import type { FollowingsRepository, InstancesRepository, MiDriveFile, UserProfilesRepository, UserPublickeysRepository, UsersRepository } from '@/models/_.js';
 import type { Config } from '@/config.js';
 import type { MiLocalUser, MiRemoteUser } from '@/models/User.js';
 import { MiUser } from '@/models/User.js';
@@ -47,7 +47,7 @@ import type { ApNoteService } from './ApNoteService.js';
 import type { ApMfmService } from '../ApMfmService.js';
 import type { ApResolverService, Resolver } from '../ApResolverService.js';
 import type { ApLoggerService } from '../ApLoggerService.js';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+
 import type { ApImageService } from './ApImageService.js';
 import type { IActor, IObject } from '../type.js';
 
@@ -371,6 +371,7 @@ export class ApPersonService implements OnModuleInit {
 					birthday: bday?.[0] ?? null,
 					location: person['vcard:Address'] ?? null,
 					userHost: host,
+					mutualLinkSections: await this.mutualLinkSections(person, user),
 				}));
 
 				if (person.publicKey) {
@@ -547,6 +548,7 @@ export class ApPersonService implements OnModuleInit {
 			description: _description,
 			birthday: bday?.[0] ?? null,
 			location: person['vcard:Address'] ?? null,
+			mutualLinkSections: await this.mutualLinkSections(person, exist),
 		});
 
 		this.globalEventService.publishInternalEvent('remoteUserUpdated', { id: exist.id });
@@ -586,6 +588,48 @@ export class ApPersonService implements OnModuleInit {
 		}
 
 		return 'skip';
+	}
+	async mutualLinkSections(person: IActor, actor: MiRemoteUser) : Promise<[] | {
+		name: string | null;
+		mutualLinks: {
+				fileId: MiDriveFile['id'];
+				description: string | null;
+				imgSrc: string;
+				url: string;
+		}[];
+}[]> {
+		const apMutualLinkSections = person.mutualLinkSections;
+
+		if (apMutualLinkSections === undefined) return [];
+
+		return await Promise.all(apMutualLinkSections.map(async ap => {
+			let name = null;
+			if (ap._misskey_sectionName) {
+				name = truncate(ap._misskey_sectionName, summaryLength);
+			} else if (ap.sectionName) {
+				name = this.apMfmService.htmlToMfm(truncate(ap.sectionName, summaryLength), person.tag);
+			}
+			return {
+				name,
+				mutualLinks: (await Promise.all(ap.entrys.map(async entry => {
+					if (entry.url === null) return null;
+					const image = entry.image ? await this.apImageService.resolveImage(actor, entry.image).catch(() => null) : null;
+					if (image === null) return null;
+					let description = null;
+					if (entry._misskey_description) {
+						description = truncate(entry._misskey_description, summaryLength);
+					} else if (entry.description) {
+						description = this.apMfmService.htmlToMfm(truncate(entry.description, summaryLength), person.tag);
+					}
+					return {
+						fileId: image.id,
+						imgSrc: image.url,
+						url: entry.url,
+						description,
+					};
+				}))).filter(e => e !== null),
+			};
+		}));
 	}
 
 	/**

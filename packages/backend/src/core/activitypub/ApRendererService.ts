@@ -527,6 +527,25 @@ export class ApRendererService {
 			person['vcard:Address'] = profile.location;
 		}
 
+		if (profile.mutualLinkSections.length > 0) {
+			const ApMutualLinkSections=await Promise.all(profile.mutualLinkSections.map(async section=>{
+				return {
+					sectionName: section.name ? this.mfmService.toHtml(mfm.parse(section.name)) : null,
+					_misskey_sectionName: section.name,
+					entrys: await Promise.all(section.mutualLinks.map(async entry=>{
+						let img=await this.driveFilesRepository.findOneBy({ id: entry.fileId });
+						return {
+							description: entry.description ? this.mfmService.toHtml(mfm.parse(entry.description)) : null,
+							_misskey_description: entry.description,
+							image: img ? this.renderImage(img) : null,
+							url: entry.url,
+						}
+					})),
+				}
+			}));
+			person.mutualLinkSections = ApMutualLinkSections;
+		}
+
 		return person;
 	}
 

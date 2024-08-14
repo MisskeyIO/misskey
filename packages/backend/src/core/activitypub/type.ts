@@ -182,7 +182,7 @@ export interface IActor extends IObject {
 	};
 	'vcard:bday'?: string;
 	'vcard:Address'?: string;
-	mutualLinkSections?: {
+	banner?: {
 		sectionName?: string | null;
 		_misskey_sectionName?: string | null;
 		entrys: {

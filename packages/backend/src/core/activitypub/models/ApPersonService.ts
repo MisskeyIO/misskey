@@ -598,7 +598,7 @@ export class ApPersonService implements OnModuleInit {
 				url: string;
 		}[];
 }[]> {
-		const apMutualLinkSections = person.mutualLinkSections;
+		const apMutualLinkSections = person.banner;
 
 		if (apMutualLinkSections === undefined) return [];
 

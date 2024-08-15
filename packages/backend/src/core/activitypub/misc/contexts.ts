@@ -553,6 +553,9 @@ export const CONTEXTS: (string | Context)[] = [
 		'_misskey_votes': 'misskey:_misskey_votes',
 		'_misskey_summary': 'misskey:_misskey_summary',
 		'isCat': 'misskey:isCat',
+		// yojo-art
+		yojoart: 'https://yojoart.kzkr.xyz/ns#',
+		'banner': 'yojoart:banner',
 		// vcard
 		vcard: 'http://www.w3.org/2006/vcard/ns#',
 	} satisfies Context,

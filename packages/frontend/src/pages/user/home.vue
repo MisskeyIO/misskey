@@ -86,7 +86,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<div :class="$style.mutualLinks">
 								<div v-for="mutualLink in section.mutualLinks.slice(0, $i.policies.mutualLinkLimit)" :key="mutualLink.id">
 									<MkLink :hideIcon="true" :url="mutualLink.url">
-										<img :class="$style.mutualLinkImg" :src="mutualLink.imgSrc" :alt="mutualLink.description"/>
+										<img :class="$style.mutualLinkImg" :src="getProxiedImageUrl(mutualLink.imgSrc)" :alt="mutualLink.description"/>
 									</MkLink>
 								</div>
 							</div>
@@ -98,7 +98,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<div :class="$style.mutualLinks">
 								<div v-for="mutualLink in section.mutualLinks" :key="mutualLink.id">
 									<MkLink :hideIcon="true" :url="mutualLink.url">
-										<img :class="$style.mutualLinkImg" :src="mutualLink.imgSrc" :alt="mutualLink.description"/>
+										<img :class="$style.mutualLinkImg" :src="getProxiedImageUrl(mutualLink.imgSrc)" :alt="mutualLink.description"/>
 									</MkLink>
 								</div>
 							</div>
@@ -237,6 +237,7 @@ import { confetti } from '@/scripts/confetti.js';
 import { misskeyApi, misskeyApiGet } from '@/scripts/misskey-api.js';
 import { isFollowingVisibleForMe, isFollowersVisibleForMe } from '@/scripts/isFfVisibleForMe.js';
 import { useRouter } from '@/router/supplier.js';
+import { getProxiedImageUrl } from '@/scripts/media-proxy.js';
 import MkLink from '@/components/MkLink.vue';
 import MkContainer from '@/components/MkContainer.vue';
 

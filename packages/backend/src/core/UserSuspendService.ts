@@ -9,7 +9,16 @@ import { bindThis } from '@/decorators.js';
 import { DI } from '@/di-symbols.js';
 import type Logger from '@/logger.js';
 import type { MiUser } from '@/models/User.js';
-import type { FollowingsRepository, FollowRequestsRepository } from '@/models/_.js';
+import type {
+	AntennasRepository,
+	ClipNotesRepository,
+	ClipsRepository,
+	FollowingsRepository,
+	FollowRequestsRepository,
+	UserListMembershipsRepository,
+	UserListsRepository,
+	WebhooksRepository,
+} from '@/models/_.js';
 import { QueueService } from '@/core/QueueService.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
 import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
@@ -30,6 +39,24 @@ export class UserSuspendService {
 		@Inject(DI.followRequestsRepository)
 		private followRequestsRepository: FollowRequestsRepository,
 
+		@Inject(DI.antennasRepository)
+		private antennasRepository: AntennasRepository,
+
+		@Inject(DI.webhooksRepository)
+		private webhooksRepository: WebhooksRepository,
+
+		@Inject(DI.userListsRepository)
+		private userListsRepository: UserListsRepository,
+
+		@Inject(DI.clipsRepository)
+		private clipsRepository: ClipsRepository,
+
+		@Inject(DI.clipNotesRepository)
+		private clipNotesRepository: ClipNotesRepository,
+
+		@Inject(DI.userListMembershipsRepository)
+		private userListMembershipsRepository: UserListMembershipsRepository,
+
 		private queueService: QueueService,
 		private globalEventService: GlobalEventService,
 		private apRendererService: ApRendererService,
@@ -45,10 +72,26 @@ export class UserSuspendService {
 
 		this.globalEventService.publishInternalEvent('userChangeSuspendedState', { id: user.id, isSuspended: true });
 
+		const clipNotes = await this.clipNotesRepository.createQueryBuilder('c')
+			.innerJoin('c.note', 'n')
+			.where('n.userId = :userId', { userId: user.id })
+			.getMany();
+
 		await Promise.all([
 			this.followRequestsRepository.delete({ followeeId: user.id }),
 			this.followRequestsRepository.delete({ followerId: user.id }),
-		]).catch(() => null);
+
+			this.antennasRepository.delete({ userId: user.id }),
+			this.webhooksRepository.delete({ userId: user.id }),
+			this.userListsRepository.delete({ userId: user.id }),
+			this.clipsRepository.delete({ userId: user.id }),
+
+			this.clipNotesRepository.createQueryBuilder()
+				.delete()
+				.where('id IN (:...ids)', { ids: clipNotes.map((clipNote) => clipNote.id) })
+				.execute(),
+			this.userListMembershipsRepository.delete({ userId: user.id }),
+		]);
 
 		if (this.userEntityService.isLocalUser(user)) {
 			// 知り得る全SharedInboxにDelete配信

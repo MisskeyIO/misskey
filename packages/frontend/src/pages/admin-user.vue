@@ -244,7 +244,6 @@ import { i18n } from '@/i18n.js';
 import { iAmAdmin, iAmModerator, $i } from '@/account.js';
 import MkRolePreview from '@/components/MkRolePreview.vue';
 import MkPagination from '@/components/MkPagination.vue';
-import MkLink from '@/components/MkLink.vue';
 
 const props = withDefaults(defineProps<{
 	userId: string;

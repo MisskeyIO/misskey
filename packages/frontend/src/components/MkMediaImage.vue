@@ -95,10 +95,16 @@ function showMenu(ev: MouseEvent) {
 		},
 	}, {
 		text: i18n.ts.saveThisFile,
-		icon: 'ti ti-upload',
+		icon: 'ti ti-cloud-upload',
 		action: () => {
-			misskeyApi('drive/files/upload-from-url', {
-				url: props.image.url,
+			os.selectDriveFolder(false).then(async folder => {
+				if (folder[0] == null) {
+					return;
+				}
+				misskeyApi('drive/files/upload-from-url', {
+					url: props.image.url,
+					folderId: folder ? folder[0].id : undefined,
+				});
 			});
 		},
 	}];

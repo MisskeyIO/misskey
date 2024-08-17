@@ -72,10 +72,27 @@ export class UserSuspendService {
 
 		this.globalEventService.publishInternalEvent('userChangeSuspendedState', { id: user.id, isSuspended: true });
 
-		const clipNotes = await this.clipNotesRepository.createQueryBuilder('c')
-			.innerJoin('c.note', 'n')
-			.where('n.userId = :userId', { userId: user.id })
-			.getMany();
+		const promises: Promise<unknown>[] = [];
+
+		let cursor = '';
+		while (true) { // eslint-disable-line @typescript-eslint/no-unnecessary-condition, no-constant-condition
+			const clipNotes = await this.clipNotesRepository.createQueryBuilder('c')
+				.innerJoin('c.note', 'n')
+				.where('n.userId = :userId', { userId: user.id })
+				.andWhere('c.id > :cursor', { cursor })
+				.orderBy('c.id', 'ASC')
+				.limit(500)
+				.getMany();
+
+			if (clipNotes.length === 0) break;
+
+			cursor = clipNotes.at(-1)?.id ?? '';
+
+			promises.push(this.clipNotesRepository.createQueryBuilder()
+				.delete()
+				.where('id IN (:...ids)', { ids: clipNotes.map((clipNote) => clipNote.id) })
+				.execute());
+		}
 
 		await Promise.all([
 			this.followRequestsRepository.delete({ followeeId: user.id }),
@@ -86,10 +103,7 @@ export class UserSuspendService {
 			this.userListsRepository.delete({ userId: user.id }),
 			this.clipsRepository.delete({ userId: user.id }),
 
-			this.clipNotesRepository.createQueryBuilder()
-				.delete()
-				.where('id IN (:...ids)', { ids: clipNotes.map((clipNote) => clipNote.id) })
-				.execute(),
+			...promises,
 			this.userListMembershipsRepository.delete({ userId: user.id }),
 		]);
 

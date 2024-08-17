@@ -134,6 +134,10 @@ export class ClipService {
 			throw new ClipService.NoSuchClipError();
 		}
 
+		if (await this.clipNotesRepository.existsBy({ clipId, noteId })) {
+			throw new ClipService.AlreadyAddedError();
+		}
+
 		const policies = await this.roleService.getUserPolicies(me.id);
 
 		const currentClipCount = await this.clipsRepository.countBy({

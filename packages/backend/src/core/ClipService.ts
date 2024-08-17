@@ -147,6 +147,13 @@ export class ClipService {
 			throw new ClipService.ClipLimitExceededError();
 		}
 
+		const currentNoteCount = await this.clipNotesRepository.countBy({
+			clipId: clip.id,
+		});
+		if (currentNoteCount >= policies.noteEachClipsLimit) {
+			throw new ClipService.TooManyClipNotesError();
+		}
+
 		const currentNoteCounts = await this.clipNotesRepository
 			.createQueryBuilder('cn')
 			.select('COUNT(*)')
@@ -156,13 +163,6 @@ export class ClipService {
 			.getRawMany<{ count: number }>();
 		if (currentNoteCounts.some((x) => x.count > policies.noteEachClipsLimit)) {
 			throw new ClipService.ClipNotesLimitExceededError();
-		}
-
-		const currentNoteCount = await this.clipNotesRepository.countBy({
-			clipId: clip.id,
-		});
-		if (currentNoteCount >= policies.noteEachClipsLimit) {
-			throw new ClipService.TooManyClipNotesError();
 		}
 
 		try {

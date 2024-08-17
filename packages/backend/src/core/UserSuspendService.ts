@@ -77,12 +77,13 @@ export class UserSuspendService {
 		let cursor = '';
 		while (true) { // eslint-disable-line @typescript-eslint/no-unnecessary-condition, no-constant-condition
 			const clipNotes = await this.clipNotesRepository.createQueryBuilder('c')
+				.select('c.id')
 				.innerJoin('c.note', 'n')
 				.where('n.userId = :userId', { userId: user.id })
 				.andWhere('c.id > :cursor', { cursor })
 				.orderBy('c.id', 'ASC')
 				.limit(500)
-				.getMany();
+				.getRawMany<{ id: string }>();
 
 			if (clipNotes.length === 0) break;
 

@@ -105,7 +105,7 @@ export class UserSuspendService {
 
 			...promises,
 			this.userListMembershipsRepository.delete({ userId: user.id }),
-		]);
+		]).catch(() => null);
 
 		if (this.userEntityService.isLocalUser(user)) {
 			// 知り得る全SharedInboxにDelete配信

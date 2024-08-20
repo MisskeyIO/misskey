@@ -6,13 +6,13 @@ services:
     restart: always
     links:
       - db
-      - keydb
+      - dragonfly
 #     - mcaptcha
 #     - meilisearch
     depends_on:
       db:
         condition: service_healthy
-      keydb:
+      dragonfly:
         condition: service_healthy
     ports:
       - "3000:3000"
@@ -23,17 +23,16 @@ services:
       - ./files:/misskey/files
       - ./.config:/misskey/.config:ro
 
-  keydb:
+  dragonfly:
     restart: always
-    image: eqalpha/keydb:latest
+    image: docker.dragonflydb.io/dragonflydb/dragonfly
+    command: dragonfly --logtostderr --version_check=false --bind=0.0.0.0 --port=6379 --maxclients=64000 --maxmemory=0 --hz=100 --snapshot_cron=* * * * * --default_lua_flags=allow-undeclared-keys --pipeline_squash=0 --multi_exec_squash=false --conn_io_threads=4 --epoll_file_threads=4 --proactor_threads=4
+    ulimits:
+      memlock: -1
     networks:
       - internal_network
     volumes:
-      - ./keydb:/data
-    healthcheck:
-      test: "keydb-cli ping"
-      interval: 5s
-      retries: 20
+      - ./redis:/data
 
   db:
     restart: always

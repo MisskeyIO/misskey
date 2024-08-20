@@ -18,9 +18,17 @@ services:
   dragonfly:
     restart: unless-stopped
     image: docker.dragonflydb.io/dragonflydb/dragonfly
-    command: dragonfly --logtostderr --version_check=false --bind=0.0.0.0 --port=6379 --maxclients=64000 --maxmemory=0 --hz=100 --snapshot_cron=* * * * * --default_lua_flags=allow-undeclared-keys --pipeline_squash=0 --multi_exec_squash=false --conn_io_threads=4 --epoll_file_threads=4 --proactor_threads=4
     ulimits:
       memlock: -1
+    environment:
+      DFLY_version_check: false
+      DFLY_snapshot_cron: '* * * * *'
+      DFLY_default_lua_flags: allow-undeclared-keys
+      DFLY_pipeline_squash: 0
+      DFLY_multi_exec_squash: false
+      DFLY_conn_io_threads: 4
+      DFLY_epoll_file_threads: 4
+      DFLY_proactor_threads: 4
     networks:
       - internal_network
     volumes:

@@ -36,13 +36,7 @@ jobs:
         image: docker.dragonflydb.io/dragonflydb/dragonfly
         options: --ulimit "memlock=-1"
         env:
-          DFLY_logtostderr: true
           DFLY_version_check: false
-          DFLY_bind: 0.0.0.0
-          DFLY_port: 6379
-          DFLY_maxclients: 64000
-          DFLY_maxmemory: 0
-          DFLY_hz: 100
           DFLY_default_lua_flags: allow-undeclared-keys
           DFLY_pipeline_squash: 0
           DFLY_multi_exec_squash: false
@@ -103,13 +97,7 @@ jobs:
         image: docker.dragonflydb.io/dragonflydb/dragonfly
         options: --ulimit "memlock=-1"
         env:
-          DFLY_logtostderr: true
           DFLY_version_check: false
-          DFLY_bind: 0.0.0.0
-          DFLY_port: 6379
-          DFLY_maxclients: 64000
-          DFLY_maxmemory: 0
-          DFLY_hz: 100
           DFLY_default_lua_flags: allow-undeclared-keys
           DFLY_pipeline_squash: 0
           DFLY_multi_exec_squash: false

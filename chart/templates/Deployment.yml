@@ -42,6 +42,8 @@ spec:
           env:
             - name: DFLY_version_check
               value: false
+            - name: DFLY_tcp_backlog
+              value: 2048
             - name: DFLY_default_lua_flags
               value: allow-undeclared-keys
             - name: DFLY_pipeline_squash

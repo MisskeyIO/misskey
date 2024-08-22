@@ -74,15 +74,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			}
 			const chartUsers: { userId: string; count: number; }[] = [];
 			if (ps.sort?.endsWith('pv')) {
-				if (ps.sort === '+pv') {
-					await this.perUserPvChart.getChartUsers('day', 0, null, ps.limit, ps.offset, 'DESC').then(users => {
+					await this.perUserPvChart.getChartUsers('day', 0, null, ps.limit, ps.offset, ps.sort === '+pv' ? 'DESC' : 'ASC').then(users => {
 						chartUsers.push(...users);
 					});
-				} else if (ps.sort === '-pv') {
-					await this.perUserPvChart.getChartUsers('day', 0, null, ps.limit, ps.offset, 'ASC').then(users => {
-						chartUsers.push(...users);
-					});
-				}
 			}
 			switch (ps.sort) {
 				case '+follower': query.orderBy('user.followersCount', 'DESC'); break;

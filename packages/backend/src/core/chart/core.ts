@@ -727,7 +727,7 @@ export default abstract class Chart<T extends Schema> {
 	}
 
 	@bindThis
-	public async getChartPv(span: 'hour' | 'day', amount: number, cursor: Date | null, limit: number, offset: number): Promise<
+	public async getChartPv(span: 'hour' | 'day', amount: number, cursor: Date | null, limit: number, offset: number, order: 'DESC'|'ASC'): Promise<
 		{
 			userId: string,
 			count: number,
@@ -751,7 +751,7 @@ export default abstract class Chart<T extends Schema> {
 		// ログ取得
 		const logs = await repository.createQueryBuilder()
 			.where('date BETWEEN :gt AND :lt', { gt: Chart.dateToTimestamp(gt), lt: Chart.dateToTimestamp(lt) })
-			.orderBy('___pv_visitor + ___upv_visitor + ___pv_user + ___upv_user', 'DESC')
+			.orderBy('___pv_visitor + ___upv_visitor + ___pv_user + ___upv_user', order === 'ASC' ? 'ASC' : 'DESC')
 			.skip(offset)
 			.take(limit)
 			.getMany() as {

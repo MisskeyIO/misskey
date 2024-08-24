@@ -54,7 +54,7 @@ export default class PerUserPvChart extends Chart<typeof schema> { // eslint-dis
 	}
 
 	@bindThis
-	public async getChartUsers(span: 'hour' | 'day', amount: number, cursor: Date | null, limit = 0, offset = 0, order: 'ASC' | 'DESC'): Promise<{
+	public async getChartUsers(span: 'hour' | 'day', amount: number, order: 'ASC' | 'DESC', cursor: Date | null, limit = 0, offset = 0): Promise<{
     userId: string;
     count: number;
 }[]> {

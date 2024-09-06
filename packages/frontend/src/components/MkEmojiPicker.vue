@@ -594,6 +594,7 @@ defineExpose({
 						width: auto;
 						height: auto;
 						min-width: 0;
+						padding: 0 3px;
 
 						&:disabled {
 							cursor: not-allowed;

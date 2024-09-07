@@ -3657,12 +3657,16 @@ export interface Locale extends ILocale {
      */
     "continueThread": string;
     /**
+     * アカウントが削除されます。よろしいですか？
+     */
+    "deleteAccountConfirm": string;
+    /**
      * アカウントが削除されます。
      * 削除リクエスト後に再ログインすると
      * アカウントの削除が中断されてしまいますのでご注意ください。
      * よろしいですか？
      */
-    "deleteAccountConfirm": string;
+    "deleteAccountConfirm2": string;
     /**
      * パスワードが間違っています。
      */

@@ -1039,7 +1039,7 @@ importers:
         version: 8.2.8(@babel/preset-env@7.25.3(@babel/core@7.25.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4)
       storybook-addon-misskey-theme:
         specifier: github:misskey-dev/storybook-addon-misskey-theme
-        version: https://codeload.github.com/misskey-dev/storybook-addon-misskey-theme/tar.gz/cf583db098365b2ccc81a82f63ca9c93bc32b640(@storybook/blocks@8.2.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.2.8(@babel/preset-env@7.25.3(@babel/core@7.25.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@storybook/components@8.2.8(storybook@8.2.8(@babel/preset-env@7.25.3(@babel/core@7.25.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@storybook/core-events@8.2.8(storybook@8.2.8(@babel/preset-env@7.25.3(@babel/core@7.25.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@storybook/manager-api@8.2.8(storybook@8.2.8(@babel/preset-env@7.25.3(@babel/core@7.25.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@storybook/preview-api@8.2.8(storybook@8.2.8(@babel/preset-env@7.25.3(@babel/core@7.25.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@storybook/theming@8.2.8(storybook@8.2.8(@babel/preset-env@7.25.3(@babel/core@7.25.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@storybook/types@8.2.8(storybook@8.2.8(@babel/preset-env@7.25.3(@babel/core@7.25.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: https://codeload.github.com/misskey-dev/storybook-addon-misskey-theme/tar.gz/cf583db098365b2ccc81a82f63ca9c93bc32b640(em34ez5wueevmkcp23v2l25opy)
       vite-plugin-turbosnap:
         specifier: 1.0.3
         version: 1.0.3
@@ -4413,24 +4413,6 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-<<<<<<< HEAD
-  address@1.2.2:
-    resolution: {integrity: sha512-4B/qKCfeE/ODUaAUpSwfzazo5x29WD4r3vXiWsB7I2mSDAihwEqKO+g8GELZUQSSAo5e1XTYh3ZVfLyxBc12nA==}
-    engines: {node: '>= 10.0.0'}
-=======
-  adm-zip@0.5.15:
-    resolution: {integrity: sha512-jYPWSeOA8EFoZnucrKCNihqBjoEGQSU4HKgHYQgKNEQ0pQF9a/DYuo/+fAxY76k4qe75LUlLWpAM1QWcBMTOKw==}
-    engines: {node: '>=12.0'}
-
-  agent-base@4.3.0:
-    resolution: {integrity: sha512-salcGninV0nPrwpGNn4VTXBb1SOuXQBiqbrNXoeizJsHrsL6ERFM2Ne3JUSBWRE6aeNJI2ROP/WEEIDUiDe3cg==}
-    engines: {node: '>= 4.0.0'}
-
-  agent-base@6.0.2:
-    resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
-    engines: {node: '>= 6.0.0'}
->>>>>>> upstream/beta
-
   agent-base@7.1.1:
     resolution: {integrity: sha512-H0TSyFNDMomMNJQBn8wFV5YC/2eJ+VXECwOadZJT554xP6cODZHPX3H9QMQECxvrgiSOP1pHjy1sMWQVYJOUOA==}
     engines: {node: '>= 14'}
@@ -4847,13 +4829,6 @@ packages:
     resolution: {integrity: sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ==}
     engines: {node: '>=8'}
 
-<<<<<<< HEAD
-=======
-  cacache@18.0.4:
-    resolution: {integrity: sha512-B+L5iIa9mgcjLbliir2th36yEwPftrzteHYujzsx3dFP/31GCHcIeS8f5MGd80odLOjaOvSpU3EEAmRQptkxLQ==}
-    engines: {node: ^16.14.0 || >=18.0.0}
-
->>>>>>> upstream/beta
   cacheable-lookup@5.0.4:
     resolution: {integrity: sha512-2/kNscPhpcxrOigMZzbiWF7dz8ilhb/nIHU3EyZiXWXpeq/au8qJ8VhdftMkty3n7Gj6HIGalQG8oiBNB3AJgA==}
     engines: {node: '>=10.6.0'}
@@ -4999,9 +4974,6 @@ packages:
   chokidar@3.6.0:
     resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==}
     engines: {node: '>= 8.10.0'}
-
-  chownr@1.1.4:
-    resolution: {integrity: sha512-jJ0bqzaylmJtVnNgzTeSOs8DPavpbYgEr/b0YL8/2GO3xJEhInFmhKMUnEJQjZumK7KXGFhUy89PrsJWlakBVg==}
 
   chownr@2.0.0:
     resolution: {integrity: sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==}
@@ -5625,17 +5597,10 @@ packages:
     resolution: {integrity: sha512-V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw==}
     engines: {node: '>=0.12'}
 
-<<<<<<< HEAD
-=======
   entities@5.0.0:
     resolution: {integrity: sha512-BeJFvFRJddxobhvEdm5GqHzRV/X+ACeuw0/BuuxsCh1EUZcAIz8+kYmBp/LrQuloy6K1f3a0M7+IhmZ7QnkISA==}
     engines: {node: '>=0.12'}
 
-  env-paths@2.2.1:
-    resolution: {integrity: sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==}
-    engines: {node: '>=6'}
-
->>>>>>> upstream/beta
   envinfo@7.13.0:
     resolution: {integrity: sha512-cvcaMr7KqXVh4nyzGTVqTum+gAiL265x5jUWQIDLq//zOGbW+gSW/C+OWLleY/rs9Qole6AZLMXPbtIFQbqu+Q==}
     engines: {node: '>=4'}
@@ -5677,22 +5642,8 @@ packages:
     resolution: {integrity: sha512-QCOllgZJtaUo9miYBcLChTUaHNjJF3PYs1VidD7AwiEj1kYxKeQTctLAezAOH5ZKRH0g2IgPn6KwB4IT8iRpvA==}
     engines: {node: '>= 0.4'}
 
-<<<<<<< HEAD
-  esbuild-plugin-alias@0.2.1:
-    resolution: {integrity: sha512-jyfL/pwPqaFXyKnj8lP8iLk6Z0m099uXR45aSN8Av1XD4vhvQutxxPzgA2bTcAwQpa1zCXDcWOlhFgyP3GKqhQ==}
-
-  esbuild-register@3.5.0:
-    resolution: {integrity: sha512-+4G/XmakeBAsvJuDugJvtyF1x+XJT4FMocynNpxrvEBViirpfUn2PgNpCHedfWhF4WokNsO/OvMKrmJOIJsI5A==}
-=======
-  es6-promise@4.2.8:
-    resolution: {integrity: sha512-HJDGx5daxeIvxdBxvG2cb9g4tEvwIk3i8+nhX0yGrYmZUzbkdg8QbDevheDB8gd0//uPj4c1EQua8Q+MViT0/w==}
-
-  es6-promisify@5.0.0:
-    resolution: {integrity: sha512-C+d6UdsYDk0lMebHNR4S2NybQMMngAOnOwYBQjTOiv0MkoJMP0Myw2mgpDLBcpfCmRLxyFqYhS/CfOENq4SJhQ==}
-
   esbuild-register@3.6.0:
     resolution: {integrity: sha512-H2/S7Pm8a9CL1uhp9OvjwrBh5Pvx0H8qVOxNu8Wed9Y7qv56MPtq+GGM8RJpq6glYJn9Wspr8uw7l55uyinNeg==}
->>>>>>> upstream/beta
     peerDependencies:
       esbuild: 0.23.0
 
@@ -6291,12 +6242,6 @@ packages:
     resolution: {integrity: sha512-s3Fq41ZVh7vbbe2PN3nrW7yC7U7MFVc5c98/iTl9c2GawNMKx/J648KQRW6WKkuU8GIbbh2IXfIRQjOZnXcTnw==}
     engines: {node: '>=18'}
 
-<<<<<<< HEAD
-=======
-  google-protobuf@3.21.4:
-    resolution: {integrity: sha512-MnG7N936zcKTco4Jd2PX2U96Kf9PxygAPKBug+74LHzmHXmceN16MmRcdgZv+DGef/S9YvQAfRsNCn4cjf9yyQ==}
-
->>>>>>> upstream/beta
   gopd@1.0.1:
     resolution: {integrity: sha512-d65bNlIadxvpb/A2abVdlqKqV563juRnZ1Wtk6s1sIR8uNsXR70xqIzVqxVf1eTqDunwT2MkczEeaezCKTZhwA==}
 
@@ -6479,21 +6424,8 @@ packages:
     resolution: {integrity: sha512-JrF8SSLVmcvc5NducxgyOrKXe3EsyHMgBFgSaIUGmArKe+rwr0uphRkRXvwiom3I+fpIfoItveHrfudL8/rxuA==}
     engines: {node: '>=16'}
 
-<<<<<<< HEAD
-  https-proxy-agent@7.0.4:
-    resolution: {integrity: sha512-wlwpilI7YdjSkWaQ/7omYBMTliDcmCN8OLihO6I9B86g06lMyAoqgoDpV0XqoaPOKj+0DIdAvnsWfyAAhmimcg==}
-=======
-  https-proxy-agent@2.2.4:
-    resolution: {integrity: sha512-OmvfoQ53WLjtA9HeYP9RNrWMJzzAz1JGaSFr1nijg0PVR1JaD/xbJq1mdEIIlxGpXp9eSe/O2LgU9DJmTPd0Eg==}
-    engines: {node: '>= 4.5.0'}
-
-  https-proxy-agent@5.0.1:
-    resolution: {integrity: sha512-dFcAjpTQFgoLMzC2VwU+C/CbS7uRL0lWmxDITmqm7C+7F0Odmj6s9l6alZc6AELXhrnggM2CeWSXHGOdX2YtwA==}
-    engines: {node: '>= 6'}
-
   https-proxy-agent@7.0.5:
     resolution: {integrity: sha512-1e4Wqeblerz+tMKPIq2EMGiiWW1dIjZOksyHWSUm1rmuvw/how9hBHZ38lAGj5ID4Ik6EdkOw7NmWPy6LAwalw==}
->>>>>>> upstream/beta
     engines: {node: '>= 14'}
 
   human-signals@1.1.1:
@@ -7719,12 +7651,6 @@ packages:
   mz@2.7.0:
     resolution: {integrity: sha512-z81GNO7nnYMEhrGh9LeymoE4+Yr0Wn5McHIZMK5cfQCl+NDX08sCZgUc9/6MHni9IWuFLm1Z3HTCXu2z9fN62Q==}
 
-<<<<<<< HEAD
-=======
-  nan@2.20.0:
-    resolution: {integrity: sha512-bk3gXBZDGILuuo/6sKtr0DQmSThYHLtNCdSdXk9YkxD/jK6X2vmCyyXBBxyqZ4XcnzTyYEAThfX3DCEnLf6igw==}
-
->>>>>>> upstream/beta
   nanoid@3.3.7:
     resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
@@ -7835,14 +7761,6 @@ packages:
     resolution: {integrity: sha512-OSs33Z9yWr148JZcbZd5WiAXhh/n9z8TxQcdMhIOlpN9AhWpLfvVFO73+m77bBABQMaY9XSvIa+qk0jlI7Gcaw==}
     hasBin: true
 
-<<<<<<< HEAD
-=======
-  node-gyp@10.2.0:
-    resolution: {integrity: sha512-sp3FonBAaFe4aYTcFdZUn2NYkbP7xroPGYvQmP4Nl5PxamznItBnNCgjrVTKrEfQynInMsJvZrdmqUnysCJ8rw==}
-    engines: {node: ^16.14.0 || >=18.0.0}
-    hasBin: true
-
->>>>>>> upstream/beta
   node-int64@0.4.0:
     resolution: {integrity: sha512-O5lz91xSOeoXP6DulyHfllpq+Eg00MWitZIbtPfoSEvqIHdl5gfcY6hYzDWnj0qD5tz52PI08u9qUvSVeUBeHw==}
 
@@ -8572,13 +8490,6 @@ packages:
   probe-image-size@7.2.3:
     resolution: {integrity: sha512-HubhG4Rb2UH8YtV4ba0Vp5bQ7L78RTONYu/ujmCu5nBI8wGv24s4E9xSKBi0N1MowRpxk76pFCpJtW0KPzOK0w==}
 
-<<<<<<< HEAD
-=======
-  proc-log@4.2.0:
-    resolution: {integrity: sha512-g8+OnU/L2v+wyiVK+D5fA34J7EH8jZ8DDlvwhRCMxmMj7UCBvxiO1mGeN+36JXIKF4zevU4kRBd8lVgG9vLelA==}
-    engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
-
->>>>>>> upstream/beta
   process-exists@5.0.0:
     resolution: {integrity: sha512-6QPRh5fyHD8MaXr4GYML8K/YY0Sq5dKHGIOrAKS3cYpHQdmygFCcijIu1dVoNKAZ0TWAMoeh8KDK9dF8auBkJA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
@@ -8756,12 +8667,6 @@ packages:
     resolution: {integrity: sha512-fUeWjrkOO0t1rg7B2fdyDTvngj+9RlUyL92vOdiB7c0FPguWVsniIMjEtHH+meLBO9rzkUlUzBVXgWrjI8P9LA==}
     engines: {node: '>=12'}
 
-<<<<<<< HEAD
-=======
-  re2@1.21.3:
-    resolution: {integrity: sha512-GI+KoGkHT4kxTaX+9p0FgNB1XUnCndO9slG5qqeEoZ7kbf6Dk6ohQVpmwKVeSp7LPLn+g6Q3BaCopz4oHuBDuQ==}
-
->>>>>>> upstream/beta
   react-colorful@5.6.1:
     resolution: {integrity: sha512-1exovf0uGTGyq5mXQT0zgQ80uvj2PCwvF8zY1RN9/vbJVSjSo3fsB/4L3ObbF7u70NduSiK4xu4Y6q1MHoUGEw==}
     peerDependencies:
@@ -8991,14 +8896,6 @@ packages:
     deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
 
-<<<<<<< HEAD
-=======
-  rimraf@2.7.1:
-    resolution: {integrity: sha512-uWjbaKIK3T1OSVptzX7Nl6PvQ3qAGtKEtVRjRuazjfL3Bx5eI409VZSqgND+4UNnmzLVdPj9FqFJNPqBZFve4w==}
-    deprecated: Rimraf versions prior to v4 are no longer supported
-    hasBin: true
-
->>>>>>> upstream/beta
   rimraf@3.0.2:
     resolution: {integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==}
     deprecated: Rimraf versions prior to v4 are no longer supported
@@ -9286,23 +9183,6 @@ packages:
   slice-ansi@4.0.0:
     resolution: {integrity: sha512-qMCMfhY040cVHT43K9BFygqYbUPFZKHOg7K73mtTWJRb8pyP3fzf4Ixd5SzdEJQ6MRUg/WBnOLxghZtKKurENQ==}
     engines: {node: '>=10'}
-
-<<<<<<< HEAD
-  sonic-boom@3.8.1:
-    resolution: {integrity: sha512-y4Z8LCDBuum+PBP3lSV7RHrXscqksve/bi0as7mhwVnBW+/wUqKT/2Kb7um8yqcFy0duYbbPxzt89Zy2nOCaxg==}
-=======
-  smart-buffer@4.2.0:
-    resolution: {integrity: sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==}
-    engines: {node: '>= 6.0.0', npm: '>= 3.0.0'}
-
-  socks-proxy-agent@8.0.4:
-    resolution: {integrity: sha512-GNAq/eg8Udq2x0eNiFkr9gRg5bA7PXEWagQdeRX4cPSG+X/8V38v637gim9bjFptMk1QWsCTr0ttrJEiXbNnRw==}
-    engines: {node: '>= 14'}
-
-  socks@2.8.3:
-    resolution: {integrity: sha512-l5x7VUUWbjVFbafGLxPWkYsHIhEvmF85tbIeFZWc8ZPtoMyybuEhL7Jye/ooC4/d48FgOjSJXgsF/AJPYCW8Zw==}
-    engines: {node: '>= 10.0.0', npm: '>= 3.0.0'}
->>>>>>> upstream/beta
 
   sonic-boom@4.0.1:
     resolution: {integrity: sha512-hTSD/6JMLyT4r9zeof6UtuBDpjJ9sO08/nmS5djaA9eozT9oOlNdpXSnzcgj4FTqpk3nkLrs61l4gip9r1HCrQ==}
@@ -9994,23 +9874,9 @@ packages:
   uniq@1.0.1:
     resolution: {integrity: sha512-Gw+zz50YNKPDKXs+9d+aKAjVwpjNwqzvNpLigIruT4HA9lMZNdMqs9x07kKHB/L9WRzqp4+DlTU5s4wG2esdoA==}
 
-<<<<<<< HEAD
-  unique-string@2.0.0:
-    resolution: {integrity: sha512-uNaeirEPvpZWSgzwsPGtU2zVSTrn/8L5q/IexZmH0eH6SA73CmAA5U4GwORTxQAZs95TAXLNqeLoPPNO5gZfWg==}
-    engines: {node: '>=8'}
-=======
-  unique-filename@3.0.0:
-    resolution: {integrity: sha512-afXhuC55wkAmZ0P18QsVE6kp8JaxrEokN2HGIoIVv2ijHQd419H0+6EigAFcIzXeMIkcIkNBpB3L/DXB3cTS/g==}
-    engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
-
-  unique-slug@4.0.0:
-    resolution: {integrity: sha512-WrcA6AyEfqDX5bWige/4NQfPZMtASNVxdmWR76WESYQVAACSgWcR6e9i0mofqqBxYFtL4oAxPIptY73/0YE1DQ==}
-    engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
-
   unique-string@3.0.0:
     resolution: {integrity: sha512-VGXBUVwxKMBUznyffQweQABPRRW1vHZAbadFZud4pLFAqRGvv/96vafgjWFqzourzr8YonlQiPgH0YCJfawoGQ==}
     engines: {node: '>=12'}
->>>>>>> upstream/beta
 
   unist-util-is@6.0.0:
     resolution: {integrity: sha512-2qCTHimwdxLfz+YzdGfkqNlH0tLi9xjTnHddPmJwtIG9MGsdbutfTc4P+haPD7l7Cjxf/WZj+we5qfVPvvxfYw==}
@@ -10239,16 +10105,11 @@ packages:
   vue-component-type-helpers@2.0.29:
     resolution: {integrity: sha512-58i+ZhUAUpwQ+9h5Hck0D+jr1qbYl4voRt5KffBx8qzELViQ4XdT/Tuo+mzq8u63teAG8K0lLaOiL5ofqW38rg==}
 
-<<<<<<< HEAD
-  vue-component-type-helpers@2.0.26:
-    resolution: {integrity: sha512-sO9qQ8oC520SW6kqlls0iqDak53gsTVSrYylajgjmkt1c0vcgjsGSy1KzlDrbEx8pm02IEYhlUkU5hCYf8rwtg==}
+  vue-component-type-helpers@2.1.6:
+    resolution: {integrity: sha512-ng11B8B/ZADUMMOsRbqv0arc442q7lifSubD0v8oDXIFoMg/mXwAPUunrroIDkY+mcD0dHKccdaznSVp8EoX3w==}
 
-  vue-demi@0.14.7:
-    resolution: {integrity: sha512-EOG8KXDQNwkJILkx/gPcoL/7vH+hORoBaKgGe+6W7VFMvCYJfmF2dGbvgDroVnI8LU7/kTu8mbjRZGBU1z9NTA==}
-=======
   vue-demi@0.14.10:
     resolution: {integrity: sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==}
->>>>>>> upstream/beta
     engines: {node: '>=12'}
     hasBin: true
     peerDependencies:
@@ -10382,18 +10243,8 @@ packages:
     engines: {node: '>= 8'}
     hasBin: true
 
-<<<<<<< HEAD
-  why-is-node-running@2.2.2:
-    resolution: {integrity: sha512-6tSwToZxTOcotxHeA+qGCq1mVzKR3CwcJGmVcY+QE8SHy6TnpFnh8PAvPNHYr7EcuVeG0QSMxtYCuO1ta/G/oA==}
-=======
-  which@4.0.0:
-    resolution: {integrity: sha512-GlaYyEb07DPxYCKhKzplCWBJtvxZcZMrL+4UkrTSJHHPyZU4mYYTv3qaOe77H7EODLSSopAUFAc6W8U4yqvscg==}
-    engines: {node: ^16.13.0 || >=18.0.0}
-    hasBin: true
-
   why-is-node-running@2.3.0:
     resolution: {integrity: sha512-hUrmaWBdVDcxvYqnyh09zunKzROWjbZTiNy8dBEjkS7ehEDQibXJ7XvlmtbwuTclUiIyN+CyXQD4Vmko8fNm8w==}
->>>>>>> upstream/beta
     engines: {node: '>=8'}
     hasBin: true
 
@@ -12678,25 +12529,6 @@ snapshots:
 
   '@lukeed/ms@2.0.2': {}
 
-<<<<<<< HEAD
-=======
-  '@mapbox/node-pre-gyp@1.0.9(encoding@0.1.13)':
-    dependencies:
-      detect-libc: 2.0.3
-      https-proxy-agent: 5.0.1
-      make-dir: 3.1.0
-      node-fetch: 2.7.0(encoding@0.1.13)
-      nopt: 5.0.0
-      npmlog: 5.0.1
-      rimraf: 3.0.2
-      semver: 7.6.3
-      tar: 6.2.1
-    transitivePeerDependencies:
-      - encoding
-      - supports-color
-    optional: true
-
->>>>>>> upstream/beta
   '@mcaptcha/core-glue@0.1.0-alpha-5': {}
 
   '@mcaptcha/vanilla-glue@0.1.0-alpha-3':
@@ -12905,23 +12737,6 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.1
 
-<<<<<<< HEAD
-=======
-  '@npmcli/agent@2.2.2':
-    dependencies:
-      agent-base: 7.1.1
-      http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.5
-      lru-cache: 10.4.3
-      socks-proxy-agent: 8.0.4
-    transitivePeerDependencies:
-      - supports-color
-
-  '@npmcli/fs@3.1.1':
-    dependencies:
-      semver: 7.6.3
-
->>>>>>> upstream/beta
   '@nsfw-filter/gif-frames@1.0.2':
     dependencies:
       '@nsfw-filter/save-pixels': 2.3.4
@@ -13900,17 +13715,8 @@ snapshots:
       storybook: 8.2.8(@babel/preset-env@7.25.3(@babel/core@7.25.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4)
       ts-dedent: 2.2.0
       type-fest: 2.19.0
-<<<<<<< HEAD
-      vue: 3.4.15(typescript@5.4.5)
-      vue-component-type-helpers: 2.0.26
-    transitivePeerDependencies:
-      - encoding
-      - prettier
-      - supports-color
-=======
       vue: 3.4.15(typescript@5.5.4)
-      vue-component-type-helpers: 2.0.29
->>>>>>> upstream/beta
+      vue-component-type-helpers: 2.1.6
 
   '@swc/cli@0.3.12(@swc/core@1.5.7)(chokidar@3.6.0)':
     dependencies:
@@ -14063,25 +13869,6 @@ snapshots:
     dependencies:
       '@tensorflow/tfjs-core': 4.20.0(encoding@0.1.13)
 
-<<<<<<< HEAD
-=======
-  '@tensorflow/tfjs-node@4.19.0(encoding@0.1.13)(seedrandom@3.0.5)':
-    dependencies:
-      '@mapbox/node-pre-gyp': 1.0.9(encoding@0.1.13)
-      '@tensorflow/tfjs': 4.19.0(encoding@0.1.13)(seedrandom@3.0.5)
-      adm-zip: 0.5.15
-      google-protobuf: 3.21.4
-      https-proxy-agent: 2.2.4
-      progress: 2.0.3
-      rimraf: 2.7.1
-      tar: 4.4.19
-    transitivePeerDependencies:
-      - encoding
-      - seedrandom
-      - supports-color
-    optional: true
-
->>>>>>> upstream/beta
   '@tensorflow/tfjs@4.19.0(encoding@0.1.13)(seedrandom@3.0.5)':
     dependencies:
       '@tensorflow/tfjs-backend-cpu': 4.19.0(@tensorflow/tfjs-core@4.20.0(encoding@0.1.13))
@@ -14823,25 +14610,6 @@ snapshots:
 
   acorn@8.12.1: {}
 
-<<<<<<< HEAD
-  address@1.2.2: {}
-=======
-  adm-zip@0.5.15:
-    optional: true
-
-  agent-base@4.3.0:
-    dependencies:
-      es6-promisify: 5.0.0
-    optional: true
-
-  agent-base@6.0.2:
-    dependencies:
-      debug: 4.3.6(supports-color@8.1.1)
-    transitivePeerDependencies:
-      - supports-color
-    optional: true
->>>>>>> upstream/beta
-
   agent-base@7.1.1:
     dependencies:
       debug: 4.3.6(supports-color@8.1.1)
@@ -15353,24 +15121,6 @@ snapshots:
 
   cac@6.7.14: {}
 
-<<<<<<< HEAD
-=======
-  cacache@18.0.4:
-    dependencies:
-      '@npmcli/fs': 3.1.1
-      fs-minipass: 3.0.3
-      glob: 10.4.5
-      lru-cache: 10.4.3
-      minipass: 7.1.2
-      minipass-collect: 2.0.1
-      minipass-flush: 1.0.5
-      minipass-pipeline: 1.2.4
-      p-map: 4.0.0
-      ssri: 10.0.6
-      tar: 6.2.1
-      unique-filename: 3.0.0
-
->>>>>>> upstream/beta
   cacheable-lookup@5.0.4: {}
 
   cacheable-lookup@7.0.0: {}
@@ -15548,9 +15298,6 @@ snapshots:
       readdirp: 3.6.0
     optionalDependencies:
       fsevents: 2.3.3
-
-  chownr@1.1.4:
-    optional: true
 
   chownr@2.0.0: {}
 
@@ -16215,13 +15962,8 @@ snapshots:
 
   entities@4.5.0: {}
 
-<<<<<<< HEAD
-=======
   entities@5.0.0: {}
 
-  env-paths@2.2.1: {}
-
->>>>>>> upstream/beta
   envinfo@7.13.0: {}
 
   error-ex@1.3.2:
@@ -16317,21 +16059,7 @@ snapshots:
       is-date-object: 1.0.5
       is-symbol: 1.0.4
 
-<<<<<<< HEAD
-  esbuild-plugin-alias@0.2.1: {}
-
-  esbuild-register@3.5.0(esbuild@0.21.3):
-=======
-  es6-promise@4.2.8:
-    optional: true
-
-  es6-promisify@5.0.0:
-    dependencies:
-      es6-promise: 4.2.8
-    optional: true
-
   esbuild-register@3.6.0(esbuild@0.23.0):
->>>>>>> upstream/beta
     dependencies:
       debug: 4.3.6(supports-color@8.1.1)
       esbuild: 0.23.0
@@ -16996,13 +16724,6 @@ snapshots:
     dependencies:
       minipass: 3.3.6
 
-<<<<<<< HEAD
-=======
-  fs-minipass@3.0.3:
-    dependencies:
-      minipass: 7.1.2
-
->>>>>>> upstream/beta
   fs.realpath@1.0.0: {}
 
   fsevents@2.3.3:
@@ -17180,12 +16901,6 @@ snapshots:
       slash: 5.1.0
       unicorn-magic: 0.1.0
 
-<<<<<<< HEAD
-=======
-  google-protobuf@3.21.4:
-    optional: true
-
->>>>>>> upstream/beta
   gopd@1.0.1:
     dependencies:
       get-intrinsic: 1.2.4
@@ -17377,27 +17092,7 @@ snapshots:
 
   http_ece@1.2.0: {}
 
-<<<<<<< HEAD
-  https-proxy-agent@7.0.4:
-=======
-  https-proxy-agent@2.2.4:
-    dependencies:
-      agent-base: 4.3.0
-      debug: 3.2.7(supports-color@8.1.1)
-    transitivePeerDependencies:
-      - supports-color
-    optional: true
-
-  https-proxy-agent@5.0.1:
-    dependencies:
-      agent-base: 6.0.2
-      debug: 4.3.6(supports-color@8.1.1)
-    transitivePeerDependencies:
-      - supports-color
-    optional: true
-
   https-proxy-agent@7.0.5:
->>>>>>> upstream/beta
     dependencies:
       agent-base: 7.1.1
       debug: 4.3.6(supports-color@8.1.1)
@@ -18417,26 +18112,6 @@ snapshots:
     dependencies:
       semver: 7.6.3
 
-<<<<<<< HEAD
-=======
-  make-fetch-happen@13.0.1:
-    dependencies:
-      '@npmcli/agent': 2.2.2
-      cacache: 18.0.4
-      http-cache-semantics: 4.1.1
-      is-lambda: 1.0.1
-      minipass: 7.1.2
-      minipass-fetch: 3.0.5
-      minipass-flush: 1.0.5
-      minipass-pipeline: 1.2.4
-      negotiator: 0.6.3
-      proc-log: 4.2.0
-      promise-retry: 2.0.1
-      ssri: 10.0.6
-    transitivePeerDependencies:
-      - supports-color
-
->>>>>>> upstream/beta
   makeerror@1.0.12:
     dependencies:
       tmpl: 1.0.5
@@ -18859,39 +18534,6 @@ snapshots:
 
   minimist@1.2.8: {}
 
-<<<<<<< HEAD
-=======
-  minipass-collect@2.0.1:
-    dependencies:
-      minipass: 7.1.2
-
-  minipass-fetch@3.0.5:
-    dependencies:
-      minipass: 7.1.2
-      minipass-sized: 1.0.3
-      minizlib: 2.1.2
-    optionalDependencies:
-      encoding: 0.1.13
-
-  minipass-flush@1.0.5:
-    dependencies:
-      minipass: 3.3.6
-
-  minipass-pipeline@1.2.4:
-    dependencies:
-      minipass: 3.3.6
-
-  minipass-sized@1.0.3:
-    dependencies:
-      minipass: 3.3.6
-
-  minipass@2.9.0:
-    dependencies:
-      safe-buffer: 5.2.1
-      yallist: 3.1.1
-    optional: true
-
->>>>>>> upstream/beta
   minipass@3.3.6:
     dependencies:
       yallist: 4.0.0
@@ -19001,11 +18643,6 @@ snapshots:
       object-assign: 4.1.1
       thenify-all: 1.6.0
 
-<<<<<<< HEAD
-=======
-  nan@2.20.0: {}
-
->>>>>>> upstream/beta
   nanoid@3.3.7: {}
 
   nanoid@5.0.7: {}
@@ -19106,24 +18743,6 @@ snapshots:
   node-gyp-build@4.8.1:
     optional: true
 
-<<<<<<< HEAD
-=======
-  node-gyp@10.2.0:
-    dependencies:
-      env-paths: 2.2.1
-      exponential-backoff: 3.1.1
-      glob: 10.4.5
-      graceful-fs: 4.2.11
-      make-fetch-happen: 13.0.1
-      nopt: 7.2.1
-      proc-log: 4.2.0
-      semver: 7.6.3
-      tar: 6.2.1
-      which: 4.0.0
-    transitivePeerDependencies:
-      - supports-color
-
->>>>>>> upstream/beta
   node-int64@0.4.0: {}
 
   node-releases@2.0.18: {}
@@ -19833,11 +19452,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-<<<<<<< HEAD
-=======
-  proc-log@4.2.0: {}
-
->>>>>>> upstream/beta
   process-exists@5.0.0:
     dependencies:
       ps-list: 8.1.1
@@ -20023,17 +19637,6 @@ snapshots:
     dependencies:
       setimmediate: 1.0.5
 
-<<<<<<< HEAD
-=======
-  re2@1.21.3:
-    dependencies:
-      install-artifact-from-github: 1.3.5
-      nan: 2.20.0
-      node-gyp: 10.2.0
-    transitivePeerDependencies:
-      - supports-color
-
->>>>>>> upstream/beta
   react-colorful@5.6.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       react: 18.3.1
@@ -20674,27 +20277,6 @@ snapshots:
       astral-regex: 2.0.0
       is-fullwidth-code-point: 3.0.0
 
-<<<<<<< HEAD
-  sonic-boom@3.8.1:
-    dependencies:
-      atomic-sleep: 1.0.0
-=======
-  smart-buffer@4.2.0: {}
-
-  socks-proxy-agent@8.0.4:
-    dependencies:
-      agent-base: 7.1.1
-      debug: 4.3.6(supports-color@8.1.1)
-      socks: 2.8.3
-    transitivePeerDependencies:
-      - supports-color
-
-  socks@2.8.3:
-    dependencies:
-      ip-address: 9.0.5
-      smart-buffer: 4.2.0
->>>>>>> upstream/beta
-
   sonic-boom@4.0.1:
     dependencies:
       atomic-sleep: 1.0.0
@@ -20763,13 +20345,6 @@ snapshots:
       safer-buffer: 2.1.2
       tweetnacl: 0.14.5
 
-<<<<<<< HEAD
-=======
-  ssri@10.0.6:
-    dependencies:
-      minipass: 7.1.2
-
->>>>>>> upstream/beta
   stack-utils@2.0.6:
     dependencies:
       escape-string-regexp: 2.0.0
@@ -20799,8 +20374,8 @@ snapshots:
     dependencies:
       internal-slot: 1.0.7
 
-  ? storybook-addon-misskey-theme@https://codeload.github.com/misskey-dev/storybook-addon-misskey-theme/tar.gz/cf583db098365b2ccc81a82f63ca9c93bc32b640(@storybook/blocks@8.2.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.2.8(@babel/preset-env@7.25.3(@babel/core@7.25.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@storybook/components@8.2.8(storybook@8.2.8(@babel/preset-env@7.25.3(@babel/core@7.25.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@storybook/core-events@8.2.8(storybook@8.2.8(@babel/preset-env@7.25.3(@babel/core@7.25.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@storybook/manager-api@8.2.8(storybook@8.2.8(@babel/preset-env@7.25.3(@babel/core@7.25.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@storybook/preview-api@8.2.8(storybook@8.2.8(@babel/preset-env@7.25.3(@babel/core@7.25.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@storybook/theming@8.2.8(storybook@8.2.8(@babel/preset-env@7.25.3(@babel/core@7.25.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@storybook/types@8.2.8(storybook@8.2.8(@babel/preset-env@7.25.3(@babel/core@7.25.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-  : dependencies:
+  storybook-addon-misskey-theme@https://codeload.github.com/misskey-dev/storybook-addon-misskey-theme/tar.gz/cf583db098365b2ccc81a82f63ca9c93bc32b640(em34ez5wueevmkcp23v2l25opy):
+    dependencies:
       '@storybook/blocks': 8.2.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.2.8(@babel/preset-env@7.25.3(@babel/core@7.25.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4))
       '@storybook/components': 8.2.8(storybook@8.2.8(@babel/preset-env@7.25.3(@babel/core@7.25.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4))
       '@storybook/core-events': 8.2.8(storybook@8.2.8(@babel/preset-env@7.25.3(@babel/core@7.25.2))(bufferutil@4.0.8)(utf-8-validate@6.0.4))
@@ -21372,19 +20947,7 @@ snapshots:
 
   uniq@1.0.1: {}
 
-<<<<<<< HEAD
-  unique-string@2.0.0:
-=======
-  unique-filename@3.0.0:
-    dependencies:
-      unique-slug: 4.0.0
-
-  unique-slug@4.0.0:
-    dependencies:
-      imurmurhash: 0.1.4
-
   unique-string@3.0.0:
->>>>>>> upstream/beta
     dependencies:
       crypto-random-string: 4.0.0
 
@@ -21619,13 +21182,9 @@ snapshots:
 
   vue-component-type-helpers@2.0.29: {}
 
-<<<<<<< HEAD
-  vue-component-type-helpers@2.0.26: {}
+  vue-component-type-helpers@2.1.6: {}
 
-  vue-demi@0.14.7(vue@3.4.15(typescript@5.4.5)):
-=======
   vue-demi@0.14.10(vue@3.4.15(typescript@5.5.4)):
->>>>>>> upstream/beta
     dependencies:
       vue: 3.4.15(typescript@5.5.4)
 
@@ -21786,15 +21345,7 @@ snapshots:
     dependencies:
       isexe: 2.0.0
 
-<<<<<<< HEAD
-  why-is-node-running@2.2.2:
-=======
-  which@4.0.0:
-    dependencies:
-      isexe: 3.1.1
-
   why-is-node-running@2.3.0:
->>>>>>> upstream/beta
     dependencies:
       siginfo: 2.0.0
       stackback: 0.0.2

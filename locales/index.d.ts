@@ -3657,7 +3657,10 @@ export interface Locale extends ILocale {
      */
     "continueThread": string;
     /**
-     * アカウントが削除されます。よろしいですか？
+     * アカウントが削除されます。
+     * 削除リクエスト後に再ログインすると
+     * アカウントの削除が中断されてしまいますのでご注意ください。
+     * よろしいですか？
      */
     "deleteAccountConfirm": string;
     /**
@@ -7081,6 +7084,10 @@ export interface Locale extends ILocale {
          * 削除が進行中
          */
         "inProgress": string;
+        /**
+         * 削除が中断されてしまいますので、アカウントにログインしないことをおすすめします。
+         */
+        "dontLogin": string;
     };
     "_ad": {
         /**

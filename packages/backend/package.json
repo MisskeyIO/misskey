@@ -46,6 +46,8 @@
 		"@swc/core-win32-arm64-msvc": "1.5.7",
 		"@swc/core-win32-ia32-msvc": "1.5.7",
 		"@swc/core-win32-x64-msvc": "1.5.7",
+		"@tensorflow/tfjs": "4.19.0",
+		"@tensorflow/tfjs-node": "4.19.0",
 		"bufferutil": "4.0.8",
 		"slacc-android-arm-eabi": "0.0.10",
 		"slacc-android-arm64": "0.0.10",

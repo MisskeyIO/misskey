@@ -2401,6 +2401,14 @@ export interface Locale extends ILocale {
      */
     "unsetUserBannerConfirm": string;
     /**
+     * 相互リンクを削除
+     */
+    "unsetUserMutualLink": string;
+    /**
+     * 相互リンクを削除しますか？
+     */
+    "unsetUserMutualLinkConfirm": string;
+    /**
      * すべてのファイルを削除
      */
     "deleteAllFiles": string;
@@ -3921,6 +3929,10 @@ export interface Locale extends ILocale {
      */
     "cannotUploadBecauseExceedsFileSizeLimit": string;
     /**
+     * 接続がタイムアウトしたため、ファイルをアップロードできませんでした。
+     */
+    "cannotUploadBecauseTimeout": string;
+    /**
      * ベータ
      */
     "beta": string;
@@ -5083,6 +5095,14 @@ export interface Locale extends ILocale {
      * こちら
      */
     "here": string;
+    /**
+     * 相互リンク
+     */
+    "mutualLink": string;
+    /**
+     * このファイルをドライブに保存する
+     */
+    "saveThisFile": string;
     "_bubbleGame": {
         /**
          * 遊び方
@@ -5332,9 +5352,9 @@ export interface Locale extends ILocale {
          */
         "haveFun": ParameterizedString<"name">;
         /**
-         * このまま{name}(Misskey)の使い方についてのチュートリアルに進むこともできますが、ここで中断してすぐに使い始めることもできます。
+         * このまま{name}(Misskey)の使い方についてのチュートリアルに進みます。
          */
-        "youCanContinueTutorial": ParameterizedString<"name">;
+        "continueTutorial": ParameterizedString<"name">;
         /**
          * チュートリアルを開始
          */
@@ -5347,6 +5367,10 @@ export interface Locale extends ILocale {
          * 初期設定をあとでやり直しますか？
          */
         "laterAreYouSure": string;
+        /**
+         * Botアカウントは管理者を必ず記載する必要があります。以下から管理者のアカウントを選択してください。
+         */
+        "mustBeSetBotOwner": string;
     };
     "_initialTutorial": {
         /**
@@ -6860,6 +6884,14 @@ export interface Locale extends ILocale {
              * アイコンデコレーションの最大取付個数
              */
             "avatarDecorationLimit": string;
+            /**
+             * 相互リンクのセクションの最大数
+             */
+            "mutualLinkSectionLimit": string;
+            /**
+             * セクション内の相互リンクの最大数
+             */
+            "mutualLinkLimit": string;
         };
         "_condition": {
             /**
@@ -8209,6 +8241,10 @@ export interface Locale extends ILocale {
          */
         "write:admin:unset-user-banner": string;
         /**
+         * ユーザーの相互リンクを削除する
+         */
+        "write:admin:unset-user-mutual-link": string;
+        /**
          * ユーザーの凍結を解除する
          */
         "write:admin:unsuspend-user": string;
@@ -8794,6 +8830,50 @@ export interface Locale extends ILocale {
          * 最大{max}つまでデコレーションを付けられます。
          */
         "avatarDecorationMax": ParameterizedString<"max">;
+        /**
+         * 相互リンクを編集
+         */
+        "mutualLinksEdit": string;
+        /**
+         * 相互リンクのバナー
+         */
+        "mutualLinksBanner": string;
+        /**
+         * 説明
+         */
+        "mutualLinksDescriptionEdit": string;
+        /**
+         * リンク先のURL
+         */
+        "mutualLinksUrl": string;
+        /**
+         * 相互リンクを設定すると、あなたのプロフィールにバナーが表示されます。
+         */
+        "mutualLinksDescription": string;
+        /**
+         * 相互リンクを追加
+         */
+        "addMutualLink": string;
+        /**
+         * セクションを追加
+         */
+        "addMutualLinkSection": string;
+        /**
+         * セクション名
+         */
+        "sectionName": string;
+        /**
+         * セクション名を表示しないようにする
+         */
+        "sectionNameNoneDescription": string;
+        /**
+         * 名前が表示されないセクション
+         */
+        "sectionNameNone": string;
+        /**
+         * 現在の支援プランの表示上限({max}個)を超えているため、この項目は表示されません。[ここ](https://go.misskey.io/donate)からプランをアップグレードできます。
+         */
+        "policyDisplayLimitExceeded": ParameterizedString<"max">;
     };
     "_exportOrImport": {
         /**

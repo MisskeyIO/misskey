@@ -46,7 +46,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<template #key>{{ i18n.ts.email }}</template>
 						<template #value><span class="_monospace">{{ info.email }}</span></template>
 					</MkKeyValue>
-					<MkKeyValue v-if="ips.length > 0" :copy="ips[0].ip" oneline>
+					<MkKeyValue v-if="iAmAdmin && ips && ips.length > 0" :copy="ips[0].ip" oneline>
 						<template #key>IP (recent)</template>
 						<template #value><span class="_monospace">{{ ips[0].ip }}</span></template>
 					</MkKeyValue>
@@ -66,6 +66,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<MkButton v-if="user.host == null" @click="resetPassword"><i class="ti ti-key"></i> {{ i18n.ts.resetPassword }}</MkButton>
 								<MkButton inline danger @click="unsetUserAvatar"><i class="ti ti-user-circle"></i> {{ i18n.ts.unsetUserAvatar }}</MkButton>
 								<MkButton inline danger @click="unsetUserBanner"><i class="ti ti-photo"></i> {{ i18n.ts.unsetUserBanner }}</MkButton>
+								<MkFolder v-if="user?.mutualLinkSections && user?.mutualLinkSections.reduce((acc, section) => acc + section.mutualLinks.length, 0) > 0">
+									<template #icon><i class="ti ti-link"></i></template>
+									<template #label>{{ i18n.ts._profile.mutualLinksEdit }}</template>
+
+									<div v-for="mutualLinkSection in user?.mutualLinkSections">
+										<div v-for="mutualLink in mutualLinkSection.mutualLinks" :key="mutualLink.id" :class="$style.fields">
+											<p> {{ mutualLink.url }} </p>
+											<img :class="$style.mutualLinkImg" :src="mutualLink.imgSrc" :alt="mutualLink.description"/>
+											<p> {{ mutualLink.description }} </p>
+											<MkButton inline danger @click="unsetUserMutualLink(mutualLink.id)"><i class="ti ti-link"></i> {{ i18n.ts.unsetUserMutualLink }}</MkButton>
+										</div>
+									</div>
+								</MkFolder>
 							</div>
 						</MkFolder>
 
@@ -292,7 +305,7 @@ function createFetcher() {
 
 		watch(moderationNote, async () => {
 			await misskeyApi('admin/update-user-note', {
-				userId: user.value.id, text: moderationNote.value
+				userId: user.value.id, text: moderationNote.value,
 			}).then(refreshUser);
 		});
 	});
@@ -304,7 +317,7 @@ function refreshUser() {
 
 async function updateRemoteUser() {
 	await os.apiWithDialog('federation/update-remote-user', {
-		userId: user.value.id
+		userId: user.value.id,
 	}).then(refreshUser);
 }
 
@@ -335,7 +348,7 @@ async function toggleSuspend(v) {
 		suspended.value = !v;
 	} else {
 		await misskeyApi(v ? 'admin/suspend-user' : 'admin/unsuspend-user', {
-			userId: user.value.id
+			userId: user.value.id,
 		}).then(refreshUser);
 	}
 }
@@ -348,7 +361,7 @@ async function unsetUserAvatar() {
 	if (confirm.canceled) return;
 
 	await os.apiWithDialog('admin/unset-user-avatar', {
-		userId: user.value.id
+		userId: user.value.id,
 	}).then(refreshUser);
 }
 
@@ -360,7 +373,20 @@ async function unsetUserBanner() {
 	if (confirm.canceled) return;
 
 	await os.apiWithDialog('admin/unset-user-banner', {
-		userId: user.value.id
+		userId: user.value.id,
+	}).then(refreshUser);
+}
+
+async function unsetUserMutualLink(mutualLinkid: string) {
+	const confirm = await os.confirm({
+		type: 'warning',
+		text: i18n.ts.unsetUserMutualLinkConfirm,
+	});
+	if (confirm.canceled) return;
+
+	await os.apiWithDialog('admin/unset-user-mutual-link', {
+		userId: user.value.id,
+		itemId: mutualLinkid,
 	}).then(refreshUser);
 }
 
@@ -378,7 +404,7 @@ async function deleteAllFiles() {
 
 	if (typed.result === user.value?.username) {
 		await os.apiWithDialog('admin/drive/delete-all-files-of-a-user', {
-			userId: user.value.id
+			userId: user.value.id,
 		}).then(refreshUser);
 	} else {
 		os.alert({
@@ -447,7 +473,7 @@ async function assignRole() {
 		: null;
 
 	await os.apiWithDialog('admin/roles/assign', {
-		roleId, userId: user.value.id, expiresAt
+		roleId, userId: user.value.id, expiresAt,
 	}).then(refreshUser);
 }
 
@@ -458,7 +484,7 @@ async function unassignRole(role, ev) {
 		danger: true,
 		action: async () => {
 			await os.apiWithDialog('admin/roles/unassign', {
-				roleId: role.id, userId: user.value.id
+				roleId: role.id, userId: user.value.id,
 			}).then(refreshUser);
 		},
 	}], ev.currentTarget ?? ev.target);
@@ -691,5 +717,17 @@ definePageMetadata(() => ({
 	padding: 8px 12px;
 	border-radius: 6px;
 	cursor: pointer;
+}
+
+.mutualLinkImg {
+	max-width: 200px;
+	max-height: 40px;
+}
+.fields {
+	padding: 24px;
+	border-bottom: solid 0.5px var(--divider);
+	&:last-child {
+		border-bottom: none;
+	}
 }
 </style>

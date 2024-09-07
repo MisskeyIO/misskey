@@ -87,6 +87,84 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</MkFolder>
 		<template #caption>{{ i18n.ts._profile.metadataDescription }}</template>
 	</FormSlot>
+	<FormSlot>
+		<MkFolder>
+			<template #icon><i class="ti ti-link"></i></template>
+			<template #label>{{ i18n.ts._profile.mutualLinksEdit }}</template>
+
+			<div :class="$style.metadataRoot">
+				<div :class="$style.metadataMargin">
+					<MkButton inline style="margin-right: 8px;" @click="addMutualLinkSections"><i class="ti ti-plus"></i> {{ i18n.ts._profile.addMutualLinkSection }}</MkButton>
+					<MkButton v-if="!mutualLinkSectionEditMode" inline danger style="margin-right: 8px;" @click="mutualLinkSectionEditMode = !mutualLinkSectionEditMode"><i class="ti ti-trash"></i> {{ i18n.ts.delete }}</MkButton>
+					<MkButton v-else inline style="margin-right: 8px;" @click="mutualLinkSectionEditMode = !mutualLinkSectionEditMode"><i class="ti ti-arrows-sort"></i> {{ i18n.ts.rearrange }}</MkButton>
+					<MkButton inline primary @click="saveMutualLinks"><i class="ti ti-check"></i> {{ i18n.ts.save }}</MkButton>
+				</div>
+
+				<Sortable
+					v-model="mutualLinkSections"
+					class="_gaps_s"
+					itemKey="id"
+					:animation="150"
+					:handle="'.' + $style.dragItemHandle"
+					@start="e => e.item.classList.add('active')"
+					@end="e => e.item.classList.remove('active')"
+				>
+					<template #item="{ element: sectionElement, index: sectionIndex }">
+						<div :class="$style.mutualLinkSectionRoot">
+							<button v-if="!mutualLinkSectionEditMode" class="_button" :class="$style.dragItemHandle" tabindex="-1"><i class="ti ti-menu"></i></button>
+
+							{{sectionElement.length }}
+							<button v-if="mutualLinkSectionEditMode" :disabled="sectionElement.length <= 1" class="_button" :class="$style.dragItemRemove" @click="deleteMutualLinkSection(sectionIndex)"><i class="ti ti-x"></i></button>
+							<FormSlot :style="{flexGrow: 1}">
+								<MkFolder>
+									<template #label>{{ sectionElement.name || i18n.ts._profile.sectionNameNone }}</template>
+
+									<div class="_gaps_s" :class="$style.metadataMargin">
+										<MkInfo v-if="sectionIndex >= $i.policies.mutualLinkSectionLimit" warn><Mfm :text="i18n.tsx._profile.policyDisplayLimitExceeded({ max: $i.policies.mutualLinkSectionLimit })"/></MkInfo>
+										<MkInput v-if="sectionElement.name !== null" v-model="sectionElement.name" :placeholder="i18n.ts._profile.sectionName" :max="32"></MkInput>
+										<MkSwitch v-model="sectionElement.none" @update:modelValue="()=>{ sectionElement.none ? sectionElement.name = null : sectionElement.name = 'New Section' }">{{ i18n.ts._profile.sectionNameNoneDescription }}</MkSwitch>
+										<MkButton inline style="margin-right: 8px;" @click="addMutualLinks(sectionIndex)"><i class="ti ti-plus"></i> {{ i18n.ts._profile.addMutualLink }}</MkButton>
+									</div>
+
+									<Sortable
+										v-model="sectionElement.mutualLinks"
+										class="_gaps_s"
+										itemKey="id"
+										:animation="150"
+										:handle="'.' + $style.dragItemHandle"
+										@start="e => e.item.classList.add('active')"
+										@end="e => e.item.classList.remove('active')"
+									>
+										<template #item="{ element: linkElement, index: linkIndex }">
+											<div :class="$style.mutualLinkRoot">
+												<button v-if="!mutualLinkSectionEditMode" class="_button" :class="$style.dragItemHandle" tabindex="-1"><i class="ti ti-menu"></i></button>
+												<button v-if="mutualLinkSectionEditMode" class="_button" :class="$style.dragItemRemove" @click="deleteMutualLink(sectionIndex,linkIndex)"><i class="ti ti-x"></i></button>
+
+												<div class="_gaps_s" :style="{flex: 1}">
+													<MkInfo v-if="linkIndex >= $i.policies.mutualLinkLimit" warn><Mfm :text="i18n.tsx._profile.policyDisplayLimitExceeded({ max: $i.policies.mutualLinkLimit })"/></MkInfo>
+													<MkInput v-model="linkElement.url" small>
+														<template #label>{{ i18n.ts._profile.mutualLinksUrl }}</template>
+													</MkInput>
+													<MkInput v-model="linkElement.description" small>
+														<template #label>{{ i18n.ts._profile.mutualLinksDescriptionEdit }}</template>
+													</MkInput>
+													<span>{{ i18n.ts._profile.mutualLinksBanner }}</span>
+													<img :class="$style.mutualLinkImg" :src="linkElement.imgSrc">
+													<MkButton class="_button" @click="ev => changeMutualLinkFile(ev, sectionIndex, linkIndex)">{{ i18n.ts.selectFile }}</MkButton>
+												</div>
+											</div>
+										</template>
+									</Sortable>
+								</MkFolder>
+							</FormSlot>
+						</div>
+					</template>
+				</Sortable>
+			</div>
+		</MkFolder>
+
+		<template #caption>{{ i18n.ts._profile.mutualLinksDescription }}</template>
+	</FormSlot>
 
 	<MkFolder>
 		<template #label>{{ i18n.ts.advancedSettings }}</template>
@@ -132,7 +210,6 @@ import MkTextarea from '@/components/MkTextarea.vue';
 const $i = signinRequired();
 
 const Sortable = defineAsyncComponent(() => import('vuedraggable').then(x => x.default));
-
 const reactionAcceptance = computed(defaultStore.makeGetterSetter('reactionAcceptance'));
 
 const profile = reactive({
@@ -151,14 +228,35 @@ watch(() => profile, () => {
 	deep: true,
 });
 
+const mutualLinkSections = ref($i.mutualLinkSections.map(section => ({ ...section, id: Math.random().toString(), none: !section.name })) ?? []);
 const fields = ref($i.fields.map(field => ({ id: Math.random().toString(), name: field.name, value: field.value })) ?? []);
 const fieldEditMode = ref(false);
+const mutualLinkSectionEditMode = ref(false);
 
 function addField() {
 	fields.value.push({
 		id: Math.random().toString(),
 		name: '',
 		value: '',
+	});
+}
+
+function addMutualLinks(index:number) {
+	mutualLinkSections.value[index].mutualLinks.push({
+		id: Math.random().toString(),
+		fileId: '',
+		url: '',
+		imgSrc: '',
+		description: '',
+	});
+}
+
+function addMutualLinkSections() {
+	mutualLinkSections.value.push({
+		id: Math.random().toString(),
+		name: 'New Section',
+		none: false,
+		mutualLinks: [],
 	});
 }
 
@@ -170,11 +268,25 @@ function deleteField(index: number) {
 	fields.value.splice(index, 1);
 }
 
+function deleteMutualLinkSection(index: number) {
+	mutualLinkSections.value.splice(index, 1);
+}
+
+function deleteMutualLink(sectionIndex:number, index: number) {
+	mutualLinkSections.value[sectionIndex].mutualLinks.splice(index, 1);
+}
+
 function saveFields() {
 	os.apiWithDialog('i/update', {
 		fields: fields.value.filter(field => field.name !== '' && field.value !== '').map(field => ({ name: field.name, value: field.value })),
 	});
 	globalEvents.emit('requestClearPageCache');
+}
+
+function saveMutualLinks() {
+	os.apiWithDialog('i/update', {
+		mutualLinkSections: mutualLinkSections.value,
+	});
 }
 
 function save() {
@@ -201,6 +313,13 @@ function save() {
 	if (profile.isCat) {
 		claimAchievement('markedAsCat');
 	}
+}
+
+function changeMutualLinkFile(ev: MouseEvent, sectionIndex: number, linkIndex: number) {
+	selectFile(ev.currentTarget ?? ev.target, i18n.ts.mutualLink).then(async (file) => {
+		mutualLinkSections.value[sectionIndex].mutualLinks[linkIndex].imgSrc = file.url;
+		mutualLinkSections.value[sectionIndex].mutualLinks[linkIndex].fileId = file.id;
+	});
 }
 
 function changeAvatar(ev) {
@@ -299,6 +418,36 @@ definePageMetadata(() => ({
 	container-type: inline-size;
 }
 
+.mutualLinkRoot{
+	display: flex;
+	align-items: center;
+	flex-direction: row;
+	gap: 8px;
+	padding-bottom: .75em;
+	border-bottom: solid 0.5px var(--divider);
+	flex: 1;
+	&:last-child {
+		border-bottom: 0;
+	}
+
+}
+.mutualLinkSectionRoot{
+	display: flex;
+	padding-bottom: .75em;
+	align-items: center;
+	border-bottom: solid 0.5px var(--divider);
+	overflow: clip;
+	&:last-child {
+		border-bottom: 0;
+	}
+
+	/* (drag button) 32px + (drag button margin) 8px + (input width) 200px * 2 + (input gap) 12px = 452px */
+	@container (max-width: 452px) {
+		align-items: center;
+	}
+
+}
+
 .metadataMargin {
 	margin-bottom: 1.5em;
 }
@@ -350,4 +499,11 @@ definePageMetadata(() => ({
 .dragItemForm {
 	flex-grow: 1;
 }
+
+.mutualLinkImg {
+	max-width: 200px;
+	max-height: 40px;
+	object-fit: contain;
+}
+
 </style>

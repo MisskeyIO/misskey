@@ -80,6 +80,30 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<p v-else class="empty">{{ i18n.ts.noAccountDescription }}</p>
 						</MkOmit>
 					</div>
+					<MkContainer v-if="$i && $i.id == user.id && user?.mutualLinkSections?.slice(0, $i.policies.mutualLinkSectionLimit).length > 0" :showHeader="false" :max-height="200" class="fields" :style="{borderRadius: 0}">
+						<div v-for="(section, index) in user?.mutualLinkSections.slice(0, $i.policies.mutualLinkSectionLimit)" :key="index" :class="$style.mutualLinkSections">
+							<span v-if="section.name">{{ section.name }}</span>
+							<div :class="$style.mutualLinks">
+								<div v-for="mutualLink in section.mutualLinks.slice(0, $i.policies.mutualLinkLimit)" :key="mutualLink.id">
+									<MkLink :hideIcon="true" :url="mutualLink.url">
+										<img :class="$style.mutualLinkImg" :src="mutualLink.imgSrc" :alt="mutualLink.description"/>
+									</MkLink>
+								</div>
+							</div>
+						</div>
+					</MkContainer>
+					<MkContainer v-else-if="user?.mutualLinkSections?.length > 0" :showHeader="false" :max-height="200" class="fields" :style="{borderRadius: 0}">
+						<div v-for="(section, index) in user?.mutualLinkSections" :key="index" :class="$style.mutualLinkSections">
+							<span v-if="section.name">{{ section.name }}</span>
+							<div :class="$style.mutualLinks">
+								<div v-for="mutualLink in section.mutualLinks" :key="mutualLink.id">
+									<MkLink :hideIcon="true" :url="mutualLink.url">
+										<img :class="$style.mutualLinkImg" :src="mutualLink.imgSrc" :alt="mutualLink.description"/>
+									</MkLink>
+								</div>
+							</div>
+						</div>
+					</MkContainer>
 					<div class="fields system">
 						<dl v-if="user.location" class="field">
 							<dt class="name"><i class="ti ti-map-pin ti-fw"></i> {{ i18n.ts.location }}</dt>
@@ -143,6 +167,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</dd>
 						</dl>
 					</div>
+
 					<div class="status">
 						<MkA :to="userPage(user)">
 							<b>{{ number(user.notesCount) }}</b>
@@ -212,6 +237,8 @@ import { confetti } from '@/scripts/confetti.js';
 import { misskeyApi, misskeyApiGet } from '@/scripts/misskey-api.js';
 import { isFollowingVisibleForMe, isFollowersVisibleForMe } from '@/scripts/isFfVisibleForMe.js';
 import { useRouter } from '@/router/supplier.js';
+import MkLink from '@/components/MkLink.vue';
+import MkContainer from '@/components/MkContainer.vue';
 
 function calcAge(birthdate: string): number {
 	const date = new Date(birthdate);
@@ -597,6 +624,7 @@ onUnmounted(() => {
 					padding: 24px;
 					font-size: 0.9em;
 					border-top: solid 0.5px var(--divider);
+					margin-top: 0.5px;
 
 					> .field {
 						display: flex;
@@ -786,5 +814,38 @@ onUnmounted(() => {
 .skebClient {
 	color: rgb(255, 255, 255);
 	background-color: rgb(54, 54, 54);
+}
+
+.mutualLinkSections {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around;
+	flex-direction: column;
+	background: var(--panel);
+	gap: 8px;
+	margin-bottom: 8px;
+
+}
+
+.mutualLinks {
+	display: flex;
+	justify-content: space-around;
+	flex-wrap: wrap;
+	gap: 12px;
+	padding-top: 8px;
+	@media (max-width: 500px) {
+		gap: 8px;
+	}
+}
+
+.mutualLink {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.mutualLinkImg {
+	max-width: 200px;
+	max-height: 40px;
 }
 </style>

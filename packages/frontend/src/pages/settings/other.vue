@@ -114,7 +114,7 @@ async function deleteAccount() {
 	{
 		const { canceled } = await os.confirm({
 			type: 'warning',
-			text: i18n.ts.deleteAccountConfirm2,
+			text: i18n.ts.deleteAccountConfirmAndWarn,
 			okWaitInitiate: 'dialog',
 			okWaitDuration: 5,
 		});

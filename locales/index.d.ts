@@ -3666,7 +3666,7 @@ export interface Locale extends ILocale {
      * アカウントの削除が中断されてしまいますのでご注意ください。
      * よろしいですか？
      */
-    "deleteAccountConfirm2": string;
+    "deleteAccountConfirmAndWarn": string;
     /**
      * パスワードが間違っています。
      */

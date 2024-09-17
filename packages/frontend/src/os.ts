@@ -84,7 +84,7 @@ export async function apiErrorHandler(err: Misskey.api.APIError, endpoint?: stri
 		text = `${i18n.ts.error}: ${err.id}`;
 	}
 
-	// @ts-ignore Misskey内部で定義されていない不明なエラー
+	// @ts-expect-error Misskey内部で定義されていない不明なエラー
 	if (!err.id && (err.statusCode ?? 0) > 499) {
 		title = i18n.ts.gotInvalidResponseError;
 		text = i18n.ts.gotInvalidResponseErrorDescription;
@@ -101,7 +101,7 @@ export async function apiErrorHandler(err: Misskey.api.APIError, endpoint?: stri
 		type: 'error',
 		title,
 		text,
-		// @ts-ignore Misskeyのエラーならinfoを、そうでなければそのまま表示
+		// @ts-expect-error Misskeyのエラーならinfoを、そうでなければそのまま表示
 		details: err.id ? err.info : err as unknown,
 	});
 }

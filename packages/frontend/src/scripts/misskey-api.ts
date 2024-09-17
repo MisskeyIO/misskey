@@ -47,7 +47,7 @@ export function misskeyApi<
 			if (res.ok && res.status !== 204) {
 				const body = await res.json();
 				resolve(body);
-			} else if (res.ok && res.status === 204) {
+			} else if (res.status === 204) {
 				resolve(undefined as _ResT); // void -> undefined
 			} else {
 				// エラー応答で JSON.parse に失敗した場合は HTTP ステータスコードとメッセージを返す

@@ -67,6 +67,7 @@ import { misskeyApi } from '@/scripts/misskey-api.js';
 import { login } from '@/account.js';
 import { i18n } from '@/i18n.js';
 import { instance } from '@/instance.js';
+import MkCaptcha, { type Captcha } from '@/components/MkCaptcha.vue';
 
 const signing = ref(false);
 const userAbortController = ref<AbortController>();

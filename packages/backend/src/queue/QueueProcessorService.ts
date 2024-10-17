@@ -219,14 +219,16 @@ export class QueueProcessorService implements OnApplicationShutdown {
 			},
 		}));
 
-		const deliverLogger = this.logger.createSubLogger('deliver');
+		this.deliverQueueWorkers.forEach((worker, index) => {
+			const deliverLogger = this.logger.createSubLogger(`deliver-${index}`);
 
-		this.deliverQueueWorkers.forEach(worker => worker
-			.on('active', (job) => deliverLogger.debug(`active ${getJobInfo(job, true)} to=${job.data.to}`))
-			.on('completed', (job, result) => deliverLogger.debug(`completed(${result}) ${getJobInfo(job, true)} to=${job.data.to}`))
-			.on('failed', (job, err) => deliverLogger.warn(`failed(${err.stack}) ${getJobInfo(job)} to=${job ? job.data.to : '-'}`))
-			.on('error', (err: Error) => deliverLogger.error(`error ${err.stack}`, { error: renderError(err) }))
-			.on('stalled', (jobId) => deliverLogger.warn(`stalled id=${jobId}`)));
+			worker
+				.on('active', (job) => deliverLogger.debug(`active ${getJobInfo(job, true)} to=${job.data.to}`))
+				.on('completed', (job, result) => deliverLogger.debug(`completed(${result}) ${getJobInfo(job, true)} to=${job.data.to}`))
+				.on('failed', (job, err) => deliverLogger.warn(`failed(${err.stack}) ${getJobInfo(job)} to=${job ? job.data.to : '-'}`))
+				.on('error', (err: Error) => deliverLogger.error(`error ${err.stack}`, { error: renderError(err) }))
+				.on('stalled', (jobId) => deliverLogger.warn(`stalled id=${jobId}`));
+		});
 		//#endregion
 
 		//#region inbox

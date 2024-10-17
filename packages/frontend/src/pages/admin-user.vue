@@ -65,7 +65,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<MkSwitch v-model="suspended" @update:modelValue="toggleSuspend">{{ i18n.ts.suspend }}</MkSwitch>
 								<div v-if="user.host == null" class="_buttons">
 									<MkButton @click="resetPassword"><i class="ti ti-key"></i> {{ i18n.ts.resetPassword }}</MkButton>
-									<MkButton @click="regenerateLoginToken" danger><i class="ti ti-refresh"></i> {{ i18n.ts.regenerateLoginToken }}</MkButton>
+									<MkButton danger @click="regenerateLoginToken"><i class="ti ti-refresh"></i> {{ i18n.ts.regenerateLoginToken }}</MkButton>
 								</div>
 								<MkButton inline danger @click="updateUserName"><i class="ti ti-user-edit"></i> {{ i18n.ts.changeUserName }}</MkButton>
 								<MkButton inline danger @click="unsetUserAvatar"><i class="ti ti-user-circle"></i> {{ i18n.ts.unsetUserAvatar }}</MkButton>

@@ -19,8 +19,10 @@ export class Queues<DataType = any, ResultType = any, NameType extends string = 
 		return this.getRandomQueue().add(name, data, opts);
 	}
 
-	addBulk(jobs: { name: NameType; data: DataType; opts?: Bull.BulkJobOptions }[]): Promise<Bull.Job<DataType, ResultType, NameType>[]> {
-		return this.getRandomQueue().addBulk(jobs);
+	async addBulk(jobs: { name: NameType; data: DataType; opts?: Bull.BulkJobOptions }[]): Promise<Bull.Job<DataType, ResultType, NameType>[]> {
+		return (await Promise.allSettled(jobs.map(job => this.add(job.name, job.data, job.opts))))
+			.filter((value): value is PromiseFulfilledResult<Bull.Job<DataType, ResultType, NameType>> => value.status === 'fulfilled')
+			.flatMap(value => value.value);
 	}
 
 	async close(): Promise<void> {

@@ -75,7 +75,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 	private logger: Logger;
 	private systemQueueWorker: Bull.Worker;
 	private dbQueueWorker: Bull.Worker;
-	private deliverQueueWorker: Bull.Worker;
+	private deliverQueueWorkers: Bull.Worker[];
 	private inboxQueueWorker: Bull.Worker;
 	private webhookDeliverQueueWorker: Bull.Worker;
 	private relationshipQueueWorker: Bull.Worker;
@@ -206,8 +206,8 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		//#endregion
 
 		//#region deliver
-		this.deliverQueueWorker = new Bull.Worker(QUEUE.DELIVER, (job) => this.deliverProcessorService.process(job), {
-			...baseWorkerOptions(this.config.redisForDeliverQueue, this.config.bullmqWorkerOptions, QUEUE.DELIVER),
+		this.deliverQueueWorkers = this.config.redisForDeliverQueues.map(config => new Bull.Worker(QUEUE.DELIVER, (job) => this.deliverProcessorService.process(job), {
+			...baseWorkerOptions(config, this.config.bullmqWorkerOptions, QUEUE.DELIVER),
 			autorun: false,
 			concurrency: this.config.deliverJobConcurrency ?? 128,
 			limiter: {
@@ -217,16 +217,16 @@ export class QueueProcessorService implements OnApplicationShutdown {
 			settings: {
 				backoffStrategy: httpRelatedBackoff,
 			},
-		});
+		}));
 
 		const deliverLogger = this.logger.createSubLogger('deliver');
 
-		this.deliverQueueWorker
+		this.deliverQueueWorkers.forEach(worker => worker
 			.on('active', (job) => deliverLogger.debug(`active ${getJobInfo(job, true)} to=${job.data.to}`))
 			.on('completed', (job, result) => deliverLogger.debug(`completed(${result}) ${getJobInfo(job, true)} to=${job.data.to}`))
 			.on('failed', (job, err) => deliverLogger.warn(`failed(${err.stack}) ${getJobInfo(job)} to=${job ? job.data.to : '-'}`))
 			.on('error', (err: Error) => deliverLogger.error(`error ${err.stack}`, { error: renderError(err) }))
-			.on('stalled', (jobId) => deliverLogger.warn(`stalled id=${jobId}`));
+			.on('stalled', (jobId) => deliverLogger.warn(`stalled id=${jobId}`)));
 		//#endregion
 
 		//#region inbox
@@ -342,7 +342,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		await Promise.all([
 			this.systemQueueWorker.run(),
 			this.dbQueueWorker.run(),
-			this.deliverQueueWorker.run(),
+			...this.deliverQueueWorkers.map(worker => worker.run()),
 			this.inboxQueueWorker.run(),
 			this.webhookDeliverQueueWorker.run(),
 			this.relationshipQueueWorker.run(),
@@ -356,7 +356,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		await Promise.all([
 			this.systemQueueWorker.close(),
 			this.dbQueueWorker.close(),
-			this.deliverQueueWorker.close(),
+			...this.deliverQueueWorkers.map(worker => worker.close()),
 			this.inboxQueueWorker.close(),
 			this.webhookDeliverQueueWorker.close(),
 			this.relationshipQueueWorker.close(),

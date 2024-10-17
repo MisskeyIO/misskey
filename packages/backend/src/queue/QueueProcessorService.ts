@@ -206,18 +206,20 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		//#endregion
 
 		//#region deliver
-		this.deliverQueueWorkers = this.config.redisForDeliverQueues.map(config => new Bull.Worker(QUEUE.DELIVER, (job) => this.deliverProcessorService.process(job), {
-			...baseWorkerOptions(config, this.config.bullmqWorkerOptions, QUEUE.DELIVER),
-			autorun: false,
-			concurrency: this.config.deliverJobConcurrency ?? 128,
-			limiter: {
-				max: this.config.deliverJobPerSec ?? 128,
-				duration: 1000,
-			},
-			settings: {
-				backoffStrategy: httpRelatedBackoff,
-			},
-		}));
+		this.deliverQueueWorkers = this.config.redisForDeliverQueues
+			.filter((_, index) => process.env.QUEUE_WORKER_INDEX == null || index === Number.parseInt(process.env.QUEUE_WORKER_INDEX, 10))
+			.map(config => new Bull.Worker(QUEUE.DELIVER, (job) => this.deliverProcessorService.process(job), {
+				...baseWorkerOptions(config, this.config.bullmqWorkerOptions, QUEUE.DELIVER),
+				autorun: false,
+				concurrency: this.config.deliverJobConcurrency ?? 128,
+				limiter: {
+					max: this.config.deliverJobPerSec ?? 128,
+					duration: 1000,
+				},
+				settings: {
+					backoffStrategy: httpRelatedBackoff,
+				},
+			}));
 
 		this.deliverQueueWorkers.forEach((worker, index) => {
 			const deliverLogger = this.logger.createSubLogger(`deliver-${index}`);

@@ -92,7 +92,7 @@ async function authorize(): Promise<void> {
 }
 
 onMounted(() => {
-	if (prompt === 'none') {
+	if ($i && prompt === 'none') {
 		onAccept();
 	}
 });

@@ -48,7 +48,7 @@ if (props.note.myReaction && !Object.keys(reactions.value).includes(props.note.m
 
 function shouldDisplayReaction([reaction]: [string, number]): boolean {
 	let reactionParsed = (reaction[0] === ':' ? reaction.substring(1, reaction.length - 1) : reaction).replace('@.', '');
-	if (!$i) true; // 非ログイン状態なら全部のリアクションを見れるように
+	if (!$i) return true; // 非ログイン状態なら全部のリアクションを見れるように
 	if (reaction === props.note.myReaction) return true;
 	if (!defaultStore.state.mutedReactions.map((x: string) => (x[0] === ':' ? x.substring(1, x.length - 1) : x).replace('@.', '')).includes(reactionParsed)) return true;
 	return false;

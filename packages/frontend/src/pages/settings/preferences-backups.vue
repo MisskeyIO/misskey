@@ -120,7 +120,7 @@ const defaultStoreSaveKeys: (keyof typeof defaultStore['state'])[] = [
 	'sound_notification',
 	'sound_antenna',
 	'sound_channel',
-	'mutedReactions'
+	'mutedReactions',
 ];
 const coldDeviceStorageSaveKeys: (keyof typeof ColdDeviceStorage.default)[] = [
 	'lightTheme',

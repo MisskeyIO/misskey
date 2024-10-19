@@ -22,6 +22,7 @@ import * as Misskey from 'misskey-js';
 import { inject, watch, ref } from 'vue';
 import XReaction from '@/components/MkReactionsViewer.reaction.vue';
 import { defaultStore } from '@/store.js';
+import { $i } from '@/account.js';
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;
@@ -43,6 +44,14 @@ const hasMoreReactions = ref(false);
 
 if (props.note.myReaction && !Object.keys(reactions.value).includes(props.note.myReaction)) {
 	reactions.value[props.note.myReaction] = props.note.reactions[props.note.myReaction];
+}
+
+function shouldDisplayReaction([reaction]: [string, number]): boolean {
+	let reactionParsed = (reaction[0] === ':' ? reaction.substring(1, reaction.length - 1) : reaction).replace('@.', '');
+	if (!$i) true; // 非ログイン状態なら全部のリアクションを見れるように
+	if (reaction === props.note.myReaction) return true;
+	if (!defaultStore.state.mutedReactions.map((x: string) => (x[0] === ':' ? x.substring(1, x.length - 1) : x).replace('@.', '')).includes(reactionParsed)) return true;
+	return false;
 }
 
 function onMockToggleReaction(emoji: string, count: number) {
@@ -80,7 +89,7 @@ watch([() => props.note.reactions, () => props.maxNumber], ([newSource, maxNumbe
 		newReactions.push([props.note.myReaction, newSource[props.note.myReaction]]);
 	}
 
-	reactions.value = newReactions;
+	reactions.value = newReactions.filter(shouldDisplayReaction);
 }, { immediate: true, deep: true });
 </script>
 

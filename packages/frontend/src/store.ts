@@ -509,7 +509,7 @@ export const defaultStore = markRaw(new Storage('base', {
 	},
 	mutedReactions: {
 		where: 'account',
-		default: [],
+		default: [] as string[],
 	},
 }));
 

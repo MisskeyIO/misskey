@@ -19,8 +19,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div class="_gaps">
 			<div v-panel style="border-radius: var(--radius); padding: var(--margin);">
 				<button v-for="emoji in mutedReactions" class="_button" :class="$style.emojisItem" @click="removeReaction(emoji, $event)">
-					<MkCustomEmoji v-if="emoji[0] === ':'" :name="emoji"/>
-					<MkEmoji v-else :emoji="emoji"/>
+					<MkCustomEmoji v-if="emoji && emoji[0] === ':'" :name="emoji"/>
+					<MkEmoji v-else :emoji="emoji ? emoji : 'null'"/>
 				</button>
 				<button class="_button" @click="chooseReaction">
 					<i class="ti ti-plus"></i>
@@ -197,7 +197,7 @@ function remove(itemsRef: Ref<string[]>, reaction: string, ev: MouseEvent) {
 async function pickEmoji(itemsRef: Ref<string[]>, ev: MouseEvent) {
 	os.pickEmoji(ev.currentTarget ?? ev.target, {
 		showPinned: false,
-		remoteReaction: true,
+		manualReactionInput: true,
 	}).then(it => {
 		const emoji = it;
 		if (!itemsRef.value.includes(emoji)) {
@@ -317,7 +317,7 @@ definePageMetadata(() => ({
 }
 
 .emojisItem{
-	height: 48px;
-	width: 48px;
+	display: inline-block;
+	padding: 8px;
 }
 </style>

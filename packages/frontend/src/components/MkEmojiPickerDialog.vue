@@ -29,13 +29,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 		:max-height="maxHeight"
 		@chosen="chosen"
 	/>
-	<div v-if="remoteReaction" :class="$style.remoteReactionInputWrapper">
+	<div v-if="manualReactionInput" :class="$style.remoteReactionInputWrapper">
 		<span>{{ i18n.ts.remoteCustomEmojiMuted }}</span>
 		<MkInput v-model="remoteReactionName" placeholder=":emojiname@host:" autocapitalize="off"/>
-		<MkButton>
+		<MkButton :disabled="!(remoteReactionName && remoteReactionName[0] === ':')" @click="chosen(remoteReactionName)">
 			{{ i18n.ts.add }}
 		</MkButton>
-		<MkCustomEmoji v-if="remoteReactionName[0] === ':' " :name="remoteReactionName" :normal="true"/>
+		<div :class="$style.emojiContainer">
+			<MkCustomEmoji v-if="remoteReactionName && remoteReactionName[0] === ':' " :class="$style.emoji" :name="remoteReactionName" :normal="true"/>
+		</div>
 	</div>
 </MkModal>
 </template>
@@ -59,14 +61,14 @@ const props = withDefaults(defineProps<{
 	asReactionPicker?: boolean;
 	targetNote?: Misskey.entities.Note;
 	choseAndClose?: boolean;
-	remoteReaction?: boolean;
+	manualReactionInput?: boolean;
 }>(), {
 	manualShowing: null,
 	showPinned: true,
 	pinnedEmojis: undefined,
 	asReactionPicker: false,
 	choseAndClose: true,
-	remoteReaction: false,
+	manualReactionInput: false,
 });
 
 const emit = defineEmits<{
@@ -110,5 +112,10 @@ function opening() {
 	padding: 16px;
 	border-radius: var(--radius);
 	background: var(--popup);
+}
+
+.emojiContainer {
+	height: 48px;
+	width: 48px;
 }
 </style>

@@ -173,7 +173,6 @@ const blockingPagination = {
 const expandedRenoteMuteItems = ref([]);
 const expandedMuteItems = ref([]);
 const expandedBlockItems = ref([]);
-//const headerTabs = computed(() => [...(defaultStore.reactiveState.pinnedUserLists.value.map(l => ({
 
 const mutedReactions = ref<string[]>(defaultStore.state.mutedReactions);
 

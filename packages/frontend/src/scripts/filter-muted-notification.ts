@@ -2,8 +2,7 @@ import * as Misskey from 'misskey-js';
 import { defaultStore } from '@/store.js';
 
 export function filterMutedNotification(notification: Misskey.entities.Notification): boolean {
-
-	switch(notification.type) {
+	switch (notification.type) {
 		case 'reaction':
 			if (defaultStore.state.mutedReactions.includes(notification.reaction.replace('@.', ''))) return false;
 			break;

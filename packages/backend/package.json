@@ -90,7 +90,7 @@
 		"@nestjs/testing": "10.4.5",
 		"@peertube/http-signature": "1.7.0",
 		"@simplewebauthn/server": "10.0.1",
-		"@sinonjs/fake-timers": "13.0.3",
+		"@sinonjs/fake-timers": "11.3.1",
 		"@smithy/node-http-handler": "3.2.4",
 		"@swc/cli": "0.3.12",
 		"@swc/core": "1.5.7",

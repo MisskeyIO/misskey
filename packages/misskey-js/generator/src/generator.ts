@@ -2,7 +2,7 @@ import { mkdir, writeFile } from 'fs/promises';
 import { OpenAPIV3_1 } from 'openapi-types';
 import { toPascal } from 'ts-case-convert';
 import OpenAPIParser from '@readme/openapi-parser';
-import openapiTS, { astToString } from 'openapi-typescript';
+import openapiTS from 'openapi-typescript';
 
 async function generateBaseTypes(
 	openApiDocs: OpenAPIV3_1.Document,
@@ -20,8 +20,8 @@ async function generateBaseTypes(
 	}
 	lines.push('');
 
-	const generatedTypes = await openapiTS(new URL(`.${openApiJsonPath}`, import.meta.url), { exportType: true });
-	lines.push(astToString(generatedTypes));
+	const generatedTypes = await openapiTS(openApiJsonPath, { exportType: true });
+	lines.push(generatedTypes);
 	lines.push('');
 
 	await writeFile(typeFileName, lines.join('\n'));

@@ -18,6 +18,7 @@ services:
       DFLY_conn_io_threads: 4
       DFLY_epoll_file_threads: 4
       DFLY_proactor_threads: 4
+      DFLY_lock_on_hashtags: true
     ports:
       - "6379:6379"
     volumes:

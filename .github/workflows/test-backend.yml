@@ -44,6 +44,7 @@ jobs:
           DFLY_conn_io_threads: 4
           DFLY_epoll_file_threads: 4
           DFLY_proactor_threads: 4
+          DFLY_lock_on_hashtags: true
         ports:
           - 56312:6379
 
@@ -106,6 +107,7 @@ jobs:
           DFLY_conn_io_threads: 4
           DFLY_epoll_file_threads: 4
           DFLY_proactor_threads: 4
+          DFLY_lock_on_hashtags: true
         ports:
           - 56312:6379
 

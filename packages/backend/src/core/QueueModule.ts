@@ -36,13 +36,13 @@ const $endedPollNotification: Provider = {
 
 const $deliver: Provider = {
 	provide: 'queue:deliver',
-	useFactory: (config: Config) => new Queues(config.redisForDeliverQueues.map(queueConfig => new Bull.Queue(QUEUE.DELIVER, baseQueueOptions(queueConfig, config.bullmqQueueOptions, QUEUE.DELIVER)))),
+	useFactory: (config: Config) => new Queues(config.redisForDeliverQueues.map((queueConfig, index) => new Bull.Queue(`${QUEUE.DELIVER}-${index}`, baseQueueOptions(queueConfig, config.bullmqQueueOptions, QUEUE.DELIVER, index)))),
 	inject: [DI.config],
 };
 
 const $inbox: Provider = {
 	provide: 'queue:inbox',
-	useFactory: (config: Config) => new Queues(config.redisForInboxQueues.map(queueConfig => new Bull.Queue(QUEUE.INBOX, baseQueueOptions(queueConfig, config.bullmqQueueOptions, QUEUE.INBOX)))),
+	useFactory: (config: Config) => new Queues(config.redisForInboxQueues.map((queueConfig, index) => new Bull.Queue(`${QUEUE.INBOX}-${index}`, baseQueueOptions(queueConfig, config.bullmqQueueOptions, QUEUE.INBOX, index)))),
 	inject: [DI.config],
 };
 
@@ -54,7 +54,7 @@ const $db: Provider = {
 
 const $relationship: Provider = {
 	provide: 'queue:relationship',
-	useFactory: (config: Config) => new Queues(config.redisForRelationshipQueues.map(queueConfig => new Bull.Queue(QUEUE.RELATIONSHIP, baseQueueOptions(queueConfig, config.bullmqQueueOptions, QUEUE.RELATIONSHIP)))),
+	useFactory: (config: Config) => new Queues(config.redisForRelationshipQueues.map((queueConfig, index) => new Bull.Queue(`${QUEUE.RELATIONSHIP}-${index}`, baseQueueOptions(queueConfig, config.bullmqQueueOptions, QUEUE.RELATIONSHIP, index)))),
 	inject: [DI.config],
 };
 

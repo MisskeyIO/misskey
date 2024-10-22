@@ -208,8 +208,8 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		//#region deliver
 		this.deliverQueueWorkers = this.config.redisForDeliverQueues
 			.filter((_, index) => process.env.QUEUE_WORKER_INDEX == null || index === Number.parseInt(process.env.QUEUE_WORKER_INDEX, 10))
-			.map(config => new Bull.Worker(QUEUE.DELIVER, (job) => this.deliverProcessorService.process(job), {
-				...baseWorkerOptions(config, this.config.bullmqWorkerOptions, QUEUE.DELIVER),
+			.map((config, index) => new Bull.Worker(`${QUEUE.DELIVER}-${index}`, (job) => this.deliverProcessorService.process(job), {
+				...baseWorkerOptions(config, this.config.bullmqWorkerOptions, QUEUE.DELIVER, index),
 				autorun: false,
 				concurrency: this.config.deliverJobConcurrency ?? 128,
 				limiter: {
@@ -236,8 +236,8 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		//#region inbox
 		this.inboxQueueWorkers = this.config.redisForInboxQueues
 			.filter((_, index) => process.env.QUEUE_WORKER_INDEX == null || index === Number.parseInt(process.env.QUEUE_WORKER_INDEX, 10))
-			.map(config => new Bull.Worker(QUEUE.INBOX, (job) => this.inboxProcessorService.process(job), {
-				...baseWorkerOptions(config, this.config.bullmqWorkerOptions, QUEUE.INBOX),
+			.map((config, index) => new Bull.Worker(`${QUEUE.INBOX}-${index}`, (job) => this.inboxProcessorService.process(job), {
+				...baseWorkerOptions(config, this.config.bullmqWorkerOptions, QUEUE.INBOX, index),
 				autorun: false,
 				concurrency: this.config.inboxJobConcurrency ?? 16,
 				limiter: {
@@ -288,7 +288,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		//#region relationship
 		this.relationshipQueueWorkers = this.config.redisForRelationshipQueues
 			.filter((_, index) => process.env.QUEUE_WORKER_INDEX == null || index === Number.parseInt(process.env.QUEUE_WORKER_INDEX, 10))
-			.map(config => new Bull.Worker(QUEUE.RELATIONSHIP, (job) => {
+			.map((config, index) => new Bull.Worker(`${QUEUE.RELATIONSHIP}-${index}`, (job) => {
 				switch (job.name) {
 					case 'follow': return this.relationshipProcessorService.processFollow(job);
 					case 'unfollow': return this.relationshipProcessorService.processUnfollow(job);
@@ -297,7 +297,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 					default: throw new Error(`unrecognized job type ${job.name} for relationship`);
 				}
 			}, {
-				...baseWorkerOptions(config, this.config.bullmqWorkerOptions, QUEUE.RELATIONSHIP),
+				...baseWorkerOptions(config, this.config.bullmqWorkerOptions, QUEUE.RELATIONSHIP, index),
 				autorun: false,
 				concurrency: this.config.relationshipJobConcurrency ?? 16,
 				limiter: {

@@ -18,7 +18,8 @@ export const QUEUE = {
 	WEBHOOK_DELIVER: 'webhookDeliver',
 };
 
-export function baseQueueOptions(config: RedisOptions & RedisOptionsSource, queueOptions: Partial<Bull.QueueOptions>, queueName: typeof QUEUE[keyof typeof QUEUE]): Bull.QueueOptions {
+export function baseQueueOptions(config: RedisOptions & RedisOptionsSource, queueOptions: Partial<Bull.QueueOptions>, queueName: typeof QUEUE[keyof typeof QUEUE], index?: number): Bull.QueueOptions {
+	const name = typeof index === 'number' ? `${queueName}-${index}` : queueName;
 	return {
 		...queueOptions,
 		connection: {
@@ -33,11 +34,12 @@ export function baseQueueOptions(config: RedisOptions & RedisOptionsSource, queu
 				return 1;
 			},
 		},
-		prefix: config.prefix ? `${config.prefix}:queue:${queueName}` : `queue:${queueName}`,
+		prefix: config.prefix ? `{${config.prefix}:queue:${name}}` : `{queue:${name}}`,
 	};
 }
 
-export function baseWorkerOptions(config: RedisOptions & RedisOptionsSource, workerOptions: Partial<Bull.WorkerOptions>, queueName: typeof QUEUE[keyof typeof QUEUE]): Bull.WorkerOptions {
+export function baseWorkerOptions(config: RedisOptions & RedisOptionsSource, workerOptions: Partial<Bull.WorkerOptions>, queueName: typeof QUEUE[keyof typeof QUEUE], index?: number): Bull.WorkerOptions {
+	const name = typeof index === 'number' ? `${queueName}-${index}` : queueName;
 	return {
 		...workerOptions,
 		connection: {
@@ -52,6 +54,6 @@ export function baseWorkerOptions(config: RedisOptions & RedisOptionsSource, wor
 				return 1;
 			},
 		},
-		prefix: config.prefix ? `${config.prefix}:queue:${queueName}` : `queue:${queueName}`,
+		prefix: config.prefix ? `{${config.prefix}:queue:${name}}` : `{queue:${name}}`,
 	};
 }

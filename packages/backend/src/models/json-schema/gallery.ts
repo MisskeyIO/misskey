@@ -78,6 +78,29 @@ export const packedGalleryPostSchema = {
 			type: 'boolean',
 			optional: true, nullable: false,
 		},
+		viewSettings: {
+			type: "object",
+			optional: true,
+			nullable: true,
+			properties: {
+				initialMode: {
+					type: "string",
+					enum: ["DEFAULT", "BOOK"],
+					optional: false,
+					nullable: false,
+				},
+				rightOpening: {
+					type: "boolean",
+					optional: false,
+					nullable: false,
+				},
+				double: {
+					type: "boolean",
+					optional: false,
+					nullable: false,
+				},
+			},
+		},
 	},
 } as const;
 

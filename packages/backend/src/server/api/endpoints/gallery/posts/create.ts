@@ -12,6 +12,7 @@ import { IdService } from '@/core/IdService.js';
 import { GalleryPostEntityService } from '@/core/entities/GalleryPostEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { isNotNull } from '@/misc/is-not-null.js';
+import { ViewMode, ViewSettings } from "@/models/GalleryPost.js";
 
 export const meta = {
 	tags: ['gallery'],
@@ -44,6 +45,19 @@ export const paramDef = {
 	properties: {
 		title: { type: 'string', minLength: 1 },
 		description: { type: 'string', nullable: true },
+		viewSettings: {
+			type: "object",
+			nullable: true,
+			properties: {
+				initialMode: {
+					type: "string",
+					enum: ["DEFAULT", "BOOK"],
+					default: "DEFAULT",
+				},
+				rightOpening: { type: "boolean", default: true },
+				double: { type: "boolean", default: true },
+			},
+		},
 		fileIds: { type: 'array', uniqueItems: true, minItems: 1, maxItems: 32, items: {
 			type: 'string', format: 'misskey:id',
 		} },
@@ -76,6 +90,20 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw new Error();
 			}
 
+			const viewSettings: ViewSettings = ps.viewSettings
+				? {
+						initialMode:
+							ViewMode[ps.viewSettings.initialMode as keyof typeof ViewMode],
+						rightOpening: ps.viewSettings.rightOpening,
+						double: ps.viewSettings.double,
+					}
+				: {
+						initialMode: ViewMode.DEFAULT,
+						rightOpening: true,
+						double: true,
+					};
+
+
 			const post = await this.galleryPostsRepository.insert(new MiGalleryPost({
 				id: this.idService.gen(),
 				updatedAt: new Date(),
@@ -84,6 +112,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				userId: me.id,
 				isSensitive: ps.isSensitive,
 				fileIds: files.map(file => file.id),
+				viewSettings: viewSettings,
 			})).then(x => this.galleryPostsRepository.findOneByOrFail(x.identifiers[0]));
 
 			return await this.galleryPostEntityService.pack(post, me);

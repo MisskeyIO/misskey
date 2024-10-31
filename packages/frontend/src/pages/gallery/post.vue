@@ -10,10 +10,36 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div class="_root">
 			<Transition :name="defaultStore.state.animation ? 'fade' : ''" mode="out-in">
 				<div v-if="post" class="rkxwuolj">
-					<div class="files">
+					<div v-if="!bookMode" class="files">
 						<div v-for="file in post.files" :key="file.id" class="file">
-							<img :src="file.url"/>
+							<img :src="file.url" />
 						</div>
+					</div>
+					<div v-if="bookMode" style="display: grid; justify-content: center; align-items: center;">
+						<Teleport to="body">
+							<div v-if="fullscreen" class="magazine-fullscreen-bg">
+								<MkButton v-if="fullscreen" :rounded="true"
+									style="position:fixed;top:10px;right:10px;" @click="closeFullscreen">
+									<i class="ti ti-x"></i>
+								</MkButton>
+								<div class="magazine-fullscreen-outer">
+									<TurnView :options="isMobile ? bookOptionsMobile : bookOptions"
+										class="magazine-fullscreen">
+										<div v-for="file in post.files" :key="file.id"
+											class="magazine-page-img-outer">
+											<img :src="file.url" class="magazine-page-img-fullscreen" />
+										</div>
+									</TurnView>
+								</div>
+							</div>
+						</Teleport>
+						<TurnView v-if="!fullscreen"
+							:class="isMobile ? 'magazine-mobile' : bookModeDouble ? 'magazine-double' : 'magazine-single'"
+							:options="isMobile ? bookOptionsMobile : bookOptions">
+							<div v-for="file in post.files" :key="file.id" class="magazine-page-img-outer">
+								<img :src="file.url" class="magazine-page-img" />
+							</div>
+						</TurnView>
 					</div>
 					<div class="body">
 						<div class="title">{{ post.title }}</div>
@@ -88,6 +114,37 @@ const props = defineProps<{
 
 const post = ref<Misskey.entities.GalleryPost | null>(null);
 const error = ref<any>(null);
+const bookMode = ref(false);
+const fullscreen = ref(false);
+const switchFullscreen = () => {
+	fullscreen.value = true;
+}
+const closeFullscreen = () => {
+	fullscreen.value = false;
+}
+
+const MOBILE_THRESHOLD = 500;
+const isMobile = ref(window.innerWidth <= 500);
+window.addEventListener('resize', () => {
+	isMobile.value = window.innerWidth <= 500;
+});
+
+const bookOptionsDefault = {
+	display: "double",
+	acceleration: true,
+	elevation: 50,
+};
+
+const bookOptions = ref(bookOptionsDefault);
+
+const bookOptionsMobileDefault = {
+	display: "single",
+	acceleration: true,
+	elevation: 50,
+};
+
+const bookOptionsMobile = ref(bookOptionsMobileDefault);
+const bookModeDouble = ref(true);
 const otherPostsPagination = {
 	endpoint: 'users/gallery/posts' as const,
 	limit: 6,
@@ -102,6 +159,25 @@ function fetchPost() {
 		postId: props.postId,
 	}).then(_post => {
 		post.value = _post;
+		if (_post.viewSettings) {
+			bookMode.value = _post.viewSettings.initialMode === "BOOK";
+			bookModeDouble.value = _post.viewSettings.double;
+			bookOptions.value = Object.assign(bookOptionsDefault, {
+				display: _post.viewSettings.double ? "double" : "single",
+				direction: _post.viewSettings.rightOpening ? "rtl" : undefined,
+			});
+			bookOptionsMobile.value = Object.assign(bookOptionsMobileDefault, {
+				direction: _post.viewSettings.rightOpening ? "rtl" : undefined,
+			});
+		} else {
+			bookMode.value = false;
+			bookOptions.value = Object.assign(bookOptionsDefault, {
+				direction: "rtl"
+			});
+			bookOptionsMobile.value = Object.assign(bookOptionsMobileDefault, {
+				direction: "rtl"
+			});
+		}
 	}).catch(_error => {
 		error.value = _error;
 	});
@@ -155,11 +231,25 @@ function edit() {
 
 watch(() => props.postId, fetchPost, { immediate: true });
 
-const headerActions = computed(() => [{
-	icon: 'ti ti-pencil',
-	text: i18n.ts.edit,
-	handler: edit,
-}]);
+const headerActions = computed(() => [
+	...((bookMode.value) ? [{
+		icon: "ti ti-book-off",
+		handler: () => { bookMode.value = false },
+	}] : [{
+		icon: "ti ti-book",
+		handler: () => { bookMode.value = true },
+	}]),
+	...((isMobile.value) ? [] : bookMode.value ? [{
+		icon: "ti ti-maximize",
+		text: i18n.ts.fullView,
+		handler: switchFullscreen,
+	}] : []),
+	{
+		icon: 'ti ti-pencil',
+		text: i18n.ts.edit,
+		handler: edit,
+	}
+]);
 
 const headerTabs = computed(() => []);
 
@@ -172,6 +262,76 @@ definePageMetadata(() => ({
 </script>
 
 <style lang="scss" scoped>
+.magazine-double {
+	background-color: #fff;
+	display: block;
+	max-width: 100%;
+	max-height: 600px;
+	margin: 0 auto;
+}
+
+.magazine-single {
+	background-color: #fff;
+	display: block;
+	max-width: 80%;
+	max-height: 600px;
+	margin: 0 auto;
+}
+
+.magazine-mobile {
+	background-color: #fff;
+	display: block;
+	max-width: 100%;
+	max-height: 600px;
+	margin: 0 auto;
+}
+
+.magazine-page-img-outer {
+	background-color: #fff;
+	display: grid;
+	justify-content: center;
+	align-items: center;
+}
+
+.magazine-page-img {
+	user-select: none;
+	max-width: 100%;
+	max-height: 600px;
+}
+
+.magazine-page-img-fullscreen {
+	user-select: none;
+	max-width: 100%;
+	max-height: 95%;
+}
+
+.magazine .turn-page {
+	background-color: #ccc;
+	background-size: 100% 100%;
+}
+
+.magazine-fullscreen-bg {
+	z-index: 1000;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: #000;
+}
+
+.magazine-fullscreen-outer {
+	display: grid;
+	justify-content: center;
+	align-items: center;
+}
+
+.magazine-fullscreen {
+	background-color: #fff;
+	width: 141dvh;
+	height: 100dvh;
+}
+
 .fade-enter-active,
 .fade-leave-active {
 	transition: opacity 0.125s ease;

@@ -14,6 +14,7 @@ import { bindThis } from '@/decorators.js';
 import { IdService } from '@/core/IdService.js';
 import { UserEntityService } from './UserEntityService.js';
 import { DriveFileEntityService } from './DriveFileEntityService.js';
+import { ViewMode } from '@/models/GalleryPost.js';
 
 @Injectable()
 export class GalleryPostEntityService {
@@ -53,6 +54,17 @@ export class GalleryPostEntityService {
 			isSensitive: post.isSensitive,
 			likedCount: post.likedCount,
 			isLiked: meId ? await this.galleryLikesRepository.exists({ where: { postId: post.id, userId: meId } }) : undefined,
+			viewSettings: post.viewSettings
+				? {
+						initialMode: ViewMode[post.viewSettings.initialMode],
+						rightOpening: post.viewSettings.rightOpening,
+						double: post.viewSettings.double,
+					}
+				: {
+						initialMode: "DEFAULT",
+						rightOpening: true,
+						double: true,
+					},
 		});
 	}
 

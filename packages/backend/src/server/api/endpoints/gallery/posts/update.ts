@@ -10,6 +10,7 @@ import type { DriveFilesRepository, GalleryPostsRepository } from '@/models/_.js
 import { GalleryPostEntityService } from '@/core/entities/GalleryPostEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { isNotNull } from '@/misc/is-not-null.js';
+import { ViewMode, ViewSettings } from "@/models/GalleryPost.js";
 
 export const meta = {
 	tags: ['gallery'],
@@ -43,6 +44,19 @@ export const paramDef = {
 		postId: { type: 'string', format: 'misskey:id' },
 		title: { type: 'string', minLength: 1 },
 		description: { type: 'string', nullable: true },
+		viewSettings: {
+			type: "object",
+			nullable: true,
+			properties: {
+				initialMode: {
+					type: "string",
+					enum: ["DEFAULT", "BOOK"],
+					default: "DEFAULT",
+				},
+				rightOpening: { type: "boolean", default: true },
+				double: { type: "boolean", default: true },
+			},
+		},
 		fileIds: { type: 'array', uniqueItems: true, minItems: 1, maxItems: 32, items: {
 			type: 'string', format: 'misskey:id',
 		} },
@@ -74,6 +88,19 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw new Error();
 			}
 
+			const viewSettings: ViewSettings = ps.viewSettings
+				? {
+						initialMode:
+							ViewMode[ps.viewSettings.initialMode as keyof typeof ViewMode],
+						rightOpening: ps.viewSettings.rightOpening,
+						double: ps.viewSettings.double,
+					}
+				: {
+						initialMode: ViewMode.DEFAULT,
+						rightOpening: true,
+						double: true,
+					};
+
 			await this.galleryPostsRepository.update({
 				id: ps.postId,
 				userId: me.id,
@@ -83,6 +110,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				description: ps.description,
 				isSensitive: ps.isSensitive,
 				fileIds: files.map(file => file.id),
+				viewSettings: viewSettings,
 			});
 
 			const post = await this.galleryPostsRepository.findOneByOrFail({ id: ps.postId });

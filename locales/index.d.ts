@@ -993,6 +993,26 @@ export interface Locale extends ILocale {
      */
     "default": string;
     /**
+     * ブックビューア
+     */
+    "bookViewer": string;
+    /**
+     * 右開き
+     */
+    "rightOpening": string;
+    /**
+     * 左開き
+     */
+    "leftOpening": string;
+    /**
+     * 単一ページ
+     */
+    "signlePage": string;
+    /**
+     * 見開きページ(モバイルでは単一ページ化)
+     */
+    "doublePage": string;
+    /**
      * デフォルト: {value}
      */
     "defaultValueIs": ParameterizedString<"value">;

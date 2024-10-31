@@ -9,6 +9,7 @@ import meta from '../../package.json';
 import packageInfo from './package.json' assert { type: 'json' };
 import pluginUnwindCssModuleClassName from './lib/rollup-plugin-unwind-css-module-class-name.js';
 import pluginJson5 from './vite.json5.js';
+import inject from "@rollup/plugin-inject";
 
 const extensions = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.json', '.json5', '.svg', '.sass', '.scss', '.css', '.vue'];
 
@@ -69,6 +70,10 @@ export function getConfig(): UserConfig {
 		},
 
 		plugins: [
+			inject({
+				$: "jquery",
+				jQuery: "jquery",
+			}),
 			typescript(),
 			pluginVue(),
 			pluginUnwindCssModuleClassName(),

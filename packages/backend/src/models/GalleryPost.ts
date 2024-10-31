@@ -8,6 +8,17 @@ import { id } from './util/id.js';
 import { MiUser } from './User.js';
 import type { MiDriveFile } from './DriveFile.js';
 
+export enum ViewMode {
+	DEFAULT = 0,
+	BOOK = 1,
+}
+
+export type ViewSettings = {
+	initialMode: ViewMode;
+	rightOpening: boolean;
+	double: boolean;
+};
+
 @Entity('gallery_post')
 export class MiGalleryPost {
 	@PrimaryColumn(id())
@@ -74,6 +85,11 @@ export class MiGalleryPost {
 		length: 128, array: true, default: '{}',
 	})
 	public tags: string[];
+
+	@Column("json", {
+		nullable: true,
+	})
+	public viewSettings: ViewSettings;
 
 	constructor(data: Partial<MiGalleryPost>) {
 		if (data == null) return;

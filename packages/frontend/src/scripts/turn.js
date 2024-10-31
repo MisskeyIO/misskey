@@ -7,6 +7,8 @@
  * All rights reserved
  **/
 
+import jQuery from "jquery";
+
 (function($) {
   "use strict";
 

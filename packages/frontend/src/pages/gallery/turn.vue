@@ -6,7 +6,7 @@
 
 <script>
 import $ from "jquery";
-import "../../../src/scripts/turn.js";
+import "@/scripts/turn.js";
 import { v4 as uuidv4 } from 'uuid';
 
 export default {

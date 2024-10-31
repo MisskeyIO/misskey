@@ -10,11 +10,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div class="_root">
 			<Transition :name="defaultStore.state.animation ? 'fade' : ''" mode="out-in">
 				<div v-if="post" class="rkxwuolj">
-					<div v-if="!bookMode" class="files">
-						<div v-for="file in post.files" :key="file.id" class="file">
-							<img :src="file.url" />
-						</div>
-					</div>
 					<div v-if="bookMode" style="display: grid; justify-content: center; align-items: center;">
 						<Teleport to="body">
 							<div v-if="fullscreen" class="magazine-fullscreen-bg">
@@ -40,6 +35,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<img :src="file.url" class="magazine-page-img" />
 							</div>
 						</TurnView>
+					</div>
+					<div v-else class="files">
+						<div v-for="file in post.files" :key="file.id" class="file">
+							<img :src="file.url" />
+						</div>
 					</div>
 					<div class="body">
 						<div class="title">{{ post.title }}</div>
@@ -88,7 +88,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, watch, ref } from 'vue';
+import { computed, watch, ref, nextTick } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@/components/MkButton.vue';
 import * as os from '@/os.js';
@@ -105,6 +105,7 @@ import { $i } from '@/account.js';
 import { isSupportShare } from '@/scripts/navigator.js';
 import copyToClipboard from '@/scripts/copy-to-clipboard.js';
 import { useRouter } from '@/router/supplier.js';
+import TurnView from './turn.vue';
 
 const router = useRouter();
 
@@ -153,34 +154,39 @@ const otherPostsPagination = {
 	})),
 };
 
-function fetchPost() {
+async function fetchPost() {
 	post.value = null;
-	misskeyApi('gallery/posts/show', {
+	const _post = await misskeyApi('gallery/posts/show', {
 		postId: props.postId,
-	}).then(_post => {
-		post.value = _post;
-		if (_post.viewSettings) {
-			bookMode.value = _post.viewSettings.initialMode === "BOOK";
-			bookModeDouble.value = _post.viewSettings.double;
-			bookOptions.value = Object.assign(bookOptionsDefault, {
-				display: _post.viewSettings.double ? "double" : "single",
-				direction: _post.viewSettings.rightOpening ? "rtl" : undefined,
-			});
-			bookOptionsMobile.value = Object.assign(bookOptionsMobileDefault, {
-				direction: _post.viewSettings.rightOpening ? "rtl" : undefined,
-			});
-		} else {
-			bookMode.value = false;
-			bookOptions.value = Object.assign(bookOptionsDefault, {
-				direction: "rtl"
-			});
-			bookOptionsMobile.value = Object.assign(bookOptionsMobileDefault, {
-				direction: "rtl"
-			});
-		}
 	}).catch(_error => {
 		error.value = _error;
 	});
+
+	post.value = null;
+	await nextTick();
+
+	if (_post.viewSettings) {
+		bookModeDouble.value = _post.viewSettings.double;
+		bookOptions.value = Object.assign(bookOptionsDefault, {
+			display: _post.viewSettings.double ? "double" : "single",
+			direction: _post.viewSettings.rightOpening ? "rtl" : undefined,
+		});
+		bookOptionsMobile.value = Object.assign(bookOptionsMobileDefault, {
+			direction: _post.viewSettings.rightOpening ? "rtl" : undefined,
+		});
+		bookMode.value = _post.viewSettings.initialMode === "BOOK";
+	} else {
+		bookOptions.value = Object.assign(bookOptionsDefault, {
+			direction: "rtl"
+		});
+		bookOptionsMobile.value = Object.assign(bookOptionsMobileDefault, {
+			direction: "rtl"
+		});
+		bookMode.value = false;
+	}
+
+	await nextTick();
+	post.value = _post;
 }
 
 function copyLink() {

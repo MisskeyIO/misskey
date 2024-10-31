@@ -11,6 +11,8 @@ import pluginUnwindCssModuleClassName from './lib/rollup-plugin-unwind-css-modul
 import pluginJson5 from './vite.json5.js';
 import inject from "@rollup/plugin-inject";
 
+const fix = (f) => /** @type {T} */ (f)
+
 const extensions = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.json', '.json5', '.svg', '.sass', '.scss', '.css', '.vue'];
 
 /**
@@ -70,7 +72,7 @@ export function getConfig(): UserConfig {
 		},
 
 		plugins: [
-			inject({
+			fix(inject)({
 				$: "jquery",
 				jQuery: "jquery",
 			}),

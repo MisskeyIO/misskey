@@ -18,7 +18,7 @@ export interface UsageReport {
 	a: string;
 }
 
-let disableUsageReport = false;
+let disableUsageReport = !instance.googleAnalyticsId;
 const usageReportBuffer: UsageReport[] = [];
 let usageReportBufferTimer: number | null = null;
 
@@ -43,7 +43,7 @@ export function sendUsageReport() {
 	const data = usageReportBuffer.splice(0, usageReportBuffer.length);
 	usageReportBufferTimer = null;
 
-	if (instance.googleAnalyticsId && (miLocalStorage.getItemAsJson('gtagConsent') as GtagConsentParams)?.ad_user_data !== 'granted') {
+	if ((miLocalStorage.getItemAsJson('gtagConsent') as GtagConsentParams)?.ad_user_data !== 'granted') {
 		console.log('Usage report is not sent because the user has not consented to sharing data about ad interactions.');
 		disableUsageReport = true;
 		return;

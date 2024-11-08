@@ -125,7 +125,7 @@ importers:
         version: 1.2.0
       '@misskey-dev/summaly':
         specifier: MisskeyIO/summaly#5.1.1
-        version: https://codeload.github.com/MisskeyIO/summaly/tar.gz/d141e1557f8ea4a9f3394452c2a68a6a3457e4ab
+        version: https://codeload.github.com/MisskeyIO/summaly/tar.gz/210a0758e72331c42038afdd6c1f953122228a01
       '@napi-rs/canvas':
         specifier: 0.1.60
         version: 0.1.60
@@ -887,7 +887,7 @@ importers:
         version: 1.0.0(@typescript-eslint/eslint-plugin@7.10.0(@typescript-eslint/parser@7.10.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1)(typescript@5.6.3))(@typescript-eslint/parser@7.10.0(eslint@8.57.1)(typescript@5.6.3))(eslint-plugin-import@2.31.0(@typescript-eslint/parser@7.10.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1))(eslint@8.57.1)
       '@misskey-dev/summaly':
         specifier: MisskeyIO/summaly#5.1.1
-        version: https://codeload.github.com/MisskeyIO/summaly/tar.gz/d141e1557f8ea4a9f3394452c2a68a6a3457e4ab
+        version: https://codeload.github.com/MisskeyIO/summaly/tar.gz/210a0758e72331c42038afdd6c1f953122228a01
       '@storybook/addon-actions':
         specifier: 8.4.2
         version: 8.4.2(storybook@8.4.2(bufferutil@4.0.8)(prettier@3.3.3)(utf-8-validate@6.0.5))
@@ -2295,8 +2295,8 @@ packages:
   '@misskey-dev/sharp-read-bmp@1.2.0':
     resolution: {integrity: sha512-er4pRakXzHYfEgOFAFfQagqDouG+wLm+kwNq1I30oSdIHDa0wM3KjFpfIGQ25Fks4GcmOl1s7Zh6xoQu5dNjTw==}
 
-  '@misskey-dev/summaly@https://codeload.github.com/MisskeyIO/summaly/tar.gz/d141e1557f8ea4a9f3394452c2a68a6a3457e4ab':
-    resolution: {tarball: https://codeload.github.com/MisskeyIO/summaly/tar.gz/d141e1557f8ea4a9f3394452c2a68a6a3457e4ab}
+  '@misskey-dev/summaly@https://codeload.github.com/MisskeyIO/summaly/tar.gz/210a0758e72331c42038afdd6c1f953122228a01':
+    resolution: {tarball: https://codeload.github.com/MisskeyIO/summaly/tar.gz/210a0758e72331c42038afdd6c1f953122228a01}
     version: 5.1.1
 
   '@mole-inc/bin-wrapper@8.0.1':
@@ -11493,7 +11493,7 @@ snapshots:
       decode-ico: 0.4.1
       sharp: 0.33.5
 
-  '@misskey-dev/summaly@https://codeload.github.com/MisskeyIO/summaly/tar.gz/d141e1557f8ea4a9f3394452c2a68a6a3457e4ab':
+  '@misskey-dev/summaly@https://codeload.github.com/MisskeyIO/summaly/tar.gz/210a0758e72331c42038afdd6c1f953122228a01':
     dependencies:
       cheerio: 1.0.0
       escape-regexp: 0.0.1

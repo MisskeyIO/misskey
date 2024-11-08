@@ -80,7 +80,7 @@
 	},
 	"devDependencies": {
 		"@misskey-dev/eslint-plugin": "1.0.0",
-		"@misskey-dev/summaly": "5.1.0",
+		"@misskey-dev/summaly": "MisskeyIO/summaly#5.1.1",
 		"@storybook/addon-actions": "8.4.2",
 		"@storybook/addon-essentials": "8.4.2",
 		"@storybook/addon-interactions": "8.4.2",

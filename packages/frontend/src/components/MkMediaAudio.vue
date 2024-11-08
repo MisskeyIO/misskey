@@ -35,40 +35,43 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</audio>
 	</div>
 
-	<div v-else :class="$style.audioControls">
-		<audio
-			ref="audioEl"
-			preload="metadata"
-		>
-			<source :src="audio.url">
-		</audio>
-		<div :class="[$style.controlsChild, $style.controlsLeft]">
-			<button class="_button" :class="$style.controlButton" @click.prevent.stop="togglePlayPause">
-				<i v-if="isPlaying" class="ti ti-player-pause-filled"></i>
-				<i v-else class="ti ti-player-play-filled"></i>
-			</button>
-		</div>
-		<div :class="[$style.controlsChild, $style.controlsRight]">
-			<button class="_button" :class="$style.controlButton" @click.prevent.stop="showMenu">
-				<i class="ti ti-settings"></i>
-			</button>
-		</div>
-		<div :class="[$style.controlsChild, $style.controlsTime]">{{ hms(elapsedTimeMs) }}</div>
-		<div :class="[$style.controlsChild, $style.controlsVolume]">
-			<button class="_button" :class="$style.controlButton" @click.prevent.stop="toggleMute">
-				<i v-if="volume === 0" class="ti ti-volume-3"></i>
-				<i v-else class="ti ti-volume"></i>
-			</button>
+	<div v-else>
+		<MkUserRippleEffect v-if="user" ref="userRippleEffect" :user="user" />
+		<div :class="$style.audioControls">
+			<audio
+				ref="audioEl"
+				preload="metadata"
+			>
+				<source :src="audio.url">
+			</audio>
+			<div :class="[$style.controlsChild, $style.controlsLeft]">
+				<button class="_button" :class="$style.controlButton" @click.prevent.stop="togglePlayPause">
+					<i v-if="isPlaying" class="ti ti-player-pause-filled"></i>
+					<i v-else class="ti ti-player-play-filled"></i>
+				</button>
+			</div>
+			<div :class="[$style.controlsChild, $style.controlsRight]">
+				<button class="_button" :class="$style.controlButton" @click.prevent.stop="showMenu">
+					<i class="ti ti-settings"></i>
+				</button>
+			</div>
+			<div :class="[$style.controlsChild, $style.controlsTime]">{{ hms(elapsedTimeMs) }}</div>
+			<div :class="[$style.controlsChild, $style.controlsVolume]">
+				<button class="_button" :class="$style.controlButton" @click.prevent.stop="toggleMute">
+					<i v-if="volume === 0" class="ti ti-volume-3"></i>
+					<i v-else class="ti ti-volume"></i>
+				</button>
+				<MkMediaRange
+					v-model="volume"
+					:class="$style.volumeSeekbar"
+				/>
+			</div>
 			<MkMediaRange
-				v-model="volume"
-				:class="$style.volumeSeekbar"
+				v-model="rangePercent"
+				:class="$style.seekbarRoot"
+				:buffer="bufferedDataRatio"
 			/>
 		</div>
-		<MkMediaRange
-			v-model="rangePercent"
-			:class="$style.seekbarRoot"
-			:buffer="bufferedDataRatio"
-		/>
 	</div>
 </div>
 </template>
@@ -83,11 +86,13 @@ import * as os from '@/os.js';
 import bytes from '@/filters/bytes.js';
 import { hms } from '@/filters/hms.js';
 import MkMediaRange from '@/components/MkMediaRange.vue';
+import MkUserRippleEffect from '@/components/MkUserRippleEffect.vue';
 import { pleaseLogin } from '@/scripts/please-login.js';
 import { $i, iAmModerator } from '@/account.js';
 
 const props = defineProps<{
 	audio: Misskey.entities.DriveFile;
+	user?: Misskey.entities.UserLite;
 }>();
 
 const keymap = {
@@ -126,6 +131,7 @@ function hasFocus() {
 
 const playerEl = shallowRef<HTMLDivElement>();
 const audioEl = shallowRef<HTMLAudioElement>();
+const userRippleEffect = ref<InstanceType<typeof MkUserRippleEffect>>();
 
 // eslint-disable-next-line vue/no-setup-props-destructure
 const hide = ref((defaultStore.state.nsfw === 'force' || defaultStore.state.dataSaver.media) ? true : (props.audio.isSensitive && defaultStore.state.nsfw !== 'ignore'));
@@ -264,9 +270,11 @@ function togglePlayPause() {
 
 	if (isPlaying.value) {
 		audioEl.value.pause();
+		userRippleEffect.value?.pauseAnimation();
 		isPlaying.value = false;
 	} else {
 		audioEl.value.play();
+		userRippleEffect.value?.resumeAnimation();
 		isPlaying.value = true;
 		oncePlayed.value = true;
 	}

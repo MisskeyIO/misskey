@@ -36,7 +36,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 
 	<div v-else>
-		<MkUserRippleEffect v-if="user" ref="userRippleEffect" :user="user" />
+		<MkUserRippleEffect v-if="user" ref="userRippleEffect" :audioEl="audioEl" :analyser="analyserNode" :user="user" :profileImage="user.avatarUrl"/>
 		<div :class="$style.audioControls">
 			<audio
 				ref="audioEl"
@@ -246,6 +246,10 @@ const isPlaying = ref(false);
 const isActuallyPlaying = ref(false);
 const elapsedTimeMs = ref(0);
 const durationMs = ref(0);
+const audioContext = ref<AudioContext | null>(null);
+const sourceNode = ref<MediaElementAudioSourceNode | null>(null);
+const gainNode = ref<GainNode | null>(null);
+const analyserNode = ref<AnalyserNode | null>(null);
 const rangePercent = computed({
 	get: () => {
 		return (elapsedTimeMs.value / durationMs.value) || 0;
@@ -267,6 +271,23 @@ const bufferedDataRatio = computed(() => {
 // MediaControl Events
 function togglePlayPause() {
 	if (!isReady.value || !audioEl.value) return;
+
+	if (!sourceNode.value) {
+		audioContext.value = new (window.AudioContext || window.webkitAudioContext)();
+		sourceNode.value = audioContext.value.createMediaElementSource(audioEl.value);
+
+		gainNode.value = audioContext.value.createGain();
+		analyserNode.value = audioContext.value.createAnalyser();
+
+		sourceNode.value.connect(analyserNode.value);
+		sourceNode.value.connect(gainNode.value);
+
+		gainNode.value.connect(audioContext.value.destination);
+
+		analyserNode.value.fftSize = 32;
+		
+		gainNode.value.gain.setValueAtTime(volume.value, audioContext.value.currentTime);
+	}
 
 	if (isPlaying.value) {
 		audioEl.value.pause();
@@ -332,6 +353,7 @@ function init() {
 				oncePlayed.value = false;
 				isActuallyPlaying.value = false;
 				isPlaying.value = false;
+				userRippleEffect.value?.pauseAnimation();
 			});
 
 			durationMs.value = audioEl.value.duration * 1000;
@@ -340,8 +362,7 @@ function init() {
 					durationMs.value = audioEl.value.duration * 1000;
 				}
 			});
-
-			audioEl.value.volume = volume.value;
+			gainNode.value?.gain.setValueAtTime(volume.value, audioContext.value?.currentTime);
 		}
 	}, {
 		immediate: true,
@@ -349,7 +370,7 @@ function init() {
 }
 
 watch(volume, (to) => {
-	if (audioEl.value) audioEl.value.volume = to;
+	if (audioEl.value) gainNode.value?.gain.setValueAtTime(to, audioContext.value?.currentTime);
 });
 
 watch(speed, (to) => {

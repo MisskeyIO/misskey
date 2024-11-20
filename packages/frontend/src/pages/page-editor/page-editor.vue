@@ -31,6 +31,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 				<MkSwitch v-model="alignCenter">{{ i18n.ts._pages.alignCenter }}</MkSwitch>
 
+				<MkSwitch v-model="isPublish">{{ i18n.ts.publish }}</MkSwitch>
+
 				<MkSelect v-model="font">
 					<template #label>{{ i18n.ts._pages.font }}</template>
 					<option value="serif">{{ i18n.ts._pages.fontSerif }}</option>
@@ -98,6 +100,7 @@ const eyeCatchingImageId = ref<string | null>(null);
 const font = ref('sans-serif');
 const content = ref<Misskey.entities.Page['content']>([]);
 const alignCenter = ref(false);
+const isPublish = ref(false);
 const hideTitleWhenPinned = ref(false);
 
 provide('readonly', readonly.value);
@@ -122,6 +125,7 @@ function getSaveOptions() {
 		script: '',
 		hideTitleWhenPinned: hideTitleWhenPinned.value,
 		alignCenter: alignCenter.value,
+		isPublish: isPublish.value,
 		content: content.value,
 		variables: [],
 		eyeCatchingImageId: eyeCatchingImageId.value,
@@ -258,6 +262,7 @@ async function init() {
 		font.value = page.value.font;
 		hideTitleWhenPinned.value = page.value.hideTitleWhenPinned;
 		alignCenter.value = page.value.alignCenter;
+		isPublish.value = page.value.isPublish;
 		content.value = page.value.content;
 		eyeCatchingImageId.value = page.value.eyeCatchingImageId;
 	} else {

@@ -49,7 +49,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		super(meta, paramDef, async (ps, me) => {
 			const query = this.queryService.makePaginationQuery(this.pagesRepository.createQueryBuilder('page'), ps.sinceId, ps.untilId)
 				.andWhere('page.userId = :userId', { userId: ps.userId })
-				.andWhere('page.visibility = \'public\'');
+				.andWhere('page.isPublish = true');
 
 			const pages = await query
 				.limit(ps.limit)

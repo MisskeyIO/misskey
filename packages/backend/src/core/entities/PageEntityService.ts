@@ -99,6 +99,7 @@ export class PageEntityService {
 			hideTitleWhenPinned: page.hideTitleWhenPinned,
 			alignCenter: page.alignCenter,
 			font: page.font,
+			isPublish: page.isPublish,
 			script: page.script,
 			eyeCatchingImageId: page.eyeCatchingImageId,
 			eyeCatchingImage: page.eyeCatchingImageId ? await this.driveFileEntityService.pack(page.eyeCatchingImageId, me) : null,

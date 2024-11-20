@@ -41,7 +41,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const query = this.pagesRepository.createQueryBuilder('page')
-				.where('page.visibility = \'public\'')
+				.where('page.isPublish = true')
 				.andWhere('page.likedCount > 0')
 				.orderBy('page.likedCount', 'DESC');
 

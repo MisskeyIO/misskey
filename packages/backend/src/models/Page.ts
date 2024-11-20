@@ -97,20 +97,11 @@ export class MiPage {
 	})
 	public script: string;
 
-	/**
-	 * public ... 公開
-	 * followers ... フォロワーのみ
-	 * specified ... visibleUserIds で指定したユーザーのみ
-	 */
-	@Column('enum', { enum: ['public', 'followers', 'specified'] })
-	public visibility: 'public' | 'followers' | 'specified';
-
 	@Index()
-	@Column({
-		...id(),
-		array: true, default: '{}',
+	@Column('boolean', {
+		default: true,
 	})
-	public visibleUserIds: MiUser['id'][];
+	public isPublish: boolean;
 
 	@Column('integer', {
 		default: 0,

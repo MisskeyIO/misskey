@@ -65,6 +65,7 @@ export const paramDef = {
 		variables: { type: 'array', items: {
 			type: 'object', additionalProperties: true,
 		} },
+		isPublish: { type: 'boolean' },
 		script: { type: 'string' },
 		eyeCatchingImageId: { type: 'string', format: 'misskey:id', nullable: true },
 		font: { type: 'string', enum: ['serif', 'sans-serif'] },
@@ -123,6 +124,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				content: ps.content,
 				variables: ps.variables,
 				script: ps.script,
+				isPublish: ps.isPublish,
 				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 				alignCenter: ps.alignCenter === undefined ? page.alignCenter : ps.alignCenter,
 				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing

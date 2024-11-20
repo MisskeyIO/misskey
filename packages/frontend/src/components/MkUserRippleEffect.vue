@@ -24,6 +24,7 @@ const vertexShader = `
         }`;
 
 const fragmentShader = `
+        precision mediump float;
         uniform float time;
         uniform float enableAudio;
         uniform sampler2D tAudioData;
@@ -35,7 +36,7 @@ const fragmentShader = `
         const float PI  = 3.141592653589793;
         const float PI2 = PI * 2.;
         const float oneStep = 0.2;
-        const float minSize = 0.2;
+        const float minSize = 0.3;
         const float speed1 = 7.0;
         const float speed2 = 8.0;
 
@@ -54,9 +55,9 @@ const fragmentShader = `
             return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
         }
 
-        float circle(vec2 uv, float audioA, float audioB, float angle, float oneStep, float minSize, float enableAudio) {
+        float circle(vec2 uv, float audioA, float audioB, float angle, float oneStep, float minSize) {
             float ratioInStep = fract(angle / oneStep);
-            float size = max(mix(audioA, audioB, ratioInStep), 0.4);
+            float size = max(mix(audioA, audioB, ratioInStep), 0.3);
             return step(length(uv), smoothstep(0.1, 0.7, pow(sin(ratioInStep - 0.5), 2.0) + 0.5) * (abs(sin(size)) * 0.85 + minSize));
         }
 
@@ -85,10 +86,8 @@ const fragmentShader = `
                     angle = fract(angleBase - (sin(time / 1000.0 * speed2 + n) + 1.0));
                 }
 
-                if (enableAudio < 0.5) {
+                if (enableAudio < 0.1) {
                     // 再生前の状態
-                    float audio = 0.1 + 0.05 * noise(vec2(time, 0.0) / 100.0 * float(i));
-                    shape += circle(uv, audio, audio, angle, oneStep, minSize, enableAudio);
                 } else {
                     // 再生中の状態
                     // 分解能ごとに丸めた角度を取得
@@ -104,7 +103,7 @@ const fragmentShader = `
                     float audio2b = texture2D(tAudioData, vec2(1.0 - roundedAngle - oneStep), 0.0).r;
                     float audioB = mix(audio1b, audio2b, 0.5);
 
-                    shape += circle(uv, audioA, audioB, angle, oneStep, minSize, enableAudio);
+                    shape += circle(uv, audioA, audioB, angle, oneStep, minSize * enableAudio);
                 }
             }
 
@@ -181,7 +180,6 @@ const initWebGL = () => {
 
 let data;
 const audioVisualizerPlay = () => {
-	uniforms.enableAudio.value = isPaused.value ? 0 : 1;
 	if (props.analyser) {
 		data = new Uint8Array(props.analyser.frequencyBinCount);
 		props.analyser.getByteFrequencyData(data);
@@ -198,14 +196,54 @@ const animate = () => {
 
 const pauseAnimation = () => {
 	isPaused.value = true;
+	setEnableAudio(0);
 };
 
 const resumeAnimation = () => {
 	isPaused.value = false;
+	setEnableAudio(1);
 };
 
-onMounted(() => {
-	initWebGL();
+let targetValue = 0;
+let currentValue = 0;
+const step = 0.05;
+
+const updateEnableAudio = () => {
+	if (currentValue < targetValue) {
+		currentValue = Math.min(currentValue + step, targetValue);
+	} else if (currentValue > targetValue) {
+		currentValue = Math.max(currentValue - step, targetValue);
+	}
+	uniforms.enableAudio.value = currentValue;
+
+	if (currentValue !== targetValue) {
+		requestAnimationFrame(updateEnableAudio);
+	}
+};
+
+const setEnableAudio = (value: number) => {
+	targetValue = value;
+	requestAnimationFrame(updateEnableAudio);
+};
+
+const onResize = () => {
+	const parent = container.value ?? { offsetWidth: 0 };
+	width = parent.offsetWidth;
+	height = Math.floor(width * 9 / 16);
+	camera.left = width / -2;
+	camera.right = width / 2;
+	camera.top = height / 2;
+	camera.bottom = height / -2;
+	camera.updateProjectionMatrix();
+	renderer.setSize(width, height);
+	uniforms.resolution.value.set(width, height);
+};
+
+onMounted(async () => {
+	nextTick().then(() => {
+		initWebGL();
+		window.addEventListener('resize', onResize);
+	});
 });
 
 onUnmounted(() => {

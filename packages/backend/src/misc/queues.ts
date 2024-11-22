@@ -2,16 +2,16 @@ import { EventEmitter } from 'node:events';
 import * as Bull from 'bullmq';
 
 export class Queues<DataType = any, ResultType = any, NameType extends string = string> {
-	public readonly queues: ReadonlyArray<Bull.Queue<DataType, ResultType, NameType>>;
+	public readonly queues: ReadonlyArray<Bull.Queue<void, void, string, DataType, ResultType, NameType>>;
 
-	constructor(queues: Bull.Queue<DataType, ResultType, NameType>[]) {
+	constructor(queues: Bull.Queue<void, void, string, DataType, ResultType, NameType>[]) {
 		if (queues.length === 0) {
 			throw new Error('queues cannot be empty.');
 		}
 		this.queues = queues;
 	}
 
-	get randomQueue(): Bull.Queue<DataType, ResultType, NameType> {
+	get randomQueue(): Bull.Queue<void, void, string, DataType, ResultType, NameType> {
 		return this.queues[Math.floor(Math.random() * this.queues.length)];
 	}
 

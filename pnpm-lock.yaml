@@ -1054,8 +1054,8 @@ importers:
         specifier: 2.1.5
         version: 2.1.5(@types/node@22.9.1)(happy-dom@15.11.6)(jsdom@25.0.1(bufferutil@4.0.8)(utf-8-validate@6.0.5))(msw@2.6.5(@types/node@22.9.1)(typescript@5.6.3))(sass@1.81.0)(terser@5.36.0)
       vitest-fetch-mock:
-        specifier: 0.4.2
-        version: 0.4.2(vitest@2.1.5(@types/node@22.9.1)(happy-dom@15.11.6)(jsdom@25.0.1(bufferutil@4.0.8)(utf-8-validate@6.0.5))(msw@2.6.5(@types/node@22.9.1)(typescript@5.6.3))(sass@1.81.0)(terser@5.36.0))
+        specifier: 0.3.0
+        version: 0.3.0(encoding@0.1.13)(vitest@2.1.5(@types/node@22.9.1)(happy-dom@15.11.6)(jsdom@25.0.1(bufferutil@4.0.8)(utf-8-validate@6.0.5))(msw@2.6.5(@types/node@22.9.1)(typescript@5.6.3))(sass@1.81.0)(terser@5.36.0))
       vue-component-type-helpers:
         specifier: 2.1.10
         version: 2.1.10
@@ -9585,9 +9585,9 @@ packages:
       terser:
         optional: true
 
-  vitest-fetch-mock@0.4.2:
-    resolution: {integrity: sha512-MuN/TCAvvUs9sLMdOPKqdXEUOD0E5cNW/LN7Tro3KkrLBsvUaH7iQWcznNUU4ml+GqX6ZbNguDmFQ2tliKqhCg==}
-    engines: {node: '>=18.0.0'}
+  vitest-fetch-mock@0.3.0:
+    resolution: {integrity: sha512-g6upWcL8/32fXL43/5f4VHcocuwQIi9Fj5othcK9gPO8XqSEGtnIZdenr2IaipDr61ReRFt+vaOEgo8jiUUX5w==}
+    engines: {node: '>=14.14.0'}
     peerDependencies:
       vitest: '>=2.0.0'
 
@@ -19963,9 +19963,12 @@ snapshots:
       sass: 1.81.0
       terser: 5.36.0
 
-  vitest-fetch-mock@0.4.2(vitest@2.1.5(@types/node@22.9.1)(happy-dom@15.11.6)(jsdom@25.0.1(bufferutil@4.0.8)(utf-8-validate@6.0.5))(msw@2.6.5(@types/node@22.9.1)(typescript@5.6.3))(sass@1.81.0)(terser@5.36.0)):
+  vitest-fetch-mock@0.3.0(encoding@0.1.13)(vitest@2.1.5(@types/node@22.9.1)(happy-dom@15.11.6)(jsdom@25.0.1(bufferutil@4.0.8)(utf-8-validate@6.0.5))(msw@2.6.5(@types/node@22.9.1)(typescript@5.6.3))(sass@1.81.0)(terser@5.36.0)):
     dependencies:
+      cross-fetch: 4.0.0(encoding@0.1.13)
       vitest: 2.1.5(@types/node@22.9.1)(happy-dom@15.11.6)(jsdom@25.0.1(bufferutil@4.0.8)(utf-8-validate@6.0.5))(msw@2.6.5(@types/node@22.9.1)(typescript@5.6.3))(sass@1.81.0)(terser@5.36.0)
+    transitivePeerDependencies:
+      - encoding
 
   vitest@2.1.5(@types/node@22.9.1)(happy-dom@15.11.6)(jsdom@25.0.1(bufferutil@4.0.8)(utf-8-validate@6.0.5))(msw@2.6.5(@types/node@22.9.1)(typescript@5.6.3))(sass@1.81.0)(terser@5.36.0):
     dependencies:

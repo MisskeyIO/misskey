@@ -135,7 +135,7 @@
 		"storybook-addon-misskey-theme": "github:misskey-dev/storybook-addon-misskey-theme",
 		"vite-plugin-turbosnap": "1.0.3",
 		"vitest": "2.1.5",
-		"vitest-fetch-mock": "0.4.2",
+		"vitest-fetch-mock": "0.3.0",
 		"vue-component-type-helpers": "2.1.10",
 		"vue-eslint-parser": "9.4.3",
 		"vue-tsc": "2.1.10"

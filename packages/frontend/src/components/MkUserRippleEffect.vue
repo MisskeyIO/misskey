@@ -35,8 +35,8 @@ const fragmentShader = `
 
         const float PI  = 3.141592653589793;
         const float PI2 = PI * 2.;
-        const float oneStep = 0.2;
-        const float minSize = 0.3;
+        const float oneStep = 0.125;
+        const float minSize = 0.35;
         const float speed1 = 7.0;
         const float speed2 = 8.0;
 
@@ -57,8 +57,12 @@ const fragmentShader = `
 
         float circle(vec2 uv, float audioA, float audioB, float angle, float oneStep, float minSize) {
             float ratioInStep = fract(angle / oneStep);
-            float size = max(mix(audioA, audioB, ratioInStep), 0.3);
-            return step(length(uv), smoothstep(0.1, 0.7, pow(sin(ratioInStep - 0.5), 2.0) + 0.5) * (abs(sin(size)) * 0.85 + minSize));
+            float size = max(mix(audioA, audioB, ratioInStep), 0.0);
+
+            return step(length(uv), smoothstep(0.1, 0.7, pow(sin(ratioInStep - 0.5), 2.0) + 0.5) * smoothstep(0.2, 1.0, (size)) + minSize );
+
+            // return step(length(uv), smoothstep(0.1, 0.65, pow(sin(ratioInStep - 0.5), 2.0) + 0.5) * smoothstep(0.1, 1.0, (abs(sin(size))) * 1.0 ));
+            // return step(length(uv),(abs(sin(size)) * 0.85 + minSize));
         }
 
         float stepValue(float value, float stepSize) {
@@ -79,11 +83,9 @@ const fragmentShader = `
             for (int i = 0; i < int(2); i++) {
                 // 回転
                 if (i == 1) {
-                    float n = noise(vec2(time, float(i)) / 1000.0);
-                    angle = fract(angleBase + (sin(time / 1000.0 * speed1 + n) + 1.0));
+                    angle = fract(angleBase + (sin(time / 1000.0 * speed1) + 1.0));
                 } else {
-                    float n = noise(vec2(time, float(i)) / 1000.0);
-                    angle = fract(angleBase - (sin(time / 1000.0 * speed2 + n) + 1.0));
+                    angle = fract(angleBase - (sin(time / 1000.0 * speed2) + 1.0));
                 }
 
                 if (enableAudio < 0.1) {
@@ -120,7 +122,7 @@ const fragmentShader = `
             vec3 backColor = mix(vec3(shape), pickColor, 0.9);
             vec3 mixedTex = backColor;
             if (texUv.x >= 0. && texUv.x <= 1. && texUv.y >= 0. && texUv.y <= 1.) {
-                mixedTex = mix(profileTex, backColor, maskTex.r);
+               mixedTex = mix(profileTex, backColor, maskTex.r);
             }
 
             gl_FragColor = vec4(mixedTex, 1.0);
@@ -128,7 +130,7 @@ const fragmentShader = `
 `;
 
 const isPaused = ref(true);
-const fftSize = 32;
+const fftSize = 64;
 
 let scene, camera, renderer, width, height, uniforms, texture, maskTexture;
 

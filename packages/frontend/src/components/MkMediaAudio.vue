@@ -284,8 +284,8 @@ function togglePlayPause() {
 
 		gainNode.value.connect(audioContext.value.destination);
 
-		analyserNode.value.fftSize = 32;
-		
+		analyserNode.value.fftSize = 64;
+
 		gainNode.value.gain.setValueAtTime(volume.value, audioContext.value.currentTime);
 	}
 

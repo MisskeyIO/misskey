@@ -36,7 +36,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 
 	<div v-else>
-		<MkUserRippleEffect v-if="user" ref="userRippleEffect" :audioEl="audioEl" :analyser="analyserNode" :user="user" :profileImage="user.avatarUrl"/>
+		<MkAudioVisualizer v-if="user" ref="audioVisualizer" :audioEl="audioEl" :analyser="analyserNode" :user="user" :profileImage="user.avatarUrl"/>
 		<div :class="$style.audioControls">
 			<audio
 				ref="audioEl"
@@ -85,8 +85,8 @@ import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import bytes from '@/filters/bytes.js';
 import { hms } from '@/filters/hms.js';
+import MkAudioVisualizer from '@/components/MkAudioVisualizer.vue';
 import MkMediaRange from '@/components/MkMediaRange.vue';
-import MkUserRippleEffect from '@/components/MkUserRippleEffect.vue';
 import { pleaseLogin } from '@/scripts/please-login.js';
 import { $i, iAmModerator } from '@/account.js';
 
@@ -131,7 +131,7 @@ function hasFocus() {
 
 const playerEl = shallowRef<HTMLDivElement>();
 const audioEl = shallowRef<HTMLAudioElement>();
-const userRippleEffect = ref<InstanceType<typeof MkUserRippleEffect>>();
+const audioVisualizer = ref<InstanceType<typeof MkAudioVisualizer>>();
 
 // eslint-disable-next-line vue/no-setup-props-destructure
 const hide = ref((defaultStore.state.nsfw === 'force' || defaultStore.state.dataSaver.media) ? true : (props.audio.isSensitive && defaultStore.state.nsfw !== 'ignore'));
@@ -291,11 +291,11 @@ function togglePlayPause() {
 
 	if (isPlaying.value) {
 		audioEl.value.pause();
-		userRippleEffect.value?.pauseAnimation();
+		audioVisualizer.value?.pauseAnimation();
 		isPlaying.value = false;
 	} else {
 		audioEl.value.play();
-		userRippleEffect.value?.resumeAnimation();
+		audioVisualizer.value?.resumeAnimation();
 		isPlaying.value = true;
 		oncePlayed.value = true;
 	}
@@ -353,7 +353,7 @@ function init() {
 				oncePlayed.value = false;
 				isActuallyPlaying.value = false;
 				isPlaying.value = false;
-				userRippleEffect.value?.pauseAnimation();
+				audioVisualizer.value?.pauseAnimation();
 			});
 
 			durationMs.value = audioEl.value.duration * 1000;

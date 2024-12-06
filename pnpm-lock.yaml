@@ -884,6 +884,9 @@ importers:
       vuedraggable:
         specifier: next
         version: 4.1.0(vue@3.5.12(typescript@5.6.3))
+      webgl-audiovisualizer:
+        specifier: github:tar-bin/webgl-audiovisualizer
+        version: https://codeload.github.com/tar-bin/webgl-audiovisualizer/tar.gz/345b9e82e25a1501749c622790b924658e4914cc
     devDependencies:
       '@misskey-dev/eslint-plugin':
         specifier: 1.0.0
@@ -9719,6 +9722,10 @@ packages:
   web-streams-polyfill@4.0.0:
     resolution: {integrity: sha512-0zJXHRAYEjM2tUfZ2DiSOHAa2aw1tisnnhU3ufD57R8iefL+DcdJyRBRyJpG+NUimDgbTI/lH+gAE1PAvV3Cgw==}
     engines: {node: '>= 8'}
+
+  webgl-audiovisualizer@https://codeload.github.com/tar-bin/webgl-audiovisualizer/tar.gz/345b9e82e25a1501749c622790b924658e4914cc:
+    resolution: {tarball: https://codeload.github.com/tar-bin/webgl-audiovisualizer/tar.gz/345b9e82e25a1501749c622790b924658e4914cc}
+    version: 0.0.0
 
   webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
@@ -20081,6 +20088,8 @@ snapshots:
       - supports-color
 
   web-streams-polyfill@4.0.0: {}
+
+  webgl-audiovisualizer@https://codeload.github.com/tar-bin/webgl-audiovisualizer/tar.gz/345b9e82e25a1501749c622790b924658e4914cc: {}
 
   webidl-conversions@3.0.1: {}
 

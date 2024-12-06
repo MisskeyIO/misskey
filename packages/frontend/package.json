@@ -108,7 +108,7 @@
 		"@types/node": "22.10.0",
 		"@types/punycode": "2.1.4",
 		"@types/sanitize-html": "2.13.0",
-		"@types/three": "^0.170.0",
+		"@types/three": "0.170.0",
 		"@types/throttle-debounce": "5.0.2",
 		"@types/tinycolor2": "1.4.6",
 		"@types/ws": "8.5.13",

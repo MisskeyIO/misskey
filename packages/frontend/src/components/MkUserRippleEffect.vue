@@ -9,6 +9,7 @@ import * as Misskey from 'misskey-js';
 import * as THREE from 'three';
 import vertexShader from '../../node_modules/webgl-audiovisualizer/audiovisial-vertex.shader?raw';
 import fragmentShader from '../../node_modules/webgl-audiovisualizer/audiovisial-fragment.shader?raw';
+import circleMask from '../../node_modules/webgl-audiovisualizer/circlemask.png';
 
 const props = defineProps<{
 	user: Misskey.entities.UserLite;
@@ -49,7 +50,7 @@ const init = () => {
 
 	const loader = new THREE.TextureLoader();
 	texture = loader.load(props.user.avatarUrl ?? '');
-	maskTexture = loader.load('/client-assets/circlemask.png');
+	maskTexture = loader.load(circleMask);
 	uniforms = {
 		enableAudio: {
 			value: 0,
@@ -122,11 +123,6 @@ const resumeAnimation = () => {
 	isPlaying.value = true;
 	renderer.setAnimationLoop(play);
 };
-
-defineExpose({
-	pauseAnimation,
-	resumeAnimation,
-});
 
 const animate = (time) => {
 	if (angle1 >= bufferLength) {

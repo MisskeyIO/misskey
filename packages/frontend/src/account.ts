@@ -5,6 +5,7 @@
 
 import { defineAsyncComponent, reactive, ref } from 'vue';
 import * as Misskey from 'misskey-js';
+import { set as gtagSet, time as gtagTime } from 'vue-gtag';
 import { showSuspendedDialog } from '@/scripts/show-suspended-dialog.js';
 import { i18n } from '@/i18n.js';
 import { miLocalStorage } from '@/local-storage.js';
@@ -14,7 +15,6 @@ import { apiUrl } from '@/config.js';
 import { waiting, popup, popupMenu, success, alert } from '@/os.js';
 import { generateClientTransactionId, misskeyApi } from '@/scripts/misskey-api.js';
 import { unisonReload, reloadChannel } from '@/scripts/unison-reload.js';
-import { set as gtagSet, time as gtagTime } from 'vue-gtag';
 import { instance } from '@/instance.js';
 
 // TODO: 他のタブと永続化されたstateを同期
@@ -340,9 +340,9 @@ export async function openAccountMenu(opts: {
 	}
 }
 
-export function getAccountWithSigninDialog(): Promise<{ id: string, token: string } | null> {
+export function getAccountWithSigninDialog(emailMode = false): Promise<{ id: string, token: string } | null> {
 	return new Promise((resolve) => {
-		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkSigninDialog.vue')), {}, {
+		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkSigninDialog.vue')), { emailMode }, {
 			done: async (res: Misskey.entities.SigninFlowResponse & { finished: true }) => {
 				await addAccount(res.id, res.i);
 				resolve({ id: res.id, token: res.i });

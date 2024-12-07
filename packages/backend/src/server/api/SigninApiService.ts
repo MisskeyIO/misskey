@@ -3,11 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { randomUUID } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 import { IsNull } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type {
+	MiUserProfile,
 	SigninsRepository,
 	UserProfilesRepository,
 	UsersRepository,
@@ -27,7 +29,6 @@ import { RateLimiterService } from './RateLimiterService.js';
 import { SigninService } from './SigninService.js';
 import type { AuthenticationResponseJSON } from '@simplewebauthn/types';
 import type { FastifyReply, FastifyRequest } from 'fastify';
-import { randomUUID } from 'node:crypto';
 
 @Injectable()
 export class SigninApiService {
@@ -121,23 +122,43 @@ export class SigninApiService {
 			return;
 		}
 
+		let user: MiLocalUser | null = null;
+		let profile: MiUserProfile | null = null;
 		// Fetch user
-		const user = await this.usersRepository.findOneBy({
-			usernameLower: username.toLowerCase(),
-			host: IsNull(),
-		}) as MiLocalUser;
+		if (username.includes('@')) {
+			profile = await this.userProfilesRepository.findOneBy({
+				email: username.toLowerCase(),
+				emailVerified: true,
+			}) as MiUserProfile;
 
-		if (user == null) {
+			user = await this.usersRepository.findOneBy({
+				// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+				id: profile?.userId,
+			}) as MiLocalUser;
+		} else {
+			user = await this.usersRepository.findOneBy({
+				usernameLower: username.toLowerCase(),
+				host: IsNull(),
+			}) as MiLocalUser;
+
+			if (user !== null) {
+				profile = await this.userProfilesRepository.findOneByOrFail({
+					userId: user.id,
+				}) as MiUserProfile;
+			}
+		}
+
+		if (user == null || profile == null) {
 			logger.error('No such user.');
-			return error(404, {
-				id: '6cc579cc-885d-43d8-95c2-b8c7fc963280',
+			return error(403, {
+				id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
 			});
 		}
 
 		if (user.isDeleted && user.isSuspended) {
 			logger.error('No such user. (logical deletion)');
-			return error(404, {
-				id: '6cc579cc-885d-43d8-95c2-b8c7fc963280',
+			return error(403, {
+				id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
 			});
 		}
 
@@ -147,8 +168,6 @@ export class SigninApiService {
 				id: 'e03a5f46-d309-4865-9b69-56282d94e1eb',
 			});
 		}
-
-		const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
 
 		// Compare password
 		const same = await bcrypt.compare(password, profile.password!);

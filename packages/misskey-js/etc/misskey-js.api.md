@@ -1776,6 +1776,8 @@ declare namespace entities {
         UsersSearchResponse,
         UsersShowRequest,
         UsersShowResponse,
+        UsersGetTwofactorEnableRequest,
+        UsersGetTwofactorEnableResponse,
         UsersStatsRequest,
         UsersStatsResponse,
         UsersAchievementsRequest,
@@ -3171,6 +3173,12 @@ type UsersGetSkebStatusRequest = operations['users___get-skeb-status']['requestB
 
 // @public (undocumented)
 type UsersGetSkebStatusResponse = operations['users___get-skeb-status']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type UsersGetTwofactorEnableRequest = operations['users___get-twofactor-enable']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type UsersGetTwofactorEnableResponse = operations['users___get-twofactor-enable']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 type UsersListsCreateFromPublicRequest = operations['users___lists___create-from-public']['requestBody']['content']['application/json'];

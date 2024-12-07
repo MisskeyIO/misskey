@@ -3587,6 +3587,15 @@ export type paths = {
      */
     post: operations['users___show'];
   };
+  '/users/get-twofactor-enable': {
+    /**
+     * users/get-twofactor-enable
+     * @description No description provided.
+     *
+     * **Credential required**: *No*
+     */
+    post: operations['users___get-twofactor-enable'];
+  };
   '/users/stats': {
     /**
      * users/stats
@@ -29134,6 +29143,63 @@ export type operations = {
       200: {
         content: {
           'application/json': components['schemas']['UserLite'] | components['schemas']['UserDetailed'] | components['schemas']['UserLite'][] | components['schemas']['UserDetailed'][];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * users/get-twofactor-enable
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  'users___get-twofactor-enable': {
+    requestBody: {
+      content: {
+        'application/json': {
+          email: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            twoFactorEnabled: boolean;
+            usePasswordLessLogin: boolean;
+            securityKeys: boolean;
+          };
         };
       };
       /** @description Client error */

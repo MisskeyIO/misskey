@@ -5318,10 +5318,6 @@ export interface Locale extends ILocale {
      * 選択した項目のみ許可
      */
     "consentSelected": string;
-    /**
-     * 公開
-     */
-    "isPublic": string;
     "_bubbleGame": {
         /**
          * 遊び方

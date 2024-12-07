@@ -177,6 +177,11 @@ export const navbarItemDef = reactive({
 		show: computed(() => $i != null),
 		to: `/@${$i?.username}`,
 	},
+	support: {
+		title: i18n.ts.misskeyIOSupport,
+		icon: 'ti ti-pig-money',
+		to: 'https://go.misskey.io/donate',
+	},
 	cacheClear: {
 		title: i18n.ts.clearCache,
 		icon: 'ti ti-trash',

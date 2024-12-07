@@ -5318,6 +5318,10 @@ export interface Locale extends ILocale {
      * 選択した項目のみ許可
      */
     "consentSelected": string;
+    /**
+     * Misskey.ioに支援する
+     */
+    "misskeyIOSupport": string;
     "_bubbleGame": {
         /**
          * 遊び方

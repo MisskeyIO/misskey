@@ -178,7 +178,7 @@ export const navbarItemDef = reactive({
 		to: `/@${$i?.username}`,
 	},
 	support: {
-		title: i18n.ts.misskeyIOSupport,
+		title: i18n.tsx.supportThisInstance({ name: instance.name ?? host }),
 		icon: 'ti ti-pig-money',
 		to: 'https://go.misskey.io/donate',
 	},

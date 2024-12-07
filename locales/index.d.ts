@@ -9501,6 +9501,18 @@ export interface Locale extends ILocale {
          * 特殊
          */
         "specialBlocks": string;
+        /**
+         * 公開範囲
+         */
+        "visibility": string;
+        /**
+         * 公開
+         */
+        "public": string;
+        /**
+         * 非公開
+         */
+        "private": string;
         "blocks": {
             /**
              * テキスト

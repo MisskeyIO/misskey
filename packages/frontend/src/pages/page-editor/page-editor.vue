@@ -31,12 +31,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 				<MkSwitch v-model="alignCenter">{{ i18n.ts._pages.alignCenter }}</MkSwitch>
 
-				<MkSwitch v-model="isPublish">{{ i18n.ts.publish }}</MkSwitch>
-
 				<MkSelect v-model="font">
 					<template #label>{{ i18n.ts._pages.font }}</template>
 					<option value="serif">{{ i18n.ts._pages.fontSerif }}</option>
 					<option value="sans-serif">{{ i18n.ts._pages.fontSansSerif }}</option>
+				</MkSelect>
+
+				<MkSelect v-model="visibility">
+					<template #label>{{ i18n.ts._pages.visibility }}</template>
+					<option value="public">{{ i18n.ts._pages.public }}</option>
+					<option value="private">{{ i18n.ts._pages.private }}</option>
 				</MkSelect>
 
 				<MkSwitch v-model="hideTitleWhenPinned">{{ i18n.ts._pages.hideTitleWhenPinned }}</MkSwitch>
@@ -98,9 +102,9 @@ const name = ref(Date.now().toString());
 const eyeCatchingImage = ref<Misskey.entities.DriveFile | null>(null);
 const eyeCatchingImageId = ref<string | null>(null);
 const font = ref('sans-serif');
+const visibility = ref('public');
 const content = ref<Misskey.entities.Page['content']>([]);
 const alignCenter = ref(false);
-const isPublish = ref(false);
 const hideTitleWhenPinned = ref(false);
 
 provide('readonly', readonly.value);
@@ -122,10 +126,10 @@ function getSaveOptions() {
 		name: name.value.trim(),
 		summary: summary.value,
 		font: font.value,
+		visibility: visibility.value,
 		script: '',
 		hideTitleWhenPinned: hideTitleWhenPinned.value,
 		alignCenter: alignCenter.value,
-		isPublish: isPublish.value,
 		content: content.value,
 		variables: [],
 		eyeCatchingImageId: eyeCatchingImageId.value,
@@ -260,9 +264,9 @@ async function init() {
 		currentName.value = page.value.name;
 		summary.value = page.value.summary;
 		font.value = page.value.font;
+		visibility.value = page.value.visibility;
 		hideTitleWhenPinned.value = page.value.hideTitleWhenPinned;
 		alignCenter.value = page.value.alignCenter;
-		isPublish.value = page.value.isPublish;
 		content.value = page.value.content;
 		eyeCatchingImageId.value = page.value.eyeCatchingImageId;
 	} else {
@@ -291,8 +295,8 @@ const headerTabs = computed(() => [{
 
 definePageMetadata(() => ({
 	title: props.initPageId ? i18n.ts._pages.editPage
-				: props.initPageName && props.initUser ? i18n.ts._pages.readPage
-				: i18n.ts._pages.newPage,
+	: props.initPageName && props.initUser ? i18n.ts._pages.readPage
+	: i18n.ts._pages.newPage,
 	icon: 'ti ti-pencil',
 }));
 </script>

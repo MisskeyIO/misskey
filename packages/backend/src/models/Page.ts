@@ -97,11 +97,12 @@ export class MiPage {
 	})
 	public script: string;
 
-	@Index()
-	@Column('boolean', {
-		default: true,
-	})
-	public isPublish: boolean;
+	/**
+	 * public ... 公開
+	 * private ... 非公開
+	 */
+	@Column('enum', { enum: ['public', 'private'] })
+	public visibility: 'public' | 'private';
 
 	@Column('integer', {
 		default: 0,

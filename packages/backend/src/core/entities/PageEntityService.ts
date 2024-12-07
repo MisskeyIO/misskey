@@ -99,13 +99,13 @@ export class PageEntityService {
 			hideTitleWhenPinned: page.hideTitleWhenPinned,
 			alignCenter: page.alignCenter,
 			font: page.font,
-			isPublish: page.isPublish,
 			script: page.script,
 			eyeCatchingImageId: page.eyeCatchingImageId,
 			eyeCatchingImage: page.eyeCatchingImageId ? await this.driveFileEntityService.pack(page.eyeCatchingImageId, me) : null,
 			attachedFiles: this.driveFileEntityService.packMany((await Promise.all(attachedFiles)).filter(isNotNull), me),
 			likedCount: page.likedCount,
 			isLiked: meId ? await this.pageLikesRepository.exists({ where: { pageId: page.id, userId: meId } }) : undefined,
+			visibility: page.visibility,
 		});
 	}
 

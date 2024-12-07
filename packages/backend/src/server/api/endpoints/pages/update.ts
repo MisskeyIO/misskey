@@ -71,6 +71,7 @@ export const paramDef = {
 		font: { type: 'string', enum: ['serif', 'sans-serif'] },
 		alignCenter: { type: 'boolean' },
 		hideTitleWhenPinned: { type: 'boolean' },
+		visibility: { type: 'string', enum: ['public', 'private'] },
 	},
 	required: ['pageId', 'title', 'name', 'content', 'variables', 'script'],
 } as const;
@@ -124,13 +125,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				content: ps.content,
 				variables: ps.variables,
 				script: ps.script,
-				isPublish: ps.isPublish,
 				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 				alignCenter: ps.alignCenter === undefined ? page.alignCenter : ps.alignCenter,
 				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 				hideTitleWhenPinned: ps.hideTitleWhenPinned === undefined ? page.hideTitleWhenPinned : ps.hideTitleWhenPinned,
 				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 				font: ps.font === undefined ? page.font : ps.font,
+				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+				visibility: ps.visibility === undefined ? page.visibility : ps.visibility,
 				eyeCatchingImageId: ps.eyeCatchingImageId === null
 					? null
 					: ps.eyeCatchingImageId === undefined

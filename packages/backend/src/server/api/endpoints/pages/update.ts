@@ -65,7 +65,6 @@ export const paramDef = {
 		variables: { type: 'array', items: {
 			type: 'object', additionalProperties: true,
 		} },
-		isPublish: { type: 'boolean' },
 		script: { type: 'string' },
 		eyeCatchingImageId: { type: 'string', format: 'misskey:id', nullable: true },
 		font: { type: 'string', enum: ['serif', 'sans-serif'] },

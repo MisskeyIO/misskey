@@ -101,7 +101,10 @@ export class MiPage {
 	 * public ... 公開
 	 * private ... 非公開
 	 */
-	@Column('enum', { enum: ['public', 'private'] })
+	@Column('enum', {
+		enum: ['public', 'private'],
+		default: 'public',
+	})
 	public visibility: 'public' | 'private';
 
 	@Column('integer', {

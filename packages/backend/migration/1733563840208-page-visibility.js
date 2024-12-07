@@ -6,6 +6,7 @@ export class PageVisibility1733563840208 {
         await queryRunner.query(`CREATE TYPE "public"."page_visibility_enum" AS ENUM('public', 'private')`);
         await queryRunner.query(`ALTER TABLE "page" ALTER COLUMN "visibility" TYPE "public"."page_visibility_enum" USING "visibility"::"text"::"public"."page_visibility_enum"`);
         await queryRunner.query(`DROP TYPE "public"."page_visibility_enum_old"`);
+				await queryRunner.query(`ALTER TABLE "page" ALTER COLUMN "visibility" SET DEFAULT 'public'`);
     }
 
     async down(queryRunner) {
@@ -13,5 +14,6 @@ export class PageVisibility1733563840208 {
         await queryRunner.query(`ALTER TABLE "page" ALTER COLUMN "visibility" TYPE "public"."page_visibility_enum_old" USING "visibility"::"text"::"public"."page_visibility_enum_old"`);
         await queryRunner.query(`DROP TYPE "public"."page_visibility_enum"`);
         await queryRunner.query(`ALTER TYPE "public"."page_visibility_enum_old" RENAME TO "page_visibility_enum"`);
+				await queryRunner.query(`ALTER TABLE "page" ALTER COLUMN "visibility" DROP DEFAULT`);
     }
 }

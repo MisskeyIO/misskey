@@ -249,6 +249,7 @@ const durationMs = ref(0);
 const audioContext = ref<AudioContext | null>(null);
 const sourceNode = ref<MediaElementAudioSourceNode | null>(null);
 const gainNode = ref<GainNode | null>(null);
+const analyserGainNode = ref<GainNode | null>(null);
 const analyserNode = ref<AnalyserNode | null>(null);
 const rangePercent = computed({
 	get: () => {
@@ -276,15 +277,18 @@ function togglePlayPause() {
 		audioContext.value = new (window.AudioContext || window.webkitAudioContext)();
 		sourceNode.value = audioContext.value.createMediaElementSource(audioEl.value);
 
+		analyserGainNode.value = audioContext.value.createGain();
 		gainNode.value = audioContext.value.createGain();
 		analyserNode.value = audioContext.value.createAnalyser();
 
-		sourceNode.value.connect(analyserNode.value);
-		sourceNode.value.connect(gainNode.value);
-
+		sourceNode.value.connect(analyserGainNode.value);
+		analyserGainNode.value.connect(analyserNode.value);
+		analyserNode.value.connect(gainNode.value);
 		gainNode.value.connect(audioContext.value.destination);
 
 		analyserNode.value.fftSize = 2048;
+
+		analyserGainNode.value.gain.setValueAtTime(0.8, audioContext.value.currentTime);
 
 		gainNode.value.gain.setValueAtTime(volume.value, audioContext.value.currentTime);
 	}

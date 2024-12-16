@@ -127,7 +127,7 @@ export class SigninApiService {
 		// Fetch user
 		if (username.includes('@')) {
 			profile = await this.userProfilesRepository.findOneBy({
-				email: username.toLowerCase(),
+				email: username,
 				emailVerified: true,
 			}) as MiUserProfile;
 

@@ -6,7 +6,7 @@
 		"type": "git",
 		"url": "https://github.com/MisskeyIO/misskey.git"
 	},
-	"packageManager": "pnpm@9.14.2",
+	"packageManager": "pnpm@9.15.0",
 	"workspaces": [
 		"packages/frontend",
 		"packages/backend",
@@ -55,6 +55,7 @@
 		"esbuild": "0.24.0",
 		"jpeg-js": "0.4.4",
 		"lodash": "4.17.21",
+		"punycode": "npm:punycode.js@2.3.1",
 		"sharp": "0.33.5",
 		"tough-cookie": "5.0.0",
 		"web-streams-polyfill": "4.0.0"

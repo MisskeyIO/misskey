@@ -116,7 +116,7 @@ export class ApiCallService implements OnApplicationShutdown {
 			return;
 		}
 		this.authenticateService.authenticate(token).then(([user, app]) => {
-			this.call(endpoint, user, app, body, null, request).then((res) => {
+			this.call(endpoint, user, app, body, null, request, reply).then((res) => {
 				if (request.method === 'GET' && endpoint.meta.cacheSec && !token && !user) {
 					reply.header('Cache-Control', `public, max-age=${endpoint.meta.cacheSec}`);
 				}
@@ -168,7 +168,7 @@ export class ApiCallService implements OnApplicationShutdown {
 			this.call(endpoint, user, app, fields, {
 				name: multipartData.filename,
 				path: path,
-			}, request).then((res) => {
+			}, request, reply).then((res) => {
 				this.send(reply, res);
 			}).catch((err: ApiError) => {
 				this.#sendApiError(reply, err);
@@ -239,6 +239,7 @@ export class ApiCallService implements OnApplicationShutdown {
 			path: string;
 		} | null,
 		request: FastifyRequest<{ Body: Record<string, unknown> | undefined, Querystring: Record<string, unknown> }>,
+		reply: FastifyReply,
 	) {
 		const isSecure = user != null && token == null;
 
@@ -372,7 +373,7 @@ export class ApiCallService implements OnApplicationShutdown {
 		}
 
 		// API invoking
-		return await ep.exec(data, user, token, file, request.ip, request.headers).catch((err: Error) => {
+		return await ep.exec(data, user, token, reply, file, request.ip, request.headers).catch((err: Error) => {
 			if (err instanceof ApiError || err instanceof AuthenticationError) {
 				throw err;
 			} else if (err instanceof IdentifiableError) {

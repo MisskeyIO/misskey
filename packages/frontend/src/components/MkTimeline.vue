@@ -23,10 +23,11 @@ import MkNotes from '@/components/MkNotes.vue';
 import MkPullToRefresh from '@/components/MkPullToRefresh.vue';
 import { useStream } from '@/stream.js';
 import * as sound from '@/scripts/sound.js';
-import { $i } from '@/account.js';
+import { $i, iAmModerator } from '@/account.js';
 import { instance } from '@/instance.js';
 import { defaultStore } from '@/store.js';
 import { Paging } from '@/components/MkPagination.vue';
+import { misskeyApiGet } from '@/scripts/misskey-api.js';
 
 const props = withDefaults(defineProps<{
 	src: 'home' | 'local' | 'media' | 'social' | 'global' | 'mentions' | 'directs' | 'list' | 'antenna' | 'channel' | 'role';
@@ -68,7 +69,12 @@ const tlComponent = shallowRef<InstanceType<typeof MkNotes>>();
 
 let tlNotesCount = 0;
 
-function prepend(note) {
+async function prepend(data) {
+	let note = data;
+	if (data.idOnly) {
+		note = await misskeyApiGet("notes/show", { noteId: data.id });
+	}
+
 	if (tlComponent.value == null) return;
 
 	tlNotesCount++;
@@ -89,6 +95,7 @@ function prepend(note) {
 let connection: Misskey.ChannelConnection | null = null;
 let connection2: Misskey.ChannelConnection | null = null;
 let paginationQuery: Paging | null = null;
+const idOnly = !iAmModerator;
 
 const stream = useStream();
 
@@ -97,11 +104,13 @@ function connectChannel() {
 		if (props.antenna == null) return;
 		connection = stream.useChannel('antenna', {
 			antennaId: props.antenna,
+			idOnly: idOnly,
 		});
 	} else if (props.src === 'home') {
 		connection = stream.useChannel('homeTimeline', {
 			withRenotes: props.withRenotes,
 			withFiles: props.onlyFiles ? true : undefined,
+			idOnly: idOnly,
 		});
 		connection2 = stream.useChannel('main');
 	} else if (props.src === 'local') {
@@ -109,23 +118,27 @@ function connectChannel() {
 			withRenotes: props.withRenotes,
 			withReplies: props.withReplies,
 			withFiles: props.onlyFiles ? true : undefined,
+			idOnly: idOnly,
 		});
 	} else if (props.src === 'media') {
 		connection = stream.useChannel('hybridTimeline', {
 			withRenotes: props.withRenotes,
 			withReplies: props.withReplies,
 			withFiles: true,
+			idOnly: idOnly,
 		});
 	} else if (props.src === 'social') {
 		connection = stream.useChannel('hybridTimeline', {
 			withRenotes: props.withRenotes,
 			withReplies: props.withReplies,
 			withFiles: props.onlyFiles ? true : undefined,
+			idOnly: idOnly,
 		});
 	} else if (props.src === 'global') {
 		connection = stream.useChannel('globalTimeline', {
 			withRenotes: props.withRenotes,
 			withFiles: props.onlyFiles ? true : undefined,
+			idOnly: idOnly,
 		});
 	} else if (props.src === 'mentions') {
 		connection = stream.useChannel('main');
@@ -144,16 +157,19 @@ function connectChannel() {
 			withRenotes: props.withRenotes,
 			withFiles: props.onlyFiles ? true : undefined,
 			listId: props.list,
+			idOnly: idOnly,
 		});
 	} else if (props.src === 'channel') {
 		if (props.channel == null) return;
 		connection = stream.useChannel('channel', {
 			channelId: props.channel,
+			idOnly: idOnly,
 		});
 	} else if (props.src === 'role') {
 		if (props.role == null) return;
 		connection = stream.useChannel('roleTimeline', {
 			roleId: props.role,
+			idOnly: idOnly,
 		});
 	}
 	if (props.src !== 'directs' && props.src !== 'mentions') connection?.on('note', prepend);

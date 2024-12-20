@@ -104,7 +104,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private loggerService: LoggerService,
 		private driveService: DriveService,
 	) {
-		super(meta, paramDef, async (ps, me, _, file, cleanup, ip, headers) => {
+		super(meta, paramDef, async (ps, me, _, reply, file, cleanup, ip, headers) => {
 			const logger = this.loggerService.getLogger('api:drive:files:create');
 
 			if (!file) {

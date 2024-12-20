@@ -49,7 +49,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private loggerService: LoggerService,
 		private userEntityService: UserEntityService,
 	) {
-		super(meta, paramDef, async (ps, user, token, _file, _cleanup, ip, headers) => {
+		super(meta, paramDef, async (ps, user, token, reply, _file, _cleanup, ip, headers) => {
 			const isSecure = token == null;
 
 			const logger = this.loggerService.getLogger('api:account:i');

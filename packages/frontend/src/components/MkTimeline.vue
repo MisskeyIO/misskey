@@ -18,6 +18,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed, watch, onUnmounted, provide, shallowRef } from 'vue';
+import { time as gtagTime } from 'vue-gtag';
 import * as Misskey from 'misskey-js';
 import MkNotes from '@/components/MkNotes.vue';
 import MkPullToRefresh from '@/components/MkPullToRefresh.vue';
@@ -27,7 +28,7 @@ import { $i, iAmModerator } from '@/account.js';
 import { instance } from '@/instance.js';
 import { defaultStore } from '@/store.js';
 import { Paging } from '@/components/MkPagination.vue';
-import { misskeyApiGet } from '@/scripts/misskey-api.js';
+import { generateClientTransactionId, misskeyApiGet } from '@/scripts/misskey-api.js';
 
 const props = withDefaults(defineProps<{
 	src: 'home' | 'local' | 'media' | 'social' | 'global' | 'mentions' | 'directs' | 'list' | 'antenna' | 'channel' | 'role';
@@ -70,17 +71,34 @@ const tlComponent = shallowRef<InstanceType<typeof MkNotes>>();
 let tlNotesCount = 0;
 
 async function prepend(data) {
+	if (tlComponent.value == null) return;
+
 	let note = data;
 
 	// チェックするプロパティはなんでも良い
 	// idOnlyが有効でid以外が存在しない場合は取得する
 	if (!data.visibility) {
-		const res = await fetch(`/notes/${data.id}.json`);
+		const initiateTime = Date.now();
+		const res = await window.fetch(`/notes/${data.id}.json`, {
+			method: 'GET',
+			credentials: 'omit',
+			headers: {
+				'Authorization': 'anonymous',
+				'X-Client-Transaction-Id': generateClientTransactionId('misskey'),
+			},
+		}).then(res => {
+			if (instance.googleAnalyticsId) {
+				gtagTime({
+					name: 'api-get',
+					event_category: `/notes/${data.id}.json`,
+					value: Date.now() - initiateTime,
+				});
+			}
+			return res;
+		});
 		if (!res.ok) return;
 		note = await res.json();
 	}
-
-	if (tlComponent.value == null) return;
 
 	tlNotesCount++;
 

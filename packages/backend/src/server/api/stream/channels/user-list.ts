@@ -132,10 +132,10 @@ class UserListChannel extends Channel {
 
 		if (this.idOnly && ['public', 'home'].includes(note.visibility)) {
 			const idOnlyNote = { id: note.id };
-			this.send("note", idOnlyNote);
+			this.send('note', idOnlyNote);
 		} else {
 			this.connection.cacheNote(note);
-			this.send("note", note);
+			this.send('note', note);
 		}
 	}
 

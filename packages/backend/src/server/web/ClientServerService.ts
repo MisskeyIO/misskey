@@ -621,6 +621,7 @@ export class ClientServerService {
 				id: request.params.note,
 				visibility: In(['public', 'home']),
 			});
+
 			if (note) {
 				try {
 					const _note = await this.noteEntityService.pack(note, null);
@@ -628,10 +629,34 @@ export class ClientServerService {
 					reply.header('Cache-Control', 'public, max-age=600');
 					return reply.send(_note);
 				} catch (err) {
-					return reply.status(500).send({ error: 'Internal Server Error' });
+					const errId = (err as IdentifiableError).id ?? randomUUID();
+					if (errId === '85ab9bd7-3a41-4530-959d-f07073900109') {
+						reply.code(403);
+					} else {
+						reply.code(500);
+					}
+
+					this.clientLoggerService.logger.error(`Internal error occurred in ${request.routeOptions.url}: ${err.message}`, {
+						path: request.routeOptions.url,
+						params: request.params,
+						query: request.query,
+						id: errId,
+						error: err,
+					});
+
+					reply.header('Cache-Control', 'max-age=10, must-revalidate');
+					return reply.send({
+						error: {
+							message: err.message ?? 'Internal server error',
+							code: err.code ?? 'INTERNAL_SERVER_ERROR',
+							id: errId,
+							kind: 'server',
+						},
+					});
 				}
 			} else {
-				return reply.status(404).send({ error: 'Data not found' });
+				reply.code(404);
+				return;
 			}
 		});
 

@@ -69,7 +69,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private driveFileEntityService: DriveFileEntityService,
 		private globalEventService: GlobalEventService,
 	) {
-		super(meta, paramDef, async (ps, me, _token, reply, _file, _cleanup, ip, headers) => {
+		super(meta, paramDef, async (ps, me, _token, _file, _cleanup, ip, headers) => {
 			const logger = this.loggerService.getLogger('api:drive:files:upload-from-url');
 			const hash = createHash('sha256').update(`${ps.folderId}:${ps.url}:${ps.isSensitive}`).digest('base64');
 			logger.setContext({ userId: me.id, hash, ip, headers });

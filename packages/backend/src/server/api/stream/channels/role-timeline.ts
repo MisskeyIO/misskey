@@ -73,7 +73,7 @@ class RoleTimelineChannel extends Channel {
 				}
 			}
 
-			if (this.idOnly && !["followers", "specified"].includes(note.visibility)) {
+			if (this.idOnly && ['public', 'home'].includes(note.visibility)) {
 				const idOnlyNote = { id: note.id, idOnly: true };
 				this.send("note", idOnlyNote);
 			} else {

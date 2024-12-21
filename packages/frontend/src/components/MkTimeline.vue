@@ -72,7 +72,9 @@ let tlNotesCount = 0;
 async function prepend(data) {
 	let note = data;
 	if (data.idOnly) {
-		note = await misskeyApiGet("notes/show", { noteId: data.id });
+		const res = await fetch(`/notes/${data.id}.json`);
+		if (!res.ok) return;
+		note = await res.json();
 	}
 
 	if (tlComponent.value == null) return;

@@ -616,6 +616,25 @@ export class ClientServerService {
 			}
 		});
 
+		fastify.get<{ Params: { note: string; } }>('/notes/:note.json', async (request, reply) => {
+			const note = await this.notesRepository.findOneBy({
+				id: request.params.note,
+				visibility: In(['public', 'home']),
+			});
+			if (note) {
+				try {
+					const _note = await this.noteEntityService.pack(note, null);
+					reply.header('Content-Type', 'application/json; charset=utf-8');
+					reply.header('Cache-Control', 'public');
+					return reply.send(_note);
+				} catch (err) {
+					return reply.status(500).send({ error: 'Internal Server Error' });
+				}
+			} else {
+				return reply.status(404).send({ error: 'Data not found' });
+			}
+		});
+
 		// Page
 		fastify.get<{ Params: { user: string; page: string; } }>('/@:user/pages/:page', async (request, reply) => {
 			const { username, host } = Acct.parse(request.params.user);

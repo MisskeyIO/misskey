@@ -625,7 +625,7 @@ export class ClientServerService {
 				try {
 					const _note = await this.noteEntityService.pack(note, null);
 					reply.header('Content-Type', 'application/json; charset=utf-8');
-					reply.header('Cache-Control', 'public');
+					reply.header('Cache-Control', 'public, max-age=600');
 					return reply.send(_note);
 				} catch (err) {
 					return reply.status(500).send({ error: 'Internal Server Error' });

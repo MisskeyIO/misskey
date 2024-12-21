@@ -12,9 +12,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</MkInfo>
 		<div v-if="!totpLogin" class="normal-signin _gaps_m">
 			<MkInput v-model="username" :debounce="true" :placeholder="loginWithEmailAddress ? i18n.ts.emailAddress : i18n.ts.username" type="text" :pattern="loginWithEmailAddress ? '^[a-zA-Z0-9_@.]+$' : '^[a-zA-Z0-9_]+$'" :spellcheck="false" :autocomplete="loginWithEmailAddress ? 'email webauthn' : 'username webauthn'" autofocus required data-cy-signin-username @update:modelValue="onUsernameChange">
-				<template v-if="!loginWithEmailAddress" #prefix>@</template>
+				<template #prefix>
+					<i v-if="loginWithEmailAddress" class="ti ti-mail"></i>
+					<span v-else>@</span>
+				</template>
 				<template v-if="!loginWithEmailAddress" #suffix>@{{ host }}</template>
-				<template v-if="loginWithEmailAddress" #prefix><i class="ti ti-mail"></i></template>
 				<template #caption>
 					<button class="_textButton" type="button" tabindex="-1" @click="loginWithEmailAddress = !loginWithEmailAddress">{{ loginWithEmailAddress ? i18n.ts.usernameLogin : i18n.ts.emailAddressLogin }}</button>
 				</template>

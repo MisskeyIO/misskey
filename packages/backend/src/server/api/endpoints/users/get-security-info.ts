@@ -57,7 +57,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					twoFactorEnabled: false,
 					usePasswordLessLogin: false,
 					securityKeys: false,
-				}
+				};
 			}
 
 			return {

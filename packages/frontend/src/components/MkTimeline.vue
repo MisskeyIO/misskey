@@ -71,7 +71,10 @@ let tlNotesCount = 0;
 
 async function prepend(data) {
 	let note = data;
-	if (data.idOnly) {
+
+	// チェックするプロパティはなんでも良い
+	// idOnlyが有効でid以外が存在しない場合は取得する
+	if (!data.visibility) {
 		const res = await fetch(`/notes/${data.id}.json`);
 		if (!res.ok) return;
 		note = await res.json();

@@ -14,7 +14,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template #header>{{ i18n.ts.login }}</template>
 
 	<MkSpacer :marginMin="20" :marginMax="28">
-		<MkSignin :autoSet="autoSet" :message="message" @login="onLogin"/>
+		<MkSignin :autoSet="autoSet" :message="message" :emailMode="emailMode" @login="onLogin" @close="onClose"/>
 	</MkSpacer>
 </MkModalWindow>
 </template>
@@ -27,10 +27,12 @@ import { i18n } from '@/i18n.js';
 
 withDefaults(defineProps<{
 	autoSet?: boolean;
-	message?: string,
+	message?: string;
+	emailMode?: boolean;
 }>(), {
 	autoSet: false,
 	message: '',
+	emailMode: false,
 });
 
 const emit = defineEmits<{

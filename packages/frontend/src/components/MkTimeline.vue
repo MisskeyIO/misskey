@@ -28,7 +28,7 @@ import { $i, iAmModerator } from '@/account.js';
 import { instance } from '@/instance.js';
 import { defaultStore } from '@/store.js';
 import { Paging } from '@/components/MkPagination.vue';
-import { generateClientTransactionId, misskeyApiGet } from '@/scripts/misskey-api.js';
+import { generateClientTransactionId } from '@/scripts/misskey-api.js';
 
 const props = withDefaults(defineProps<{
 	src: 'home' | 'local' | 'media' | 'social' | 'global' | 'mentions' | 'directs' | 'list' | 'antenna' | 'channel' | 'role';

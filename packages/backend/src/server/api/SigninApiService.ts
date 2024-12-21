@@ -122,33 +122,25 @@ export class SigninApiService {
 			return;
 		}
 
-		let user: MiLocalUser | null = null;
-		let profile: MiUserProfile | null = null;
 		// Fetch user
-		if (username.includes('@')) {
-			profile = await this.userProfilesRepository.findOneBy({
+		const profile = await this.userProfilesRepository.findOne({
+			relations: ['user'],
+			where: username.includes('@') ? {
 				email: username,
 				emailVerified: true,
-			}) as MiUserProfile;
-
-			user = await this.usersRepository.findOneBy({
-				// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-				id: profile?.userId,
-			}) as MiLocalUser;
-		} else {
-			user = await this.usersRepository.findOneBy({
-				usernameLower: username.toLowerCase(),
-				host: IsNull(),
-			}) as MiLocalUser;
-
-			if (user !== null) {
-				profile = await this.userProfilesRepository.findOneByOrFail({
-					userId: user.id,
-				}) as MiUserProfile;
+				user: {
+					host: IsNull(),
+				}
+			} : {
+				user: {
+					usernameLower: username.toLowerCase(),
+					host: IsNull(),
+				}
 			}
-		}
+		});
+		const user = (profile?.user as MiLocalUser) ?? null;
 
-		if (user == null || profile == null) {
+		if (!user || !profile) {
 			logger.error('No such user.');
 			return error(403, {
 				id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',

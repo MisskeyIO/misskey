@@ -4172,7 +4172,7 @@ declare module '../api.js' {
      * 
      * **Credential required**: *No*
      */
-    request<E extends 'users/get-twofactor-enable', P extends Endpoints[E]['req']>(
+    request<E extends 'users/get-security-info', P extends Endpoints[E]['req']>(
       endpoint: E,
       params: P,
       credential?: string | null,

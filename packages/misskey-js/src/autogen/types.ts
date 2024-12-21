@@ -3587,14 +3587,14 @@ export type paths = {
      */
     post: operations['users___show'];
   };
-  '/users/get-twofactor-enable': {
+  '/users/get-security-info': {
     /**
-     * users/get-twofactor-enable
+     * users/get-security-info
      * @description No description provided.
      *
      * **Credential required**: *No*
      */
-    post: operations['users___get-twofactor-enable'];
+    post: operations['users___get-security-info'];
   };
   '/users/stats': {
     /**
@@ -29184,16 +29184,17 @@ export type operations = {
     };
   };
   /**
-   * users/get-twofactor-enable
+   * users/get-security-info
    * @description No description provided.
    *
    * **Credential required**: *No*
    */
-  'users___get-twofactor-enable': {
+  'users___get-security-info': {
     requestBody: {
       content: {
         'application/json': {
           email: string;
+          password: string;
         };
       };
     };
@@ -29228,6 +29229,12 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description To many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };

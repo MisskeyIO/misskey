@@ -1,17 +1,20 @@
-/*
- * SPDX-FileCopyrightText: syuilo and misskey-project
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { Inject, Injectable } from '@nestjs/common';
 import type { UserProfilesRepository, UserSecurityKeysRepository } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
+import bcrypt from 'bcryptjs';
+import ms from 'ms';
 
 export const meta = {
 	tags: ['users'],
 
 	requireCredential: false,
+
+	limit: {
+		duration: ms('1hour'),
+		max: 30,
+	},
+
 	res: {
 		type: 'object',
 		properties: {
@@ -28,8 +31,9 @@ export const paramDef = {
 	type: 'object',
 	properties: {
 		email: { type: 'string' },
+		password: { type: 'string' },
 	},
-	required: ['email'],
+	required: ['email', 'password'],
 } as const;
 
 @Injectable()
@@ -42,22 +46,24 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private userSecurityKeysRepository: UserSecurityKeysRepository,
 	) {
 		super(meta, paramDef, async (ps, me) => {
-			const userProfile = await this.userProfilesRepository.findOneBy({
-				email: ps.email,
-			});
+			const profile = await this.userProfilesRepository.findOneBy({ email: ps.email });
 
-			return userProfile ? {
-				twoFactorEnabled: userProfile.twoFactorEnabled,
-				usePasswordLessLogin: userProfile.usePasswordLessLogin,
-				securityKeys: userProfile.twoFactorEnabled
-					? await this.userSecurityKeysRepository.countBy({ userId: userProfile.userId }).then(result => result >= 1)
+			const passwordMatched = await bcrypt.compare(ps.password, profile?.password ?? '');
+			if (!profile || !passwordMatched) {
+				return {
+					twoFactorEnabled: false,
+					usePasswordLessLogin: false,
+					securityKeys: false,
+				}
+			}
+
+			return {
+				twoFactorEnabled: profile.twoFactorEnabled,
+				usePasswordLessLogin: profile.usePasswordLessLogin,
+				securityKeys: profile.twoFactorEnabled
+					? await this.userSecurityKeysRepository.countBy({ userId: profile.userId }).then(result => result >= 1)
 					: false,
-			} : {
-				twoFactorEnabled: false,
-				usePasswordLessLogin: false,
-				securityKeys: false,
 			};
 		});
 	}
 }
-

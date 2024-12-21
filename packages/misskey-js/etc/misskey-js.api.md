@@ -1776,8 +1776,8 @@ declare namespace entities {
         UsersSearchResponse,
         UsersShowRequest,
         UsersShowResponse,
-        UsersGetTwofactorEnableRequest,
-        UsersGetTwofactorEnableResponse,
+        UsersGetSecurityInfoRequest,
+        UsersGetSecurityInfoResponse,
         UsersStatsRequest,
         UsersStatsResponse,
         UsersAchievementsRequest,
@@ -3169,16 +3169,16 @@ type UsersGetFrequentlyRepliedUsersRequest = operations['users___get-frequently-
 type UsersGetFrequentlyRepliedUsersResponse = operations['users___get-frequently-replied-users']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
+type UsersGetSecurityInfoRequest = operations['users___get-security-info']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type UsersGetSecurityInfoResponse = operations['users___get-security-info']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
 type UsersGetSkebStatusRequest = operations['users___get-skeb-status']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 type UsersGetSkebStatusResponse = operations['users___get-skeb-status']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type UsersGetTwofactorEnableRequest = operations['users___get-twofactor-enable']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type UsersGetTwofactorEnableResponse = operations['users___get-twofactor-enable']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 type UsersListsCreateFromPublicRequest = operations['users___lists___create-from-public']['requestBody']['content']['application/json'];

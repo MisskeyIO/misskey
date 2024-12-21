@@ -6,32 +6,30 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <form :class="{ signing, totpLogin }" @submit.prevent="onSubmit">
 	<div class="_gaps_m">
-		<div v-show="withAvatar && !emailMode" :class="$style.avatar" :style="{ backgroundImage: user ? `url('${ user.avatarUrl }')` : undefined, marginBottom: message ? '1.5em' : undefined }"></div>
+		<div v-show="withAvatar && !loginWithEmailAddress" :class="$style.avatar" :style="{ backgroundImage: user ? `url('${ user.avatarUrl }')` : undefined, marginBottom: message ? '1.5em' : undefined }"></div>
 		<MkInfo v-if="message">
 			{{ message }}
 		</MkInfo>
 		<div v-if="!totpLogin" class="normal-signin _gaps_m">
-			<MkInput v-model="username" :debounce="true" :placeholder="emailMode ? i18n.ts.emailAddress : i18n.ts.username" type="text" :pattern="emailMode ? '^[a-zA-Z0-9_@.]+$' : '^[a-zA-Z0-9_]+$'" :spellcheck="false" :autocomplete="emailMode ? 'email webauthn' : 'username webauthn'" autofocus required data-cy-signin-username @update:modelValue="onUsernameChange">
-				<template v-if="!emailMode" #prefix>@</template>
-				<template v-if="!emailMode" #suffix>@{{ host }}</template>
+			<MkInput v-model="username" :debounce="true" :placeholder="loginWithEmailAddress ? i18n.ts.emailAddress : i18n.ts.username" type="text" :pattern="loginWithEmailAddress ? '^[a-zA-Z0-9_@.]+$' : '^[a-zA-Z0-9_]+$'" :spellcheck="false" :autocomplete="loginWithEmailAddress ? 'email webauthn' : 'username webauthn'" autofocus required data-cy-signin-username @update:modelValue="onUsernameChange">
+				<template v-if="!loginWithEmailAddress" #prefix>@</template>
+				<template v-if="!loginWithEmailAddress" #suffix>@{{ host }}</template>
+				<template v-if="loginWithEmailAddress" #prefix><i class="ti ti-mail"></i></template>
+				<template #caption>
+					<button class="_textButton" type="button" tabindex="-1" @click="loginWithEmailAddress = !loginWithEmailAddress">{{ loginWithEmailAddress ? i18n.ts.usernameLogin : i18n.ts.emailAddressLogin }}</button>
+				</template>
 			</MkInput>
 			<MkInput v-if="!user || user && !user.usePasswordLessLogin" v-model="password" :placeholder="i18n.ts.password" type="password" autocomplete="current-password webauthn" :withPasswordToggle="true" required data-cy-signin-password>
 				<template #prefix><i class="ti ti-lock"></i></template>
 				<template #caption>
-					<div class="_margin">
-						<button v-if="!emailMode" class="_textButton" type="button" @click="emailAddressLogin">{{ i18n.ts.emailAddressLogin }}</button>
-						<button v-if="emailMode" class="_textButton" type="button" @click="usernameLogin">{{ i18n.ts.usernameLogin }}</button>
-					</div>
-					<div class="_margin">
-						<button class="_textButton" type="button" @click="resetPassword">{{ i18n.ts.forgotPassword }}</button>
-					</div>
+					<button class="_textButton" type="button" tabindex="-1" @click="resetPassword">{{ i18n.ts.forgotPassword }}</button>
 				</template>
 			</MkInput>
 			<MkCaptcha v-if="!user?.twoFactorEnabled && instance.enableHcaptcha" ref="hcaptcha" v-model="hCaptchaResponse" :class="$style.captcha" provider="hcaptcha" :sitekey="instance.hcaptchaSiteKey"/>
 			<MkCaptcha v-if="!user?.twoFactorEnabled && instance.enableMcaptcha" ref="mcaptcha" v-model="mCaptchaResponse" :class="$style.captcha" provider="mcaptcha" :sitekey="instance.mcaptchaSiteKey" :instanceUrl="instance.mcaptchaInstanceUrl"/>
 			<MkCaptcha v-if="!user?.twoFactorEnabled && instance.enableRecaptcha" ref="recaptcha" v-model="reCaptchaResponse" :class="$style.captcha" provider="recaptcha" :sitekey="instance.recaptchaSiteKey"/>
 			<MkCaptcha v-if="!user?.twoFactorEnabled && instance.enableTurnstile" ref="turnstile" v-model="turnstileResponse" :class="$style.captcha" provider="turnstile" :sitekey="instance.turnstileSiteKey"/>
-			<MkButton type="submit" large primary rounded :disabled="(!emailMode && !user) || captchaFailed || signing" style="margin: 0 auto;">{{ signing ? i18n.ts.loggingIn : i18n.ts.login }}</MkButton>
+			<MkButton type="submit" large primary rounded :disabled="(!loginWithEmailAddress && !user) || captchaFailed || signing" style="margin: 0 auto;">{{ signing ? i18n.ts.loggingIn : i18n.ts.login }}</MkButton>
 		</div>
 		<div v-if="totpLogin" class="2fa-signin" :class="{ securityKeys: user && user.securityKeys }">
 			<div v-if="user && user.securityKeys" class="twofa-group tap-group">
@@ -72,14 +70,15 @@ import MkInfo from '@/components/MkInfo.vue';
 import { host as configHost } from '@/config.js';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/scripts/misskey-api.js';
-import { getAccountWithSigninDialog, login } from '@/account.js';
+import { login } from '@/account.js';
 import { i18n } from '@/i18n.js';
 import { instance } from '@/instance.js';
 import MkCaptcha, { type Captcha } from '@/components/MkCaptcha.vue';
 
 const signing = ref(false);
+const loginWithEmailAddress = ref(false);
 const userAbortController = ref<AbortController>();
-const user = ref<Credential | null>(null);
+const user = ref<Misskey.entities.UserDetailed | null>(null);
 const username = ref('');
 const password = ref('');
 const token = ref('');
@@ -107,7 +106,6 @@ const captchaFailed = computed((): boolean => {
 
 const emit = defineEmits<{
 	(ev: 'login', v: any): void;
-	(ev: 'close', v: any): void;
 }>();
 
 const props = defineProps({
@@ -126,31 +124,11 @@ const props = defineProps({
 		required: false,
 		default: '',
 	},
-	emailMode: {
-		type: Boolean,
-		required: false,
-		default: false,
-	},
 });
 
-type Credential = {
-	twoFactorEnabled: boolean;
-	usePasswordLessLogin: boolean;
-	securityKeys: boolean;
-};
-
 async function onUsernameChange(): Promise<void> {
-	if (props.emailMode) {
-		let twofactorEnable = await misskeyApi('users/get-twofactor-enable', {
-			email: username.value,
-		});
-		user.value = {
-			twoFactorEnabled: twofactorEnable.twoFactorEnabled,
-			usePasswordLessLogin: twofactorEnable.usePasswordLessLogin,
-			securityKeys: twofactorEnable.securityKeys,
-		};
-		return;
-	}
+	if (loginWithEmailAddress.value) return;
+
 	if (userAbortController.value) {
 		userAbortController.value.abort();
 	}
@@ -201,6 +179,13 @@ async function queryKey(): Promise<void> {
 
 async function onSubmit(): Promise<void> {
 	signing.value = true;
+	if (loginWithEmailAddress.value) {
+		user.value = await misskeyApi('users/get-security-info', {
+			email: username.value,
+			password: password.value,
+		});
+	}
+
 	if (!totpLogin.value && user.value?.twoFactorEnabled) {
 		if (webAuthnSupported() && user.value.securityKeys) {
 			misskeyApi('signin', {
@@ -288,17 +273,6 @@ function resetPassword(): void {
 	os.popup(defineAsyncComponent(() => import('@/components/MkForgotPassword.vue')), {}, {
 	}, 'closed');
 }
-
-function emailAddressLogin(): void {
-	getAccountWithSigninDialog(true);
-	emit('close', {});
-}
-
-function usernameLogin(): void {
-	getAccountWithSigninDialog();
-	emit('close', {});
-}
-
 </script>
 
 <style lang="scss" module>

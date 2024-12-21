@@ -340,9 +340,9 @@ export async function openAccountMenu(opts: {
 	}
 }
 
-export function getAccountWithSigninDialog(emailMode = false): Promise<{ id: string, token: string } | null> {
+export function getAccountWithSigninDialog(): Promise<{ id: string, token: string } | null> {
 	return new Promise((resolve) => {
-		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkSigninDialog.vue')), { emailMode }, {
+		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkSigninDialog.vue')), {}, {
 			done: async (res: Misskey.entities.SigninFlowResponse & { finished: true }) => {
 				await addAccount(res.id, res.i);
 				resolve({ id: res.id, token: res.i });

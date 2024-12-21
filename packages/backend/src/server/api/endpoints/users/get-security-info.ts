@@ -46,7 +46,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private userSecurityKeysRepository: UserSecurityKeysRepository,
 	) {
 		super(meta, paramDef, async (ps, me) => {
-			const profile = await this.userProfilesRepository.findOneBy({ email: ps.email });
+			const profile = await this.userProfilesRepository.findOneBy({
+				email: ps.email,
+				emailVerified: true,
+			});
 
 			const passwordMatched = await bcrypt.compare(ps.password, profile?.password ?? '');
 			if (!profile || !passwordMatched) {

@@ -629,30 +629,61 @@ export class ClientServerService {
 					reply.header('Cache-Control', 'public, max-age=600');
 					return reply.send(_note);
 				} catch (err) {
-					const errId = (err as IdentifiableError).id ?? randomUUID();
-					if (errId === '85ab9bd7-3a41-4530-959d-f07073900109') {
-						reply.code(403);
-					} else {
-						reply.code(500);
-					}
-
-					this.clientLoggerService.logger.error(`Internal error occurred in ${request.routeOptions.url}: ${err.message}`, {
-						path: request.routeOptions.url,
-						params: request.params,
-						query: request.query,
-						id: errId,
-						error: err,
-					});
-
 					reply.header('Cache-Control', 'max-age=10, must-revalidate');
-					return reply.send({
-						error: {
-							message: err.message ?? 'Internal server error',
-							code: err.code ?? 'INTERNAL_SERVER_ERROR',
-							id: errId,
+					if (err instanceof IdentifiableError) {
+						this.clientLoggerService.logger.error(`Internal error occurred in ${request.routeOptions.url}: ${err.message}`, {
+							path: request.routeOptions.url,
+							params: request.params,
+							query: request.query,
+							id: err.id,
+							error: {
+								message: err.message,
+								code: 'INTERNAL_ERROR',
+								stack: err.stack,
+							},
+						});
+						const httpStatusCode = err.id === '85ab9bd7-3a41-4530-959d-f07073900109' ? 403 : 500;
+						reply.code(httpStatusCode);
+						return reply.send({
+							message: err.message,
+							code: 'INTERNAL_ERROR',
+							id: err.id,
 							kind: 'server',
-						},
-					});
+							httpStatusCode,
+							info: {
+								message: err.message,
+								code: err.name,
+								id: err.id,
+							},
+						});
+					} else {
+						const error = err as Error;
+						const errId = randomUUID();
+						this.clientLoggerService.logger.error(`Internal error occurred in ${request.routeOptions.url}: ${error.message}`, {
+							path: request.routeOptions.url,
+							params: request.params,
+							query: request.query,
+							id: errId,
+							error: {
+								message: error.message,
+								code: error.name,
+								stack: error.stack,
+							},
+						});
+						reply.code(500);
+						return reply.send({
+							message: 'Internal error occurred. Please contact us if the error persists.',
+							code: 'INTERNAL_ERROR',
+							id: 'b9f2a7f9-fe64-434b-9484-cb1f804d1a80',
+							kind: 'server',
+							httpStatusCode: 500,
+							info: {
+								message: error.message,
+								code: error.name,
+								id: errId,
+							},
+						});
+					}
 				}
 			} else {
 				reply.code(404);

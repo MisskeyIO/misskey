@@ -122,10 +122,12 @@ export class SigninApiService {
 			return;
 		}
 
+		const loginWithEmail = username.includes('@');
+
 		// Fetch user
 		const profile = await this.userProfilesRepository.findOne({
 			relations: ['user'],
-			where: username.includes('@') ? {
+			where: loginWithEmail ? {
 				email: username,
 				emailVerified: true,
 				user: {
@@ -143,21 +145,21 @@ export class SigninApiService {
 		if (!user || !profile) {
 			logger.error('No such user.');
 			return error(403, {
-				id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
+				id: loginWithEmail ? '932c904e-9460-45b7-9ce6-7ed33be7eb2c' : '6cc579cc-885d-43d8-95c2-b8c7fc963280',
 			});
 		}
 
 		if (user.isDeleted && user.isSuspended) {
 			logger.error('No such user. (logical deletion)');
 			return error(403, {
-				id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
+				id: loginWithEmail ? '932c904e-9460-45b7-9ce6-7ed33be7eb2c' : '6cc579cc-885d-43d8-95c2-b8c7fc963280',
 			});
 		}
 
 		if (user.isSuspended) {
 			logger.error('User is suspended.');
 			return error(403, {
-				id: 'e03a5f46-d309-4865-9b69-56282d94e1eb',
+				id: loginWithEmail ? '932c904e-9460-45b7-9ce6-7ed33be7eb2c' : 'e03a5f46-d309-4865-9b69-56282d94e1eb',
 			});
 		}
 
@@ -229,7 +231,7 @@ export class SigninApiService {
 			} catch (e) {
 				logger.error('Invalid request: Unable to authenticate with two-factor token.');
 				return await fail(403, {
-					id: 'cdf1235b-ac71-46d4-a3a6-84ccce48df6f',
+					id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
 				});
 			}
 
@@ -251,7 +253,7 @@ export class SigninApiService {
 			} else {
 				logger.error('Invalid request: Unable to authenticate with WebAuthn credential.');
 				return await fail(403, {
-					id: '93b86c4b-72f9-40eb-9815-798928603d1e',
+					id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
 				});
 			}
 		} else {

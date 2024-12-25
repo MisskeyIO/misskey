@@ -58,7 +58,7 @@ export class AiService {
 			const sharp = await sharpBmp(path, mime);
 			const { data, info } = await sharp
 				.resize(299, 299, { fit: 'inside' })
-				.ensureAlpha()
+				.removeAlpha()
 				.raw({ depth: 'uchar' })
 				.toBuffer({ resolveWithObject: true });
 

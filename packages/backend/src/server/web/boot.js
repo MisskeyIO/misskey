@@ -32,20 +32,24 @@
 		renderError('FORCED_ERROR', 'This error is forced by having forceError in local storage.')
 	}
 
+	if (localStorage.getItem('id') === null) {
+		localStorage.setItem('id', crypto.randomUUID().replaceAll('-', ''));
+	}
+	let id = localStorage.getItem('id');
+
 	//#region Detect language & fetch translations
-	if (!localStorage.hasOwnProperty('locale')) {
+	if (!Object.hasOwn(localStorage, 'locale')) {
 		let lang = localStorage.getItem('lang');
 		if (lang == null || lang.toString == null || lang.toString() === 'null') {
 			lang = 'ja-JP';
 		}
 
 		const metaRes = await window.fetch('/api/meta', {
-			method: 'POST',
-			body: JSON.stringify({}),
+			method: 'GET',
 			credentials: 'omit',
-			cache: 'no-cache',
 			headers: {
 				'Content-Type': 'application/json',
+				'X-Client-Transaction-Id': `${id}-misskey-${crypto.randomUUID().replaceAll('-', '')}`
 			},
 		});
 		if (metaRes.status !== 200) {

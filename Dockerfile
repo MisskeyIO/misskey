@@ -1,6 +1,7 @@
 # syntax = docker/dockerfile:1.4
 
-ARG NODE_VERSION=20
+ARG NODE_VERSION=22
+ARG BUN_VERSION=1.1
 
 # build assets & compile TypeScript
 
@@ -14,11 +15,10 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 	&& apt-get install -yqq --no-install-recommends \
 	build-essential
 
-RUN corepack enable
-
 WORKDIR /misskey
 
 COPY --link pnpm-lock.yaml ./
+RUN npm install -g pnpm
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
 	pnpm fetch --ignore-scripts
 
@@ -36,11 +36,7 @@ RUN pnpm i --frozen-lockfile --aggregate-output --offline \
 
 COPY --link . ./
 
-ARG NODE_ENV=production
-
-RUN git submodule update --init
-RUN pnpm build
-RUN rm -rf .git/
+RUN NODE_ENV=production pnpm build
 
 # build native dependencies for target platform
 
@@ -50,11 +46,10 @@ RUN apt-get update \
 	&& apt-get install -yqq --no-install-recommends \
 	build-essential
 
-RUN corepack enable
-
 WORKDIR /misskey
 
 COPY --link pnpm-lock.yaml ./
+RUN npm install -g pnpm
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
 	pnpm fetch --ignore-scripts
 
@@ -68,14 +63,14 @@ COPY --link ["packages/misskey-bubble-game/package.json", "./packages/misskey-bu
 RUN pnpm i --frozen-lockfile --aggregate-output --offline \
 	&& pnpm rebuild -r
 
-FROM oven/bun:latest AS runner
+FROM --platform=$TARGETPLATFORM oven/bun:${BUN_VERSION} AS runner
 
 ARG UID="991"
 ARG GID="991"
 
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
-	ffmpeg tini curl libjemalloc-dev libjemalloc2 \
+	curl ffmpeg libjemalloc-dev libjemalloc2 tini \
 	&& ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so \
 	&& groupadd -g "${GID}" misskey \
 	&& useradd -l -u "${UID}" -g "${GID}" -m -d /misskey misskey \
@@ -84,8 +79,10 @@ RUN apt-get update \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists
 
-USER misskey
 WORKDIR /misskey
+
+COPY --chown=misskey:misskey pnpm-lock.yaml ./
+RUN npm install -g pnpm
 
 COPY --chown=misskey:misskey --from=target-builder /misskey/node_modules ./node_modules
 COPY --chown=misskey:misskey --from=target-builder /misskey/packages/backend/node_modules ./packages/backend/node_modules
@@ -100,10 +97,11 @@ COPY --chown=misskey:misskey --from=native-builder /misskey/packages/backend/bui
 COPY --chown=misskey:misskey --from=native-builder /misskey/fluent-emojis /misskey/fluent-emojis
 COPY --chown=misskey:misskey . ./
 
+USER misskey
 ENV LD_PRELOAD=/usr/local/lib/libjemalloc.so
 ENV MALLOC_CONF=background_thread:true,metadata_thp:auto,dirty_decay_ms:30000,muzzy_decay_ms:30000
+ENV TF_CPP_MIN_LOG_LEVEL=2
 ENV NODE_ENV=production
-ENV COREPACK_ENABLE_NETWORK=0
 HEALTHCHECK --interval=5s --retries=20 CMD ["/bin/bash", "/misskey/healthcheck.sh"]
 ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD [ "bun", "run", "migrateandstart:docker" ]

@@ -20,7 +20,7 @@ jobs:
     strategy:
       matrix:
         node-version: [22.x]
-        bun-version: [1.1.x]
+        bun-version: [1.1]
 
     steps:
     - uses: actions/checkout@v4

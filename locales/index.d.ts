@@ -3704,6 +3704,10 @@ export interface Locale extends ILocale {
      */
     "incorrectPassword": string;
     /**
+     * 認証に失敗しました。
+     */
+    "authenticationFailed": string;
+    /**
      * 「{choice}」に投票しますか？
      */
     "voteConfirm": ParameterizedString<"choice">;
@@ -5318,6 +5322,14 @@ export interface Locale extends ILocale {
      * 選択した項目のみ許可
      */
     "consentSelected": string;
+    /**
+     * メールアドレスでログイン
+     */
+    "emailAddressLogin": string;
+    /**
+     * ユーザー名でログイン
+     */
+    "usernameLogin": string;
     "_bubbleGame": {
         /**
          * 遊び方
@@ -9497,6 +9509,18 @@ export interface Locale extends ILocale {
          * 特殊
          */
         "specialBlocks": string;
+        /**
+         * 公開範囲
+         */
+        "visibility": string;
+        /**
+         * 公開
+         */
+        "public": string;
+        /**
+         * 非公開
+         */
+        "private": string;
         "blocks": {
             /**
              * テキスト

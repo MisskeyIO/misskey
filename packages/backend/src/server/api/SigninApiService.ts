@@ -182,27 +182,25 @@ export class SigninApiService {
 		if (!profile.twoFactorEnabled) {
 			if (process.env.NODE_ENV !== 'test') {
 				const meta = await this.metaService.fetch();
-				if (meta.enableHcaptcha && meta.hcaptchaSecretKey) {
-					await this.captchaService.verifyHcaptcha(meta.hcaptchaSecretKey, body['hcaptcha-response']).catch(err => {
-						throw new FastifyReplyError(400, err);
-					});
-				}
+				try {
+					if (meta.enableHcaptcha && meta.hcaptchaSecretKey) {
+						await this.captchaService.verifyHcaptcha(meta.hcaptchaSecretKey, body['hcaptcha-response']);
+					}
 
-				if (meta.enableMcaptcha && meta.mcaptchaSecretKey && meta.mcaptchaSitekey && meta.mcaptchaInstanceUrl) {
-					await this.captchaService.verifyMcaptcha(meta.mcaptchaSecretKey, meta.mcaptchaSitekey, meta.mcaptchaInstanceUrl, body['m-captcha-response']).catch(err => {
-						throw new FastifyReplyError(400, err);
-					});
-				}
+					if (meta.enableMcaptcha && meta.mcaptchaSecretKey && meta.mcaptchaSitekey && meta.mcaptchaInstanceUrl) {
+						await this.captchaService.verifyMcaptcha(meta.mcaptchaSecretKey, meta.mcaptchaSitekey, meta.mcaptchaInstanceUrl, body['m-captcha-response']);
+					}
 
-				if (meta.enableRecaptcha && meta.recaptchaSecretKey) {
-					await this.captchaService.verifyRecaptcha(meta.recaptchaSecretKey, body['g-recaptcha-response']).catch(err => {
-						throw new FastifyReplyError(400, err);
-					});
-				}
+					if (meta.enableRecaptcha && meta.recaptchaSecretKey) {
+						await this.captchaService.verifyRecaptcha(meta.recaptchaSecretKey, body['g-recaptcha-response']);
+					}
 
-				if (meta.enableTurnstile && meta.turnstileSecretKey) {
-					await this.captchaService.verifyTurnstile(meta.turnstileSecretKey, body['turnstile-response']).catch(err => {
-						throw new FastifyReplyError(400, err);
+					if (meta.enableTurnstile && meta.turnstileSecretKey) {
+						await this.captchaService.verifyTurnstile(meta.turnstileSecretKey, body['turnstile-response']);
+					}
+				} catch (err) {
+					return await fail(403, {
+						id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
 					});
 				}
 			}

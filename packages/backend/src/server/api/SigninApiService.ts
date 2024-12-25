@@ -199,6 +199,7 @@ export class SigninApiService {
 						await this.captchaService.verifyTurnstile(meta.turnstileSecretKey, body['turnstile-response']);
 					}
 				} catch (err) {
+					logger.error(`Invalid request: captcha verification failed: ${err}`);
 					return await fail(403, {
 						id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
 					});

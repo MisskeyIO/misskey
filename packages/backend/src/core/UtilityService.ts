@@ -12,6 +12,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { bindThis } from '@/decorators.js';
+import { getApId } from '@/core/activitypub/type.js';
+import type { IObject } from '@/core/activitypub/type.js';
 
 @Injectable()
 export class UtilityService {
@@ -174,5 +176,22 @@ export class UtilityService {
 		const hostB = this.extractHost(uriB);
 
 		return this.isRelatedHosts(hostA, hostB);
+	}
+
+	@bindThis
+	public assertActivityRelatedToUrl(activity: IObject, url: string): void {
+		if (activity.id && this.isRelatedUris(activity.id, url)) return;
+
+		if (activity.url) {
+			if (!Array.isArray(activity.url)) {
+				if (typeof(activity.url) === 'string' && this.isRelatedUris(activity.url, url)) return;
+				if (typeof(activity.url) === 'object' && activity.url.href && this.isRelatedUris(activity.url.href, url)) return;
+			} else {
+				if (activity.url.some(x => typeof(x) === 'string' && this.isRelatedUris(x, url))) return;
+				if (activity.url.some(x => typeof(x) === 'object' && x.href && this.isRelatedUris(x.href, url))) return;
+			}
+		}
+
+		throw new Error(`Invalid object: neither id(${activity.id}) nor url(${activity.url}) related to ${url}`);
 	}
 }

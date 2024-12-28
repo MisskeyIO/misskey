@@ -137,9 +137,10 @@ export class UtilityService {
 		// サブドメイン部分が後方一致で階層差が1以内かどうかを判定する。
 		// 完全一致だと既に true で返しているので、ここでは完全一致以外の場合のみの判定
 		// 例:
-		//  subA = "www",         subB = ""      => true (1階層差以内)
-		//  subA = "alice.users", subB = "users" => true (「alice」1階層差のみ)
-		//  subA = "alice.users", subB = ""      => false(2階層差)
+		//  subA = "www",         subB = ""          => true  (1階層差)
+		//  subA = "alice.users", subB = "users"     => true  (1階層差)
+		//  subA = "alice.users", subB = "bob.users" => true  (1階層差)
+		//  subA = "alice.users", subB = ""          => false (2階層差)
 
 		const labelsA = parsedA.subdomain?.split('.') ?? [];
 		const levelsA = labelsA.length;
@@ -160,7 +161,7 @@ export class UtilityService {
 		const unmatchedA = levelsA - i;
 		const unmatchedB = levelsB - i;
 
-		// 不一致ラベルが1個以内なら true
+		// 不一致ラベルが1階層以内なら true
 		return Math.max(unmatchedA, unmatchedB) <= 1;
 	}
 

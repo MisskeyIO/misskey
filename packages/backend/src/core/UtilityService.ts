@@ -160,8 +160,8 @@ export class UtilityService {
 		const unmatchedA = levelsA - i;
 		const unmatchedB = levelsB - i;
 
-		// 不一致ラベル (unmatchedA + unmatchedB) が1以内なら true
-		return (unmatchedA + unmatchedB) <= 1;
+		// 不一致ラベルが1個以内なら true
+		return Math.max(unmatchedA, unmatchedB) <= 1;
 	}
 
 	@bindThis

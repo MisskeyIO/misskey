@@ -89,13 +89,13 @@ export class ApNoteService {
 		}
 
 		let actualHost = object.id && this.utilityService.extractHost(object.id);
-		if (actualHost && expectedHost !== actualHost) {
-			return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', `invalid Note: id has different host. expected: ${expectedHost}, actual: ${actualHost}`);
+		if (actualHost && !this.utilityService.isRelatedHosts(expectedHost, actualHost)) {
+			return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', `invalid Note: id has unrelated host. expected: ${expectedHost}, actual: ${actualHost}`);
 		}
 
 		actualHost = object.attributedTo && this.utilityService.extractHost(getOneApId(object.attributedTo));
-		if (actualHost && expectedHost !== actualHost) {
-			return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', `invalid Note: attributedTo has different host. expected: ${expectedHost}, actual: ${actualHost}`);
+		if (actualHost && !this.utilityService.isRelatedHosts(expectedHost, actualHost)) {
+			return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', `invalid Note: attributedTo has unrelated host. expected: ${expectedHost}, actual: ${actualHost}`);
 		}
 
 		if (object.published && !this.idService.isSafeT(new Date(object.published).valueOf())) {
@@ -166,8 +166,8 @@ export class ApNoteService {
 				throw new Error('unexpected schema of note url: ' + url);
 			}
 
-			if (this.utilityService.extractHost(note.id) !== this.utilityService.extractHost(url)) {
-				throw new Error(`note id and url have different host: ${note.id} - ${url}`);
+			if (!this.utilityService.isRelatedUris(note.id, url)) {
+				throw new Error(`note id and url has unrelated host: ${note.id} - ${url}`);
 			}
 		}
 

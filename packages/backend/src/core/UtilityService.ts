@@ -4,7 +4,9 @@
  */
 
 import { URL } from 'node:url';
+import { isIP } from 'node:net';
 import punycode from 'punycode.js';
+import psl from 'psl';
 import RE2 from 're2';
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
@@ -92,5 +94,85 @@ export class UtilityService {
 		// ASCII String で返されるので punycode 化はいらない
 		// ref: https://url.spec.whatwg.org/#host-serializing
 		return new URL(uri).host;
+	}
+
+	@bindThis
+	public isRelatedHosts(hostA: string, hostB: string): boolean {
+		// hostA と hostB は呼び出す側で正規化済みであることを前提とする
+
+		// ポート番号が付いてる場合、ポート番号を除去
+		if (hostA.includes(':')) hostA = hostA.split(':')[0];
+		if (hostB.includes(':')) hostB = hostB.split(':')[0];
+
+		// ホストが完全一致している場合は true
+		if (hostA === hostB) {
+			return true;
+		}
+
+		// -----------------------------
+		// 1. IPアドレスの場合の処理
+		// -----------------------------
+		const aIpVersion = isIP(hostA);
+		const bIpVersion = isIP(hostB);
+		if (aIpVersion !== 0 || bIpVersion !== 0) {
+			// どちらかが IP の場合、完全一致以外は false
+			return false;
+		}
+
+		// -----------------------------
+		// 2. ホストの場合の処理
+		// -----------------------------
+		const parsedA = psl.parse(hostA);
+		const parsedB = psl.parse(hostB);
+
+		// どちらか一方でもパース失敗 or eTLD+1が異なる場合は false
+		if (parsedA.error || parsedB.error || parsedA.domain !== parsedB.domain) {
+			return false;
+		}
+
+		// -----------------------------
+		// 3. サブドメインの比較
+		// -----------------------------
+		// サブドメイン部分が後方一致で階層差が1以内かどうかを判定する。
+		// 完全一致だと既に true で返しているので、ここでは完全一致以外の場合のみの判定
+		// 例:
+		//  subA = "www",         subB = ""      => true (1階層差以内)
+		//  subA = "alice.users", subB = "users" => true (「alice」1階層差のみ)
+		//  subA = "alice.users", subB = ""      => false(2階層差)
+
+		const labelsA = parsedA.subdomain?.split('.') ?? [];
+		const levelsA = labelsA.length;
+		const labelsB = parsedB.subdomain?.split('.') ?? [];
+		const levelsB = labelsB.length;
+
+		// 後ろ(右)から一致している部分をカウント
+		let i = 0;
+		while (
+			i < levelsA &&
+			i < levelsB &&
+			labelsA[levelsA - 1 - i] === labelsB[levelsB - 1 - i]
+			) {
+			i++;
+		}
+
+		// 後方一致していないラベルの数 = (総数 - 一致数)
+		const unmatchedA = levelsA - i;
+		const unmatchedB = levelsB - i;
+
+		// 不一致ラベル (unmatchedA + unmatchedB) が1以内なら true
+		return (unmatchedA + unmatchedB) <= 1;
+	}
+
+	@bindThis
+	public isRelatedUris(uriA: string, uriB: string): boolean {
+		// URI が完全一致している場合は true
+		if (uriA === uriB) {
+			return true;
+		}
+
+		const hostA = this.extractHost(uriA);
+		const hostB = this.extractHost(uriB);
+
+		return this.isRelatedHosts(hostA, hostB);
 	}
 }

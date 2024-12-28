@@ -13,7 +13,6 @@
 		"revert": "bun typeorm migration:revert -d ormconfig.js",
 		"check:connect": "bun ./scripts/check_connect.js",
 		"build": "swc src -d built -D --strip-leading-paths",
-		"build:test": "swc test-server -d built-test -D --config-file test-server/.swcrc --strip-leading-paths",
 		"watch:swc": "swc src -d built -D -w --strip-leading-paths",
 		"build:tsc": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
 		"watch": "node ./scripts/watch.mjs",
@@ -28,9 +27,9 @@
 		"jest-and-coverage:e2e": "cross-env NODE_ENV=test node --experimental-vm-modules --experimental-import-meta-resolve --no-experimental-require-module node_modules/jest/bin/jest.js --coverage --forceExit --config jest.config.e2e.cjs",
 		"jest-clear": "cross-env NODE_ENV=test node --experimental-vm-modules --experimental-import-meta-resolve node_modules/jest/bin/jest.js --clearCache",
 		"test": "bun jest",
-		"test:e2e": "pnpm build && bun build:test && bun jest:e2e",
+		"test:e2e": "pnpm build && bun jest:e2e",
 		"test-and-coverage": "bun jest-and-coverage",
-		"test-and-coverage:e2e": "pnpm build && bun build:test && bun jest-and-coverage:e2e",
+		"test-and-coverage:e2e": "pnpm build && bun jest-and-coverage:e2e",
 		"generate-api-json": "pnpm build && bun run ./scripts/generate_api_json.js"
 	},
 	"optionalDependencies": {

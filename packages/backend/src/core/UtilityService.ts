@@ -101,9 +101,9 @@ export class UtilityService {
 	public isRelatedHosts(hostA: string, hostB: string): boolean {
 		// hostA と hostB は呼び出す側で正規化済みであることを前提とする
 
-		// ポート番号が付いてる場合、ポート番号を除去
-		if (hostA.includes(':')) hostA = hostA.split(':')[0];
-		if (hostB.includes(':')) hostB = hostB.split(':')[0];
+		// ポート番号が付いてる可能性がある場合、ポート番号を除去するためもう一度正規化
+		if (hostA.includes(':')) hostA = new URL(`urn://${hostA}`).hostname;
+		if (hostB.includes(':')) hostB = new URL(`urn://${hostB}`).hostname;
 
 		// ホストが完全一致している場合は true
 		if (hostA === hostB) {

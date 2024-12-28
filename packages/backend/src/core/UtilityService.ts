@@ -12,7 +12,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { bindThis } from '@/decorators.js';
-import { getApId } from '@/core/activitypub/type.js';
 import type { IObject } from '@/core/activitypub/type.js';
 
 @Injectable()

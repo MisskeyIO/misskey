@@ -102,11 +102,14 @@ export class ApNoteService {
 			return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', 'invalid Note: published timestamp is malformed');
 		}
 
-		if (actor) {
-			const attribution = (object.attributedTo) ? getOneApId(object.attributedTo) : actor.uri;
+		if (actor?.uri) {
+			if (object.id && !this.utilityService.isRelatedUris(object.id, actor.uri)) {
+				return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', `invalid Note: id has unrelated host to actor. actor: ${actor.uri}, id: ${object.id}`);
+			}
 
-			if (attribution !== actor.uri) {
-				return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', `invalid Note: attribution does not match the actor that send it. attribution: ${attribution}, actor: ${actor.uri}`);
+			const attributedTo = object.attributedTo && getOneApId(object.attributedTo);
+			if (attributedTo && !this.utilityService.isRelatedUris(attributedTo, actor.uri)) {
+				return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', `invalid Note: attributedTo has unrelated host to actor. actor: ${actor.uri}, attributedTo: ${attributedTo}`);
 			}
 		}
 

@@ -104,7 +104,7 @@ export class ApNoteService {
 
 		if (actor?.uri) {
 			if (!this.utilityService.isRelatedUris(uri, actor.uri)) {
-				return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', `invalid Note: actor has unrelated host to object. actor: ${actor.uri}, object: ${uri}`);
+				return new IdentifiableError('d450b8a9-48e4-4dab-ae36-f4db763fda7c', `invalid Note: object has unrelated host to actor. actor: ${actor.uri}, object: ${uri}`);
 			}
 
 			if (object.id && !this.utilityService.isRelatedUris(object.id, actor.uri)) {

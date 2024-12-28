@@ -89,18 +89,18 @@ export class Resolver {
 		}
 
 		if (this.history.size > this.recursionLimit) {
-			throw new Error(`hit recursion limit: ${this.utilityService.extractDbHost(value)}`);
+			throw new Error(`hit recursion limit: ${this.utilityService.extractHost(value)}`);
 		}
 
 		this.history.add(value);
 
-		const host = this.utilityService.extractDbHost(value);
+		const host = this.utilityService.extractHost(value);
 		if (this.utilityService.isSelfHost(host)) {
 			return await this.resolveLocal(value);
 		}
 
 		const meta = await this.metaService.fetch();
-		if (this.utilityService.isBlockedHost(meta.blockedHosts, host)) {
+		if (this.utilityService.isItemListedIn(host, meta.blockedHosts)) {
 			throw new Error('Instance is blocked');
 		}
 
@@ -118,18 +118,6 @@ export class Resolver {
 				object['@context'] !== 'https://www.w3.org/ns/activitystreams'
 		) {
 			throw new Error('invalid response');
-		}
-
-		// HttpRequestService / ApRequestService have already checked that
-		// `object.id` or `object.url` matches the URL used to fetch the
-		// object after redirects; here we double-check that no redirects
-		// bounced between hosts
-		if (object.id == null) {
-			throw new Error('invalid AP object: missing id');
-		}
-
-		if (this.utilityService.punyHost(object.id) !== this.utilityService.punyHost(value)) {
-			throw new Error(`invalid AP object ${value}: id ${object.id} has different host`);
 		}
 
 		return object;

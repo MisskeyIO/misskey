@@ -534,7 +534,7 @@ export class ClientServerService {
 
 			vary(reply.raw, 'Accept');
 
-			if (user != null) {
+			if (user) {
 				const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
 				const meta = await this.metaService.fetch();
 				const me = profile.fields
@@ -564,11 +564,10 @@ export class ClientServerService {
 		fastify.get<{ Params: { user: string; } }>('/users/:user', async (request, reply) => {
 			const user = await this.usersRepository.findOneBy({
 				id: request.params.user,
-				host: IsNull(),
 				isSuspended: false,
 			});
 
-			if (user == null) {
+			if (!user || (user.isDeleted && user.isSuspended)) {
 				reply.code(404);
 				return;
 			}

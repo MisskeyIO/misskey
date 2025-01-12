@@ -1462,7 +1462,7 @@ defineExpose({
 		min-width: 20px;
 	}
 
-	.submitButtonText{
+	.submitButtonText {
 		display: none;
 	}
 

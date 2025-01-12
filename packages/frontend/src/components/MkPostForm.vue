@@ -48,7 +48,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div :class="$style.submitInner">
 					<template v-if="posted"></template>
 					<template v-else-if="posting"><MkEllipsis/></template>
-					<template v-else :class="$style.submitText">{{ submitText }}</template>
+					<template v-else>
+						<span :class="$style.submitButtonText">
+							{{ submitText }}
+						</span>
+					</template>
 					<i :class="[posted ? 'ti ti-check' : reply ? 'ti ti-arrow-back-up' : renote ? 'ti ti-quote' : 'ti ti-send',$style.submitIconMargin]"></i>
 				</div>
 			</button>
@@ -1204,9 +1208,11 @@ defineExpose({
 	.submitInner {
 		min-width: 20px;
 	}
-	.submitText{
-	margin-left: 6px;
-}
+
+	.submitButtonText{
+		display: none;
+	}
+
 	.submitIconMargin{
 		margin-left: 0;
 	}

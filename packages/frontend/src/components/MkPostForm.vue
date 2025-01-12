@@ -48,7 +48,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div :class="$style.submitInner">
 					<template v-if="posted"></template>
 					<template v-else-if="posting"><MkEllipsis/></template>
-					<template v-else-if="screenWidth >= 355">{{ submitText }}</template>
+					<template v-else :class="$style.submitText">{{ submitText }}</template>
 					<i :class="[posted ? 'ti ti-check' : reply ? 'ti ti-arrow-back-up' : renote ? 'ti ti-quote' : 'ti ti-send',$style.submitIconMargin]"></i>
 				</div>
 			</button>
@@ -215,7 +215,6 @@ const recentHashtags = ref(JSON.parse(miLocalStorage.getItem('hashtags') ?? '[]'
 const imeText = ref('');
 const showingOptions = ref(false);
 const textAreaReadOnly = ref(false);
-const screenWidth = ref(0);
 
 const nsfwGuideUrl = 'https://go.misskey.io/media-guideline';
 
@@ -1037,11 +1036,6 @@ function openAccountMenu(ev: MouseEvent) {
 }
 
 onMounted(() => {
-	screenWidth.value = window.innerWidth;
-	window.addEventListener('resize', () => {
-		screenWidth.value = window.innerWidth;
-	});
-
 	if (props.autofocus) {
 		focus();
 
@@ -1210,6 +1204,9 @@ defineExpose({
 	.submitInner {
 		min-width: 20px;
 	}
+	.submitText{
+	margin-left: 6px;
+}
 	.submitIconMargin{
 		margin-left: 0;
 	}

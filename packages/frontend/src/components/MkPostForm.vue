@@ -1200,7 +1200,10 @@ defineExpose({
 	box-sizing: border-box;
 	color: var(--fgOnAccent);
 	background: linear-gradient(90deg, var(--buttonGradateA), var(--buttonGradateB));
+	display: flex;
 	gap: 6px;
+	align-items: center;
+	justify-content: center;
 }
 
 .headerRightItem {

@@ -53,7 +53,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							{{ submitText }}
 						</span>
 					</template>
-					<i :class="[posted ? 'ti ti-check' : reply ? 'ti ti-arrow-back-up' : renote ? 'ti ti-quote' : 'ti ti-send',$style.submitIconMargin]"></i>
+					<i :class="posted ? 'ti ti-check' : reply ? 'ti ti-arrow-back-up' : renote ? 'ti ti-quote' : 'ti ti-send'"></i>
 				</div>
 			</button>
 		</div>
@@ -1198,24 +1198,7 @@ defineExpose({
 	box-sizing: border-box;
 	color: var(--fgOnAccent);
 	background: linear-gradient(90deg, var(--buttonGradateA), var(--buttonGradateB));
-}
-
-.submitIconMargin{
-	margin-left: 6px;
-}
-
-@media (width < 355px) {
-	.submitInner {
-		min-width: 20px;
-	}
-
-	.submitButtonText{
-		display: none;
-	}
-
-	.submitIconMargin{
-		margin-left: 0;
-	}
+	gap: 6px;
 }
 
 .headerRightItem {
@@ -1468,6 +1451,15 @@ defineExpose({
 
 	.headerRight {
 		gap: 0;
+	}
+
+	.submitInner {
+		min-width: 20px;
+		gap: 0;
+	}
+
+	.submitButtonText{
+		display: none;
 	}
 
 }

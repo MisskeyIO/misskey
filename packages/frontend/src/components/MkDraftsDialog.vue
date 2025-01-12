@@ -76,8 +76,8 @@ import MkModalWindow from '@/components/MkModalWindow.vue';
 import type { NoteDraftItem } from '@/types/note-draft-item.js';
 
 const emit = defineEmits<{
-	(ev: "done", v: { canceled: true } | { canceled: false; selected: string | undefined }): void;
-	(ev: "closed"): void;
+	(ev: 'done', v: { canceled: true } | { canceled: false; selected: string | undefined }): void;
+	(ev: 'closed'): void;
 }>();
 
 const dialog = shallowRef<InstanceType<typeof MkModalWindow>>();
@@ -88,7 +88,7 @@ onMounted(loadDrafts);
 onActivated(loadDrafts);
 
 function loadDrafts() {
-	const stored = JSON.parse(miLocalStorage.getItem("drafts") ?? "{}") as Record<string, NoteDraftItem>;
+	const stored = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}') as Record<string, NoteDraftItem>;
 	drafts.value = Object.keys(stored).map((key) => ({
 		...(stored[key].data as Misskey.entities.Note & { useCw: boolean }),
 		id: key,
@@ -105,16 +105,16 @@ function selectDraft(draft: string) {
 }
 
 function removeDraft(draft: string) {
-	const stored = JSON.parse(miLocalStorage.getItem("drafts") ?? "{}") as Record<string, NoteDraftItem>;
+	const stored = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}') as Record<string, NoteDraftItem>;
 
 	delete stored[draft];
-	miLocalStorage.setItem("drafts", JSON.stringify(stored));
+	miLocalStorage.setItem('drafts', JSON.stringify(stored));
 
 	loadDrafts();
 }
 
 function done(canceled: boolean, selected?: string): void {
-	emit("done", { canceled, selected } as
+	emit('done', { canceled, selected } as
 		| { canceled: true }
 		| { canceled: false; selected: string | undefined });
 	dialog.value?.close();

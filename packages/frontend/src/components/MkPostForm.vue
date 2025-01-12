@@ -48,8 +48,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div :class="$style.submitInner">
 					<template v-if="posted"></template>
 					<template v-else-if="posting"><MkEllipsis/></template>
-					<template v-else>{{ submitText }}</template>
-					<i style="margin-left: 6px;" :class="posted ? 'ti ti-check' : reply ? 'ti ti-arrow-back-up' : renote ? 'ti ti-quote' : 'ti ti-send'"></i>
+					<template v-else-if="screenWidth >= 355">{{ submitText }}</template>
+					<i :class="[posted ? 'ti ti-check' : reply ? 'ti ti-arrow-back-up' : renote ? 'ti ti-quote' : 'ti ti-send',$style.submitIconMargin]"></i>
 				</div>
 			</button>
 		</div>
@@ -109,6 +109,7 @@ import * as mfm from 'mfm-js';
 import * as Misskey from 'misskey-js';
 import insertTextAtCursor from 'insert-text-at-cursor';
 import { toASCII } from 'punycode.js';
+import type { NoteDraftItem } from '@/types/note-draft-item.js';
 import MkNoteSimple from '@/components/MkNoteSimple.vue';
 import MkNotePreview from '@/components/MkNotePreview.vue';
 import XPostFormAttaches from '@/components/MkPostFormAttaches.vue';
@@ -134,7 +135,6 @@ import { miLocalStorage } from '@/local-storage.js';
 import { claimAchievement } from '@/scripts/achievements.js';
 import { emojiPicker } from '@/scripts/emoji-picker.js';
 import { mfmFunctionPicker } from '@/scripts/mfm-function-picker.js';
-import type { NoteDraftItem } from '@/types/note-draft-item.js';
 
 const $i = signinRequired();
 
@@ -215,6 +215,7 @@ const recentHashtags = ref(JSON.parse(miLocalStorage.getItem('hashtags') ?? '[]'
 const imeText = ref('');
 const showingOptions = ref(false);
 const textAreaReadOnly = ref(false);
+const screenWidth = ref(0);
 
 const nsfwGuideUrl = 'https://go.misskey.io/media-guideline';
 
@@ -770,7 +771,7 @@ async function openDrafts() {
 	}
 }
 
-function loadDraft(exactMatch: boolean = false) {
+function loadDraft(exactMatch = false) {
 	const drafts = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}') as Record<string, NoteDraftItem>;
 	const scope = exactMatch ? draftKey.value : draftKey.value.replace(`note:${draftId.value}`, 'note:');
 	const draft = Object.entries(drafts).filter(([k]) => k.startsWith(scope))
@@ -968,9 +969,9 @@ async function post(ev?: MouseEvent) {
 			type: 'error',
 			text: err.message + '\n' + (err as any).id,
 		});
-		emit("postError");
+		emit('postError');
 	});
-	emit("posting");
+	emit('posting');
 }
 
 function cancel() {
@@ -987,7 +988,7 @@ async function insertEmoji(ev: MouseEvent) {
 	os.openEmojiPicker(
 		(ev.currentTarget ?? ev.target) as HTMLElement,
 		{ asReactionPicker: false },
-		textareaEl.value
+		textareaEl.value,
 	);
 }
 
@@ -1036,6 +1037,11 @@ function openAccountMenu(ev: MouseEvent) {
 }
 
 onMounted(() => {
+	screenWidth.value = window.innerWidth;
+	window.addEventListener('resize', () => {
+		screenWidth.value = window.innerWidth;
+	});
+
 	if (props.autofocus) {
 		focus();
 
@@ -1194,6 +1200,19 @@ defineExpose({
 	box-sizing: border-box;
 	color: var(--fgOnAccent);
 	background: linear-gradient(90deg, var(--buttonGradateA), var(--buttonGradateB));
+}
+
+.submitIconMargin{
+	margin-left: 6px;
+}
+
+@media (width < 355px) {
+	.submitInner {
+		min-width: 20px;
+	}
+	.submitIconMargin{
+		margin-left: 0;
+	}
 }
 
 .headerRightItem {

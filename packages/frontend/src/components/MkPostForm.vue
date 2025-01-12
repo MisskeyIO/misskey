@@ -1457,7 +1457,6 @@ defineExpose({
 
 	.submitInner {
 		min-width: 20px;
-		gap: 0;
 	}
 
 	.submitButtonText{

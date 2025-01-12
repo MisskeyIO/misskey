@@ -53,7 +53,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 							{{ submitText }}
 						</span>
 					</template>
-					<i :class="posted ? 'ti ti-check' : reply ? 'ti ti-arrow-back-up' : renote ? 'ti ti-quote' : 'ti ti-send'"></i>
+					<span>
+						<i :class="posted ? 'ti ti-check' : reply ? 'ti ti-arrow-back-up' : renote ? 'ti ti-quote' : 'ti ti-send'"></i>
+					</span>
 				</div>
 			</button>
 		</div>

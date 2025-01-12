@@ -1411,6 +1411,14 @@ defineExpose({
 		display: none;
 	}
 
+	.submitInner {
+		min-width: 20px;
+	}
+
+	.submitButtonText {
+		display: none;
+	}
+
 	.visibility {
 		overflow: initial;
 	}
@@ -1457,14 +1465,5 @@ defineExpose({
 	.headerRight {
 		gap: 0;
 	}
-
-	.submitInner {
-		min-width: 20px;
-	}
-
-	.submitButtonText {
-		display: none;
-	}
-
 }
 </style>

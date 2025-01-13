@@ -1411,14 +1411,6 @@ defineExpose({
 		display: none;
 	}
 
-	.submitInner {
-		min-width: 20px;
-	}
-
-	.submitButtonText {
-		display: none;
-	}
-
 	.visibility {
 		overflow: initial;
 	}
@@ -1446,6 +1438,16 @@ defineExpose({
 
 	.footer {
 		padding: 0 8px 8px 8px;
+	}
+}
+
+@container (max-width: 400px) {
+	.submitInner {
+		min-width: 20px;
+	}
+
+	.submitButtonText {
+		display: none;
 	}
 }
 

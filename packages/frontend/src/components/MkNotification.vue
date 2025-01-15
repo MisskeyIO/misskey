@@ -109,7 +109,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkA>
 			<div v-else-if="notification.type === 'noteScheduled'">
 				<Mfm :class="$style.text" :text="getNoteSummary(notification.draft.data as unknown as Misskey.entities.Note)" :plain="true" :nowrap="true"/>
-				<div :class="$style.text" style="opacity: 0.6;">
+				<div v-if="notification.draft.scheduledAt" :class="$style.text" style="opacity: 0.6;">
 					<span><i class="ti ti-calendar-clock" style="margin-right: 4px;"/></span>
 					<MkTime :time="notification.draft.scheduledAt"/>
 				</div>
@@ -119,7 +119,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkA>
 			<div v-else-if="notification.type === 'scheduledNoteError'">
 				<Mfm :class="$style.text" :text="getNoteSummary(notification.draft.data as unknown as Misskey.entities.Note)" :plain="true" :nowrap="true"/>
-				<div :class="$style.text" style="opacity: 0.6;">
+				<div v-if="notification.draft.reason" :class="$style.text" style="opacity: 0.6;">
 					<span><i class="ti ti-exclamation-circle" style="margin-right: 4px;"/></span>
 					{{ notification.draft.reason }}
 				</div>

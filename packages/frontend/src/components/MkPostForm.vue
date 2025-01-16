@@ -265,7 +265,7 @@ const placeholder = computed((): string => {
 });
 
 const submitText = computed((): string => {
-  if (scheduledTime.value) {
+	if (scheduledTime.value) {
 		return i18n.ts.schedule;
 	} else if (renote.value) {
 		return i18n.ts.quote;

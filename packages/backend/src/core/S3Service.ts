@@ -48,6 +48,8 @@ export class S3Service {
 			tls: this.config.s3?.useSSL,
 			forcePathStyle: this.config.s3?.options?.forcePathStyle ?? false, // AWS with endPoint omitted
 			requestHandler: new NodeHttpHandler(handlerOption),
+			requestChecksumCalculation: 'WHEN_REQUIRED',
+			responseChecksumValidation: 'WHEN_REQUIRED',
 		});
 	}
 

@@ -79,7 +79,7 @@
 			</div>
 		</template>
 		<template #default="{ items }">
-			<div v-for="(draft, index) in items.map(x => convertNoteDraftToNoteCompat(x))" :key="draft.id" :class="$style.draftItem">
+			<div v-for="draft in items.map(x => convertNoteDraftToNoteCompat(x))" :key="draft.id" :class="$style.draftItem">
 				<div :class="$style.draftNote">
 					<div :class="$style.draftNoteHeader">
 						<div :class="$style.draftNoteDestination">
@@ -130,7 +130,7 @@
 						</div>
 					</div>
 				</div>
-				<button v-tooltip="i18n.ts.unschedule" :class="$style.button" class="_button" @click="unschedule(index)">
+				<button v-tooltip="i18n.ts.unschedule" :class="$style.button" class="_button" @click="unschedule(draft.id)">
 					<i class="ti ti-calendar-x"></i>
 				</button>
 				<button v-tooltip="i18n.ts.delete" :class="$style.button" class="_button" @click="cancelScheduled(draft.id)">
@@ -200,8 +200,9 @@ function removeDraft(draft: string) {
 	loadDrafts();
 }
 
-function unschedule(index: number) {
-	const item = scheduledPaginationEl.value!.items[index];
+function unschedule(draft: string) {
+	const item = scheduledPaginationEl.value!.items.find(x => x.id === draft);
+	if (!item) return;
 
 	let key = item.channel ? `channel:${item.channel.id}` : '';
 	if (item.renote) {

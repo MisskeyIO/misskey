@@ -61,7 +61,7 @@ export class ScheduledNoteProcessorService {
 		try {
 			const note = (await this.noteCreateService.create(draft.user, {
 				...draft.draft,
-				createdAt: draft.scheduledAt,
+				createdAt: new Date(),
 				scheduledAt: null,
 			})) as MiNote;
 

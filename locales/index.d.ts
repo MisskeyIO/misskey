@@ -5490,11 +5490,11 @@ export interface Locale extends ILocale {
          */
         "violationRights_description": string;
         /**
-         * 権利侵害やなりすまし（第三者による通報）
+         * 権利侵害（第三者による通報）
          */
         "violationRightsOther": string;
         /**
-         * 他人の著作権、商標権、またはその他の権利を侵害する投稿及びなりすまし行為
+         * 他人の著作権、商標権、またはその他の権利を侵害する行為
          * 第三者による通報の場合、法律で定められた非親告罪の範囲外のケースには対応できないことがあります
          */
         "violationRightsOther_description": string;
@@ -7019,6 +7019,14 @@ export interface Locale extends ILocale {
              * 予約投稿の許可
              */
             "canScheduleNote": string;
+            /**
+             * 予約投稿の最大数
+             */
+            "scheduleNoteLimit": string;
+            /**
+             * 予約投稿の最大日数
+             */
+            "scheduleNoteMaxDays": string;
             /**
              * メンション、リプライ、引用の許可
              */
@@ -9068,9 +9076,13 @@ export interface Locale extends ILocale {
             "f": string;
         };
         /**
-         * [NSFWガイドライン]({nsfwGuideUrl})を必ずお読みになってからご利用ください。
+         * 予約できる日数の上限は{max}日です。
          */
-        "guidelineInfo": ParameterizedString<"nsfwGuideUrl">;
+        "policyScheduleNoteMaxDaysExceeded": ParameterizedString<"max">;
+        /**
+         * 投稿する前に、[利用規約]({tosUrl})を必ずお読みください。
+         */
+        "tosAndGuidelinesInfo": ParameterizedString<"tosUrl">;
     };
     "_profile": {
         /**

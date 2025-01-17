@@ -1370,8 +1370,8 @@ _abuseReportCategory:
   otherBreach_description: "明確に分類されないその他の規約違反行為"
   violationRights: "権利侵害やなりすまし（侵害を受けた権利者本人によるご申告）"
   violationRights_description: "権利者本人の著作権、商標権、またはその他の権利を侵害する投稿及びなりすまし行為"
-  violationRightsOther: "権利侵害やなりすまし（第三者による通報）"
-  violationRightsOther_description: "他人の著作権、商標権、またはその他の権利を侵害する投稿及びなりすまし行為\n第三者による通報の場合、法律で定められた非親告罪の範囲外のケースには対応できないことがあります"
+  violationRightsOther: "権利侵害（第三者による通報）"
+  violationRightsOther_description: "他人の著作権、商標権、またはその他の権利を侵害する行為\n第三者による通報の場合、法律で定められた非親告罪の範囲外のケースには対応できないことがあります"
   notLike: "この人が気に入らない"
   notLike_description: "個人的な理由で不快と感じるユーザーや投稿"
   other: "その他"
@@ -1808,6 +1808,8 @@ _role:
     ltlAvailable: "ローカルタイムラインの閲覧"
     canPublicNote: "パブリック投稿の許可"
     canScheduleNote: "予約投稿の許可"
+    scheduleNoteLimit: "予約投稿の最大数"
+    scheduleNoteMaxDays: "予約投稿の最大日数"
     canInitiateConversation: "メンション、リプライ、引用の許可"
     canCreateContent: "コンテンツの作成"
     canUpdateContent: "コンテンツの編集"
@@ -2377,7 +2379,8 @@ _postForm:
     d: "言いたいことは？"
     e: "ここに書いてください"
     f: "あなたが書くのを待っています..."
-  guidelineInfo: "[NSFWガイドライン]({nsfwGuideUrl})を必ずお読みになってからご利用ください。"
+  policyScheduleNoteMaxDaysExceeded: "現在の支援プランで予約できる日数の上限は{max}日です。\n[ここ](https://go.misskey.io/donate)からプランをアップグレードできます。"
+  tosAndGuidelinesInfo: "投稿する前に、[利用規約]({tosUrl})と[NSFWガイドライン](https://go.misskey.io/media-guideline)を必ずお読みください。"
 
 _profile:
   name: "名前"
@@ -2403,7 +2406,7 @@ _profile:
   sectionName: "セクション名"
   sectionNameNoneDescription: "セクション名を表示しないようにする"
   sectionNameNone: "名前が表示されないセクション"
-  policyDisplayLimitExceeded: "現在の支援プランの表示上限({max}個)を超えているため、この項目は表示されません。[ここ](https://go.misskey.io/donate)からプランをアップグレードできます。"
+  policyDisplayLimitExceeded: "現在の支援プランの表示上限({max}個)を超えているため、この項目は表示されません。\n[ここ](https://go.misskey.io/donate)からプランをアップグレードできます。"
 
 _exportOrImport:
   allNotes: "全てのノート"

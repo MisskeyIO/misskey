@@ -115,8 +115,8 @@ importers:
         specifier: 11.0.1
         version: 11.0.1(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       '@fastify/multipart':
-        specifier: 9.0.2
-        version: 9.0.2
+        specifier: 9.0.3
+        version: 9.0.3
       '@fastify/static':
         specifier: 8.0.4
         version: 8.0.4
@@ -128,7 +128,7 @@ importers:
         version: 1.2.0
       '@misskey-dev/summaly':
         specifier: github:MisskeyIO/summaly#5.1.3
-        version: https://codeload.github.com/MisskeyIO/summaly/tar.gz/62a0730625ba2ea5530d8ef1642afa8880e4528d
+        version: git+https://git@github.com:MisskeyIO/summaly.git#62a0730625ba2ea5530d8ef1642afa8880e4528d
       '@napi-rs/canvas':
         specifier: 0.1.65
         version: 0.1.65
@@ -745,7 +745,7 @@ importers:
         version: 3.5.13
       aiscript-vscode:
         specifier: github:aiscript-dev/aiscript-vscode#v0.1.15
-        version: https://codeload.github.com/aiscript-dev/aiscript-vscode/tar.gz/c3cde89e79a41d93540cf8a48cd619c3f2dcb1b7
+        version: git+https://git@github.com:aiscript-dev/aiscript-vscode.git#c3cde89e79a41d93540cf8a48cd619c3f2dcb1b7
       astring:
         specifier: 1.9.0
         version: 1.9.0
@@ -883,14 +883,14 @@ importers:
         version: 4.1.0(vue@3.5.13(typescript@5.7.3))
       webgl-audiovisualizer:
         specifier: github:tar-bin/webgl-audiovisualizer
-        version: https://codeload.github.com/tar-bin/webgl-audiovisualizer/tar.gz/345b9e82e25a1501749c622790b924658e4914cc
+        version: git+https://git@github.com:tar-bin/webgl-audiovisualizer.git#345b9e82e25a1501749c622790b924658e4914cc
     devDependencies:
       '@misskey-dev/eslint-plugin':
         specifier: 1.0.0
         version: 1.0.0(@typescript-eslint/eslint-plugin@7.10.0(@typescript-eslint/parser@7.10.0(eslint@8.57.1)(typescript@5.7.3))(eslint@8.57.1)(typescript@5.7.3))(@typescript-eslint/parser@7.10.0(eslint@8.57.1)(typescript@5.7.3))(eslint-plugin-import@2.31.0(@typescript-eslint/parser@7.10.0(eslint@8.57.1)(typescript@5.7.3))(eslint@8.57.1))(eslint@8.57.1)
       '@misskey-dev/summaly':
         specifier: github:MisskeyIO/summaly#5.1.3
-        version: https://codeload.github.com/MisskeyIO/summaly/tar.gz/62a0730625ba2ea5530d8ef1642afa8880e4528d
+        version: git+https://git@github.com:MisskeyIO/summaly.git#62a0730625ba2ea5530d8ef1642afa8880e4528d
       '@storybook/addon-actions':
         specifier: 8.5.0
         version: 8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5))
@@ -1049,7 +1049,7 @@ importers:
         version: 8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)
       storybook-addon-misskey-theme:
         specifier: github:misskey-dev/storybook-addon-misskey-theme
-        version: https://codeload.github.com/misskey-dev/storybook-addon-misskey-theme/tar.gz/cf583db098365b2ccc81a82f63ca9c93bc32b640(@storybook/blocks@8.5.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/components@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/core-events@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/manager-api@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/preview-api@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/theming@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/types@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+        version: git+https://git@github.com:misskey-dev/storybook-addon-misskey-theme.git#cf583db098365b2ccc81a82f63ca9c93bc32b640(@storybook/blocks@8.5.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/components@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/core-events@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/manager-api@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/preview-api@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/theming@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/types@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       vite-plugin-turbosnap:
         specifier: 1.0.3
         version: 1.0.3
@@ -1980,8 +1980,8 @@ packages:
   '@fastify/merge-json-schemas@0.2.1':
     resolution: {integrity: sha512-OA3KGBCy6KtIvLf8DINC5880o5iBlDX4SxzLQS8HorJAbqluzLRn80UXU0bxZn7UOFhFgpRJDasfwn9nG4FG4A==}
 
-  '@fastify/multipart@9.0.2':
-    resolution: {integrity: sha512-UOB5zl62YYTrM99o06Hk8gFVpHBhPwuP7IXeihRjl4nK835XQG3XwN9a+Dd2b4aFYapsQtt1h+QqTCY3ZPhEww==}
+  '@fastify/multipart@9.0.3':
+    resolution: {integrity: sha512-pJogxQCrT12/6I5Fh6jr3narwcymA0pv4B0jbC7c6Bl9wnrxomEUnV0d26w6gUls7gSXmhG8JGRMmHFIPsxt1g==}
 
   '@fastify/proxy-addr@5.0.0':
     resolution: {integrity: sha512-37qVVA1qZ5sgH7KpHkkC4z9SK6StIsIcOmpjvMPXNb3vx2GQxhZocogVYbr2PbbeLCQxYIPDok307xEvRZOzGA==}
@@ -2344,8 +2344,8 @@ packages:
   '@misskey-dev/sharp-read-bmp@1.2.0':
     resolution: {integrity: sha512-er4pRakXzHYfEgOFAFfQagqDouG+wLm+kwNq1I30oSdIHDa0wM3KjFpfIGQ25Fks4GcmOl1s7Zh6xoQu5dNjTw==}
 
-  '@misskey-dev/summaly@https://codeload.github.com/MisskeyIO/summaly/tar.gz/62a0730625ba2ea5530d8ef1642afa8880e4528d':
-    resolution: {tarball: https://codeload.github.com/MisskeyIO/summaly/tar.gz/62a0730625ba2ea5530d8ef1642afa8880e4528d}
+  '@misskey-dev/summaly@git+https://git@github.com:MisskeyIO/summaly.git#62a0730625ba2ea5530d8ef1642afa8880e4528d':
+    resolution: {commit: 62a0730625ba2ea5530d8ef1642afa8880e4528d, repo: git@github.com:MisskeyIO/summaly.git, type: git}
     version: 5.1.3
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
@@ -4222,8 +4222,8 @@ packages:
     resolution: {integrity: sha512-gOsf2YwSlleG6IjRYG2A7k0HmBMEo6qVNk9Bp/EaLgAJT5ngH6PXbqa4ItvnEwCm/velL5jAnQgsHsWnjhGmvw==}
     engines: {node: '>=18'}
 
-  aiscript-vscode@https://codeload.github.com/aiscript-dev/aiscript-vscode/tar.gz/c3cde89e79a41d93540cf8a48cd619c3f2dcb1b7:
-    resolution: {tarball: https://codeload.github.com/aiscript-dev/aiscript-vscode/tar.gz/c3cde89e79a41d93540cf8a48cd619c3f2dcb1b7}
+  aiscript-vscode@git+https://git@github.com:aiscript-dev/aiscript-vscode.git#c3cde89e79a41d93540cf8a48cd619c3f2dcb1b7:
+    resolution: {commit: c3cde89e79a41d93540cf8a48cd619c3f2dcb1b7, repo: git@github.com:aiscript-dev/aiscript-vscode.git, type: git}
     version: 0.1.15
     engines: {vscode: ^1.83.0}
 
@@ -6880,6 +6880,7 @@ packages:
 
   lodash.get@4.4.2:
     resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
+    deprecated: This package is deprecated. Use the optional chaining (?.) operator instead.
 
   lodash.isarguments@3.1.0:
     resolution: {integrity: sha512-chi4NHZlZqZD18a0imDHnZPrDeBbTtVN7GXMwuGdRH9qotxAjYs3aVLKc7zNOG9eddR5Ksd8rvFEBc9SsggPpg==}
@@ -8920,8 +8921,8 @@ packages:
     resolution: {integrity: sha512-eLoXW/DHyl62zxY4SCaIgnRhuMr6ri4juEYARS8E6sCEqzKpOiE521Ucofdx+KnDZl5xmvGYaaKCk5FEOxJCoQ==}
     engines: {node: '>= 0.4'}
 
-  storybook-addon-misskey-theme@https://codeload.github.com/misskey-dev/storybook-addon-misskey-theme/tar.gz/cf583db098365b2ccc81a82f63ca9c93bc32b640:
-    resolution: {tarball: https://codeload.github.com/misskey-dev/storybook-addon-misskey-theme/tar.gz/cf583db098365b2ccc81a82f63ca9c93bc32b640}
+  storybook-addon-misskey-theme@git+https://git@github.com:misskey-dev/storybook-addon-misskey-theme.git#cf583db098365b2ccc81a82f63ca9c93bc32b640:
+    resolution: {commit: cf583db098365b2ccc81a82f63ca9c93bc32b640, repo: git@github.com:misskey-dev/storybook-addon-misskey-theme.git, type: git}
     version: 0.0.0
     peerDependencies:
       '@storybook/blocks': ^7.0.0-rc.4
@@ -9824,8 +9825,8 @@ packages:
     resolution: {integrity: sha512-A7Jxrg7+eV+eZR/CIdESDnRGFb6/bcKukGvJBB5snI6cw3is1c2qamkYstC1bY1p08TyMRlN9eTMkxmnKJBPBw==}
     engines: {node: '>= 8'}
 
-  webgl-audiovisualizer@https://codeload.github.com/tar-bin/webgl-audiovisualizer/tar.gz/345b9e82e25a1501749c622790b924658e4914cc:
-    resolution: {tarball: https://codeload.github.com/tar-bin/webgl-audiovisualizer/tar.gz/345b9e82e25a1501749c622790b924658e4914cc}
+  webgl-audiovisualizer@git+https://git@github.com:tar-bin/webgl-audiovisualizer.git#345b9e82e25a1501749c622790b924658e4914cc:
+    resolution: {commit: 345b9e82e25a1501749c622790b924658e4914cc, repo: git@github.com:tar-bin/webgl-audiovisualizer.git, type: git}
     version: 0.0.0
 
   webidl-conversions@3.0.1:
@@ -11155,7 +11156,7 @@ snapshots:
     dependencies:
       dequal: 2.0.3
 
-  '@fastify/multipart@9.0.2':
+  '@fastify/multipart@9.0.3':
     dependencies:
       '@fastify/busboy': 3.1.1
       '@fastify/deepmerge': 2.0.1
@@ -11646,7 +11647,7 @@ snapshots:
       decode-ico: 0.4.1
       sharp: 0.33.5
 
-  '@misskey-dev/summaly@https://codeload.github.com/MisskeyIO/summaly/tar.gz/62a0730625ba2ea5530d8ef1642afa8880e4528d':
+  '@misskey-dev/summaly@git+https://git@github.com:MisskeyIO/summaly.git#62a0730625ba2ea5530d8ef1642afa8880e4528d':
     dependencies:
       cheerio: 1.0.0
       escape-regexp: 0.0.1
@@ -13828,7 +13829,7 @@ snapshots:
       clean-stack: 5.2.0
       indent-string: 5.0.0
 
-  aiscript-vscode@https://codeload.github.com/aiscript-dev/aiscript-vscode/tar.gz/c3cde89e79a41d93540cf8a48cd619c3f2dcb1b7:
+  aiscript-vscode@git+https://git@github.com:aiscript-dev/aiscript-vscode.git#c3cde89e79a41d93540cf8a48cd619c3f2dcb1b7:
     dependencies:
       '@aiscript-dev/aiscript-languageserver': https://github.com/aiscript-dev/aiscript-languageserver/releases/download/0.1.6/aiscript-dev-aiscript-languageserver-0.1.6.tgz
       vscode-languageclient: 9.0.1
@@ -19467,7 +19468,7 @@ snapshots:
       es-errors: 1.3.0
       internal-slot: 1.1.0
 
-  storybook-addon-misskey-theme@https://codeload.github.com/misskey-dev/storybook-addon-misskey-theme/tar.gz/cf583db098365b2ccc81a82f63ca9c93bc32b640(@storybook/blocks@8.5.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/components@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/core-events@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/manager-api@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/preview-api@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/theming@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/types@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+  storybook-addon-misskey-theme@git+https://git@github.com:misskey-dev/storybook-addon-misskey-theme.git#cf583db098365b2ccc81a82f63ca9c93bc32b640(@storybook/blocks@8.5.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/components@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/core-events@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/manager-api@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/preview-api@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/theming@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(@storybook/types@8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5)))(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
       '@storybook/blocks': 8.5.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5))
       '@storybook/components': 8.5.0(storybook@8.5.0(bufferutil@4.0.9)(prettier@3.4.2)(utf-8-validate@6.0.5))
@@ -20325,7 +20326,7 @@ snapshots:
 
   web-streams-polyfill@4.1.0: {}
 
-  webgl-audiovisualizer@https://codeload.github.com/tar-bin/webgl-audiovisualizer/tar.gz/345b9e82e25a1501749c622790b924658e4914cc: {}
+  webgl-audiovisualizer@git+https://git@github.com:tar-bin/webgl-audiovisualizer.git#345b9e82e25a1501749c622790b924658e4914cc: {}
 
   webidl-conversions@3.0.1: {}
 

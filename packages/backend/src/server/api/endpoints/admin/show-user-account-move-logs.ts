@@ -62,6 +62,9 @@ export const paramDef = {
 		untilId: { type: 'string', format: 'misskey:id' },
 		movedFromId: { type: 'string', format: 'misskey:id', nullable: true },
 		movedToId: { type: 'string', format: 'misskey:id', nullable: true },
+		toLocal: { type: 'boolean', nullable: true },
+		fromLocal: { type: 'boolean', nullable: true },
+		toFromLocal: { type: 'boolean', nullable: true },
 	},
 	required: [],
 } as const;
@@ -84,6 +87,28 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (ps.movedToId != null) {
 				query.andWhere('accountMoveLogs.movedToId = :movedToId', { movedToId: ps.movedToId });
+			}
+
+			if (ps.toLocal || ps.fromLocal || ps.toFromLocal) {
+				query.innerJoin('accountMoveLogs.movedTo', 'movedTo')
+					.innerJoin('accountMoveLogs.movedFrom', 'movedFrom');
+			}
+
+			if (ps.toLocal && ps.fromLocal) {
+				query.andWhere('(movedTo.host IS NULL OR movedFrom.host IS NULL)');
+			} else {
+				if (ps.toLocal) {
+					query.andWhere('movedFrom.host IS NULL');
+					query.andWhere('movedTo.host IS NOT NULL');
+				}
+				if (ps.fromLocal) {
+					query.andWhere('movedTo.host IS NULL');
+					query.andWhere('movedFrom.host IS NOT NULL');
+				}
+			}
+
+			if (ps.toFromLocal) {
+				query.andWhere('movedTo.host IS NULL AND movedFrom.host IS NULL');
 			}
 
 			const accountMoveLogs = await query.limit(ps.limit).getMany();

@@ -9,6 +9,17 @@
 			<MkInput v-model="movedToId" style="margin: 0; flex: 1;">
 				<template #label> {{ i18n.ts.movedToId }}</template>
 			</MkInput>
+			<div class="_gaps_s">
+				<MkSwitch v-model="toLocal" :disabled="toFromLocal">
+					<template #label> {{ i18n.ts.toLocal }}</template>
+				</MkSwitch>
+				<MkSwitch v-model="fromLocal" :disabled="toFromLocal">
+					<template #label> {{ i18n.ts.fromLocal }}</template>
+				</MkSwitch>
+				<MkSwitch v-model="toFromLocal" :disabled="toLocal || fromLocal">
+					<template #label> {{ i18n.ts.toFromLocal }}</template>
+				</MkSwitch>
+			</div>
 		</div>
 
 		<MkPagination v-slot="{items}" ref="logs" :pagination="pagination" style="margin-top: var(--margin);">
@@ -48,11 +59,15 @@ import { i18n } from '@/i18n.js';
 import { definePageMetadata } from '@/scripts/page-metadata.js';
 import { userPage } from '@/filters/user.js';
 import MkFolder from '@/components/MkFolder.vue';
+import MkSwitch from '@/components/MkSwitch.vue';
 
 const logs = shallowRef<InstanceType<typeof MkPagination>>();
 
 const movedToId = ref('');
 const movedFromId = ref('');
+const toLocal = ref<boolean>(false);
+const fromLocal = ref<boolean>(false);
+const toFromLocal = ref<boolean>(false);
 
 const pagination = {
 	endpoint: 'admin/show-user-account-move-logs' as const,
@@ -60,6 +75,9 @@ const pagination = {
 	params: computed(() => ({
 		movedFromId: movedFromId.value === '' ? null : movedFromId.value,
 		movedToId: movedToId.value === '' ? null : movedToId.value,
+		toLocal: toLocal.value,
+		fromLocal: fromLocal.value,
+		toFromLocal: toFromLocal.value,
 	})),
 };
 

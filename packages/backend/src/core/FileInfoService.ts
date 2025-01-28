@@ -9,11 +9,11 @@ import { join } from 'node:path';
 import * as stream from 'node:stream/promises';
 import { Injectable } from '@nestjs/common';
 import { FSWatcher } from 'chokidar';
-import * as fileType from 'file-type';
+import { fileTypeFromFile } from 'file-type';
 import FFmpeg from 'fluent-ffmpeg';
 import isSvg from 'is-svg';
 import probeImageSize from 'probe-image-size';
-import { type predictionType } from 'nsfwjs';
+import { type PredictionType } from 'nsfwjs';
 import { sharpBmp } from '@misskey-dev/sharp-read-bmp';
 import { encode } from 'blurhash';
 import { createTempDir } from '@/misc/create-temp.js';
@@ -170,7 +170,7 @@ export class FileInfoService {
 		let sensitive = false;
 		let porn = false;
 
-		function judgePrediction(result: readonly predictionType[]): [sensitive: boolean, porn: boolean] {
+		function judgePrediction(result: readonly PredictionType[]): [sensitive: boolean, porn: boolean] {
 			let sensitive = false;
 			let porn = false;
 
@@ -188,7 +188,7 @@ export class FileInfoService {
 			'image/png',
 			'image/webp',
 		].includes(mime)) {
-			const result = await this.aiService.detectSensitive(source);
+			const result = await this.aiService.detectSensitive(source, mime);
 			if (result) {
 				[sensitive, porn] = judgePrediction(result);
 			}
@@ -247,7 +247,7 @@ export class FileInfoService {
 						}
 						targetIndex = nextIndex;
 						nextIndex += index; // fibonacci sequence によってフレーム数制限を掛ける
-						const result = await this.aiService.detectSensitive(path);
+						const result = await this.aiService.detectSensitive(path, 'image/png');
 						if (result) {
 							results.push(judgePrediction(result));
 						}
@@ -309,7 +309,7 @@ export class FileInfoService {
 	}
 
 	@bindThis
-	public fixMime(mime: string | fileType.MimeType): string {
+	public fixMime(mime: string): string {
 		// see https://github.com/misskey-dev/misskey/pull/10686
 		if (mime === 'audio/x-flac') {
 			return 'audio/flac';
@@ -363,7 +363,7 @@ export class FileInfoService {
 			return TYPE_OCTET_STREAM;
 		}
 
-		const type = await fileType.fileTypeFromFile(path);
+		const type = await fileTypeFromFile(path);
 
 		if (type) {
 		// XMLはSVGかもしれない
@@ -457,9 +457,9 @@ export class FileInfoService {
 	private async getBlurhash(path: string, type: string): Promise<string> {
 		const sharp = await sharpBmp(path, type);
 		const { data, info } = await sharp
-			.raw()
-			.ensureAlpha()
 			.resize(64, 64, { fit: 'inside' })
+			.ensureAlpha()
+			.raw()
 			.toBuffer({ resolveWithObject: true });
 
 		return encode(new Uint8ClampedArray(data), info.width, info.height, 5, 5);

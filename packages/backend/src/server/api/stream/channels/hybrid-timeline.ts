@@ -20,6 +20,7 @@ class HybridTimelineChannel extends Channel {
 	private withRenotes: boolean;
 	private withReplies: boolean;
 	private withFiles: boolean;
+	private minimize: boolean;
 
 	constructor(
 		private metaService: MetaService,
@@ -41,6 +42,7 @@ class HybridTimelineChannel extends Channel {
 		this.withRenotes = params.withRenotes ?? true;
 		this.withReplies = params.withReplies ?? false;
 		this.withFiles = params.withFiles ?? false;
+		this.minimize = params.minimize ?? false;
 
 		// Subscribe events
 		this.subscriber.on('notesStream', this.onNote);
@@ -103,9 +105,20 @@ class HybridTimelineChannel extends Channel {
 			}
 		}
 
-		this.connection.cacheNote(note);
+		if (this.user && (note.visibleUserIds?.includes(this.user.id) ?? note.mentions?.includes(this.user.id))) {
+			this.connection.cacheNote(note);
+		}
 
-		this.send('note', note);
+		if (this.minimize && ['public', 'home'].includes(note.visibility)) {
+			this.send('note', {
+				id: note.id, myReaction: note.myReaction,
+				poll: note.poll?.choices ? { choices: note.poll.choices } : undefined,
+				reply: note.reply?.myReaction ? { myReaction: note.reply.myReaction } : undefined,
+				renote: note.renote?.myReaction ? { myReaction: note.renote.myReaction } : undefined,
+			});
+		} else {
+			this.send('note', note);
+		}
 	}
 
 	@bindThis

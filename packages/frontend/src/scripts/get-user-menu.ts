@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { toUnicode } from 'punycode';
+import { toUnicode } from 'punycode.js';
 import { defineAsyncComponent, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import { i18n } from '@/i18n.js';
@@ -295,7 +295,14 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: IRouter
 								: period === 'oneMonth' ? Date.now() + (1000 * 60 * 60 * 24 * 30)
 								: null;
 
-							os.apiWithDialog('admin/roles/assign', { roleId: r.id, userId: user.id, expiresAt });
+							const { canceled: canceled3, result: memo } = await os.inputText({
+								title: i18n.ts.addMemo,
+								type: 'textarea',
+								default: '',
+							});
+							if (canceled3) return;
+
+							os.apiWithDialog('admin/roles/assign', { roleId: r.id, userId: user.id, memo: memo ?? undefined, expiresAt });
 						},
 					}));
 				},

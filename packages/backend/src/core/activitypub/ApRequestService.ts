@@ -6,15 +6,18 @@
 import * as crypto from 'node:crypto';
 import { URL } from 'node:url';
 import { Inject, Injectable } from '@nestjs/common';
+import { JSDOM } from 'jsdom';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import type { MiUser } from '@/models/User.js';
 import { UserKeypairService } from '@/core/UserKeypairService.js';
+import { UtilityService } from '@/core/UtilityService.js';
 import { HttpRequestService } from '@/core/HttpRequestService.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import { bindThis } from '@/decorators.js';
 import type Logger from '@/logger.js';
 import { validateContentTypeSetAsActivityPub } from '@/core/activitypub/misc/validator.js';
+import type { IObject } from './type.js';
 
 type Request = {
 	url: string;
@@ -144,6 +147,7 @@ export class ApRequestService {
 		private userKeypairService: UserKeypairService,
 		private httpRequestService: HttpRequestService,
 		private loggerService: LoggerService,
+		private utilityService: UtilityService,
 	) {
 		this.logger = this.loggerService.getLogger('ap:request');
 	}
@@ -177,9 +181,11 @@ export class ApRequestService {
 	 * Get AP object with http-signature
 	 * @param user http-signature user
 	 * @param url URL to fetch
+	 * @param followAlternate If true, follow alternate link tag in HTML
 	 */
 	@bindThis
-	public async signedGet(url: string, user: { id: MiUser['id'] }): Promise<unknown> {
+	public async signedGet(url: string, user: { id: MiUser['id'] }, followAlternate?: boolean): Promise<unknown> {
+		const _followAlternate = followAlternate ?? true;
 		const keypair = await this.userKeypairService.getUserKeypair(user.id);
 
 		const req = ApRequestCreator.createSignedGet({
@@ -197,9 +203,39 @@ export class ApRequestService {
 			headers: req.request.headers,
 		}, {
 			throwErrorWhenResponseNotOk: true,
-			validators: [validateContentTypeSetAsActivityPub],
 		});
 
-		return await res.json();
+		//#region リクエスト先がhtmlかつactivity+jsonへのalternate linkタグがあるとき
+		const contentType = res.headers.get('content-type');
+
+		if (
+			res.ok &&
+			(contentType ?? '').split(';')[0].trimEnd().toLowerCase() === 'text/html' &&
+			_followAlternate
+		) {
+			const html = await res.text();
+			try {
+				const fragment = JSDOM.fragment(html);
+
+				const alternate = fragment.querySelector('head > link[rel="alternate"][type="application/activity+json"]');
+				if (alternate) {
+					const href = alternate.getAttribute('href');
+					if (href && this.utilityService.isRelatedUris(url, href)) {
+						return await this.signedGet(href, user, false);
+					}
+				}
+			} catch (e) {
+				// something went wrong parsing the HTML, ignore the whole thing
+			}
+		}
+		//#endregion
+
+		validateContentTypeSetAsActivityPub(res);
+		const finalUrl = res.url; // redirects may have been involved
+		const activity = await res.json() as IObject;
+
+		this.utilityService.assertActivityRelatedToUrl(activity, finalUrl);
+
+		return activity;
 	}
 }

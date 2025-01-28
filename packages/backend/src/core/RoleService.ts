@@ -36,6 +36,9 @@ export type RolePolicies = {
 	gtlAvailable: boolean;
 	ltlAvailable: boolean;
 	canPublicNote: boolean;
+	canScheduleNote: boolean;
+	scheduleNoteLimit: number;
+	scheduleNoteMaxDays: number;
 	canInitiateConversation: boolean;
 	canCreateContent: boolean;
 	canUpdateContent: boolean;
@@ -77,6 +80,9 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	gtlAvailable: true,
 	ltlAvailable: true,
 	canPublicNote: true,
+	canScheduleNote: true,
+	scheduleNoteLimit: 10,
+	scheduleNoteMaxDays: 365,
 	canInitiateConversation: true,
 	canCreateContent: true,
 	canUpdateContent: true,
@@ -149,10 +155,8 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		private moderationLogService: ModerationLogService,
 		private fanoutTimelineService: FanoutTimelineService,
 	) {
-		//this.onMessage = this.onMessage.bind(this);
-
-		this.rolesCache = new MemorySingleCache<MiRole[]>(1000 * 60 * 60 * 1);
-		this.roleAssignmentByUserIdCache = new MemoryKVCache<MiRoleAssignment[]>(1000 * 60 * 60 * 1);
+		this.rolesCache = new MemorySingleCache<MiRole[]>(1000 * 60 * 60); // 1h
+		this.roleAssignmentByUserIdCache = new MemoryKVCache<MiRoleAssignment[]>(1000 * 60 * 5); // 5m
 
 		this.redisForSub.on('message', this.onMessage);
 	}
@@ -391,6 +395,9 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			gtlAvailable: calc('gtlAvailable', vs => vs.some(v => v === true)),
 			ltlAvailable: calc('ltlAvailable', vs => vs.some(v => v === true)),
 			canPublicNote: calc('canPublicNote', vs => vs.some(v => v === true)),
+			canScheduleNote: calc('canScheduleNote', vs => vs.some(v => v === true)),
+			scheduleNoteLimit: calc('scheduleNoteLimit', vs => Math.max(...vs)),
+			scheduleNoteMaxDays: calc('scheduleNoteMaxDays', vs => Math.max(...vs)),
 			canInitiateConversation: calc('canInitiateConversation', vs => vs.some(v => v === true)),
 			canCreateContent: calc('canCreateContent', vs => vs.some(v => v === true)),
 			canUpdateContent: calc('canUpdateContent', vs => vs.some(v => v === true)),
@@ -490,7 +497,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
-	public async assign(userId: MiUser['id'], roleId: MiRole['id'], expiresAt: Date | null = null, moderator?: MiUser): Promise<void> {
+	public async assign(userId: MiUser['id'], roleId: MiRole['id'], memo: string | null = null, expiresAt: Date | null = null, moderator?: MiUser): Promise<void> {
 		const now = Date.now();
 
 		const role = await this.rolesRepository.findOneByOrFail({ id: roleId });
@@ -514,6 +521,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				expiresAt: expiresAt,
 				roleId: roleId,
 				userId: userId,
+				memo: memo,
 			}).then(x => this.roleAssignmentsRepository.findOneByOrFail(x.identifiers[0]));
 
 			this.globalEventService.publishInternalEvent('userRoleAssigned', created);
@@ -523,9 +531,10 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 					roleId: roleId,
 				});
 			}
-		} else if (existing.expiresAt !== expiresAt) {
+		} else if (existing.expiresAt !== expiresAt || existing.memo !== memo) {
 			await this.roleAssignmentsRepository.update(existing.id, {
 				expiresAt: expiresAt,
+				memo: memo,
 			});
 		} else {
 			throw new IdentifiableError('67d8689c-25c6-435f-8ced-631e4b81fce1', 'User is already assigned to this role.');
@@ -544,6 +553,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				userUsername: user.username,
 				userHost: user.host,
 				expiresAt: expiresAt ? expiresAt.toISOString() : null,
+				memo: memo,
 			});
 		}
 	}
@@ -584,6 +594,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				userId: userId,
 				userUsername: user.username,
 				userHost: user.host,
+				memo: existing.memo,
 			});
 		}
 	}

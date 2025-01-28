@@ -15,6 +15,7 @@ class ChannelChannel extends Channel {
 	public static readonly shouldShare = false;
 	public static readonly requireCredential = false as const;
 	private channelId: string;
+	private minimize: boolean;
 
 	constructor(
 		private noteEntityService: NoteEntityService,
@@ -29,6 +30,7 @@ class ChannelChannel extends Channel {
 	@bindThis
 	public async init(params: any) {
 		this.channelId = params.channelId as string;
+		this.minimize = params.minimize ?? false;
 
 		// Subscribe stream
 		this.subscriber.on('notesStream', this.onNote);
@@ -55,9 +57,20 @@ class ChannelChannel extends Channel {
 			}
 		}
 
-		this.connection.cacheNote(note);
+		if (this.user && (note.visibleUserIds?.includes(this.user.id) ?? note.mentions?.includes(this.user.id))) {
+			this.connection.cacheNote(note);
+		}
 
-		this.send('note', note);
+		if (this.minimize && ['public', 'home'].includes(note.visibility)) {
+			this.send('note', {
+				id: note.id, myReaction: note.myReaction,
+				poll: note.poll?.choices ? { choices: note.poll.choices } : undefined,
+				reply: note.reply?.myReaction ? { myReaction: note.reply.myReaction } : undefined,
+				renote: note.renote?.myReaction ? { myReaction: note.renote.myReaction } : undefined,
+			});
+		} else {
+			this.send('note', note);
+		}
 	}
 
 	@bindThis

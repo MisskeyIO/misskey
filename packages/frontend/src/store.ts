@@ -279,6 +279,10 @@ export const defaultStore = markRaw(new Storage('base', {
 		where: 'device',
 		default: false,
 	},
+	autoloadDrafts: {
+		where: 'device',
+		default: true,
+	},
 	enableInfiniteScroll: {
 		where: 'device',
 		default: true,
@@ -377,7 +381,7 @@ export const defaultStore = markRaw(new Storage('base', {
 	},
 	forceShowAds: {
 		where: 'device',
-		default: false,
+		default: true,
 	},
 	aiChanMode: {
 		where: 'device',
@@ -417,7 +421,7 @@ export const defaultStore = markRaw(new Storage('base', {
 	},
 	defaultWithReplies: {
 		where: 'account',
-		default: false,
+		default: true,
 	},
 	disableStreamingTimeline: {
 		where: 'device',

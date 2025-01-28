@@ -245,13 +245,13 @@ export class ClientServerService {
 			queues: [
 				this.systemQueue,
 				this.endedPollNotificationQueue,
+				...this.deliverQueue.queues,
+				...this.inboxQueue.queues,
 				this.dbQueue,
+				...this.relationshipQueue.queues,
 				this.objectStorageQueue,
 				this.webhookDeliverQueue,
-			].map(q => new BullMQAdapter(q))
-				.concat(this.deliverQueue.queues.map((q, index) => new BullMQAdapter(q, { prefix: `${index}-` })))
-				.concat(this.inboxQueue.queues.map((q, index) => new BullMQAdapter(q, { prefix: `${index}-` })))
-				.concat(this.relationshipQueue.queues.map((q, index) => new BullMQAdapter(q, { prefix: `${index}-` }))),
+			].map(q => new BullMQAdapter(q)),
 			serverAdapter,
 		});
 
@@ -303,9 +303,12 @@ export class ClientServerService {
 				done();
 			});
 		} else {
+			const configUrl = new URL(this.config.url);
+			const urlOriginWithoutPort = configUrl.origin.replace(/:\d+$/, '');
+
 			const port = (process.env.VITE_PORT ?? '5173');
 			fastify.register(fastifyProxy, {
-				upstream: 'http://localhost:' + port,
+				upstream: urlOriginWithoutPort + ':' + port,
 				prefix: '/vite',
 				rewritePrefix: '/vite',
 			});
@@ -534,7 +537,7 @@ export class ClientServerService {
 
 			vary(reply.raw, 'Accept');
 
-			if (user != null) {
+			if (user) {
 				const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
 				const meta = await this.metaService.fetch();
 				const me = profile.fields
@@ -564,11 +567,9 @@ export class ClientServerService {
 		fastify.get<{ Params: { user: string; } }>('/users/:user', async (request, reply) => {
 			const user = await this.usersRepository.findOneBy({
 				id: request.params.user,
-				host: IsNull(),
-				isSuspended: false,
 			});
 
-			if (user == null) {
+			if (!user || (user.isDeleted && user.isSuspended)) {
 				reply.code(404);
 				return;
 			}
@@ -613,6 +614,81 @@ export class ClientServerService {
 				}
 			} else {
 				return await renderBase(reply);
+			}
+		});
+
+		fastify.get<{ Params: { note: string; } }>('/notes/:note.json', async (request, reply) => {
+			const note = await this.notesRepository.findOneBy({
+				id: request.params.note,
+				visibility: In(['public', 'home']),
+			});
+
+			if (note) {
+				try {
+					const _note = await this.noteEntityService.pack(note, null);
+					reply.header('Content-Type', 'application/json; charset=utf-8');
+					reply.header('Cache-Control', 'public, max-age=600');
+					return reply.send(_note);
+				} catch (err) {
+					reply.header('Cache-Control', 'max-age=10, must-revalidate');
+					if (err instanceof IdentifiableError) {
+						this.clientLoggerService.logger.error(`Internal error occurred in ${request.routeOptions.url}: ${err.message}`, {
+							path: request.routeOptions.url,
+							params: request.params,
+							query: request.query,
+							id: err.id,
+							error: {
+								message: err.message,
+								code: 'INTERNAL_ERROR',
+								stack: err.stack,
+							},
+						});
+						const httpStatusCode = err.id === '85ab9bd7-3a41-4530-959d-f07073900109' ? 403 : 500;
+						reply.code(httpStatusCode);
+						return reply.send({
+							message: err.message,
+							code: 'INTERNAL_ERROR',
+							id: err.id,
+							kind: 'server',
+							httpStatusCode,
+							info: {
+								message: err.message,
+								code: err.name,
+								id: err.id,
+							},
+						});
+					} else {
+						const error = err as Error;
+						const errId = randomUUID();
+						this.clientLoggerService.logger.error(`Internal error occurred in ${request.routeOptions.url}: ${error.message}`, {
+							path: request.routeOptions.url,
+							params: request.params,
+							query: request.query,
+							id: errId,
+							error: {
+								message: error.message,
+								code: error.name,
+								stack: error.stack,
+							},
+						});
+						reply.code(500);
+						return reply.send({
+							message: 'Internal error occurred. Please contact us if the error persists.',
+							code: 'INTERNAL_ERROR',
+							id: 'b9f2a7f9-fe64-434b-9484-cb1f804d1a80',
+							kind: 'server',
+							httpStatusCode: 500,
+							info: {
+								message: error.message,
+								code: error.name,
+								id: errId,
+							},
+						});
+					}
+				}
+			} else {
+				reply.code(404);
+				return;
 			}
 		});
 

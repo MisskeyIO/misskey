@@ -42,7 +42,7 @@ export class Resolver {
 		private apRendererService: ApRendererService,
 		private apDbResolverService: ApDbResolverService,
 		private loggerService: LoggerService,
-		private recursionLimit = 100,
+		private recursionLimit = 256,
 	) {
 		this.history = new Set();
 		this.logger = this.loggerService.getLogger('ap:resolve');
@@ -51,6 +51,11 @@ export class Resolver {
 	@bindThis
 	public getHistory(): string[] {
 		return Array.from(this.history);
+	}
+
+	@bindThis
+	public getRecursionLimit(): number {
+		return this.recursionLimit;
 	}
 
 	@bindThis
@@ -84,18 +89,18 @@ export class Resolver {
 		}
 
 		if (this.history.size > this.recursionLimit) {
-			throw new Error(`hit recursion limit: ${this.utilityService.extractDbHost(value)}`);
+			throw new Error(`hit recursion limit: ${this.utilityService.extractHost(value)}`);
 		}
 
 		this.history.add(value);
 
-		const host = this.utilityService.extractDbHost(value);
+		const host = this.utilityService.extractHost(value);
 		if (this.utilityService.isSelfHost(host)) {
 			return await this.resolveLocal(value);
 		}
 
 		const meta = await this.metaService.fetch();
-		if (this.utilityService.isBlockedHost(meta.blockedHosts, host)) {
+		if (this.utilityService.isItemListedIn(host, meta.blockedHosts)) {
 			throw new Error('Instance is blocked');
 		}
 

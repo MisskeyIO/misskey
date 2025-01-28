@@ -11,9 +11,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div class="_gaps_m">
 				<div :class="$style.banner" :style="{ backgroundImage: `url(${ instance.bannerUrl })` }">
 					<div style="overflow: clip;">
-						<img v-if="miLocalStorage.getItem('kawaii')" src="/client-assets/kawaii/misskey-io.png" alt="" :class="$style.bannerIconAlt"/>
+						<img v-if="kawaiiMode" src="/client-assets/kawaii/misskey-io.png" alt="" :class="$style.bannerIconAlt"/>
 						<img v-else :src="instance.iconUrl ?? instance.faviconUrl ?? '/favicon.ico'" alt="" :class="$style.bannerIcon"/>
-						<Mfm v-if="miLocalStorage.getItem('kawaii')" text="Logo by @sawaratsuki@misskey.io" :class="$style.iconCredit"/>
+						<Mfm v-if="kawaiiMode" text="Logo by @sawaratsuki@misskey.io" :class="$style.iconCredit"/>
 						<div :class="$style.bannerName">
 							<b>{{ instance.name ?? host }}</b>
 						</div>
@@ -164,7 +164,7 @@ import MkKeyValue from '@/components/MkKeyValue.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import MkInstanceStats from '@/components/MkInstanceStats.vue';
 import MkHorizontalSwipe from '@/components/MkHorizontalSwipe.vue';
-import { misskeyApi } from '@/scripts/misskey-api.js';
+import { misskeyApiGet } from '@/scripts/misskey-api.js';
 import number from '@/filters/number.js';
 import { i18n } from '@/i18n.js';
 import { definePageMetadata } from '@/scripts/page-metadata.js';
@@ -178,6 +178,7 @@ const props = withDefaults(defineProps<{
 	initialTab: 'overview',
 });
 
+const kawaiiMode = miLocalStorage.getItem('kawaii') === 'true';
 const stats = ref<Misskey.entities.StatsResponse | null>(null);
 const tab = ref(props.initialTab);
 
@@ -187,8 +188,7 @@ watch(tab, () => {
 	}
 });
 
-const initStats = () => misskeyApi('stats', {
-}).then((res) => {
+const initStats = () => misskeyApiGet('stats').then((res) => {
 	stats.value = res;
 });
 

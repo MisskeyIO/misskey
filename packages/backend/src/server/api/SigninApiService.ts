@@ -3,11 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { randomUUID } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 import { IsNull } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type {
+	MiUserProfile,
 	SigninsRepository,
 	UserProfilesRepository,
 	UsersRepository,
@@ -25,9 +27,8 @@ import { FastifyReplyError } from '@/misc/fastify-reply-error.js';
 import { MetaService } from '@/core/MetaService.js';
 import { RateLimiterService } from './RateLimiterService.js';
 import { SigninService } from './SigninService.js';
-import type { AuthenticationResponseJSON } from '@simplewebauthn/types';
+import type { AuthenticationResponseJSON } from '@simplewebauthn/server';
 import type { FastifyReply, FastifyRequest } from 'fastify';
-import { randomUUID } from 'node:crypto';
 
 @Injectable()
 export class SigninApiService {
@@ -96,10 +97,15 @@ export class SigninApiService {
 			reply.code(429);
 			return {
 				error: {
-					message: 'Too many failed attempts to sign in. Try again later.',
-					code: 'TOO_MANY_AUTHENTICATION_FAILURES',
+					message: 'Rate limit exceeded. Please try again later.',
+					code: 'RATE_LIMIT_EXCEEDED',
 					id: '22d05606-fbcf-421a-a2db-b32610dcfd1b',
-				},
+					info: {
+						message: 'Too many failed attempts to sign in.',
+						code: 'TOO_MANY_AUTHENTICATION_FAILURES',
+						id: '6c181469-ecb9-42d2-82c9-60db5486a819',
+					},
+				}
 			};
 		}
 
@@ -121,34 +127,46 @@ export class SigninApiService {
 			return;
 		}
 
-		// Fetch user
-		const user = await this.usersRepository.findOneBy({
-			usernameLower: username.toLowerCase(),
-			host: IsNull(),
-		}) as MiLocalUser;
+		const loginWithEmail = username.includes('@');
 
-		if (user == null) {
+		// Fetch user
+		const profile = await this.userProfilesRepository.findOne({
+			relations: ['user'],
+			where: loginWithEmail ? {
+				email: username,
+				emailVerified: true,
+				user: {
+					host: IsNull(),
+				}
+			} : {
+				user: {
+					usernameLower: username.toLowerCase(),
+					host: IsNull(),
+				}
+			}
+		});
+		const user = (profile?.user as MiLocalUser) ?? null;
+
+		if (!user || !profile) {
 			logger.error('No such user.');
-			return error(404, {
-				id: '6cc579cc-885d-43d8-95c2-b8c7fc963280',
+			return error(403, {
+				id: loginWithEmail ? '932c904e-9460-45b7-9ce6-7ed33be7eb2c' : '6cc579cc-885d-43d8-95c2-b8c7fc963280',
 			});
 		}
 
 		if (user.isDeleted && user.isSuspended) {
 			logger.error('No such user. (logical deletion)');
-			return error(404, {
-				id: '6cc579cc-885d-43d8-95c2-b8c7fc963280',
+			return error(403, {
+				id: loginWithEmail ? '932c904e-9460-45b7-9ce6-7ed33be7eb2c' : '6cc579cc-885d-43d8-95c2-b8c7fc963280',
 			});
 		}
 
 		if (user.isSuspended) {
 			logger.error('User is suspended.');
 			return error(403, {
-				id: 'e03a5f46-d309-4865-9b69-56282d94e1eb',
+				id: loginWithEmail ? '932c904e-9460-45b7-9ce6-7ed33be7eb2c' : 'e03a5f46-d309-4865-9b69-56282d94e1eb',
 			});
 		}
-
-		const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
 
 		// Compare password
 		const same = await bcrypt.compare(password, profile.password!);
@@ -169,27 +187,26 @@ export class SigninApiService {
 		if (!profile.twoFactorEnabled) {
 			if (process.env.NODE_ENV !== 'test') {
 				const meta = await this.metaService.fetch();
-				if (meta.enableHcaptcha && meta.hcaptchaSecretKey) {
-					await this.captchaService.verifyHcaptcha(meta.hcaptchaSecretKey, body['hcaptcha-response']).catch(err => {
-						throw new FastifyReplyError(400, err);
-					});
-				}
+				try {
+					if (meta.enableHcaptcha && meta.hcaptchaSecretKey) {
+						await this.captchaService.verifyHcaptcha(meta.hcaptchaSecretKey, body['hcaptcha-response']);
+					}
 
-				if (meta.enableMcaptcha && meta.mcaptchaSecretKey && meta.mcaptchaSitekey && meta.mcaptchaInstanceUrl) {
-					await this.captchaService.verifyMcaptcha(meta.mcaptchaSecretKey, meta.mcaptchaSitekey, meta.mcaptchaInstanceUrl, body['m-captcha-response']).catch(err => {
-						throw new FastifyReplyError(400, err);
-					});
-				}
+					if (meta.enableMcaptcha && meta.mcaptchaSecretKey && meta.mcaptchaSitekey && meta.mcaptchaInstanceUrl) {
+						await this.captchaService.verifyMcaptcha(meta.mcaptchaSecretKey, meta.mcaptchaSitekey, meta.mcaptchaInstanceUrl, body['m-captcha-response']);
+					}
 
-				if (meta.enableRecaptcha && meta.recaptchaSecretKey) {
-					await this.captchaService.verifyRecaptcha(meta.recaptchaSecretKey, body['g-recaptcha-response']).catch(err => {
-						throw new FastifyReplyError(400, err);
-					});
-				}
+					if (meta.enableRecaptcha && meta.recaptchaSecretKey) {
+						await this.captchaService.verifyRecaptcha(meta.recaptchaSecretKey, body['g-recaptcha-response']);
+					}
 
-				if (meta.enableTurnstile && meta.turnstileSecretKey) {
-					await this.captchaService.verifyTurnstile(meta.turnstileSecretKey, body['turnstile-response']).catch(err => {
-						throw new FastifyReplyError(400, err);
+					if (meta.enableTurnstile && meta.turnstileSecretKey) {
+						await this.captchaService.verifyTurnstile(meta.turnstileSecretKey, body['turnstile-response']);
+					}
+				} catch (err) {
+					logger.error(`Invalid request: captcha verification failed: ${err}`);
+					return await fail(403, {
+						id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
 					});
 				}
 			}
@@ -218,7 +235,7 @@ export class SigninApiService {
 			} catch (e) {
 				logger.error('Invalid request: Unable to authenticate with two-factor token.');
 				return await fail(403, {
-					id: 'cdf1235b-ac71-46d4-a3a6-84ccce48df6f',
+					id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
 				});
 			}
 
@@ -240,7 +257,7 @@ export class SigninApiService {
 			} else {
 				logger.error('Invalid request: Unable to authenticate with WebAuthn credential.');
 				return await fail(403, {
-					id: '93b86c4b-72f9-40eb-9815-798928603d1e',
+					id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
 				});
 			}
 		} else {

@@ -41,12 +41,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<span v-else-if="reactionAcceptance === 'likeOnlyForRemote'"><i class="ti ti-heart-plus"></i></span>
 				<span v-else><i class="ti ti-icons"></i></span>
 			</button>
+			<button v-if="!props.instant" v-click-anime v-tooltip="i18n.ts.drafts" class="_button" :class="$style.headerRightItem" @click="openDrafts">
+				<i class="ti ti-pencil"></i>
+			</button>
 			<button v-click-anime class="_button" :class="$style.submit" :disabled="!canPost" data-cy-open-post-form-submit @click="post">
 				<div :class="$style.submitInner">
 					<template v-if="posted"></template>
 					<template v-else-if="posting"><MkEllipsis/></template>
-					<template v-else>{{ submitText }}</template>
-					<i style="margin-left: 6px;" :class="posted ? 'ti ti-check' : reply ? 'ti ti-arrow-back-up' : renote ? 'ti ti-quote' : 'ti ti-send'"></i>
+					<template v-else>
+						<span :class="$style.submitButtonText">
+							{{ submitText }}
+						</span>
+					</template>
+					<span>
+						<i :class="posted ? 'ti ti-check' : reply ? 'ti ti-arrow-back-up' : renote ? 'ti ti-quote' : 'ti ti-send'"></i>
+					</span>
 				</div>
 			</button>
 		</div>
@@ -72,7 +81,24 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div v-if="maxTextLength - textLength < 100" :class="['_acrylic', $style.textCount, { [$style.textOver]: textLength > maxTextLength }]">{{ maxTextLength - textLength }}</div>
 	</div>
 	<input v-show="withHashtags" ref="hashtagsInputEl" v-model="hashtags" class="mk-input-text" :class="$style.hashtags" :placeholder="i18n.ts.hashtags" list="hashtags">
-	<MkInfo v-if="files.length > 0" warn :class="$style.guidelineInfo" :rounded="false"><Mfm :text="i18n.tsx._postForm.guidelineInfo({ tosUrl: instance.tosUrl, nsfwGuideUrl })"/></MkInfo>
+	<div v-if="scheduledTime" :class="$style.scheduledTime">
+		<div>
+			<div style="display: flex; gap: 4px" :style="scheduledTimeExceededPolicy ? 'color: var(--error)' : undefined">
+				<span style="margin-right: 4px"><i class="ti ti-calendar-clock"></i></span>
+				<component :is="scheduledTimeExceededPolicy ? 'del' : 'span'" :style="scheduledTimeExceededPolicy ? 'opacity: 0.6' : undefined">
+					{{ i18n.tsx.willBePostedAt({ x: dateTimeFormat.format(scheduledTime) }) }}
+				</component>
+			</div>
+			<div v-if="scheduledTimeExceededPolicy" style="display: flex; gap: 4px; margin-top: 4px; color: var(--infoWarnFg)">
+				<span style="margin-right: 4px"><i class="ti ti-exclamation-circle"></i></span>
+				<Mfm :text="i18n.tsx._postForm.policyScheduleNoteMaxDaysExceeded({ max: $i.policies.scheduleNoteMaxDays })"/>
+			</div>
+		</div>
+		<button class="_button" style="margin-left: auto" @click="scheduledTime = null"><i class="ti ti-x"></i></button>
+	</div>
+	<MkInfo v-if="files.length > 0 && instance.tosUrl" warn style="margin-top: 8px;" :rounded="false">
+		<Mfm :text="i18n.tsx._postForm.tosAndGuidelinesInfo({ tosUrl: instance.tosUrl })"/>
+	</MkInfo>
 	<XPostFormAttaches v-model="files" @detach="detachFile" @changeSensitive="updateFileSensitive" @changeName="updateFileName" @replaceFile="replaceFile"/>
 	<MkPollEditor v-if="poll" v-model="poll" @destroyed="poll = null"/>
 	<MkNotePreview v-if="showPreview" :class="$style.preview" :text="text" :files="files" :poll="poll ?? undefined" :useCw="useCw" :cw="cw" :user="postAccount ?? $i"/>
@@ -85,6 +111,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<button v-tooltip="i18n.ts.useCw" class="_button" :class="[$style.footerButton, { [$style.footerButtonActive]: useCw }]" @click="useCw = !useCw"><i class="ti ti-eye-off"></i></button>
 			<button v-tooltip="i18n.ts.mention" class="_button" :class="$style.footerButton" @click="insertMention"><i class="ti ti-at"></i></button>
 			<button v-tooltip="i18n.ts.hashtags" class="_button" :class="[$style.footerButton, { [$style.footerButtonActive]: withHashtags }]" @click="withHashtags = !withHashtags"><i class="ti ti-hash"></i></button>
+			<button v-if="$i.policies.canScheduleNote" v-tooltip="i18n.ts.setScheduledTime" class="_button" :class="$style.footerButton" @click="setScheduledTime"><i class="ti ti-calendar-clock"></i></button>
 			<button v-if="postFormActions.length > 0" v-tooltip="i18n.ts.plugins" class="_button" :class="$style.footerButton" @click="showActions"><i class="ti ti-plug"></i></button>
 			<button v-tooltip="i18n.ts.emoji" :class="['_button', $style.footerButton]" @click="insertEmoji"><i class="ti ti-mood-happy"></i></button>
 			<button v-if="showAddMfmFunction" v-tooltip="i18n.ts.addMfmFunction" :class="['_button', $style.footerButton]" @click="insertMfmFunction"><i class="ti ti-palette"></i></button>
@@ -105,11 +132,12 @@ import { inject, watch, nextTick, onMounted, onUnmounted, defineAsyncComponent, 
 import * as mfm from 'mfm-js';
 import * as Misskey from 'misskey-js';
 import insertTextAtCursor from 'insert-text-at-cursor';
-import { toASCII } from 'punycode/';
+import { toASCII } from 'punycode.js';
 import MkNoteSimple from '@/components/MkNoteSimple.vue';
 import MkNotePreview from '@/components/MkNotePreview.vue';
 import XPostFormAttaches from '@/components/MkPostFormAttaches.vue';
 import MkPollEditor, { type PollEditorModelValue } from '@/components/MkPollEditor.vue';
+import MkDraftsDialog from '@/components/MkDraftsDialog.vue';
 import { host, url } from '@/config.js';
 import { erase, unique } from '@/scripts/array.js';
 import { extractMentions } from '@/scripts/extract-mentions.js';
@@ -127,8 +155,8 @@ import { uploadFile } from '@/scripts/upload.js';
 import { deepClone } from '@/scripts/clone.js';
 import MkRippleEffect from '@/components/MkRippleEffect.vue';
 import { miLocalStorage } from '@/local-storage.js';
+import { dateTimeFormat } from '@/scripts/intl-const.js';
 import { claimAchievement } from '@/scripts/achievements.js';
-import { emojiPicker } from '@/scripts/emoji-picker.js';
 import { mfmFunctionPicker } from '@/scripts/mfm-function-picker.js';
 
 const $i = signinRequired();
@@ -180,6 +208,10 @@ const visibilityButton = shallowRef<HTMLElement>();
 
 const posting = ref(false);
 const posted = ref(false);
+const draftId = ref<string>(Date.now().toString());
+const reply = ref(props.reply ?? null);
+const renote = ref(props.renote ?? null);
+const channel = ref(props.channel ?? null);
 const text = ref(props.initialText ?? '');
 const files = ref(props.initialFiles ?? []);
 const poll = ref<PollEditorModelValue | null>(null);
@@ -196,6 +228,10 @@ if (props.initialVisibleUsers) {
 	props.initialVisibleUsers.forEach(u => pushVisibleUser(u));
 }
 const reactionAcceptance = ref(defaultStore.state.reactionAcceptance);
+const scheduledTime = ref<Date | null>(null);
+const scheduledTimeExceededPolicy = computed(() =>
+	scheduledTime.value ? (scheduledTime.value.getTime() - Date.now()) / 86_400_000 > $i!.policies.scheduleNoteMaxDays : false
+);
 const autocompleteTextareaInput = ref<Autocomplete | null>(null);
 const autocompleteCwInput = ref<Autocomplete | null>(null);
 const autocompleteHashtagsInput = ref<Autocomplete | null>(null);
@@ -207,28 +243,26 @@ const imeText = ref('');
 const showingOptions = ref(false);
 const textAreaReadOnly = ref(false);
 
-const nsfwGuideUrl = 'https://go.misskey.io/media-guideline';
-
 const draftKey = computed((): string => {
-	let key = props.channel ? `channel:${props.channel.id}` : '';
+	let key = channel.value ? `channel:${channel.value.id}` : '';
 
-	if (props.renote) {
-		key += `renote:${props.renote.id}`;
-	} else if (props.reply) {
-		key += `reply:${props.reply.id}`;
+	if (renote.value) {
+		key += `renote:${renote.value.id}`;
+	} else if (reply.value) {
+		key += `reply:${reply.value.id}`;
 	} else {
-		key += `note:${$i.id}`;
+		key += `note:${draftId.value}`;
 	}
 
 	return key;
 });
 
 const placeholder = computed((): string => {
-	if (props.renote) {
+	if (renote.value) {
 		return i18n.ts._postForm.quotePlaceholder;
-	} else if (props.reply) {
+	} else if (reply.value) {
 		return i18n.ts._postForm.replyPlaceholder;
-	} else if (props.channel) {
+	} else if (channel.value) {
 		return i18n.ts._postForm.channelPlaceholder;
 	} else {
 		const xs = [
@@ -244,11 +278,15 @@ const placeholder = computed((): string => {
 });
 
 const submitText = computed((): string => {
-	return props.renote
-		? i18n.ts.quote
-		: props.reply
-			? i18n.ts.reply
-			: i18n.ts.note;
+	if (scheduledTime.value) {
+		return i18n.ts.schedule;
+	} else if (renote.value) {
+		return i18n.ts.quote;
+	} else if (reply.value) {
+		return i18n.ts.reply;
+	} else {
+		return i18n.ts.note;
+	}
 });
 
 const textLength = computed((): number => {
@@ -260,16 +298,20 @@ const maxTextLength = computed((): number => {
 });
 
 const canPost = computed((): boolean => {
-	return !props.mock && !posting.value && !posted.value &&
-		(
+	return !props.mock
+		&& !posting.value
+		&& !posted.value
+		&& (
 			1 <= textLength.value ||
 			1 <= files.value.length ||
 			poll.value != null ||
-			props.renote != null ||
-			(props.reply != null && quoteId.value != null)
-		) &&
-		(textLength.value <= maxTextLength.value) &&
-		(!poll.value || poll.value.choices.length >= 2);
+			renote.value != null ||
+			(reply.value != null && quoteId.value != null)
+		)
+		&& (textLength.value <= maxTextLength.value)
+		&& (!poll.value || poll.value.choices.length >= 2)
+		&& !scheduledTimeExceededPolicy.value
+	;
 });
 
 const withHashtags = computed(defaultStore.makeGetterSetter('postFormWithHashtags'));
@@ -294,13 +336,13 @@ if (props.mention) {
 	text.value += ' ';
 }
 
-if (props.reply && (props.reply.user.username !== $i.username || (props.reply.user.host != null && props.reply.user.host !== host))) {
-	text.value = `@${props.reply.user.username}${props.reply.user.host != null ? '@' + toASCII(props.reply.user.host) : ''} `;
+if (reply.value && (reply.value.user.username !== $i.username || (reply.value.user.host != null && reply.value.user.host !== host))) {
+	text.value = `@${reply.value.user.username}${reply.value.user.host != null ? '@' + toASCII(reply.value.user.host) : ''} `;
 }
 
-if (props.reply && props.reply.text != null) {
-	const ast = mfm.parse(props.reply.text);
-	const otherHost = props.reply.user.host;
+if (reply.value && reply.value.text != null) {
+	const ast = mfm.parse(reply.value.text);
+	const otherHost = reply.value.user.host;
 
 	for (const x of extractMentions(ast)) {
 		const mention = x.host ?
@@ -323,32 +365,32 @@ if ($i.isSilenced && visibility.value === 'public') {
 	visibility.value = 'home';
 }
 
-if (props.channel) {
+if (channel.value) {
 	visibility.value = 'public';
 	localOnly.value = true; // TODO: チャンネルが連合するようになった折には消す
 }
 
 // 公開以外へのリプライ時は元の公開範囲を引き継ぐ
-if (props.reply && ['home', 'followers', 'specified'].includes(props.reply.visibility)) {
-	if (props.reply.visibility === 'home' && visibility.value === 'followers') {
+if (reply.value && ['home', 'followers', 'specified'].includes(reply.value.visibility)) {
+	if (reply.value.visibility === 'home' && visibility.value === 'followers') {
 		visibility.value = 'followers';
-	} else if (['home', 'followers'].includes(props.reply.visibility) && visibility.value === 'specified') {
+	} else if (['home', 'followers'].includes(reply.value.visibility) && visibility.value === 'specified') {
 		visibility.value = 'specified';
 	} else {
-		visibility.value = props.reply.visibility;
+		visibility.value = reply.value.visibility;
 	}
 
 	if (visibility.value === 'specified') {
-		if (props.reply.visibleUserIds) {
+		if (reply.value.visibleUserIds) {
 			misskeyApi('users/show', {
-				userIds: props.reply.visibleUserIds.filter(uid => uid !== $i.id && uid !== props.reply?.userId),
+				userIds: reply.value.visibleUserIds.filter(uid => uid !== $i.id && uid !== reply.value?.userId),
 			}).then(users => {
 				users.forEach(u => pushVisibleUser(u));
 			});
 		}
 
-		if (props.reply.userId !== $i.id) {
-			misskeyApi('users/show', { userId: props.reply.userId }).then(user => {
+		if (reply.value.userId !== $i.id) {
+			misskeyApi('users/show', { userId: reply.value.userId }).then(user => {
 				pushVisibleUser(user);
 			});
 		}
@@ -361,9 +403,9 @@ if (props.specified) {
 }
 
 // keep cw when reply
-if (defaultStore.state.keepCw && props.reply?.cw) {
+if (defaultStore.state.keepCw && reply.value?.cw) {
 	useCw.value = true;
-	cw.value = props.reply.cw;
+	cw.value = reply.value.cw;
 }
 
 function watchForDraft() {
@@ -374,6 +416,7 @@ function watchForDraft() {
 	watch(files, () => saveDraft(), { deep: true });
 	watch(visibility, () => saveDraft());
 	watch(localOnly, () => saveDraft());
+	watch(scheduledTime, () => saveDraft());
 }
 
 function checkMissingMention() {
@@ -465,7 +508,7 @@ function upload(file: File, name?: string): void {
 }
 
 function setVisibility() {
-	if (props.channel) {
+	if (channel.value) {
 		visibility.value = 'public';
 		localOnly.value = true; // TODO: チャンネルが連合するようになった折には消す
 		return;
@@ -476,7 +519,7 @@ function setVisibility() {
 		isSilenced: $i.isSilenced,
 		localOnly: localOnly.value,
 		src: visibilityButton.value,
-		...(props.reply ? { isReplyVisibilitySpecified: props.reply.visibility === 'specified' } : {}),
+		...(reply.value ? { isReplyVisibilitySpecified: reply.value.visibility === 'specified' } : {}),
 	}, {
 		changeVisibility: v => {
 			visibility.value = v;
@@ -488,7 +531,7 @@ function setVisibility() {
 }
 
 async function toggleLocalOnly() {
-	if (props.channel) {
+	if (channel.value) {
 		visibility.value = 'public';
 		localOnly.value = true; // TODO: チャンネルが連合するようになった折には消す
 		return;
@@ -568,10 +611,26 @@ function removeVisibleUser(user) {
 	visibleUsers.value = erase(user, visibleUsers.value);
 }
 
+async function setScheduledTime() {
+	const { canceled, result: date } = await os.inputDateTime({
+		title: i18n.ts.setScheduledTime,
+		default: scheduledTime.value ?? undefined,
+	});
+	if (canceled) return;
+
+	scheduledTime.value = date;
+}
+
 function clear() {
 	text.value = '';
+	useCw.value = false;
+	cw.value = null;
+	visibility.value = defaultStore.state.rememberNoteVisibility ? defaultStore.state.visibility : defaultStore.state.defaultNoteVisibility;
+	localOnly.value = defaultStore.state.rememberNoteVisibility ? defaultStore.state.localOnly : defaultStore.state.defaultNoteLocalOnly;
 	files.value = [];
 	poll.value = null;
+	visibleUsers.value = [];
+	scheduledTime.value = null;
 	quoteId.value = null;
 }
 
@@ -605,7 +664,7 @@ async function onPaste(ev: ClipboardEvent) {
 
 	const paste = ev.clipboardData.getData('text');
 
-	if (!props.renote && !quoteId.value && paste.startsWith(url + '/notes/')) {
+	if (!renote.value && !quoteId.value && paste.startsWith(url + '/notes/')) {
 		ev.preventDefault();
 
 		os.confirm({
@@ -679,10 +738,38 @@ function onDrop(ev: DragEvent): void {
 function saveDraft() {
 	if (props.instant || props.mock) return;
 
-	const draftData = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}');
+	let scheduledAt = scheduledTime.value ?? null;
+	if (scheduledAt && (isNaN(scheduledAt.getTime()) || scheduledAt.getTime() < Date.now())) {
+		scheduledAt = null;
+	}
+
+	const draftData = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}') as Record<string, Misskey.entities.NoteDraft>;
 
 	draftData[draftKey.value] = {
-		updatedAt: new Date(),
+		updatedAt: new Date().toISOString(),
+		scheduledAt: scheduledAt?.toISOString() ?? null,
+		channel: channel.value ? {
+			id: channel.value.id,
+			name: channel.value.name,
+		} : undefined,
+		renote: renote.value ? {
+			id: renote.value.id,
+			text: (renote.value.cw ?? renote.value.text)?.substring(0, 100),
+			user: {
+				id: renote.value.userId,
+				username: renote.value.user.username,
+				host: renote.value.user.host,
+			},
+		} : undefined,
+		reply: reply.value ? {
+			id: reply.value.id,
+			text: (reply.value.cw ?? reply.value.text)?.substring(0, 100),
+			user: {
+				id: reply.value.userId,
+				username: reply.value.user.username,
+				host: reply.value.user.host,
+			},
+		} : undefined,
 		data: {
 			text: text.value,
 			useCw: useCw.value,
@@ -700,11 +787,77 @@ function saveDraft() {
 }
 
 function deleteDraft() {
-	const draftData = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}');
+	const draftData = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}') as Record<string, Misskey.entities.NoteDraft>;
 
 	delete draftData[draftKey.value];
 
+	draftId.value = Date.now().toString();
+
 	miLocalStorage.setItem('drafts', JSON.stringify(draftData));
+}
+
+async function openDrafts() {
+	const { canceled, selected } = await new Promise<{canceled: boolean, selected: string | undefined}>(resolve => {
+		os.popup(MkDraftsDialog, {}, {
+			done: result => {
+				resolve(typeof result.selected === 'string' ? result : { canceled: true, selected: undefined });
+			},
+		}, 'closed');
+	});
+
+	if (canceled) return;
+
+	if (selected) {
+		const channelId = selected.startsWith('channel:') ? selected.match(/channel:(.+?)(renote|reply|note):/)?.[1] : undefined;
+		const renoteId = selected.includes('renote:') ? selected.match(/renote:(.+)/)?.[1] : undefined;
+		const replyId = selected.includes('reply:') ? selected.match(/reply:(.+)/)?.[1] : undefined;
+
+		channel.value = channelId ? await misskeyApi('channels/show', { channelId }) : null;
+		renote.value = renoteId ? await misskeyApi('notes/show', { noteId: renoteId }) : null;
+		reply.value = replyId ? await misskeyApi('notes/show', { noteId: replyId }) : null;
+
+		if (!renote.value && !reply.value) {
+			draftId.value = selected.match(/note:(.+)/)?.[1] ?? Date.now().toString();
+		} else {
+			draftId.value = Date.now().toString();
+		}
+
+		loadDraft(true);
+	}
+}
+
+function loadDraft(exactMatch = false) {
+	const drafts = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}') as Record<string, Misskey.entities.NoteDraft>;
+	const scope = exactMatch ? draftKey.value : draftKey.value.replace(`note:${draftId.value}`, 'note:');
+	const draft = Object.entries(drafts).filter(([k]) => k.startsWith(scope))
+		.map(r => ({ key: r[0], value: { ...r[1], updatedAt: new Date(r[1].updatedAt).getTime() } }))
+		.sort((a, b) => b.value.updatedAt - a.value.updatedAt).at(0);
+
+	if (draft) {
+		if (scope !== draft.key) {
+			draftId.value = draft.key.replace(scope, '');
+		}
+
+		scheduledTime.value = draft.value.scheduledAt ? new Date(draft.value.scheduledAt) : null;
+		if (scheduledTime.value && (isNaN(scheduledTime.value.getTime()) || scheduledTime.value.getTime() < Date.now())) {
+			scheduledTime.value = null;
+		}
+		text.value = draft.value.data.text ?? '';
+		useCw.value = draft.value.data.useCw;
+		cw.value = draft.value.data.cw;
+		visibility.value = draft.value.data.visibility;
+		localOnly.value = draft.value.data.localOnly;
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+		files.value = draft.value.data.files?.filter(f => f?.id && f.type && f.name) || [];
+		if (draft.value.data.poll) {
+			poll.value = draft.value.data.poll;
+		}
+		if (draft.value.data.visibleUserIds) {
+			misskeyApi('users/show', { userIds: draft.value.data.visibleUserIds }).then(users => {
+				users.forEach(u => pushVisibleUser(u));
+			});
+		}
+	}
 }
 
 async function post(ev?: MouseEvent) {
@@ -764,15 +917,17 @@ async function post(ev?: MouseEvent) {
 		text: text.value === '' ? null : text.value,
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		fileIds: files.value.length > 0 ? files.value.filter(f => f?.id).map(f => f.id) : undefined,
-		replyId: props.reply ? props.reply.id : undefined,
-		renoteId: props.renote ? props.renote.id : quoteId.value ? quoteId.value : undefined,
-		channelId: props.channel ? props.channel.id : undefined,
+		replyId: reply.value ? reply.value.id : undefined,
+		renoteId: renote.value ? renote.value.id : quoteId.value ? quoteId.value : undefined,
+		channelId: channel.value ? channel.value.id : undefined,
 		poll: poll.value,
 		cw: useCw.value ? cw.value ?? '' : null,
 		localOnly: localOnly.value,
 		visibility: visibility.value,
 		visibleUserIds: visibility.value === 'specified' ? visibleUsers.value.map(u => u.id) : undefined,
 		reactionAcceptance: reactionAcceptance.value,
+		scheduledAt: scheduledTime.value?.getTime() ?? undefined,
+		noCreatedNote: true,
 	};
 
 	if (withHashtags.value && hashtags.value && hashtags.value.trim() !== '') {
@@ -853,7 +1008,7 @@ async function post(ev?: MouseEvent) {
 				claimAchievement('brainDiver');
 			}
 
-			if (props.renote && (props.renote.userId === $i.id) && text.length > 0) {
+			if (renote.value && (renote.value.userId === $i.id) && text.length > 0) {
 				claimAchievement('selfQuote');
 			}
 
@@ -874,9 +1029,9 @@ async function post(ev?: MouseEvent) {
 			type: 'error',
 			text: err.message + '\n' + (err as any).id,
 		});
-		emit("postError");
+		emit('postError');
 	});
-	emit("posting");
+	emit('posting');
 }
 
 function cancel() {
@@ -893,7 +1048,7 @@ async function insertEmoji(ev: MouseEvent) {
 	os.openEmojiPicker(
 		(ev.currentTarget ?? ev.target) as HTMLElement,
 		{ asReactionPicker: false },
-		textareaEl.value
+		textareaEl.value,
 	);
 }
 
@@ -956,25 +1111,8 @@ onMounted(() => {
 
 	nextTick(() => {
 		// 書きかけの投稿を復元
-		if (!props.instant && !props.mention && !props.specified && !props.mock) {
-			const draft = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}')[draftKey.value];
-			if (draft) {
-				text.value = draft.data.text;
-				useCw.value = draft.data.useCw;
-				cw.value = draft.data.cw;
-				visibility.value = draft.data.visibility;
-				localOnly.value = draft.data.localOnly;
-				// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-				files.value = draft.data.files?.filter(f => f?.id && f.type && f.name) || [];
-				if (draft.data.poll) {
-					poll.value = draft.data.poll;
-				}
-				if (draft.data.visibleUserIds) {
-					misskeyApi('users/show', { userIds: draft.data.visibleUserIds }).then(users => {
-						users.forEach(u => pushVisibleUser(u));
-					});
-				}
-			}
+		if (!props.instant && !props.mention && !props.specified && !props.mock && defaultStore.state.autoloadDrafts) {
+			loadDraft();
 		}
 
 		// 削除して編集
@@ -996,6 +1134,7 @@ onMounted(() => {
 			visibility.value = init.visibility;
 			localOnly.value = init.localOnly ?? false;
 			quoteId.value = init.renote ? init.renote.id : null;
+			scheduledTime.value = null;
 		}
 
 		nextTick(() => watchForDraft());
@@ -1117,6 +1256,10 @@ defineExpose({
 	box-sizing: border-box;
 	color: var(--fgOnAccent);
 	background: linear-gradient(90deg, var(--buttonGradateA), var(--buttonGradateB));
+	display: flex;
+	gap: 6px;
+	align-items: center;
+	justify-content: center;
 }
 
 .headerRightItem {
@@ -1265,6 +1408,15 @@ defineExpose({
 	}
 }
 
+.scheduledTime {
+	display: flex;
+	padding: 8px 12px;
+	gap: 4px;
+	align-items: center;
+	font-size: 90%;
+	background: var(--infoBg);
+}
+
 .footer {
 	display: flex;
 	padding: 0 16px 16px 16px;
@@ -1311,10 +1463,6 @@ defineExpose({
 	color: var(--accent);
 }
 
-.guidelineInfo {
-	margin-top: 8px;
-}
-
 @container (max-width: 500px) {
 	.headerRight {
 		font-size: .9em;
@@ -1354,6 +1502,16 @@ defineExpose({
 	}
 }
 
+@container (max-width: 375px) {
+	.submitInner {
+		min-width: 20px;
+	}
+
+	.submitButtonText {
+		display: none;
+	}
+}
+
 @container (max-width: 350px) {
 	.footer {
 		font-size: 0.9em;
@@ -1370,6 +1528,5 @@ defineExpose({
 	.headerRight {
 		gap: 0;
 	}
-
 }
 </style>

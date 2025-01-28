@@ -2541,6 +2541,13 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
+    get: operations['meta_get'];
+    /**
+     * meta
+     * @description No description provided.
+     *
+     * **Credential required**: *No*
+     */
     post: operations['meta'];
   };
   '/emojis': {
@@ -2701,6 +2708,24 @@ export type paths = {
      * **Credential required**: *Yes* / **Permission**: *write:notes*
      */
     post: operations['notes___delete'];
+  };
+  '/notes/scheduled/cancel': {
+    /**
+     * notes/scheduled/cancel
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:notes*
+     */
+    post: operations['notes___scheduled___cancel'];
+  };
+  '/notes/scheduled/list': {
+    /**
+     * notes/scheduled/list
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:notes*
+     */
+    post: operations['notes___scheduled___list'];
   };
   '/notes/favorites/create': {
     /**
@@ -3235,6 +3260,13 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
+    get: operations['stats_get'];
+    /**
+     * stats
+     * @description No description provided.
+     *
+     * **Credential required**: *No*
+     */
     post: operations['stats'];
   };
   '/sw/show-registration': {
@@ -3586,6 +3618,15 @@ export type paths = {
      * **Credential required**: *No*
      */
     post: operations['users___show'];
+  };
+  '/users/get-security-info': {
+    /**
+     * users/get-security-info
+     * @description No description provided.
+     *
+     * **Credential required**: *No*
+     */
+    post: operations['users___get-security-info'];
   };
   '/users/stats': {
     /**
@@ -4249,6 +4290,58 @@ export type components = {
       clippedCount?: number;
       myReaction?: string | null;
     };
+    NoteDraft: {
+      /** Format: misskey:id */
+      id: string;
+      /** Format: date-time */
+      updatedAt: string;
+      /** Format: date-time */
+      scheduledAt: string | null;
+      reason?: string;
+      channel?: {
+        /** Format: misskey:id */
+        id: string;
+        name: string;
+      } | null;
+      renote?: ({
+        /** Format: misskey:id */
+        id: string;
+        text: string | null;
+        user: {
+          /** Format: misskey:id */
+          id: string;
+          username: string;
+          host: string | null;
+        };
+      }) | null;
+      reply?: ({
+        /** Format: misskey:id */
+        id: string;
+        text: string | null;
+        user: {
+          /** Format: misskey:id */
+          id: string;
+          username: string;
+          host: string | null;
+        };
+      }) | null;
+      data: {
+        text: string | null;
+        useCw: boolean;
+        cw: string | null;
+        /** @enum {string} */
+        visibility: 'public' | 'home' | 'followers' | 'specified';
+        localOnly: boolean;
+        files: components['schemas']['DriveFile'][];
+        poll: ({
+          choices: string[];
+          multiple: boolean;
+          expiresAt: number | null;
+          expiredAfter: number | null;
+        }) | null;
+        visibleUserIds?: string[];
+      };
+    };
     NoteReaction: {
       /**
        * Format: id
@@ -4396,6 +4489,30 @@ export type components = {
       /** @enum {string} */
       type: 'achievementEarned';
       achievement: string;
+    } | {
+      /** Format: id */
+      id: string;
+      /** Format: date-time */
+      createdAt: string;
+      /** @enum {string} */
+      type: 'noteScheduled';
+      draft: components['schemas']['NoteDraft'];
+    } | {
+      /** Format: id */
+      id: string;
+      /** Format: date-time */
+      createdAt: string;
+      /** @enum {string} */
+      type: 'scheduledNotePosted';
+      note: components['schemas']['Note'];
+    } | {
+      /** Format: id */
+      id: string;
+      /** Format: date-time */
+      createdAt: string;
+      /** @enum {string} */
+      type: 'scheduledNoteError';
+      draft: components['schemas']['NoteDraft'];
     } | {
       /** Format: id */
       id: string;
@@ -4960,6 +5077,9 @@ export type components = {
       gtlAvailable: boolean;
       ltlAvailable: boolean;
       canPublicNote: boolean;
+      canScheduleNote: boolean;
+      scheduleNoteLimit: number;
+      scheduleNoteMaxDays: number;
       canInitiateConversation: boolean;
       canCreateContent: boolean;
       canUpdateContent: boolean;
@@ -9807,6 +9927,7 @@ export type operations = {
                 createdAt: string;
                 expiresAt: string | null;
                 roleId: string;
+                memo: string | null;
               })[];
           };
         };
@@ -10596,6 +10717,7 @@ export type operations = {
           roleId: string;
           /** Format: misskey:id */
           userId: string;
+          memo?: string;
           expiresAt?: number | null;
         };
       };
@@ -10773,6 +10895,7 @@ export type operations = {
               /** Format: date-time */
               createdAt: string;
               user: components['schemas']['UserDetailed'];
+              memo: string | null;
               /** Format: date-time */
               expiresAt: string | null;
             })[];
@@ -20340,8 +20463,8 @@ export type operations = {
           untilId?: string;
           /** @default true */
           markAsRead?: boolean;
-          includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'achievementEarned' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
-          excludeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'achievementEarned' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
+          includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'achievementEarned' | 'noteScheduled' | 'scheduledNotePosted' | 'scheduledNoteError' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
+          excludeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'achievementEarned' | 'noteScheduled' | 'scheduledNotePosted' | 'scheduledNoteError' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
         };
       };
     };
@@ -20408,8 +20531,8 @@ export type operations = {
           untilId?: string;
           /** @default true */
           markAsRead?: boolean;
-          includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'achievementEarned' | 'app' | 'test' | 'reaction:grouped' | 'renote:grouped' | 'pollVote' | 'groupInvited')[];
-          excludeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'achievementEarned' | 'app' | 'test' | 'reaction:grouped' | 'renote:grouped' | 'pollVote' | 'groupInvited')[];
+          includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'achievementEarned' | 'noteScheduled' | 'scheduledNotePosted' | 'scheduledNoteError' | 'app' | 'test' | 'reaction:grouped' | 'renote:grouped' | 'pollVote' | 'groupInvited')[];
+          excludeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'achievementEarned' | 'noteScheduled' | 'scheduledNotePosted' | 'scheduledNoteError' | 'app' | 'test' | 'reaction:grouped' | 'renote:grouped' | 'pollVote' | 'groupInvited')[];
         };
       };
     };
@@ -22268,6 +22391,60 @@ export type operations = {
    *
    * **Credential required**: *No*
    */
+  meta_get: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @default true */
+          detail?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': components['schemas']['MetaLite'] | components['schemas']['MetaDetailed'];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * meta
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
   meta: {
     requestBody: {
       content: {
@@ -23253,6 +23430,9 @@ export type operations = {
             expiresAt?: number | null;
             expiredAfter?: number | null;
           }) | null;
+          scheduledAt?: number | null;
+          /** @default false */
+          noCreatedNote?: boolean;
         };
       };
     };
@@ -23264,6 +23444,10 @@ export type operations = {
             createdNote: components['schemas']['Note'];
           };
         };
+      };
+      /** @description OK (without any results) */
+      204: {
+        content: never;
       };
       /** @description Client error */
       400: {
@@ -23349,6 +23533,120 @@ export type operations = {
       };
       /** @description To many requests */
       429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * notes/scheduled/cancel
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:notes*
+   */
+  notes___scheduled___cancel: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          draftId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description To many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * notes/scheduled/list
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:notes*
+   */
+  notes___scheduled___list: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @default 10 */
+          limit?: number;
+          /** @default 0 */
+          offset?: number;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': components['schemas']['NoteDraft'][];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
         content: {
           'application/json': components['schemas']['Error'];
         };
@@ -26773,6 +27071,60 @@ export type operations = {
    *
    * **Credential required**: *No*
    */
+  stats_get: {
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            notesCount: number;
+            originalNotesCount: number;
+            usersCount: number;
+            originalUsersCount: number;
+            instances: number;
+            driveUsageLocal: number;
+            driveUsageRemote: number;
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * stats
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
   stats: {
     responses: {
       /** @description OK (with results) */
@@ -29162,6 +29514,70 @@ export type operations = {
       };
       /** @description I'm Ai */
       418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * users/get-security-info
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  'users___get-security-info': {
+    requestBody: {
+      content: {
+        'application/json': {
+          email: string;
+          password: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            twoFactorEnabled: boolean;
+            usePasswordLessLogin: boolean;
+            securityKeys: boolean;
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description To many requests */
+      429: {
         content: {
           'application/json': components['schemas']['Error'];
         };

@@ -5,7 +5,7 @@
 ```ts
 
 import { EventEmitter } from 'eventemitter3';
-import _ReconnectingWebsocket from 'reconnecting-websocket';
+import { Options } from 'reconnecting-websocket';
 
 // Warning: (ae-forgotten-export) The symbol "components" needs to be exported by the entry point index.d.ts
 //
@@ -642,6 +642,7 @@ export type Channels = {
         params: {
             withRenotes?: boolean;
             withFiles?: boolean;
+            minimize?: boolean;
         };
         events: {
             note: (payload: Note) => void;
@@ -653,6 +654,7 @@ export type Channels = {
             withRenotes?: boolean;
             withReplies?: boolean;
             withFiles?: boolean;
+            minimize?: boolean;
         };
         events: {
             note: (payload: Note) => void;
@@ -664,6 +666,7 @@ export type Channels = {
             withRenotes?: boolean;
             withReplies?: boolean;
             withFiles?: boolean;
+            minimize?: boolean;
         };
         events: {
             note: (payload: Note) => void;
@@ -674,6 +677,7 @@ export type Channels = {
         params: {
             withRenotes?: boolean;
             withFiles?: boolean;
+            minimize?: boolean;
         };
         events: {
             note: (payload: Note) => void;
@@ -685,6 +689,7 @@ export type Channels = {
             listId: string;
             withFiles?: boolean;
             withRenotes?: boolean;
+            minimize?: boolean;
         };
         events: {
             note: (payload: Note) => void;
@@ -703,6 +708,7 @@ export type Channels = {
     roleTimeline: {
         params: {
             roleId: string;
+            minimize?: boolean;
         };
         events: {
             note: (payload: Note) => void;
@@ -712,6 +718,7 @@ export type Channels = {
     antenna: {
         params: {
             antennaId: string;
+            minimize?: boolean;
         };
         events: {
             note: (payload: Note) => void;
@@ -721,6 +728,7 @@ export type Channels = {
     channel: {
         params: {
             channelId: string;
+            minimize?: boolean;
         };
         events: {
             note: (payload: Note) => void;
@@ -1632,6 +1640,9 @@ declare namespace entities {
         NotesCreateRequest,
         NotesCreateResponse,
         NotesDeleteRequest,
+        NotesScheduledCancelRequest,
+        NotesScheduledListRequest,
+        NotesScheduledListResponse,
         NotesFavoritesCreateRequest,
         NotesFavoritesDeleteRequest,
         NotesFeaturedRequest,
@@ -1776,6 +1787,8 @@ declare namespace entities {
         UsersSearchResponse,
         UsersShowRequest,
         UsersShowResponse,
+        UsersGetSecurityInfoRequest,
+        UsersGetSecurityInfoResponse,
         UsersStatsRequest,
         UsersStatsResponse,
         UsersAchievementsRequest,
@@ -1815,6 +1828,7 @@ declare namespace entities {
         Announcement,
         App,
         Note,
+        NoteDraft,
         NoteReaction,
         NoteFavorite,
         Notification_2 as Notification,
@@ -2564,6 +2578,9 @@ type MyAppsResponse = operations['my___apps']['responses']['200']['content']['ap
 type Note = components['schemas']['Note'];
 
 // @public (undocumented)
+type NoteDraft = components['schemas']['NoteDraft'];
+
+// @public (undocumented)
 type NoteFavorite = components['schemas']['NoteFavorite'];
 
 // @public (undocumented)
@@ -2672,6 +2689,15 @@ type NotesRequest = operations['notes']['requestBody']['content']['application/j
 type NotesResponse = operations['notes']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
+type NotesScheduledCancelRequest = operations['notes___scheduled___cancel']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type NotesScheduledListRequest = operations['notes___scheduled___list']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type NotesScheduledListResponse = operations['notes___scheduled___list']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
 type NotesSearchByTagRequest = operations['notes___search-by-tag']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
@@ -2732,7 +2758,7 @@ type Notification_2 = components['schemas']['Notification'];
 type NotificationsCreateRequest = operations['notifications___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-export const notificationTypes: readonly ["note", "follow", "mention", "reply", "renote", "quote", "reaction", "pollVote", "pollEnded", "receiveFollowRequest", "followRequestAccepted", "groupInvited", "app", "roleAssigned", "achievementEarned"];
+export const notificationTypes: readonly ["note", "follow", "mention", "reply", "renote", "quote", "reaction", "pollVote", "pollEnded", "receiveFollowRequest", "followRequestAccepted", "groupInvited", "app", "roleAssigned", "achievementEarned", "noteScheduled", "scheduledNotePosted", "scheduledNoteError"];
 
 // @public (undocumented)
 type Page = components['schemas']['Page'];
@@ -3013,7 +3039,7 @@ export class Stream extends EventEmitter<StreamEvents> {
     constructor(origin: string, user: {
         token: string;
     } | null, options?: {
-        WebSocket?: _ReconnectingWebsocket.Options['WebSocket'];
+        WebSocket?: Options['WebSocket'];
     });
     // (undocumented)
     close(): void;
@@ -3165,6 +3191,12 @@ type UsersGetFrequentlyRepliedUsersRequest = operations['users___get-frequently-
 
 // @public (undocumented)
 type UsersGetFrequentlyRepliedUsersResponse = operations['users___get-frequently-replied-users']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type UsersGetSecurityInfoRequest = operations['users___get-security-info']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type UsersGetSecurityInfoResponse = operations['users___get-security-info']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 type UsersGetSkebStatusRequest = operations['users___get-skeb-status']['requestBody']['content']['application/json'];

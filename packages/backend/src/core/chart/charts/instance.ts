@@ -5,13 +5,14 @@
 
 import { Injectable, Inject } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+import * as Redis from 'ioredis';
 import type { DriveFilesRepository, FollowingsRepository, UsersRepository, NotesRepository } from '@/models/_.js';
 import type { MiDriveFile } from '@/models/DriveFile.js';
 import type { MiNote } from '@/models/Note.js';
-import { AppLockService } from '@/core/AppLockService.js';
 import { DI } from '@/di-symbols.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { bindThis } from '@/decorators.js';
+import { acquireChartInsertLock } from '@/misc/distributed-lock.js';
 import Chart from '../core.js';
 import { ChartLoggerService } from '../ChartLoggerService.js';
 import { name, schema } from './entities/instance.js';
@@ -26,6 +27,9 @@ export default class InstanceChart extends Chart<typeof schema> { // eslint-disa
 		@Inject(DI.db)
 		private db: DataSource,
 
+		@Inject(DI.redisForTimelines)
+		private redisForTimelines: Redis.Redis,
+
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
 
@@ -39,10 +43,9 @@ export default class InstanceChart extends Chart<typeof schema> { // eslint-disa
 		private followingsRepository: FollowingsRepository,
 
 		private utilityService: UtilityService,
-		private appLockService: AppLockService,
 		private chartLoggerService: ChartLoggerService,
 	) {
-		super(db, (k) => appLockService.getChartInsertLock(k), chartLoggerService.logger, name, schema, true);
+		super(db, (k) => acquireChartInsertLock(redisForTimelines, k), chartLoggerService.logger, name, schema, true);
 	}
 
 	protected async tickMajor(group: string): Promise<Partial<KVs<typeof schema>>> {
@@ -77,7 +80,7 @@ export default class InstanceChart extends Chart<typeof schema> { // eslint-disa
 	public async requestReceived(host: string): Promise<void> {
 		await this.commit({
 			'requests.received': 1,
-		}, this.utilityService.toPuny(host));
+		}, this.utilityService.normalizeHost(host));
 	}
 
 	@bindThis
@@ -85,7 +88,7 @@ export default class InstanceChart extends Chart<typeof schema> { // eslint-disa
 		await this.commit({
 			'requests.succeeded': isSucceeded ? 1 : 0,
 			'requests.failed': isSucceeded ? 0 : 1,
-		}, this.utilityService.toPuny(host));
+		}, this.utilityService.normalizeHost(host));
 	}
 
 	@bindThis
@@ -93,7 +96,7 @@ export default class InstanceChart extends Chart<typeof schema> { // eslint-disa
 		await this.commit({
 			'users.total': 1,
 			'users.inc': 1,
-		}, this.utilityService.toPuny(host));
+		}, this.utilityService.normalizeHost(host));
 	}
 
 	@bindThis
@@ -106,7 +109,7 @@ export default class InstanceChart extends Chart<typeof schema> { // eslint-disa
 			'notes.diffs.renote': note.renoteId != null ? (isAdditional ? 1 : -1) : 0,
 			'notes.diffs.reply': note.replyId != null ? (isAdditional ? 1 : -1) : 0,
 			'notes.diffs.withFile': note.fileIds.length > 0 ? (isAdditional ? 1 : -1) : 0,
-		}, this.utilityService.toPuny(host));
+		}, this.utilityService.normalizeHost(host));
 	}
 
 	@bindThis
@@ -115,7 +118,7 @@ export default class InstanceChart extends Chart<typeof schema> { // eslint-disa
 			'following.total': isAdditional ? 1 : -1,
 			'following.inc': isAdditional ? 1 : 0,
 			'following.dec': isAdditional ? 0 : 1,
-		}, this.utilityService.toPuny(host));
+		}, this.utilityService.normalizeHost(host));
 	}
 
 	@bindThis
@@ -124,7 +127,7 @@ export default class InstanceChart extends Chart<typeof schema> { // eslint-disa
 			'followers.total': isAdditional ? 1 : -1,
 			'followers.inc': isAdditional ? 1 : 0,
 			'followers.dec': isAdditional ? 0 : 1,
-		}, this.utilityService.toPuny(host));
+		}, this.utilityService.normalizeHost(host));
 	}
 
 	@bindThis

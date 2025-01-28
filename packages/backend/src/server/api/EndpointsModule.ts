@@ -287,6 +287,8 @@ import * as ep___notes_clips from './endpoints/notes/clips.js';
 import * as ep___notes_conversation from './endpoints/notes/conversation.js';
 import * as ep___notes_create from './endpoints/notes/create.js';
 import * as ep___notes_delete from './endpoints/notes/delete.js';
+import * as ep___notes_scheduled_cancel from './endpoints/notes/scheduled/cancel.js';
+import * as ep___notes_scheduled_list from './endpoints/notes/scheduled/list.js';
 import * as ep___notes_favorites_create from './endpoints/notes/favorites/create.js';
 import * as ep___notes_favorites_delete from './endpoints/notes/favorites/delete.js';
 import * as ep___notes_featured from './endpoints/notes/featured.js';
@@ -382,6 +384,7 @@ import * as ep___users_searchByUsernameAndHost from './endpoints/users/search-by
 import * as ep___users_search from './endpoints/users/search.js';
 import * as ep___users_show from './endpoints/users/show.js';
 import * as ep___users_stats from './endpoints/users/stats.js';
+import * as ep___users_get_security_info from './endpoints/users/get-security-info.js';
 import * as ep___users_achievements from './endpoints/users/achievements.js';
 import * as ep___users_updateMemo from './endpoints/users/update-memo.js';
 import * as ep___fetchRss from './endpoints/fetch-rss.js';
@@ -681,6 +684,8 @@ const $notes_clips: Provider = { provide: 'ep:notes/clips', useClass: ep___notes
 const $notes_conversation: Provider = { provide: 'ep:notes/conversation', useClass: ep___notes_conversation.default };
 const $notes_create: Provider = { provide: 'ep:notes/create', useClass: ep___notes_create.default };
 const $notes_delete: Provider = { provide: 'ep:notes/delete', useClass: ep___notes_delete.default };
+const $notes_scheduled_cancel: Provider = { provide: 'ep:notes/scheduled/cancel', useClass: ep___notes_scheduled_cancel.default };
+const $notes_scheduled_list: Provider = { provide: 'ep:notes/scheduled/list', useClass: ep___notes_scheduled_list.default };
 const $notes_favorites_create: Provider = { provide: 'ep:notes/favorites/create', useClass: ep___notes_favorites_create.default };
 const $notes_favorites_delete: Provider = { provide: 'ep:notes/favorites/delete', useClass: ep___notes_favorites_delete.default };
 const $notes_featured: Provider = { provide: 'ep:notes/featured', useClass: ep___notes_featured.default };
@@ -751,6 +756,7 @@ const $users_following: Provider = { provide: 'ep:users/following', useClass: ep
 const $users_gallery_posts: Provider = { provide: 'ep:users/gallery/posts', useClass: ep___users_gallery_posts.default };
 const $users_getFollowingBirthdayUsers: Provider = { provide: 'ep:users/get-following-birthday-users', useClass: ep___users_getFollowingBirthdayUsers.default };
 const $users_getFrequentlyRepliedUsers: Provider = { provide: 'ep:users/get-frequently-replied-users', useClass: ep___users_getFrequentlyRepliedUsers.default };
+const $users_getSecurityInfo: Provider = { provide: 'ep:users/get-security-info', useClass: ep___users_get_security_info.default };
 const $users_getSkebStatus: Provider = { provide: 'ep:users/get-skeb-status', useClass: ep___users_getSkebStatus.default };
 const $users_featuredNotes: Provider = { provide: 'ep:users/featured-notes', useClass: ep___users_featuredNotes.default };
 const $users_lists_create: Provider = { provide: 'ep:users/lists/create', useClass: ep___users_lists_create.default };
@@ -1079,6 +1085,8 @@ const $reversi_verify: Provider = { provide: 'ep:reversi/verify', useClass: ep__
 		$notes_conversation,
 		$notes_create,
 		$notes_delete,
+		$notes_scheduled_cancel,
+		$notes_scheduled_list,
 		$notes_favorites_create,
 		$notes_favorites_delete,
 		$notes_featured,
@@ -1149,6 +1157,7 @@ const $reversi_verify: Provider = { provide: 'ep:reversi/verify', useClass: ep__
 		$users_gallery_posts,
 		$users_getFollowingBirthdayUsers,
 		$users_getFrequentlyRepliedUsers,
+		$users_getSecurityInfo,
 		$users_getSkebStatus,
 		$users_featuredNotes,
 		$users_lists_create,
@@ -1471,6 +1480,8 @@ const $reversi_verify: Provider = { provide: 'ep:reversi/verify', useClass: ep__
 		$notes_conversation,
 		$notes_create,
 		$notes_delete,
+		$notes_scheduled_cancel,
+		$notes_scheduled_list,
 		$notes_favorites_create,
 		$notes_favorites_delete,
 		$notes_featured,
@@ -1539,6 +1550,7 @@ const $reversi_verify: Provider = { provide: 'ep:reversi/verify', useClass: ep__
 		$users_gallery_posts,
 		$users_getFollowingBirthdayUsers,
 		$users_getFrequentlyRepliedUsers,
+		$users_getSecurityInfo,
 		$users_getSkebStatus,
 		$users_featuredNotes,
 		$users_lists_create,

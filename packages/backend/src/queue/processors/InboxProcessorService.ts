@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { URL } from 'node:url';
 import { Injectable, OnApplicationShutdown } from '@nestjs/common';
 import httpSignature from '@peertube/http-signature';
 import * as Bull from 'bullmq';
@@ -65,11 +64,11 @@ export class InboxProcessorService implements OnApplicationShutdown {
 		this.logger.debug(JSON.stringify(info, null, 2));
 		//#endregion
 
-		const host = this.utilityService.toPuny(new URL(signature.keyId).hostname);
+		const host = this.utilityService.extractHost(signature.keyId);
 
 		// ブロックしてたら中断
 		const meta = await this.metaService.fetch();
-		if (this.utilityService.isBlockedHost(meta.blockedHosts, host)) {
+		if (this.utilityService.isItemListedIn(host, meta.blockedHosts)) {
 			return `Blocked request: ${host}`;
 		}
 
@@ -164,8 +163,8 @@ export class InboxProcessorService implements OnApplicationShutdown {
 				}
 
 				// ブロックしてたら中断
-				const ldHost = this.utilityService.extractDbHost(authUser.user.uri);
-				if (this.utilityService.isBlockedHost(meta.blockedHosts, ldHost)) {
+				const ldHost = this.utilityService.extractHost(authUser.user.uri);
+				if (this.utilityService.isItemListedIn(ldHost, meta.blockedHosts)) {
 					throw new Bull.UnrecoverableError(`Blocked request: ${ldHost}`);
 				}
 			} else {
@@ -175,11 +174,13 @@ export class InboxProcessorService implements OnApplicationShutdown {
 
 		// activity.idがあればホストが署名者のホストであることを確認する
 		if (typeof activity.id === 'string') {
-			const signerHost = this.utilityService.extractDbHost(authUser.user.uri!);
-			const activityIdHost = this.utilityService.extractDbHost(activity.id);
+			const signerHost = this.utilityService.extractHost(authUser.user.uri!);
+			const activityIdHost = this.utilityService.extractHost(activity.id);
 			if (signerHost !== activityIdHost) {
 				throw new Bull.UnrecoverableError(`skip: signerHost(${signerHost}) !== activity.id host(${activityIdHost}`);
 			}
+		} else {
+			throw new Bull.UnrecoverableError('skip: activity id is not a string');
 		}
 
 		// Update stats
@@ -198,7 +199,11 @@ export class InboxProcessorService implements OnApplicationShutdown {
 
 		// アクティビティを処理
 		try {
-			await this.apInboxService.performActivity(authUser.user, activity, job.data.user?.id);
+			const result = await this.apInboxService.performActivity(authUser.user, activity, undefined, job.data.user?.id);
+			if (result && !result.startsWith('ok')) {
+				this.logger.warn(`inbox activity ignored (maybe): id=${activity.id} reason=${result}`);
+				return result;
+			}
 		} catch (e) {
 			if (e instanceof IdentifiableError) {
 				if ([
@@ -206,6 +211,7 @@ export class InboxProcessorService implements OnApplicationShutdown {
 					'689ee33f-f97c-479a-ac49-1b9f8140af99',
 					'9f466dab-c856-48cd-9e65-ff90ff750580',
 					'85ab9bd7-3a41-4530-959d-f07073900109',
+					'd450b8a9-48e4-4dab-ae36-f4db763fda7c',
 				].includes(e.id)) return e.message;
 			}
 			throw e;

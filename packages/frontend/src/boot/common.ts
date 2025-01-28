@@ -62,10 +62,6 @@ export async function common(createVue: () => App<Element>) {
 		});
 	}
 
-	if (miLocalStorage.getItem('id') === null) {
-		miLocalStorage.setItem('id', crypto.randomUUID());
-	}
-
 	let isClientUpdated = false;
 
 	//#region クライアントが更新されたかチェック
@@ -102,6 +98,11 @@ export async function common(createVue: () => App<Element>) {
 
 	// タッチデバイスでCSSの:hoverを機能させる
 	document.addEventListener('touchend', () => {}, { passive: true });
+
+	// URLに#pswpを含む場合は取り除く
+	if (location.hash === '#pswp') {
+		history.replaceState(null, '', location.href.replace('#pswp', ''));
+	}
 
 	// 一斉リロード
 	reloadChannel.addEventListener('message', path => {

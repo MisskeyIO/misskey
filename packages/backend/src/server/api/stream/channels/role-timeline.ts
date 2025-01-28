@@ -16,6 +16,7 @@ class RoleTimelineChannel extends Channel {
 	public static readonly shouldShare = false;
 	public static readonly requireCredential = false as const;
 	private roleId: string;
+	private minimize: boolean;
 
 	constructor(
 		private noteEntityService: NoteEntityService,
@@ -31,6 +32,7 @@ class RoleTimelineChannel extends Channel {
 	@bindThis
 	public async init(params: any) {
 		this.roleId = params.roleId as string;
+		this.minimize = params.minimize ?? false;
 
 		this.subscriber.on(`roleTimelineStream:${this.roleId}`, this.onEvent);
 	}
@@ -71,9 +73,20 @@ class RoleTimelineChannel extends Channel {
 				}
 			}
 
-			this.connection.cacheNote(note);
+			if (this.user && (note.visibleUserIds?.includes(this.user.id) ?? note.mentions?.includes(this.user.id))) {
+				this.connection.cacheNote(note);
+			}
 
-			this.send('note', note);
+			if (this.minimize && ['public', 'home'].includes(note.visibility)) {
+				this.send('note', {
+					id: note.id, myReaction: note.myReaction,
+					poll: note.poll?.choices ? { choices: note.poll.choices } : undefined,
+					reply: note.reply?.myReaction ? { myReaction: note.reply.myReaction } : undefined,
+					renote: note.renote?.myReaction ? { myReaction: note.renote.myReaction } : undefined,
+				});
+			} else {
+				this.send('note', note);
+			}
 		} else {
 			this.send(data.type, data.body);
 		}

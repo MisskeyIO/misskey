@@ -18,9 +18,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div>
 			<div v-for="ad in ads" class="_panel _gaps_m" :class="$style.ad">
 				<MkAd v-if="ad.url" :key="ad.id" :specify="ad"/>
-				<MkInput v-if="ad.id !== ''" v-model="ad.id" :readonly="true">
-					<template #label>ID</template>
-				</MkInput>
+				<div v-if="ad.id !== '' && ad.id " class="_gaps_s">
+					<MkInput v-model="ad.id" :readonly="true">
+						<template #label>ID</template>
+					</MkInput>
+					<MkButton @click="copyAdId(ad.id)">
+						<i class="ti ti-clipboard"></i>
+						{{ i18n.ts.copy }}
+					</MkButton>
+				</div>
 				<MkInput v-model="ad.url" type="url">
 					<template #label>URL</template>
 				</MkInput>
@@ -103,6 +109,7 @@ import * as os from '@/os.js';
 import { misskeyApi } from '@/scripts/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { definePageMetadata } from '@/scripts/page-metadata.js';
+import copyToClipboard from '@/scripts/copy-to-clipboard.js';
 
 const ads = ref<Misskey.entities.Ad[]>([]);
 
@@ -246,6 +253,11 @@ function refresh() {
 			};
 		});
 	});
+}
+
+function copyAdId(id) {
+	copyToClipboard(id);
+	os.success();
 }
 
 refresh();

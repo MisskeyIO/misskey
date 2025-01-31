@@ -590,6 +590,7 @@ export class DriveService {
 		if (info.sensitive && profile!.autoSensitive) file.isSensitive = true;
 		if (info.sensitive && instance.setSensitiveFlagAutomatically) file.isSensitive = true;
 		if (userRoleNSFW) file.isSensitive = true;
+		if (file.isSensitiveByModerator) file.isSensitive = true;
 
 		if (url !== null) {
 			file.src = url;
@@ -660,6 +661,7 @@ export class DriveService {
 	@bindThis
 	public async updateFile(file: MiDriveFile, values: Partial<MiDriveFile>, updater: MiUser) {
 		const alwaysMarkNsfw = (await this.roleService.getUserPolicies(file.userId)).alwaysMarkNsfw;
+		const isModerator = await this.roleService.isModerator(updater);
 
 		if (values.name != null && !this.driveFileEntityService.validateFileName(values.name)) {
 			throw new DriveService.InvalidFileNameError();
@@ -680,6 +682,10 @@ export class DriveService {
 			}
 		}
 
+		if (isModerator && file.userId !== updater.id) {
+			values.isSensitiveByModerator = values.isSensitive;
+		}
+
 		await this.driveFilesRepository.update(file.id, values);
 
 		const fileObj = await this.driveFileEntityService.pack(file.id, updater, { self: true });
@@ -689,7 +695,7 @@ export class DriveService {
 			this.globalEventService.publishDriveStream(file.userId, 'fileUpdated', fileObj);
 		}
 
-		if (await this.roleService.isModerator(updater) && (file.userId !== updater.id)) {
+		if (isModerator && (file.userId !== updater.id)) {
 			if (values.isSensitive !== undefined && values.isSensitive !== file.isSensitive) {
 				const user = file.userId ? await this.usersRepository.findOneByOrFail({ id: file.userId }) : null;
 				if (values.isSensitive) {

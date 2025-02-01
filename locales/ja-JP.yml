@@ -1514,7 +1514,6 @@ _accountMigration:
   movedToServer: "移行先のサーバー"
   movedFromServer: "移行元のサーバー"
 
-
 _achievements:
   earnedAt: "獲得日時"
   _types:

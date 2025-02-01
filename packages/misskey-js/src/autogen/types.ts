@@ -9684,6 +9684,10 @@ export type operations = {
           movedFromId?: string | null;
           /** Format: misskey:id */
           movedToId?: string | null;
+          /** @enum {string|null} */
+          from?: 'local' | 'remote' | 'all';
+          /** @enum {string|null} */
+          to?: 'local' | 'remote' | 'all';
         };
       };
     };

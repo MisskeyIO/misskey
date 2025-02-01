@@ -48,8 +48,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</audio>
 			<div :class="[$style.controlsChild, $style.controlsLeft]">
 				<button class="_button" :class="$style.controlButton" @click.prevent.stop="togglePlayPause">
-					<i v-if="isPlaying" class="ti ti-player-pause-filled"></i>
-					<i v-else class="ti ti-player-play-filled"></i>
+					<i v-if="isPlaying" class="ti-filled ti-filled-player-pause"></i>
+					<i v-else class="ti-filled ti-filled-player-play"></i>
 				</button>
 			</div>
 			<div :class="[$style.controlsChild, $style.controlsRight]">
@@ -79,7 +79,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { shallowRef, watch, computed, ref, onDeactivated, onActivated, onMounted } from 'vue';
+import { shallowRef, watch, computed, ref, onDeactivated, onActivated, onMounted, defineAsyncComponent } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { MenuItem } from '@/types/menu.js';
 import { defaultStore } from '@/store.js';
@@ -87,11 +87,11 @@ import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import bytes from '@/filters/bytes.js';
 import { hms } from '@/filters/hms.js';
-import MkAudioVisualizer from '@/components/MkAudioVisualizer.vue';
 import MkMediaRange from '@/components/MkMediaRange.vue';
 import { pleaseLogin } from '@/scripts/please-login.js';
 import { $i, iAmModerator } from '@/account.js';
 
+const MkAudioVisualizer = defineAsyncComponent(() => import('@/components/MkAudioVisualizer.vue'));
 const props = defineProps<{
 	audio: Misskey.entities.DriveFile;
 	user?: Misskey.entities.UserLite;

@@ -380,7 +380,7 @@ export const defaultStore = markRaw(new Storage('base', {
 	},
 	forceShowAds: {
 		where: 'device',
-		default: false,
+		default: true,
 	},
 	aiChanMode: {
 		where: 'device',

@@ -53,8 +53,8 @@ export const meta = {
 		},
 
 		restrictedByModerator: {
-			message: 'The isSensitive specified by the moderator cannot be deleted.',
-			code: 'RESTRICTED_BY_MODERATOR',
+			message: 'The isSensitive specified by the administrator cannot be changed.',
+			code: 'RESTRICTED_BY_ADMINISTRATOR',
 			id: '20e6c501-e579-400d-97e4-1c7efc286f35',
 		},
 	},
@@ -96,7 +96,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw new ApiError(meta.errors.accessDenied);
 			}
 
-			if (!await this.roleService.isModerator(me) && !ps.isSensitive && file.isSensitiveByModerator) {
+			if (!await this.roleService.isModerator(me) && file.isSensitiveByModerator) {
 				throw new ApiError(meta.errors.restrictedByModerator);
 			}
 

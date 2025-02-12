@@ -211,13 +211,15 @@ export class DriveFileEntityService {
 			md5: file.md5,
 			size: file.size,
 			isSensitive: file.isSensitive,
+			...(opts.detail ? {
+				isSensitiveByModerator: file.isSensitiveByModerator,
+			} : {}),
 			blurhash: file.blurhash,
 			properties: opts.self ? file.properties : this.getPublicProperties(file),
 			url: opts.self ? file.url : this.getPublicUrl(file),
 			thumbnailUrl: this.getThumbnailUrl(file),
 			comment: file.comment,
 			folderId: file.folderId,
-			isSensitiveByModerator: opts.detail ? file.isSensitiveByModerator : null,
 			folder: opts.detail && file.folderId ? this.driveFolderEntityService.pack(file.folderId, {
 				detail: true,
 			}) : null,
@@ -248,7 +250,9 @@ export class DriveFileEntityService {
 			md5: file.md5,
 			size: file.size,
 			isSensitive: file.isSensitive,
-			isSensitiveByModerator: opts.detail ? file.isSensitiveByModerator : null,
+			...(opts.detail ? {
+				isSensitiveByModerator: file.isSensitiveByModerator,
+			} : {}),
 			blurhash: file.blurhash,
 			properties: opts.self ? file.properties : this.getPublicProperties(file),
 			url: opts.self ? file.url : this.getPublicUrl(file),

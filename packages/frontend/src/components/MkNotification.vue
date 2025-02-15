@@ -12,7 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			v-else-if="notification.type === 'sensitiveFlagAssigned'"
 			:class="$style.iconFrame"
 		>
-			<div :class="[$style.iconInner]" >
+			<div :class="[$style.iconInner]">
 				<img :class="$style.iconImg" src="/fluent-emoji/1f6a9.png">
 			</div>
 		</div>
@@ -168,8 +168,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkAvatar :class="$style.reactionsItemAvatar" :user="user" link preview/>
 				</div>
 			</div>
-				<Mfm v-else-if="notification.type === 'sensitiveFlagAssigned'" :text="i18n.ts.sensitiveByModerator"/>
-			<span :class="$style.text" style="opacity: 0.6;" v-if="['sensitiveFlagAssigned'].includes(notification.type)">
+			<Mfm v-else-if="notification.type === 'sensitiveFlagAssigned'" :text="i18n.ts.sensitiveByModerator"/>
+			<span v-if="['sensitiveFlagAssigned'].includes(notification.type)" :class="$style.text" style="opacity: 0.6;">
 				{{ i18n.ts.thisInfoIsNotVisibleOtherUser }}
 			</span>
 		</div>
@@ -189,7 +189,7 @@ import { userPage } from '@/filters/user.js';
 import { i18n } from '@/i18n.js';
 import { misskeyApi } from '@/scripts/misskey-api.js';
 import { signinRequired } from '@/account.js';
-import {infoImageUrl} from '@/instance.js';
+import { infoImageUrl } from '@/instance.js';
 
 const $i = signinRequired();
 

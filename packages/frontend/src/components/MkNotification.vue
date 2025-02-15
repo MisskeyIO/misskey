@@ -485,21 +485,6 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	background: linear-gradient(0deg, #d37566, #703827);
 }
 
-.iconFrame_gold {
-	&:before {
-		content: "";
-		display: block;
-		position: absolute;
-		top: 30px;
-		width: 200px;
-		height: 8px;
-		rotate: -45deg;
-		translate: -30px;
-		background: #ffffff88;
-		animation: shine 2s infinite;
-	}
-}
-
 @container (max-width: 600px) {
 	.root {
 		padding: 16px;

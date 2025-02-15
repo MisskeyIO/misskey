@@ -212,7 +212,7 @@ export const entities = [
 	...charts,
 ];
 
-const log = false;
+const log = process.env.NODE_ENV !== 'production';
 const timeoutFinalizationRegistry = new FinalizationRegistry((reference: { name: string; timeout: NodeJS.Timeout }) => {
 	dbLogger.info(`Finalizing timeout: ${reference.name}`);
 	clearInterval(reference.timeout);

@@ -592,7 +592,6 @@ export class DriveService {
 		if (info.sensitive && profile!.autoSensitive) file.isSensitive = true;
 		if (info.sensitive && instance.setSensitiveFlagAutomatically) file.isSensitive = true;
 		if (userRoleNSFW) file.isSensitive = true;
-		if (file.isSensitiveByModerator) file.isSensitive = true;
 
 		if (url !== null) {
 			file.src = url;
@@ -669,7 +668,7 @@ export class DriveService {
 			throw new DriveService.InvalidFileNameError();
 		}
 
-		if (values.isSensitive !== undefined && values.isSensitive !== file.isSensitive && alwaysMarkNsfw && !values.isSensitive) {
+		if ((values.isSensitive !== undefined && values.isSensitive !== file.isSensitive && alwaysMarkNsfw || (!isModerator && file.isSensitiveByModerator)) && !values.isSensitive) {
 			throw new DriveService.CannotUnmarkSensitiveError();
 		}
 

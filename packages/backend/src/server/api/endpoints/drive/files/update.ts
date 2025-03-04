@@ -96,10 +96,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw new ApiError(meta.errors.accessDenied);
 			}
 
-			if (!await this.roleService.isModerator(me) && file.isSensitiveByModerator) {
-				throw new ApiError(meta.errors.restrictedByModerator);
-			}
-
 			let packedFile;
 
 			try {
@@ -115,7 +111,11 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				} else if (e instanceof DriveService.NoSuchFolderError) {
 					throw new ApiError(meta.errors.noSuchFolder);
 				} else if (e instanceof DriveService.CannotUnmarkSensitiveError) {
-					throw new ApiError(meta.errors.restrictedByRole);
+					if (file.isSensitiveByModerator) {
+						throw new ApiError(meta.errors.restrictedByModerator);
+					} else {
+						throw new ApiError(meta.errors.restrictedByRole);
+					}
 				} else {
 					throw e;
 				}

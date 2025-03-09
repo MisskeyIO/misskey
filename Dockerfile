@@ -1,10 +1,8 @@
 # syntax = docker/dockerfile:1.4
 
-ARG NODE_VERSION=22
-
 # build assets & compile TypeScript
 
-FROM --platform=$BUILDPLATFORM node:${NODE_VERSION} AS native-builder
+FROM --platform=$BUILDPLATFORM node:22 AS native-builder
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 	--mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -30,7 +28,7 @@ COPY --link ["packages/misskey-js/package.json", "./packages/misskey-js/"]
 COPY --link ["packages/misskey-reversi/package.json", "./packages/misskey-reversi/"]
 COPY --link ["packages/misskey-bubble-game/package.json", "./packages/misskey-bubble-game/"]
 
-RUN pnpm i --frozen-lockfile --aggregate-output --offline \
+RUN pnpm i --frozen-lockfile --aggregate-output --prefer-offline \
 	&& pnpm rebuild -r
 
 COPY --link . ./
@@ -59,10 +57,10 @@ COPY --link ["packages/misskey-js/package.json", "./packages/misskey-js/"]
 COPY --link ["packages/misskey-reversi/package.json", "./packages/misskey-reversi/"]
 COPY --link ["packages/misskey-bubble-game/package.json", "./packages/misskey-bubble-game/"]
 
-RUN pnpm i --frozen-lockfile --aggregate-output --offline \
+RUN pnpm i --frozen-lockfile --aggregate-output --prefer-offline \
 	&& pnpm rebuild -r
 
-FROM --platform=$TARGETPLATFORM node:${NODE_VERSION}-slim AS runner
+FROM --platform=$TARGETPLATFORM node:22-slim AS runner
 
 ARG UID="991"
 ARG GID="991"

@@ -37,7 +37,7 @@ RUN NODE_ENV=production pnpm build
 
 # build native dependencies for target platform
 
-FROM --platform=$TARGETPLATFORM node:${NODE_VERSION} AS target-builder
+FROM --platform=$TARGETPLATFORM node:22 AS target-builder
 
 RUN apt-get update \
 	&& apt-get install -yqq --no-install-recommends \

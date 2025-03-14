@@ -668,8 +668,9 @@ export class DriveService {
 			throw new DriveService.InvalidFileNameError();
 		}
 
-		if ((values.isSensitive !== undefined && values.isSensitive !== file.isSensitive && alwaysMarkNsfw || (!isModerator && file.isSensitiveByModerator)) && !values.isSensitive) {
-			throw new DriveService.CannotUnmarkSensitiveError();
+		if (values.isSensitive !== undefined && values.isSensitive !== file.isSensitive && !values.isSensitive) {
+			if (alwaysMarkNsfw) throw new DriveService.CannotUnmarkSensitiveError();
+			if (!isModerator && file.isSensitiveByModerator) throw new DriveService.CannotUnmarkSensitiveError();
 		}
 
 		if (values.folderId != null) {

@@ -189,7 +189,7 @@ export class DriveService {
 			//#region Uploads
 			this.registerLogger.info(`uploading original: ${key}`);
 			const uploads = [
-				this.upload(key, fs.createReadStream(path), fileType, null, name),
+				this.upload(key, fs.createReadStream(path), type, null, name),
 			];
 
 			if (alts.webpublic) {
@@ -219,7 +219,7 @@ export class DriveService {
 			file.webpublicAccessKey = webpublicKey;
 			file.webpublicType = alts.webpublic?.type ?? null;
 			file.name = name;
-			file.type = fileType;
+			file.type = type;
 			file.md5 = hash;
 			file.size = size;
 			file.storedInternal = false;
@@ -254,7 +254,7 @@ export class DriveService {
 			file.webpublicAccessKey = webpublicAccessKey;
 			file.webpublicType = alts.webpublic?.type ?? null;
 			file.name = name;
-			file.type = fileType;
+			file.type = type;
 			file.md5 = hash;
 			file.size = size;
 
@@ -375,10 +375,10 @@ export class DriveService {
 	 */
 	@bindThis
 	private async upload(key: string, stream: fs.ReadStream | Buffer, type: string, ext?: string | null, filename?: string) {
-		let fileType = type.split(';')[0];
+		const fileType = type.split(';')[0];
 
-		if (fileType === 'image/apng') fileType = 'image/png';
-		if (!FILE_TYPE_BROWSERSAFE.includes(fileType)) fileType = 'application/octet-stream';
+		if (fileType === 'image/apng') type = 'image/png';
+		if (!FILE_TYPE_BROWSERSAFE.includes(fileType)) type = 'application/octet-stream';
 
 		const meta = await this.metaService.fetch();
 
@@ -386,7 +386,7 @@ export class DriveService {
 			Bucket: meta.objectStorageBucket,
 			Key: key,
 			Body: stream,
-			ContentType: fileType,
+			ContentType: type,
 			CacheControl: 'max-age=31536000, immutable',
 		} as PutObjectCommandInput;
 

@@ -670,7 +670,7 @@ export class DriveService {
 
 		if (values.isSensitive !== undefined && values.isSensitive !== file.isSensitive && !values.isSensitive) {
 			if (alwaysMarkNsfw) throw new DriveService.CannotUnmarkSensitiveError();
-			if (!isModerator && file.isSensitiveByModerator) throw new DriveService.CannotUnmarkSensitiveError();
+			if (file.isSensitiveByModerator && (file.userId === updater.id)) throw new DriveService.CannotUnmarkSensitiveError();
 		}
 
 		if (values.folderId != null) {

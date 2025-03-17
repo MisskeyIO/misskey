@@ -5364,7 +5364,7 @@ export interface Locale extends ILocale {
     "willBePostedAt": ParameterizedString<"x">;
     /**
      * 管理者によって、ドライブのファイルがセンシティブとして設定されました。
-     * 詳細については、[NSFWガイドライン](https://go.misskey.io/media-guideline)を確認してください
+     * 詳細については、[NSFWガイドライン](https://go.misskey.io/media-guideline)を確認してください。
      */
     "sensitiveByModerator": string;
     /**

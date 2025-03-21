@@ -17,7 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, watch, onUnmounted, provide, shallowRef } from 'vue';
+import { computed, watch, onUnmounted, provide, shallowRef, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkNotes from '@/components/MkNotes.vue';
 import MkPullToRefresh from '@/components/MkPullToRefresh.vue';
@@ -69,40 +69,65 @@ const prComponent = shallowRef<InstanceType<typeof MkPullToRefresh>>();
 const tlComponent = shallowRef<InstanceType<typeof MkNotes>>();
 
 let tlNotesCount = 0;
+const notVisibleNoteData = new Set<object>();
 
 async function prepend(data) {
 	if (tlComponent.value == null) return;
 
 	let note = data;
 
-	// チェックするプロパティはなんでも良い
-	// minimizeが有効でid以外が存在しない場合は取得する
-	if (!data.visibility) {
-		const res = await window.fetch(`/notes/${data.id}.json`, {
-			method: 'GET',
-			credentials: 'omit',
-			headers: {
-				'Authorization': 'anonymous',
-				'X-Client-Transaction-Id': generateClientTransactionId('misskey'),
-			},
-		});
-		if (!res.ok) return;
-		note = deepMerge(data, await res.json());
+	if (!document.hidden) {
+		// チェックするプロパティはなんでも良い
+		// minimizeが有効でid以外が存在しない場合は取得する
+		if (!data.visibility) {
+			const res = await window.fetch(`/notes/${data.id}.json`, {
+				method: 'GET',
+				credentials: 'omit',
+				headers: {
+					'Authorization': 'anonymous',
+					'X-Client-Transaction-Id': generateClientTransactionId('misskey'),
+				},
+			});
+			if (!res.ok) return;
+			note = deepMerge(data, await res.json());
+		}
+
+		tlNotesCount++;
+
+		if (instance.notesPerOneAd > 0 && tlNotesCount % instance.notesPerOneAd === 0) {
+			note._shouldInsertAd_ = true;
+		}
+
+		tlComponent.value.pagingComponent?.prepend(note);
+	} else {
+		if (notVisibleNoteData.has(data.id)) return;
+		notVisibleNoteData.add(data);
 	}
-
-	tlNotesCount++;
-
-	if (instance.notesPerOneAd > 0 && tlNotesCount % instance.notesPerOneAd === 0) {
-		note._shouldInsertAd_ = true;
-	}
-
-	tlComponent.value.pagingComponent?.prepend(note);
 
 	emit('note');
 
 	if (props.sound) {
 		sound.playMisskeySfx($i && (note.userId === $i.id) ? 'noteMy' : 'note');
 	}
+}
+
+async function loadUnloadedNotes() {
+	if (document.hidden) return;
+	if (tlComponent.value == null) return;
+	if (notVisibleNoteData.size === 0) return;
+
+	// 10件以上表示できる投稿がない状態でdeleteItemしてしまうと、TLのリロードが入って逆効果になってしまう
+	if (notVisibleNoteData.size > 10) {
+		tlComponent.value.pagingComponent?.deleteItem();
+	}
+
+	let loopCount = 0;
+	for (const noteData of notVisibleNoteData) {
+		if (loopCount++ > 10) break;
+		await prepend(noteData);
+	}
+
+	notVisibleNoteData.clear();
 }
 
 let connection: Misskey.ChannelConnection | null = null;
@@ -291,8 +316,13 @@ watch(() => [props.list, props.antenna, props.channel, props.role, props.withRen
 // 初回表示用
 refreshEndpointAndChannel();
 
+onMounted(() => {
+	document.addEventListener('visibilitychange', loadUnloadedNotes);
+});
+
 onUnmounted(() => {
 	disconnectChannel();
+	document.removeEventListener('visibilitychange', loadUnloadedNotes);
 });
 
 function reloadTimeline() {

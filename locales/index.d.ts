@@ -5362,6 +5362,14 @@ export interface Locale extends ILocale {
      * {x}に投稿されます
      */
     "willBePostedAt": ParameterizedString<"x">;
+    /**
+     * 水に流す
+     */
+    "flushItAway": string;
+    /**
+     * 削除をしても全てが水に流れるわけではありませんが、
+     */
+    "deleteNotWash": string;
     "_bubbleGame": {
         /**
          * 遊び方

@@ -125,7 +125,8 @@ export class ServerService implements OnApplicationShutdown {
 		fastify.register(this.samlIdentifyProviderService.createServer, { prefix: '/sso/saml' });
 		fastify.register(this.jwtIdentifyProviderService.createServer, { prefix: '/sso/jwt' });
 		fastify.register(this.jwtIdentifyProviderService.createApiServer, { prefix: '/sso/jwt/api' });
-
+		// fastify.register(this.healthServerService.createServer, { prefix: '/healthz' });
+		// TODO: あとでまっちゃとーにゅさんに消すか聞く
 		fastify.get<{ Params: { path: string }; Querystring: { static?: any; badge?: any; }; }>('/emoji/:path(.*)', async (request, reply) => {
 			const path = request.params.path;
 

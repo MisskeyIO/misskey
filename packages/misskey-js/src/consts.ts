@@ -60,7 +60,6 @@ export const permissions = [
 	'read:admin:show-moderation-log',
 	'read:admin:show-account-move-log',
 	'read:admin:show-user',
-	'read:admin:show-users',
 	'write:admin:suspend-user',
 	'write:admin:unsuspend-user',
 	'write:admin:meta',

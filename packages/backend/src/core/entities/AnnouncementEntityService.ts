@@ -9,6 +9,7 @@ import type { AnnouncementsRepository, AnnouncementReadsRepository, MiAnnounceme
 import type { Packed } from '@/misc/json-schema.js';
 import { bindThis } from '@/decorators.js';
 import { IdService } from '@/core/IdService.js';
+import announcements from '@/server/api/endpoints/announcements.js';
 
 @Injectable()
 export class AnnouncementEntityService {

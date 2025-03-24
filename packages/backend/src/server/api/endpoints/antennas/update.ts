@@ -74,7 +74,6 @@ export const paramDef = {
 		excludeBots: { type: 'boolean' },
 		withReplies: { type: 'boolean' },
 		withFile: { type: 'boolean' },
-		notify: { type: 'boolean' },
 	},
 	required: ['antennaId'],
 } as const;
@@ -140,7 +139,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				excludeBots: ps.excludeBots,
 				withReplies: ps.withReplies,
 				withFile: ps.withFile,
-				notify: ps.notify,
 				isActive: true,
 				lastUsedAt: new Date(),
 			});

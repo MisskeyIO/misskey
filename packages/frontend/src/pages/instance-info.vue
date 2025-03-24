@@ -35,10 +35,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<FormSection v-if="iAmModerator">
 					<template #label>Moderation</template>
 					<div class="_gaps_s">
+						<MkKeyValue>
+							<template #key>
+								{{ i18n.ts._delivery.status }}
+							</template>
+							<template #value>
+								{{ i18n.ts._delivery._type[suspensionState] }}
+							</template>
+						</MkKeyValue>
 						<MkTextarea v-model="moderationNote" manualSave>
 							<template #label>{{ i18n.ts.moderationNote }}</template>
 						</MkTextarea>
-						<MkSwitch v-model="suspended" :disabled="!instance" @update:modelValue="toggleSuspend">{{ i18n.ts.stopActivityDelivery }}</MkSwitch>
+						<MkButton v-if="suspensionState === 'none'" :disabled="!instance" danger @click="stopDelivery">{{ i18n.ts._delivery.stop }}</MkButton>
+						<MkButton v-if="suspensionState !== 'none'" :disabled="!instance" @click="resumeDelivery">{{ i18n.ts._delivery.resume }}</MkButton>
 						<MkSwitch v-model="isBlocked" :disabled="!meta || !instance" @update:modelValue="toggleBlock">{{ i18n.ts.blockThisInstance }}</MkSwitch>
 						<MkSwitch v-model="isSilenced" :disabled="!meta || !instance" @update:modelValue="toggleSilenced">{{ i18n.ts.silenceThisInstance }}</MkSwitch>
 						<MkSwitch v-model="isSensitiveMedia" :disabled="!meta || !instance" @update:modelValue="toggleSensitiveMedia">{{ i18n.ts.sensitiveMediaThisInstance }}</MkSwitch>
@@ -156,7 +165,7 @@ const tab = ref('overview');
 const chartSrc = ref('instance-requests');
 const meta = ref<Misskey.entities.AdminMetaResponse | null>(null);
 const instance = ref<Misskey.entities.FederationInstance | null>(null);
-const suspended = ref(false);
+const suspensionState = ref<'none' | 'manuallySuspended' | 'goneSuspended' | 'autoSuspendedForNotResponding'>('none');
 const isBlocked = ref(false);
 const isSilenced = ref(false);
 const isSensitiveMedia = ref(false);
@@ -190,7 +199,7 @@ async function fetch(): Promise<void> {
 	instance.value = await misskeyApi('federation/show-instance', {
 		host: props.host,
 	});
-	suspended.value = instance.value?.isSuspended ?? false;
+	suspensionState.value = instance.value?.suspensionState ?? 'none';
 	isBlocked.value = instance.value?.isBlocked ?? false;
 	isSilenced.value = instance.value?.isSilenced ?? false;
 	isSensitiveMedia.value = instance.value?.isSensitiveMedia ?? false;
@@ -227,11 +236,21 @@ async function toggleSensitiveMedia(): Promise<void> {
 	});
 }
 
-async function toggleSuspend(): Promise<void> {
+async function stopDelivery(): Promise<void> {
 	if (!instance.value) throw new Error('No instance?');
+	suspensionState.value = 'manuallySuspended';
 	await misskeyApi('admin/federation/update-instance', {
 		host: instance.value.host,
-		isSuspended: suspended.value,
+		isSuspended: true,
+	});
+}
+
+async function resumeDelivery(): Promise<void> {
+	if (!instance.value) throw new Error('No instance?');
+	suspensionState.value = 'none';
+	await misskeyApi('admin/federation/update-instance', {
+		host: instance.value.host,
+		isSuspended: false,
 	});
 }
 

@@ -186,6 +186,12 @@ export class InboxProcessorService implements OnApplicationShutdown {
 		// Update stats
 		this.federatedInstanceService.fetch(authUser.user.host).then(i => {
 			this.updateInstanceQueue.enqueue(i.id, new Date());
+			// TODO 			this.federatedInstanceService.update(i.id, {
+			// 				latestRequestReceivedAt: new Date(),
+			// 				isNotResponding: false,
+			// 				// もしサーバーが死んでるために配信が止まっていた場合には自動的に復活させてあげる
+			// 				suspensionState: i.suspensionState === 'autoSuspendedForNotResponding' ? 'none' : undefined,
+			// 			});
 
 			this.fetchInstanceMetadataService.fetchInstanceMetadata(i);
 

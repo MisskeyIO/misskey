@@ -101,6 +101,7 @@ import * as ep___admin_sso_list from './endpoints/admin/sso/list.js';
 import * as ep___admin_sso_update from './endpoints/admin/sso/update.js';
 import * as ep___announcement from './endpoints/announcement.js';
 import * as ep___announcements from './endpoints/announcements.js';
+import * as ep___announcements_show from './endpoints/announcements/show.js';
 import * as ep___antennas_create from './endpoints/antennas/create.js';
 import * as ep___antennas_delete from './endpoints/antennas/delete.js';
 import * as ep___antennas_list from './endpoints/antennas/list.js';
@@ -498,6 +499,7 @@ const $admin_sso_list: Provider = { provide: 'ep:admin/sso/list', useClass: ep__
 const $admin_sso_update: Provider = { provide: 'ep:admin/sso/update', useClass: ep___admin_sso_update.default };
 const $announcement: Provider = { provide: 'ep:announcement', useClass: ep___announcement.default };
 const $announcements: Provider = { provide: 'ep:announcements', useClass: ep___announcements.default };
+const $announcements_show: Provider = { provide: 'ep:announcements/show', useClass: ep___announcements_show.default };
 const $antennas_create: Provider = { provide: 'ep:antennas/create', useClass: ep___antennas_create.default };
 const $antennas_delete: Provider = { provide: 'ep:antennas/delete', useClass: ep___antennas_delete.default };
 const $antennas_list: Provider = { provide: 'ep:antennas/list', useClass: ep___antennas_list.default };
@@ -899,6 +901,7 @@ const $reversi_verify: Provider = { provide: 'ep:reversi/verify', useClass: ep__
 		$admin_sso_update,
 		$announcement,
 		$announcements,
+		$announcements_show,
 		$antennas_create,
 		$antennas_delete,
 		$antennas_list,
@@ -1294,6 +1297,7 @@ const $reversi_verify: Provider = { provide: 'ep:reversi/verify', useClass: ep__
 		$admin_sso_update,
 		$announcement,
 		$announcements,
+		$announcements_show,
 		$antennas_create,
 		$antennas_delete,
 		$antennas_list,

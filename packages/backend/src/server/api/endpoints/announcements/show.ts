@@ -4,8 +4,10 @@
  */
 
 import { Injectable } from '@nestjs/common';
+import { EntityNotFoundError } from 'typeorm';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { AnnouncementService } from '@/core/AnnouncementService.js';
+import { ApiError } from '../../error.js';
 
 export const meta = {
 	tags: ['meta'],
@@ -13,12 +15,16 @@ export const meta = {
 	requireCredential: false,
 
 	res: {
-		type: 'array',
+		type: 'object',
 		optional: false, nullable: false,
-		items: {
-			type: 'object',
-			optional: false, nullable: false,
-			ref: 'Announcement',
+		ref: 'Announcement',
+	},
+
+	errors: {
+		noSuchAnnouncement: {
+			message: 'No such announcement.',
+			code: 'NO_SUCH_ANNOUNCEMENT',
+			id: 'b57b5e1d-4f49-404a-9edb-46b00268f121',
 		},
 	},
 } as const;
@@ -26,13 +32,9 @@ export const meta = {
 export const paramDef = {
 	type: 'object',
 	properties: {
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		offset: { type: 'integer', default: 0 },
-		isActive: { type: 'boolean', default: true },
+		announcementId: { type: 'string', format: 'misskey:id' },
 	},
-	required: [],
+	required: ['announcementId'],
 } as const;
 
 @Injectable()
@@ -41,8 +43,12 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private announcementService: AnnouncementService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
-			return this.announcementService.getAnnouncements(me, ps.limit, ps.offset, ps.isActive);
-		//TODO: sinceIdとかを対応させる
+			try {
+				return await this.announcementService.getAnnouncement(ps.announcementId, me);
+			} catch (err) {
+				if (err instanceof EntityNotFoundError) throw new ApiError(meta.errors.noSuchAnnouncement);
+				throw err;
+			}
 		});
 	}
 }

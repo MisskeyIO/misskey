@@ -1323,6 +1323,10 @@ unschedule: "예약 취소"
 setScheduledTime: "예약 시간 설정"
 willBePostedAt: "{x}에 게시됩니다"
 
+_delivery:
+  stop: "정지됨"
+  _type:
+    none: "배포 중"
 _bubbleGame:
   howToPlay: "설명"
   hold: "홀드"
@@ -2169,7 +2173,6 @@ _permissions:
   "read:admin:server-info": "서버 정보 보기"
   "read:admin:show-moderation-log": "조정 기록 보기"
   "read:admin:show-user": "사용자 개인정보 보기"
-  "read:admin:show-users": "사용자 개인정보 보기"
   "write:admin:suspend-user": "사용자 정지하기"
   "write:admin:user-avatar": "사용자 아바타 삭제하기"
   "write:admin:user-banner": "사용자 배너 삭제하기"

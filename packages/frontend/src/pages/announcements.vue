@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<i v-else-if="announcement.icon === 'error'" class="ti ti-circle-x" style="color: var(--error);"></i>
 								<i v-else-if="announcement.icon === 'success'" class="ti ti-check" style="color: var(--success);"></i>
 							</span>
-							<Mfm :text="announcement.title"/>
+							<MkA :to="`/announcements/${announcement.id}`"><span>{{ announcement.title }}</span></MkA>
 						</div>
 						<div :class="$style.content">
 							<Mfm :text="announcement.text"/>
@@ -83,7 +83,7 @@ const paginationEl = ref<InstanceType<typeof MkPagination>>();
 
 const tab = ref('current');
 
-async function read(announcement): Promise<void> {
+async function read(target): Promise<void> {
 	if (announcement.needEnrollmentTutorialToRead) {
 		const tutorialCompleted = await (new Promise<boolean>(resolve => {
 			os.popup(defineAsyncComponent(() => import('@/components/MkTutorialDialog.vue')), {}, {
@@ -95,24 +95,24 @@ async function read(announcement): Promise<void> {
 		if (!tutorialCompleted) return;
 	}
 
-	if (announcement.needConfirmationToRead) {
+	if (target.needConfirmationToRead) {
 		const confirm = await os.confirm({
 			type: 'question',
 			title: i18n.ts._announcement.readConfirmTitle,
-			text: i18n.tsx._announcement.readConfirmText({ title: announcement.title }),
+			text: i18n.tsx._announcement.readConfirmText({ title: target.title }),
 		});
 		if (confirm.canceled) return;
 	}
 
 	if (!paginationEl.value) return;
-	paginationEl.value.updateItem(announcement.id, a => {
+	paginationEl.value.updateItem(target.id, a => {
 		a.isRead = true;
 		return a;
 	});
-	await misskeyApi('i/read-announcement', { announcementId: announcement.id });
+	await misskeyApi('i/read-announcement', { announcementId: target.id });
 	if ($i) {
 		updateAccount({
-			unreadAnnouncements: $i.unreadAnnouncements.filter((a: { id: string; }) => a.id !== announcement.id),
+			unreadAnnouncements: $i.unreadAnnouncements.filter((a: { id: string; }) => a.id !== target.id),
 		});
 	}
 }

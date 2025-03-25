@@ -1,4 +1,4 @@
-const date = new Date('2024/04/01');
+const date = new Date();
 const month = date.getMonth();
 const day = date.getDate();
 

@@ -5363,6 +5363,15 @@ export interface Locale extends ILocale {
      */
     "willBePostedAt": ParameterizedString<"x">;
     /**
+     * 管理者によって、ドライブのファイルがセンシティブとして設定されました。
+     * 詳細については、[NSFWガイドライン](https://go.misskey.io/media-guideline)を確認してください。
+     */
+    "sensitiveByModerator": string;
+    /**
+     * この情報は他のユーザーには公開されません。
+     */
+    "thisInfoIsNotVisibleOtherUser": string;
+    /**
      * 水に流す
      */
     "flushItAway": string;
@@ -6012,6 +6021,14 @@ export interface Locale extends ILocale {
          * 移行先のアカウント:
          */
         "movedTo": string;
+        /**
+         * 移行先のサーバー
+         */
+        "movedToServer": string;
+        /**
+         * 移行元のサーバー
+         */
+        "movedFromServer": string;
     };
     "_achievements": {
         /**
@@ -9747,6 +9764,10 @@ export interface Locale extends ILocale {
          * 通知の履歴をリセットする
          */
         "flushNotification": string;
+        /**
+         * ドライブのファイルがセンシティブとして設定されました
+         */
+        "sensitiveFlagAssigned": string;
         "_types": {
             /**
              * すべて

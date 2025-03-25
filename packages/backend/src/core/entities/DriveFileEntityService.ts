@@ -12,7 +12,7 @@ import type { Packed } from '@/misc/json-schema.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { MiUser } from '@/models/User.js';
 import type { MiDriveFile } from '@/models/DriveFile.js';
-import { appendQuery, query } from '@/misc/prelude/url.js';
+import { appendQuery, omitHttps, query } from '@/misc/prelude/url.js';
 import { deepClone } from '@/misc/clone.js';
 import { bindThis } from '@/decorators.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
@@ -77,9 +77,8 @@ export class DriveFileEntityService {
 	@bindThis
 	private getProxiedUrl(url: string, mode?: 'static' | 'avatar'): string {
 		return appendQuery(
-			`${this.config.mediaProxy}/${mode ?? 'image'}.webp`,
+			`${this.config.mediaProxy}/${mode ?? 'image'}/${encodeURIComponent(omitHttps(url))}`,
 			query({
-				url,
 				...(mode ? { [mode]: '1' } : {}),
 			}),
 		);
@@ -211,6 +210,9 @@ export class DriveFileEntityService {
 			md5: file.md5,
 			size: file.size,
 			isSensitive: file.isSensitive,
+			...(opts.detail ? {
+				isSensitiveByModerator: file.isSensitiveByModerator,
+			} : {}),
 			blurhash: file.blurhash,
 			properties: opts.self ? file.properties : this.getPublicProperties(file),
 			url: opts.self ? file.url : this.getPublicUrl(file),
@@ -247,6 +249,9 @@ export class DriveFileEntityService {
 			md5: file.md5,
 			size: file.size,
 			isSensitive: file.isSensitive,
+			...(opts.detail ? {
+				isSensitiveByModerator: file.isSensitiveByModerator,
+			} : {}),
 			blurhash: file.blurhash,
 			properties: opts.self ? file.properties : this.getPublicProperties(file),
 			url: opts.self ? file.url : this.getPublicUrl(file),

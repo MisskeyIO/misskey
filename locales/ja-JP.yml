@@ -1334,6 +1334,8 @@ scheduled: "予約済み"
 unschedule: "予約を解除"
 setScheduledTime: "予約日時を設定"
 willBePostedAt: "{x}に投稿されます"
+sensitiveByModerator: "管理者によって、ドライブのファイルがセンシティブとして設定されました。\n詳細については、[NSFWガイドライン](https://go.misskey.io/media-guideline)を確認してください。"
+thisInfoIsNotVisibleOtherUser: "この情報は他のユーザーには公開されません。"
 flushItAway: "水に流す"
 deleteNotWash: "削除をしても全てが水に流れるわけではありませんが、"
 
@@ -1513,6 +1515,8 @@ _accountMigration:
   movedAndCannotBeUndone: "\nアカウントは移行されています。\n移行を取り消すことはできません。"
   postMigrationNote: "このアカウントからのフォロー解除は移行操作から24時間後に実行されます。\nこのアカウントのフォロー・フォロワー数は0になっています。フォロワーの解除はされないため、あなたのフォロワーはこのアカウントのフォロワー向け投稿を引き続き閲覧できます。"
   movedTo: "移行先のアカウント:"
+  movedToServer: "移行先のサーバー"
+  movedFromServer: "移行元のサーバー"
 
 _achievements:
   earnedAt: "獲得日時"
@@ -2562,6 +2566,7 @@ _notification:
   renotedBySomeUsers: "{n}人がリノートしました"
   followedBySomeUsers: "{n}人にフォローされました"
   flushNotification: "通知の履歴をリセットする"
+  sensitiveFlagAssigned: "ドライブのファイルがセンシティブとして設定されました"
 
   _types:
     all: "すべて"

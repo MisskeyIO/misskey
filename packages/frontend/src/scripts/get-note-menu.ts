@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import * as os from 'node:os';
 import { defineAsyncComponent, Ref, ShallowRef } from 'vue';
 import * as Misskey from 'misskey-js';
+import { action } from '@storybook/addon-actions';
 import { claimAchievement } from './achievements.js';
 import { $i } from '@/account.js';
 import { i18n } from '@/i18n.js';
@@ -21,7 +23,8 @@ import { MenuItem } from '@/types/menu.js';
 import MkRippleEffect from '@/components/MkRippleEffect.vue';
 import { isSupportShare } from '@/scripts/navigator.js';
 import { isMute, playUrl } from '@/scripts/sound';
-import { isAprilFool } from '@/scripts/is-april-fool';
+import { isAprilFoolsDay } from '@/scripts/seasonal-events';
+import channel from '@/pages/channel.vue';
 
 export async function getNoteClipMenu(props: {
 	note: Misskey.entities.Note;
@@ -182,11 +185,11 @@ export function getNoteMenu(props: {
 	function del(): void {
 		os.confirm({
 			type: 'warning',
-			text: isAprilFool ? i18n.ts.deleteNotWash + '\n' + i18n.ts.noteDeleteConfirm : i18n.ts.noteDeleteConfirm,
+			text: isAprilFoolsDay() ? i18n.ts.deleteNotWash + '\n' + i18n.ts.noteDeleteConfirm : i18n.ts.noteDeleteConfirm,
 		}).then(({ canceled }) => {
 			if (canceled) return;
 
-			if (isAprilFool) {
+			if (isAprilFoolsDay()) {
 				if (!isMute()) playUrl('/client-assets/sounds/flush.mp3', {});
 			}
 
@@ -441,8 +444,8 @@ export function getNoteMenu(props: {
 					action: delEdit,
 				} : undefined,
 				{
-					icon: isAprilFool ? 'ti ti-whirl' : 'ti ti-trash',
-					text: isAprilFool ? i18n.ts.flushItAway : i18n.ts.delete,
+					icon: isAprilFoolsDay() ? 'ti ti-whirl' : 'ti ti-trash',
+					text: isAprilFoolsDay() ? i18n.ts.flushItAway : i18n.ts.delete,
 					danger: true,
 					action: del,
 				}]

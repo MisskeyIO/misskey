@@ -5376,7 +5376,7 @@ export interface Locale extends ILocale {
      */
     "flushItAway": string;
     /**
-     * 削除をしても全てが水に流れるわけではありませんが、
+     * 削除をしても全てが水に流れるわけではありませんが
      */
     "deleteNotWash": string;
     "_bubbleGame": {

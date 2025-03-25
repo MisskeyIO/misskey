@@ -11,7 +11,7 @@ import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import { defaultStore } from '@/store.js';
 import { MisskeyEntity } from '@/types/date-separated-list.js';
-import { isAprilFool } from '@/scripts/is-april-fool';
+import { isAprilFoolsDay } from '@/scripts/seasonal-events';
 
 export default defineComponent({
 	props: {
@@ -120,7 +120,7 @@ export default defineComponent({
 		};
 
 		function onBeforeLeave(element: Element) {
-			if (isAprilFool) return;
+			if (isAprilFoolsDay()) return;
 
 			const el = element as HTMLElement;
 			el.style.top = `${el.offsetTop}px`;
@@ -128,7 +128,7 @@ export default defineComponent({
 		}
 
 		function onLeaveCancelled(element: Element) {
-			if (isAprilFool) return;
+			if (isAprilFoolsDay()) return;
 
 			const el = element as HTMLElement;
 			el.style.top = '';
@@ -141,7 +141,7 @@ export default defineComponent({
 			[$style['date-separated-list-nogap']]: props.noGap,
 			[$style['direction-down']]: props.direction === 'down',
 			[$style['direction-up']]: props.direction === 'up',
-			[$style['april-fool']]: isAprilFool,
+			[$style['april-fool']]: isAprilFoolsDay(),
 		};
 
 		return () => defaultStore.state.animation ? h(TransitionGroup, {

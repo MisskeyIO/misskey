@@ -5,7 +5,7 @@
 
 import * as Misskey from 'misskey-js';
 import { ref } from 'vue';
-import { apiUrl } from '@/config.js';
+import { apiUrl } from '@@/js/config.js';
 import { $i } from '@/account.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { time as gtagTime } from 'vue-gtag';

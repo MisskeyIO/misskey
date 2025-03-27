@@ -55,4 +55,4 @@ export type BadgeNames =
 	| 'calendar-clock'
 	| 'calendar-check'
 	| 'calendar-exclamation'
-	;
+	| 'login-2';

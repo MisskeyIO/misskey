@@ -286,7 +286,7 @@ defineExpose({
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background-color: color-mix(in srgb, var(--panel), transparent 50%);
+	background-color: color-mix(in srgb, var(--MI_THEME-panel), transparent 50%);
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -316,15 +316,15 @@ defineExpose({
 
 .icon {
 	border-radius: 50%;
-	border: 1px solid var(--divider);
+	border: 1px solid var(--MI_THEME-divider);
 	background-color: #fff;
 	object-fit: contain;
 }
 
 .iconFallback {
 	border-radius: 50%;
-	background-color: var(--accentedBg);
-	color: var(--accent);
+	background-color: var(--MI_THEME-accentedBg);
+	color: var(--MI_THEME-accent);
 	text-align: center;
 	line-height: 54px;
 	font-size: 18px;
@@ -344,16 +344,16 @@ defineExpose({
 
 .permissionRoot {
 	padding: 16px;
-	border-radius: var(--radius);
-	background-color: var(--bg);
+	border-radius: var(--MI-radius);
+	background-color: var(--MI_THEME-bg);
 }
 
 .permissionListWrapper {
 	max-height: 350px;
 	overflow-y: auto;
 	padding: 12px;
-	border-radius: var(--radius);
-	background-color: var(--panel);
+	border-radius: var(--MI-radius);
+	background-color: var(--MI_THEME-panel);
 }
 
 .permissionList {
@@ -369,8 +369,8 @@ defineExpose({
 }
 
 .accountSelectorList {
-	border-radius: var(--radius);
-	border: 1px solid var(--divider);
+	border-radius: var(--MI-radius);
+	border: 1px solid var(--MI_THEME-divider);
 	overflow: hidden;
 	overflow: clip;
 }
@@ -381,7 +381,7 @@ defineExpose({
 	pointer-events: none;
 
 	&:focus-visible + .accountSelectorItem {
-		outline: 2px solid var(--accent);
+		outline: 2px solid var(--MI_THEME-accent);
 		outline-offset: -4px;
 	}
 
@@ -390,7 +390,7 @@ defineExpose({
 	}
 
 	&:checked + .accountSelectorItem {
-		background: color-mix(in srgb, var(--accent), transparent 50%);
+		background: var(--MI_THEME-accent);
 		color: #fff;
 	}
 }
@@ -404,7 +404,7 @@ defineExpose({
 	cursor: pointer;
 
 	&:hover {
-		background: var(--buttonHoverBg);
+		background: var(--MI_THEME-buttonHoverBg);
 	}
 
 	&.static {
@@ -431,8 +431,8 @@ defineExpose({
 }
 
 .accountSelectorAddAccountAvatar {
-	background-color: var(--accentedBg);
-	color: var(--accent);
+	background-color: var(--MI_THEME-accentedBg);
+	color: var(--MI_THEME-accent);
 	font-size: 16px;
 	line-height: 45px;
 	text-align: center;

@@ -80,7 +80,7 @@ export class AnnouncementService {
 
 	@bindThis
 	public async create(values: Partial<MiAnnouncement>, moderator?: MiUser): Promise<{ raw: MiAnnouncement; packed: Packed<'Announcement'> }> {
-		const announcement = await this.announcementsRepository.insert({
+		const announcement = await this.announcementsRepository.insertOne({
 			id: this.idService.gen(),
 			updatedAt: null,
 			title: values.title,
@@ -95,7 +95,7 @@ export class AnnouncementService {
 			closeDuration: values.closeDuration,
 			displayOrder: values.displayOrder,
 			userId: values.userId,
-		}).then(x => this.announcementsRepository.findOneByOrFail(x.identifiers[0]));
+		});
 
 		const packed = (await this.announcementEntityService.packMany([announcement], null))[0];
 
@@ -377,6 +377,13 @@ export class AnnouncementService {
 			});
 		} catch (e) {
 			return;
+		}
+
+		const announcement = await this.announcementsRepository.findOneBy({ id: announcementId });
+		if (announcement != null && announcement.userId === user.id) {
+			await this.announcementsRepository.update(announcementId, {
+				isActive: false,
+			});
 		}
 
 		if ((await this.countUnreadAnnouncements(user)) === 0) {

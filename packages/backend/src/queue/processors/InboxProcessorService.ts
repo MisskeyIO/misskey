@@ -3,11 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable, OnApplicationShutdown } from '@nestjs/common';
+import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import httpSignature from '@peertube/http-signature';
 import * as Bull from 'bullmq';
 import type Logger from '@/logger.js';
-import { MetaService } from '@/core/MetaService.js';
 import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
 import { FetchInstanceMetadataService } from '@/core/FetchInstanceMetadataService.js';
 import InstanceChart from '@/core/chart/charts/instance.js';
@@ -29,6 +28,13 @@ import { CollapsedQueue } from '@/misc/collapsed-queue.js';
 import { MiNote } from '@/models/Note.js';
 import { QueueLoggerService } from '../QueueLoggerService.js';
 import type { InboxJobData } from '../types.js';
+import { DI } from '@/di-symbols.js';
+import { MiMeta } from '@/models/Meta.js';
+
+type UpdateInstanceJob = {
+	latestRequestReceivedAt: Date,
+	shouldUnsuspend: boolean,
+};
 
 @Injectable()
 export class InboxProcessorService implements OnApplicationShutdown {
@@ -36,8 +42,10 @@ export class InboxProcessorService implements OnApplicationShutdown {
 	private updateInstanceQueue: CollapsedQueue<MiNote['id'], Date>;
 
 	constructor(
+		@Inject(DI.meta)
+		private meta: MiMeta,
+
 		private utilityService: UtilityService,
-		private metaService: MetaService,
 		private apInboxService: ApInboxService,
 		private federatedInstanceService: FederatedInstanceService,
 		private fetchInstanceMetadataService: FetchInstanceMetadataService,
@@ -67,7 +75,7 @@ export class InboxProcessorService implements OnApplicationShutdown {
 		const host = this.utilityService.extractHost(signature.keyId);
 
 		// ブロックしてたら中断
-		const meta = await this.metaService.fetch();
+		const meta = this.meta;
 		if (this.utilityService.isItemListedIn(host, meta.blockedHosts)) {
 			return `Blocked request: ${host}`;
 		}
@@ -183,24 +191,27 @@ export class InboxProcessorService implements OnApplicationShutdown {
 			throw new Bull.UnrecoverableError('skip: activity id is not a string');
 		}
 
-		// Update stats
-		this.federatedInstanceService.fetch(authUser.user.host).then(i => {
-			this.updateInstanceQueue.enqueue(i.id, new Date());
-			// TODO 			this.federatedInstanceService.update(i.id, {
-			// 				latestRequestReceivedAt: new Date(),
-			// 				isNotResponding: false,
-			// 				// もしサーバーが死んでるために配信が止まっていた場合には自動的に復活させてあげる
-			// 				suspensionState: i.suspensionState === 'autoSuspendedForNotResponding' ? 'none' : undefined,
-			// 			});
+		this.apRequestChart.inbox();
+		this.federationChart.inbox(authUser.user.host);
 
-			this.fetchInstanceMetadataService.fetchInstanceMetadata(i);
+		// Update instance stats
+		process.nextTick(async () => {
+			const i = await (this.meta.enableStatsForFederatedInstances
+				? this.federatedInstanceService.fetchOrRegister(authUser.user.host)
+				: this.federatedInstanceService.fetch(authUser.user.host));
 
-			this.apRequestChart.inbox();
-			this.federationChart.inbox(i.host);
+			if (i == null) return;
 
-			if (meta.enableChartsForFederatedInstances) {
+			this.updateInstanceQueue.enqueue(i.id, {
+				latestRequestReceivedAt: new Date(),
+				shouldUnsuspend: i.suspensionState === 'autoSuspendedForNotResponding',
+			});
+
+			if (this.meta.enableChartsForFederatedInstances) {
 				this.instanceChart.requestReceived(i.host);
 			}
+
+			this.fetchInstanceMetadataService.fetchInstanceMetadata(i);
 		});
 
 		// アクティビティを処理
@@ -218,7 +229,12 @@ export class InboxProcessorService implements OnApplicationShutdown {
 					'9f466dab-c856-48cd-9e65-ff90ff750580',
 					'85ab9bd7-3a41-4530-959d-f07073900109',
 					'd450b8a9-48e4-4dab-ae36-f4db763fda7c',
-				].includes(e.id)) return e.message;
+				].includes(e.id)) {
+					return e.message;
+				}
+				if (e.id === 'd450b8a9-48e4-4dab-ae36-f4db763fda7c') { // invalid Note
+					return e.message;
+				}
 			}
 			throw e;
 		}

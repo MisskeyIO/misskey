@@ -19,7 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template #icon><i class="ti ti-shield-lock"></i></template>
 			<template #label>{{ i18n.ts.totp }}</template>
 			<template #caption>{{ i18n.ts.totpDescription }}</template>
-			<template #suffix><i v-if="$i.twoFactorEnabled" class="ti ti-check" style="color: var(--success)"></i></template>
+			<template #suffix><i v-if="$i.twoFactorEnabled" class="ti ti-check" style="color: var(--MI_THEME-success)"></i></template>
 
 			<div class="_gaps_s">
 				<MkInfo>
@@ -86,7 +86,7 @@ import MkSwitch from '@/components/MkSwitch.vue';
 import FormSection from '@/components/form/section.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import * as os from '@/os.js';
-import { signinRequired, updateAccount } from '@/account.js';
+import { signinRequired, updateAccountPartial } from '@/account.js';
 import { i18n } from '@/i18n.js';
 
 const $i = signinRequired();
@@ -110,9 +110,11 @@ async function registerTOTP(): Promise<void> {
 		token: auth.result.token,
 	});
 
-	os.popup(defineAsyncComponent(() => import('./2fa.qrdialog.vue')), {
+	const { dispose } = os.popup(defineAsyncComponent(() => import('./2fa.qrdialog.vue')), {
 		twoFactorData,
-	}, {}, 'closed');
+	}, {
+		closed: () => dispose(),
+	});
 }
 
 async function unregisterTOTP(): Promise<void> {
@@ -123,7 +125,7 @@ async function unregisterTOTP(): Promise<void> {
 		password: auth.result.password,
 		token: auth.result.token,
 	}).then(res => {
-		updateAccount({
+		updateAccountPartial({
 			twoFactorEnabled: false,
 		});
 	}).catch(error => {

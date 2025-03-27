@@ -4,7 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<MkModal ref="modal" :preferType="'dialog'" :zPriority="'high'" @click="done(true)" @closed="emit('closed')">
+<MkModal ref="modal" :preferType="'dialog'" :zPriority="'high'" @click="done(true)" @closed="emit('closed')" @esc="cancel()">
 	<div :class="$style.root">
 		<div v-if="icon" :class="$style.icon">
 			<i :class="icon"></i>
@@ -45,7 +45,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</template>
 		<MkSelect v-if="select" v-model="selectedValue" autofocus>
 			<template v-if="select.items">
-				<option v-for="item in select.items" :value="item.value">{{ item.text }}</option>
+				<template v-for="item in select.items">
+					<optgroup v-if="'sectionTitle' in item" :label="item.sectionTitle">
+						<option v-for="subItem in item.items" :value="subItem.value">{{ subItem.text }}</option>
+					</optgroup>
+					<option v-else :value="item.value">{{ item.text }}</option>
+				</template>
 			</template>
 		</MkSelect>
 		<MkSwitch v-if="switchLabel" v-model="switchValue" style="display: flex; margin: 1em 0; justify-content: center;">{{ switchLabel }}</MkSwitch>
@@ -70,7 +75,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { onBeforeUnmount, onMounted, ref, shallowRef, computed, watch } from 'vue';
+import { ref, shallowRef, computed, watch } from 'vue';
 import MkModal from '@/components/MkModal.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
@@ -89,11 +94,16 @@ type Input = {
 	maxLength?: number;
 };
 
+type SelectItem = {
+	value: any;
+	text: string;
+};
+
 type Select = {
-	items: {
-		value: any;
-		text: string;
-	}[];
+	items: (SelectItem | {
+		sectionTitle: string;
+		items: SelectItem[];
+	})[];
 	default: string | null;
 };
 
@@ -245,7 +255,7 @@ onBeforeUnmount(() => {
 	max-width: 480px;
 	box-sizing: border-box;
 	text-align: center;
-	background: var(--panel);
+	background: var(--MI_THEME-panel);
 	border-radius: 16px;
 }
 
@@ -267,15 +277,15 @@ onBeforeUnmount(() => {
 }
 
 .type_success {
-	color: var(--success);
+	color: var(--MI_THEME-success);
 }
 
 .type_error {
-	color: var(--error);
+	color: var(--MI_THEME-error);
 }
 
 .type_warning {
-	color: var(--warn);
+	color: var(--MI_THEME-warn);
 }
 
 .title {

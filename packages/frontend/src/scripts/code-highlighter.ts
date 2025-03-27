@@ -8,13 +8,13 @@ import { createOnigurumaEngine } from 'shiki/engine/oniguruma';
 import darkPlus from 'shiki/themes/dark-plus.mjs';
 import { bundledThemesInfo } from 'shiki/themes';
 import { bundledLanguagesInfo } from 'shiki/langs';
+import lightTheme from '@@/themes/_light.json5';
+import darkTheme from '@@/themes/_dark.json5';
 import { unique } from './array.js';
 import { deepClone } from './clone.js';
 import { deepMerge } from './merge.js';
 import type { HighlighterCore, LanguageRegistration, ThemeRegistration, ThemeRegistrationRaw } from 'shiki/core';
 import { ColdDeviceStorage } from '@/store.js';
-import lightTheme from '@/themes/_light.json5';
-import darkTheme from '@/themes/_dark.json5';
 
 let _highlighter: HighlighterCore | null = null;
 

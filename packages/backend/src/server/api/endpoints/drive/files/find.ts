@@ -55,6 +55,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			});
 
 			return await this.driveFileEntityService.packMany(files, me, { self: true });
+			// return await this.driveFileEntityService.packMany(files, { self: true });
+			// TODO わからないから後で調べる
 		});
 	}
 }

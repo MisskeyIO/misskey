@@ -5,7 +5,7 @@
 
 import { setImmediate } from 'node:timers/promises';
 import * as mfm from 'mfm-js';
-import { In, DataSource, IsNull, LessThan } from 'typeorm';
+import { DataSource, In, IsNull, LessThan } from 'typeorm';
 import * as Redis from 'ioredis';
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import { extractMentions } from '@/misc/extract-mentions.js';
@@ -20,20 +20,21 @@ import type {
 	FollowingsRepository,
 	InstancesRepository,
 	MiFollowing,
+	MiMeta,
 	NotesRepository,
 	NoteThreadMutingsRepository,
 	ScheduledNotesRepository,
 	UserListMembershipsRepository,
 	UserProfilesRepository,
-	UsersRepository
+	UsersRepository,
 } from '@/models/_.js';
 import type { MiDriveFile } from '@/models/DriveFile.js';
 import { concat } from '@/misc/prelude/array.js';
 import { IdService } from '@/core/IdService.js';
-import type { MiUser, MiLocalUser, MiRemoteUser } from '@/models/User.js';
+import type { MiLocalUser, MiRemoteUser, MiUser } from '@/models/User.js';
 import type { IPoll } from '@/models/Poll.js';
 import { MiPoll } from '@/models/Poll.js';
-import type { NoteCreateOption, MinimumUser } from '@/types.js';
+import type { MinimumUser, NoteCreateOption } from '@/types.js';
 import { isDuplicateKeyValueError } from '@/misc/is-duplicate-key-value-error.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
 import { RelayService } from '@/core/RelayService.js';
@@ -48,7 +49,7 @@ import ActiveUsersChart from '@/core/chart/charts/active-users.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
 import { NotificationService } from '@/core/NotificationService.js';
-import { WebhookService } from '@/core/WebhookService.js';
+import { UserWebhookService } from '@/core/UserWebhookService.js';
 import { HashtagService } from '@/core/HashtagService.js';
 import { AntennaService } from '@/core/AntennaService.js';
 import { QueueService } from '@/core/QueueService.js';
@@ -61,7 +62,6 @@ import { RemoteUserResolveService } from '@/core/RemoteUserResolveService.js';
 import { bindThis } from '@/decorators.js';
 import { DB_MAX_NOTE_TEXT_LENGTH } from '@/const.js';
 import { RoleService } from '@/core/RoleService.js';
-import { MetaService } from '@/core/MetaService.js';
 import { SearchService } from '@/core/SearchService.js';
 import { FeaturedService } from '@/core/FeaturedService.js';
 import { FanoutTimelineService } from '@/core/FanoutTimelineService.js';
@@ -69,7 +69,6 @@ import { UtilityService } from '@/core/UtilityService.js';
 import { UserBlockingService } from '@/core/UserBlockingService.js';
 import { isReply } from '@/misc/is-reply.js';
 import { trackPromise } from '@/misc/promise-tracker.js';
-import { isNotNull } from '@/misc/is-not-null.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { CollapsedQueue } from '@/misc/collapsed-queue.js';
 
@@ -140,6 +139,9 @@ export class NoteCreateService implements OnApplicationShutdown {
 		@Inject(DI.config)
 		private config: Config,
 
+		@Inject(DI.meta)
+		private meta: MiMeta,
+
 		@Inject(DI.db)
 		private db: DataSource,
 
@@ -188,13 +190,12 @@ export class NoteCreateService implements OnApplicationShutdown {
 		private federatedInstanceService: FederatedInstanceService,
 		private hashtagService: HashtagService,
 		private antennaService: AntennaService,
-		private webhookService: WebhookService,
+		private webhookService: UserWebhookService,
 		private featuredService: FeaturedService,
 		private remoteUserResolveService: RemoteUserResolveService,
 		private apDeliverManagerService: ApDeliverManagerService,
 		private apRendererService: ApRendererService,
 		private roleService: RoleService,
-		private metaService: MetaService,
 		private searchService: SearchService,
 		private notesChart: NotesChart,
 		private perUserNotesChart: PerUserNotesChart,
@@ -204,6 +205,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 		private userBlockingService: UserBlockingService,
 		private loggerService: LoggerService,
 	) {
+		this.updateNotesCountQueue = new CollapsedQueue(process.env.NODE_ENV !== 'test' ? 60 * 1000 * 5 : 0, this.collapseNotesCount, this.performUpdateNotesCount);
 		this.logger = this.loggerService.getLogger('note:create');
 		this.updateNotesCountQueue = new CollapsedQueue(process.env.NODE_ENV !== 'test' ? 60 * 1000 * 5 : 0, this.collapseNotesCount, this.performUpdateNotesCount);
 	}
@@ -239,7 +241,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 		if (data.channel != null) data.visibleUsers = [];
 		if (data.channel != null) data.localOnly = true;
 
-		const meta = await this.metaService.fetch();
+		const meta = this.meta;
 		const policies = await this.roleService.getUserPolicies(user.id);
 
 		if (!policies.canCreateContent) {
@@ -362,6 +364,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 			mentionedUsers = data.apMentions ?? await this.extractMentionedUsers(user, combinedTokens);
 		}
+
+		if (inSilencedInstance) emojis = [];
 
 		const willCauseNotification = mentionedUsers.some(u => u.host === null)
 			|| (data.visibility === 'specified' && data.visibleUsers?.some(u => u.host === null))
@@ -575,21 +579,22 @@ export class NoteCreateService implements OnApplicationShutdown {
 		host: MiUser['host'];
 		isBot: MiUser['isBot'];
 	}, data: NoteCreateOption, silent: boolean, tags: string[], mentionedUsers: MinimumUser[]) {
-		const meta = await this.metaService.fetch();
-
 		this.notesChart.update(note, true);
+		const meta = this.meta;
 		if (note.visibility !== 'specified' && (meta.enableChartsForRemoteUser || (user.host == null))) {
 			this.perUserNotesChart.update(user, note, true);
 		}
 
 		// Register host
-		if (this.userEntityService.isRemoteUser(user)) {
-			this.federatedInstanceService.fetch(user.host).then(async i => {
-				this.updateNotesCountQueue.enqueue(i.id, 1);
-				if ((await this.metaService.fetch()).enableChartsForFederatedInstances) {
-					this.instanceChart.updateNote(i.host, note, true);
-				}
-			});
+		if (meta.enableStatsForFederatedInstances) {
+			if (this.userEntityService.isRemoteUser(user)) {
+				this.federatedInstanceService.fetchOrRegister(user.host).then(async i => {
+					this.updateNotesCountQueue.enqueue(i.id, 1);
+					if (meta.enableChartsForFederatedInstances) {
+						this.instanceChart.updateNote(i.host, note, true);
+					}
+				});
+			}
 		}
 
 		// ハッシュタグ更新
@@ -677,7 +682,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 			this.webhookService.getActiveWebhooks().then(webhooks => {
 				webhooks = webhooks.filter(x => x.userId === user.id && x.on.includes('note'));
 				for (const webhook of webhooks) {
-					this.queueService.webhookDeliver(webhook, 'note', {
+					this.queueService.userWebhookDeliver(webhook, 'note', {
 						note: noteObj,
 					});
 				}
@@ -704,7 +709,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 						const webhooks = (await this.webhookService.getActiveWebhooks()).filter(x => x.userId === data.reply!.userId && x.on.includes('reply'));
 						for (const webhook of webhooks) {
-							this.queueService.webhookDeliver(webhook, 'reply', {
+							this.queueService.userWebhookDeliver(webhook, 'reply', {
 								note: noteObj,
 							});
 						}
@@ -727,7 +732,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 					const webhooks = (await this.webhookService.getActiveWebhooks()).filter(x => x.userId === data.renote!.userId && x.on.includes('renote'));
 					for (const webhook of webhooks) {
-						this.queueService.webhookDeliver(webhook, 'renote', {
+						this.queueService.userWebhookDeliver(webhook, 'renote', {
 							note: noteObj,
 						});
 					}
@@ -891,7 +896,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 			const webhooks = (await this.webhookService.getActiveWebhooks()).filter(x => x.userId === u.id && x.on.includes('mention'));
 			for (const webhook of webhooks) {
-				this.queueService.webhookDeliver(webhook, 'mention', {
+				this.queueService.userWebhookDeliver(webhook, 'mention', {
 					note: detailPackedNote,
 				});
 			}
@@ -942,7 +947,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 		const mentions = extractMentions(tokens);
 		let mentionedUsers = (await Promise.all(mentions.map(m =>
 			this.remoteUserResolveService.resolveUser(m.username, m.host ?? user.host).catch(() => null),
-		))).filter(isNotNull);
+		))).filter(x => x != null);
 
 		// Drop duplicate users
 		mentionedUsers = mentionedUsers.filter((u, i, self) =>
@@ -954,7 +959,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 	@bindThis
 	private async pushToTl(note: MiNote, user: { id: MiUser['id']; host: MiUser['host']; }) {
-		const meta = await this.metaService.fetch();
+		const meta = this.meta;
+
 		if (!meta.enableFanoutTimeline) return;
 
 		const r = this.redisForTimelines.pipeline();

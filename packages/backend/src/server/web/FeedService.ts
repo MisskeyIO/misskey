@@ -6,6 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { In, IsNull } from 'typeorm';
 import { Feed } from 'feed';
+import { parse as mfmParse } from 'mfm-js';
 import { DI } from '@/di-symbols.js';
 import type { DriveFilesRepository, NotesRepository, UserProfilesRepository } from '@/models/_.js';
 import type { Config } from '@/config.js';
@@ -14,6 +15,7 @@ import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
 import { bindThis } from '@/decorators.js';
 import { IdService } from '@/core/IdService.js';
+import { MfmService } from '@/core/MfmService.js';
 
 @Injectable()
 export class FeedService {
@@ -33,6 +35,7 @@ export class FeedService {
 		private userEntityService: UserEntityService,
 		private driveFileEntityService: DriveFileEntityService,
 		private idService: IdService,
+		private mfmService: MfmService,
 	) {
 	}
 
@@ -76,13 +79,14 @@ export class FeedService {
 				id: In(note.fileIds),
 			}) : [];
 			const file = files.find(file => file.type.startsWith('image/'));
+			const text = note.text;
 
 			feed.addItem({
 				title: `New note by ${author.name}`,
 				link: `${this.config.url}/notes/${note.id}`,
 				date: this.idService.parse(note.id).date,
 				description: note.cw ?? undefined,
-				content: note.text ?? undefined,
+				content: text ? this.mfmService.toHtml(mfmParse(text), JSON.parse(note.mentionedRemoteUsers)) ?? undefined : undefined,
 				image: file ? this.driveFileEntityService.getPublicUrl(file) : undefined,
 			});
 		}

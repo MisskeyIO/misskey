@@ -13,6 +13,7 @@ import { CacheService } from '@/core/CacheService.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { RoleService } from '@/core/RoleService.js';
 import { MiNoteReaction } from '@/models/_.js';
+import { isUserRelated } from '@/misc/is-user-related.js';
 import { ApiError } from '../../error.js';
 
 export const meta = {
@@ -78,6 +79,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private roleService: RoleService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
+			const userIdsWhoBlockingMe = me ? await this.cacheService.userBlockedCache.fetch(me.id) : new Set<string>();
 			const iAmModerator = me ? await this.roleService.isModerator(me) : false; // Moderators can see reactions of all users
 			if (!iAmModerator) {
 				const user = await this.cacheService.findUserById(ps.userId);
@@ -89,7 +91,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				if ((me == null || me.id !== ps.userId) && !profile.publicReactions) {
 					throw new ApiError(meta.errors.reactionsNotPublic);
 				}
+
+				// early return if me is blocked by requesting user
+				if (userIdsWhoBlockingMe.has(ps.userId)) {
+					return [];
+				}
 			}
+
+			const userIdsWhoMeMuting = me ? await this.cacheService.userMutingsCache.fetch(me.id) : new Set<string>();
 
 			const query = this.notesRepository.createQueryBuilder('note')
 				.innerJoinAndSelect(qb =>
@@ -105,9 +114,15 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			this.queryService.generateVisibilityQuery(query, me);
 
-			const reactions = await query
+			const reactions = (await query
 				.limit(ps.limit)
-				.getRawMany<MiNoteReaction>();
+				.getRawMany<MiNoteReaction>()).filter(reaction => {
+				if (reaction.note?.userId === ps.userId) return true; // we can see reactions to note of requesting user
+				if (me && isUserRelated(reaction.note, userIdsWhoBlockingMe)) return false;
+				if (me && isUserRelated(reaction.note, userIdsWhoMeMuting)) return false;
+
+				return true;
+			});
 
 			return await this.noteReactionEntityService.packMany(reactions, me, { withNote: true });
 		});

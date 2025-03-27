@@ -40,6 +40,12 @@ export const meta = {
 			code: 'ANTENNA_LIMIT_EXCEEDED',
 			id: '3166a92e-09d9-4c09-afa3-1dbe34a3afcf',
 		},
+
+		emptyKeyword: {
+			message: 'Either keywords or excludeKeywords is required.',
+			code: 'EMPTY_KEYWORD',
+			id: '721aaff6-4e1b-4d88-8de6-877fae9f68c4',
+		},
 	},
 
 	res: {
@@ -94,7 +100,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		super(meta, paramDef, async (ps, me) => {
 			if (ps.keywords && ps.excludeKeywords) {
 				if (ps.keywords.flat().every(x => x === '') && ps.excludeKeywords.flat().every(x => x === '')) {
-					throw new Error('either keywords or excludeKeywords is required.');
+					throw new ApiError(meta.errors.emptyKeyword);
 				}
 			}
 			// Fetch the antenna

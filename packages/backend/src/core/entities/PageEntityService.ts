@@ -13,7 +13,6 @@ import type { MiPage } from '@/models/Page.js';
 import type { MiDriveFile } from '@/models/DriveFile.js';
 import { bindThis } from '@/decorators.js';
 import { IdService } from '@/core/IdService.js';
-import { isNotNull } from '@/misc/is-not-null.js';
 import { UserEntityService } from './UserEntityService.js';
 import { DriveFileEntityService } from './DriveFileEntityService.js';
 
@@ -39,6 +38,9 @@ export class PageEntityService {
 	public async pack(
 		src: MiPage['id'] | MiPage,
 		me: { id: MiUser['id'] } | null | undefined,
+		hint?: {
+			packedUser?: Packed<'UserLite'>
+		},
 	): Promise<Packed<'Page'>> {
 		const meId = me ? me.id : null;
 		const page = typeof src === 'object' ? src : await this.pagesRepository.findOneByOrFail({ id: src });
@@ -90,7 +92,7 @@ export class PageEntityService {
 			createdAt: this.idService.parse(page.id).date.toISOString(),
 			updatedAt: page.updatedAt.toISOString(),
 			userId: page.userId,
-			user: this.userEntityService.pack(page.user ?? page.userId, me), // { schema: 'UserDetailed' } すると無限ループするので注意
+			user: hint?.packedUser ?? this.userEntityService.pack(page.user ?? page.userId, me), // { schema: 'UserDetailed' } すると無限ループするので注意
 			content: page.content,
 			variables: page.variables,
 			title: page.title,
@@ -102,7 +104,7 @@ export class PageEntityService {
 			script: page.script,
 			eyeCatchingImageId: page.eyeCatchingImageId,
 			eyeCatchingImage: page.eyeCatchingImageId ? await this.driveFileEntityService.pack(page.eyeCatchingImageId, me) : null,
-			attachedFiles: this.driveFileEntityService.packMany((await Promise.all(attachedFiles)).filter(isNotNull), me),
+			attachedFiles: this.driveFileEntityService.packMany((await Promise.all(attachedFiles)).filter(x => x != null), me),
 			likedCount: page.likedCount,
 			isLiked: meId ? await this.pageLikesRepository.exists({ where: { pageId: page.id, userId: meId } }) : undefined,
 			visibility: page.visibility,
@@ -114,7 +116,7 @@ export class PageEntityService {
 		pages: (MiPage['id'] | MiPage)[],
 		me: { id: MiUser['id'] } | null | undefined,
 	) : Promise<Packed<'Page'>[]> {
-		return (await Promise.allSettled(pages.map(x => this.pack(x, me))))
+		return (await Promise.allSettled(pages.map(page => this.pack(page, me))))
 			.filter(result => result.status === 'fulfilled')
 			.map(result => (result as PromiseFulfilledResult<Packed<'Page'>>).value);
 	}

@@ -134,13 +134,22 @@ const deleted = computed(() => props.user.isDeleted ?? false);
 	}
 
 	> .suspended {
-		color: var(--error);
-		border-color: var(--error);
+		color: var(--MI_THEME-error);
+		border-color: var(--MI_THEME-error);
 	}
 
+	> .silenced {
+		color: var(--MI_THEME-warn);
+		border-color: var(--MI_THEME-warn);
+	}
+
+	> .moderator {
+		color: var(--MI_THEME-success);
+		border-color: var(--MI_THEME-success);
+	}
 	> .deleted {
-		color: var(--error);
-		border-color: var(--error);
+		color: var(--MI_THEME-error);
+		border-color: var(--MI_THEME-error);
 	}
 }
 </style>

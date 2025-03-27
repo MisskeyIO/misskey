@@ -26,11 +26,10 @@ import type { MiUserKeypair } from '@/models/UserKeypair.js';
 import type { UsersRepository, UserProfilesRepository, NotesRepository, DriveFilesRepository, PollsRepository } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { CustomEmojiService } from '@/core/CustomEmojiService.js';
-import { isNotNull } from '@/misc/is-not-null.js';
 import { IdService } from '@/core/IdService.js';
 import { JsonLdService } from './JsonLdService.js';
 import { ApMfmService } from './ApMfmService.js';
-import { CONTEXTS } from './misc/contexts.js';
+import { CONTEXT } from './misc/contexts.js';
 import type { IAccept, IActivity, IAdd, IAnnounce, IApDocument, IApEmoji, IApHashtag, IApImage, IApMention, IBlock, ICreate, IDelete, IFlag, IFollow, IKey, ILike, IMove, IObject, IPost, IQuestion, IReject, IRemove, ITombstone, IUndo, IUpdate } from './type.js';
 
 @Injectable()
@@ -323,7 +322,7 @@ export class ApRendererService {
 		const getPromisedFiles = async (ids: string[]): Promise<MiDriveFile[]> => {
 			if (ids.length === 0) return [];
 			const items = await this.driveFilesRepository.findBy({ id: In(ids) });
-			return ids.map(id => items.find(item => item.id === id)).filter(isNotNull);
+			return ids.map(id => items.find(item => item.id === id)).filter(x => x != null);
 		};
 
 		let inReplyTo;
@@ -511,6 +510,10 @@ export class ApRendererService {
 			name: user.name,
 			summary: profile.description ? this.mfmService.toHtml(mfm.parse(profile.description)) : null,
 			_misskey_summary: profile.description,
+			_misskey_followedMessage: profile.followedMessage,
+			_misskey_requireSigninToViewContents: user.requireSigninToViewContents,
+			_misskey_makeNotesFollowersOnlyBefore: user.makeNotesFollowersOnlyBefore,
+			_misskey_makeNotesHiddenBefore: user.makeNotesHiddenBefore,
 			icon: avatar ? this.renderImage(avatar) : null,
 			image: banner ? this.renderImage(banner) : null,
 			tag,
@@ -635,7 +638,7 @@ export class ApRendererService {
 			x.id = `${this.config.url}/${randomUUID()}`;
 		}
 
-		return { '@context': CONTEXTS, ...(x as T & { id: string }) };
+		return { '@context': CONTEXT, ...(x as T & { id: string }) };
 	}
 
 	@bindThis
@@ -702,7 +705,7 @@ export class ApRendererService {
 		if (names.length === 0) return [];
 
 		const allEmojis = await this.customEmojiService.localEmojisCache.fetch();
-		const emojis = names.map(name => allEmojis.get(name)).filter(isNotNull);
+		const emojis = names.map(name => allEmojis.get(name)).filter(x => x != null);
 
 		return emojis;
 	}

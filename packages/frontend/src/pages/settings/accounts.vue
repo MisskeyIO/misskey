@@ -45,7 +45,7 @@ const init = async () => {
 	});
 };
 
-function menu(account, ev) {
+function menu(account: Misskey.entities.UserDetailed, ev: MouseEvent) {
 	os.popupMenu([{
 		text: i18n.ts.switch,
 		icon: 'ti ti-switch-horizontal',
@@ -58,7 +58,7 @@ function menu(account, ev) {
 	}], ev.currentTarget ?? ev.target);
 }
 
-function addAccount(ev) {
+function addAccount(ev: MouseEvent) {
 	os.popupMenu([{
 		text: i18n.ts.existingAccount,
 		action: () => { addExistingAccount(); },
@@ -68,7 +68,7 @@ function addAccount(ev) {
 	}], ev.currentTarget ?? ev.target);
 }
 
-async function removeAccount(account) {
+async function removeAccount(account: Misskey.entities.UserDetailed) {
 	await _removeAccount(account.id);
 	accounts.value = accounts.value.filter(x => x.id !== account.id);
 }
@@ -91,8 +91,8 @@ function createAccount() {
 }
 
 async function switchAccount(account: any) {
-	const fetchedAccounts: any[] = await getAccounts();
-	const token = fetchedAccounts.find(x => x.id === account.id).token;
+	const fetchedAccounts = await getAccounts();
+	const token = fetchedAccounts.find(x => x.id === account.id)!.token;
 	switchAccountWithToken(token);
 }
 

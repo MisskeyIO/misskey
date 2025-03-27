@@ -28,9 +28,11 @@
 		"@types/node": "22.13.0",
 		"@typescript-eslint/eslint-plugin": "7.10.0",
 		"@typescript-eslint/parser": "7.10.0",
+		"execa": "8.0.1",
 		"eslint": "8.57.1",
 		"nodemon": "3.1.9",
-		"typescript": "5.7.3"
+		"typescript": "5.7.3",
+		"glob": "10.3.10"
 	},
 	"dependencies": {
 		"crc-32": "1.2.2",

@@ -92,6 +92,10 @@ export const packedFederationInstanceSchema = {
 			type: 'boolean',
 			optional: false, nullable: false,
 		},
+		isMediaSilenced: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
 		iconUrl: {
 			type: 'string',
 			optional: false, nullable: true,

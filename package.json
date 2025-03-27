@@ -1,6 +1,6 @@
 {
 	"name": "misskey",
-	"version": "2024.5.0-io.8a",
+	"version": "2024.10.2-alpha.2",
 	"codename": "nasubi",
 	"repository": {
 		"type": "git",
@@ -8,7 +8,9 @@
 	},
 	"packageManager": "pnpm@9.15.4",
 	"workspaces": [
+		"packages/frontend-shared",
 		"packages/frontend",
+		"packages/frontend-embed",
 		"packages/backend",
 		"packages/sw",
 		"packages/misskey-js",
@@ -21,7 +23,7 @@
 		"build-assets": "node ./scripts/build-assets.mjs",
 		"build": "pnpm build-pre && pnpm -r build && pnpm build-assets",
 		"build-storybook": "pnpm --filter frontend build-storybook",
-		"build-misskey-js-with-types": "pnpm build-pre && pnpm -r build:tsc && pnpm --filter backend... --filter=!misskey-js build && pnpm --filter backend generate-api-json && ncp packages/backend/built/api.json packages/misskey-js/generator/api.json && pnpm --filter misskey-js update-autogen-code && pnpm --filter misskey-js build && pnpm --filter misskey-js api",
+		"build-misskey-js-with-types": "pnpm build-pre && pnpm -r build:tsc && pnpm --filter backend... --filter=!misskey-js build && pnpm --filter backend generate-api-json --no-build && ncp packages/backend/built/api.json packages/misskey-js/generator/api.json && pnpm --filter misskey-js update-autogen-code && pnpm --filter misskey-js build && pnpm --filter misskey-js api",
 		"start": "pnpm check:connect && cd packages/backend && node ./built/boot/entry.js",
 		"start:docker": "pnpm check:connect && cd packages/backend && exec node ./built/boot/entry.js",
 		"start:test": "cd packages/backend && cross-env NODE_ENV=test node ./built/boot/entry.js",
@@ -37,6 +39,7 @@
 		"cy:open": "pnpm cypress open --browser --e2e --config-file=cypress.config.ts",
 		"cy:run": "pnpm cypress run",
 		"e2e": "pnpm start-server-and-test start:test http://localhost:61812 cy:run",
+		"e2e-dev-container": "cp ./.config/cypress-devcontainer.yml ./.config/test.yml && pnpm start-server-and-test start:test http://localhost:61812 cy:run",
 		"jest": "cd packages/backend && pnpm jest",
 		"jest-and-coverage": "cd packages/backend && pnpm jest-and-coverage",
 		"test": "pnpm -r test",
@@ -62,18 +65,24 @@
 	"dependencies": {
 		"cssnano": "7.0.6",
 		"execa": "9.5.2",
+		"fast-glob": "3.3.2",
+		"ignore-walk": "6.0.5",
 		"js-yaml": "4.1.0",
 		"postcss": "8.5.1",
 		"terser": "5.37.0",
-		"typescript": "5.7.3"
+		"typescript": "5.7.3",
+		"esbuild": "0.23.1",
+		"glob": "11.0.0"
 	},
 	"devDependencies": {
+		"@misskey-dev/eslint-plugin": "2.0.3",
 		"@types/node": "22.13.0",
 		"@typescript-eslint/eslint-plugin": "7.10.0",
 		"@typescript-eslint/parser": "7.10.0",
 		"cross-env": "7.0.3",
 		"cypress": "14.0.1",
 		"eslint": "8.57.1",
+		"globals": "15.9.0",
 		"ncp": "2.0.0",
 		"start-server-and-test": "2.0.10"
 	},

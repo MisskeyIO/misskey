@@ -84,12 +84,22 @@ export class MiMeta {
 	@Column('varchar', {
 		length: 1024, array: true, default: '{}',
 	})
+	public prohibitedWordsForNameOfUser: string[];
+
+	@Column('varchar', {
+		length: 1024, array: true, default: '{}',
+	})
 	public silencedHosts: string[];
 
 	@Column('varchar', {
 		length: 1024, array: true, default: '{}',
 	})
 	public sensitiveMediaHosts: string[];
+
+	@Column('varchar', {
+		length: 1024, array: true, default: '{}',
+	})
+	public mediaSilencedHosts: string[];
 
 	@Column('varchar', {
 		length: 1024,
@@ -258,6 +268,11 @@ export class MiMeta {
 	})
 	public turnstileSecretKey: string | null;
 
+	@Column('boolean', {
+		default: false,
+	})
+	public enableTestcaptcha: boolean;
+
 	// chaptcha系を追加した際にはnodeinfoのレスポンスに追加するのを忘れないようにすること
 
 	@Column('varchar', {
@@ -386,6 +401,12 @@ export class MiMeta {
 		nullable: true,
 	})
 	public privacyPolicyUrl: string | null;
+
+	@Column('varchar', {
+		length: 1024,
+		nullable: true,
+	})
+	public inquiryUrl: string | null;
 
 	@Column('varchar', {
 		length: 8192,
@@ -520,6 +541,11 @@ export class MiMeta {
 	public enableChartsForFederatedInstances: boolean;
 
 	@Column('boolean', {
+		default: true,
+	})
+	public enableStatsForFederatedInstances: boolean;
+
+	@Column('boolean', {
 		default: false,
 	})
 	public enableServerMachineStats: boolean;
@@ -589,6 +615,11 @@ export class MiMeta {
 	})
 	public perUserListTimelineCacheMax: number;
 
+	@Column('boolean', {
+		default: false,
+	})
+	public enableReactionsBuffering: boolean;
+
 	@Column('integer', {
 		default: 0,
 	})
@@ -640,4 +671,17 @@ export class MiMeta {
 		nullable: true,
 	})
 	public urlPreviewUserAgent: string | null;
+
+	@Column('varchar', {
+		length: 128,
+		default: 'all',
+	})
+	public federation: 'all' | 'specified' | 'none';
+
+	@Column('varchar', {
+		length: 1024,
+		array: true,
+		default: '{}',
+	})
+	public federationHosts: string[];
 }

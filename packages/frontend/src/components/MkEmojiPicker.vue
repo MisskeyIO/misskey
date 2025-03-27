@@ -5,7 +5,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div class="omfetrab" :class="['s' + size, 'w' + width, 'h' + height, { asDrawer, asWindow }]" :style="{ maxHeight: maxHeight ? maxHeight + 'px' : undefined }">
-	<input ref="searchEl" :value="q" class="mk-input-search search" data-prevent-emoji-insert :class="{ filled: q != null && q != '' }" :placeholder="i18n.ts.search" type="text" autocapitalize="off" @input="input()" @paste.stop="paste" @keydown.stop.prevent.enter="onEnter">
+	<input
+		ref="searchEl"
+		:value="q"
+		class="mk-input-search search"
+		data-prevent-emoji-insert
+		:class="{ filled: q != null && q != '' }"
+		:placeholder="i18n.ts.search"
+		type="text"
+		autocapitalize="off"
+		@input="input()"
+		@paste.stop="paste"
+		@keydown="onKeydown"
+	>
 	<!-- FirefoxのTabフォーカスが想定外の挙動となるためtabindex="-1"を追加 https://github.com/misskey-dev/misskey/issues/10744 -->
 	<div ref="emojisEl" class="emojis" tabindex="-1">
 		<section class="result">
@@ -105,7 +117,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref, shallowRef, computed, watch, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
-import XSection from '@/components/MkEmojiPicker.section.vue';
 import {
 	emojilist,
 	emojiCharByCategory,
@@ -113,7 +124,8 @@ import {
 	unicodeEmojiCategories as categories,
 	getEmojiName,
 	CustomEmojiFolderTree,
-} from '@/scripts/emojilist.js';
+} from '@@/js/emojilist.js';
+import XSection from '@/components/MkEmojiPicker.section.vue';
 import MkRippleEffect from '@/components/MkRippleEffect.vue';
 import * as os from '@/os.js';
 import { isTouchUsing } from '@/scripts/touch.js';
@@ -138,6 +150,7 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{
 	(ev: 'chosen', v: string): void;
+	(ev: 'esc'): void;
 }>();
 
 const searchEl = shallowRef<HTMLInputElement>();
@@ -409,7 +422,9 @@ function chosen(emoji: any, ev?: MouseEvent) {
 		const rect = el.getBoundingClientRect();
 		const x = rect.left + (el.offsetWidth / 2);
 		const y = rect.top + (el.offsetHeight / 2);
-		os.popup(MkRippleEffect, { x, y }, {}, 'end');
+		const { dispose } = os.popup(MkRippleEffect, { x, y }, {
+			end: () => dispose(),
+		});
 	}
 
 	const key = getKey(emoji);
@@ -438,9 +453,18 @@ function paste(event: ClipboardEvent): void {
 	}
 }
 
-function onEnter(ev: KeyboardEvent) {
+function onKeydown(ev: KeyboardEvent) {
 	if (ev.isComposing || ev.key === 'Process' || ev.keyCode === 229) return;
-	done();
+	if (ev.key === 'Enter') {
+		ev.preventDefault();
+		ev.stopPropagation();
+		done();
+	}
+	if (ev.key === 'Escape') {
+		ev.preventDefault();
+		ev.stopPropagation();
+		emit('esc');
+	}
 }
 
 function done(query?: string): boolean | void {
@@ -563,7 +587,7 @@ defineExpose({
 
 						&:disabled {
 							cursor: not-allowed;
-							background: linear-gradient(-45deg, transparent 0% 48%, var(--X6) 48% 52%, transparent 52% 100%);
+							background: linear-gradient(-45deg, transparent 0% 48%, var(--MI_THEME-X6) 48% 52%, transparent 52% 100%);
 							opacity: 1;
 
 							> .emoji {
@@ -598,7 +622,7 @@ defineExpose({
 
 						&:disabled {
 							cursor: not-allowed;
-							background: linear-gradient(-45deg, transparent 0% 48%, var(--X6) 48% 52%, transparent 52% 100%);
+							background: linear-gradient(-45deg, transparent 0% 48%, var(--MI_THEME-X6) 48% 52%, transparent 52% 100%);
 							opacity: 1;
 
 							> .emoji {
@@ -621,7 +645,7 @@ defineExpose({
 		outline: none;
 		border: none;
 		background: transparent;
-		color: var(--fg);
+		color: var(--MI_THEME-fg);
 
 		&:not(:focus):not(.filled) {
 			margin-bottom: env(safe-area-inset-bottom, 0px);
@@ -630,7 +654,7 @@ defineExpose({
 		&:not(.filled) {
 			order: 1;
 			z-index: 2;
-			box-shadow: 0px -1px 0 0px var(--divider);
+			box-shadow: 0px -1px 0 0px var(--MI_THEME-divider);
 		}
 	}
 
@@ -641,11 +665,11 @@ defineExpose({
 		> .tab {
 			flex: 1;
 			height: 38px;
-			border-top: solid 0.5px var(--divider);
+			border-top: solid 0.5px var(--MI_THEME-divider);
 
 			&.active {
-				border-top: solid 1px var(--accent);
-				color: var(--accent);
+				border-top: solid 1px var(--MI_THEME-accent);
+				color: var(--MI_THEME-accent);
 			}
 		}
 	}
@@ -664,7 +688,7 @@ defineExpose({
 		> .group {
 			&:not(.index) {
 				padding: 4px 0 8px 0;
-				border-top: solid 0.5px var(--divider);
+				border-top: solid 0.5px var(--MI_THEME-divider);
 			}
 
 			> header {
@@ -691,7 +715,7 @@ defineExpose({
 				cursor: pointer;
 
 				&:hover {
-					color: var(--accent);
+					color: var(--MI_THEME-accent);
 				}
 			}
 
@@ -708,23 +732,18 @@ defineExpose({
 					border-radius: 4px;
 					font-size: 24px;
 
-					&:focus-visible {
-						outline: solid 2px var(--focus);
-						z-index: 1;
-					}
-
 					&:hover {
 						background: rgba(0, 0, 0, 0.05);
 					}
 
 					&:active {
-						background: var(--accent);
+						background: var(--MI_THEME-accent);
 						box-shadow: inset 0 0.15em 0.3em rgba(27, 31, 35, 0.15);
 					}
 
 					&:disabled {
 						cursor: not-allowed;
-						background: linear-gradient(-45deg, transparent 0% 48%, var(--X6) 48% 52%, transparent 52% 100%);
+						background: linear-gradient(-45deg, transparent 0% 48%, var(--MI_THEME-X6) 48% 52%, transparent 52% 100%);
 						opacity: 1;
 
 						> .emoji {
@@ -745,7 +764,7 @@ defineExpose({
 			}
 
 			&.result {
-				border-bottom: solid 0.5px var(--divider);
+				border-bottom: solid 0.5px var(--MI_THEME-divider);
 
 				&:empty {
 					display: none;

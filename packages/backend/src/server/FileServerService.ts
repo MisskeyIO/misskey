@@ -64,7 +64,7 @@ export class FileServerService {
 		private internalStorageService: InternalStorageService,
 		private loggerService: LoggerService,
 	) {
-		this.logger = this.loggerService.getLogger('server', 'gray', false);
+		this.logger = this.loggerService.getLogger('server', 'gray');
 
 		//this.createServer = this.createServer.bind(this);
 	}

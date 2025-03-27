@@ -10,7 +10,7 @@ import { bindThis } from '@/decorators.js';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import type { MiLocalUser, MiRemoteUser, MiUser } from '@/models/User.js';
-import type { BlockingsRepository, FollowingsRepository, InstancesRepository, MutingsRepository, UserListMembershipsRepository, UserAccountMoveLogRepository, UserProfilesRepository, UsersRepository } from '@/models/_.js';
+import type { BlockingsRepository, FollowingsRepository, InstancesRepository, MiMeta, MutingsRepository, UserListMembershipsRepository, UserAccountMoveLogRepository, UserProfilesRepository, UsersRepository } from '@/models/_.js';
 import type { RelationshipJobData, ThinUser } from '@/queue/types.js';
 
 import { IdService } from '@/core/IdService.js';
@@ -23,13 +23,15 @@ import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { ProxyAccountService } from '@/core/ProxyAccountService.js';
 import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
-import { MetaService } from '@/core/MetaService.js';
 import InstanceChart from '@/core/chart/charts/instance.js';
 import PerUserFollowingChart from '@/core/chart/charts/per-user-following.js';
 
 @Injectable()
 export class AccountMoveService {
 	constructor(
+		@Inject(DI.meta)
+		private meta: MiMeta,
+
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
 
@@ -67,7 +69,6 @@ export class AccountMoveService {
 		private perUserFollowingChart: PerUserFollowingChart,
 		private federatedInstanceService: FederatedInstanceService,
 		private instanceChart: InstanceChart,
-		private metaService: MetaService,
 		private relayService: RelayService,
 		private queueService: QueueService,
 	) {
@@ -306,13 +307,15 @@ export class AccountMoveService {
 		}
 
 		// Update instance stats by decreasing remote followers count by the number of local followers who were following the old account.
-		if (this.userEntityService.isRemoteUser(oldAccount)) {
-			this.federatedInstanceService.fetch(oldAccount.host).then(async i => {
-				this.instancesRepository.decrement({ id: i.id }, 'followersCount', localFollowerIds.length);
-				if ((await this.metaService.fetch()).enableChartsForFederatedInstances) {
-					this.instanceChart.updateFollowers(i.host, false);
-				}
-			});
+		if (this.meta.enableStatsForFederatedInstances) {
+			if (this.userEntityService.isRemoteUser(oldAccount)) {
+				this.federatedInstanceService.fetchOrRegister(oldAccount.host).then(async i => {
+					this.instancesRepository.decrement({ id: i.id }, 'followersCount', localFollowerIds.length);
+					if (this.meta.enableChartsForFederatedInstances) {
+						this.instanceChart.updateFollowers(i.host, false);
+					}
+				});
+			}
 		}
 
 		// FIXME: expensive?

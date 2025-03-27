@@ -231,6 +231,7 @@ export class ApRequestService {
 		//#endregion
 
 		validateContentTypeSetAsActivityPub(res);
+
 		const finalUrl = res.url; // redirects may have been involved
 		const activity = await res.json() as IObject;
 

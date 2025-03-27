@@ -118,7 +118,7 @@ definePageMetadata(() => ({
 	}
 
 	&:not(:last-child) {
-		border-bottom: solid 0.5px var(--divider);
+		border-bottom: solid 0.5px var(--MI_THEME-divider);
 	}
 
 	> header {
@@ -130,11 +130,11 @@ definePageMetadata(() => ({
 			margin-right: 0.75em;
 
 			&.succ {
-				color: var(--success);
+				color: var(--MI_THEME-success);
 			}
 
 			&.fail {
-				color: var(--error);
+				color: var(--MI_THEME-error);
 			}
 		}
 

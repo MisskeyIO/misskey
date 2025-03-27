@@ -1,31 +1,26 @@
-<!--
-SPDX-FileCopyrightText: syuilo and misskey-project
-SPDX-License-Identifier: AGPL-3.0-only
--->
-
 <template>
-<div>
-	<MkAnimBg style="position: fixed; top: 0;"/>
-	<div :class="$style.formContainer">
-		<div :class="$style.form">
-			<MkAuthConfirm
-				ref="authRoot"
-				:name="name"
-				:icon="icon || undefined"
-				:permissions="_permissions"
-				@accept="onAccept"
-				@deny="onDeny"
-			>
-				<template #consentAdditionalInfo>
-					<div v-if="callback != null" class="_gaps_s" :class="$style.redirectRoot">
-						<div>{{ i18n.ts._auth.byClickingYouWillBeRedirectedToThisUrl }}</div>
-						<div class="_monospace" :class="$style.redirectUrl">{{ callback }}</div>
-					</div>
-				</template>
-			</MkAuthConfirm>
+	<div>
+		<MkAnimBg style="position: fixed; top: 0;"/>
+		<div :class="$style.formContainer">
+			<div :class="$style.form">
+				<MkAuthConfirm
+					ref="authRoot"
+					:name="name"
+					:icon="icon || undefined"
+					:permissions="_permissions"
+					@accept="onAccept"
+					@deny="onDeny"
+				>
+					<template #consentAdditionalInfo>
+						<div v-if="callback != null" class="_gaps_s" :class="$style.redirectRoot">
+							<div>{{ i18n.ts._auth.byClickingYouWillBeRedirectedToThisUrl }}</div>
+							<div class="_monospace" :class="$style.redirectUrl">{{ callback }}</div>
+						</div>
+					</template>
+				</MkAuthConfirm>
+			</div>
 		</div>
 	</div>
-</div>
 </template>
 
 <script lang="ts" setup>
@@ -95,8 +90,8 @@ definePageMetadata(() => ({
 .form {
 	position: relative;
 	z-index: 10;
-	border-radius: var(--radius);
-	background-color: var(--panel);
+	border-radius: var(--MI-radius);
+	background-color: var(--MI_THEME-panel);
 	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 	overflow: clip;
 	max-width: 500px;
@@ -107,15 +102,15 @@ definePageMetadata(() => ({
 
 .redirectRoot {
 	padding: 16px;
-	border-radius: var(--radius);
-	background-color: var(--bg);
+	border-radius: var(--MI-radius);
+	background-color: var(--MI_THEME-bg);
 }
 
 .redirectUrl {
 	font-size: 90%;
 	padding: 12px;
-	border-radius: var(--radius);
-	background-color: var(--panel);
+	border-radius: var(--MI-radius);
+	background-color: var(--MI_THEME-panel);
 	overflow-x: scroll;
 }
 </style>

@@ -16,7 +16,6 @@ import { appendQuery, omitHttps, query } from '@/misc/prelude/url.js';
 import { deepClone } from '@/misc/clone.js';
 import { bindThis } from '@/decorators.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
-import { isNotNull } from '@/misc/is-not-null.js';
 import { IdService } from '@/core/IdService.js';
 import { UtilityService } from '../UtilityService.js';
 import { VideoProcessingService } from '../VideoProcessingService.js';
@@ -232,6 +231,9 @@ export class DriveFileEntityService {
 		src: MiDriveFile['id'] | MiDriveFile,
 		me: { id: MiUser['id'] } | null | undefined,
 		options?: PackOptions,
+		hint?: {
+			packedUser?: Packed<'UserLite'>
+		},
 	): Promise<Packed<'DriveFile'> | null> {
 		const opts = Object.assign({
 			detail: false,
@@ -262,7 +264,7 @@ export class DriveFileEntityService {
 				detail: true,
 			}) : null,
 			userId: file.userId,
-			user: (opts.withUser && file.userId) ? this.userEntityService.pack(file.userId, me) : null,
+			user: (opts.withUser && file.userId) ? hint?.packedUser ?? this.userEntityService.pack(file.userId, me) : null,
 		});
 	}
 
@@ -301,6 +303,6 @@ export class DriveFileEntityService {
 	): Promise<Packed<'DriveFile'>[]> {
 		if (fileIds.length === 0) return [];
 		const filesMap = await this.packManyByIdsMap(fileIds, me, options);
-		return fileIds.map(id => filesMap.get(id)).filter(isNotNull);
+		return fileIds.map(id => filesMap.get(id)).filter(x => x != null);
 	}
 }

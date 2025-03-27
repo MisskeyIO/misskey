@@ -5,7 +5,6 @@
 
 // https://github.com/typeorm/typeorm/issues/2400
 import pg from 'pg';
-pg.types.setTypeParser(20, Number);
 
 import { DataSource, Logger, QueryRunner } from 'typeorm';
 import { QueryResultCache } from 'typeorm/cache/QueryResultCache.js';
@@ -15,6 +14,7 @@ import { entities as charts } from '@/core/chart/entities.js';
 
 import { MiAbuseReportResolver } from '@/models/AbuseReportResolver.js';
 import { MiAbuseUserReport } from '@/models/AbuseUserReport.js';
+import { MiAbuseReportNotificationRecipient } from '@/models/AbuseReportNotificationRecipient.js';
 import { MiAccessToken } from '@/models/AccessToken.js';
 import { MiAd } from '@/models/Ad.js';
 import { MiAnnouncement } from '@/models/Announcement.js';
@@ -76,6 +76,7 @@ import { MiUserPublickey } from '@/models/UserPublickey.js';
 import { MiUserSecurityKey } from '@/models/UserSecurityKey.js';
 import { MiUserAccountMoveLog } from '@/models/UserAccountMoveLog.js';
 import { MiWebhook } from '@/models/Webhook.js';
+import { MiSystemWebhook } from '@/models/SystemWebhook.js';
 import { MiChannel } from '@/models/Channel.js';
 import { MiRetentionAggregation } from '@/models/RetentionAggregation.js';
 import { MiRole } from '@/models/Role.js';
@@ -90,6 +91,8 @@ import { Config } from '@/config.js';
 import { bindThis } from '@/decorators.js';
 import MisskeyLogger from '@/logger.js';
 import { envOption } from './env.js';
+
+pg.types.setTypeParser(20, Number);
 
 export const dbLogger = new MisskeyLogger('db');
 
@@ -181,6 +184,7 @@ export const entities = [
 	MiIndieAuthClient,
 	MiSwSubscription,
 	MiAbuseUserReport,
+	MiAbuseReportNotificationRecipient,
 	MiRegistrationTicket,
 	MiSignin,
 	MiSingleSignOnServiceProvider,
@@ -200,6 +204,7 @@ export const entities = [
 	MiPasswordResetRequest,
 	MiUserPending,
 	MiWebhook,
+	MiSystemWebhook,
 	MiUserIp,
 	MiRetentionAggregation,
 	MiRole,

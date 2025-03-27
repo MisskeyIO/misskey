@@ -216,7 +216,7 @@ misskeyApiGet('federation/instances', {
 	vertical-align: bottom;
 	padding: 6px 12px 6px 6px;
 	margin: 0 10px 0 0;
-	background: var(--panel);
+	background: var(--MI_THEME-panel);
 	border-radius: 999px;
 
 	> :global(.icon) {

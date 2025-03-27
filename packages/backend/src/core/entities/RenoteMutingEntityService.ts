@@ -29,6 +29,9 @@ export class RenoteMutingEntityService {
 	public async pack(
 		src: MiRenoteMuting['id'] | MiRenoteMuting,
 		me: { id: MiUser['id'] } | null | undefined,
+		hints?: {
+			packedMutee?: Packed<'UserDetailedNotMe'>
+		},
 	): Promise<Packed<'RenoteMuting'>> {
 		const muting = typeof src === 'object' ? src : await this.renoteMutingsRepository.findOneByOrFail({ id: src });
 
@@ -36,7 +39,7 @@ export class RenoteMutingEntityService {
 			id: muting.id,
 			createdAt: this.idService.parse(muting.id).date.toISOString(),
 			muteeId: muting.muteeId,
-			mutee: this.userEntityService.pack(muting.muteeId, me, {
+			mutee: hints?.packedMutee ?? this.userEntityService.pack(muting.muteeId, me, {
 				schema: 'UserDetailedNotMe',
 			}),
 		});
@@ -46,8 +49,11 @@ export class RenoteMutingEntityService {
 	public async packMany(
 		mutings: (MiRenoteMuting['id'] | MiRenoteMuting)[],
 		me: { id: MiUser['id'] },
-	) : Promise<Packed<'RenoteMuting'>[]> {
-		return (await Promise.allSettled(mutings.map(u => this.pack(u, me))))
+	) {
+		const _users = mutings.map(({ mutee, muteeId }) => mutee ?? muteeId);
+		const _userMap = await this.userEntityService.packMany(_users, me, { schema: 'UserDetailedNotMe' })
+			.then(users => new Map(users.map(u => [u.id, u])));
+		return (await Promise.allSettled(mutings.map(u => this.pack(u, me, { packedMutee: _userMap.get(muting.muteeId) }))))
 			.filter(result => result.status === 'fulfilled')
 			.map(result => (result as PromiseFulfilledResult<Packed<'RenoteMuting'>>).value);
 	}

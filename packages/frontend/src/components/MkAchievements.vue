@@ -152,7 +152,7 @@ onMounted(() => {
 		background: linear-gradient(0deg, #ffee20, #eb7018);
 	}
 
-	&:before {
+	&::before {
 		content: "";
 		display: block;
 		position: absolute;
@@ -172,7 +172,7 @@ onMounted(() => {
 		background: linear-gradient(0deg, #e1e1e1, #7c7c7c);
 	}
 
-	&:before {
+	&::before {
 		content: "";
 		display: block;
 		position: absolute;

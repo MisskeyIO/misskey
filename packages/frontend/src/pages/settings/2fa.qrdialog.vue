@@ -111,7 +111,7 @@ import MkKeyValue from '@/components/MkKeyValue.vue';
 import MkInput from '@/components/MkInput.vue';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
-import * as config from '@/config.js';
+import * as config from '@@/js/config.js';
 import MkFolder from '@/components/MkFolder.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import { confetti } from '@/scripts/confetti.js';

@@ -10,8 +10,9 @@
  * The getter will return a .bind version of the function
  * and memoize the result against a symbol on the instance
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function bindThis(target: any, key: string, descriptor: any) {
-	let fn = descriptor.value;
+	const fn = descriptor.value;
 
 	if (typeof fn !== 'function') {
 		throw new TypeError(`@bindThis decorator can only be applied to methods not: ${typeof fn}`);
@@ -20,26 +21,18 @@ export function bindThis(target: any, key: string, descriptor: any) {
 	return {
 		configurable: true,
 		get() {
-			if (this === target.prototype || Object.hasOwn(this, key) ||
-        typeof fn !== 'function') {
+			if (this === target.prototype || Object.hasOwn(this, key)) {
 				return fn;
 			}
 
 			const boundFn = fn.bind(this);
-			Object.defineProperty(this, key, {
+			Reflect.defineProperty(this, key, {
+				value: boundFn,
 				configurable: true,
-				get() {
-					return boundFn;
-				},
-				set(value) {
-					fn = value;
-					delete this[key];
-				},
+				writable: true,
 			});
+
 			return boundFn;
-		},
-		set(value: any) {
-			fn = value;
 		},
 	};
 }

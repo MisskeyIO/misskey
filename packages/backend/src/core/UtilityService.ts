@@ -5,6 +5,7 @@
 
 import { URL } from 'node:url';
 import { isIP } from 'node:net';
+import { toASCII } from 'punycode';
 import punycode from 'punycode.js';
 import psl from 'psl';
 import RE2 from 're2';
@@ -12,6 +13,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { bindThis } from '@/decorators.js';
+import { MiMeta } from '@/models/Meta.js';
 import type { IObject } from '@/core/activitypub/type.js';
 
 @Injectable()
@@ -19,6 +21,10 @@ export class UtilityService {
 	constructor(
 		@Inject(DI.config)
 		private config: Config,
+
+		@Inject(DI.meta)
+		private meta: MiMeta,
+
 	) {
 	}
 
@@ -44,6 +50,12 @@ export class UtilityService {
 		list = list.map(x => '.' + this.normalizeHost(x).split(':')[0]);
 		item = '.' + this.normalizeHost(item).split(':')[0];
 		return list.some(x => item.endsWith(x));
+	}
+
+	@bindThis
+	public isMediaSilencedHost(silencedHosts: string[] | undefined, host: string | null): boolean {
+		if (!silencedHosts || host == null) return false;
+		return silencedHosts.some(x => host.toLowerCase() === x);
 	}
 
 	@bindThis
@@ -97,6 +109,22 @@ export class UtilityService {
 		return new URL(uri).host;
 	}
 
+	@bindThis
+	public extractDbHost(uri: string): string {
+		const url = new URL(uri);
+		return this.toPuny(url.hostname);
+	}
+
+	@bindThis
+	public toPuny(host: string): string {
+		return toASCII(host.toLowerCase());
+	}
+
+	@bindThis
+	public toPunyNullable(host: string | null | undefined): string | null {
+		if (host == null) return null;
+		return toASCII(host.toLowerCase());
+	}
 	@bindThis
 	public isRelatedHosts(hostA: string, hostB: string): boolean {
 		// hostA と hostB は呼び出す側で正規化済みであることを前提とする
@@ -153,7 +181,7 @@ export class UtilityService {
 			i < levelsA &&
 			i < levelsB &&
 			labelsA[levelsA - 1 - i] === labelsB[levelsB - 1 - i]
-			) {
+		) {
 			i++;
 		}
 
@@ -193,5 +221,20 @@ export class UtilityService {
 		}
 
 		throw new Error(`Invalid object: neither id(${activity.id}) nor url(${activity.url}) related to ${url}`);
+	}
+
+	@bindThis
+	public isFederationAllowedHost(host: string): boolean {
+		if (this.meta.federation === 'none') return false;
+		if (this.meta.federation === 'specified' && !this.meta.federationHosts.some(x => `.${host.toLowerCase()}`.endsWith(`.${x}`))) return false;
+		if (this.isItemListedIn(host, this.meta.blockedHosts)) return false;
+
+		return true;
+	}
+
+	@bindThis
+	public isFederationAllowedUri(uri: string): boolean {
+		const host = this.extractDbHost(uri);
+		return this.isFederationAllowedHost(host);
 	}
 }

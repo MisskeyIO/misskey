@@ -45,9 +45,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts">
 import { computed, ComputedRef, isRef, nextTick, onActivated, onBeforeMount, onBeforeUnmount, onDeactivated, ref, shallowRef, watch } from 'vue';
 import * as Misskey from 'misskey-js';
+import { useDocumentVisibility } from '@@/js/use-document-visibility.js';
+import { onScrollTop, isTopVisible, getBodyScrollHeight, getScrollContainer, onScrollBottom, scrollToBottom, scroll, isBottomVisible } from '@@/js/scroll.js';
 import { misskeyApi } from '@/scripts/misskey-api.js';
-import { onScrollTop, isTopVisible, getBodyScrollHeight, getScrollContainer, onScrollBottom, scrollToBottom, scroll, isBottomVisible } from '@/scripts/scroll.js';
-import { useDocumentVisibility } from '@/scripts/use-document-visibility.js';
 import { defaultStore } from '@/store.js';
 import { MisskeyEntity } from '@/types/date-separated-list.js';
 import { i18n } from '@/i18n.js';
@@ -101,9 +101,22 @@ const backed = ref(false);
 
 const scrollRemove = ref<(() => void) | null>(null);
 
-const items = ref<MisskeyEntity[]>([]);
-const queue = ref<MisskeyEntity[]>([]);
+/**
+ * 表示するアイテムのソース
+ * 最新が0番目
+ */
+const items = ref<MisskeyEntityMap>(new Map());
+
+/**
+ * タブが非アクティブなどの場合に更新を貯めておく
+ * 最新が0番目
+ */
+const queue = ref<MisskeyEntityMap>(new Map());
+
 const offset = ref(0);
+/**
+ * 初期化中かどうか（trueならMkLoadingで全て隠す）
+ */
 const fetching = ref(true);
 const moreFetching = ref(false);
 const more = ref(false);
@@ -150,7 +163,9 @@ watch([backed, contentEl], () => {
 	if (!backed.value) {
 		if (!contentEl.value) return;
 
-		scrollRemove.value = (props.pagination.prepend ? onScrollBottom : onScrollTop)(contentEl.value, executeQueue, TOLERANCE);
+		scrollRemove.value = props.pagination.prepend
+			? onScrollBottom(contentEl.value, executeQueue, TOLERANCE)
+			: onScrollTop(contentEl.value, (topVisible) => { if (topVisible) executeQueue(); }, TOLERANCE);
 	} else {
 		if (scrollRemove.value) scrollRemove.value();
 		scrollRemove.value = null;
@@ -195,7 +210,6 @@ async function init(): Promise<void> {
 			more.value = true;
 		}
 
-		offset.value = res.length;
 		error.value = false;
 		fetching.value = false;
 	}, err => {
@@ -217,7 +231,7 @@ const fetchMore = async (): Promise<void> => {
 		...params,
 		limit: SECOND_FETCH_LIMIT,
 		...(props.pagination.offsetMode ? {
-			offset: offset.value,
+			offset: items.value.size,
 		} : {
 			untilId: items.value[items.value.length - 1].id,
 		}),
@@ -269,7 +283,6 @@ const fetchMore = async (): Promise<void> => {
 				moreFetching.value = false;
 			}
 		}
-		offset.value += res.length;
 	}, err => {
 		moreFetching.value = false;
 	});
@@ -283,7 +296,7 @@ const fetchMoreAhead = async (): Promise<void> => {
 		...params,
 		limit: SECOND_FETCH_LIMIT,
 		...(props.pagination.offsetMode ? {
-			offset: offset.value,
+			offset: items.value.size,
 		} : {
 			sinceId: items.value[0].id,
 		}),
@@ -297,7 +310,6 @@ const fetchMoreAhead = async (): Promise<void> => {
 			items.value = res.concat(items.value);
 			more.value = true;
 		}
-		offset.value += res.length;
 		moreFetching.value = false;
 	}, err => {
 		moreFetching.value = false;

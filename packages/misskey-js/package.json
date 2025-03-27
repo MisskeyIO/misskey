@@ -3,7 +3,9 @@
 	"name": "misskey-js",
 	"version": "2024.5.0-io.8a",
 	"description": "Misskey SDK for JavaScript",
-	"types": "./built/dts/index.d.ts",
+	"license": "MIT",
+	"main": "./built/index.js",
+	"types": "./built/index.d.ts",
 	"exports": {
 		".": {
 			"import": "./built/esm/index.js",
@@ -23,7 +25,7 @@
 		"tsd": "tsd",
 		"api": "pnpm api-extractor run --local --verbose",
 		"api-prod": "pnpm api-extractor run --verbose",
-		"eslint": "eslint . --ext .js,.jsx,.ts,.tsx",
+		"eslint": "eslint './**/*.{js,jsx,ts,tsx}'",
 		"typecheck": "tsc --noEmit",
 		"lint": "pnpm typecheck && pnpm eslint",
 		"jest": "jest --coverage --detectOpenHandles",
@@ -32,7 +34,8 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/misskey-dev/misskey.js.git"
+		"url": "https://github.com/misskey-dev/misskey.git",
+		"directory": "packages/misskey-js"
 	},
 	"devDependencies": {
 		"@microsoft/api-extractor": "7.49.2",
@@ -50,6 +53,9 @@
 		"ncp": "2.0.0",
 		"nodemon": "3.1.9",
 		"tsd": "0.31.2",
+		"esbuild": "0.23.1",
+
+		"glob": "11.0.0",
 		"typescript": "5.7.3"
 	},
 	"files": [
@@ -58,6 +64,7 @@
 		"built/dts"
 	],
 	"dependencies": {
+		"@simplewebauthn/types": "10.0.0",
 		"@swc/cli": "0.6.0",
 		"@swc/core": "1.10.12",
 		"eventemitter3": "5.0.1",

@@ -12,7 +12,7 @@ import { bindThis } from '@/decorators.js';
 import { DI } from '@/di-symbols.js';
 import type Logger from '@/logger.js';
 import generateUserToken from '@/misc/generate-native-user-token.js';
-import type { UsedUsernamesRepository, UsersRepository } from '@/models/_.js';
+import type { MiMeta, UsedUsernamesRepository, UsersRepository } from '@/models/_.js';
 import { MiUser } from '@/models/User.js';
 import { MiUserProfile } from '@/models/UserProfile.js';
 import { MiUserKeypair } from '@/models/UserKeypair.js';
@@ -24,6 +24,7 @@ import { LoggerService } from '@/core/LoggerService.js';
 import { InstanceActorService } from '@/core/InstanceActorService.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import UsersChart from '@/core/chart/charts/users.js';
+import { UserService } from '@/core/UserService.js';
 
 @Injectable()
 export class SignupService {
@@ -35,14 +36,17 @@ export class SignupService {
 		@Inject(DI.redis)
 		private redisClient: Redis.Redis,
 
+		@Inject(DI.meta)
+		private meta: MiMeta,
+
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
 
 		@Inject(DI.usedUsernamesRepository)
 		private usedUsernamesRepository: UsedUsernamesRepository,
 
+		private userService: UserService,
 		private idService: IdService,
-		private metaService: MetaService,
 		private utilityService: UtilityService,
 		private loggerService: LoggerService,
 		private instanceActorService: InstanceActorService,
@@ -95,8 +99,7 @@ export class SignupService {
 		const isTheFirstUser = !await this.instanceActorService.realLocalUsersPresent();
 
 		if (!opts.ignorePreservedUsernames && !isTheFirstUser) {
-			const instance = await this.metaService.fetch(true);
-			const isPreserved = instance.preservedUsernames.map(x => x.toLowerCase()).includes(username.toLowerCase());
+			const isPreserved = this.meta.preservedUsernames.map(x => x.toLowerCase()).includes(username.toLowerCase());
 			if (isPreserved) {
 				throw new Error('USED_USERNAME');
 			}
@@ -165,6 +168,7 @@ export class SignupService {
 			});
 
 			this.usersChart.update(account, true);
+		this.userService.notifySystemWebhook(account, 'userCreated');
 
 			return { account, secret };
 		} catch (err) {

@@ -28,6 +28,66 @@ declare module '../api.js' {
     /**
      * No description provided.
      * 
+     * **Internal Endpoint**: This endpoint is an API for the misskey mainframe and is not intended for use by third parties.
+     * **Credential required**: *Yes* / **Permission**: *read:admin:abuse-report:notification-recipient*
+     */
+    request<E extends 'admin/abuse-report/notification-recipient/list', P extends Endpoints[E]['req']>(
+      endpoint: E,
+      params: P,
+      credential?: string | null,
+    ): Promise<SwitchCaseResponseType<E, P>>;
+
+    /**
+     * No description provided.
+     * 
+     * **Internal Endpoint**: This endpoint is an API for the misskey mainframe and is not intended for use by third parties.
+     * **Credential required**: *Yes* / **Permission**: *read:admin:abuse-report:notification-recipient*
+     */
+    request<E extends 'admin/abuse-report/notification-recipient/show', P extends Endpoints[E]['req']>(
+      endpoint: E,
+      params: P,
+      credential?: string | null,
+    ): Promise<SwitchCaseResponseType<E, P>>;
+
+    /**
+     * No description provided.
+     * 
+     * **Internal Endpoint**: This endpoint is an API for the misskey mainframe and is not intended for use by third parties.
+     * **Credential required**: *Yes* / **Permission**: *write:admin:abuse-report:notification-recipient*
+     */
+    request<E extends 'admin/abuse-report/notification-recipient/create', P extends Endpoints[E]['req']>(
+      endpoint: E,
+      params: P,
+      credential?: string | null,
+    ): Promise<SwitchCaseResponseType<E, P>>;
+
+    /**
+     * No description provided.
+     * 
+     * **Internal Endpoint**: This endpoint is an API for the misskey mainframe and is not intended for use by third parties.
+     * **Credential required**: *Yes* / **Permission**: *write:admin:abuse-report:notification-recipient*
+     */
+    request<E extends 'admin/abuse-report/notification-recipient/update', P extends Endpoints[E]['req']>(
+      endpoint: E,
+      params: P,
+      credential?: string | null,
+    ): Promise<SwitchCaseResponseType<E, P>>;
+
+    /**
+     * No description provided.
+     * 
+     * **Internal Endpoint**: This endpoint is an API for the misskey mainframe and is not intended for use by third parties.
+     * **Credential required**: *Yes* / **Permission**: *write:admin:abuse-report:notification-recipient*
+     */
+    request<E extends 'admin/abuse-report/notification-recipient/delete', P extends Endpoints[E]['req']>(
+      endpoint: E,
+      params: P,
+      credential?: string | null,
+    ): Promise<SwitchCaseResponseType<E, P>>;
+
+    /**
+     * No description provided.
+     * 
      * **Credential required**: *No*
      */
     request<E extends 'admin/accounts/create', P extends Endpoints[E]['req']>(
@@ -53,28 +113,6 @@ declare module '../api.js' {
      * **Credential required**: *Yes* / **Permission**: *read:admin:account*
      */
     request<E extends 'admin/accounts/find-by-email', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
-     * No description provided.
-     * 
-     * **Credential required**: *Yes* / **Permission**: *read:admin:account*
-     */
-    request<E extends 'admin/accounts/pending/list', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
-     * No description provided.
-     * 
-     * **Credential required**: *Yes* / **Permission**: *write:admin:account*
-     */
-    request<E extends 'admin/accounts/pending/revoke', P extends Endpoints[E]['req']>(
       endpoint: E,
       params: P,
       credential?: string | null,
@@ -171,50 +209,6 @@ declare module '../api.js' {
     /**
      * No description provided.
      * 
-     * **Credential required**: *Yes* / **Permission**: *write:admin:abuse-report-resolvers*
-     */
-    request<E extends 'admin/abuse-report-resolver/create', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
-     * No description provided.
-     * 
-     * **Credential required**: *Yes* / **Permission**: *read:admin:abuse-report-resolvers*
-     */
-    request<E extends 'admin/abuse-report-resolver/list', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
-     * No description provided.
-     * 
-     * **Credential required**: *Yes* / **Permission**: *write:admin:abuse-report-resolvers*
-     */
-    request<E extends 'admin/abuse-report-resolver/delete', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
-     * No description provided.
-     * 
-     * **Credential required**: *Yes* / **Permission**: *write:admin:abuse-report-resolvers*
-     */
-    request<E extends 'admin/abuse-report-resolver/update', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
-     * No description provided.
-     * 
      * **Credential required**: *Yes* / **Permission**: *write:admin:avatar-decorations*
      */
     request<E extends 'admin/avatar-decorations/create', P extends Endpoints[E]['req']>(
@@ -259,7 +253,18 @@ declare module '../api.js' {
     /**
      * No description provided.
      * 
-     * **Credential required**: *Yes* / **Permission**: *write:admin:user-avatar*
+     * **Credential required**: *Yes* / **Permission**: *write:admin:delete-all-files-of-a-user*
+     */
+    request<E extends 'admin/delete-all-files-of-a-user', P extends Endpoints[E]['req']>(
+      endpoint: E,
+      params: P,
+      credential?: string | null,
+    ): Promise<SwitchCaseResponseType<E, P>>;
+
+    /**
+     * No description provided.
+     * 
+     * **Credential required**: *Yes* / **Permission**: *write:admin:unset-user-avatar*
      */
     request<E extends 'admin/unset-user-avatar', P extends Endpoints[E]['req']>(
       endpoint: E,
@@ -270,20 +275,9 @@ declare module '../api.js' {
     /**
      * No description provided.
      * 
-     * **Credential required**: *Yes* / **Permission**: *write:admin:user-banner*
+     * **Credential required**: *Yes* / **Permission**: *write:admin:unset-user-banner*
      */
     request<E extends 'admin/unset-user-banner', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
-     * No description provided.
-     * 
-     * **Credential required**: *Yes* / **Permission**: *write:admin:user-mutual-link*
-     */
-    request<E extends 'admin/unset-user-mutual-link', P extends Endpoints[E]['req']>(
       endpoint: E,
       params: P,
       credential?: string | null,
@@ -306,17 +300,6 @@ declare module '../api.js' {
      * **Credential required**: *Yes* / **Permission**: *write:admin:drive*
      */
     request<E extends 'admin/drive/cleanup', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
-     * No description provided.
-     * 
-     * **Credential required**: *Yes* / **Permission**: *write:admin:drive*
-     */
-    request<E extends 'admin/drive/delete-all-files-of-a-user', P extends Endpoints[E]['req']>(
       endpoint: E,
       params: P,
       credential?: string | null,
@@ -535,50 +518,6 @@ declare module '../api.js' {
     /**
      * No description provided.
      * 
-     * **Credential required**: *Yes* / **Permission**: *write:admin:indie-auth*
-     */
-    request<E extends 'admin/indie-auth/create', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
-     * No description provided.
-     * 
-     * **Credential required**: *Yes* / **Permission**: *write:admin:indie-auth*
-     */
-    request<E extends 'admin/indie-auth/delete', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
-     * No description provided.
-     * 
-     * **Credential required**: *Yes* / **Permission**: *read:admin:indie-auth*
-     */
-    request<E extends 'admin/indie-auth/list', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
-     * No description provided.
-     * 
-     * **Credential required**: *Yes* / **Permission**: *write:admin:indie-auth*
-     */
-    request<E extends 'admin/indie-auth/update', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
-     * No description provided.
-     * 
      * **Credential required**: *Yes* / **Permission**: *read:admin:index-stats*
      */
     request<E extends 'admin/get-index-stats', P extends Endpoints[E]['req']>(
@@ -744,9 +683,9 @@ declare module '../api.js' {
     /**
      * No description provided.
      * 
-     * **Credential required**: *Yes* / **Permission**: *write:admin:regenerate-user-token*
+     * **Credential required**: *Yes* / **Permission**: *write:admin:resolve-abuse-user-report*
      */
-    request<E extends 'admin/regenerate-user-token', P extends Endpoints[E]['req']>(
+    request<E extends 'admin/resolve-abuse-user-report', P extends Endpoints[E]['req']>(
       endpoint: E,
       params: P,
       credential?: string | null,
@@ -757,7 +696,18 @@ declare module '../api.js' {
      * 
      * **Credential required**: *Yes* / **Permission**: *write:admin:resolve-abuse-user-report*
      */
-    request<E extends 'admin/resolve-abuse-user-report', P extends Endpoints[E]['req']>(
+    request<E extends 'admin/forward-abuse-user-report', P extends Endpoints[E]['req']>(
+      endpoint: E,
+      params: P,
+      credential?: string | null,
+    ): Promise<SwitchCaseResponseType<E, P>>;
+
+    /**
+     * No description provided.
+     * 
+     * **Credential required**: *Yes* / **Permission**: *write:admin:resolve-abuse-user-report*
+     */
+    request<E extends 'admin/update-abuse-user-report', P extends Endpoints[E]['req']>(
       endpoint: E,
       params: P,
       credential?: string | null,
@@ -791,17 +741,6 @@ declare module '../api.js' {
      * **Credential required**: *Yes* / **Permission**: *read:admin:show-moderation-log*
      */
     request<E extends 'admin/show-moderation-logs', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
-     * No description provided.
-     * 
-     * **Credential required**: *Yes* / **Permission**: *read:admin:show-account-move-log*
-     */
-    request<E extends 'admin/show-user-account-move-logs', P extends Endpoints[E]['req']>(
       endpoint: E,
       params: P,
       credential?: string | null,
@@ -865,9 +804,9 @@ declare module '../api.js' {
     /**
      * No description provided.
      * 
-     * **Credential required**: *Yes* / **Permission**: *write:admin:user-name*
+     * **Credential required**: *Yes* / **Permission**: *write:admin:delete-account*
      */
-    request<E extends 'admin/update-user-name', P extends Endpoints[E]['req']>(
+    request<E extends 'admin/delete-account', P extends Endpoints[E]['req']>(
       endpoint: E,
       params: P,
       credential?: string | null,
@@ -986,9 +925,10 @@ declare module '../api.js' {
     /**
      * No description provided.
      * 
-     * **Credential required**: *Yes* / **Permission**: *write:admin:sso*
+     * **Internal Endpoint**: This endpoint is an API for the misskey mainframe and is not intended for use by third parties.
+     * **Credential required**: *Yes* / **Permission**: *write:admin:system-webhook*
      */
-    request<E extends 'admin/sso/create', P extends Endpoints[E]['req']>(
+    request<E extends 'admin/system-webhook/create', P extends Endpoints[E]['req']>(
       endpoint: E,
       params: P,
       credential?: string | null,
@@ -997,9 +937,10 @@ declare module '../api.js' {
     /**
      * No description provided.
      * 
-     * **Credential required**: *Yes* / **Permission**: *write:admin:sso*
+     * **Internal Endpoint**: This endpoint is an API for the misskey mainframe and is not intended for use by third parties.
+     * **Credential required**: *Yes* / **Permission**: *write:admin:system-webhook*
      */
-    request<E extends 'admin/sso/delete', P extends Endpoints[E]['req']>(
+    request<E extends 'admin/system-webhook/delete', P extends Endpoints[E]['req']>(
       endpoint: E,
       params: P,
       credential?: string | null,
@@ -1008,9 +949,10 @@ declare module '../api.js' {
     /**
      * No description provided.
      * 
-     * **Credential required**: *Yes* / **Permission**: *read:admin:sso*
+     * **Internal Endpoint**: This endpoint is an API for the misskey mainframe and is not intended for use by third parties.
+     * **Credential required**: *Yes* / **Permission**: *write:admin:system-webhook*
      */
-    request<E extends 'admin/sso/list', P extends Endpoints[E]['req']>(
+    request<E extends 'admin/system-webhook/list', P extends Endpoints[E]['req']>(
       endpoint: E,
       params: P,
       credential?: string | null,
@@ -1019,9 +961,10 @@ declare module '../api.js' {
     /**
      * No description provided.
      * 
-     * **Credential required**: *Yes* / **Permission**: *write:admin:sso*
+     * **Internal Endpoint**: This endpoint is an API for the misskey mainframe and is not intended for use by third parties.
+     * **Credential required**: *Yes* / **Permission**: *write:admin:system-webhook*
      */
-    request<E extends 'admin/sso/update', P extends Endpoints[E]['req']>(
+    request<E extends 'admin/system-webhook/show', P extends Endpoints[E]['req']>(
       endpoint: E,
       params: P,
       credential?: string | null,
@@ -1030,9 +973,22 @@ declare module '../api.js' {
     /**
      * No description provided.
      * 
-     * **Credential required**: *No*
+     * **Internal Endpoint**: This endpoint is an API for the misskey mainframe and is not intended for use by third parties.
+     * **Credential required**: *Yes* / **Permission**: *write:admin:system-webhook*
      */
-    request<E extends 'announcement', P extends Endpoints[E]['req']>(
+    request<E extends 'admin/system-webhook/update', P extends Endpoints[E]['req']>(
+      endpoint: E,
+      params: P,
+      credential?: string | null,
+    ): Promise<SwitchCaseResponseType<E, P>>;
+
+    /**
+     * No description provided.
+     * 
+     * **Internal Endpoint**: This endpoint is an API for the misskey mainframe and is not intended for use by third parties.
+     * **Credential required**: *Yes* / **Permission**: *read:admin:system-webhook*
+     */
+    request<E extends 'admin/system-webhook/test', P extends Endpoints[E]['req']>(
       endpoint: E,
       params: P,
       credential?: string | null,
@@ -1265,17 +1221,6 @@ declare module '../api.js' {
      * **Credential required**: *No*
      */
     request<E extends 'channels/featured', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
-     * No description provided.
-     * 
-     * **Credential required**: *No*
-     */
-    request<E extends 'channels/featured-games', P extends Endpoints[E]['req']>(
       endpoint: E,
       params: P,
       credential?: string | null,
@@ -2911,6 +2856,18 @@ declare module '../api.js' {
     /**
      * No description provided.
      * 
+     * **Internal Endpoint**: This endpoint is an API for the misskey mainframe and is not intended for use by third parties.
+     * **Credential required**: *Yes* / **Permission**: *read:account*
+     */
+    request<E extends 'i/webhooks/test', P extends Endpoints[E]['req']>(
+      endpoint: E,
+      params: P,
+      credential?: string | null,
+    ): Promise<SwitchCaseResponseType<E, P>>;
+
+    /**
+     * No description provided.
+     * 
      * **Credential required**: *Yes* / **Permission**: *write:invite-codes*
      */
     request<E extends 'invite/create', P extends Endpoints[E]['req']>(
@@ -3135,28 +3092,6 @@ declare module '../api.js' {
      * **Credential required**: *Yes* / **Permission**: *write:notes*
      */
     request<E extends 'notes/delete', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
-     * No description provided.
-     * 
-     * **Credential required**: *Yes* / **Permission**: *write:notes*
-     */
-    request<E extends 'notes/scheduled/cancel', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
-     * No description provided.
-     * 
-     * **Credential required**: *Yes* / **Permission**: *write:notes*
-     */
-    request<E extends 'notes/scheduled/list', P extends Endpoints[E]['req']>(
       endpoint: E,
       params: P,
       credential?: string | null,
@@ -3915,33 +3850,11 @@ declare module '../api.js' {
     ): Promise<SwitchCaseResponseType<E, P>>;
 
     /**
-     * Find users who have a birthday on the specified range.
-     * 
-     * **Credential required**: *Yes* / **Permission**: *read:account*
-     */
-    request<E extends 'users/get-following-birthday-users', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
      * Get a list of other users that the specified user frequently replies to.
      * 
      * **Credential required**: *No*
      */
     request<E extends 'users/get-frequently-replied-users', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
-     * No description provided.
-     * 
-     * **Credential required**: *No*
-     */
-    request<E extends 'users/get-skeb-status', P extends Endpoints[E]['req']>(
       endpoint: E,
       params: P,
       credential?: string | null,
@@ -4205,28 +4118,6 @@ declare module '../api.js' {
      * 
      * **Credential required**: *No*
      */
-    request<E extends 'users/get-security-info', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
-     * Show statistics about a user.
-     * 
-     * **Credential required**: *No*
-     */
-    request<E extends 'users/stats', P extends Endpoints[E]['req']>(
-      endpoint: E,
-      params: P,
-      credential?: string | null,
-    ): Promise<SwitchCaseResponseType<E, P>>;
-
-    /**
-     * No description provided.
-     * 
-     * **Credential required**: *No*
-     */
     request<E extends 'users/achievements', P extends Endpoints[E]['req']>(
       endpoint: E,
       params: P,
@@ -4303,7 +4194,7 @@ declare module '../api.js' {
     /**
      * No description provided.
      * 
-     * **Credential required**: *Yes* / **Permission**: *read:account*
+     * **Credential required**: *Yes* / **Permission**: *write:account*
      */
     request<E extends 'reversi/cancel-match', P extends Endpoints[E]['req']>(
       endpoint: E,
@@ -4325,7 +4216,7 @@ declare module '../api.js' {
     /**
      * No description provided.
      * 
-     * **Credential required**: *Yes* / **Permission**: *read:account*
+     * **Credential required**: *Yes* / **Permission**: *write:account*
      */
     request<E extends 'reversi/match', P extends Endpoints[E]['req']>(
       endpoint: E,
@@ -4358,7 +4249,7 @@ declare module '../api.js' {
     /**
      * No description provided.
      * 
-     * **Credential required**: *Yes* / **Permission**: *read:account*
+     * **Credential required**: *Yes* / **Permission**: *write:account*
      */
     request<E extends 'reversi/surrender', P extends Endpoints[E]['req']>(
       endpoint: E,

@@ -99,7 +99,7 @@ definePageMetadata(() => ({
 .card {
 	display: flex;
 	gap: var(--margin);
-	border-radius: var(--radius);
+	border-radius: var(--MI-radius);
 	padding: var(--margin);
 	align-items: center;
 	justify-content: center;

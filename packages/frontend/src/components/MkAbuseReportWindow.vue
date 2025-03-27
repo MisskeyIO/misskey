@@ -71,7 +71,7 @@ import { i18n } from '@/i18n.js';
 import { misskeyApi } from '@/scripts/misskey-api.js';
 
 const props = defineProps<{
-	user: Misskey.entities.UserDetailed;
+	user: Misskey.entities.UserLite;
 	initialComment?: string;
 }>();
 

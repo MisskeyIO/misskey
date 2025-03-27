@@ -27,6 +27,8 @@ import type { MiNote } from '@/models/Note.js';
  * scheduledNotePosted - 予約投稿が投稿された
  * scheduledNoteError - 予約投稿がエラーになった
  * sensitiveFlagAssigned - センシティブフラグが付与された
+ * exportCompleted - エクスポートが完了
+ * login - ログイン
  * app - アプリ通知
  * test - テスト通知（サーバー側）
  */
@@ -43,6 +45,8 @@ export const notificationTypes = [
 	'followRequestAccepted',
 	'roleAssigned',
 	'achievementEarned',
+	'exportCompleted',
+	'login',
 	'noteScheduled',
 	'scheduledNotePosted',
 	'scheduledNoteError',
@@ -65,6 +69,20 @@ export const mutedNoteReasons = ['word', 'manual', 'spam', 'other'] as const;
 
 export const followingVisibilities = ['public', 'followers', 'private'] as const;
 export const followersVisibilities = ['public', 'followers', 'private'] as const;
+
+/**
+ * ユーザーがエクスポートできるものの種類
+ *
+ * （主にエクスポート完了通知で使用するものであり、既存のDBの名称等と必ずしも一致しない）
+ */
+export const userExportableEntities = ['antenna', 'blocking', 'clip', 'customEmoji', 'favorite', 'following', 'muting', 'note', 'userList'] as const;
+
+/**
+ * ユーザーがインポートできるものの種類
+ *
+ * （主にインポート完了通知で使用するものであり、既存のDBの名称等と必ずしも一致しない）
+ */
+export const userImportableEntities = ['antenna', 'blocking', 'customEmoji', 'following', 'muting', 'userList'] as const;
 
 export const moderationLogTypes = [
 	'updateServerSettings',
@@ -98,6 +116,8 @@ export const moderationLogTypes = [
 	'markSensitiveDriveFile',
 	'unmarkSensitiveDriveFile',
 	'resolveAbuseReport',
+	'forwardAbuseReport',
+	'updateAbuseReportNote',
 	'createInvitation',
 	'createAd',
 	'updateAd',
@@ -114,6 +134,16 @@ export const moderationLogTypes = [
 	'unsetUserAvatar',
 	'unsetUserBanner',
 	'unsetUserMutualLink',
+	'createSystemWebhook',
+	'updateSystemWebhook',
+	'deleteSystemWebhook',
+	'createAbuseReportNotificationRecipient',
+	'updateAbuseReportNotificationRecipient',
+	'deleteAbuseReportNotificationRecipient',
+	'deleteAccount',
+	'deletePage',
+	'deleteFlash',
+	'deleteGalleryPost',
 ] as const;
 
 export type ModerationLogPayloads = {
@@ -277,7 +307,18 @@ export type ModerationLogPayloads = {
 	resolveAbuseReport: {
 		reportId: string;
 		report: any;
-		forwarded: boolean;
+		forwarded?: boolean;
+		resolvedAs?: string | null;
+	};
+	forwardAbuseReport: {
+		reportId: string;
+		report: any;
+	};
+	updateAbuseReportNote: {
+		reportId: string;
+		report: any;
+		before: string;
+		after: string;
 	};
 	createInvitation: {
 		invitations: any[];
@@ -350,7 +391,56 @@ export type ModerationLogPayloads = {
 		userId: string;
 		userUsername: string;
 		userMutualLinkSections: { name: string | null; mutualLinks: { id: string; url: string; fileId: string; description: string | null; imgSrc: string; }[]; }[] | []
-	}
+	};
+	createSystemWebhook: {
+		systemWebhookId: string;
+		webhook: any;
+	};
+	updateSystemWebhook: {
+		systemWebhookId: string;
+		before: any;
+		after: any;
+	};
+	deleteSystemWebhook: {
+		systemWebhookId: string;
+		webhook: any;
+	};
+	createAbuseReportNotificationRecipient: {
+		recipientId: string;
+		recipient: any;
+	};
+	updateAbuseReportNotificationRecipient: {
+		recipientId: string;
+		before: any;
+		after: any;
+	};
+	deleteAbuseReportNotificationRecipient: {
+		recipientId: string;
+		recipient: any;
+	};
+	deleteAccount: {
+		userId: string;
+		userUsername: string;
+		userHost: string | null;
+	};
+	deletePage: {
+		pageId: string;
+		pageUserId: string;
+		pageUserUsername: string;
+		page: any;
+	};
+	deleteFlash: {
+		flashId: string;
+		flashUserId: string;
+		flashUserUsername: string;
+		flash: any;
+	};
+	deleteGalleryPost: {
+		postId: string;
+		postUserId: string;
+		postUserUsername: string;
+		post: any;
+	};
 };
 
 export type MinimumUser = {

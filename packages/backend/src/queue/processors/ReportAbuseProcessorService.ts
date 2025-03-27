@@ -15,7 +15,7 @@ import type { AbuseReportResolversRepository, AbuseUserReportsRepository, UsersR
 import { DI } from '@/di-symbols.js';
 import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
 import { QueueService } from '@/core/QueueService.js';
-import { WebhookService } from '@/core/WebhookService.js';
+import { UserWebhookService } from '@/core/UserWebhookService.js';
 import { QueueLoggerService } from '../QueueLoggerService.js';
 import type { DbAbuseReportJobData } from '../types.js';
 import type * as Bull from 'bullmq';
@@ -40,7 +40,7 @@ export class ReportAbuseProcessorService {
 		private apRendererService: ApRendererService,
 		private roleService: RoleService,
 		private queueService: QueueService,
-		private webhookService: WebhookService,
+		private userWebhookService: UserWebhookService,
 	) {
 		this.logger = this.queueLoggerService.logger.createSubLogger('report-abuse');
 	}
@@ -88,10 +88,10 @@ export class ReportAbuseProcessorService {
 					forwarded: resolver.forward && job.data.targetUserHost !== null && job.data.reporterHost === null,
 				});
 
-				const webhooks = (await this.webhookService.getActiveWebhooks()).filter(x => x.on.includes('reportAutoResolved'));
+				const webhooks = (await this.userWebhookService.fetchWebhooks()).filter(x => x.on.includes('reportAutoResolved'));
 				for (const webhook of webhooks) {
 					if (await this.roleService.isAdministrator({ id: webhook.userId, isRoot: false })) {
-						this.queueService.webhookDeliver(webhook, 'reportAutoResolved', {
+						this.queueService.userWebhookDeliver(webhook, 'reportAutoResolved', {
 							resolver: resolver,
 							report: job.data,
 						});

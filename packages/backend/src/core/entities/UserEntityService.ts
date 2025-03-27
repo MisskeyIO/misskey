@@ -48,7 +48,6 @@ import { IdService } from '@/core/IdService.js';
 import type { AnnouncementService } from '@/core/AnnouncementService.js';
 import type { CustomEmojiService } from '@/core/CustomEmojiService.js';
 import { AvatarDecorationService } from '@/core/AvatarDecorationService.js';
-import { isNotNull } from '@/misc/is-not-null.js';
 import type { OnModuleInit } from '@nestjs/common';
 import type { NoteEntityService } from './NoteEntityService.js';
 import type { PageEntityService } from './PageEntityService.js';
@@ -489,6 +488,9 @@ export class UserEntityService implements OnModuleInit {
 			}))) : [],
 			isBot: user.isBot,
 			isCat: user.isCat,
+			requireSigninToViewContents: user.requireSigninToViewContents === false ? undefined : true,
+			makeNotesFollowersOnlyBefore: user.makeNotesFollowersOnlyBefore ?? undefined,
+			makeNotesHiddenBefore: user.makeNotesHiddenBefore ?? undefined,
 			instance: user.host ? this.federatedInstanceService.federatedInstanceCache.fetch(user.host).then(instance => instance ? {
 				name: instance.name,
 				softwareName: instance.softwareName,
@@ -507,7 +509,7 @@ export class UserEntityService implements OnModuleInit {
 				movedTo: user.movedToUri ? this.apPersonService.resolvePerson(user.movedToUri).then(user => user.id).catch(() => null) : null,
 				alsoKnownAs: user.alsoKnownAs
 					? Promise.all(user.alsoKnownAs.map(uri => this.apPersonService.fetchPerson(uri).then(user => user?.id).catch(() => null)))
-						.then(xs => xs.length === 0 ? null : xs.filter(isNotNull))
+						.then(xs => xs.length === 0 ? null : xs.filter(x => x != null))
 					: null,
 				createdAt: this.idService.parse(user.id).date.toISOString(),
 				updatedAt: user.updatedAt ? user.updatedAt.toISOString() : null,
@@ -537,11 +539,6 @@ export class UserEntityService implements OnModuleInit {
 				publicReactions: this.isLocalUser(user) ? profile!.publicReactions : false, // https://github.com/misskey-dev/misskey/issues/12964
 				followersVisibility: profile!.followersVisibility,
 				followingVisibility: profile!.followingVisibility,
-				twoFactorEnabled: profile!.twoFactorEnabled,
-				usePasswordLessLogin: profile!.usePasswordLessLogin,
-				securityKeys: profile!.twoFactorEnabled
-					? this.userSecurityKeysRepository.countBy({ userId: user.id }).then(result => result >= 1)
-					: false,
 				roles: this.roleService.getUserRoles(user.id).then(roles => roles
 					.filter(role => role.isPublic || iAmModerator)
 					.sort((a, b) => b.displayOrder - a.displayOrder)
@@ -561,8 +558,17 @@ export class UserEntityService implements OnModuleInit {
 			} : {}),
 
 			...(isDetailed && (isMe || iAmModerator) ? {
+				twoFactorEnabled: profile!.twoFactorEnabled,
+				usePasswordLessLogin: profile!.usePasswordLessLogin,
+				securityKeys: profile!.twoFactorEnabled
+					? this.userSecurityKeysRepository.countBy({ userId: user.id }).then(result => result >= 1)
+					: false,
+			} : {}),
+
+			...(isDetailed && (isMe || iAmModerator) ? {
 				avatarId: user.avatarId,
 				bannerId: user.bannerId,
+				followedMessage: profile!.followedMessage,
 				isModerator: isModerator,
 				isAdmin: isAdmin,
 				injectFeaturedNote: profile!.injectFeaturedNote,
@@ -630,6 +636,7 @@ export class UserEntityService implements OnModuleInit {
 				isRenoteMuted: relation.isRenoteMuted,
 				notify: relation.following?.notify ?? 'none',
 				withReplies: relation.following?.withReplies ?? false,
+				followedMessage: relation.isFollowing ? profile!.followedMessage : undefined,
 			} : {}),
 		} as Promiseable<Packed<S>>;
 
@@ -695,7 +702,7 @@ export class UserEntityService implements OnModuleInit {
 			}
 		}
 
-		return (await Promise.allSettled(_users.map(u => this.pack(u, me, { ...options, userProfile: profilesMap?.get(u.id), userRelations: userRelations, userMemos: userMemos, pinNotes: pinNotes }))))
+		return (await Promise.allSettled(_users.map(u => this.pack(u, me, { ...options, userProfile: profilesMap.get(u.id), userRelations: userRelations, userMemos: userMemos, pinNotes: pinNotes }))))
 			.filter(result => result.status === 'fulfilled')
 			.map(result => (result as PromiseFulfilledResult<Packed<S>>).value);
 	}

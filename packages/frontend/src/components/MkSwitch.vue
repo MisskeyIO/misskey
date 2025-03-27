@@ -11,10 +11,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 		type="checkbox"
 		:disabled="disabled"
 		:class="$style.input"
-		@keydown.enter="toggle"
+		@click="toggle"
 	>
-	<XButton :checked="checked" :disabled="disabled" @toggle="toggle"/>
-	<span :class="$style.body">
+	<XButton :class="$style.toggle" :checked="checked" :disabled="disabled" @toggle="toggle"/>
+	<span v-if="!noBody" :class="$style.body">
 		<!-- TODO: 無名slotの方は廃止 -->
 		<span :class="$style.label">
 			<span @click="toggle">
@@ -35,16 +35,19 @@ const props = defineProps<{
 	modelValue: boolean | Ref<boolean>;
 	disabled?: boolean;
 	helpText?: string;
+	noBody?: boolean;
 }>();
 
 const emit = defineEmits<{
 	(ev: 'update:modelValue', v: boolean): void;
+	(ev: 'change', v: boolean): void;
 }>();
 
 const checked = toRefs(props).modelValue;
 const toggle = () => {
 	if (props.disabled) return;
 	emit('update:modelValue', !checked.value);
+	emit('change', !checked.value);
 };
 </script>
 
@@ -57,7 +60,7 @@ const toggle = () => {
 
 	&:hover {
 		> .button {
-			border-color: var(--inputBorderHover) !important;
+			border-color: var(--MI_THEME-inputBorderHover) !important;
 		}
 	}
 
@@ -73,13 +76,19 @@ const toggle = () => {
 	height: 0;
 	opacity: 0;
 	margin: 0;
+
+	&:focus-visible ~ .toggle {
+		outline: 2px solid var(--MI_THEME-focus);
+		outline-offset: 2px;
+	}
 }
+
 .body {
 	margin-left: 12px;
 	margin-top: 2px;
 	display: block;
 	transition: inherit;
-	color: var(--fg);
+	color: var(--MI_THEME-fg);
 }
 
 .label {
@@ -91,7 +100,7 @@ const toggle = () => {
 
 .caption {
 	margin: 8px 0 0 0;
-	color: var(--fgTransparentWeak);
+	color: var(--MI_THEME-fgTransparentWeak);
 	font-size: 0.85em;
 
 	&:empty {

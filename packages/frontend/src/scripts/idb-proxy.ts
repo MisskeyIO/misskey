@@ -11,10 +11,11 @@ import {
 	del as idel,
 	keys as ikeys,
 } from 'idb-keyval';
+import { miLocalStorage } from '@/local-storage.js';
 
-const fallbackName = (key: string) => `idbfallback::${key}`;
+const PREFIX = 'idbfallback::';
 
-let idbAvailable = typeof window !== 'undefined' ? !!(window.indexedDB && window.indexedDB.open) : true;
+let idbAvailable = typeof window !== 'undefined' ? !!(window.indexedDB && typeof window.indexedDB.open === 'function') : true;
 
 // iframe.contentWindow.indexedDB.deleteDatabase() がchromeのバグで使用できないため、indexedDBを無効化している。
 // バグが治って再度有効化するのであれば、cypressのコマンド内のコメントアウトを外すこと
@@ -39,17 +40,17 @@ if (idbAvailable) {
 
 export async function get(key: string) {
 	if (idbAvailable) return iget(key);
-	return JSON.parse(window.localStorage.getItem(fallbackName(key)));
+	return miLocalStorage.getItemAsJson(`${PREFIX}${key}`);
 }
 
 export async function set(key: string, val: any) {
 	if (idbAvailable) return iset(key, val);
-	return window.localStorage.setItem(fallbackName(key), JSON.stringify(val));
+	return miLocalStorage.setItemAsJson(`${PREFIX}${key}`, val);
 }
 
 export async function del(key: string) {
 	if (idbAvailable) return idel(key);
-	return window.localStorage.removeItem(fallbackName(key));
+	return miLocalStorage.removeItem(`${PREFIX}${key}`);
 }
 
 export async function exist(key: string) {

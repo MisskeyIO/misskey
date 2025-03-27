@@ -5,19 +5,19 @@
 
 import { URLSearchParams } from 'node:url';
 import * as nodemailer from 'nodemailer';
+import juice from 'juice';
 import { Inject, Injectable } from '@nestjs/common';
 import { validate as validateEmail } from 'deep-email-validator';
 import Redis from 'ioredis';
-import { MetaService } from '@/core/MetaService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { DI } from '@/di-symbols.js';
-import type { Config } from '@/config.js';
 import type Logger from '@/logger.js';
-import type { UserProfilesRepository } from '@/models/_.js';
+import type { MiMeta, UserProfilesRepository } from '@/models/_.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import { bindThis } from '@/decorators.js';
 import { HttpRequestService } from '@/core/HttpRequestService.js';
 import { RedisKVCache } from '@/misc/cache.js';
+import type { Config } from '@@/js/config.js';
 
 @Injectable()
 export class EmailService {
@@ -32,13 +32,15 @@ export class EmailService {
 		@Inject(DI.config)
 		private config: Config,
 
+		@Inject(DI.meta)
+		private meta: MiMeta,
+
 		@Inject(DI.redis)
 		private redisClient: Redis.Redis,
 
 		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
 
-		private metaService: MetaService,
 		private loggerService: LoggerService,
 		private utilityService: UtilityService,
 		private httpRequestService: HttpRequestService,
@@ -58,14 +60,14 @@ export class EmailService {
 
 	@bindThis
 	public async sendEmail(to: string, subject: string, html: string, text: string) {
-		const meta = await this.metaService.fetch(true);
+		const meta = this.meta;
 
 		if (!meta.enableEmail) return;
 
 		const iconUrl = `${this.config.url}/static-assets/mi-white.png`;
 		const emailSettingUrl = `${this.config.url}/settings/email`;
 
-		const enableAuth = meta.smtpUser != null && meta.smtpUser !== '';
+		const enableAuth = this.meta.smtpUser != null && this.meta.smtpUser !== '';
 
 		const transporter = nodemailer.createTransport({
 			host: meta.smtpHost,
@@ -79,14 +81,7 @@ export class EmailService {
 			} : undefined,
 		} as any);
 
-		try {
-			// TODO: htmlサニタイズ
-			const info = await transporter.sendMail({
-				from: meta.email!,
-				to: to,
-				subject: subject,
-				text: text,
-				html: `<!doctype html>
+		const htmlContent = `<!doctype html>
 <html>
 	<head>
 		<meta charset="utf-8">
@@ -151,7 +146,7 @@ export class EmailService {
 	<body>
 		<main>
 			<header>
-				<img src="${ meta.logoImageUrl ?? meta.iconUrl ?? iconUrl }"/>
+				<img src="${ this.meta.logoImageUrl ?? this.meta.iconUrl ?? iconUrl }"/>
 			</header>
 			<article>
 				<h1>${ subject }</h1>
@@ -165,7 +160,18 @@ export class EmailService {
 			<a href="${ this.config.url }">${ this.config.host }</a>
 		</nav>
 	</body>
-</html>`,
+</html>`;
+
+		const inlinedHtml = juice(htmlContent);
+
+		try {
+			// TODO: htmlサニタイズ
+			const info = await transporter.sendMail({
+				from: this.meta.email!,
+				to: to,
+				subject: subject,
+				text: text,
+				html: inlinedHtml,
 			});
 
 			this.logger.info(`Message sent: ${info.messageId}`);
@@ -180,8 +186,7 @@ export class EmailService {
 		available: boolean;
 		reason: null | 'used' | 'format' | 'disposable' | 'mx' | 'smtp' | 'banned' | 'network' | 'blacklist';
 	}> {
-		const meta = await this.metaService.fetch();
-
+		const meta = this.meta;
 		const exist = await this.userProfilesRepository.countBy({
 			emailVerified: true,
 			email: emailAddress,

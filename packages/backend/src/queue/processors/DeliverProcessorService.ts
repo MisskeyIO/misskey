@@ -3,26 +3,25 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
+import {Inject, Injectable} from '@nestjs/common';
 import * as Bull from 'bullmq';
-import { Not } from 'typeorm';
-import { DI } from '@/di-symbols.js';
-import type { InstancesRepository } from '@/models/_.js';
+import {Not} from 'typeorm';
+import {DI} from '@/di-symbols.js';
+import type {InstancesRepository, MiMeta} from '@/models/_.js';
 import type Logger from '@/logger.js';
-import { MetaService } from '@/core/MetaService.js';
-import { ApRequestService } from '@/core/activitypub/ApRequestService.js';
-import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
-import { FetchInstanceMetadataService } from '@/core/FetchInstanceMetadataService.js';
-import { MemorySingleCache } from '@/misc/cache.js';
-import type { MiInstance } from '@/models/Instance.js';
+import {ApRequestService} from '@/core/activitypub/ApRequestService.js';
+import {FederatedInstanceService} from '@/core/FederatedInstanceService.js';
+import {FetchInstanceMetadataService} from '@/core/FetchInstanceMetadataService.js';
+import {MemorySingleCache} from '@/misc/cache.js';
+import type {MiInstance} from '@/models/Instance.js';
 import InstanceChart from '@/core/chart/charts/instance.js';
 import ApRequestChart from '@/core/chart/charts/ap-request.js';
 import FederationChart from '@/core/chart/charts/federation.js';
-import { StatusError } from '@/misc/status-error.js';
-import { UtilityService } from '@/core/UtilityService.js';
-import { bindThis } from '@/decorators.js';
-import { QueueLoggerService } from '../QueueLoggerService.js';
-import type { DeliverJobData } from '../types.js';
+import {StatusError} from '@/misc/status-error.js';
+import {UtilityService} from '@/core/UtilityService.js';
+import {bindThis} from '@/decorators.js';
+import {QueueLoggerService} from '../QueueLoggerService.js';
+import type {DeliverJobData} from '../types.js';
 
 @Injectable()
 export class DeliverProcessorService {
@@ -31,10 +30,12 @@ export class DeliverProcessorService {
 	private latest: string | null;
 
 	constructor(
+		@Inject(DI.meta)
+		private meta: MiMeta,
+
 		@Inject(DI.instancesRepository)
 		private instancesRepository: InstancesRepository,
 
-		private metaService: MetaService,
 		private utilityService: UtilityService,
 		private federatedInstanceService: FederatedInstanceService,
 		private fetchInstanceMetadataService: FetchInstanceMetadataService,
@@ -53,8 +54,7 @@ export class DeliverProcessorService {
 		const { host } = new URL(job.data.to);
 
 		// ブロックしてたら中断
-		const meta = await this.metaService.fetch();
-		if (this.utilityService.isItemListedIn(host, meta.blockedHosts)) {
+		if (this.utilityService.isItemListedIn(host, this.meta.blockedHosts)) {
 			return 'skip (blocked)';
 		}
 
@@ -75,8 +75,17 @@ export class DeliverProcessorService {
 		try {
 			await this.apRequestService.signedPost(job.data.user, job.data.to, job.data.content, job.data.digest);
 
-			// Update stats
-			this.federatedInstanceService.fetch(host).then(i => {
+			this.apRequestChart.deliverSucc();
+			this.federationChart.deliverd(host, true);
+
+			// Update instance stats
+			process.nextTick(async () => {
+				const i = await (this.meta.enableStatsForFederatedInstances
+					? this.federatedInstanceService.fetchOrRegister(host)
+					: this.federatedInstanceService.fetch(host));
+
+				if (i == null) return;
+
 				if (i.isNotResponding) {
 					this.federatedInstanceService.update(i.id, {
 						isNotResponding: false,
@@ -84,19 +93,22 @@ export class DeliverProcessorService {
 					});
 				}
 
-				this.fetchInstanceMetadataService.fetchInstanceMetadata(i);
-				this.apRequestChart.deliverSucc();
-				this.federationChart.deliverd(i.host, true);
+				if (this.meta.enableStatsForFederatedInstances) {
+					this.fetchInstanceMetadataService.fetchInstanceMetadata(i);
+				}
 
-				if (meta.enableChartsForFederatedInstances) {
+				if (this.meta.enableChartsForFederatedInstances) {
 					this.instanceChart.requestSent(i.host, true);
 				}
 			});
 
 			return 'Success';
 		} catch (res) {
-			// Update stats
-			this.federatedInstanceService.fetch(host).then(i => {
+			this.apRequestChart.deliverFail();
+			this.federationChart.deliverd(host, false);
+
+			// Update instance stats
+			this.federatedInstanceService.fetchOrRegister(host).then(i => {
 				if (!i.isNotResponding) {
 					this.federatedInstanceService.update(i.id, {
 						isNotResponding: true,
@@ -109,12 +121,15 @@ export class DeliverProcessorService {
 							suspensionState: 'autoSuspendedForNotResponding',
 						});
 					}
+				} else {
+					// isNotRespondingがtrueでnotRespondingSinceがnullの場合はnotRespondingSinceをセット
+					// notRespondingSinceは新たな機能なので、それ以前のデータにはnotRespondingSinceがない場合がある
+					this.federatedInstanceService.update(i.id, {
+						notRespondingSince: new Date(),
+					});
 				}
 
-				this.apRequestChart.deliverFail();
-				this.federationChart.deliverd(i.host, false);
-
-				if (meta.enableChartsForFederatedInstances) {
+				if (this.meta.enableChartsForFederatedInstances) {
 					this.instanceChart.requestSent(i.host, false);
 				}
 			});
@@ -124,7 +139,7 @@ export class DeliverProcessorService {
 				if (!res.isRetryable) {
 					// 相手が閉鎖していることを明示しているため、配送停止する
 					if (job.data.isSharedInbox && res.statusCode === 410) {
-						this.federatedInstanceService.fetch(host).then(i => {
+						this.federatedInstanceService.fetchOrRegister(host).then(i => {
 							this.federatedInstanceService.update(i.id, {
 								suspensionState: 'goneSuspended',
 							});

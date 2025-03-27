@@ -11,6 +11,7 @@ import type { Packed } from '@/misc/json-schema.js';
 import { RoleService } from '@/core/RoleService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
+import type { JsonObject } from '@/misc/json-value.js';
 import Channel, { type MiChannelService } from '../channel.js';
 
 class UserListChannel extends Channel {
@@ -39,10 +40,11 @@ class UserListChannel extends Channel {
 	}
 
 	@bindThis
-	public async init(params: any) {
-		this.listId = params.listId as string;
-		this.withFiles = params.withFiles ?? false;
-		this.withRenotes = params.withRenotes ?? true;
+	public async init(params: JsonObject) {
+		if (typeof params.listId !== 'string') return;
+		this.listId = params.listId;
+		this.withFiles = !!(params.withFiles ?? false);
+		this.withRenotes = !!(params.withRenotes ?? true);
 		this.minimize = params.minimize ?? false;
 
 		// Check existence and owner

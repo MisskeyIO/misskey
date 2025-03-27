@@ -53,13 +53,14 @@ async function buildBackendScript() {
   await fs.mkdir('./packages/backend/built/server/web', { recursive: true });
   let clientEntry;
   try {
-    clientEntry = JSON.parse(await fs.readFile('./built/_vite_/manifest.json', 'utf-8'))['src/_boot_.ts'].file;
+		console.log(JSON.parse(await fs.readFile('./built/_frontend_vite_/manifest.json', 'utf-8'))['src/_boot_.ts'].file)
+    clientEntry = JSON.parse(await fs.readFile('./built/_frontend_vite_/manifest.json', 'utf-8'))['src/_boot_.ts'].file;
   } catch {
     clientEntry = 'src/_boot_.ts';
   }
-
   for (const file of [
     './packages/backend/src/server/web/boot.js',
+    './packages/backend/src/server/web/boot.embed.js',
     './packages/backend/src/server/web/bios.js',
     './packages/backend/src/server/web/cli.js',
     './packages/backend/src/server/web/flush.js'
@@ -77,6 +78,7 @@ async function buildBackendStyle() {
 
   for (const file of [
     './packages/backend/src/server/web/style.css',
+    './packages/backend/src/server/web/style.embed.css',
     './packages/backend/src/server/web/bios.css',
     './packages/backend/src/server/web/cli.css',
     './packages/backend/src/server/web/error.css'

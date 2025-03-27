@@ -10,7 +10,6 @@ import * as Redis from 'ioredis';
 import ms from 'ms';
 import { Inject, Injectable } from '@nestjs/common';
 import type { DriveFilesRepository } from '@/models/_.js';
-import { DI } from '@/di-symbols.js';
 import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
 import { DriveService } from '@/core/DriveService.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
@@ -19,6 +18,8 @@ import { DB_MAX_IMAGE_COMMENT_LENGTH } from '@/const.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import { MetaService } from '@/core/MetaService.js';
 import { ApiError } from '@/server/api/error.js';
+import { MiMeta } from '@/models/_.js';
+import { DI } from '@/di-symbols.js';
 
 export const meta = {
 	tags: ['drive'],
@@ -99,6 +100,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
 
+		@Inject(DI.meta)
+		private serverSettings: MiMeta,
+
 		private driveFileEntityService: DriveFileEntityService,
 		private metaService: MetaService,
 		private loggerService: LoggerService,
@@ -151,8 +155,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				}
 			}
 
-			const instance = await this.metaService.fetch();
-
 			try {
 				// Create file
 				const driveFile = await this.driveService.addFile({
@@ -163,8 +165,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					folderId: ps.folderId,
 					force: ps.force,
 					sensitive: ps.isSensitive,
-					requestIp: instance.enableIpLogging ? ip : null,
-					requestHeaders: instance.enableIpLogging ? headers : null,
+					requestIp: this.serverSettings.enableIpLogging ? ip : null,
+					requestHeaders: this.serverSettings.enableIpLogging ? headers : null,
 				});
 
 				// 1分間、リクエストの処理結果を記録

@@ -77,6 +77,10 @@ export class FollowingEntityService {
 			populateFollowee?: boolean;
 			populateFollower?: boolean;
 		},
+		hint?: {
+			packedFollowee?: Packed<'UserDetailedNotMe'>,
+			packedFollower?: Packed<'UserDetailedNotMe'>,
+		},
 	): Promise<Packed<'Following'>> {
 		const following = typeof src === 'object' ? src : await this.followingsRepository.findOneByOrFail({ id: src });
 
@@ -87,10 +91,10 @@ export class FollowingEntityService {
 			createdAt: this.idService.parse(following.id).date.toISOString(),
 			followeeId: following.followeeId,
 			followerId: following.followerId,
-			followee: opts.populateFollowee ? this.userEntityService.pack(following.followee ?? following.followeeId, me, {
+			followee: opts.populateFollowee ? hint?.packedFollowee ?? this.userEntityService.pack(following.followee ?? following.followeeId, me, {
 				schema: 'UserDetailedNotMe',
 			}) : undefined,
-			follower: opts.populateFollower ? this.userEntityService.pack(following.follower ?? following.followerId, me, {
+			follower: opts.populateFollower ? hint?.packedFollower ?? this.userEntityService.pack(following.follower ?? following.followerId, me, {
 				schema: 'UserDetailedNotMe',
 			}) : undefined,
 		});

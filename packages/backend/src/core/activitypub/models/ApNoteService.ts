@@ -7,7 +7,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
 import * as Redis from 'ioredis';
 import { DI } from '@/di-symbols.js';
-import type { UsersRepository, PollsRepository, EmojisRepository } from '@/models/_.js';
+import type { UsersRepository, PollsRepository, EmojisRepository, MiMeta } from '@/models/_.js';
 import type { Config } from '@/config.js';
 import type { MiRemoteUser } from '@/models/User.js';
 import type { MiNote } from '@/models/Note.js';
@@ -25,7 +25,6 @@ import { UtilityService } from '@/core/UtilityService.js';
 import { bindThis } from '@/decorators.js';
 import { checkHttps } from '@/misc/check-https.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
-import { isNotNull } from '@/misc/is-not-null.js';
 import { getOneApId, getApId, getOneApHrefNullable, validPost, isEmoji, getApType } from '../type.js';
 import { ApLoggerService } from '../ApLoggerService.js';
 import { ApMfmService } from '../ApMfmService.js';
@@ -50,9 +49,6 @@ export class ApNoteService {
 
 		@Inject(DI.redisForTimelines)
 		private redisForTimelines: Redis.Redis,
-
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
 
 		@Inject(DI.pollsRepository)
 		private pollsRepository: PollsRepository,
@@ -152,7 +148,7 @@ export class ApNoteService {
 				resolver: { history: resolver.getHistory() },
 				value,
 				object,
-				error: err
+				error: err,
 			});
 			throw err;
 		}
@@ -219,7 +215,11 @@ export class ApNoteService {
 		/**
 		 * 禁止ワードチェック
 		 */
-		const hasProhibitedWords = await this.noteCreateService.checkProhibitedWordsContain(meta.prohibitedWords, { cw, text, pollChoices: poll?.choices });
+		const hasProhibitedWords = await this.noteCreateService.checkProhibitedWordsContain(meta.prohibitedWords, {
+			cw,
+			text,
+			pollChoices: poll?.choices,
+		});
 		if (hasProhibitedWords) {
 			throw new IdentifiableError('689ee33f-f97c-479a-ac49-1b9f8140af99', 'Notes including prohibited words are not allowed.');
 		}
@@ -294,7 +294,7 @@ export class ApNoteService {
 				}
 			};
 
-			const uris = unique([note._misskey_quote, note.quoteUrl].filter(isNotNull));
+			const uris = unique([note._misskey_quote, note.quoteUrl].filter(x => x != null));
 			const results = await Promise.all(uris.map(tryResolveNote));
 
 			quote = results.filter((x): x is { status: 'ok', res: MiNote } => x.status === 'ok').map(x => x.res).at(0);
@@ -376,9 +376,7 @@ export class ApNoteService {
 	public async resolveNote(value: string | IObject, options: { sentFrom?: URL, resolver?: Resolver } = {}): Promise<MiNote | null> {
 		const uri = getApId(value);
 
-		// ブロックしていたら中断
-		const meta = await this.metaService.fetch();
-		if (this.utilityService.isItemListedIn(this.utilityService.extractHost(uri), meta.blockedHosts)) {
+		if (!this.utilityService.isFederationAllowedHost(uri) || !this.utilityService.isFederationAllowedUri(uri)) {
 			throw new StatusError('blocked host', 451);
 		}
 
@@ -407,7 +405,7 @@ export class ApNoteService {
 	@bindThis
 	public async extractEmojis(tags: IObject | IObject[], host: string): Promise<MiEmoji[]> {
 		// eslint-disable-next-line no-param-reassign
-		host = this.utilityService.normalizeHost(host);
+		host = this.utilityService.toPuny(host);
 
 		const eomjiTags = toArray(tags).filter(isEmoji);
 
@@ -448,7 +446,7 @@ export class ApNoteService {
 
 			this.logger.info(`register emoji host=${host}, name=${name}`);
 
-			return await this.emojisRepository.insert({
+			return await this.emojisRepository.insertOne({
 				id: this.idService.gen(),
 				host,
 				name,
@@ -457,7 +455,7 @@ export class ApNoteService {
 				publicUrl: tag.icon.url,
 				updatedAt: new Date(),
 				aliases: [],
-			}).then(x => this.emojisRepository.findOneByOrFail(x.identifiers[0]));
+			});
 		}));
 	}
 }

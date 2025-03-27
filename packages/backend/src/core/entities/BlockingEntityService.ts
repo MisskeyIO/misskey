@@ -29,6 +29,9 @@ export class BlockingEntityService {
 	public async pack(
 		src: MiBlocking['id'] | MiBlocking,
 		me: { id: MiUser['id'] } | null | undefined,
+		hint?: {
+			blockee?: Packed<'UserDetailedNotMe'>,
+		},
 	): Promise<Packed<'Blocking'>> {
 		const blocking = typeof src === 'object' ? src : await this.blockingsRepository.findOneByOrFail({ id: src });
 
@@ -36,7 +39,7 @@ export class BlockingEntityService {
 			id: blocking.id,
 			createdAt: this.idService.parse(blocking.id).date.toISOString(),
 			blockeeId: blocking.blockeeId,
-			blockee: this.userEntityService.pack(blocking.blockeeId, me, {
+			blockee: hint?.blockee ?? this.userEntityService.pack(blocking.blockeeId, me, {
 				schema: 'UserDetailedNotMe',
 			}),
 		});

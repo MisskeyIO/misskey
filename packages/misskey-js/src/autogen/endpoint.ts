@@ -4,14 +4,20 @@ import type {
 	AdminMetaResponse,
 	AdminAbuseUserReportsRequest,
 	AdminAbuseUserReportsResponse,
+	AdminAbuseReportNotificationRecipientListRequest,
+	AdminAbuseReportNotificationRecipientListResponse,
+	AdminAbuseReportNotificationRecipientShowRequest,
+	AdminAbuseReportNotificationRecipientShowResponse,
+	AdminAbuseReportNotificationRecipientCreateRequest,
+	AdminAbuseReportNotificationRecipientCreateResponse,
+	AdminAbuseReportNotificationRecipientUpdateRequest,
+	AdminAbuseReportNotificationRecipientUpdateResponse,
+	AdminAbuseReportNotificationRecipientDeleteRequest,
 	AdminAccountsCreateRequest,
 	AdminAccountsCreateResponse,
 	AdminAccountsDeleteRequest,
 	AdminAccountsFindByEmailRequest,
 	AdminAccountsFindByEmailResponse,
-	AdminAccountsPendingListRequest,
-	AdminAccountsPendingListResponse,
-	AdminAccountsPendingRevokeRequest,
 	AdminAdCreateRequest,
 	AdminAdCreateResponse,
 	AdminAdDeleteRequest,
@@ -24,22 +30,15 @@ import type {
 	AdminAnnouncementsListRequest,
 	AdminAnnouncementsListResponse,
 	AdminAnnouncementsUpdateRequest,
-	AdminAbuseReportResolverCreateRequest,
-	AdminAbuseReportResolverCreateResponse,
-	AdminAbuseReportResolverListRequest,
-	AdminAbuseReportResolverListResponse,
-	AdminAbuseReportResolverDeleteRequest,
-	AdminAbuseReportResolverUpdateRequest,
 	AdminAvatarDecorationsCreateRequest,
 	AdminAvatarDecorationsCreateResponse,
 	AdminAvatarDecorationsDeleteRequest,
 	AdminAvatarDecorationsListRequest,
 	AdminAvatarDecorationsListResponse,
 	AdminAvatarDecorationsUpdateRequest,
+	AdminDeleteAllFilesOfAUserRequest,
 	AdminUnsetUserAvatarRequest,
 	AdminUnsetUserBannerRequest,
-	AdminUnsetUserMutualLinkRequest,
-	AdminDriveDeleteAllFilesOfAUserRequest,
 	AdminDriveFilesRequest,
 	AdminDriveFilesResponse,
 	AdminDriveShowFileRequest,
@@ -65,12 +64,6 @@ import type {
 	AdminFederationRefreshRemoteInstanceMetadataRequest,
 	AdminFederationRemoveAllFollowingRequest,
 	AdminFederationUpdateInstanceRequest,
-	AdminIndieAuthCreateRequest,
-	AdminIndieAuthCreateResponse,
-	AdminIndieAuthDeleteRequest,
-	AdminIndieAuthListRequest,
-	AdminIndieAuthListResponse,
-	AdminIndieAuthUpdateRequest,
 	AdminGetIndexStatsResponse,
 	AdminGetTableStatsResponse,
 	AdminGetUserIpsRequest,
@@ -90,14 +83,13 @@ import type {
 	AdminRelaysRemoveRequest,
 	AdminResetPasswordRequest,
 	AdminResetPasswordResponse,
-	AdminRegenerateUserTokenRequest,
 	AdminResolveAbuseUserReportRequest,
+	AdminForwardAbuseUserReportRequest,
+	AdminUpdateAbuseUserReportRequest,
 	AdminSendEmailRequest,
 	AdminServerInfoResponse,
 	AdminShowModerationLogsRequest,
 	AdminShowModerationLogsResponse,
-	AdminShowUserAccountMoveLogsRequest,
-	AdminShowUserAccountMoveLogsResponse,
 	AdminShowUserRequest,
 	AdminShowUserResponse,
 	AdminShowUsersRequest,
@@ -105,7 +97,7 @@ import type {
 	AdminSuspendUserRequest,
 	AdminUnsuspendUserRequest,
 	AdminUpdateMetaRequest,
-	AdminUpdateUserNameRequest,
+	AdminDeleteAccountRequest,
 	AdminUpdateUserNoteRequest,
 	AdminRolesCreateRequest,
 	AdminRolesCreateResponse,
@@ -119,14 +111,16 @@ import type {
 	AdminRolesUpdateDefaultPoliciesRequest,
 	AdminRolesUsersRequest,
 	AdminRolesUsersResponse,
-	AdminSsoCreateRequest,
-	AdminSsoCreateResponse,
-	AdminSsoDeleteRequest,
-	AdminSsoListRequest,
-	AdminSsoListResponse,
-	AdminSsoUpdateRequest,
-	AnnouncementRequest,
-	AnnouncementResponse,
+	AdminSystemWebhookCreateRequest,
+	AdminSystemWebhookCreateResponse,
+	AdminSystemWebhookDeleteRequest,
+	AdminSystemWebhookListRequest,
+	AdminSystemWebhookListResponse,
+	AdminSystemWebhookShowRequest,
+	AdminSystemWebhookShowResponse,
+	AdminSystemWebhookUpdateRequest,
+	AdminSystemWebhookUpdateResponse,
+	AdminSystemWebhookTestRequest,
 	AnnouncementsRequest,
 	AnnouncementsResponse,
 	AnnouncementsShowRequest,
@@ -165,7 +159,6 @@ import type {
 	ChannelsCreateRequest,
 	ChannelsCreateResponse,
 	ChannelsFeaturedResponse,
-	ChannelsFeaturedGamesResponse,
 	ChannelsFollowRequest,
 	ChannelsFollowedRequest,
 	ChannelsFollowedResponse,
@@ -387,6 +380,7 @@ import type {
 	IWebhooksShowResponse,
 	IWebhooksUpdateRequest,
 	IWebhooksDeleteRequest,
+	IWebhooksTestRequest,
 	InviteCreateResponse,
 	InviteDeleteRequest,
 	InviteListRequest,
@@ -420,9 +414,6 @@ import type {
 	NotesCreateRequest,
 	NotesCreateResponse,
 	NotesDeleteRequest,
-	NotesScheduledCancelRequest,
-	NotesScheduledListRequest,
-	NotesScheduledListResponse,
 	NotesFavoritesCreateRequest,
 	NotesFavoritesDeleteRequest,
 	NotesFeaturedRequest,
@@ -477,6 +468,7 @@ import type {
 	FlashCreateRequest,
 	FlashCreateResponse,
 	FlashDeleteRequest,
+	FlashFeaturedRequest,
 	FlashFeaturedResponse,
 	FlashLikeRequest,
 	FlashShowRequest,
@@ -522,12 +514,8 @@ import type {
 	UsersFollowingResponse,
 	UsersGalleryPostsRequest,
 	UsersGalleryPostsResponse,
-	UsersGetFollowingBirthdayUsersRequest,
-	UsersGetFollowingBirthdayUsersResponse,
 	UsersGetFrequentlyRepliedUsersRequest,
 	UsersGetFrequentlyRepliedUsersResponse,
-	UsersGetSkebStatusRequest,
-	UsersGetSkebStatusResponse,
 	UsersFeaturedNotesRequest,
 	UsersFeaturedNotesResponse,
 	UsersListsCreateRequest,
@@ -567,10 +555,6 @@ import type {
 	UsersSearchResponse,
 	UsersShowRequest,
 	UsersShowResponse,
-	UsersGetSecurityInfoRequest,
-	UsersGetSecurityInfoResponse,
-	UsersStatsRequest,
-	UsersStatsResponse,
 	UsersAchievementsRequest,
 	UsersAchievementsResponse,
 	UsersUpdateMemoRequest,
@@ -598,11 +582,14 @@ import type {
 export type Endpoints = {
 	'admin/meta': { req: EmptyRequest; res: AdminMetaResponse };
 	'admin/abuse-user-reports': { req: AdminAbuseUserReportsRequest; res: AdminAbuseUserReportsResponse };
+	'admin/abuse-report/notification-recipient/list': { req: AdminAbuseReportNotificationRecipientListRequest; res: AdminAbuseReportNotificationRecipientListResponse };
+	'admin/abuse-report/notification-recipient/show': { req: AdminAbuseReportNotificationRecipientShowRequest; res: AdminAbuseReportNotificationRecipientShowResponse };
+	'admin/abuse-report/notification-recipient/create': { req: AdminAbuseReportNotificationRecipientCreateRequest; res: AdminAbuseReportNotificationRecipientCreateResponse };
+	'admin/abuse-report/notification-recipient/update': { req: AdminAbuseReportNotificationRecipientUpdateRequest; res: AdminAbuseReportNotificationRecipientUpdateResponse };
+	'admin/abuse-report/notification-recipient/delete': { req: AdminAbuseReportNotificationRecipientDeleteRequest; res: EmptyResponse };
 	'admin/accounts/create': { req: AdminAccountsCreateRequest; res: AdminAccountsCreateResponse };
 	'admin/accounts/delete': { req: AdminAccountsDeleteRequest; res: EmptyResponse };
 	'admin/accounts/find-by-email': { req: AdminAccountsFindByEmailRequest; res: AdminAccountsFindByEmailResponse };
-	'admin/accounts/pending/list': { req: AdminAccountsPendingListRequest; res: AdminAccountsPendingListResponse };
-	'admin/accounts/pending/revoke': { req: AdminAccountsPendingRevokeRequest; res: EmptyResponse };
 	'admin/ad/create': { req: AdminAdCreateRequest; res: AdminAdCreateResponse };
 	'admin/ad/delete': { req: AdminAdDeleteRequest; res: EmptyResponse };
 	'admin/ad/list': { req: AdminAdListRequest; res: AdminAdListResponse };
@@ -611,20 +598,15 @@ export type Endpoints = {
 	'admin/announcements/delete': { req: AdminAnnouncementsDeleteRequest; res: EmptyResponse };
 	'admin/announcements/list': { req: AdminAnnouncementsListRequest; res: AdminAnnouncementsListResponse };
 	'admin/announcements/update': { req: AdminAnnouncementsUpdateRequest; res: EmptyResponse };
-	'admin/abuse-report-resolver/create': { req: AdminAbuseReportResolverCreateRequest; res: AdminAbuseReportResolverCreateResponse };
-	'admin/abuse-report-resolver/list': { req: AdminAbuseReportResolverListRequest; res: AdminAbuseReportResolverListResponse };
-	'admin/abuse-report-resolver/delete': { req: AdminAbuseReportResolverDeleteRequest; res: EmptyResponse };
-	'admin/abuse-report-resolver/update': { req: AdminAbuseReportResolverUpdateRequest; res: EmptyResponse };
 	'admin/avatar-decorations/create': { req: AdminAvatarDecorationsCreateRequest; res: AdminAvatarDecorationsCreateResponse };
 	'admin/avatar-decorations/delete': { req: AdminAvatarDecorationsDeleteRequest; res: EmptyResponse };
 	'admin/avatar-decorations/list': { req: AdminAvatarDecorationsListRequest; res: AdminAvatarDecorationsListResponse };
 	'admin/avatar-decorations/update': { req: AdminAvatarDecorationsUpdateRequest; res: EmptyResponse };
+	'admin/delete-all-files-of-a-user': { req: AdminDeleteAllFilesOfAUserRequest; res: EmptyResponse };
 	'admin/unset-user-avatar': { req: AdminUnsetUserAvatarRequest; res: EmptyResponse };
 	'admin/unset-user-banner': { req: AdminUnsetUserBannerRequest; res: EmptyResponse };
-	'admin/unset-user-mutual-link': { req: AdminUnsetUserMutualLinkRequest; res: EmptyResponse };
 	'admin/drive/clean-remote-files': { req: EmptyRequest; res: EmptyResponse };
 	'admin/drive/cleanup': { req: EmptyRequest; res: EmptyResponse };
-	'admin/drive/delete-all-files-of-a-user': { req: AdminDriveDeleteAllFilesOfAUserRequest; res: EmptyResponse };
 	'admin/drive/files': { req: AdminDriveFilesRequest; res: AdminDriveFilesResponse };
 	'admin/drive/show-file': { req: AdminDriveShowFileRequest; res: AdminDriveShowFileResponse };
 	'admin/emoji/add-aliases-bulk': { req: AdminEmojiAddAliasesBulkRequest; res: EmptyResponse };
@@ -644,10 +626,6 @@ export type Endpoints = {
 	'admin/federation/refresh-remote-instance-metadata': { req: AdminFederationRefreshRemoteInstanceMetadataRequest; res: EmptyResponse };
 	'admin/federation/remove-all-following': { req: AdminFederationRemoveAllFollowingRequest; res: EmptyResponse };
 	'admin/federation/update-instance': { req: AdminFederationUpdateInstanceRequest; res: EmptyResponse };
-	'admin/indie-auth/create': { req: AdminIndieAuthCreateRequest; res: AdminIndieAuthCreateResponse };
-	'admin/indie-auth/delete': { req: AdminIndieAuthDeleteRequest; res: EmptyResponse };
-	'admin/indie-auth/list': { req: AdminIndieAuthListRequest; res: AdminIndieAuthListResponse };
-	'admin/indie-auth/update': { req: AdminIndieAuthUpdateRequest; res: EmptyResponse };
 	'admin/get-index-stats': { req: EmptyRequest; res: AdminGetIndexStatsResponse };
 	'admin/get-table-stats': { req: EmptyRequest; res: AdminGetTableStatsResponse };
 	'admin/get-user-ips': { req: AdminGetUserIpsRequest; res: AdminGetUserIpsResponse };
@@ -663,18 +641,18 @@ export type Endpoints = {
 	'admin/relays/list': { req: EmptyRequest; res: AdminRelaysListResponse };
 	'admin/relays/remove': { req: AdminRelaysRemoveRequest; res: EmptyResponse };
 	'admin/reset-password': { req: AdminResetPasswordRequest; res: AdminResetPasswordResponse };
-	'admin/regenerate-user-token': { req: AdminRegenerateUserTokenRequest; res: EmptyResponse };
 	'admin/resolve-abuse-user-report': { req: AdminResolveAbuseUserReportRequest; res: EmptyResponse };
+	'admin/forward-abuse-user-report': { req: AdminForwardAbuseUserReportRequest; res: EmptyResponse };
+	'admin/update-abuse-user-report': { req: AdminUpdateAbuseUserReportRequest; res: EmptyResponse };
 	'admin/send-email': { req: AdminSendEmailRequest; res: EmptyResponse };
 	'admin/server-info': { req: EmptyRequest; res: AdminServerInfoResponse };
 	'admin/show-moderation-logs': { req: AdminShowModerationLogsRequest; res: AdminShowModerationLogsResponse };
-	'admin/show-user-account-move-logs': { req: AdminShowUserAccountMoveLogsRequest; res: AdminShowUserAccountMoveLogsResponse };
 	'admin/show-user': { req: AdminShowUserRequest; res: AdminShowUserResponse };
 	'admin/show-users': { req: AdminShowUsersRequest; res: AdminShowUsersResponse };
 	'admin/suspend-user': { req: AdminSuspendUserRequest; res: EmptyResponse };
 	'admin/unsuspend-user': { req: AdminUnsuspendUserRequest; res: EmptyResponse };
 	'admin/update-meta': { req: AdminUpdateMetaRequest; res: EmptyResponse };
-	'admin/update-user-name': { req: AdminUpdateUserNameRequest; res: EmptyResponse };
+	'admin/delete-account': { req: AdminDeleteAccountRequest; res: EmptyResponse };
 	'admin/update-user-note': { req: AdminUpdateUserNoteRequest; res: EmptyResponse };
 	'admin/roles/create': { req: AdminRolesCreateRequest; res: AdminRolesCreateResponse };
 	'admin/roles/delete': { req: AdminRolesDeleteRequest; res: EmptyResponse };
@@ -685,11 +663,12 @@ export type Endpoints = {
 	'admin/roles/unassign': { req: AdminRolesUnassignRequest; res: EmptyResponse };
 	'admin/roles/update-default-policies': { req: AdminRolesUpdateDefaultPoliciesRequest; res: EmptyResponse };
 	'admin/roles/users': { req: AdminRolesUsersRequest; res: AdminRolesUsersResponse };
-	'admin/sso/create': { req: AdminSsoCreateRequest; res: AdminSsoCreateResponse };
-	'admin/sso/delete': { req: AdminSsoDeleteRequest; res: EmptyResponse };
-	'admin/sso/list': { req: AdminSsoListRequest; res: AdminSsoListResponse };
-	'admin/sso/update': { req: AdminSsoUpdateRequest; res: EmptyResponse };
-	'announcement': { req: AnnouncementRequest; res: AnnouncementResponse };
+	'admin/system-webhook/create': { req: AdminSystemWebhookCreateRequest; res: AdminSystemWebhookCreateResponse };
+	'admin/system-webhook/delete': { req: AdminSystemWebhookDeleteRequest; res: EmptyResponse };
+	'admin/system-webhook/list': { req: AdminSystemWebhookListRequest; res: AdminSystemWebhookListResponse };
+	'admin/system-webhook/show': { req: AdminSystemWebhookShowRequest; res: AdminSystemWebhookShowResponse };
+	'admin/system-webhook/update': { req: AdminSystemWebhookUpdateRequest; res: AdminSystemWebhookUpdateResponse };
+	'admin/system-webhook/test': { req: AdminSystemWebhookTestRequest; res: EmptyResponse };
 	'announcements': { req: AnnouncementsRequest; res: AnnouncementsResponse };
 	'announcements/show': { req: AnnouncementsShowRequest; res: AnnouncementsShowResponse };
 	'antennas/create': { req: AntennasCreateRequest; res: AntennasCreateResponse };
@@ -711,7 +690,6 @@ export type Endpoints = {
 	'blocking/list': { req: BlockingListRequest; res: BlockingListResponse };
 	'channels/create': { req: ChannelsCreateRequest; res: ChannelsCreateResponse };
 	'channels/featured': { req: EmptyRequest; res: ChannelsFeaturedResponse };
-	'channels/featured-games': { req: EmptyRequest; res: ChannelsFeaturedGamesResponse };
 	'channels/follow': { req: ChannelsFollowRequest; res: EmptyResponse };
 	'channels/followed': { req: ChannelsFollowedRequest; res: ChannelsFollowedResponse };
 	'channels/owned': { req: ChannelsOwnedRequest; res: ChannelsOwnedResponse };
@@ -857,6 +835,7 @@ export type Endpoints = {
 	'i/webhooks/show': { req: IWebhooksShowRequest; res: IWebhooksShowResponse };
 	'i/webhooks/update': { req: IWebhooksUpdateRequest; res: EmptyResponse };
 	'i/webhooks/delete': { req: IWebhooksDeleteRequest; res: EmptyResponse };
+	'i/webhooks/test': { req: IWebhooksTestRequest; res: EmptyResponse };
 	'invite/create': { req: EmptyRequest; res: InviteCreateResponse };
 	'invite/delete': { req: InviteDeleteRequest; res: EmptyResponse };
 	'invite/list': { req: InviteListRequest; res: InviteListResponse };
@@ -878,8 +857,6 @@ export type Endpoints = {
 	'notes/conversation': { req: NotesConversationRequest; res: NotesConversationResponse };
 	'notes/create': { req: NotesCreateRequest; res: NotesCreateResponse };
 	'notes/delete': { req: NotesDeleteRequest; res: EmptyResponse };
-	'notes/scheduled/cancel': { req: NotesScheduledCancelRequest; res: EmptyResponse };
-	'notes/scheduled/list': { req: NotesScheduledListRequest; res: NotesScheduledListResponse };
 	'notes/favorites/create': { req: NotesFavoritesCreateRequest; res: EmptyResponse };
 	'notes/favorites/delete': { req: NotesFavoritesDeleteRequest; res: EmptyResponse };
 	'notes/featured': { req: NotesFeaturedRequest; res: NotesFeaturedResponse };
@@ -918,7 +895,7 @@ export type Endpoints = {
 	'pages/update': { req: PagesUpdateRequest; res: EmptyResponse };
 	'flash/create': { req: FlashCreateRequest; res: FlashCreateResponse };
 	'flash/delete': { req: FlashDeleteRequest; res: EmptyResponse };
-	'flash/featured': { req: EmptyRequest; res: FlashFeaturedResponse };
+	'flash/featured': { req: FlashFeaturedRequest; res: FlashFeaturedResponse };
 	'flash/like': { req: FlashLikeRequest; res: EmptyResponse };
 	'flash/show': { req: FlashShowRequest; res: FlashShowResponse };
 	'flash/unlike': { req: FlashUnlikeRequest; res: EmptyResponse };
@@ -948,9 +925,7 @@ export type Endpoints = {
 	'users/followers': { req: UsersFollowersRequest; res: UsersFollowersResponse };
 	'users/following': { req: UsersFollowingRequest; res: UsersFollowingResponse };
 	'users/gallery/posts': { req: UsersGalleryPostsRequest; res: UsersGalleryPostsResponse };
-	'users/get-following-birthday-users': { req: UsersGetFollowingBirthdayUsersRequest; res: UsersGetFollowingBirthdayUsersResponse };
 	'users/get-frequently-replied-users': { req: UsersGetFrequentlyRepliedUsersRequest; res: UsersGetFrequentlyRepliedUsersResponse };
-	'users/get-skeb-status': { req: UsersGetSkebStatusRequest; res: UsersGetSkebStatusResponse };
 	'users/featured-notes': { req: UsersFeaturedNotesRequest; res: UsersFeaturedNotesResponse };
 	'users/lists/create': { req: UsersListsCreateRequest; res: UsersListsCreateResponse };
 	'users/lists/delete': { req: UsersListsDeleteRequest; res: EmptyResponse };
@@ -974,8 +949,6 @@ export type Endpoints = {
 	'users/search-by-username-and-host': { req: UsersSearchByUsernameAndHostRequest; res: UsersSearchByUsernameAndHostResponse };
 	'users/search': { req: UsersSearchRequest; res: UsersSearchResponse };
 	'users/show': { req: UsersShowRequest; res: UsersShowResponse };
-	'users/get-security-info': { req: UsersGetSecurityInfoRequest; res: UsersGetSecurityInfoResponse };
-	'users/stats': { req: UsersStatsRequest; res: UsersStatsResponse };
 	'users/achievements': { req: UsersAchievementsRequest; res: UsersAchievementsResponse };
 	'users/update-memo': { req: UsersUpdateMemoRequest; res: EmptyResponse };
 	'fetch-rss': { req: FetchRssRequest; res: FetchRssResponse };
@@ -991,3 +964,10 @@ export type Endpoints = {
 	'reversi/surrender': { req: ReversiSurrenderRequest; res: EmptyResponse };
 	'reversi/verify': { req: ReversiVerifyRequest; res: ReversiVerifyResponse };
 }
+
+/**
+ * NOTE: The content-type for all endpoints not listed here is application/json.
+ */
+export const endpointReqTypes = {
+	'drive/files/create': 'multipart/form-data',
+} as const satisfies { [K in keyof Endpoints]?: 'multipart/form-data'; };

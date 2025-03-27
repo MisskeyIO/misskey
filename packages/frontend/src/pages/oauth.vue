@@ -91,8 +91,8 @@ definePageMetadata(() => ({
 .form {
 	position: relative;
 	z-index: 10;
-	border-radius: var(--radius);
-	background-color: var(--panel);
+	border-radius: var(--MI-radius);
+	background-color: var(--MI_THEME-panel);
 	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 	overflow: clip;
 	max-width: 500px;

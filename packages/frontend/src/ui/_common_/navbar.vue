@@ -30,7 +30,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					v-on="navbarItemDef[item].action ? { click: navbarItemDef[item].action } : {}"
 				>
 					<i class="ti-fw" :class="[$style.itemIcon, navbarItemDef[item].icon]"></i><span :class="$style.itemText">{{ navbarItemDef[item].title }}</span>
-					<span v-if="navbarItemDef[item].indicated" :class="$style.itemIndicator">
+					<span v-if="navbarItemDef[item].indicated" :class="$style.itemIndicator" class="_blink">
 						<span v-if="navbarItemDef[item].indicateValue" class="_indicateCounter" :class="$style.itemIndicateValueIcon">{{ navbarItemDef[item].indicateValue }}</span>
 						<i v-else class="_indicatorCircle"></i>
 					</span>
@@ -42,7 +42,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkA>
 			<button class="_button" :class="$style.item" @click="more">
 				<i :class="$style.itemIcon" class="ti ti-grid-dots ti-fw"></i><span :class="$style.itemText">{{ i18n.ts.more }}</span>
-				<span v-if="otherMenuItemIndicated" :class="$style.itemIndicator"><i class="_indicatorCircle"></i></span>
+				<span v-if="otherMenuItemIndicated" :class="$style.itemIndicator" class="_blink"><i class="_indicatorCircle"></i></span>
 			</button>
 			<MkA v-tooltip.noDelay.right="i18n.ts.settings" :class="$style.item" :activeClass="$style.active" to="/settings">
 				<i :class="$style.itemIcon" class="ti ti-settings ti-fw"></i><span :class="$style.itemText">{{ i18n.ts.settings }}</span>
@@ -102,10 +102,11 @@ function openAccountMenu(ev: MouseEvent) {
 }
 
 function more(ev: MouseEvent) {
-	os.popup(defineAsyncComponent(() => import('@/components/MkLaunchPad.vue')), {
+	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkLaunchPad.vue')), {
 		src: ev.currentTarget ?? ev.target,
 	}, {
-	}, 'closed');
+		closed: () => dispose(),
+	});
 }
 </script>
 
@@ -113,6 +114,7 @@ function more(ev: MouseEvent) {
 .root {
 	--nav-width: 250px;
 	--nav-icon-only-width: 80px;
+	--nav-bg-transparent: color(from var(--MI_THEME-navBg) srgb r g b / 0.5);
 
 	flex: 0 0 var(--nav-width);
 	width: var(--nav-width);
@@ -130,7 +132,7 @@ function more(ev: MouseEvent) {
 	overflow: auto;
 	overflow-x: clip;
 	overscroll-behavior: contain;
-	background: var(--navBg);
+	background: var(--MI_THEME-navBg);
 	contain: strict;
 	display: flex;
 	flex-direction: column;
@@ -146,9 +148,9 @@ function more(ev: MouseEvent) {
 		top: 0;
 		z-index: 1;
 		padding: 20px 0;
-		background: var(--X14);
-		-webkit-backdrop-filter: var(--blur, blur(8px));
-		backdrop-filter: var(--blur, blur(8px));
+		background: var(--nav-bg-transparent);
+		-webkit-backdrop-filter: var(--MI-blur, blur(8px));
+		backdrop-filter: var(--MI-blur, blur(8px));
 	}
 
 	.banner {
@@ -168,6 +170,15 @@ function more(ev: MouseEvent) {
 		display: block;
 		text-align: center;
 		width: 100%;
+
+		&:focus-visible {
+			outline: none;
+
+			> .instanceIcon {
+				outline: 2px solid var(--MI_THEME-focus);
+				outline-offset: 2px;
+			}
+		}
 	}
 
 	.instanceIcon {
@@ -185,9 +196,9 @@ function more(ev: MouseEvent) {
 		position: sticky;
 		bottom: 0;
 		padding-top: 20px;
-		background: var(--X14);
-		-webkit-backdrop-filter: var(--blur, blur(8px));
-		backdrop-filter: var(--blur, blur(8px));
+		background: var(--nav-bg-transparent);
+		-webkit-backdrop-filter: var(--MI-blur, blur(8px));
+		backdrop-filter: var(--MI-blur, blur(8px));
 	}
 
 	.post {
@@ -195,11 +206,11 @@ function more(ev: MouseEvent) {
 		display: block;
 		width: 100%;
 		height: 40px;
-		color: var(--fgOnAccent);
+		color: var(--MI_THEME-fgOnAccent);
 		font-weight: bold;
 		text-align: left;
 
-		&:before {
+		&::before {
 			content: "";
 			display: block;
 			width: calc(100% - 38px);
@@ -211,12 +222,21 @@ function more(ev: MouseEvent) {
 			right: 0;
 			bottom: 0;
 			border-radius: 999px;
-			background: linear-gradient(90deg, var(--buttonGradateA), var(--buttonGradateB));
+			background: linear-gradient(90deg, var(--MI_THEME-buttonGradateA), var(--MI_THEME-buttonGradateB));
+		}
+
+		&:focus-visible {
+			outline: none;
+
+			&::before {
+				outline: 2px solid var(--MI_THEME-fgOnAccent);
+				outline-offset: -4px;
+			}
 		}
 
 		&:hover, &.active {
-			&:before {
-				background: var(--accentLighten);
+			&::before {
+				background: var(--MI_THEME-accentLighten);
 			}
 		}
 	}
@@ -241,6 +261,14 @@ function more(ev: MouseEvent) {
 		text-align: left;
 		box-sizing: border-box;
 		overflow: clip;
+
+		&:focus-visible {
+			outline: none;
+
+			> .avatar {
+				box-shadow: 0 0 0 4px var(--MI_THEME-focus);
+			}
+		}
 	}
 
 	.avatar {
@@ -264,7 +292,7 @@ function more(ev: MouseEvent) {
 
 	.divider {
 		margin: 16px 16px;
-		border-top: solid 0.5px var(--divider);
+		border-top: solid 0.5px var(--MI_THEME-divider);
 	}
 
 	.item {
@@ -278,21 +306,30 @@ function more(ev: MouseEvent) {
 		width: 100%;
 		text-align: left;
 		box-sizing: border-box;
-		color: var(--navFg);
+		color: var(--MI_THEME-navFg);
 
 		&:hover {
 			text-decoration: none;
-			color: var(--navHoverFg);
+			color: var(--MI_THEME-navHoverFg);
 		}
 
 		&.active {
-			color: var(--navActive);
+			color: var(--MI_THEME-navActive);
 		}
 
-		&:hover, &.active {
-			color: var(--accent);
+		&:focus-visible {
+			outline: none;
 
-			&:before {
+			&::before {
+				outline: 2px solid var(--MI_THEME-focus);
+				outline-offset: -2px;
+			}
+		}
+
+		&:hover, &.active, &:focus {
+			color: var(--MI_THEME-accent);
+
+			&::before {
 				content: "";
 				display: block;
 				width: calc(100% - 34px);
@@ -304,7 +341,7 @@ function more(ev: MouseEvent) {
 				right: 0;
 				bottom: 0;
 				border-radius: 999px;
-				background: var(--accentedBg);
+				background: var(--MI_THEME-accentedBg);
 			}
 		}
 	}
@@ -319,9 +356,8 @@ function more(ev: MouseEvent) {
 		position: absolute;
 		top: 0;
 		left: 20px;
-		color: var(--navIndicator);
+		color: var(--MI_THEME-navIndicator);
 		font-size: 8px;
-		animation: global-blink 1s infinite;
 
 		&:has(.itemIndicateValueIcon) {
 			animation: none;
@@ -350,15 +386,24 @@ function more(ev: MouseEvent) {
 		top: 0;
 		z-index: 1;
 		padding: 20px 0;
-		background: var(--X14);
-		-webkit-backdrop-filter: var(--blur, blur(8px));
-		backdrop-filter: var(--blur, blur(8px));
+		background: var(--nav-bg-transparent);
+		-webkit-backdrop-filter: var(--MI-blur, blur(8px));
+		backdrop-filter: var(--MI-blur, blur(8px));
 	}
 
 	.instance {
 		display: block;
 		text-align: center;
 		width: 100%;
+
+		&:focus-visible {
+			outline: none;
+
+			> .instanceIcon {
+				outline: 2px solid var(--MI_THEME-focus);
+				outline-offset: 2px;
+			}
+		}
 	}
 
 	.instanceIcon {
@@ -376,9 +421,9 @@ function more(ev: MouseEvent) {
 		position: sticky;
 		bottom: 0;
 		padding-top: 20px;
-		background: var(--X14);
-		-webkit-backdrop-filter: var(--blur, blur(8px));
-		backdrop-filter: var(--blur, blur(8px));
+		background: var(--nav-bg-transparent);
+		-webkit-backdrop-filter: var(--MI-blur, blur(8px));
+		backdrop-filter: var(--MI-blur, blur(8px));
 	}
 
 	.post {
@@ -388,7 +433,7 @@ function more(ev: MouseEvent) {
 		height: 52px;
 		text-align: center;
 
-		&:before {
+		&::before {
 			content: "";
 			display: block;
 			position: absolute;
@@ -400,19 +445,28 @@ function more(ev: MouseEvent) {
 			width: 52px;
 			aspect-ratio: 1/1;
 			border-radius: 100%;
-			background: linear-gradient(90deg, var(--buttonGradateA), var(--buttonGradateB));
+			background: linear-gradient(90deg, var(--MI_THEME-buttonGradateA), var(--MI_THEME-buttonGradateB));
+		}
+
+		&:focus-visible {
+			outline: none;
+
+			&::before {
+				outline: 2px solid var(--MI_THEME-fgOnAccent);
+				outline-offset: -4px;
+			}
 		}
 
 		&:hover, &.active {
-			&:before {
-				background: var(--accentLighten);
+			&::before {
+				background: var(--MI_THEME-accentLighten);
 			}
 		}
 	}
 
 	.postIcon {
 		position: relative;
-		color: var(--fgOnAccent);
+		color: var(--MI_THEME-fgOnAccent);
 	}
 
 	.postText {
@@ -425,6 +479,14 @@ function more(ev: MouseEvent) {
 		padding: 20px 0;
 		width: 100%;
 		overflow: clip;
+
+		&:focus-visible {
+			outline: none;
+
+			> .avatar {
+				box-shadow: 0 0 0 4px var(--MI_THEME-focus);
+			}
+		}
 	}
 
 	.avatar {
@@ -444,7 +506,7 @@ function more(ev: MouseEvent) {
 	.divider {
 		margin: 8px auto;
 		width: calc(100% - 32px);
-		border-top: solid 0.5px var(--divider);
+		border-top: solid 0.5px var(--MI_THEME-divider);
 	}
 
 	.item {
@@ -454,11 +516,20 @@ function more(ev: MouseEvent) {
 		width: 100%;
 		text-align: center;
 
-		&:hover, &.active {
-			text-decoration: none;
-			color: var(--accent);
+		&:focus-visible {
+			outline: none;
 
-			&:before {
+			&::before {
+				outline: 2px solid var(--MI_THEME-focus);
+				outline-offset: -2px;
+			}
+		}
+
+		&:hover, &.active, &:focus {
+			text-decoration: none;
+			color: var(--MI_THEME-accent);
+
+			&::before {
 				content: "";
 				display: block;
 				height: 100%;
@@ -470,7 +541,7 @@ function more(ev: MouseEvent) {
 				right: 0;
 				bottom: 0;
 				border-radius: 999px;
-				background: var(--accentedBg);
+				background: var(--MI_THEME-accentedBg);
 			}
 
 			> .icon,
@@ -494,9 +565,8 @@ function more(ev: MouseEvent) {
 		position: absolute;
 		top: 6px;
 		left: 24px;
-		color: var(--navIndicator);
+		color: var(--MI_THEME-navIndicator);
 		font-size: 8px;
-		animation: global-blink 1s infinite;
 
 		&:has(.itemIndicateValueIcon) {
 			animation: none;

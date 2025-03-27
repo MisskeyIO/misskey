@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div :class="$style.root">
-	<div v-if="media.isSensitive && hide" :class="$style.sensitive" @click="showHiddenContent">
+	<div v-if="media.isSensitive && hide" :class="$style.sensitive" @click="show">
 		<span style="font-size: 1.6em;"><i class="ti ti-alert-triangle"></i></span>
 		<b>{{ i18n.ts.sensitive }}</b>
 		<span>{{ i18n.ts.clickToShow }}</span>
@@ -24,24 +24,23 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { shallowRef, watch, ref } from 'vue';
+import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { i18n } from '@/i18n.js';
+import { defaultStore } from '@/store.js';
 import MkMediaAudio from '@/components/MkMediaAudio.vue';
 import { pleaseLogin } from '@/scripts/please-login.js';
 import { $i } from '@/account.js';
 
-const props = withDefaults(defineProps<{
+const props = defineProps<{
 	media: Misskey.entities.DriveFile;
 	user?: Misskey.entities.UserLite;
-}>(), {
-});
+}>();
 
-const audioEl = shallowRef<HTMLAudioElement>();
 const hide = ref(true);
 
-function showHiddenContent(ev: MouseEvent) {
-	if (props.media.isSensitive && !$i) {
+function show(ev: MouseEvent) {
+	if (props.media.isSensitive && !$i && defaultStore.state.confirmWhenRevealingSensitiveMedia) {
 		ev.preventDefault();
 		ev.stopPropagation();
 		pleaseLogin();
@@ -54,12 +53,6 @@ function showHiddenContent(ev: MouseEvent) {
 		hide.value = false;
 	}
 }
-
-watch(audioEl, () => {
-	if (audioEl.value) {
-		audioEl.value.volume = 0.3;
-	}
-});
 </script>
 
 <style lang="scss" module>
@@ -80,7 +73,6 @@ watch(audioEl, () => {
 }
 
 .download {
-	background: var(--noteAttachedFile);
 }
 
 .sensitive {

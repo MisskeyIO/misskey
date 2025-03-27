@@ -51,6 +51,9 @@ export class NoteReactionEntityService implements OnModuleInit {
 		options?: {
 			withNote: boolean;
 		},
+		hints?: {
+			packedUser?: Packed<'UserLite'>
+		},
 	): Promise<Packed<'NoteReaction'>> {
 		const opts = Object.assign({
 			withNote: false,
@@ -61,7 +64,7 @@ export class NoteReactionEntityService implements OnModuleInit {
 		return {
 			id: reaction.id,
 			createdAt: this.idService.parse(reaction.id).date.toISOString(),
-			user: await this.userEntityService.pack(reaction.user ?? reaction.userId, me),
+			user: hints?.packedUser ?? await this.userEntityService.pack(reaction.user ?? reaction.userId, me),
 			type: this.reactionService.convertLegacyReaction(reaction.reaction),
 			...(opts.withNote ? {
 				note: await this.noteEntityService.pack(reaction.note ?? reaction.noteId, me),

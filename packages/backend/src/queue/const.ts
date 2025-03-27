@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { RedisOptionsSource } from '@/config.js';
 import type * as Bull from 'bullmq';
 import type { RedisOptions } from 'ioredis';
-import type { RedisOptionsSource } from '@/config.js';
 
 export const QUEUE = {
 	DELIVER: 'deliver',
@@ -15,7 +15,8 @@ export const QUEUE = {
 	DB: 'db',
 	RELATIONSHIP: 'relationship',
 	OBJECT_STORAGE: 'objectStorage',
-	WEBHOOK_DELIVER: 'webhookDeliver',
+	USER_WEBHOOK_DELIVER: 'userWebhookDeliver',
+	SYSTEM_WEBHOOK_DELIVER: 'systemWebhookDeliver',
 };
 
 export function formatQueueName(config: RedisOptionsSource, queueName: typeof QUEUE[keyof typeof QUEUE]): string {

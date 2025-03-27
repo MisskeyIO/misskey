@@ -1,0 +1,61 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    volumes:
+      - ../:/workspace:cached
+      - node_modules:/workspace/node_modules
+
+    command: sleep infinity
+
+    networks:
+      - internal_network
+      - external_network
+
+  dragonfly:
+    restart: unless-stopped
+    image: docker.dragonflydb.io/dragonflydb/dragonfly
+    ulimits:
+      memlock: -1
+    environment:
+      DFLY_snapshot_cron: '* * * * *'
+      DFLY_version_check: false
+      DFLY_tcp_backlog: 2048
+      DFLY_default_lua_flags: allow-undeclared-keys
+      DFLY_pipeline_squash: 0
+      DFLY_multi_exec_squash: false
+      DFLY_conn_io_threads: 4
+      DFLY_epoll_file_threads: 4
+      DFLY_proactor_threads: 4
+    networks:
+      - internal_network
+    volumes:
+      - dragonfly-data:/data
+
+  db:
+    restart: unless-stopped
+    image: postgres:15-alpine
+    networks:
+      - internal_network
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: misskey
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"
+      interval: 5s
+      retries: 20
+
+volumes:
+  postgres-data:
+  dragonfly-data:
+  node_modules:
+
+networks:
+  internal_network:
+    internal: true
+  external_network:

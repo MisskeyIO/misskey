@@ -11,9 +11,9 @@ import { JSDOM } from 'jsdom';
 import { extractCustomEmojisFromMfm } from '@/misc/extract-custom-emojis-from-mfm.js';
 import { extractHashtags } from '@/misc/extract-hashtags.js';
 import * as Acct from '@/misc/acct.js';
-import type { UsersRepository, DriveFilesRepository, UserProfilesRepository, PagesRepository } from '@/models/_.js';
+import type { UsersRepository, DriveFilesRepository, MiMeta, UserProfilesRepository, PagesRepository } from '@/models/_.js';
 import type { MiLocalUser, MiUser } from '@/models/User.js';
-import { birthdaySchema, descriptionSchema, locationSchema, nameSchema } from '@/models/User.js';
+import { birthdaySchema, descriptionSchema, followedMessageSchema, locationSchema, nameSchema } from '@/models/User.js';
 import type { MiUserProfile } from '@/models/UserProfile.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
 import { langmap } from '@/misc/langmap.js';
@@ -22,9 +22,10 @@ import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
 import { UserFollowingService } from '@/core/UserFollowingService.js';
 import { AccountUpdateService } from '@/core/AccountUpdateService.js';
+import { UtilityService } from '@/core/UtilityService.js';
 import { HashtagService } from '@/core/HashtagService.js';
 import { DI } from '@/di-symbols.js';
-import { RoleService } from '@/core/RoleService.js';
+import { RolePolicies, RoleService } from '@/core/RoleService.js';
 import { CacheService } from '@/core/CacheService.js';
 import { RemoteUserResolveService } from '@/core/RemoteUserResolveService.js';
 import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
@@ -134,6 +135,13 @@ export const meta = {
 			code: 'RESTRICTED_BY_ROLE',
 			id: '8feff0ba-5ab5-585b-31f4-4df816663fad',
 		},
+
+		nameContainsProhibitedWords: {
+			message: 'Your new name contains prohibited words.',
+			code: 'YOUR_NAME_CONTAINS_PROHIBITED_WORDS',
+			id: '0b3f9f6a-2f4d-4b1f-9fb4-49d3a2fd7191',
+			httpStatusCode: 422,
+		},
 	},
 
 	res: {
@@ -148,6 +156,7 @@ export const paramDef = {
 	properties: {
 		name: { ...nameSchema, nullable: true },
 		description: { ...descriptionSchema, nullable: true },
+		followedMessage: { ...followedMessageSchema, nullable: true },
 		location: { ...locationSchema, nullable: true },
 		birthday: { ...birthdaySchema, nullable: true },
 		lang: { type: 'string', enum: [null, ...Object.keys(langmap)] as string[], nullable: true },
@@ -185,6 +194,9 @@ export const paramDef = {
 		autoAcceptFollowed: { type: 'boolean' },
 		noCrawle: { type: 'boolean' },
 		preventAiLearning: { type: 'boolean' },
+		requireSigninToViewContents: { type: 'boolean' },
+		makeNotesFollowersOnlyBefore: { type: 'integer', nullable: true },
+		makeNotesHiddenBefore: { type: 'integer', nullable: true },
 		isBot: { type: 'boolean' },
 		isCat: { type: 'boolean' },
 		injectFeaturedNote: { type: 'boolean' },
@@ -265,6 +277,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		@Inject(DI.config)
 		private config: Config,
 
+		@Inject(DI.meta)
+		private instanceMeta: MiMeta,
+
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
 
@@ -290,6 +305,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private cacheService: CacheService,
 		private httpRequestService: HttpRequestService,
 		private avatarDecorationService: AvatarDecorationService,
+		private utilityService: UtilityService,
 	) {
 		super(meta, paramDef, async (ps, _user, token) => {
 			const user = await this.usersRepository.findOneByOrFail({ id: _user.id }) as MiLocalUser;
@@ -300,9 +316,18 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const policy = await this.roleService.getUserPolicies(user.id);
 
 			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
+			let policies: RolePolicies | null = null;
 
-			if (ps.name !== undefined) updates.name = ps.name;
+			if (ps.name !== undefined) {
+				if (ps.name === null) {
+					updates.name = null;
+				} else {
+					const trimmedName = ps.name.trim();
+					updates.name = trimmedName === '' ? null : trimmedName;
+				}
+			}
 			if (ps.description !== undefined) profileUpdates.description = ps.description;
+			if (ps.followedMessage !== undefined) profileUpdates.followedMessage = ps.followedMessage;
 			if (ps.lang !== undefined) profileUpdates.lang = ps.lang;
 			if (ps.location !== undefined) profileUpdates.location = ps.location;
 			if (ps.birthday !== undefined) profileUpdates.birthday = ps.birthday;
@@ -340,6 +365,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (typeof ps.autoAcceptFollowed === 'boolean') profileUpdates.autoAcceptFollowed = ps.autoAcceptFollowed;
 			if (typeof ps.noCrawle === 'boolean') profileUpdates.noCrawle = ps.noCrawle;
 			if (typeof ps.preventAiLearning === 'boolean') profileUpdates.preventAiLearning = ps.preventAiLearning;
+			if (typeof ps.requireSigninToViewContents === 'boolean') updates.requireSigninToViewContents = ps.requireSigninToViewContents;
+			if ((typeof ps.makeNotesFollowersOnlyBefore === 'number') || (ps.makeNotesFollowersOnlyBefore === null)) updates.makeNotesFollowersOnlyBefore = ps.makeNotesFollowersOnlyBefore;
+			if ((typeof ps.makeNotesHiddenBefore === 'number') || (ps.makeNotesHiddenBefore === null)) updates.makeNotesHiddenBefore = ps.makeNotesHiddenBefore;
 			if (typeof ps.isCat === 'boolean') updates.isCat = ps.isCat;
 			if (typeof ps.injectFeaturedNote === 'boolean') profileUpdates.injectFeaturedNote = ps.injectFeaturedNote;
 			if (typeof ps.receiveAnnouncementEmail === 'boolean') profileUpdates.receiveAnnouncementEmail = ps.receiveAnnouncementEmail;
@@ -373,7 +401,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 						const file = await this.driveFilesRepository.findOneBy({ id: mutualLink.fileId });
 						if (!file) throw new ApiError(meta.errors.noSuchFile);
-						if (!file.type.startsWith("image/")) throw new ApiError(meta.errors.fileNotAnImage);
+						if (!file.type.startsWith('image/')) throw new ApiError(meta.errors.fileNotAnImage);
 
 						return {
 							id: this.idService.gen(),
@@ -410,6 +438,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			}
 
 			if (ps.avatarDecorations) {
+				policies ??= await this.roleService.getUserPolicies(user.id);
 				const decorations = await this.avatarDecorationService.getAll(true);
 				const myRoles = await this.roleService.getUserRoles(user.id);
 				const allRoles = await this.roleService.getRoles();
@@ -488,6 +517,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const newFields = profileUpdates.fields === undefined ? profile.fields : profileUpdates.fields;
 
 			if (newName != null) {
+				let hasProhibitedWords = false;
+				if (!await this.roleService.isModerator(user)) {
+					hasProhibitedWords = this.utilityService.isKeyWordIncluded(newName, this.instanceMeta.prohibitedWordsForNameOfUser);
+				}
+				if (hasProhibitedWords) {
+					throw new ApiError(meta.errors.nameContainsProhibitedWords);
+				}
+
 				const tokens = mfm.parseSimple(newName);
 				emojis = emojis.concat(extractCustomEmojisFromMfm(tokens));
 			}

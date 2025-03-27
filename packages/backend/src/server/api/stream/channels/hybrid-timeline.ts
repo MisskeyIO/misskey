@@ -10,6 +10,7 @@ import { MetaService } from '@/core/MetaService.js';
 import { RoleService } from '@/core/RoleService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
+import type { JsonObject } from '@/misc/json-value.js';
 import Channel, { type MiChannelService } from '../channel.js';
 
 class HybridTimelineChannel extends Channel {
@@ -35,13 +36,13 @@ class HybridTimelineChannel extends Channel {
 	}
 
 	@bindThis
-	public async init(params: any): Promise<void> {
+	public async init(params: JsonObject): Promise<void> {
 		const policies = await this.roleService.getUserPolicies(this.user ? this.user.id : null);
 		if (!policies.ltlAvailable) return;
 
-		this.withRenotes = params.withRenotes ?? true;
-		this.withReplies = params.withReplies ?? false;
-		this.withFiles = params.withFiles ?? false;
+		this.withRenotes = !!(params.withRenotes ?? true);
+		this.withReplies = !!(params.withReplies ?? false);
+		this.withFiles = !!(params.withFiles ?? false);
 		this.minimize = params.minimize ?? false;
 
 		// Subscribe events
@@ -77,7 +78,7 @@ class HybridTimelineChannel extends Channel {
 			const reply = note.reply;
 			if ((this.following[note.userId]?.withReplies ?? false) || this.withReplies) {
 				// 自分のフォローしていないユーザーの visibility: followers な投稿への返信は弾く
-				if (reply.visibility === 'followers' && !Object.hasOwn(this.following, reply.userId)) return;
+				if (reply.visibility === 'followers' && !Object.hasOwn(this.following, reply.userId) && reply.userId !== this.user!.id) return;
 				// 自分の見ることができないユーザーの visibility: specified な投稿への返信は弾く
 				if (reply.visibility === 'specified' && !reply.visibleUserIds!.includes(this.user!.id)) return;
 			} else {

@@ -1,4 +1,4 @@
-import { url as local } from '@/config.js';
+import { url as local } from '@@/js/config.js';
 import { defaultStore } from '@/store.js';
 import { instance } from '@/instance.js';
 import { i18n } from '@/i18n.js';

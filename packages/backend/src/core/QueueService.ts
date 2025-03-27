@@ -10,13 +10,31 @@ import type { MiDriveFile } from '@/models/DriveFile.js';
 import type { MiScheduledNote } from '@/models/ScheduledNote.js';
 import type { MiAbuseUserReport } from '@/models/AbuseUserReport.js';
 import type { MiWebhook, webhookEventTypes } from '@/models/Webhook.js';
+import type { MiSystemWebhook, SystemWebhookEventType } from '@/models/SystemWebhook.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import type { Antenna } from '@/server/api/endpoints/i/import-antennas.js';
 import { ApRequestCreator } from '@/core/activitypub/ApRequestService.js';
-import type { DbQueue, DeliverQueue, EndedPollNotificationQueue, InboxQueue, ObjectStorageQueue, RelationshipQueue, SystemQueue, WebhookDeliverQueue } from './QueueModule.js';
-import type { DbJobData, DeliverJobData, RelationshipJobData, ThinUser } from '../queue/types.js';
+import type {
+	DbJobData,
+	DeliverJobData,
+	RelationshipJobData,
+	SystemWebhookDeliverJobData,
+	ThinUser,
+	UserWebhookDeliverJobData,
+} from '../queue/types.js';
+import type {
+	DbQueue,
+	DeliverQueue,
+	EndedPollNotificationQueue,
+	InboxQueue,
+	ObjectStorageQueue,
+	RelationshipQueue,
+	SystemQueue,
+	UserWebhookDeliverQueue,
+	SystemWebhookDeliverQueue,
+} from './QueueModule.js';
 import type httpSignature from '@peertube/http-signature';
 import type * as Bull from 'bullmq';
 
@@ -33,7 +51,8 @@ export class QueueService {
 		@Inject('queue:db') public dbQueue: DbQueue,
 		@Inject('queue:relationship') public relationshipQueue: RelationshipQueue,
 		@Inject('queue:objectStorage') public objectStorageQueue: ObjectStorageQueue,
-		@Inject('queue:webhookDeliver') public webhookDeliverQueue: WebhookDeliverQueue,
+		@Inject('queue:userWebhookDeliver') public userWebhookDeliverQueue: UserWebhookDeliverQueue,
+		@Inject('queue:systemWebhookDeliver') public systemWebhookDeliverQueue: SystemWebhookDeliverQueue,
 	) {
 		this.ensureRepeatJobs();
 	}
@@ -79,6 +98,19 @@ export class QueueService {
 		this.systemQueue.add('checkMissingScheduledNote', {
 		}, {
 			repeat: { pattern: '*/5 * * * *' },
+			removeOnComplete: true,
+		});
+
+		this.systemQueue.add('bakeBufferedReactions', {
+		}, {
+			repeat: { pattern: '0 0 * * *' },
+			removeOnComplete: true,
+		});
+
+		this.systemQueue.add('checkModeratorsActivity', {
+		}, {
+			// 毎時30分に起動
+			repeat: { pattern: '30 * * * *' },
 			removeOnComplete: true,
 		});
 	}
@@ -477,9 +509,18 @@ export class QueueService {
 		});
 	}
 
+	/**
+	 * @see UserWebhookDeliverJobData
+	 * @see UserWebhookDeliverProcessorService
+	 */
 	@bindThis
-	public webhookDeliver(webhook: MiWebhook, type: typeof webhookEventTypes[number], content: unknown) {
-		const data = {
+	public userWebhookDeliver(
+		webhook: MiWebhook,
+		type: typeof webhookEventTypes[number],
+		content: unknown,
+		opts?: { attempts?: number },
+	) {
+		const data: UserWebhookDeliverJobData = {
 			type,
 			content,
 			webhookId: webhook.id,
@@ -490,8 +531,39 @@ export class QueueService {
 			eventId: randomUUID(),
 		};
 
-		return this.webhookDeliverQueue.add(webhook.id, data, {
-			attempts: 4,
+		return this.userWebhookDeliverQueue.add(webhook.id, data, {
+			attempts: opts?.attempts ?? 4,
+			backoff: {
+				type: 'custom',
+			},
+			removeOnComplete: true,
+			removeOnFail: true,
+		});
+	}
+
+	/**
+	 * @see SystemWebhookDeliverJobData
+	 * @see SystemWebhookDeliverProcessorService
+	 */
+	@bindThis
+	public systemWebhookDeliver(
+		webhook: MiSystemWebhook,
+		type: SystemWebhookEventType,
+		content: unknown,
+		opts?: { attempts?: number },
+	) {
+		const data: SystemWebhookDeliverJobData = {
+			type,
+			content,
+			webhookId: webhook.id,
+			to: webhook.url,
+			secret: webhook.secret,
+			createdAt: Date.now(),
+			eventId: randomUUID(),
+		};
+
+		return this.systemWebhookDeliverQueue.add(webhook.id, data, {
+			attempts: opts?.attempts ?? 4,
 			backoff: {
 				type: 'custom',
 			},

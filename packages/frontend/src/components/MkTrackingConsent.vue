@@ -1,50 +1,50 @@
 <template>
-	<div class="_panel _shadow" :class="$style.root">
-		<div :class="$style.main">
-			<div style="display: flex; align-items: center;">
-				<div :class="$style.headerIcon">
-					<i class="ti ti-report-analytics"></i>
-				</div>
-				<div :class="$style.headerTitle"><Mfm :text="i18n.ts.helpUsImproveUserExperience" /></div>
+<div class="_panel _shadow" :class="$style.root">
+	<div :class="$style.main">
+		<div style="display: flex; align-items: center;">
+			<div :class="$style.headerIcon">
+				<i class="ti ti-report-analytics"></i>
 			</div>
-			<div :class="$style.text">
-				<Mfm
-					:text="i18n.tsx.pleaseConsentToTracking({
-						host: instance.name ?? host,
-						privacyPolicyUrl: instance.privacyPolicyUrl,
-					})"
-				/>
+			<div :class="$style.headerTitle"><Mfm :text="i18n.ts.helpUsImproveUserExperience"/></div>
+		</div>
+		<div :class="$style.text">
+			<Mfm
+				:text="i18n.tsx.pleaseConsentToTracking({
+					host: instance.name ?? host,
+					privacyPolicyUrl: instance.privacyPolicyUrl,
+				})"
+			/>
+		</div>
+		<div class="_gaps_s">
+			<div class="_buttons" style="justify-content: right;">
+				<MkButton @click="consentEssential">{{ i18n.ts.consentEssential }}</MkButton>
+				<MkButton primary @click="consentAll">{{ i18n.ts.consentAll }}</MkButton>
 			</div>
-			<div class="_gaps_s">
-				<div class="_buttons" style="justify-content: right;">
-					<MkButton @click="consentEssential">{{ i18n.ts.consentEssential }}</MkButton>
-					<MkButton primary @click="consentAll">{{ i18n.ts.consentAll }}</MkButton>
-				</div>
-				<MkFolder>
-					<template #icon><i class="ti ti-lock-square"></i></template>
-					<template #label>{{ i18n.ts.gtagConsentCustomize }}</template>
-					<div class="_gaps_s">
-						<MkInfo>{{ i18n.tsx.gtagConsentCustomizeDescription({ host: instance.name ?? host }) }}</MkInfo>
-						<MkSwitch v-model="gtagConsentAnalytics">
-							{{ i18n.ts.gtagConsentAnalytics }}
-							<template #caption>{{ i18n.ts.gtagConsentAnalyticsDescription }}</template>
-						</MkSwitch>
-						<MkSwitch v-model="gtagConsentFunctionality">
-							{{ i18n.ts.gtagConsentFunctionality }}
-							<template #caption>{{ i18n.ts.gtagConsentFunctionalityDescription }}</template>
-						</MkSwitch>
-						<MkSwitch v-model="gtagConsentPersonalization">
-							{{ i18n.ts.gtagConsentPersonalization }}
-							<template #caption>{{ i18n.ts.gtagConsentPersonalizationDescription }}</template>
-						</MkSwitch>
-						<div class="_buttons" style="justify-content: right;">
-							<MkButton @click="consentSelected">{{ i18n.ts.consentSelected }}</MkButton>
-						</div>
+			<MkFolder>
+				<template #icon><i class="ti ti-lock-square"></i></template>
+				<template #label>{{ i18n.ts.gtagConsentCustomize }}</template>
+				<div class="_gaps_s">
+					<MkInfo>{{ i18n.tsx.gtagConsentCustomizeDescription({ host: instance.name ?? host }) }}</MkInfo>
+					<MkSwitch v-model="gtagConsentAnalytics">
+						{{ i18n.ts.gtagConsentAnalytics }}
+						<template #caption>{{ i18n.ts.gtagConsentAnalyticsDescription }}</template>
+					</MkSwitch>
+					<MkSwitch v-model="gtagConsentFunctionality">
+						{{ i18n.ts.gtagConsentFunctionality }}
+						<template #caption>{{ i18n.ts.gtagConsentFunctionalityDescription }}</template>
+					</MkSwitch>
+					<MkSwitch v-model="gtagConsentPersonalization">
+						{{ i18n.ts.gtagConsentPersonalization }}
+						<template #caption>{{ i18n.ts.gtagConsentPersonalizationDescription }}</template>
+					</MkSwitch>
+					<div class="_buttons" style="justify-content: right;">
+						<MkButton @click="consentSelected">{{ i18n.ts.consentSelected }}</MkButton>
 					</div>
-				</MkFolder>
-			</div>
+				</div>
+			</MkFolder>
 		</div>
 	</div>
+</div>
 </template>
 
 <script lang="ts" setup>
@@ -55,7 +55,7 @@ import MkSwitch from '@/components/MkSwitch.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import { miLocalStorage } from '@/local-storage.js';
 import { instance } from '@/instance.js';
-import { host } from '@/config.js';
+import { host } from '@@/js/config.js';
 import { i18n } from '@/i18n.js';
 import { $i } from '@/account.js';
 import * as os from '@/os.js';

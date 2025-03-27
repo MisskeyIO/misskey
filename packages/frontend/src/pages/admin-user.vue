@@ -25,7 +25,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</div>
 				</div>
 
-				<MkInfo v-if="user.username.includes('.')">{{ i18n.ts.isSystemAccount }}</MkInfo>
+				<MkInfo v-if="['instance.actor', 'relay.actor'].includes(user.username)">{{ i18n.ts.isSystemAccount }}</MkInfo>
 
 				<FormLink v-if="user.host" :to="`/instance-info/${user.host}`">{{ i18n.ts.instanceInfo }}</FormLink>
 
@@ -54,6 +54,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 				<MkTextarea v-model="moderationNote" manualSave>
 					<template #label>{{ i18n.ts.moderationNote }}</template>
+					<template #caption>{{ i18n.ts.moderationNoteDescription }}</template>
 				</MkTextarea>
 
 				<FormSection>
@@ -143,15 +144,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div v-else-if="tab === 'announcements'" class="_gaps">
 				<MkButton primary rounded @click="createAnnouncement"><i class="ti ti-plus"></i> {{ i18n.ts.new }}</MkButton>
 
+				<MkSelect v-model="announcementsStatus">
+					<template #label>{{ i18n.ts.filter }}</template>
+					<option value="active">{{ i18n.ts.active }}</option>
+					<option value="archived">{{ i18n.ts.archived }}</option>
+				</MkSelect>
+
 				<MkPagination ref="announcementsPaginationEl" :pagination="announcementsPagination">
 					<template #default="{ items }">
 						<div class="_gaps_s">
 							<div v-for="announcement in items" :key="announcement.id" v-panel :class="$style.announcementItem" @click="editAnnouncement(announcement)">
 								<span style="margin-right: 0.5em;">
 									<i v-if="announcement.icon === 'info'" class="ti ti-info-circle"></i>
-									<i v-else-if="announcement.icon === 'warning'" class="ti ti-alert-triangle" style="color: var(--warn);"></i>
-									<i v-else-if="announcement.icon === 'error'" class="ti ti-circle-x" style="color: var(--error);"></i>
-									<i v-else-if="announcement.icon === 'success'" class="ti ti-check" style="color: var(--success);"></i>
+									<i v-else-if="announcement.icon === 'warning'" class="ti ti-alert-triangle" style="color: var(--MI_THEME-warn);"></i>
+									<i v-else-if="announcement.icon === 'error'" class="ti ti-circle-x" style="color: var(--MI_THEME-error);"></i>
+									<i v-else-if="announcement.icon === 'success'" class="ti ti-check" style="color: var(--MI_THEME-success);"></i>
 								</span>
 								<span>{{ announcement.title }}</span>
 								<span v-if="announcement.reads > 0" style="margin-left: auto; opacity: 0.7;">{{ i18n.ts.messageRead }} <span v-if="announcement.lastReadAt">(<MkTime :time="announcement.lastReadAt" mode="absolute"/>)</span></span>
@@ -227,6 +234,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, watch, ref } from 'vue';
 import * as Misskey from 'misskey-js';
+import { url } from '@@/js/config.js';
 import MkChart from '@/components/MkChart.vue';
 import MkObjectView from '@/components/MkObjectView.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
@@ -242,7 +250,6 @@ import MkFileListForAdmin from '@/components/MkFileListForAdmin.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/scripts/misskey-api.js';
-import { url } from '@/config.js';
 import { acct } from '@/filters/user.js';
 import { definePageMetadata } from '@/scripts/page-metadata.js';
 import { i18n } from '@/i18n.js';
@@ -279,12 +286,16 @@ const filesPagination = {
 	})),
 };
 const announcementsPaginationEl = ref<InstanceType<typeof MkPagination>>();
+
+const announcementsStatus = ref<'active' | 'archived'>('active');
+
 const announcementsPagination = {
 	endpoint: 'admin/announcements/list' as const,
 	offsetMode: true,
 	limit: 10,
 	params: computed(() => ({
 		userId: props.userId,
+		status: announcementsStatus.value,
 	})),
 };
 const expandedRoles = ref([]);
@@ -537,24 +548,20 @@ function toggleRoleItem(role) {
 }
 
 function createAnnouncement(): void {
-	os.popup(defineAsyncComponent(() => import('@/components/MkUserAnnouncementEditDialog.vue')), {
+	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkUserAnnouncementEditDialog.vue')), {
 		user: user.value,
 	}, {
-		done: async () => {
-			announcementsPaginationEl.value?.reload();
-		},
-	}, 'closed');
+		closed: () => dispose(),
+	});
 }
 
 function editAnnouncement(announcement): void {
-	os.popup(defineAsyncComponent(() => import('@/components/MkUserAnnouncementEditDialog.vue')), {
+	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkUserAnnouncementEditDialog.vue')), {
 		user: user.value,
 		announcement,
 	}, {
-		done: async () => {
-			announcementsPaginationEl.value?.reload();
-		},
-	}, 'closed');
+		closed: () => dispose(),
+	});
 }
 
 watch(() => props.userId, () => {
@@ -667,13 +674,23 @@ definePageMetadata(() => ({
 			}
 
 			> .admin {
-				color: var(--success);
-				border-color: var(--success);
+				color: var(--MI_THEME-success);
+				border-color: var(--MI_THEME-success);
+			}
+
+			> .suspended {
+				color: var(--MI_THEME-error);
+				border-color: var(--MI_THEME-error);
+			}
+
+			> .silenced {
+				color: var(--MI_THEME-warn);
+				border-color: var(--MI_THEME-warn);
 			}
 
 			> .moderator {
-				color: var(--success);
-				border-color: var(--success);
+				color: var(--MI_THEME-success);
+				border-color: var(--MI_THEME-success);
 			}
 
 			> .silenced {
@@ -741,7 +758,7 @@ definePageMetadata(() => ({
 .roleItemSub {
 	padding: 6px 12px;
 	font-size: 85%;
-	color: var(--fgTransparentWeak);
+	color: var(--MI_THEME-fgTransparentWeak);
 }
 
 .roleUnassign {

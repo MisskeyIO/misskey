@@ -11,7 +11,7 @@ import { QueueService } from '@/core/QueueService.js';
 import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
 import { DI } from '@/di-symbols.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
-import { WebhookService } from '@/core/WebhookService.js';
+import { UserWebhookService } from '@/core/UserWebhookService.js';
 import { RoleService } from '@/core/RoleService.js';
 
 export const meta = {
@@ -46,7 +46,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private instanceActorService: InstanceActorService,
 		private apRendererService: ApRendererService,
 		private moderationLogService: ModerationLogService,
-		private webhookService: WebhookService,
+		private userWebhookService: UserWebhookService,
 		private roleService: RoleService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
@@ -69,10 +69,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				forwarded: ps.forward && report.targetUserHost != null,
 			}).then(() => this.abuseUserReportsRepository.findOneBy({ id: ps.reportId }));
 
-			const webhooks = (await this.webhookService.getActiveWebhooks()).filter(x => x.on.includes('reportResolved'));
+			const webhooks = (await this.userWebhookService.getActiveWebhooks()).filter(x => x.on.includes('reportResolved'));
 			for (const webhook of webhooks) {
 				if (await this.roleService.isAdministrator({ id: webhook.userId, isRoot: false })) {
-					this.queueService.webhookDeliver(webhook, 'reportResolved', {
+					this.queueService.userWebhookDeliver(webhook, 'reportResolved', {
 						updatedReport,
 					});
 				}

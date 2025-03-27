@@ -6,12 +6,14 @@
 export const DI = {
 	config: Symbol('config'),
 	db: Symbol('db'),
+	meta: Symbol('meta'),
 	meilisearch: Symbol('meilisearch'),
 	elasticsearch: Symbol('elasticsearch'),
 	redis: Symbol('redis'),
 	redisForPub: Symbol('redisForPub'),
 	redisForSub: Symbol('redisForSub'),
 	redisForTimelines: Symbol('redisForTimelines'),
+	redisForReactions: Symbol('redisForReactions'),
 
 	//#region Repositories
 	usersRepository: Symbol('usersRepository'),
@@ -54,6 +56,7 @@ export const DI = {
 	hashtagsRepository: Symbol('hashtagsRepository'),
 	indieAuthClientsRepository: Symbol('indieAuthClientsRepository'),
 	abuseUserReportsRepository: Symbol('abuseUserReportsRepository'),
+	abuseReportNotificationRecipientRepository: Symbol('abuseReportNotificationRecipientRepository'),
 	registrationTicketsRepository: Symbol('registrationTicketsRepository'),
 	authSessionsRepository: Symbol('authSessionsRepository'),
 	accessTokensRepository: Symbol('accessTokensRepository'),
@@ -76,6 +79,7 @@ export const DI = {
 	channelFavoritesRepository: Symbol('channelFavoritesRepository'),
 	registryItemsRepository: Symbol('registryItemsRepository'),
 	webhooksRepository: Symbol('webhooksRepository'),
+	systemWebhooksRepository: Symbol('systemWebhooksRepository'),
 	adsRepository: Symbol('adsRepository'),
 	passwordResetRequestsRepository: Symbol('passwordResetRequestsRepository'),
 	retentionAggregationsRepository: Symbol('retentionAggregationsRepository'),

@@ -6,8 +6,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <div :class="$style.wrapper" data-cy-signin-page-password>
 	<div class="_gaps" :class="$style.root">
-		<div :class="$style.avatar" :style="{ backgroundImage: user ? `url('${user.avatarUrl}')` : undefined }"></div>
-		<div :class="$style.welcomeBackMessage">
+		<div v-if="user" :class="$style.avatar" :style="{ backgroundImage: user ? `url('${user.avatarUrl}')` : undefined }"></div>
+		<div v-if="user" :class="$style.welcomeBackMessage">
 			<I18n :src="i18n.ts.welcomeBackWithName" tag="span">
 				<template #name><Mfm :text="user.name ?? user.username" :plain="true"/></template>
 			</I18n>
@@ -16,7 +16,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<!-- password入力 -->
 		<form class="_gaps_s" @submit.prevent="onSubmit">
 			<!-- ブラウザ オートコンプリート用 -->
-			<input type="hidden" name="username" autocomplete="username" :value="user.username">
+			<input type="hidden" name="username" autocomplete="username" :value="user?.username ?? username"/>
 
 			<MkInput v-model="password" :placeholder="i18n.ts.password" type="password" autocomplete="current-password webauthn" :withPasswordToggle="true" required autofocus data-cy-signin-password>
 				<template #prefix><i class="ti ti-lock"></i></template>
@@ -62,8 +62,9 @@ import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
 import MkCaptcha from '@/components/MkCaptcha.vue';
 
-const props = defineProps<{
-	user: Misskey.entities.UserDetailed;
+ defineProps<{
+	user?: Misskey.entities.UserDetailed;
+	username?: string;
 	needCaptcha: boolean;
 }>();
 

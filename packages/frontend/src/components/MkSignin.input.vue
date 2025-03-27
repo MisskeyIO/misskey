@@ -6,7 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <div :class="$style.wrapper" data-cy-signin-page-input>
 	<div :class="$style.root">
-		<div :class="$style.avatar">
+		<div v-if="!loginWithEmailAddress" :class="$style.avatar">
 			<i class="ti ti-user"></i>
 		</div>
 
@@ -32,20 +32,28 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 		<!-- username入力 -->
 		<form class="_gaps_s" @submit.prevent="emit('usernameSubmitted', username)">
-			<MkInput v-model="username" :placeholder="i18n.ts.username" type="text" pattern="^[a-zA-Z0-9_]+$" :spellcheck="false" autocomplete="username webauthn" autofocus required data-cy-signin-username>
-				<template #prefix>@</template>
-				<template #suffix>@{{ host }}</template>
+			<MkInput v-model="username" :placeholder="loginWithEmailAddress ? i18n.ts.emailAddress : i18n.ts.username" type="text" :pattern="loginWithEmailAddress ? '^[a-zA-Z0-9_@.]+$' : '^[a-zA-Z0-9_]+$'" :spellcheck="false" :autocomplete="loginWithEmailAddress ? 'email webauthn' : 'username webauthn'" autofocus data-cy-signin-username>
+				<template #prefix>
+					<i v-if="loginWithEmailAddress" class="ti ti-mail"></i>
+					<span v-else>@</span>
+				</template>
+				<template v-if="!loginWithEmailAddress" #suffix>@{{ host }}</template>
 			</MkInput>
 			<MkButton type="submit" large primary rounded style="margin: 0 auto;" data-cy-signin-page-input-continue>{{ i18n.ts.continue }} <i class="ti ti-arrow-right"></i></MkButton>
 		</form>
 
-		<!-- パスワードレスログイン -->
 		<div :class="$style.orHr">
 			<p :class="$style.orMsg">{{ i18n.ts.or }}</p>
 		</div>
-		<div>
+		<div class="_gaps">
+			<!-- パスワードレスログイン -->
 			<MkButton type="submit" style="margin: auto auto;" large rounded primary gradate @click="emit('passkeyClick', $event)">
-				<i class="ti ti-device-usb" style="font-size: medium;"></i>{{ i18n.ts.signinWithPasskey }}
+				<i class="ti ti-device-usb" style="font-size: medium;"></i>{{ i18n.tsx.signinWith({x: i18n.ts.securityKeyAndPasskey}) }}
+			</MkButton>
+
+			<!-- メールアドレスログイン -->
+			<MkButton type="submit" style="margin: auto auto;" large rounded primary gradate @click="loginWithEmailAddress = !loginWithEmailAddress">
+				<i :class="!loginWithEmailAddress ? 'ti ti-mail' : 'ti ti-user'" style="font-size: medium;"></i>{{ !loginWithEmailAddress ? i18n.tsx.signinWith({x: i18n.ts.emailAddress}) : i18n.tsx.signinWith({x: i18n.ts.username}) }}
 			</MkButton>
 		</div>
 	</div>
@@ -66,7 +74,7 @@ import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
 import MkInfo from '@/components/MkInfo.vue';
 
-const props = withDefaults(defineProps<{
+ withDefaults(defineProps<{
 	message?: string,
 	openOnRemote?: OpenOnRemoteOptions,
 }>(), {
@@ -82,6 +90,8 @@ const emit = defineEmits<{
 const host = toUnicode(configHost);
 
 const username = ref('');
+
+const loginWithEmailAddress = ref(false);
 
 //#region Open on remote
 function openRemote(options: OpenOnRemoteOptions, targetHost?: string): void {

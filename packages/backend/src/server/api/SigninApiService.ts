@@ -118,12 +118,6 @@ export class SigninApiService {
 			return;
 		}
 
-		if (typeof password !== 'string') {
-			logger.warn('Invalid parameter: password is not a string.');
-			reply.code(400);
-			return;
-		}
-
 		if (token != null && typeof token !== 'string') {
 			logger.warn('Invalid parameter: token is not a string.');
 			reply.code(400);

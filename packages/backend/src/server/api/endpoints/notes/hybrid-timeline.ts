@@ -42,12 +42,6 @@ export const meta = {
 			code: 'STL_DISABLED',
 			id: '620763f4-f621-4533-ab33-0577a1a3c342',
 		},
-
-		bothWithRepliesAndWithFiles: {
-			message: 'Specifying both withReplies and withFiles is not supported',
-			code: 'BOTH_WITH_REPLIES_AND_WITH_FILES',
-			id: 'dfaa3eb7-8002-4cb7-bcc4-1095df46656f'
-		},
 	},
 } as const;
 
@@ -99,8 +93,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (!policies.ltlAvailable) {
 				throw new ApiError(meta.errors.stlDisabled);
 			}
-
-			if (ps.withReplies && ps.withFiles) throw new ApiError(meta.errors.bothWithRepliesAndWithFiles);
 
 			if (!this.serverSettings.enableFanoutTimeline) {
 				const timeline = await this.getFromDb({

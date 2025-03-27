@@ -47,13 +47,13 @@ export class RenoteMutingEntityService {
 
 	@bindThis
 	public async packMany(
-		mutings: (MiRenoteMuting['id'] | MiRenoteMuting)[],
+		mutings: MiRenoteMuting[],
 		me: { id: MiUser['id'] },
 	) {
 		const _users = mutings.map(({ mutee, muteeId }) => mutee ?? muteeId);
 		const _userMap = await this.userEntityService.packMany(_users, me, { schema: 'UserDetailedNotMe' })
 			.then(users => new Map(users.map(u => [u.id, u])));
-		return (await Promise.allSettled(mutings.map(u => this.pack(u, me, { packedMutee: _userMap.get(muting.muteeId) }))))
+		return (await Promise.allSettled(mutings.map(muting => this.pack(muting, me, { packedMutee: _userMap.get(muting.muteeId) }))))
 			.filter(result => result.status === 'fulfilled')
 			.map(result => (result as PromiseFulfilledResult<Packed<'RenoteMuting'>>).value);
 	}

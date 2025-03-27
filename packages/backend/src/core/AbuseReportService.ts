@@ -64,6 +64,7 @@ export class AbuseReportService {
 		const reports = Array.of<MiAbuseUserReport>();
 		for (const entity of entities) {
 			const report = await this.abuseUserReportsRepository.insertOne(entity);
+			await this.queueService.createReportAbuseJob(report);
 			reports.push(report);
 		}
 

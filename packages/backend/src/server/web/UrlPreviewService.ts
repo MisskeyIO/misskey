@@ -98,7 +98,7 @@ export class UrlPreviewService {
 			summary.icon = this.wrap(summary.icon);
 			summary.thumbnail = this.wrap(summary.thumbnail);
 
-			const includeDenyList = meta.urlPreviewDenyList.some(filter => {
+			const includeDenyList = this.meta.urlPreviewDenyList.some(filter => {
 				// represents RegExp
 				const regexp = /^\/(.+)\/(.*)$/.exec(filter);
 				// This should never happen due to input sanitisation.

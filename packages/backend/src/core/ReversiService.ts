@@ -298,7 +298,7 @@ export class ReversiService implements OnModuleInit {
 		}, { relations: ['user1', 'user2'] });
 		this.cacheGame(game);
 
-		const packed = await this.reversiGameEntityService.packDetail(game, null);
+		const packed = await this.reversiGameEntityService.packDetail(game);
 		this.globalEventService.publishReversiStream(parentId, 'matched', { game: packed });
 
 		return game;
@@ -359,7 +359,7 @@ export class ReversiService implements OnModuleInit {
 		this.redisClient.setex(`reversi:game:turnTimer:${game.id}:1`, updatedGame.timeLimitForEachTurn, '');
 
 		this.globalEventService.publishReversiGameStream(game.id, 'started', {
-			game: await this.reversiGameEntityService.packDetail(updatedGame, null),
+			game: await this.reversiGameEntityService.packDetail(updatedGame),
 		});
 	}
 
@@ -385,7 +385,7 @@ export class ReversiService implements OnModuleInit {
 
 		this.globalEventService.publishReversiGameStream(game.id, 'ended', {
 			winnerId: winnerId,
-			game: await this.reversiGameEntityService.packDetail(updatedGame, null),
+			game: await this.reversiGameEntityService.packDetail(updatedGame),
 		});
 	}
 

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { URLSearchParams } from 'node:url';
 import * as nodemailer from 'nodemailer';
 import juice from 'juice';
 import { Inject, Injectable } from '@nestjs/common';
@@ -17,7 +16,7 @@ import { LoggerService } from '@/core/LoggerService.js';
 import { bindThis } from '@/decorators.js';
 import { HttpRequestService } from '@/core/HttpRequestService.js';
 import { RedisKVCache } from '@/misc/cache.js';
-import type { Config } from '@@/js/config.js';
+import type { Config } from '@/config.js';
 
 @Injectable()
 export class EmailService {
@@ -260,7 +259,7 @@ export class EmailService {
 		valid: boolean;
 		reason: 'used' | 'format' | 'disposable' | 'mx' | 'smtp' | null;
 	}> {
-		const meta = await this.metaService.fetch();
+		const meta = this.meta;
 		if (meta.verifymailAuthKey == null) throw new Error('verifymailAuthKey is not set');
 
 		const endpoint = 'https://verifymail.io/api/' + domain + '?key=' + meta.verifymailAuthKey;

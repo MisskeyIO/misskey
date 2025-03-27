@@ -98,7 +98,7 @@ export class Resolver {
 			return await this.resolveLocal(value);
 		}
 
-		const meta = await this.metaService.fetch();
+		const meta = this.meta;
 		if (this.utilityService.isItemListedIn(host, meta.blockedHosts)) {
 			throw new Error('Instance is blocked');
 		}

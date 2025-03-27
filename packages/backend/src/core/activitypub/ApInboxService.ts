@@ -150,7 +150,7 @@ export class ApInboxService {
 	}
 
 	@bindThis
-	public async performOneActivity(actor: MiRemoteUser, activity: IObject, resolver?: Resolver, additionalCc?: MiLocalUser['id']): Promise<string | void> {
+	public async performOneActivity(actor: MiRemoteUser, activity: IObject, resolver?: Resolver, additionalCc?: MiLocalUser['id']): Promise<string> {
 		if (actor.isSuspended) return 'skip: actor is suspended';
 
 		if (isCreate(activity)) {
@@ -596,16 +596,13 @@ export class ApInboxService {
 		});
 		if (users.length < 1) return 'skip';
 
-		//TODO あとでなおす
-		const report = await this.abuseReportService.report([{
+		await this.abuseReportService.report([{
 			targetUserId: users[0].id,
 			targetUserHost: users[0].host,
 			reporterId: actor.id,
 			reporterHost: actor.host,
 			comment: `${activity.content}\n${JSON.stringify(uris, null, 2)}`,
-		}]).then(x => this.abuseUserReportsRepository.findOneByOrFail(x.identifiers[0]));
-
-		this.queueService.createReportAbuseJob(report);
+		}]);
 
 		return 'ok';
 	}

@@ -45,7 +45,7 @@ class UserListChannel extends Channel {
 		this.listId = params.listId;
 		this.withFiles = !!(params.withFiles ?? false);
 		this.withRenotes = !!(params.withRenotes ?? true);
-		this.minimize = params.minimize ?? false;
+		this.minimize = !!(params.minimize ?? false);
 
 		// Check existence and owner
 		const listExist = await this.userListsRepository.exists({

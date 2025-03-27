@@ -20,7 +20,6 @@ import type Logger from '@/logger.js';
 import type { MiNote } from '@/models/Note.js';
 import type { IdService } from '@/core/IdService.js';
 import type { MfmService } from '@/core/MfmService.js';
-import type { RoleService } from '@/core/RoleService.js';
 import { toArray } from '@/misc/prelude/array.js';
 import type { GlobalEventService } from '@/core/GlobalEventService.js';
 import type { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
@@ -105,7 +104,6 @@ export class ApPersonService implements OnModuleInit {
 		@Inject(DI.followingsRepository)
 		private followingsRepository: FollowingsRepository,
 
-		private roleService: RoleService,
 	) {
 	}
 

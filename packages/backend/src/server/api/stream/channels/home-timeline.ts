@@ -36,7 +36,7 @@ class HomeTimelineChannel extends Channel {
 	public async init(params: JsonObject) {
 		this.withRenotes = !!(params.withRenotes ?? true);
 		this.withFiles = !!(params.withFiles ?? false);
-		this.minimize = params.minimize ?? false;
+		this.minimize = !!(params.minimize ?? false);
 
 		this.subscriber.on('notesStream', this.onNote);
 	}

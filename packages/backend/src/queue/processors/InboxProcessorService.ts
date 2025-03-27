@@ -26,10 +26,10 @@ import { bindThis } from '@/decorators.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { CollapsedQueue } from '@/misc/collapsed-queue.js';
 import { MiNote } from '@/models/Note.js';
-import { QueueLoggerService } from '../QueueLoggerService.js';
-import type { InboxJobData } from '../types.js';
 import { DI } from '@/di-symbols.js';
 import { MiMeta } from '@/models/Meta.js';
+import { QueueLoggerService } from '../QueueLoggerService.js';
+import type { InboxJobData } from '../types.js';
 
 type UpdateInstanceJob = {
 	latestRequestReceivedAt: Date,
@@ -39,7 +39,7 @@ type UpdateInstanceJob = {
 @Injectable()
 export class InboxProcessorService implements OnApplicationShutdown {
 	private logger: Logger;
-	private updateInstanceQueue: CollapsedQueue<MiNote['id'], Date>;
+	private updateInstanceQueue: CollapsedQueue<MiNote['id'], UpdateInstanceJob>;
 
 	constructor(
 		@Inject(DI.meta)
@@ -242,15 +242,24 @@ export class InboxProcessorService implements OnApplicationShutdown {
 	}
 
 	@bindThis
-	public collapseUpdateInstanceJobs(oldValue: Date, newValue: Date) {
-		return oldValue < newValue ? newValue : oldValue;
+	public collapseUpdateInstanceJobs(oldJob: UpdateInstanceJob, newJob: UpdateInstanceJob) {
+		const latestRequestReceivedAt = oldJob.latestRequestReceivedAt < newJob.latestRequestReceivedAt
+			? newJob.latestRequestReceivedAt
+			: oldJob.latestRequestReceivedAt;
+		const shouldUnsuspend = oldJob.shouldUnsuspend || newJob.shouldUnsuspend;
+		return {
+			latestRequestReceivedAt,
+			shouldUnsuspend,
+		};
 	}
 
 	@bindThis
-	public async performUpdateInstance(id: string, value: Date) {
+	public async performUpdateInstance(id: string, job: UpdateInstanceJob) {
 		await this.federatedInstanceService.update(id, {
-			latestRequestReceivedAt: value,
+			latestRequestReceivedAt: new Date(),
 			isNotResponding: false,
+			// もしサーバーが死んでるために配信が止まっていた場合には自動的に復活させてあげる
+			suspensionState: job.shouldUnsuspend ? 'none' : undefined,
 		});
 	}
 

@@ -40,7 +40,7 @@ class GlobalTimelineChannel extends Channel {
 
 		this.withRenotes = !!(params.withRenotes ?? true);
 		this.withFiles = !!(params.withFiles ?? false);
-		this.minimize = params.minimize ?? false;
+		this.minimize = !!(params.minimize ?? false);
 
 		// Subscribe events
 		this.subscriber.on('notesStream', this.onNote);

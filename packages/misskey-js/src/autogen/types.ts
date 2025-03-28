@@ -107,6 +107,24 @@ export type paths = {
      */
     post: operations['admin___accounts___find-by-email'];
   };
+  '/admin/accounts/pending/list': {
+    /**
+     * admin/accounts/pending/list
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *read:admin:account*
+     */
+    post: operations['admin___accounts___pending___list'];
+  };
+  '/admin/accounts/pending/revoke': {
+    /**
+     * admin/accounts/pending/revoke
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:account*
+     */
+    post: operations['admin___accounts___pending___revoke'];
+  };
   '/admin/ad/create': {
     /**
      * admin/ad/create
@@ -179,6 +197,42 @@ export type paths = {
      */
     post: operations['admin___announcements___update'];
   };
+  '/admin/abuse-report-resolver/create': {
+    /**
+     * admin/abuse-report-resolver/create
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:abuse-report-resolvers*
+     */
+    post: operations['admin___abuse-report-resolver___create'];
+  };
+  '/admin/abuse-report-resolver/list': {
+    /**
+     * admin/abuse-report-resolver/list
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *read:admin:abuse-report-resolvers*
+     */
+    post: operations['admin___abuse-report-resolver___list'];
+  };
+  '/admin/abuse-report-resolver/delete': {
+    /**
+     * admin/abuse-report-resolver/delete
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:abuse-report-resolvers*
+     */
+    post: operations['admin___abuse-report-resolver___delete'];
+  };
+  '/admin/abuse-report-resolver/update': {
+    /**
+     * admin/abuse-report-resolver/update
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:abuse-report-resolvers*
+     */
+    post: operations['admin___abuse-report-resolver___update'];
+  };
   '/admin/avatar-decorations/create': {
     /**
      * admin/avatar-decorations/create
@@ -215,21 +269,12 @@ export type paths = {
      */
     post: operations['admin___avatar-decorations___update'];
   };
-  '/admin/delete-all-files-of-a-user': {
-    /**
-     * admin/delete-all-files-of-a-user
-     * @description No description provided.
-     *
-     * **Credential required**: *Yes* / **Permission**: *write:admin:delete-all-files-of-a-user*
-     */
-    post: operations['admin___delete-all-files-of-a-user'];
-  };
   '/admin/unset-user-avatar': {
     /**
      * admin/unset-user-avatar
      * @description No description provided.
      *
-     * **Credential required**: *Yes* / **Permission**: *write:admin:unset-user-avatar*
+     * **Credential required**: *Yes* / **Permission**: *write:admin:user-avatar*
      */
     post: operations['admin___unset-user-avatar'];
   };
@@ -238,9 +283,18 @@ export type paths = {
      * admin/unset-user-banner
      * @description No description provided.
      *
-     * **Credential required**: *Yes* / **Permission**: *write:admin:unset-user-banner*
+     * **Credential required**: *Yes* / **Permission**: *write:admin:user-banner*
      */
     post: operations['admin___unset-user-banner'];
+  };
+  '/admin/unset-user-mutual-link': {
+    /**
+     * admin/unset-user-mutual-link
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:user-mutual-link*
+     */
+    post: operations['admin___unset-user-mutual-link'];
   };
   '/admin/drive/clean-remote-files': {
     /**
@@ -259,6 +313,15 @@ export type paths = {
      * **Credential required**: *Yes* / **Permission**: *write:admin:drive*
      */
     post: operations['admin___drive___cleanup'];
+  };
+  '/admin/drive/delete-all-files-of-a-user': {
+    /**
+     * admin/drive/delete-all-files-of-a-user
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:drive*
+     */
+    post: operations['admin___drive___delete-all-files-of-a-user'];
   };
   '/admin/drive/files': {
     /**
@@ -432,6 +495,42 @@ export type paths = {
      */
     post: operations['admin___federation___update-instance'];
   };
+  '/admin/indie-auth/create': {
+    /**
+     * admin/indie-auth/create
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:indie-auth*
+     */
+    post: operations['admin___indie-auth___create'];
+  };
+  '/admin/indie-auth/delete': {
+    /**
+     * admin/indie-auth/delete
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:indie-auth*
+     */
+    post: operations['admin___indie-auth___delete'];
+  };
+  '/admin/indie-auth/list': {
+    /**
+     * admin/indie-auth/list
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *read:admin:indie-auth*
+     */
+    post: operations['admin___indie-auth___list'];
+  };
+  '/admin/indie-auth/update': {
+    /**
+     * admin/indie-auth/update
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:indie-auth*
+     */
+    post: operations['admin___indie-auth___update'];
+  };
   '/admin/get-index-stats': {
     /**
      * admin/get-index-stats
@@ -567,6 +666,15 @@ export type paths = {
      */
     post: operations['admin___reset-password'];
   };
+  '/admin/regenerate-user-token': {
+    /**
+     * admin/regenerate-user-token
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:regenerate-user-token*
+     */
+    post: operations['admin___regenerate-user-token'];
+  };
   '/admin/resolve-abuse-user-report': {
     /**
      * admin/resolve-abuse-user-report
@@ -621,6 +729,15 @@ export type paths = {
      */
     post: operations['admin___show-moderation-logs'];
   };
+  '/admin/show-user-account-move-logs': {
+    /**
+     * admin/show-user-account-move-logs
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *read:admin:show-account-move-log*
+     */
+    post: operations['admin___show-user-account-move-logs'];
+  };
   '/admin/show-user': {
     /**
      * admin/show-user
@@ -666,14 +783,14 @@ export type paths = {
      */
     post: operations['admin___update-meta'];
   };
-  '/admin/delete-account': {
+  '/admin/update-user-name': {
     /**
-     * admin/delete-account
+     * admin/update-user-name
      * @description No description provided.
      *
-     * **Credential required**: *Yes* / **Permission**: *write:admin:delete-account*
+     * **Credential required**: *Yes* / **Permission**: *write:admin:user-name*
      */
-    post: operations['admin___delete-account'];
+    post: operations['admin___update-user-name'];
   };
   '/admin/update-user-note': {
     /**
@@ -764,6 +881,51 @@ export type paths = {
      * **Credential required**: *No* / **Permission**: *read:admin:roles*
      */
     post: operations['admin___roles___users'];
+  };
+  '/admin/sso/create': {
+    /**
+     * admin/sso/create
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:sso*
+     */
+    post: operations['admin___sso___create'];
+  };
+  '/admin/sso/delete': {
+    /**
+     * admin/sso/delete
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:sso*
+     */
+    post: operations['admin___sso___delete'];
+  };
+  '/admin/sso/list': {
+    /**
+     * admin/sso/list
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *read:admin:sso*
+     */
+    post: operations['admin___sso___list'];
+  };
+  '/admin/sso/update': {
+    /**
+     * admin/sso/update
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:admin:sso*
+     */
+    post: operations['admin___sso___update'];
+  };
+  '/announcement': {
+    /**
+     * announcement
+     * @description No description provided.
+     *
+     * **Credential required**: *No*
+     */
+    post: operations['announcement'];
   };
   '/admin/system-webhook/create': {
     /**
@@ -1015,6 +1177,15 @@ export type paths = {
      */
     post: operations['channels___featured'];
   };
+  '/channels/featured-games': {
+    /**
+     * channels/featured-games
+     * @description No description provided.
+     *
+     * **Credential required**: *No*
+     */
+    post: operations['channels___featured-games'];
+  };
   '/channels/follow': {
     /**
      * channels/follow
@@ -1121,7 +1292,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['charts___active-users'];
+    get: operations['charts___active-users_get'];
     /**
      * charts/active-users
      * @description No description provided.
@@ -1137,7 +1308,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['charts___ap-request'];
+    get: operations['charts___ap-request_get'];
     /**
      * charts/ap-request
      * @description No description provided.
@@ -1153,7 +1324,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['charts___drive'];
+    get: operations['charts___drive_get'];
     /**
      * charts/drive
      * @description No description provided.
@@ -1169,7 +1340,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['charts___federation'];
+    get: operations['charts___federation_get'];
     /**
      * charts/federation
      * @description No description provided.
@@ -1185,7 +1356,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['charts___instance'];
+    get: operations['charts___instance_get'];
     /**
      * charts/instance
      * @description No description provided.
@@ -1201,7 +1372,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['charts___notes'];
+    get: operations['charts___notes_get'];
     /**
      * charts/notes
      * @description No description provided.
@@ -1217,7 +1388,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['charts___user___drive'];
+    get: operations['charts___user___drive_get'];
     /**
      * charts/user/drive
      * @description No description provided.
@@ -1233,7 +1404,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['charts___user___following'];
+    get: operations['charts___user___following_get'];
     /**
      * charts/user/following
      * @description No description provided.
@@ -1249,7 +1420,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['charts___user___notes'];
+    get: operations['charts___user___notes_get'];
     /**
      * charts/user/notes
      * @description No description provided.
@@ -1265,7 +1436,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['charts___user___pv'];
+    get: operations['charts___user___pv_get'];
     /**
      * charts/user/pv
      * @description No description provided.
@@ -1281,7 +1452,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['charts___user___reactions'];
+    get: operations['charts___user___reactions_get'];
     /**
      * charts/user/reactions
      * @description No description provided.
@@ -1297,7 +1468,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['charts___users'];
+    get: operations['charts___users_get'];
     /**
      * charts/users
      * @description No description provided.
@@ -1629,7 +1800,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['federation___instances'];
+    get: operations['federation___instances_get'];
     /**
      * federation/instances
      * @description No description provided.
@@ -1672,7 +1843,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['federation___stats'];
+    get: operations['federation___stats_get'];
     /**
      * federation/stats
      * @description No description provided.
@@ -1850,7 +2021,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['get-online-users-count'];
+    get: operations['get-online-users-count_get'];
     /**
      * get-online-users-count
      * @description No description provided.
@@ -1902,7 +2073,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['hashtags___trend'];
+    get: operations['hashtags___trend_get'];
     /**
      * hashtags/trend
      * @description No description provided.
@@ -2517,6 +2688,13 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
+    get: operations['meta_get'];
+    /**
+     * meta
+     * @description No description provided.
+     *
+     * **Credential required**: *No*
+     */
     post: operations['meta'];
   };
   '/emojis': {
@@ -2526,7 +2704,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['emojis'];
+    get: operations['emojis_get'];
     /**
      * emojis
      * @description No description provided.
@@ -2542,7 +2720,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['emoji'];
+    get: operations['emoji_get'];
     /**
      * emoji
      * @description No description provided.
@@ -2678,6 +2856,24 @@ export type paths = {
      */
     post: operations['notes___delete'];
   };
+  '/notes/scheduled/cancel': {
+    /**
+     * notes/scheduled/cancel
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:notes*
+     */
+    post: operations['notes___scheduled___cancel'];
+  };
+  '/notes/scheduled/list': {
+    /**
+     * notes/scheduled/list
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:notes*
+     */
+    post: operations['notes___scheduled___list'];
+  };
   '/notes/favorites/create': {
     /**
      * notes/favorites/create
@@ -2703,7 +2899,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['notes___featured'];
+    get: operations['notes___featured_get'];
     /**
      * notes/featured
      * @description No description provided.
@@ -2773,7 +2969,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['notes___reactions'];
+    get: operations['notes___reactions_get'];
     /**
      * notes/reactions
      * @description No description provided.
@@ -3195,7 +3391,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['server-info'];
+    get: operations['server-info_get'];
     /**
      * server-info
      * @description No description provided.
@@ -3205,6 +3401,13 @@ export type paths = {
     post: operations['server-info'];
   };
   '/stats': {
+    /**
+     * stats
+     * @description No description provided.
+     *
+     * **Credential required**: *No*
+     */
+    get: operations['stats_get'];
     /**
      * stats
      * @description No description provided.
@@ -3315,6 +3518,15 @@ export type paths = {
      */
     post: operations['users___gallery___posts'];
   };
+  '/users/get-following-birthday-users': {
+    /**
+     * users/get-following-birthday-users
+     * @description Find users who have a birthday on the specified range.
+     *
+     * **Credential required**: *Yes* / **Permission**: *read:account*
+     */
+    post: operations['users___get-following-birthday-users'];
+  };
   '/users/get-frequently-replied-users': {
     /**
      * users/get-frequently-replied-users
@@ -3324,6 +3536,22 @@ export type paths = {
      */
     post: operations['users___get-frequently-replied-users'];
   };
+  '/users/get-skeb-status': {
+    /**
+     * users/get-skeb-status
+     * @description No description provided.
+     *
+     * **Credential required**: *No*
+     */
+    get: operations['users___get-skeb-status_get'];
+    /**
+     * users/get-skeb-status
+     * @description No description provided.
+     *
+     * **Credential required**: *No*
+     */
+    post: operations['users___get-skeb-status'];
+  };
   '/users/featured-notes': {
     /**
      * users/featured-notes
@@ -3331,7 +3559,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['users___featured-notes'];
+    get: operations['users___featured-notes_get'];
     /**
      * users/featured-notes
      * @description No description provided.
@@ -3538,6 +3766,24 @@ export type paths = {
      */
     post: operations['users___show'];
   };
+  '/users/get-security-info': {
+    /**
+     * users/get-security-info
+     * @description No description provided.
+     *
+     * **Credential required**: *No*
+     */
+    post: operations['users___get-security-info'];
+  };
+  '/users/stats': {
+    /**
+     * users/stats
+     * @description Show statistics about a user.
+     *
+     * **Credential required**: *No*
+     */
+    post: operations['users___stats'];
+  };
   '/users/achievements': {
     /**
      * users/achievements
@@ -3563,7 +3809,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['fetch-rss'];
+    get: operations['fetch-rss_get'];
     /**
      * fetch-rss
      * @description No description provided.
@@ -3589,7 +3835,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['retention'];
+    get: operations['retention_get'];
     /**
      * retention
      * @description No description provided.
@@ -3614,7 +3860,7 @@ export type paths = {
      *
      * **Credential required**: *No*
      */
-    get: operations['bubble-game___ranking'];
+    get: operations['bubble-game___ranking_get'];
     /**
      * bubble-game/ranking
      * @description No description provided.
@@ -3628,7 +3874,7 @@ export type paths = {
      * reversi/cancel-match
      * @description No description provided.
      *
-     * **Credential required**: *Yes* / **Permission**: *write:account*
+     * **Credential required**: *Yes* / **Permission**: *read:account*
      */
     post: operations['reversi___cancel-match'];
   };
@@ -3646,7 +3892,7 @@ export type paths = {
      * reversi/match
      * @description No description provided.
      *
-     * **Credential required**: *Yes* / **Permission**: *write:account*
+     * **Credential required**: *Yes* / **Permission**: *read:account*
      */
     post: operations['reversi___match'];
   };
@@ -3673,7 +3919,7 @@ export type paths = {
      * reversi/surrender
      * @description No description provided.
      *
-     * **Credential required**: *Yes* / **Permission**: *write:account*
+     * **Credential required**: *Yes* / **Permission**: *read:account*
      */
     post: operations['reversi___surrender'];
   };
@@ -3756,6 +4002,7 @@ export type components = {
           name: string;
           iconUrl: string | null;
           displayOrder: number;
+          behavior?: string;
         })[];
     };
     UserDetailedNotMeOnly: {
@@ -3777,6 +4024,7 @@ export type components = {
       bannerBlurhash: string | null;
       isLocked: boolean;
       isSilenced: boolean;
+      isLimited: boolean;
       /** @example false */
       isSuspended: boolean;
       /** @example Hi masters, I am Ai! */
@@ -3810,6 +4058,19 @@ export type components = {
       twoFactorEnabled?: boolean;
       usePasswordLessLogin?: boolean;
       securityKeys?: boolean;
+      mutualLinkSections: ({
+          name: string | null;
+          mutualLinks: ({
+              /** Format: misskey:id */
+              id: string;
+              /** Format: url */
+              url: string;
+              /** Format: misskey:id */
+              fileId: string;
+              description: string | null;
+              imgSrc: string;
+            })[];
+        })[];
       isFollowing?: boolean;
       isFollowed?: boolean;
       hasPendingFollowRequestFromYou?: boolean;
@@ -3853,7 +4114,6 @@ export type components = {
       hasPendingReceivedFollowRequest: boolean;
       unreadNotificationsCount: number;
       mutedWords: string[][];
-      hardMutedWords: string[][];
       mutedInstances: string[] | null;
       notificationRecieveConfig: {
         note?: OneOf<[{
@@ -4025,6 +4285,37 @@ export type components = {
       userIds?: string[];
       isPublic: boolean;
     };
+    UserListMembership: {
+      /**
+       * Format: id
+       * @example xxxxxxxxxx
+       */
+      id: string;
+      /** Format: date-time */
+      createdAt: string;
+      /**
+       * Format: id
+       * @example xxxxxxxxxx
+       */
+      userId: string;
+      user: components['schemas']['UserLite'];
+      withReplies: boolean;
+    };
+    UserAccountMoveLog: {
+      /**
+       * Format: id
+       * @example xxxxxxxxxx
+       */
+      id: string;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: id */
+      movedToId: string;
+      movedTo: components['schemas']['UserDetailed'];
+      /** Format: id */
+      movedFromId: string;
+      movedFrom: components['schemas']['UserDetailed'];
+    };
     Ad: {
       /**
        * Format: id
@@ -4061,8 +4352,11 @@ export type components = {
       /** @enum {string} */
       display: 'dialog' | 'normal' | 'banner';
       needConfirmationToRead: boolean;
-      silence: boolean;
+      needEnrollmentTutorialToRead: boolean;
       forYou: boolean;
+      closeDuration: number;
+      displayOrder: number;
+      silence: boolean;
       isRead?: boolean;
     };
     App: {
@@ -4151,6 +4445,58 @@ export type components = {
       reactionAndUserPairCache?: string[];
       clippedCount?: number;
       myReaction?: string | null;
+    };
+    NoteDraft: {
+      /** Format: misskey:id */
+      id: string;
+      /** Format: date-time */
+      updatedAt: string;
+      /** Format: date-time */
+      scheduledAt: string | null;
+      reason?: string;
+      channel?: {
+        /** Format: misskey:id */
+        id: string;
+        name: string;
+      } | null;
+      renote?: ({
+        /** Format: misskey:id */
+        id: string;
+        text: string | null;
+        user: {
+          /** Format: misskey:id */
+          id: string;
+          username: string;
+          host: string | null;
+        };
+      }) | null;
+      reply?: ({
+        /** Format: misskey:id */
+        id: string;
+        text: string | null;
+        user: {
+          /** Format: misskey:id */
+          id: string;
+          username: string;
+          host: string | null;
+        };
+      }) | null;
+      data: {
+        text: string | null;
+        useCw: boolean;
+        cw: string | null;
+        /** @enum {string} */
+        visibility: 'public' | 'home' | 'followers' | 'specified';
+        localOnly: boolean;
+        files: components['schemas']['DriveFile'][];
+        poll: ({
+          choices: string[];
+          multiple: boolean;
+          expiresAt: number | null;
+          expiredAfter: number | null;
+        }) | null;
+        visibleUserIds?: string[];
+      };
     };
     NoteReaction: {
       /**
@@ -4319,6 +4665,38 @@ export type components = {
       createdAt: string;
       /** @enum {string} */
       type: 'login';
+    } | {
+      /** Format: id */
+      id: string;
+      /** Format: date-time */
+      createdAt: string;
+      /** @enum {string} */
+      type: 'noteScheduled';
+      draft: components['schemas']['NoteDraft'];
+    } | {
+      /** Format: id */
+      id: string;
+      /** Format: date-time */
+      createdAt: string;
+      /** @enum {string} */
+      type: 'scheduledNotePosted';
+      note: components['schemas']['Note'];
+    } | {
+      /** Format: id */
+      id: string;
+      /** Format: date-time */
+      createdAt: string;
+      /** @enum {string} */
+      type: 'scheduledNoteError';
+      draft: components['schemas']['NoteDraft'];
+    } | {
+      /** Format: id */
+      id: string;
+      /** Format: date-time */
+      createdAt: string;
+      /** @enum {string} */
+      type: 'sensitiveFlagAssigned';
+      fileId: unknown;
     } | ({
       /** Format: id */
       id: string;
@@ -4378,6 +4756,7 @@ export type components = {
       /** @example 51469 */
       size: number;
       isSensitive: boolean;
+      isSensitiveByModerator?: boolean | null;
       blurhash: string | null;
       properties: {
         /** @example 1280 */
@@ -4439,6 +4818,15 @@ export type components = {
       followerId: string;
       followee?: components['schemas']['UserDetailedNotMe'];
       follower?: components['schemas']['UserDetailedNotMe'];
+    };
+    FollowRequest: {
+      /**
+       * Format: id
+       * @example xxxxxxxxxx
+       */
+      id: string;
+      follower: components['schemas']['UserLite'];
+      followee: components['schemas']['UserLite'];
     };
     Muting: {
       /**
@@ -4533,6 +4921,8 @@ export type components = {
       attachedFiles: components['schemas']['DriveFile'][];
       likedCount: number;
       isLiked?: boolean;
+      /** @enum {string} */
+      visibility: 'public' | 'private';
     };
     PageBlock: OneOf<[{
       id: string;
@@ -4557,6 +4947,14 @@ export type components = {
       detailed: boolean;
       note: string | null;
     }]>;
+    PageLike: {
+      /**
+       * Format: id
+       * @example xxxxxxxxxx
+       */
+      id: string;
+      page: components['schemas']['Page'];
+    };
     Channel: {
       /**
        * Format: id
@@ -4665,6 +5063,7 @@ export type components = {
       maintainerName: string | null;
       maintainerEmail: string | null;
       isSilenced: boolean;
+      isSensitiveMedia: boolean;
       isMediaSilenced: boolean;
       /** Format: url */
       iconUrl: string | null;
@@ -4699,6 +5098,14 @@ export type components = {
       likedCount: number;
       isLiked?: boolean;
     };
+    GalleryLike: {
+      /**
+       * Format: id
+       * @example xxxxxxxxxx
+       */
+      id: string;
+      post: components['schemas']['GalleryPost'];
+    };
     EmojiSimple: {
       aliases: string[];
       name: string;
@@ -4707,10 +5114,15 @@ export type components = {
       localOnly?: boolean;
       isSensitive?: boolean;
       roleIdsThatCanBeUsedThisEmojiAsReaction?: string[];
+      roleIdsThatCanNotBeUsedThisEmojiAsReaction?: string[];
     };
     EmojiDetailed: {
       /** Format: id */
       id: string;
+      /** Format: date-time */
+      createdAt?: string;
+      /** Format: date-time */
+      updatedAt?: string | null;
       aliases: string[];
       name: string;
       category: string | null;
@@ -4720,7 +5132,10 @@ export type components = {
       license: string | null;
       isSensitive: boolean;
       localOnly: boolean;
-      roleIdsThatCanBeUsedThisEmojiAsReaction: string[];
+      requestedBy?: string | null;
+      memo?: string | null;
+      roleIdsThatCanBeUsedThisEmojiAsReaction?: string[];
+      roleIdsThatCanNotBeUsedThisEmojiAsReaction?: string[];
     };
     Flash: {
       /**
@@ -4742,6 +5157,14 @@ export type components = {
       visibility: 'private' | 'public';
       likedCount: number | null;
       isLiked?: boolean;
+    };
+    FlashLike: {
+      /**
+       * Format: id
+       * @example xxxxxxxxxx
+       */
+      id: string;
+      flash: components['schemas']['Flash'];
     };
     Signin: {
       id: string;
@@ -4829,6 +5252,7 @@ export type components = {
       isExplorable: boolean;
       /** @example false */
       asBadge: boolean;
+      badgeBehavior: string | null;
       /** @example false */
       canEditMembersByModerator: boolean;
       policies: {
@@ -4844,6 +5268,16 @@ export type components = {
       gtlAvailable: boolean;
       ltlAvailable: boolean;
       canPublicNote: boolean;
+      canScheduleNote: boolean;
+      scheduleNoteLimit: number;
+      scheduleNoteMaxDays: number;
+      canInitiateConversation: boolean;
+      canCreateContent: boolean;
+      canUpdateContent: boolean;
+      canDeleteContent: boolean;
+      canPurgeAccount: boolean;
+      canUpdateAvatar: boolean;
+      canUpdateBanner: boolean;
       mentionLimit: number;
       canInvite: boolean;
       inviteLimit: number;
@@ -4853,12 +5287,16 @@ export type components = {
       canManageAvatarDecorations: boolean;
       canSearchNotes: boolean;
       canUseTranslator: boolean;
+      canUseDriveFileInSoundSettings: boolean;
+      canUseReaction: boolean;
       canHideAds: boolean;
       driveCapacityMb: number;
       alwaysMarkNsfw: boolean;
+      skipNsfwDetection: boolean;
       canUpdateBioMedia: boolean;
       pinLimit: number;
       antennaLimit: number;
+      antennaNotesLimit: number;
       wordMuteLimit: number;
       webhookLimit: number;
       clipLimit: number;
@@ -4872,6 +5310,8 @@ export type components = {
       canImportFollowing: boolean;
       canImportMuting: boolean;
       canImportUserLists: boolean;
+      mutualLinkSectionLimit: number;
+      mutualLinkLimit: number;
     };
     ReversiGameLite: {
       /** Format: id */
@@ -4947,7 +5387,6 @@ export type components = {
       maintainerName: string | null;
       maintainerEmail: string | null;
       version: string;
-      providesTarball: boolean;
       name: string | null;
       shortName: string | null;
       /**
@@ -4975,6 +5414,7 @@ export type components = {
       recaptchaSiteKey: string | null;
       enableTurnstile: boolean;
       turnstileSiteKey: string | null;
+      googleAnalyticsId: string | null;
       enableTestcaptcha: boolean;
       swPublickey: string | null;
       /** @default /assets/ai.png */
@@ -4985,7 +5425,7 @@ export type components = {
       notFoundImageUrl: string | null;
       iconUrl: string | null;
       maxNoteTextLength: number;
-      ads: {
+      ads: ({
           /**
            * Format: id
            * @example xxxxxxxxxx
@@ -4993,12 +5433,14 @@ export type components = {
           id: string;
           /** Format: url */
           url: string;
-          place: string;
+          /** @enum {string} */
+          place: 'square' | 'horizontal' | 'horizontal-big' | 'vertical';
           ratio: number;
           /** Format: url */
           imageUrl: string;
           dayOfWeek: number;
-        }[];
+        })[];
+      wellKnownWebsites: string[];
       /** @default 0 */
       notesPerOneAd: number;
       enableEmail: boolean;
@@ -5006,6 +5448,7 @@ export type components = {
       translatorAvailable: boolean;
       mediaProxy: string;
       enableUrlPreview: boolean;
+      enableSkebStatus: boolean;
       backgroundImageUrl: string | null;
       impressumUrl: string | null;
       logoImageUrl: string | null;
@@ -5027,9 +5470,16 @@ export type components = {
         emailRequiredForSignup: boolean;
         localTimeline: boolean;
         globalTimeline: boolean;
+        hCaptcha: boolean;
+        /** @description Alias of hCaptcha */
         hcaptcha: boolean;
-        turnstile: boolean;
+        mCaptcha: boolean;
+        /** @description Alias of mCaptcha */
+        mcaptcha: boolean;
+        reCaptcha: boolean;
+        /** @description Alias of reCaptcha */
         recaptcha: boolean;
+        turnstile: boolean;
         objectStorage: boolean;
         serviceWorker: boolean;
         /** @default true */
@@ -5042,6 +5492,45 @@ export type components = {
       cacheRemoteSensitiveFiles: boolean;
     };
     MetaDetailed: components['schemas']['MetaLite'] & components['schemas']['MetaDetailedOnly'];
+    AbuseUserReport: {
+      /**
+       * Format: id
+       * @example xxxxxxxxxx
+       */
+      id: string;
+      category: string;
+      /** Format: date-time */
+      createdAt: string;
+      comment: string;
+      resolved: boolean;
+      /** Format: id */
+      reporterId: string;
+      reporter: components['schemas']['UserDetailed'];
+      /** Format: id */
+      targetUserId: string;
+      targetUser: components['schemas']['UserDetailed'];
+      /** Format: id */
+      assigneeId: string | null;
+      assignee?: components['schemas']['UserDetailed'] | null;
+      forwarded: boolean;
+    };
+    ModerationLog: {
+      /**
+       * Format: id
+       * @example xxxxxxxxxx
+       */
+      id: string;
+      /** Format: date-time */
+      createdAt: string;
+      type: string;
+      info: Record<string, never>;
+      /**
+       * Format: id
+       * @example xxxxxxxxxx
+       */
+      userId: string;
+      user: components['schemas']['UserDetailed'];
+    };
     SystemWebhook: {
       id: string;
       isActive: boolean;
@@ -5051,7 +5540,7 @@ export type components = {
       latestSentAt: string | null;
       latestStatus: number | null;
       name: string;
-      on: ('abuseReport' | 'abuseReportResolved' | 'userCreated' | 'inactiveModeratorsWarning' | 'inactiveModeratorsInvitationOnlyChanged')[];
+      on: ('abuseReport' | 'abuseReportResolved' | 'userCreated' | 'inactiveModeratorsWarning' | 'inactiveModeratorsInvitationOnlyChanged' | 'reportAutoResolved')[];
       url: string;
       secret: string;
     };
@@ -5106,7 +5595,7 @@ export type operations = {
             recaptchaSiteKey: string | null;
             enableTurnstile: boolean;
             turnstileSiteKey: string | null;
-            enableTestcaptcha: boolean;
+            googleAnalyticsId: string | null;
             swPublickey: string | null;
             /** @default /assets/ai.png */
             mascotImageUrl: string | null;
@@ -5121,13 +5610,12 @@ export type operations = {
             enableServiceWorker: boolean;
             translatorAvailable: boolean;
             silencedHosts?: string[];
-            mediaSilencedHosts: string[];
+            sensitiveMediaHosts?: string[];
             pinnedUsers: string[];
             hiddenTags: string[];
             blockedHosts: string[];
             sensitiveWords: string[];
             prohibitedWords: string[];
-            prohibitedWordsForNameOfUser: string[];
             bannedEmailDomains?: string[];
             preservedUsernames: string[];
             hcaptchaSecretKey: string | null;
@@ -5168,7 +5656,6 @@ export type operations = {
             truemailAuthKey: string | null;
             enableChartsForRemoteUser: boolean;
             enableChartsForFederatedInstances: boolean;
-            enableStatsForFederatedInstances: boolean;
             enableServerMachineStats: boolean;
             enableIdenticonGeneration: boolean;
             manifestJsonOverride: string;
@@ -5179,8 +5666,10 @@ export type operations = {
             perRemoteUserUserTimelineCacheMax: number;
             perUserHomeTimelineCacheMax: number;
             perUserListTimelineCacheMax: number;
-            enableReactionsBuffering: boolean;
             notesPerOneAd: number;
+            wellKnownWebsites: string[];
+            urlPreviewDenyList: string[];
+            featuredGameChannels: string[];
             backgroundImageUrl: string | null;
             deeplAuthKey: string | null;
             deeplIsPro: boolean;
@@ -5195,7 +5684,6 @@ export type operations = {
             shortName: string | null;
             objectStorageS3ForcePathStyle: boolean;
             privacyPolicyUrl: string | null;
-            inquiryUrl: string | null;
             repositoryUrl: string | null;
             /**
              * @deprecated
@@ -5212,8 +5700,6 @@ export type operations = {
             urlPreviewRequireContentLength: boolean;
             urlPreviewUserAgent: string | null;
             urlPreviewSummaryProxyUrl: string | null;
-            federation: string;
-            federationHosts: string[];
           };
         };
       };
@@ -5277,6 +5763,10 @@ export type operations = {
            * @enum {string}
            */
           targetUserOrigin?: 'combined' | 'local' | 'remote';
+          /** @default false */
+          forwarded?: boolean;
+          /** @default null */
+          category?: string | null;
         };
       };
     };
@@ -5301,13 +5791,10 @@ export type operations = {
               targetUserId: string;
               /** Format: id */
               assigneeId: string | null;
-              reporter: components['schemas']['UserDetailedNotMe'];
-              targetUser: components['schemas']['UserDetailedNotMe'];
-              assignee: components['schemas']['UserDetailedNotMe'] | null;
-              forwarded: boolean;
-              /** @enum {string|null} */
-              resolvedAs: 'accept' | 'reject' | null;
-              moderationNote: string;
+              reporter: components['schemas']['UserDetailed'];
+              targetUser: components['schemas']['UserDetailed'];
+              assignee?: components['schemas']['UserDetailed'] | null;
+              category: string;
             })[];
         };
       };
@@ -5696,6 +6183,11 @@ export type operations = {
         'application/json': {
           /** Format: misskey:id */
           userId: string;
+          /**
+           * @description Since deletion by an administrator is a moderation action, the default is to soft delete.
+           * @default true
+           */
+          soft?: boolean;
         };
       };
     };
@@ -5754,8 +6246,137 @@ export type operations = {
       /** @description OK (with results) */
       200: {
         content: {
-          'application/json': components['schemas']['UserDetailedNotMe'];
+          'application/json': components['schemas']['UserDetailed'];
         };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/accounts/pending/list
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *read:admin:account*
+   */
+  admin___accounts___pending___list: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @default 10 */
+          limit?: number;
+          /** @default 0 */
+          offset?: number;
+          /** @enum {string} */
+          sort?: '+createdAt' | '-createdAt';
+          /** @default null */
+          username?: string | null;
+          /** @default null */
+          email?: string | null;
+          /** @default null */
+          code?: string | null;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': ({
+              /**
+               * Format: id
+               * @example xxxxxxxxxx
+               */
+              id: string;
+              /** Format: date-time */
+              createdAt: string;
+              code: string;
+              /** @example ai */
+              username: string;
+              email?: string | null;
+            })[];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/accounts/pending/revoke
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:account*
+   */
+  admin___accounts___pending___revoke: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          id?: string;
+          code?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
       };
       /** @description Client error */
       400: {
@@ -6049,9 +6670,15 @@ export type operations = {
           /** @default false */
           forExistingUsers?: boolean;
           /** @default false */
-          silence?: boolean;
-          /** @default false */
           needConfirmationToRead?: boolean;
+          /** @default false */
+          needEnrollmentTutorialToRead?: boolean;
+          /** @default 0 */
+          closeDuration?: number;
+          /** @default 0 */
+          displayOrder?: number;
+          /** @default false */
+          silence?: boolean;
           /**
            * Format: misskey:id
            * @default null
@@ -6077,6 +6704,15 @@ export type operations = {
             title: string;
             text: string;
             imageUrl: string | null;
+            icon: string;
+            display: string;
+            forYou: boolean;
+            needConfirmationToRead: boolean;
+            needEnrollmentTutorialToRead: boolean;
+            closeDuration: number;
+            displayOrder: number;
+            silence: boolean;
+            isRead?: boolean;
           };
         };
       };
@@ -6176,17 +6812,10 @@ export type operations = {
         'application/json': {
           /** @default 10 */
           limit?: number;
-          /** Format: misskey:id */
-          sinceId?: string;
-          /** Format: misskey:id */
-          untilId?: string;
+          /** @default 0 */
+          offset?: number;
           /** Format: misskey:id */
           userId?: string | null;
-          /**
-           * @default active
-           * @enum {string}
-           */
-          status?: 'all' | 'active' | 'archived';
         };
       };
     };
@@ -6205,9 +6834,22 @@ export type operations = {
               /** Format: date-time */
               updatedAt: string | null;
               text: string;
+              isActive: boolean;
               title: string;
               imageUrl: string | null;
+              icon: string;
+              display: string;
+              forExistingUsers: boolean;
+              needConfirmationToRead: boolean;
+              needEnrollmentTutorialToRead: boolean;
+              closeDuration: number;
+              displayOrder: number;
+              silence: boolean;
+              userId: string | null;
+              user: components['schemas']['UserLite'] | null;
               reads: number;
+              /** Format: date-time */
+              lastReadAt: string | null;
             })[];
         };
       };
@@ -6263,9 +6905,256 @@ export type operations = {
           /** @enum {string} */
           display?: 'normal' | 'banner' | 'dialog';
           forExistingUsers?: boolean;
-          silence?: boolean;
           needConfirmationToRead?: boolean;
+          needEnrollmentTutorialToRead?: boolean;
+          /** @default 0 */
+          closeDuration?: number;
+          /** @default 0 */
+          displayOrder?: number;
+          silence?: boolean;
           isActive?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/abuse-report-resolver/create
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:abuse-report-resolvers*
+   */
+  'admin___abuse-report-resolver___create': {
+    requestBody: {
+      content: {
+        'application/json': {
+          name: string;
+          targetUserPattern: string | null;
+          reporterPattern: string | null;
+          reportContentPattern: string | null;
+          /** @enum {string} */
+          expiresAt: '1hour' | '12hours' | '1day' | '1week' | '1month' | '3months' | '6months' | '1year' | 'indefinitely';
+          forward: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            name: string;
+            targetUserPattern: string | null;
+            reporterPattern: string | null;
+            reportContentPattern: string | null;
+            expiresAt: string;
+            forward: boolean;
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/abuse-report-resolver/list
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *read:admin:abuse-report-resolvers*
+   */
+  'admin___abuse-report-resolver___list': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @default 10 */
+          limit?: number;
+          /** Format: misskey:id */
+          sinceId?: string;
+          /** Format: misskey:id */
+          untilId?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': ({
+              name: string;
+              targetUserPattern: string | null;
+              reporterPattern: string | null;
+              reportContentPattern: string | null;
+              expiresAt: string;
+              forward: boolean;
+            })[];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/abuse-report-resolver/delete
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:abuse-report-resolvers*
+   */
+  'admin___abuse-report-resolver___delete': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          resolverId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/abuse-report-resolver/update
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:abuse-report-resolvers*
+   */
+  'admin___abuse-report-resolver___update': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          resolverId: string;
+          name?: string;
+          targetUserPattern?: string | null;
+          reporterPattern?: string | null;
+          reportContentPattern?: string | null;
+          /** @enum {string} */
+          expiresAt?: '1hour' | '12hours' | '1day' | '1week' | '1month' | '3months' | '6months' | '1year' | 'indefinitely';
+          forward?: boolean;
         };
       };
     };
@@ -6556,62 +7445,10 @@ export type operations = {
     };
   };
   /**
-   * admin/delete-all-files-of-a-user
-   * @description No description provided.
-   *
-   * **Credential required**: *Yes* / **Permission**: *write:admin:delete-all-files-of-a-user*
-   */
-  'admin___delete-all-files-of-a-user': {
-    requestBody: {
-      content: {
-        'application/json': {
-          /** Format: misskey:id */
-          userId: string;
-        };
-      };
-    };
-    responses: {
-      /** @description OK (without any results) */
-      204: {
-        content: never;
-      };
-      /** @description Client error */
-      400: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Authentication error */
-      401: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Forbidden error */
-      403: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description I'm Ai */
-      418: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Internal server error */
-      500: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-    };
-  };
-  /**
    * admin/unset-user-avatar
    * @description No description provided.
    *
-   * **Credential required**: *Yes* / **Permission**: *write:admin:unset-user-avatar*
+   * **Credential required**: *Yes* / **Permission**: *write:admin:user-avatar*
    */
   'admin___unset-user-avatar': {
     requestBody: {
@@ -6663,7 +7500,7 @@ export type operations = {
    * admin/unset-user-banner
    * @description No description provided.
    *
-   * **Credential required**: *Yes* / **Permission**: *write:admin:unset-user-banner*
+   * **Credential required**: *Yes* / **Permission**: *write:admin:user-banner*
    */
   'admin___unset-user-banner': {
     requestBody: {
@@ -6671,6 +7508,60 @@ export type operations = {
         'application/json': {
           /** Format: misskey:id */
           userId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/unset-user-mutual-link
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:user-mutual-link*
+   */
+  'admin___unset-user-mutual-link': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          userId: string;
+          /** Format: misskey:id */
+          itemId: string;
         };
       };
     };
@@ -6762,6 +7653,58 @@ export type operations = {
    * **Credential required**: *Yes* / **Permission**: *write:admin:drive*
    */
   admin___drive___cleanup: {
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/drive/delete-all-files-of-a-user
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:drive*
+   */
+  'admin___drive___delete-all-files-of-a-user': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          userId: string;
+        };
+      };
+    };
     responses: {
       /** @description OK (without any results) */
       204: {
@@ -7050,7 +7993,10 @@ export type operations = {
           license?: string | null;
           isSensitive?: boolean;
           localOnly?: boolean;
+          requestedBy?: string | null;
+          memo?: string | null;
           roleIdsThatCanBeUsedThisEmojiAsReaction?: string[];
+          roleIdsThatCanNotBeUsedThisEmojiAsReaction?: string[];
         };
       };
     };
@@ -7680,7 +8626,10 @@ export type operations = {
           license?: string | null;
           isSensitive?: boolean;
           localOnly?: boolean;
+          requestedBy?: string | null;
+          memo?: string | null;
           roleIdsThatCanBeUsedThisEmojiAsReaction?: string[];
+          roleIdsThatCanNotBeUsedThisEmojiAsReaction?: string[];
         };
       };
     };
@@ -7887,6 +8836,233 @@ export type operations = {
           host: string;
           isSuspended?: boolean;
           moderationNote?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/indie-auth/create
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:indie-auth*
+   */
+  'admin___indie-auth___create': {
+    requestBody: {
+      content: {
+        'application/json': {
+          id: string;
+          name?: string | null;
+          redirectUris?: string[];
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            id: string;
+            /** Format: date-time */
+            createdAt: string;
+            name: string | null;
+            redirectUris: string[];
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/indie-auth/delete
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:indie-auth*
+   */
+  'admin___indie-auth___delete': {
+    requestBody: {
+      content: {
+        'application/json': {
+          id: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/indie-auth/list
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *read:admin:indie-auth*
+   */
+  'admin___indie-auth___list': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @default 10 */
+          limit?: number;
+          /** @default 0 */
+          offset?: number;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': ({
+              id: string;
+              /** Format: date-time */
+              createdAt: string;
+              name: string | null;
+              redirectUris: string[];
+            })[];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/indie-auth/update
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:indie-auth*
+   */
+  'admin___indie-auth___update': {
+    requestBody: {
+      content: {
+        'application/json': {
+          id: string;
+          name?: string | null;
+          redirectUris?: string[];
         };
       };
     };
@@ -8722,6 +9898,58 @@ export type operations = {
     };
   };
   /**
+   * admin/regenerate-user-token
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:regenerate-user-token*
+   */
+  'admin___regenerate-user-token': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          userId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
    * admin/resolve-abuse-user-report
    * @description No description provided.
    *
@@ -8733,8 +9961,8 @@ export type operations = {
         'application/json': {
           /** Format: misskey:id */
           reportId: string;
-          /** @enum {string|null} */
-          resolvedAs?: 'accept' | 'reject' | null;
+          /** @default false */
+          forward?: boolean;
         };
       };
     };
@@ -9038,7 +10266,84 @@ export type operations = {
               info: Record<string, never>;
               /** Format: id */
               userId: string;
-              user: components['schemas']['UserDetailedNotMe'];
+              user: components['schemas']['UserDetailed'];
+            }[];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/show-user-account-move-logs
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *read:admin:show-account-move-log*
+   */
+  'admin___show-user-account-move-logs': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @default 10 */
+          limit?: number;
+          /** Format: misskey:id */
+          sinceId?: string;
+          /** Format: misskey:id */
+          untilId?: string;
+          /** Format: misskey:id */
+          movedFromId?: string | null;
+          /** Format: misskey:id */
+          movedToId?: string | null;
+          /** @enum {string|null} */
+          from?: 'local' | 'remote' | 'all';
+          /** @enum {string|null} */
+          to?: 'local' | 'remote' | 'all';
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+              /** Format: id */
+              id: string;
+              /** Format: date-time */
+              createdAt: string;
+              /** Format: id */
+              movedToId: string;
+              movedTo: components['schemas']['UserDetailed'];
+              /** Format: id */
+              movedFromId: string;
+              movedFrom: components['schemas']['UserDetailed'];
             }[];
         };
       };
@@ -9237,6 +10542,8 @@ export type operations = {
             };
             isModerator: boolean;
             isSilenced: boolean;
+            isLimited: boolean;
+            isDeleted: boolean;
             isSuspended: boolean;
             isHibernated: boolean;
             lastActiveDate: string | null;
@@ -9248,6 +10555,7 @@ export type operations = {
                 createdAt: string;
                 expiresAt: string | null;
                 roleId: string;
+                memo: string | null;
               })[];
           };
         };
@@ -9479,7 +10787,6 @@ export type operations = {
           blockedHosts?: string[] | null;
           sensitiveWords?: string[] | null;
           prohibitedWords?: string[] | null;
-          prohibitedWordsForNameOfUser?: string[] | null;
           themeColor?: string | null;
           mascotImageUrl?: string | null;
           bannerUrl?: string | null;
@@ -9512,7 +10819,7 @@ export type operations = {
           enableTurnstile?: boolean;
           turnstileSiteKey?: string | null;
           turnstileSecretKey?: string | null;
-          enableTestcaptcha?: boolean;
+          googleAnalyticsId?: string | null;
           /** @enum {string} */
           sensitiveMediaDetection?: 'none' | 'all' | 'local' | 'remote';
           /** @enum {string} */
@@ -9541,7 +10848,6 @@ export type operations = {
           feedbackUrl?: string | null;
           impressumUrl?: string | null;
           privacyPolicyUrl?: string | null;
-          inquiryUrl?: string | null;
           useObjectStorage?: boolean;
           objectStorageBaseUrl?: string | null;
           objectStorageBucket?: string | null;
@@ -9564,7 +10870,6 @@ export type operations = {
           truemailAuthKey?: string | null;
           enableChartsForRemoteUser?: boolean;
           enableChartsForFederatedInstances?: boolean;
-          enableStatsForFederatedInstances?: boolean;
           enableServerMachineStats?: boolean;
           enableIdenticonGeneration?: boolean;
           serverRules?: string[];
@@ -9577,10 +10882,12 @@ export type operations = {
           perRemoteUserUserTimelineCacheMax?: number;
           perUserHomeTimelineCacheMax?: number;
           perUserListTimelineCacheMax?: number;
-          enableReactionsBuffering?: boolean;
           notesPerOneAd?: number;
           silencedHosts?: string[] | null;
-          mediaSilencedHosts?: string[] | null;
+          sensitiveMediaHosts?: string[] | null;
+          wellKnownWebsites?: string[] | null;
+          urlPreviewDenyList?: string[] | null;
+          featuredGameChannels?: string[] | null;
           /** @description [Deprecated] Use "urlPreviewSummaryProxyUrl" instead. */
           summalyProxy?: string | null;
           urlPreviewEnabled?: boolean;
@@ -9589,9 +10896,6 @@ export type operations = {
           urlPreviewRequireContentLength?: boolean;
           urlPreviewUserAgent?: string | null;
           urlPreviewSummaryProxyUrl?: string | null;
-          /** @enum {string} */
-          federation?: 'all' | 'none' | 'specified';
-          federationHosts?: string[];
         };
       };
     };
@@ -9633,17 +10937,18 @@ export type operations = {
     };
   };
   /**
-   * admin/delete-account
+   * admin/update-user-name
    * @description No description provided.
    *
-   * **Credential required**: *Yes* / **Permission**: *write:admin:delete-account*
+   * **Credential required**: *Yes* / **Permission**: *write:admin:user-name*
    */
-  'admin___delete-account': {
+  'admin___update-user-name': {
     requestBody: {
       content: {
         'application/json': {
           /** Format: misskey:id */
           userId: string;
+          name?: string;
         };
       };
     };
@@ -9760,6 +11065,7 @@ export type operations = {
           /** @default false */
           isExplorable?: boolean;
           asBadge: boolean;
+          badgeBehavior?: string | null;
           canEditMembersByModerator: boolean;
           displayOrder: number;
           policies: Record<string, never>;
@@ -9981,6 +11287,7 @@ export type operations = {
           isAdministrator?: boolean;
           isExplorable?: boolean;
           asBadge?: boolean;
+          badgeBehavior?: string | null;
           canEditMembersByModerator?: boolean;
           displayOrder?: number;
           policies?: Record<string, never>;
@@ -10038,6 +11345,7 @@ export type operations = {
           roleId: string;
           /** Format: misskey:id */
           userId: string;
+          memo?: string;
           expiresAt?: number | null;
         };
       };
@@ -10215,9 +11523,339 @@ export type operations = {
               /** Format: date-time */
               createdAt: string;
               user: components['schemas']['UserDetailed'];
+              memo: string | null;
               /** Format: date-time */
               expiresAt: string | null;
             })[];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/sso/create
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:sso*
+   */
+  admin___sso___create: {
+    requestBody: {
+      content: {
+        'application/json': {
+          name?: string | null;
+          /** @enum {string} */
+          type: 'saml' | 'jwt';
+          issuer: string;
+          /** @default [] */
+          audience?: string[];
+          /** @enum {string} */
+          binding?: 'post' | 'redirect';
+          acsUrl: string;
+          signatureAlgorithm: string;
+          cipherAlgorithm?: string | null;
+          /** @default false */
+          wantAuthnRequestsSigned?: boolean;
+          /** @default true */
+          wantAssertionsSigned?: boolean;
+          /** @default true */
+          useCertificate: boolean;
+          secret?: string | null;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            id: string;
+            /** Format: date-time */
+            createdAt: string;
+            name: string | null;
+            /** @enum {string} */
+            type: 'saml' | 'jwt';
+            issuer: string;
+            audience: string[];
+            /** @enum {string} */
+            binding: 'post' | 'redirect';
+            acsUrl: string;
+            publicKey: string;
+            signatureAlgorithm: string;
+            cipherAlgorithm?: string | null;
+            wantAuthnRequestsSigned: boolean;
+            wantAssertionsSigned: boolean;
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/sso/delete
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:sso*
+   */
+  admin___sso___delete: {
+    requestBody: {
+      content: {
+        'application/json': {
+          id: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/sso/list
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *read:admin:sso*
+   */
+  admin___sso___list: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @default 10 */
+          limit?: number;
+          /** @default 0 */
+          offset?: number;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': ({
+              id: string;
+              /** Format: date-time */
+              createdAt: string;
+              name: string | null;
+              /** @enum {string} */
+              type: 'saml' | 'jwt';
+              issuer: string;
+              audience: string[];
+              /** @enum {string} */
+              binding: 'post' | 'redirect';
+              acsUrl: string;
+              useCertificate: boolean;
+              publicKey: string;
+              signatureAlgorithm: string;
+              cipherAlgorithm?: string | null;
+              wantAuthnRequestsSigned: boolean;
+              wantAssertionsSigned: boolean;
+            })[];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * admin/sso/update
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:admin:sso*
+   */
+  admin___sso___update: {
+    requestBody: {
+      content: {
+        'application/json': {
+          id: string;
+          name?: string | null;
+          issuer?: string;
+          audience?: string[];
+          /** @enum {string} */
+          binding?: 'post' | 'redirect';
+          acsUrl?: string;
+          signatureAlgorithm?: string;
+          cipherAlgorithm?: string | null;
+          wantAuthnRequestsSigned?: boolean;
+          wantAssertionsSigned?: boolean;
+          regenerateCertificate?: boolean | null;
+          secret?: string | null;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * announcement
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  announcement: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          announcementId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': components['schemas']['Announcement'];
         };
       };
       /** @description Client error */
@@ -10265,7 +11903,7 @@ export type operations = {
         'application/json': {
           isActive: boolean;
           name: string;
-          on: ('abuseReport' | 'abuseReportResolved' | 'userCreated' | 'inactiveModeratorsWarning' | 'inactiveModeratorsInvitationOnlyChanged')[];
+          on: ('abuseReport' | 'abuseReportResolved' | 'userCreated' | 'inactiveModeratorsWarning' | 'inactiveModeratorsInvitationOnlyChanged' | 'reportAutoResolved')[];
           url: string;
           secret: string;
         };
@@ -10375,7 +12013,7 @@ export type operations = {
       content: {
         'application/json': {
           isActive?: boolean;
-          on?: ('abuseReport' | 'abuseReportResolved' | 'userCreated' | 'inactiveModeratorsWarning' | 'inactiveModeratorsInvitationOnlyChanged')[];
+          on?: ('abuseReport' | 'abuseReportResolved' | 'userCreated' | 'inactiveModeratorsWarning' | 'inactiveModeratorsInvitationOnlyChanged' | 'reportAutoResolved')[];
         };
       };
     };
@@ -10488,7 +12126,7 @@ export type operations = {
           id: string;
           isActive: boolean;
           name: string;
-          on: ('abuseReport' | 'abuseReportResolved' | 'userCreated' | 'inactiveModeratorsWarning' | 'inactiveModeratorsInvitationOnlyChanged')[];
+          on: ('abuseReport' | 'abuseReportResolved' | 'userCreated' | 'inactiveModeratorsWarning' | 'inactiveModeratorsInvitationOnlyChanged' | 'reportAutoResolved')[];
           url: string;
           secret: string;
         };
@@ -10547,7 +12185,7 @@ export type operations = {
           /** Format: misskey:id */
           webhookId: string;
           /** @enum {string} */
-          type: 'abuseReport' | 'abuseReportResolved' | 'userCreated' | 'inactiveModeratorsWarning' | 'inactiveModeratorsInvitationOnlyChanged';
+          type: 'abuseReport' | 'abuseReportResolved' | 'userCreated' | 'inactiveModeratorsWarning' | 'inactiveModeratorsInvitationOnlyChanged' | 'reportAutoResolved';
           override?: {
             url?: string;
             secret?: string;
@@ -10614,6 +12252,8 @@ export type operations = {
           sinceId?: string;
           /** Format: misskey:id */
           untilId?: string;
+          /** @default 0 */
+          offset?: number;
           /** @default true */
           isActive?: boolean;
         };
@@ -11482,7 +13122,7 @@ export type operations = {
         content: {
           'application/json': {
             accessToken: string;
-            user: components['schemas']['UserDetailedNotMe'];
+            user: components['schemas']['UserDetailed'];
           };
         };
       };
@@ -11768,6 +13408,52 @@ export type operations = {
    * **Credential required**: *No*
    */
   channels___featured: {
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': components['schemas']['Channel'][];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * channels/featured-games
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  'channels___featured-games': {
     responses: {
       /** @description OK (with results) */
       200: {
@@ -12428,6 +14114,74 @@ export type operations = {
    *
    * **Credential required**: *No*
    */
+  'charts___active-users_get': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          span: 'day' | 'hour';
+          /** @default 30 */
+          limit?: number;
+          /** @default null */
+          offset?: number | null;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            readWrite: number[];
+            read: number[];
+            write: number[];
+            registeredWithinWeek: number[];
+            registeredWithinMonth: number[];
+            registeredWithinYear: number[];
+            registeredOutsideWeek: number[];
+            registeredOutsideMonth: number[];
+            registeredOutsideYear: number[];
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * charts/active-users
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
   'charts___active-users': {
     requestBody: {
       content: {
@@ -12496,6 +14250,68 @@ export type operations = {
    *
    * **Credential required**: *No*
    */
+  'charts___ap-request_get': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          span: 'day' | 'hour';
+          /** @default 30 */
+          limit?: number;
+          /** @default null */
+          offset?: number | null;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            deliverFailed: number[];
+            deliverSucceeded: number[];
+            inboxReceived: number[];
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * charts/ap-request
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
   'charts___ap-request': {
     requestBody: {
       content: {
@@ -12517,6 +14333,77 @@ export type operations = {
             deliverFailed: number[];
             deliverSucceeded: number[];
             inboxReceived: number[];
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * charts/drive
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  charts___drive_get: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          span: 'day' | 'hour';
+          /** @default 30 */
+          limit?: number;
+          /** @default null */
+          offset?: number | null;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            local: {
+              incCount: number[];
+              incSize: number[];
+              decCount: number[];
+              decSize: number[];
+            };
+            remote: {
+              incCount: number[];
+              incSize: number[];
+              decCount: number[];
+              decSize: number[];
+            };
           };
         };
       };
@@ -12629,6 +14516,73 @@ export type operations = {
    *
    * **Credential required**: *No*
    */
+  charts___federation_get: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          span: 'day' | 'hour';
+          /** @default 30 */
+          limit?: number;
+          /** @default null */
+          offset?: number | null;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            deliveredInstances: number[];
+            inboxInstances: number[];
+            stalled: number[];
+            sub: number[];
+            pub: number[];
+            pubsub: number[];
+            subActive: number[];
+            pubActive: number[];
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * charts/federation
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
   charts___federation: {
     requestBody: {
       content: {
@@ -12655,6 +14609,104 @@ export type operations = {
             pubsub: number[];
             subActive: number[];
             pubActive: number[];
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * charts/instance
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  charts___instance_get: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          span: 'day' | 'hour';
+          /** @default 30 */
+          limit?: number;
+          /** @default null */
+          offset?: number | null;
+          host: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            requests: {
+              failed: number[];
+              succeeded: number[];
+              received: number[];
+            };
+            notes: {
+              total: number[];
+              inc: number[];
+              dec: number[];
+              diffs: {
+                normal: number[];
+                reply: number[];
+                renote: number[];
+                withFile: number[];
+              };
+            };
+            users: {
+              total: number[];
+              inc: number[];
+              dec: number[];
+            };
+            following: {
+              total: number[];
+              inc: number[];
+              dec: number[];
+            };
+            followers: {
+              total: number[];
+              inc: number[];
+              dec: number[];
+            };
+            drive: {
+              totalFiles: number[];
+              incFiles: number[];
+              decFiles: number[];
+              incUsage: number[];
+              decUsage: number[];
+            };
           };
         };
       };
@@ -12794,6 +14846,87 @@ export type operations = {
    *
    * **Credential required**: *No*
    */
+  charts___notes_get: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          span: 'day' | 'hour';
+          /** @default 30 */
+          limit?: number;
+          /** @default null */
+          offset?: number | null;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            local: {
+              total: number[];
+              inc: number[];
+              dec: number[];
+              diffs: {
+                normal: number[];
+                reply: number[];
+                renote: number[];
+                withFile: number[];
+              };
+            };
+            remote: {
+              total: number[];
+              inc: number[];
+              dec: number[];
+              diffs: {
+                normal: number[];
+                reply: number[];
+                renote: number[];
+                withFile: number[];
+              };
+            };
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * charts/notes
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
   charts___notes: {
     requestBody: {
       content: {
@@ -12875,6 +15008,73 @@ export type operations = {
    *
    * **Credential required**: *No*
    */
+  charts___user___drive_get: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          span: 'day' | 'hour';
+          /** @default 30 */
+          limit?: number;
+          /** @default null */
+          offset?: number | null;
+          /** Format: misskey:id */
+          userId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            totalCount: number[];
+            totalSize: number[];
+            incCount: number[];
+            incSize: number[];
+            decCount: number[];
+            decSize: number[];
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * charts/user/drive
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
   charts___user___drive: {
     requestBody: {
       content: {
@@ -12901,6 +15101,91 @@ export type operations = {
             incSize: number[];
             decCount: number[];
             decSize: number[];
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * charts/user/following
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  charts___user___following_get: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          span: 'day' | 'hour';
+          /** @default 30 */
+          limit?: number;
+          /** @default null */
+          offset?: number | null;
+          /** Format: misskey:id */
+          userId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            local: {
+              followings: {
+                total: number[];
+                inc: number[];
+                dec: number[];
+              };
+              followers: {
+                total: number[];
+                inc: number[];
+                dec: number[];
+              };
+            };
+            remote: {
+              followings: {
+                total: number[];
+                inc: number[];
+                dec: number[];
+              };
+              followers: {
+                total: number[];
+                inc: number[];
+                dec: number[];
+              };
+            };
           };
         };
       };
@@ -13027,6 +15312,76 @@ export type operations = {
    *
    * **Credential required**: *No*
    */
+  charts___user___notes_get: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          span: 'day' | 'hour';
+          /** @default 30 */
+          limit?: number;
+          /** @default null */
+          offset?: number | null;
+          /** Format: misskey:id */
+          userId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            total: number[];
+            inc: number[];
+            dec: number[];
+            diffs: {
+              normal: number[];
+              reply: number[];
+              renote: number[];
+              withFile: number[];
+            };
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * charts/user/notes
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
   charts___user___notes: {
     requestBody: {
       content: {
@@ -13055,6 +15410,75 @@ export type operations = {
               reply: number[];
               renote: number[];
               withFile: number[];
+            };
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * charts/user/pv
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  charts___user___pv_get: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          span: 'day' | 'hour';
+          /** @default 30 */
+          limit?: number;
+          /** @default null */
+          offset?: number | null;
+          /** Format: misskey:id */
+          userId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            upv: {
+              user: number[];
+              visitor: number[];
+            };
+            pv: {
+              user: number[];
+              visitor: number[];
             };
           };
         };
@@ -13166,6 +15590,73 @@ export type operations = {
    *
    * **Credential required**: *No*
    */
+  charts___user___reactions_get: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          span: 'day' | 'hour';
+          /** @default 30 */
+          limit?: number;
+          /** @default null */
+          offset?: number | null;
+          /** Format: misskey:id */
+          userId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            local: {
+              count: number[];
+            };
+            remote: {
+              count: number[];
+            };
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * charts/user/reactions
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
   charts___user___reactions: {
     requestBody: {
       content: {
@@ -13191,6 +15682,75 @@ export type operations = {
             };
             remote: {
               count: number[];
+            };
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * charts/users
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  charts___users_get: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          span: 'day' | 'hour';
+          /** @default 30 */
+          limit?: number;
+          /** @default null */
+          offset?: number | null;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            local: {
+              total: number[];
+              inc: number[];
+              dec: number[];
+            };
+            remote: {
+              total: number[];
+              inc: number[];
+              dec: number[];
             };
           };
         };
@@ -15280,6 +17840,73 @@ export type operations = {
    *
    * **Credential required**: *No*
    */
+  federation___instances_get: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Omit or use `null` to not filter by host. */
+          host?: string | null;
+          blocked?: boolean | null;
+          notResponding?: boolean | null;
+          suspended?: boolean | null;
+          silenced?: boolean | null;
+          federating?: boolean | null;
+          subscribing?: boolean | null;
+          publishing?: boolean | null;
+          /** @default 30 */
+          limit?: number;
+          /** @default 0 */
+          offset?: number;
+          /** @enum {string|null} */
+          sort?: '+pubSub' | '-pubSub' | '+notes' | '-notes' | '+users' | '-users' | '+following' | '-following' | '+followers' | '-followers' | '+firstRetrievedAt' | '-firstRetrievedAt' | '+latestRequestReceivedAt' | '-latestRequestReceivedAt' | null;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': components['schemas']['FederationInstance'][];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * federation/instances
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
   federation___instances: {
     requestBody: {
       content: {
@@ -15475,6 +18102,65 @@ export type operations = {
       200: {
         content: {
           'application/json': components['schemas']['UserDetailedNotMe'][];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * federation/stats
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  federation___stats_get: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @default 10 */
+          limit?: number;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            topSubInstances: components['schemas']['FederationInstance'][];
+            otherFollowersCount: number;
+            topPubInstances: components['schemas']['FederationInstance'][];
+            otherFollowingCount: number;
+          };
         };
       };
       /** @description Client error */
@@ -16596,6 +19282,54 @@ export type operations = {
    *
    * **Credential required**: *No*
    */
+  'get-online-users-count_get': {
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            count: number;
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * get-online-users-count
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
   'get-online-users-count': {
     responses: {
       /** @description OK (with results) */
@@ -16832,6 +19566,56 @@ export type operations = {
       200: {
         content: {
           'application/json': components['schemas']['Hashtag'];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * hashtags/trend
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  hashtags___trend_get: {
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+              tag: string;
+              chart: number[];
+              usersCount: number;
+            }[];
         };
       };
       /** @description Client error */
@@ -18709,8 +21493,8 @@ export type operations = {
           untilId?: string;
           /** @default true */
           markAsRead?: boolean;
-          includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'achievementEarned' | 'exportCompleted' | 'login' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
-          excludeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'achievementEarned' | 'exportCompleted' | 'login' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
+          includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'achievementEarned' | 'exportCompleted' | 'login' | 'noteScheduled' | 'scheduledNotePosted' | 'scheduledNoteError' | 'sensitiveFlagAssigned' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
+          excludeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'achievementEarned' | 'exportCompleted' | 'login' | 'noteScheduled' | 'scheduledNotePosted' | 'scheduledNoteError' | 'sensitiveFlagAssigned' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
         };
       };
     };
@@ -18777,8 +21561,8 @@ export type operations = {
           untilId?: string;
           /** @default true */
           markAsRead?: boolean;
-          includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'achievementEarned' | 'exportCompleted' | 'login' | 'app' | 'test' | 'reaction:grouped' | 'renote:grouped' | 'pollVote' | 'groupInvited')[];
-          excludeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'achievementEarned' | 'exportCompleted' | 'login' | 'app' | 'test' | 'reaction:grouped' | 'renote:grouped' | 'pollVote' | 'groupInvited')[];
+          includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'achievementEarned' | 'exportCompleted' | 'login' | 'noteScheduled' | 'scheduledNotePosted' | 'scheduledNoteError' | 'sensitiveFlagAssigned' | 'app' | 'test' | 'reaction:grouped' | 'renote:grouped' | 'pollVote' | 'groupInvited')[];
+          excludeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'achievementEarned' | 'exportCompleted' | 'login' | 'noteScheduled' | 'scheduledNotePosted' | 'scheduledNoteError' | 'sensitiveFlagAssigned' | 'app' | 'test' | 'reaction:grouped' | 'renote:grouped' | 'pollVote' | 'groupInvited')[];
         };
       };
     };
@@ -19876,7 +22660,6 @@ export type operations = {
           /** Format: misskey:id */
           pinnedPageId?: string | null;
           mutedWords?: (string[] | string)[];
-          hardMutedWords?: (string[] | string)[];
           mutedInstances?: string[];
           notificationRecieveConfig?: {
             note?: OneOf<[{
@@ -20008,6 +22791,16 @@ export type operations = {
           };
           emailNotificationTypes?: string[];
           alsoKnownAs?: string[];
+          mutualLinkSections?: ({
+              name?: string | null;
+              mutualLinks: ({
+                  /** Format: url */
+                  url: string;
+                  /** Format: misskey:id */
+                  fileId: string;
+                  description?: string | null;
+                })[];
+            })[];
         };
       };
     };
@@ -20130,7 +22923,7 @@ export type operations = {
           url: string;
           /** @default */
           secret?: string;
-          on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
+          on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction' | 'reportCreated' | 'reportResolved' | 'reportAutoResolved')[];
         };
       };
     };
@@ -20144,7 +22937,7 @@ export type operations = {
             /** Format: misskey:id */
             userId: string;
             name: string;
-            on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
+            on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction' | 'reportCreated' | 'reportResolved' | 'reportAutoResolved')[];
             url: string;
             secret: string;
             active: boolean;
@@ -20203,7 +22996,7 @@ export type operations = {
               /** Format: misskey:id */
               userId: string;
               name: string;
-              on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
+              on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction' | 'reportCreated' | 'reportResolved' | 'reportAutoResolved')[];
               url: string;
               secret: string;
               active: boolean;
@@ -20270,7 +23063,7 @@ export type operations = {
             /** Format: misskey:id */
             userId: string;
             name: string;
-            on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
+            on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction' | 'reportCreated' | 'reportResolved' | 'reportAutoResolved')[];
             url: string;
             secret: string;
             active: boolean;
@@ -20327,7 +23120,7 @@ export type operations = {
           name?: string;
           url?: string;
           secret?: string | null;
-          on?: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
+          on?: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction' | 'reportCreated' | 'reportResolved' | 'reportAutoResolved')[];
           active?: boolean;
         };
       };
@@ -20435,7 +23228,7 @@ export type operations = {
           /** Format: misskey:id */
           webhookId: string;
           /** @enum {string} */
-          type: 'mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction';
+          type: 'mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction' | 'reportCreated' | 'reportResolved' | 'reportAutoResolved';
           override?: {
             url?: string;
             secret?: string;
@@ -20696,6 +23489,60 @@ export type operations = {
    *
    * **Credential required**: *No*
    */
+  meta_get: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @default true */
+          detail?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': components['schemas']['MetaLite'] | components['schemas']['MetaDetailed'];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * meta
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
   meta: {
     requestBody: {
       content: {
@@ -20750,6 +23597,54 @@ export type operations = {
    *
    * **Credential required**: *No*
    */
+  emojis_get: {
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            emojis: components['schemas']['EmojiSimple'][];
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * emojis
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
   emojis: {
     responses: {
       /** @description OK (with results) */
@@ -20758,6 +23653,59 @@ export type operations = {
           'application/json': {
             emojis: components['schemas']['EmojiSimple'][];
           };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * emoji
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  emoji_get: {
+    requestBody: {
+      content: {
+        'application/json': {
+          name: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': components['schemas']['EmojiDetailed'];
         };
       };
       /** @description Client error */
@@ -21580,6 +24528,9 @@ export type operations = {
             expiresAt?: number | null;
             expiredAfter?: number | null;
           }) | null;
+          scheduledAt?: number | null;
+          /** @default false */
+          noCreatedNote?: boolean;
         };
       };
     };
@@ -21591,6 +24542,10 @@ export type operations = {
             createdNote: components['schemas']['Note'];
           };
         };
+      };
+      /** @description OK (without any results) */
+      204: {
+        content: never;
       };
       /** @description Client error */
       400: {
@@ -21689,6 +24644,120 @@ export type operations = {
     };
   };
   /**
+   * notes/scheduled/cancel
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:notes*
+   */
+  notes___scheduled___cancel: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          draftId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description To many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * notes/scheduled/list
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:notes*
+   */
+  notes___scheduled___list: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @default 10 */
+          limit?: number;
+          /** @default 0 */
+          offset?: number;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': components['schemas']['NoteDraft'][];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
    * notes/favorites/create
    * @description No description provided.
    *
@@ -21765,6 +24834,64 @@ export type operations = {
       /** @description OK (without any results) */
       204: {
         content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * notes/featured
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  notes___featured_get: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @default 10 */
+          limit?: number;
+          /** Format: misskey:id */
+          untilId?: string;
+          /** Format: misskey:id */
+          channelId?: string | null;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': components['schemas']['Note'][];
+        };
       };
       /** @description Client error */
       400: {
@@ -22240,6 +25367,67 @@ export type operations = {
    *
    * **Credential required**: *No*
    */
+  notes___reactions_get: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          noteId: string;
+          type?: string | null;
+          /** @default 10 */
+          limit?: number;
+          /** Format: misskey:id */
+          sinceId?: string;
+          /** Format: misskey:id */
+          untilId?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': components['schemas']['NoteReaction'][];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * notes/reactions
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
   notes___reactions: {
     requestBody: {
       content: {
@@ -22536,6 +25724,8 @@ export type operations = {
     requestBody: {
       content: {
         'application/json': {
+          /** @default null */
+          local?: boolean | null;
           /** @default null */
           reply?: boolean | null;
           /** @default null */
@@ -23206,12 +26396,6 @@ export type operations = {
           'application/json': components['schemas']['Error'];
         };
       };
-      /** @description To many requests */
-      429: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
       /** @description Internal server error */
       500: {
         content: {
@@ -23444,6 +26628,8 @@ export type operations = {
           alignCenter?: boolean;
           /** @default false */
           hideTitleWhenPinned?: boolean;
+          /** @enum {string} */
+          visibility?: 'public' | 'private';
         };
       };
     };
@@ -23778,6 +26964,8 @@ export type operations = {
           font?: 'serif' | 'sans-serif';
           alignCenter?: boolean;
           hideTitleWhenPinned?: boolean;
+          /** @enum {string} */
+          visibility?: 'public' | 'private';
         };
       };
     };
@@ -24873,6 +28061,65 @@ export type operations = {
    *
    * **Credential required**: *No*
    */
+  'server-info_get': {
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            machine: string;
+            cpu: {
+              model: string;
+              cores: number;
+            };
+            mem: {
+              total: number;
+            };
+            fs: {
+              total: number;
+              used: number;
+            };
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * server-info
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
   'server-info': {
     responses: {
       /** @description OK (with results) */
@@ -24891,6 +28138,60 @@ export type operations = {
               total: number;
               used: number;
             };
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * stats
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  stats_get: {
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            notesCount: number;
+            originalNotesCount: number;
+            usersCount: number;
+            originalUsersCount: number;
+            instances: number;
+            driveUsageLocal: number;
+            driveUsageRemote: number;
           };
         };
       };
@@ -25355,7 +28656,7 @@ export type operations = {
           /** @default 0 */
           offset?: number;
           /** @enum {string} */
-          sort?: '+follower' | '-follower' | '+createdAt' | '-createdAt' | '+updatedAt' | '-updatedAt';
+          sort?: '+follower' | '-follower' | '+createdAt' | '-createdAt' | '+updatedAt' | '-updatedAt' | '+pv' | '-pv';
           /**
            * @default all
            * @enum {string}
@@ -25557,6 +28858,7 @@ export type operations = {
           username?: string;
           /** @description The local host is represented with `null`. */
           host?: string | null;
+          /** @description @deprecated use get-following-birthday-users instead. */
           birthday?: string | null;
         };
       };
@@ -25661,6 +28963,78 @@ export type operations = {
     };
   };
   /**
+   * users/get-following-birthday-users
+   * @description Find users who have a birthday on the specified range.
+   *
+   * **Credential required**: *Yes* / **Permission**: *read:account*
+   */
+  'users___get-following-birthday-users': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @default 10 */
+          limit?: number;
+          /** @default 0 */
+          offset?: number;
+          birthday: {
+            month?: number;
+            day?: number;
+            begin?: {
+              month: number;
+              day: number;
+            };
+            end?: {
+              month: number;
+              day: number;
+            };
+          };
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+              /** Format: date-time */
+              birthday: string;
+              user: components['schemas']['UserLite'];
+            }[];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
    * users/get-frequently-replied-users
    * @description Get a list of other users that the specified user frequently replies to.
    *
@@ -25685,6 +29059,194 @@ export type operations = {
               user: components['schemas']['UserDetailed'];
               weight: number;
             }[];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * users/get-skeb-status
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  'users___get-skeb-status_get': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          userId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            screenName: string;
+            isCreator: boolean;
+            isAcceptable: boolean;
+            creatorRequestCount: number;
+            clientRequestCount: number;
+            skills: ({
+                amount: number;
+                /** @enum {string} */
+                genre: 'art' | 'comic' | 'voice' | 'novel' | 'video' | 'music' | 'correction';
+              })[];
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * users/get-skeb-status
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  'users___get-skeb-status': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          userId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            screenName: string;
+            isCreator: boolean;
+            isAcceptable: boolean;
+            creatorRequestCount: number;
+            clientRequestCount: number;
+            skills: ({
+                amount: number;
+                /** @enum {string} */
+                genre: 'art' | 'comic' | 'voice' | 'novel' | 'video' | 'music' | 'correction';
+              })[];
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * users/featured-notes
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  'users___featured-notes_get': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @default 10 */
+          limit?: number;
+          /** Format: misskey:id */
+          untilId?: string;
+          /** Format: misskey:id */
+          userId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': components['schemas']['Note'][];
         };
       };
       /** @description Client error */
@@ -26845,6 +30407,11 @@ export type operations = {
           /** Format: misskey:id */
           userId: string;
           comment: string;
+          /**
+           * @default other
+           * @enum {string}
+           */
+          category?: 'nsfw' | 'spam' | 'explicit' | 'phishing' | 'personalInfoLeak' | 'selfHarm' | 'criticalBreach' | 'otherBreach' | 'violationRights' | 'violationRightsOther' | 'other';
         };
       };
     };
@@ -27023,6 +30590,8 @@ export type operations = {
           username?: string;
           /** @description The local host is represented with `null`. */
           host?: string | null;
+          /** @default true */
+          detailed?: boolean;
         };
       };
     };
@@ -27030,7 +30599,147 @@ export type operations = {
       /** @description OK (with results) */
       200: {
         content: {
-          'application/json': components['schemas']['UserDetailed'] | components['schemas']['UserDetailed'][];
+          'application/json': components['schemas']['UserLite'] | components['schemas']['UserDetailed'] | components['schemas']['UserLite'][] | components['schemas']['UserDetailed'][];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * users/get-security-info
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  'users___get-security-info': {
+    requestBody: {
+      content: {
+        'application/json': {
+          email: string;
+          password: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            twoFactorEnabled: boolean;
+            usePasswordLessLogin: boolean;
+            securityKeys: boolean;
+          };
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description To many requests */
+      429: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * users/stats
+   * @description Show statistics about a user.
+   *
+   * **Credential required**: *No*
+   */
+  users___stats: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          userId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            notesCount: number;
+            repliesCount: number;
+            renotesCount: number;
+            repliedCount: number;
+            renotedCount: number;
+            pollVotesCount: number;
+            pollVotedCount: number;
+            localFollowingCount: number;
+            remoteFollowingCount: number;
+            localFollowersCount: number;
+            remoteFollowersCount: number;
+            followingCount: number;
+            followersCount: number;
+            sentReactionsCount: number;
+            receivedReactionsCount: number;
+            noteFavoritesCount: number;
+            pageLikesCount: number;
+            pageLikedCount: number;
+            driveFilesCount: number;
+            /** @description Drive usage in bytes */
+            driveUsage: number;
+          };
         };
       };
       /** @description Client error */
@@ -27143,6 +30852,106 @@ export type operations = {
       /** @description OK (without any results) */
       204: {
         content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * fetch-rss
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
+  'fetch-rss_get': {
+    requestBody: {
+      content: {
+        'application/json': {
+          url: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+            image?: {
+              link?: string;
+              url: string;
+              title?: string;
+            };
+            paginationLinks?: {
+              self?: string;
+              first?: string;
+              next?: string;
+              last?: string;
+              prev?: string;
+            };
+            link?: string;
+            title?: string;
+            items: {
+                link?: string;
+                guid?: string;
+                title?: string;
+                pubDate?: string;
+                creator?: string;
+                summary?: string;
+                content?: string;
+                isoDate?: string;
+                categories?: string[];
+                contentSnippet?: string;
+                enclosure?: {
+                  url: string;
+                  length?: number;
+                  type?: string;
+                };
+              }[];
+            feedUrl?: string;
+            description?: string;
+            itunes?: {
+              image?: string;
+              owner?: {
+                name?: string;
+                email?: string;
+              };
+              author?: string;
+              summary?: string;
+              explicit?: string;
+              categories?: string[];
+              keywords?: string[];
+              [key: string]: unknown;
+            };
+          };
+        };
       };
       /** @description Client error */
       400: {
@@ -27346,6 +31155,59 @@ export type operations = {
    *
    * **Credential required**: *No*
    */
+  retention_get: {
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+              /** Format: date-time */
+              createdAt: string;
+              users: number;
+              data: {
+                [key: string]: number;
+              };
+            }[];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * retention
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
   retention: {
     responses: {
       /** @description OK (with results) */
@@ -27460,6 +31322,64 @@ export type operations = {
    *
    * **Credential required**: *No*
    */
+  'bubble-game___ranking_get': {
+    requestBody: {
+      content: {
+        'application/json': {
+          gameMode: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (with results) */
+      200: {
+        content: {
+          'application/json': {
+              /** Format: misskey:id */
+              id: string;
+              score: number;
+              user?: components['schemas']['UserLite'];
+            }[];
+        };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * bubble-game/ranking
+   * @description No description provided.
+   *
+   * **Credential required**: *No*
+   */
   'bubble-game___ranking': {
     requestBody: {
       content: {
@@ -27516,7 +31436,7 @@ export type operations = {
    * reversi/cancel-match
    * @description No description provided.
    *
-   * **Credential required**: *Yes* / **Permission**: *write:account*
+   * **Credential required**: *Yes* / **Permission**: *read:account*
    */
   'reversi___cancel-match': {
     requestBody: {
@@ -27628,7 +31548,7 @@ export type operations = {
    * reversi/match
    * @description No description provided.
    *
-   * **Credential required**: *Yes* / **Permission**: *write:account*
+   * **Credential required**: *Yes* / **Permission**: *read:account*
    */
   reversi___match: {
     requestBody: {
@@ -27790,7 +31710,7 @@ export type operations = {
    * reversi/surrender
    * @description No description provided.
    *
-   * **Credential required**: *Yes* / **Permission**: *write:account*
+   * **Credential required**: *Yes* / **Permission**: *read:account*
    */
   reversi___surrender: {
     requestBody: {

@@ -69,7 +69,7 @@ const prComponent = shallowRef<InstanceType<typeof MkPullToRefresh>>();
 const tlComponent = shallowRef<InstanceType<typeof MkNotes>>();
 
 let tlNotesCount = 0;
-const notVisibleNoteData = new Set<object>();
+const notVisibleNoteData = new Array<object>();
 
 async function prepend(data) {
 	if (tlComponent.value == null) return;
@@ -100,14 +100,11 @@ async function prepend(data) {
 
 		tlComponent.value.pagingComponent?.prepend(note);
 	} else {
-		if (notVisibleNoteData.has(data.id)) return;
+		notVisibleNoteData.push(data);
 
-		if (notVisibleNoteData.size > 10) {
-			const firstItem = notVisibleNoteData.values().next().value;
-			if (firstItem) notVisibleNoteData.delete(firstItem);
+		if (notVisibleNoteData.length > 10) {
+			notVisibleNoteData.shift();
 		}
-
-		notVisibleNoteData.add(data);
 	}
 
 	emit('note');
@@ -120,23 +117,18 @@ async function prepend(data) {
 async function loadUnloadedNotes() {
 	if (document.hidden) return;
 	if (tlComponent.value == null) return;
-	if (notVisibleNoteData.size === 0) return;
+	if (notVisibleNoteData.length === 0) return;
 
-	// 10件以上表示できる投稿がない状態でdeleteItemしてしまうと、TLのリロードが入って逆効果になってしまう
-	if (notVisibleNoteData.size > 10) {
+	if (notVisibleNoteData.length >= 10) {
 		tlComponent.value.pagingComponent?.deleteItem();
 		tlComponent.value.pagingComponent?.stopFetch();
 	}
 
-	for (const noteData of notVisibleNoteData) {
-		await prepend(noteData);
+	while (notVisibleNoteData.length > 0) {
+		await prepend(notVisibleNoteData.shift());
 	}
 
-	if (notVisibleNoteData.size > 10) {
-		tlComponent.value.pagingComponent?.startFetch();
-	}
-
-	notVisibleNoteData.clear();
+	tlComponent.value.pagingComponent?.startFetch();
 }
 
 let connection: Misskey.ChannelConnection | null = null;

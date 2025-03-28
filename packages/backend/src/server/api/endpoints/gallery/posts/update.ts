@@ -9,6 +9,7 @@ import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { DriveFilesRepository, GalleryPostsRepository } from '@/models/_.js';
 import { GalleryPostEntityService } from '@/core/entities/GalleryPostEntityService.js';
 import { DI } from '@/di-symbols.js';
+import type { MiDriveFile } from '@/models/DriveFile.js';
 
 export const meta = {
 	tags: ['gallery'],

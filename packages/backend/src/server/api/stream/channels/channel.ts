@@ -34,7 +34,7 @@ class ChannelChannel extends Channel {
 	public async init(params: JsonObject) {
 		if (typeof params.channelId !== 'string') return;
 		this.channelId = params.channelId;
-		this.minimize = params.minimize ?? false;
+		this.minimize = !!(params.minimize ?? false);
 
 		// Subscribe stream
 		this.subscriber.on('notesStream', this.onNote);

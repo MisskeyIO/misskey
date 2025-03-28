@@ -74,8 +74,10 @@ export class UserWebhookService implements OnApplicationShutdown {
 		switch (type) {
 			case 'webhookCreated': {
 				if (body.active) {
-					this.activeWebhooks.push({ // TODO: このあたりのデシリアライズ処理は各modelファイル内に関数としてexportしたい
+					// TODO: このあたりのデシリアライズ処理は各modelファイル内に関数としてexportしたい
+					this.activeWebhooks.push({
 						...body,
+						createdAt: new Date(body.createdAt),
 						latestSentAt: body.latestSentAt ? new Date(body.latestSentAt) : null,
 						user: null, // joinなカラムは通常取ってこないので
 					});
@@ -86,14 +88,18 @@ export class UserWebhookService implements OnApplicationShutdown {
 				if (body.active) {
 					const i = this.activeWebhooks.findIndex(a => a.id === body.id);
 					if (i > -1) {
-						this.activeWebhooks[i] = { // TODO: このあたりのデシリアライズ処理は各modelファイル内に関数としてexportしたい
+						// TODO: このあたりのデシリアライズ処理は各modelファイル内に関数としてexportしたい
+						this.activeWebhooks[i] = {
 							...body,
+							createdAt: new Date(body.createdAt),
 							latestSentAt: body.latestSentAt ? new Date(body.latestSentAt) : null,
 							user: null, // joinなカラムは通常取ってこないので
 						};
 					} else {
-						this.activeWebhooks.push({ // TODO: このあたりのデシリアライズ処理は各modelファイル内に関数としてexportしたい
+						// TODO: このあたりのデシリアライズ処理は各modelファイル内に関数としてexportしたい
+						this.activeWebhooks.push({
 							...body,
+							createdAt: new Date(body.createdAt),
 							latestSentAt: body.latestSentAt ? new Date(body.latestSentAt) : null,
 							user: null, // joinなカラムは通常取ってこないので
 						});

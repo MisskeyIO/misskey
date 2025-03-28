@@ -202,7 +202,7 @@ export class WebAuthnService {
 	 */
 	@bindThis
 	public async verifySignInWithPasskeyAuthentication(context: string, response: AuthenticationResponseJSON): Promise<MiUser['id'] | null> {
-		const challenge = await this.redisClient.get(`webauthn:challenge:${context}`);
+		const challenge = await this.redisClient.getdel(`webauthn:challenge:${context}`);
 
 		if (!challenge) {
 			throw new IdentifiableError('2d16e51c-007b-4edd-afd2-f7dd02c947f6', `challenge '${context}' not found`);
@@ -218,18 +218,18 @@ export class WebAuthnService {
 			throw new IdentifiableError('36b96a7d-b547-412d-aeed-2d611cdc8cdc', 'Unknown Webauthn key');
 		}
 
-		const relyingParty = await this.getRelyingParty();
+		const relyingParty = this.getRelyingParty();
 
 		let verification;
-		try { //TODO 確認する
+		try {
 			verification = await verifyAuthenticationResponse({
 				response: response,
 				expectedChallenge: challenge,
 				expectedOrigin: relyingParty.origin,
 				expectedRPID: relyingParty.rpId,
-				authenticator: {
-					credentialID: key.id,
-					credentialPublicKey: Buffer.from(key.publicKey, 'base64url'),
+				credential: {
+					id: key.id,
+					publicKey: Buffer.from(key.publicKey, 'base64url'),
 					counter: key.counter,
 					transports: key.transports ? key.transports as AuthenticatorTransportFuture[] : undefined,
 				},

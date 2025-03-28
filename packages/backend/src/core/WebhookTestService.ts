@@ -38,6 +38,8 @@ function generateAbuseReport(override?: Partial<MiAbuseUserReport>): AbuseUserRe
 		reporterHost: null,
 		resolvedAs: null,
 		moderationNote: 'foo',
+		category: 'other',
+		createdAt: new Date(),
 		...override,
 	};
 
@@ -95,6 +97,7 @@ function generateDummyUser(override?: Partial<MiUser>): MiUser {
 		uri: null,
 		followersUri: null,
 		token: null,
+		createdAt: new Date(),
 		...override,
 	};
 }
@@ -137,6 +140,7 @@ function generateDummyNote(override?: Partial<MiNote>): MiNote {
 		replyUserHost: null,
 		renoteUserId: null,
 		renoteUserHost: null,
+		createdAt: new Date(),
 		...override,
 	};
 }
@@ -255,6 +259,7 @@ function toPackedUserDetailedNotMe(user: MiUser, override?: Packed<'UserDetailed
 		isRenoteMuted: false,
 		notify: 'none',
 		withReplies: true,
+		isLimited: false,
 		...override,
 	};
 }

@@ -34,7 +34,7 @@ class AntennaChannel extends Channel {
 	public async init(params: JsonObject) {
 		if (typeof params.antennaId !== 'string') return;
 		this.antennaId = params.antennaId;
-		this.minimize = params.minimize ?? false;
+		this.minimize = !!(params.minimize ?? false);
 
 		// Subscribe stream
 		this.subscriber.on(`antennaStream:${this.antennaId}`, this.onEvent);

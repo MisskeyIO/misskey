@@ -168,12 +168,10 @@ export class ApiCallService implements OnApplicationShutdown {
 				});
 			}
 
-			throw new ApiError(null, {
-				e: {
-					message: err.message,
-					code: err.name,
-					id: errId,
-				},
+			throw new ApiError({
+				message: err.message,
+				code: err.name,
+				id: errId,
 			});
 		}
 	}

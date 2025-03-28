@@ -89,8 +89,8 @@ describe('SigninWithPasskeyApiService', () => {
 		app = await Test.createTestingModule({
 			imports: [GlobalModule, CoreModule],
 			providers: [
-				SigninWithPasskeyApiService, 
-				{ provide: RateLimiterService, useClass: FakeLimiter }, 
+				SigninWithPasskeyApiService,
+				{ provide: RateLimiterService, useClass: FakeLimiter },
 				{ provide: SigninService, useClass: FakeSigninService },
 			],
 		}).useMocker((token) => {
@@ -115,8 +115,7 @@ describe('SigninWithPasskeyApiService', () => {
 		jest.spyOn(webAuthnService, 'verifySignInWithPasskeyAuthentication').mockImplementation(FakeWebauthnVerify);
 
 		const dummyUser = {
-			id: uid, username: uid, usernameLower: uid.toLocaleLowerCase(), uri: null, host: null,
-		 };
+			id: uid, username: uid, usernameLower: uid.toLocaleLowerCase(), uri: null, host: null };
 		const dummyProfile = {
 			userId: uid,
 			password: 'qwerty',
@@ -161,7 +160,7 @@ describe('SigninWithPasskeyApiService', () => {
 			const res = new DummyFastifyReply() as FastifyReply;
 			jest.spyOn(webAuthnService, 'verifySignInWithPasskeyAuthentication')
 				.mockImplementation(async () => {
-					throw new IdentifiableError('THIS_ERROR_CODE_SHOULD_BE_FORWARDED');
+					throw new IdentifiableError('THIS_ERROR_CODE_SHOULD_BE_FORWARDED', 'THIS_ERROR_CODE_SHOULD_BE_FORWARDED');
 				});
 			const res_body = await passkeyApiService.signin(req, res);
 			expect(res.statusCode).toBe(403);

@@ -1151,7 +1151,7 @@ describe('Timelines', () => {
 			const res = await api('notes/user-list-timeline', { listId: list.id }, alice);
 
 			assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
-			assert.strictEqual(res.body.find((note: any) => note.id === bobNote.id).text, 'hi');
+			assert.strictEqual(res.body.find((note: any) => note.id === bobNote.id)?.text, 'hi');
 		});
 
 		test.concurrent('[withFiles: true] リスインしているユーザーのファイル付きノートのみ含まれる', async () => {

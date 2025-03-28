@@ -417,7 +417,7 @@ describe('User', () => {
 				const followers = await alice.client.request('users/followers', { userId: alice.id });
 				strictEqual(followers.length, 1); // followed by Bob
 
-				await bAdmin.client.request('admin/delete-account', { userId: aliceInB.id });
+				await bAdmin.client.request('admin/accounts/delete', { userId: aliceInB.id });
 				await sleep();
 
 				/**

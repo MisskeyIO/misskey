@@ -3,10 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import * as os from 'node:os';
 import { defineAsyncComponent, Ref, ShallowRef } from 'vue';
 import * as Misskey from 'misskey-js';
-import { action } from '@storybook/addon-actions';
 import { claimAchievement } from './achievements.js';
 import { $i } from '@/account.js';
 import { i18n } from '@/i18n.js';
@@ -24,7 +22,6 @@ import MkRippleEffect from '@/components/MkRippleEffect.vue';
 import { isSupportShare } from '@/scripts/navigator.js';
 import { isMute, playUrl } from '@/scripts/sound';
 import { isAprilFoolsDay } from '@/scripts/seasonal-events';
-import channel from '@/pages/channel.vue';
 
 export async function getNoteClipMenu(props: {
 	note: Misskey.entities.Note;

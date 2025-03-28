@@ -422,6 +422,12 @@ defineExpose({
 	append: appendItem,
 	removeItem,
 	updateItem,
+	stopFetch: () => {
+		more.value = false;
+	},
+	startFetch: () => {
+		more.value = true;
+	},
 });
 </script>
 

@@ -101,6 +101,12 @@ async function prepend(data) {
 		tlComponent.value.pagingComponent?.prepend(note);
 	} else {
 		if (notVisibleNoteData.has(data.id)) return;
+
+		if (notVisibleNoteData.size > 10) {
+			const firstItem = notVisibleNoteData.values().next().value;
+			if (firstItem) notVisibleNoteData.delete(firstItem);
+		}
+
 		notVisibleNoteData.add(data);
 	}
 
@@ -119,12 +125,15 @@ async function loadUnloadedNotes() {
 	// 10件以上表示できる投稿がない状態でdeleteItemしてしまうと、TLのリロードが入って逆効果になってしまう
 	if (notVisibleNoteData.size > 10) {
 		tlComponent.value.pagingComponent?.deleteItem();
+		tlComponent.value.pagingComponent?.stopFetch();
 	}
 
-	let loopCount = 0;
 	for (const noteData of notVisibleNoteData) {
-		if (loopCount++ > 10) break;
 		await prepend(noteData);
+	}
+
+	if (notVisibleNoteData.size > 10) {
+		tlComponent.value.pagingComponent?.startFetch();
 	}
 
 	notVisibleNoteData.clear();

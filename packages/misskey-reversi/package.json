@@ -19,7 +19,7 @@
 		"tsc-esm": "tsc --outDir built/esm",
 		"tsc-dts": "tsc --outDir built/dts --declaration true --emitDeclarationOnly true --declarationMap true",
 		"watch": "nodemon -w src -e ts,js,cjs,mjs,json --exec \"pnpm run build:tsc\"",
-		"eslint": "eslint . --ext .js,.jsx,.ts,.tsx",
+		"eslint": "eslint './**/*.{js,jsx,ts,tsx}'",
 		"typecheck": "tsc --noEmit",
 		"lint": "pnpm typecheck && pnpm eslint"
 	},

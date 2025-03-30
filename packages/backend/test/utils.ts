@@ -136,7 +136,7 @@ export const signup = async (params?: Partial<misskey.Endpoints['signup']['req']
 	return res.body;
 };
 
-export const post = async (user: UserToken, params: misskey.Endpoints['notes/create']['req']): Promise<misskey.entities.Note> => {
+export const post = async (user: UserToken, params: misskey.Endpoints['notes/create']['req']): Promise<misskey.entities.Note | null> => {
 	const q = params;
 
 	const res = await api('notes/create', q, user);

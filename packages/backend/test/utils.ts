@@ -141,6 +141,9 @@ export const post = async (user: UserToken, params: misskey.Endpoints['notes/cre
 
 	const res = await api('notes/create', q, user);
 
+	assert.strictEqual(res.status, 200);
+	assert.notEqual(res.body, null);
+
 	return res.body.createdNote;
 };
 

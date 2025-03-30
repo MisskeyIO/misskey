@@ -46,6 +46,7 @@
 		"cleanall": "pnpm clean-all"
 	},
 	"resolutions": {
+		"@aiscript-dev/aiscript-languageserver": "github:aiscript-dev/aiscript-languageserver#0.1.6",
 		"@tensorflow/tfjs-core": "4.22.0",
 		"axios": "1.8.4",
 		"chokidar": "4.0.3",

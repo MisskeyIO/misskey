@@ -5,6 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
+  '@aiscript-dev/aiscript-languageserver': github:aiscript-dev/aiscript-languageserver#0.1.6
   '@tensorflow/tfjs-core': 4.22.0
   axios: 1.8.4
   chokidar: 4.0.3
@@ -1285,8 +1286,8 @@ packages:
   '@adobe/css-tools@4.4.2':
     resolution: {integrity: sha512-baYZExFpsdkBNuvGKTKWCwKH57HRZLVtycZS05WTQNVOiXVSeAki3nU35zlRbToeMW8aHlJfyS+1C4BOv27q0A==}
 
-  '@aiscript-dev/aiscript-languageserver@https://objects.githubusercontent.com/github-production-release-asset-2e65be/719047635/e986a4bc-d6d1-4ccc-8772-37eead5f7832?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=releaseassetproduction%2F20250330%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250330T193322Z&X-Amz-Expires=300&X-Amz-Signature=7ca4078634c12b6eebd5aa8203d3d029305f1ad268335980c8375fefd761e31b&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3Daiscript-dev-aiscript-languageserver-0.1.6.tgz&response-content-type=application%2Foctet-stream':
-    resolution: {tarball: https://objects.githubusercontent.com/github-production-release-asset-2e65be/719047635/e986a4bc-d6d1-4ccc-8772-37eead5f7832?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=releaseassetproduction%2F20250330%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250330T193322Z&X-Amz-Expires=300&X-Amz-Signature=7ca4078634c12b6eebd5aa8203d3d029305f1ad268335980c8375fefd761e31b&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3Daiscript-dev-aiscript-languageserver-0.1.6.tgz&response-content-type=application%2Foctet-stream}
+  '@aiscript-dev/aiscript-languageserver@https://codeload.github.com/aiscript-dev/aiscript-languageserver/tar.gz/55617e59efc6d13b3ec7be04942343e09853272f':
+    resolution: {tarball: https://codeload.github.com/aiscript-dev/aiscript-languageserver/tar.gz/55617e59efc6d13b3ec7be04942343e09853272f}
     version: 0.1.6
     hasBin: true
 
@@ -10087,7 +10088,7 @@ snapshots:
 
   '@adobe/css-tools@4.4.2': {}
 
-  '@aiscript-dev/aiscript-languageserver@https://objects.githubusercontent.com/github-production-release-asset-2e65be/719047635/e986a4bc-d6d1-4ccc-8772-37eead5f7832?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=releaseassetproduction%2F20250330%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250330T193322Z&X-Amz-Expires=300&X-Amz-Signature=7ca4078634c12b6eebd5aa8203d3d029305f1ad268335980c8375fefd761e31b&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3Daiscript-dev-aiscript-languageserver-0.1.6.tgz&response-content-type=application%2Foctet-stream':
+  '@aiscript-dev/aiscript-languageserver@https://codeload.github.com/aiscript-dev/aiscript-languageserver/tar.gz/55617e59efc6d13b3ec7be04942343e09853272f':
     dependencies:
       seedrandom: 3.0.5
       stringz: 2.1.0
@@ -13789,7 +13790,7 @@ snapshots:
 
   aiscript-vscode@https://codeload.github.com/aiscript-dev/aiscript-vscode/tar.gz/c3cde89e79a41d93540cf8a48cd619c3f2dcb1b7:
     dependencies:
-      '@aiscript-dev/aiscript-languageserver': https://objects.githubusercontent.com/github-production-release-asset-2e65be/719047635/e986a4bc-d6d1-4ccc-8772-37eead5f7832?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=releaseassetproduction%2F20250330%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250330T193322Z&X-Amz-Expires=300&X-Amz-Signature=7ca4078634c12b6eebd5aa8203d3d029305f1ad268335980c8375fefd761e31b&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3Daiscript-dev-aiscript-languageserver-0.1.6.tgz&response-content-type=application%2Foctet-stream
+      '@aiscript-dev/aiscript-languageserver': https://codeload.github.com/aiscript-dev/aiscript-languageserver/tar.gz/55617e59efc6d13b3ec7be04942343e09853272f
       vscode-languageclient: 9.0.1
 
   ajv-draft-04@1.0.0(ajv@8.13.0):

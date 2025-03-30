@@ -138,17 +138,16 @@ const gaConsent = computed({
 		gaConsentInternal.value = value;
 	},
 });
-const gtagConsentInternal = ref(
-	(miLocalStorage.getItemAsJson('gtagConsent') as GtagConsentParams) ?? {
-		ad_storage: 'denied',
-		ad_user_data: 'denied',
-		ad_personalization: 'denied',
-		analytics_storage: 'denied',
-		functionality_storage: 'denied',
-		personalization_storage: 'denied',
-		security_storage: 'granted',
-	},
-);
+const gtagConsentInternal = ref({
+	ad_storage: 'denied',
+	ad_user_data: 'denied',
+	ad_personalization: 'denied',
+	analytics_storage: 'denied',
+	functionality_storage: 'denied',
+	personalization_storage: 'denied',
+	security_storage: 'granted',
+	...(miLocalStorage.getItemAsJson('gtagConsent') as GtagConsentParams),
+});
 const gtagConsentParams = computed({
 	get: () => gtagConsentInternal.value,
 	set: (value: GtagConsentParams) => {
@@ -201,8 +200,8 @@ watch(gaConsent, async () => {
 	await reloadAsk();
 });
 
-watch(gtagConsent, async () => {
-	gtagConsent('update', gtagConsentParams.value);
+watch(gtagConsentParams, async () => {
+	gtagConsent('update', gtagConsentParams.value as GtagConsentParams);
 });
 
 function save() {

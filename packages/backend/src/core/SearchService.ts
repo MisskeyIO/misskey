@@ -121,7 +121,7 @@ export class SearchService {
 			});*/
 		} else if (this.elasticsearch) {
 			this.elasticsearchNoteIndex = `${config.elasticsearch!.index}`;
-			this.elasticsearchIdField = `${this.config.host}_id`;
+			this.elasticsearchIdField = `${config.host}_id`;
 			/* 外部からindexさせるのでこの処理は不要
 			this.elasticsearch.indices.exists({
 				index: this.elasticsearchNoteIndex,

@@ -68,7 +68,8 @@ function compileQuery(q: Q): string {
 export class SearchService {
 	private readonly meilisearchIndexScope: 'local' | 'global' | string[] = 'local';
 	private meilisearchNoteIndex: Index | null = null;
-	private elasticsearchNoteIndex: string | null = null;
+	private readonly elasticsearchNoteIndex: string;
+	private readonly elasticsearchIdField: string;
 	private logger: Logger;
 
 	constructor(
@@ -119,7 +120,8 @@ export class SearchService {
 				},
 			});*/
 		} else if (this.elasticsearch) {
-			this.elasticsearchNoteIndex = `${config.elasticsearch!.index}---notes`;
+			this.elasticsearchNoteIndex = `${config.elasticsearch!.index}`;
+			this.elasticsearchIdField = `${this.config.host}_id`;
 			/* 外部からindexさせるのでこの処理は不要
 			this.elasticsearch.indices.exists({
 				index: this.elasticsearchNoteIndex,
@@ -165,7 +167,7 @@ export class SearchService {
 			}).catch((error) => {
 				this.logger.error('Error while checking if index exists', error);
 			});
-			 */
+			*/
 		}
 	}
 
@@ -221,7 +223,7 @@ export class SearchService {
 			}).catch((error) => {
 				this.logger.error(error);
 			});
-			 */
+			*/
 		}
 	}
 
@@ -239,7 +241,7 @@ export class SearchService {
 			}).catch((error) => {
 				this.logger.error(error);
 			});
-			 */
+			*/
 		}
 	}
 
@@ -327,11 +329,14 @@ export class SearchService {
 				index: this.elasticsearchNoteIndex + '*' as string,
 				query: esFilter,
 				sort: [{ createdAt: { order: 'desc' } }],
-				_source: ['id', 'createdAt', `${this.config.host}_id`],
+				_source: ['id', 'createdAt', this.elasticsearchIdField],
 				size: pagination.limit,
 			});
 
-			const noteIds = res.hits.hits.map((hit) => (hit._source as Record<string, unknown>)[`${this.config.host}_id`] as string);
+			const noteIds = res.hits.hits.map((hit) => {
+				const source = hit._source as Record<string, unknown>;
+				return (source[this.elasticsearchIdField] as string) || null;
+			}).filter((id): id is string => id !== null);
 			if (noteIds.length === 0) return [];
 			const [
 				userIdsWhoMeMuting,

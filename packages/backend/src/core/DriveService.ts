@@ -44,6 +44,7 @@ import { correctFilename } from '@/misc/correct-filename.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
 import { LoggerService } from '@/core/LoggerService.js';
+import { NotificationService } from '@/core/NotificationService.js';
 
 type AddFileArgs = {
 	/** User who wish to add file */
@@ -129,6 +130,7 @@ export class DriveService {
 		private driveChart: DriveChart,
 		private perUserDriveChart: PerUserDriveChart,
 		private instanceChart: InstanceChart,
+		private notificationService: NotificationService,
 	) {
 		const logger = this.loggerService.getLogger('drive', 'blue');
 		this.registerLogger = logger.createSubLogger('register', 'yellow');
@@ -146,25 +148,27 @@ export class DriveService {
 	 */
 	@bindThis
 	private async save(file: MiDriveFile, path: string, name: string, type: string, hash: string, size: number): Promise<MiDriveFile> {
-	// thunbnail, webpublic を必要なら生成
-		const alts = await this.generateAlts(path, type, !file.uri);
+		const fileType = type.split(';')[0];
+
+		// thunbnail, webpublic を必要なら生成
+		const alts = await this.generateAlts(path, fileType, !file.uri);
 
 		if (this.config.s3) {
 		//#region ObjectStorage params
 			let [ext] = (name.match(/\.([a-zA-Z0-9_-]+)$/) ?? ['']);
 
 			if (ext === '') {
-				if (type === 'image/jpeg') ext = '.jpg';
-				if (type === 'image/png') ext = '.png';
-				if (type === 'image/webp') ext = '.webp';
-				if (type === 'image/avif') ext = '.avif';
-				if (type === 'image/apng') ext = '.apng';
-				if (type === 'image/vnd.mozilla.apng') ext = '.apng';
+				if (fileType === 'image/jpeg') ext = '.jpg';
+				if (fileType === 'image/png') ext = '.png';
+				if (fileType === 'image/webp') ext = '.webp';
+				if (fileType === 'image/avif') ext = '.avif';
+				if (fileType === 'image/apng') ext = '.apng';
+				if (fileType === 'image/vnd.mozilla.apng') ext = '.apng';
 			}
 
 			// 拡張子からContent-Typeを設定してそうな挙動を示すオブジェクトストレージ (upcloud?) も存在するので、
 			// 許可されているファイル形式でしかURLに拡張子をつけない
-			if (!FILE_TYPE_BROWSERSAFE.includes(type)) {
+			if (!FILE_TYPE_BROWSERSAFE.includes(fileType)) {
 				ext = '';
 			}
 
@@ -371,8 +375,10 @@ export class DriveService {
 	 */
 	@bindThis
 	private async upload(key: string, stream: fs.ReadStream | Buffer, type: string, ext?: string | null, filename?: string) {
-		if (type === 'image/apng') type = 'image/png';
-		if (!FILE_TYPE_BROWSERSAFE.includes(type)) type = 'application/octet-stream';
+		const fileType = type.split(';')[0];
+
+		if (fileType === 'image/apng') type = 'image/png';
+		if (!FILE_TYPE_BROWSERSAFE.includes(fileType)) type = 'application/octet-stream';
 
 		const params = {
 			Bucket: this.config.s3?.bucket,
@@ -656,13 +662,15 @@ export class DriveService {
 	@bindThis
 	public async updateFile(file: MiDriveFile, values: Partial<MiDriveFile>, updater: MiUser) {
 		const alwaysMarkNsfw = (await this.roleService.getUserPolicies(file.userId)).alwaysMarkNsfw;
+		const isModerator = await this.roleService.isModerator(updater);
 
 		if (values.name != null && !this.driveFileEntityService.validateFileName(values.name)) {
 			throw new DriveService.InvalidFileNameError();
 		}
 
-		if (values.isSensitive !== undefined && values.isSensitive !== file.isSensitive && alwaysMarkNsfw && !values.isSensitive) {
-			throw new DriveService.CannotUnmarkSensitiveError();
+		if (values.isSensitive !== undefined && values.isSensitive !== file.isSensitive && !values.isSensitive) {
+			if (alwaysMarkNsfw) throw new DriveService.CannotUnmarkSensitiveError();
+			if (file.isSensitiveByModerator && (file.userId === updater.id)) throw new DriveService.CannotUnmarkSensitiveError();
 		}
 
 		if (values.folderId != null) {
@@ -676,6 +684,10 @@ export class DriveService {
 			}
 		}
 
+		if (isModerator && file.userId !== updater.id) {
+			values.isSensitiveByModerator = values.isSensitive;
+		}
+
 		await this.driveFilesRepository.update(file.id, values);
 
 		const fileObj = await this.driveFileEntityService.pack(file.id, updater, { self: true });
@@ -685,7 +697,7 @@ export class DriveService {
 			this.globalEventService.publishDriveStream(file.userId, 'fileUpdated', fileObj);
 		}
 
-		if (await this.roleService.isModerator(updater) && (file.userId !== updater.id)) {
+		if (isModerator && (file.userId !== updater.id)) {
 			if (values.isSensitive !== undefined && values.isSensitive !== file.isSensitive) {
 				const user = file.userId ? await this.usersRepository.findOneByOrFail({ id: file.userId }) : null;
 				if (values.isSensitive) {
@@ -695,6 +707,11 @@ export class DriveService {
 						fileUserUsername: user?.username ?? null,
 						fileUserHost: user?.host ?? null,
 					});
+					if (file.userId) {
+						this.notificationService.createNotification(file.userId, 'sensitiveFlagAssigned', {
+							fileId: file.id,
+						});
+					}
 				} else {
 					this.moderationLogService.log(updater, 'unmarkSensitiveDriveFile', {
 						fileId: file.id,

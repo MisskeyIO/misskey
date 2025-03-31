@@ -11,6 +11,7 @@ import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import { defaultStore } from '@/store.js';
 import { MisskeyEntity } from '@/types/date-separated-list.js';
+import { isAprilFoolsDay } from '@/scripts/seasonal-events';
 
 export default defineComponent({
 	props: {
@@ -136,14 +137,15 @@ export default defineComponent({
 			[$style['date-separated-list-nogap']]: props.noGap,
 			[$style['direction-down']]: props.direction === 'down',
 			[$style['direction-up']]: props.direction === 'up',
+			[$style['april-fool']]: defaultStore.state.animation ? isAprilFoolsDay() : false,
 		};
 
 		return () => defaultStore.state.animation ? h(TransitionGroup, {
 			class: classes,
 			name: 'list',
 			tag: 'div',
-			onBeforeLeave,
-			onLeaveCancelled,
+			onBeforeLeave: !isAprilFoolsDay() ? onBeforeLeave : undefined,
+			onLeaveCancelled: !isAprilFoolsDay() ? onLeaveCancelled : undefined,
 		}, { default: renderChildren }) : h('div', {
 			class: classes,
 		}, { default: renderChildren });
@@ -207,6 +209,13 @@ export default defineComponent({
 		opacity: 0;
 		transform: translateY(-64px);
 	}
+	}
+}
+
+.april-fool {
+	&:global > .list-enter-from,
+	&:global > .list-leave-to {
+		animation: global-spin-shrink 3s ease-in forwards;
 	}
 }
 

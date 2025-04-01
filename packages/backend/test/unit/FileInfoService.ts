@@ -11,13 +11,13 @@ import { dirname } from 'node:path';
 import { ModuleMocker } from 'jest-mock';
 import { Test } from '@nestjs/testing';
 import { afterAll, beforeAll, describe, test } from '@jest/globals';
+import type { TestingModule } from '@nestjs/testing';
+import type { MockFunctionMetadata } from 'jest-mock';
 import { GlobalModule } from '@/GlobalModule.js';
 import { FileInfo, FileInfoService } from '@/core/FileInfoService.js';
 //import { DI } from '@/di-symbols.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import { AiService } from '@/core/AiService.js';
-import type { TestingModule } from '@nestjs/testing';
-import type { MockFunctionMetadata } from 'jest-mock';
 
 const _filename = fileURLToPath(import.meta.url);
 const _dirname = dirname(_filename);
@@ -36,7 +36,7 @@ describe('FileInfoService', () => {
 		delete fi.porn;
 
 		return fi;
-	}
+	};
 
 	beforeAll(async () => {
 		app = await Test.createTestingModule({
@@ -89,7 +89,7 @@ describe('FileInfoService', () => {
 
 	describe('IMAGE', () => {
 		test('Generic JPEG', async () => {
-			const path = `${resources}/Lenna.jpg`;
+			const path = `${resources}/192.jpg`;
 			const info = strip(await fileInfoService.getFileInfo(path, { skipSensitiveDetection: true }));
 			assert.deepStrictEqual(info, {
 				size: 5131,

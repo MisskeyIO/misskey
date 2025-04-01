@@ -6,15 +6,14 @@ import { MainModule } from '../built/MainModule.js';
 import { ServerService } from '../built/server/ServerService.js';
 import { loadConfig } from '../built/config.js';
 import { NestLogger } from '../built/NestLogger.js';
-import { INestApplicationContext } from '@nestjs/common';
 
 const config = loadConfig();
 const originEnv = JSON.stringify(process.env);
 
 process.env.NODE_ENV = 'test';
 
-let app: INestApplicationContext;
-let serverService: ServerService;
+let app;
+let serverService;
 
 /**
  * テスト用のサーバインスタンスを起動する

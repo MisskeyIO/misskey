@@ -4,8 +4,7 @@
 	"version": "2024.10.2-alpha.2",
 	"description": "Misskey SDK for JavaScript",
 	"license": "MIT",
-	"main": "./built/index.js",
-	"types": "./built/index.d.ts",
+	"types": "./built/dts/index.d.ts",
 	"exports": {
 		".": {
 			"import": "./built/esm/index.js",

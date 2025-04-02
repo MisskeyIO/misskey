@@ -10,8 +10,8 @@ import { Endpoint } from '@/server/api/endpoint-base.js';
 import { QueryService } from '@/core/QueryService.js';
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { ApiError } from '../../error.js';
 import type { Packed } from '@/misc/json-schema.js';
+import { ApiError } from '../../error.js';
 
 export const meta = {
 	tags: ['role', 'users'],

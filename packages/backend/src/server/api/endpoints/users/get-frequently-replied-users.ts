@@ -13,8 +13,8 @@ import { DI } from '@/di-symbols.js';
 import { GetterService } from '@/server/api/GetterService.js';
 import { CacheService } from '@/core/CacheService.js';
 import { isUserRelated } from '@/misc/is-user-related.js';
-import { ApiError } from '../../error.js';
 import { Packed } from '@/misc/json-schema.js';
+import { ApiError } from '../../error.js';
 
 export const meta = {
 	tags: ['users'],

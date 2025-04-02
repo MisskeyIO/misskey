@@ -83,7 +83,7 @@ export async function apiErrorHandler(err: Misskey.api.APIError, endpoint?: stri
 	} else if (err.code === 'ROLE_PERMISSION_DENIED') {
 		title = i18n.ts.permissionDeniedError;
 		text = i18n.ts.permissionDeniedErrorDescription;
-	} else if (err.code?.startsWith('TOO_MANY_')) {
+	} else if (err.code.startsWith('TOO_MANY_')) {
 		title = i18n.ts.youCannotCreateAnymore;
 		text = `${i18n.ts.error}: ${err.id}`;
 	}
@@ -93,9 +93,9 @@ export async function apiErrorHandler(err: Misskey.api.APIError, endpoint?: stri
 		title = i18n.ts.gotInvalidResponseError;
 		text = i18n.ts.gotInvalidResponseErrorDescription;
 	} else if (customErrors && customErrors[err.id] != null) {
-			title = customErrors[err.id].title;
-			text = customErrors[err.id].text;
-		}
+		title = customErrors[err.id].title;
+		text = customErrors[err.id].text;
+	}
 
 	if (err.id && !title) {
 		title = i18n.ts.somethingHappened;

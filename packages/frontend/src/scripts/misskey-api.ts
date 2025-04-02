@@ -6,9 +6,9 @@
 import * as Misskey from 'misskey-js';
 import { ref } from 'vue';
 import { apiUrl } from '@@/js/config.js';
+import { time as gtagTime } from 'vue-gtag';
 import { $i } from '@/account.js';
 import { miLocalStorage } from '@/local-storage.js';
-import { time as gtagTime } from 'vue-gtag';
 import { instance } from '@/instance.js';
 export const pendingApiRequestsCount = ref(0);
 
@@ -59,7 +59,7 @@ export function misskeyApi<
 	data: P = {} as any,
 	token?: string | null | undefined,
 	signal?: AbortSignal,
-	initiator: string = 'misskey',
+	initiator = 'misskey',
 ): Promise<_ResT> {
 	if (endpoint.includes('://')) throw new Error('invalid endpoint');
 	pendingApiRequestsCount.value++;
@@ -109,7 +109,7 @@ export function misskeyApiGet<
 >(
 	endpoint: E,
 	data: P = {} as any,
-	initiator: string = 'misskey',
+	initiator = 'misskey',
 ): Promise<_ResT> {
 	pendingApiRequestsCount.value++;
 

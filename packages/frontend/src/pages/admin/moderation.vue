@@ -75,16 +75,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 
 
-					<MkTextarea v-model="hiddenTags">
-						<template #label>{{ i18n.ts.hiddenTags }}</template>
+						<MkTextarea v-model="hiddenTags">
+							<template #label>{{ i18n.ts.hiddenTags }}</template>
 
-						<div class="_gaps">
-							<MkTextarea v-model="hiddenTags">
-								<template #caption>{{ i18n.ts.hiddenTagsDescription }}</template>
-							</MkTextarea>
-							<MkButton primary @click="save_hiddenTags">{{ i18n.ts.save }}</MkButton>
-						</div>
-					</MkTextarea>
+							<div class="_gaps">
+								<MkTextarea v-model="hiddenTags">
+									<template #caption>{{ i18n.ts.hiddenTagsDescription }}</template>
+								</MkTextarea>
+								<MkButton primary @click="save_hiddenTags">{{ i18n.ts.save }}</MkButton>
+							</div>
+						</MkTextarea>
 					</MkFolder>
 
 					<MkFolder>

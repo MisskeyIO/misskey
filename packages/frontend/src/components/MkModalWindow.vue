@@ -61,7 +61,7 @@ function close() {
 
 function onBgClick() {
 	emit('click');
-};
+}
 
 const onKeydown = (evt) => {
 	if (evt.which === 27) { // Esc

@@ -4,6 +4,7 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
+import { reversiUpdateKeys } from 'misskey-js';
 import type { MiReversiGame } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
@@ -12,7 +13,6 @@ import { ReversiGameEntityService } from '@/core/entities/ReversiGameEntityServi
 import { isJsonObject } from '@/misc/json-value.js';
 import type { JsonObject, JsonValue } from '@/misc/json-value.js';
 import Channel, { type MiChannelService } from '../channel.js';
-import { reversiUpdateKeys } from 'misskey-js';
 
 class ReversiGameChannel extends Channel {
 	public readonly chName = 'reversiGame';

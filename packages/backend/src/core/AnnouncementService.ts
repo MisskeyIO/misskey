@@ -171,7 +171,7 @@ export class AnnouncementService {
 			id: In(announcements.map(a => a.userId).filter(id => id != null)),
 		});
 		const packedUsers = await this.userEntityService.packMany(users, moderator, {
-			schema: 'UserLite'
+			schema: 'UserLite',
 		});
 
 		return announcements.map(announcement => ({

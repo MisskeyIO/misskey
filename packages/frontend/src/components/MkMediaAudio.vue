@@ -54,7 +54,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</button>
 			</div>
 			<div :class="[$style.controlsChild, $style.controlsRight]">
-				<button class="_button" tabindex="-1" :class="['_button', $style.controlButton]"  @click.prevent.stop="showMenu">
+				<button class="_button" tabindex="-1" :class="['_button', $style.controlButton]" @click.prevent.stop="showMenu">
 					<i class="ti ti-settings"></i>
 				</button>
 			</div>

@@ -51,21 +51,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkSwitch v-model="event_mention">{{ i18n.ts._webhookSettings._events.mention }}</MkSwitch>
 					<MkButton transparent :class="$style.testButton" :disabled="!(active && event_mention)" @click="test('mention')"><i class="ti ti-send"></i></MkButton>
 				</div>
-					<div :class="$style.switchBox">
-						<MkSwitch v-if="$i?.isAdmin" v-model="event_reportCreated">{{ i18n.ts._webhookSettings._events.reportCreated }}</MkSwitch>
-						<MkButton transparent :class="$style.testButton" :disabled="!(active && event_reportCreated)" @click="test('mention')"><i class="ti ti-send"></i></MkButton>
-					</div>
+				<div :class="$style.switchBox">
+					<MkSwitch v-if="$i?.isAdmin" v-model="event_reportCreated">{{ i18n.ts._webhookSettings._events.reportCreated }}</MkSwitch>
+					<MkButton transparent :class="$style.testButton" :disabled="!(active && event_reportCreated)" @click="test('mention')"><i class="ti ti-send"></i></MkButton>
+				</div>
 
 				<div :class="$style.switchBox">
 					<MkSwitch v-if="$i?.isAdmin" v-model="event_reportResolved">{{ i18n.ts._webhookSettings._events.reportResolved }}</MkSwitch>
-						<MkButton transparent :class="$style.testButton" :disabled="!(active && event_reportResolved)" @click="test('mention')"><i class="ti ti-send"></i></MkButton>
-					</div>
+					<MkButton transparent :class="$style.testButton" :disabled="!(active && event_reportResolved)" @click="test('mention')"><i class="ti ti-send"></i></MkButton>
+				</div>
 
 				<div :class="$style.switchBox">
 					<MkSwitch v-if="$i?.isAdmin" v-model="event_reportAutoResolved">{{ i18n.ts._webhookSettings._events.reportAutoResolved }}</MkSwitch>
-						<MkButton transparent :class="$style.testButton" :disabled="!(active && event_reportAutoResolved)" @click="test('mention')"><i class="ti ti-send"></i></MkButton>
-					</div>
-<!--TODO あとでこれは何なのか調べる-->
+					<MkButton transparent :class="$style.testButton" :disabled="!(active && event_reportAutoResolved)" @click="test('mention')"><i class="ti ti-send"></i></MkButton>
+				</div>
+				<!--TODO あとでこれは何なのか調べる-->
 			</div>
 
 			<div :class="$style.description">

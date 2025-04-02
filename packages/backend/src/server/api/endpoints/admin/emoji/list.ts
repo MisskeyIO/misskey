@@ -98,7 +98,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					emojis = (await q.getMany())
 						.filter(emoji => emoji.name.includes(ps.query!)
 							|| emoji.aliases.some(a => a.includes(ps.query!))
-							|| emoji.category?.includes(ps.query!)
+							|| emoji.category?.includes(ps.query!),
 						)
 						.slice(0, ps.limit);
 				}

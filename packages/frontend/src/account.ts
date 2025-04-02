@@ -375,7 +375,6 @@ export async function openAccountMenu(opts: {
 	});
 }
 
-
 export function getAccountWithSigninDialog(): Promise<{ id: string, token: string } | null> {
 	return new Promise((resolve) => {
 		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkSigninDialog.vue')), {}, {

@@ -104,14 +104,14 @@ export class ImportCustomEmojisProcessorService {
 						isSensitive: emojiInfo.isSensitive,
 						localOnly: emojiInfo.localOnly,
 						requestedBy: emojiInfo.requestedBy,
-					memo: emojiInfo.memo,
-					roleIdsThatCanBeUsedThisEmojiAsReaction: [],
-					roleIdsThatCanNotBeUsedThisEmojiAsReaction: [],
-				});} catch (e) {
+						memo: emojiInfo.memo,
+						roleIdsThatCanBeUsedThisEmojiAsReaction: [],
+						roleIdsThatCanNotBeUsedThisEmojiAsReaction: [],
+					});
+				} catch (e) {
 					if (e instanceof Error || typeof e === 'string') {
 						this.logger.error(`couldn't import ${emojiPath} for ${emojiInfo.name}: ${e}`);
 					}
-
 				}
 			}
 

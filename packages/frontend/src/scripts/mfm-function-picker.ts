@@ -4,10 +4,10 @@
  */
 
 import { Ref, nextTick } from 'vue';
-import * as os from '@/os.js';
-import { i18n } from '@/i18n.js';
 import { MFM_TAGS } from '@@/js/const.js';
 import type { MenuItem } from '@/types/menu.js';
+import * as os from '@/os.js';
+import { i18n } from '@/i18n.js';
 
 /**
  * MFMの装飾のリストを表示する

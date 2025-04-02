@@ -18,8 +18,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkRadio v-model="radio" value="pleroma">Pleroma</MkRadio>
 		</div>
 		<div :class="$style.preview__content1__button">
-		<MkButton inline>This is</MkButton>
-		<MkButton inline primary>the button</MkButton>
+			<MkButton inline>This is</MkButton>
+			<MkButton inline primary>the button</MkButton>
 		</div>
 	</div>
 	<div :class="$style.preview__content2" style="pointer-events: none;">

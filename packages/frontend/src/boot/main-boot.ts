@@ -11,7 +11,7 @@ import { i18n } from '@/i18n.js';
 import { alert, confirm, popup, post, toast } from '@/os.js';
 import { useStream } from '@/stream.js';
 import * as sound from '@/scripts/sound.js';
-import {$i, signout, updateAccount, updateAccountPartial} from '@/account.js';
+import { $i, signout, updateAccount, updateAccountPartial } from '@/account.js';
 import { ColdDeviceStorage, defaultStore } from '@/store.js';
 import { reactionPicker } from '@/scripts/reaction-picker.js';
 import { miLocalStorage } from '@/local-storage.js';
@@ -298,8 +298,8 @@ export async function mainBoot() {
 			if (neverShowDonationInfo !== 'true' && (createdAt.getTime() < (Date.now() - (1000 * 60 * 60 * 24 * 3)))) {
 				if (latestDonationInfoShownAt == null || (new Date(latestDonationInfoShownAt).getTime() < (Date.now() - (1000 * 60 * 60 * 24 * 30)))) {
 					const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkDonation.vue')), {}, {
-					closed: () => dispose(),
-				});
+						closed: () => dispose(),
+					});
 				}
 			}
 

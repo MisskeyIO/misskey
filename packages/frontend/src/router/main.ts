@@ -4,9 +4,8 @@
  */
 
 import { EventEmitter } from 'eventemitter3';
-import { AfterNavigationHook, IRouter, Resolved, RouteDef, RouterEvent } from '@/nirax.js';
-
 import type { App, ShallowRef } from 'vue';
+import { AfterNavigationHook, IRouter, Resolved, RouteDef, RouterEvent } from '@/nirax.js';
 
 /**
  * {@link Router}による画面遷移を可能とするために{@link mainRouter}をセットアップする。

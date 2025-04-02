@@ -87,7 +87,7 @@ export function useNoteCapture(props: {
 	function capture(withHandler = false): void {
 		if (connection) {
 			let command: string;
-			if ($i && (note.value?.visibleUserIds?.includes($i.id) ?? note.value?.mentions?.includes($i.id))) {
+			if ($i && (note.value.visibleUserIds?.includes($i.id) ?? note.value.mentions?.includes($i.id))) {
 				command = document.body.contains(props.rootEl.value ?? null as Node | null) ? 'sr' : 's';
 			} else {
 				command = 's';

@@ -1,26 +1,26 @@
 <template>
-	<div>
-		<MkAnimBg style="position: fixed; top: 0;"/>
-		<div :class="$style.formContainer">
-			<div :class="$style.form">
-				<MkAuthConfirm
-					ref="authRoot"
-					:name="name"
-					:icon="icon || undefined"
-					:permissions="_permissions"
-					@accept="onAccept"
-					@deny="onDeny"
-				>
-					<template #consentAdditionalInfo>
-						<div v-if="callback != null" class="_gaps_s" :class="$style.redirectRoot">
-							<div>{{ i18n.ts._auth.byClickingYouWillBeRedirectedToThisUrl }}</div>
-							<div class="_monospace" :class="$style.redirectUrl">{{ callback }}</div>
-						</div>
-					</template>
-				</MkAuthConfirm>
-			</div>
+<div>
+	<MkAnimBg style="position: fixed; top: 0;"/>
+	<div :class="$style.formContainer">
+		<div :class="$style.form">
+			<MkAuthConfirm
+				ref="authRoot"
+				:name="name"
+				:icon="icon || undefined"
+				:permissions="_permissions"
+				@accept="onAccept"
+				@deny="onDeny"
+			>
+				<template #consentAdditionalInfo>
+					<div v-if="callback != null" class="_gaps_s" :class="$style.redirectRoot">
+						<div>{{ i18n.ts._auth.byClickingYouWillBeRedirectedToThisUrl }}</div>
+						<div class="_monospace" :class="$style.redirectUrl">{{ callback }}</div>
+					</div>
+				</template>
+			</MkAuthConfirm>
 		</div>
 	</div>
+</div>
 </template>
 
 <script lang="ts" setup>

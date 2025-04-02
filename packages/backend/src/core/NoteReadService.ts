@@ -92,7 +92,7 @@ export class NoteReadService implements OnApplicationShutdown {
 
 		const noteIds = new Set<MiNote['id']>(
 			notes.filter(note =>
-				(note.mentions?.includes(userId) ?? false) || (note.visibleUserIds?.includes(userId) ?? false)
+				(note.mentions?.includes(userId) ?? false) || (note.visibleUserIds?.includes(userId) ?? false),
 			).map(note => note.id),
 		);
 

@@ -108,8 +108,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 							.where('"reaction"."userId" = :userId', { userId: ps.userId }),
 						ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate,
 					),
-					'reaction',
-					'"reaction"."noteId" = note.id',
+				'reaction',
+				'"reaction"."noteId" = note.id',
 				);
 
 			this.queryService.generateVisibilityQuery(query, me);

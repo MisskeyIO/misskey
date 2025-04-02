@@ -111,117 +111,116 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 				<div class="_gaps_m">
 					<MkSwitch v-model="ipLoggingForm.state.enableIpLogging">
-							<template #label>Enable</template>
-						</MkSwitch>
-					</div>
-				</MkFolder>
+						<template #label>Enable</template>
+					</MkSwitch>
+				</div>
+			</MkFolder>
 
-				<MkFolder>
-					<template #label>IndieAuth Clients</template>
+			<MkFolder>
+				<template #label>IndieAuth Clients</template>
 
-					<div class="_gaps">
-						<MkButton primary full @click="indieAuthAddNew"><i class="ti ti-plus"></i> New</MkButton>
-						<MkFolder v-for="(client, index) in indieAuthClients" :key="`${indieAuthTimestamp}-${index}-${client.createdAt ? client.id : 'new'}`" :defaultOpen="!client.createdAt">
-							<template #label>{{ client.name || client.id }}</template>
-							<template #icon>
-								<i v-if="client.id" class="ti ti-key"></i>
-								<i v-else class="ti ti-plus"></i>
-							</template>
-							<template v-if="client.name && client.id" #caption>{{ client.id }}</template>
+				<div class="_gaps">
+					<MkButton primary full @click="indieAuthAddNew"><i class="ti ti-plus"></i> New</MkButton>
+					<MkFolder v-for="(client, index) in indieAuthClients" :key="`${indieAuthTimestamp}-${index}-${client.createdAt ? client.id : 'new'}`" :defaultOpen="!client.createdAt">
+						<template #label>{{ client.name || client.id }}</template>
+						<template #icon>
+							<i v-if="client.id" class="ti ti-key"></i>
+							<i v-else class="ti ti-plus"></i>
+						</template>
+						<template v-if="client.name && client.id" #caption>{{ client.id }}</template>
 
-							<div class="_gaps_m">
-								<MkInput v-model="client.id" :disabled="!!client.createdAt">
-									<template #label>Client ID</template>
-								</MkInput>
-								<MkInput v-model="client.name">
-									<template #label>Name</template>
-								</MkInput>
-								<MkTextarea v-model="client.redirectUris">
-									<template #label>Redirect URIs</template>
-								</MkTextarea>
-								<div class="buttons _buttons">
-									<MkButton primary @click="indieAuthSave(client)"><i class="ti ti-device-floppy"></i> Save</MkButton>
-									<MkButton v-if="client.createdAt" warn @click="indieAuthDelete(client)"><i class="ti ti-trash"></i> Delete</MkButton>
-								</div>
+						<div class="_gaps_m">
+							<MkInput v-model="client.id" :disabled="!!client.createdAt">
+								<template #label>Client ID</template>
+							</MkInput>
+							<MkInput v-model="client.name">
+								<template #label>Name</template>
+							</MkInput>
+							<MkTextarea v-model="client.redirectUris">
+								<template #label>Redirect URIs</template>
+							</MkTextarea>
+							<div class="buttons _buttons">
+								<MkButton primary @click="indieAuthSave(client)"><i class="ti ti-device-floppy"></i> Save</MkButton>
+								<MkButton v-if="client.createdAt" warn @click="indieAuthDelete(client)"><i class="ti ti-trash"></i> Delete</MkButton>
 							</div>
-						</MkFolder>
-						<MkButton v-if="indieAuthHasMore" :class="$style.more" :disabled="!indieAuthHasMore" primary rounded @click="indieAuthFetch()">
-							<i class="ti ti-reload"></i>{{ i18n.ts.more }}
-						</MkButton>
-					</div>
-				</MkFolder>
+						</div>
+					</MkFolder>
+					<MkButton v-if="indieAuthHasMore" :class="$style.more" :disabled="!indieAuthHasMore" primary rounded @click="indieAuthFetch()">
+						<i class="ti ti-reload"></i>{{ i18n.ts.more }}
+					</MkButton>
+				</div>
+			</MkFolder>
 
-				<MkFolder>
-					<template #label>Single Sign-On Service Providers</template>
+			<MkFolder>
+				<template #label>Single Sign-On Service Providers</template>
 
-					<div class="_gaps">
-						<MkButton primary full @click="ssoServiceAddNew"><i class="ti ti-plus"></i> New</MkButton>
-						<MkFolder v-for="(service, index) in ssoServices" :key="`${ssoServiceTimestamp}-${index}-${service.createdAt ? service.id : 'new'}`" :defaultOpen="!service.createdAt">
-							<template #label>{{ service.name || service.id }}</template>
-							<template #icon>
-								<i v-if="service.id" class="ti ti-key"></i>
-								<i v-else class="ti ti-plus"></i>
-							</template>
-							<template v-if="service.name && service.id" #caption>{{ service.id }}</template>
+				<div class="_gaps">
+					<MkButton primary full @click="ssoServiceAddNew"><i class="ti ti-plus"></i> New</MkButton>
+					<MkFolder v-for="(service, index) in ssoServices" :key="`${ssoServiceTimestamp}-${index}-${service.createdAt ? service.id : 'new'}`" :defaultOpen="!service.createdAt">
+						<template #label>{{ service.name || service.id }}</template>
+						<template #icon>
+							<i v-if="service.id" class="ti ti-key"></i>
+							<i v-else class="ti ti-plus"></i>
+						</template>
+						<template v-if="service.name && service.id" #caption>{{ service.id }}</template>
 
-							<div class="_gaps_m">
-								<MkInput v-model="service.id" disabled>
-									<template #label>Service ID</template>
-								</MkInput>
-								<MkInput v-model="service.name">
-									<template #label>Name</template>
-								</MkInput>
-								<MkRadios v-model="service.type" :disabled="!!service.createdAt">
-									<option value="jwt">JWT</option>
-									<option value="saml">SAML</option>
-								</MkRadios>
-								<MkInput v-model="service.issuer">
-									<template #label>Issuer</template>
-								</MkInput>
-								<MkTextarea v-model="service.audience">
-									<template #label>Audience</template>
-								</MkTextarea>
-								<MkRadios v-model="service.binding">
-									<option value="post">POST</option>
-									<option value="redirect">Redirect</option>
-								</MkRadios>
-								<MkInput v-model="service.acsUrl">
-									<template #label>Assertion Consumer Service URL</template>
-								</MkInput>
-								<MkTextarea v-model="service.publicKey">
-									<template #label>{{ service['useCertificate'] ? 'Public Key' : 'Secret' }}</template>
-								</MkTextarea>
-								<MkInput v-model="service.signatureAlgorithm">
-									<template #label>Signature Algorithm</template>
-								</MkInput>
-								<MkInput v-model="service.cipherAlgorithm">
-									<template #label>Cipher Algorithm</template>
-								</MkInput>
-								<MkSwitch v-model="service.wantAuthnRequestsSigned">
-									<template #label>Want Authn Requests Signed</template>
-								</MkSwitch>
-								<MkSwitch v-model="service.wantAssertionsSigned">
-									<template #label>Want Assertions Signed</template>
-								</MkSwitch>
-								<MkSwitch v-model="service.useCertificate" :disabled="!!service.createdAt">
-									<template #label>Use Certificate</template>
-								</MkSwitch>
-								<MkSwitch v-if="service.useCertificate" v-model="service.regenerateCertificate">
-									<template #label>Regenerate Certificate</template>
-								</MkSwitch>
-								<div class="buttons _buttons">
-									<MkButton primary @click="ssoServiceSave(service)"><i class="ti ti-device-floppy"></i> Save</MkButton>
-									<MkButton v-if="service.createdAt" warn @click="ssoServiceDelete(service)"><i class="ti ti-trash"></i> Delete</MkButton>
-								</div>
+						<div class="_gaps_m">
+							<MkInput v-model="service.id" disabled>
+								<template #label>Service ID</template>
+							</MkInput>
+							<MkInput v-model="service.name">
+								<template #label>Name</template>
+							</MkInput>
+							<MkRadios v-model="service.type" :disabled="!!service.createdAt">
+								<option value="jwt">JWT</option>
+								<option value="saml">SAML</option>
+							</MkRadios>
+							<MkInput v-model="service.issuer">
+								<template #label>Issuer</template>
+							</MkInput>
+							<MkTextarea v-model="service.audience">
+								<template #label>Audience</template>
+							</MkTextarea>
+							<MkRadios v-model="service.binding">
+								<option value="post">POST</option>
+								<option value="redirect">Redirect</option>
+							</MkRadios>
+							<MkInput v-model="service.acsUrl">
+								<template #label>Assertion Consumer Service URL</template>
+							</MkInput>
+							<MkTextarea v-model="service.publicKey">
+								<template #label>{{ service['useCertificate'] ? 'Public Key' : 'Secret' }}</template>
+							</MkTextarea>
+							<MkInput v-model="service.signatureAlgorithm">
+								<template #label>Signature Algorithm</template>
+							</MkInput>
+							<MkInput v-model="service.cipherAlgorithm">
+								<template #label>Cipher Algorithm</template>
+							</MkInput>
+							<MkSwitch v-model="service.wantAuthnRequestsSigned">
+								<template #label>Want Authn Requests Signed</template>
+							</MkSwitch>
+							<MkSwitch v-model="service.wantAssertionsSigned">
+								<template #label>Want Assertions Signed</template>
+							</MkSwitch>
+							<MkSwitch v-model="service.useCertificate" :disabled="!!service.createdAt">
+								<template #label>Use Certificate</template>
+							</MkSwitch>
+							<MkSwitch v-if="service.useCertificate" v-model="service.regenerateCertificate">
+								<template #label>Regenerate Certificate</template>
+							</MkSwitch>
+							<div class="buttons _buttons">
+								<MkButton primary @click="ssoServiceSave(service)"><i class="ti ti-device-floppy"></i> Save</MkButton>
+								<MkButton v-if="service.createdAt" warn @click="ssoServiceDelete(service)"><i class="ti ti-trash"></i> Delete</MkButton>
 							</div>
-						</MkFolder>
-						<MkButton v-if="ssoServiceHasMore" :class="$style.more" :disabled="!ssoServiceHasMore" primary rounded @click="ssoServiceFetch()">
-							<i class="ti ti-reload"></i>{{ i18n.ts.more }}
-						</MkButton>
-					</div>
-				</MkFolder>
-			</div>
-
+						</div>
+					</MkFolder>
+					<MkButton v-if="ssoServiceHasMore" :class="$style.more" :disabled="!ssoServiceHasMore" primary rounded @click="ssoServiceFetch()">
+						<i class="ti ti-reload"></i>{{ i18n.ts.more }}
+					</MkButton>
+				</div>
+			</MkFolder>
+		</div>
 	</MkSpacer>
 </MkStickyContainer>
 </template>

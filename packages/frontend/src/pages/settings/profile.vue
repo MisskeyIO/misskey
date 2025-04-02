@@ -112,7 +112,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<div :class="$style.mutualLinkSectionRoot">
 							<button v-if="!mutualLinkSectionEditMode" class="_button" :class="$style.dragItemHandle" tabindex="-1"><i class="ti ti-menu"></i></button>
 
-							{{sectionElement.length }}
+							{{ sectionElement.length }}
 							<button v-if="mutualLinkSectionEditMode" :disabled="sectionElement.length <= 1" class="_button" :class="$style.dragItemRemove" @click="deleteMutualLinkSection(sectionIndex)"><i class="ti ti-x"></i></button>
 							<FormSlot :style="{flexGrow: 1}">
 								<MkFolder>

@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
+import bcrypt from 'bcryptjs';
+import ms from 'ms';
 import type { UserProfilesRepository, UserSecurityKeysRepository } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
-import bcrypt from 'bcryptjs';
-import ms from 'ms';
 
 export const meta = {
 	tags: ['users'],

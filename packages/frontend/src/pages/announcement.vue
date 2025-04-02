@@ -31,11 +31,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<img v-if="announcement.imageUrl" :src="announcement.imageUrl"/>
 					<MkA :to="`/announcements/${announcement.id}`">
 						<div style="margin-top: 8px; opacity: 0.7; font-size: 85%;">
-						{{ i18n.ts.createdAt }}: <MkTime :time="announcement.createdAt" mode="detail"/>
-					</div>
-					<div v-if="announcement.updatedAt" style="opacity: 0.7; font-size: 85%;">
-						{{ i18n.ts.updatedAt }}: <MkTime :time="announcement.updatedAt" mode="detail"/>
-					</div>
+							{{ i18n.ts.createdAt }}: <MkTime :time="announcement.createdAt" mode="detail"/>
+						</div>
+						<div v-if="announcement.updatedAt" style="opacity: 0.7; font-size: 85%;">
+							{{ i18n.ts.updatedAt }}: <MkTime :time="announcement.updatedAt" mode="detail"/>
+						</div>
 					</MkA>
 				</div>
 				<div v-if="$i && !announcement.silence && !announcement.isRead" :class="$style.footer">

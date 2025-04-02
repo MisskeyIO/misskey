@@ -6,9 +6,9 @@
 // i: event initiator
 // a: action
 
+import { GtagConsentParams } from 'vue-gtag';
 import { generateClientTransactionId } from '@/scripts/misskey-api.js';
 import { miLocalStorage } from '@/local-storage.js';
-import { GtagConsentParams } from 'vue-gtag';
 import { instance } from '@/instance.js';
 
 export interface UsageReport {
@@ -43,7 +43,7 @@ export function sendUsageReport() {
 	const data = usageReportBuffer.splice(0, usageReportBuffer.length);
 	usageReportBufferTimer = null;
 
-	if ((miLocalStorage.getItemAsJson('gtagConsent') as GtagConsentParams)?.ad_user_data !== 'granted') {
+	if ((miLocalStorage.getItemAsJson('gtagConsent') as GtagConsentParams).ad_user_data !== 'granted') {
 		console.log('Usage report is not sent because the user has not consented to sharing data about ad interactions.');
 		disableUsageReport = true;
 		return;

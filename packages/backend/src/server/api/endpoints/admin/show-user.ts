@@ -184,7 +184,7 @@ export const meta = {
 						memo: {
 							type: 'string',
 							optional: false, nullable: true,
-						}
+						},
 					},
 				},
 			},

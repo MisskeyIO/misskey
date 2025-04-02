@@ -4,6 +4,7 @@
  */
 
 import { computed, reactive } from 'vue';
+import { ui, host } from '@@/js/config.js';
 import { clearCache } from './scripts/clear-cache.js';
 import { $i } from '@/account.js';
 import { miLocalStorage } from '@/local-storage.js';
@@ -11,7 +12,6 @@ import { openInstanceMenu, openToolsMenu } from '@/ui/_common_/common.js';
 import { lookup } from '@/scripts/lookup.js';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
-import { ui, host } from '@@/js/config.js';
 import { unisonReload } from '@/scripts/unison-reload.js';
 import { instance } from '@/instance.js';
 

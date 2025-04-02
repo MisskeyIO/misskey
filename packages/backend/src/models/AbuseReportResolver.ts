@@ -55,7 +55,7 @@ export class MiAbuseReportResolver {
 	public expirationDate: Date | null;
 
 	@Column('enum', {
-		enum: ['1hour', '12hours', '1day', '1week', '1month', '3months', '6months', '1year', 'indefinitely']
+		enum: ['1hour', '12hours', '1day', '1week', '1month', '3months', '6months', '1year', 'indefinitely'],
 	})
 	public expiresAt: string;
 

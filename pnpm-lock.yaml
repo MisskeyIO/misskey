@@ -125,7 +125,7 @@ importers:
         specifier: 11.0.0
         version: 11.0.0
       '@instana/collector':
-        specifier: ^4.10.0
+        specifier: 4.10.0
         version: 4.10.0
       '@misskey-dev/sharp-read-bmp':
         specifier: 1.2.0

@@ -197,7 +197,7 @@ export class ClientServerService {
 			instanceUrl: this.config.url,
 			metaJson: htmlSafeJsonStringify(await this.metaEntityService.packDetailed(meta)),
 			now: Date.now(),
-			extraScriptTag: this.config.extraScriptTag,
+			extraHead: this.config.extraHead,
 		};
 	}
 

@@ -234,7 +234,7 @@ export type Config = {
 	perUserNotificationsMaxCount: number;
 	deactivateAntennaThreshold: number;
 	pidFile: string;
-	extraHead?: string;
+	extraHead: string | undefined;
 };
 
 const _filename = fileURLToPath(import.meta.url);

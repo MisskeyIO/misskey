@@ -56,7 +56,7 @@
 		"esbuild": "0.25.2",
 		"jpeg-js": "0.4.4",
 		"lodash": "4.17.21",
-		"sharp": "0.33.5",
+		"sharp": "0.34.1",
 		"tough-cookie": "5.1.2",
 		"web-streams-polyfill": "4.1.0"
 	},
@@ -66,14 +66,14 @@
 		"js-yaml": "4.1.0",
 		"postcss": "8.5.3",
 		"terser": "5.39.0",
-		"typescript": "5.8.2"
+		"typescript": "5.8.3"
 	},
 	"devDependencies": {
-		"@types/node": "22.13.14",
+		"@types/node": "22.14.1",
 		"@typescript-eslint/eslint-plugin": "7.10.0",
 		"@typescript-eslint/parser": "7.10.0",
 		"cross-env": "7.0.3",
-		"cypress": "14.2.1",
+		"cypress": "14.3.1",
 		"eslint": "8.57.1",
 		"ncp": "2.0.0",
 		"start-server-and-test": "2.0.11"

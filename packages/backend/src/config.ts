@@ -67,7 +67,7 @@ type Source = {
 		scope?: 'local' | 'global' | string[];
 	};
 
-	elasticsearch?: {
+	opensearch?: {
 		host: string;
 		port: string;
 		user: string;
@@ -162,7 +162,7 @@ export type Config = {
 		index: string;
 		scope?: 'local' | 'global' | string[];
 	} | undefined;
-	elasticsearch: {
+	opensearch: {
 		host: string;
 		port: string;
 		user: string;
@@ -295,7 +295,7 @@ export function loadConfig(): Config {
 		dbReplications: config.dbReplications,
 		dbSlaves: config.dbSlaves,
 		meilisearch: config.meilisearch,
-		elasticsearch: config.elasticsearch,
+		opensearch: config.opensearch,
 		redis,
 		redisForPubsub: config.redisForPubsub ? convertRedisOptions(config.redisForPubsub, host) : redis,
 		redisForSystemQueue: config.redisForSystemQueue ? convertRedisOptions(config.redisForSystemQueue, host) : redisForJobQueue,

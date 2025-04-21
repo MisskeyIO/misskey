@@ -8,7 +8,7 @@ import { Global, Inject, Module } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { DataSource } from 'typeorm';
 import { MeiliSearch } from 'meilisearch';
-import { Client as ElasticSearch } from '@elastic/elasticsearch';
+import { Client as OpenSearch } from '@opensearch-project/opensearch';
 import { DI } from './di-symbols.js';
 import { Config, loadConfig } from './config.js';
 import { createPostgresDataSource } from './postgres.js';
@@ -45,20 +45,20 @@ const $meilisearch: Provider = {
 	inject: [DI.config],
 };
 
-const $elasticsearch: Provider = {
-	provide: DI.elasticsearch,
+const $opensearch: Provider = {
+	provide: DI.opensearch,
 	useFactory: (config: Config) => {
-		if (config.elasticsearch) {
-			return new ElasticSearch({
+		if (config.opensearch) {
+			return new OpenSearch({
 				nodes: {
-					url: new URL(`${config.elasticsearch.ssl ? 'https' : 'http'}://${config.elasticsearch.host}:${config.elasticsearch.port}`),
+					url: new URL(`${config.opensearch.ssl ? 'https' : 'http'}://${config.opensearch.host}:${config.opensearch.port}`),
 					ssl: {
-						rejectUnauthorized: config.elasticsearch.rejectUnauthorized,
+						rejectUnauthorized: config.opensearch.rejectUnauthorized,
 					},
 				},
-				auth: (config.elasticsearch.user && config.elasticsearch.pass) ? {
-					username: config.elasticsearch.user,
-					password: config.elasticsearch.pass,
+				auth: (config.opensearch.user && config.opensearch.pass) ? {
+					username: config.opensearch.user,
+					password: config.opensearch.pass,
 				} : undefined,
 				pingTimeout: 30000,
 			});
@@ -185,8 +185,8 @@ const $redisForTimelines: Provider = {
 @Global()
 @Module({
 	imports: [RepositoryModule],
-	providers: [$config, $db, $meilisearch, $elasticsearch, $redis, $redisForPub, $redisForSub, $redisForTimelines],
-	exports: [$config, $db, $meilisearch, $elasticsearch, $redis, $redisForPub, $redisForSub, $redisForTimelines, RepositoryModule],
+	providers: [$config, $db, $meilisearch, $opensearch, $redis, $redisForPub, $redisForSub, $redisForTimelines],
+	exports: [$config, $db, $meilisearch, $opensearch, $redis, $redisForPub, $redisForSub, $redisForTimelines, RepositoryModule],
 })
 export class GlobalModule implements OnApplicationShutdown {
 	constructor(

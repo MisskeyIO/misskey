@@ -10972,6 +10972,8 @@ export type operations = {
           /** @default true */
           wantAssertionsSigned?: boolean;
           /** @default true */
+          wantEmailAddressNormalized?: boolean;
+          /** @default true */
           useCertificate: boolean;
           secret?: string | null;
         };
@@ -10998,6 +11000,7 @@ export type operations = {
             cipherAlgorithm?: string | null;
             wantAuthnRequestsSigned: boolean;
             wantAssertionsSigned: boolean;
+            wantEmailAddressNormalized: boolean;
           };
         };
       };
@@ -11123,6 +11126,7 @@ export type operations = {
               cipherAlgorithm?: string | null;
               wantAuthnRequestsSigned: boolean;
               wantAssertionsSigned: boolean;
+              wantEmailAddressNormalized: boolean;
             })[];
         };
       };
@@ -11179,6 +11183,7 @@ export type operations = {
           cipherAlgorithm?: string | null;
           wantAuthnRequestsSigned?: boolean;
           wantAssertionsSigned?: boolean;
+          wantEmailAddressNormalized?: boolean;
           regenerateCertificate?: boolean | null;
           secret?: string | null;
         };

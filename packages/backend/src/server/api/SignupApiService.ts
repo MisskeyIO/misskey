@@ -20,6 +20,7 @@ import { FastifyReplyError } from '@/misc/fastify-reply-error.js';
 import { bindThis } from '@/decorators.js';
 import { L_CHARS, secureRndstr } from '@/misc/secure-rndstr.js';
 import { LoggerService } from '@/core/LoggerService.js';
+import { envOption } from '@/env.js';
 import { SigninService } from './SigninService.js';
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import { randomUUID } from 'node:crypto';
@@ -136,7 +137,7 @@ export class SignupApiService {
 
 		let ticket: MiRegistrationTicket | null = null;
 
-		if (instance.disableRegistration) {
+		if (instance.disableRegistration || envOption.disableRegistration) {
 			if (invitationCode == null || typeof invitationCode !== 'string') {
 				logger.error('Invalid request: invitation code is required.');
 				reply.code(400);

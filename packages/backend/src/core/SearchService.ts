@@ -19,7 +19,7 @@ import { QueryService } from '@/core/QueryService.js';
 import { IdService } from '@/core/IdService.js';
 import type Logger from '@/logger.js';
 import type { Index, MeiliSearch } from 'meilisearch';
-import type { Client as ElasticSearch } from '@elastic/elasticsearch';
+import type { Client as OpenSearch } from '@opensearch-project/opensearch';
 
 type K = string;
 type V = string | number | boolean;
@@ -68,8 +68,8 @@ function compileQuery(q: Q): string {
 export class SearchService {
 	private readonly meilisearchIndexScope: 'local' | 'global' | string[] = 'local';
 	private meilisearchNoteIndex: Index | null = null;
-	private readonly elasticsearchNoteIndex: string;
-	private readonly elasticsearchIdField: string;
+	private readonly opensearchNoteIndex: string;
+	private readonly opensearchIdField: string;
 	private logger: Logger;
 
 	constructor(
@@ -79,8 +79,8 @@ export class SearchService {
 		@Inject(DI.meilisearch)
 		private meilisearch: MeiliSearch | null,
 
-		@Inject(DI.elasticsearch)
-		private elasticsearch: ElasticSearch | null,
+		@Inject(DI.opensearch)
+		private opensearch: OpenSearch | null,
 
 		@Inject(DI.notesRepository)
 		private notesRepository: NotesRepository,
@@ -119,17 +119,17 @@ export class SearchService {
 					maxTotalHits: 10000,
 				},
 			});*/
-		} else if (this.elasticsearch) {
-			this.elasticsearchNoteIndex = `${config.elasticsearch!.index}`;
-			this.elasticsearchIdField = `${config.host}_id`;
+		} else if (this.opensearch) {
+			this.opensearchNoteIndex = `${config.opensearch!.index}`;
+			this.opensearchIdField = `${config.host}_id`;
 			/* 外部からindexさせるのでこの処理は不要
-			this.elasticsearch.indices.exists({
-				index: this.elasticsearchNoteIndex,
+			this.opensearch.indices.exists({
+				index: this.opensearchNoteIndex,
 			}).then((indexExists) => {
 				if (!indexExists) {
-					this.elasticsearch?.indices.create(
+					this.opensearch?.indices.create(
 						{
-							index: this.elasticsearchNoteIndex + `-${new Date().toISOString().slice(0, 7).replace(/-/g, '')}`,
+							index: this.opensearchNoteIndex + `-${new Date().toISOString().slice(0, 7).replace(/-/g, '')}`,
 							mappings: {
 								properties: {
 									text: { type: 'text' },
@@ -205,7 +205,7 @@ export class SearchService {
 			}], {
 				primaryKey: 'id',
 			});
-		}	else if (this.elasticsearch) {
+		}	else if (this.opensearch) {
 			/* 外部からindexさせるのでこの処理は不要
 			const body = {
 				createdAt: createdAt.getTime(),
@@ -216,8 +216,8 @@ export class SearchService {
 				text: note.text,
 				tags: note.tags,
 			};
-			await this.elasticsearch.index({
-				index: `${this.elasticsearchNoteIndex}-${createdAt.toISOString().slice(0, 7).replace(/-/g, '')}`,
+			await this.opensearch.index({
+				index: `${this.opensearchNoteIndex}-${createdAt.toISOString().slice(0, 7).replace(/-/g, '')}`,
 				id: note.id,
 				body: body,
 			}).catch((error) => {
@@ -233,10 +233,10 @@ export class SearchService {
 
 		if (this.meilisearch) {
 			this.meilisearchNoteIndex!.deleteDocument(note.id);
-		} else if (this.elasticsearch) {
+		} else if (this.opensearch) {
 			/* 外部からindexさせるのでこの処理は不要
-			await this.elasticsearch.delete({
-				index: `${this.elasticsearchNoteIndex}-${this.idService.parse(note.id).date.toISOString().slice(0, 7).replace(/-/g, '')}`,
+			await this.opensearch.delete({
+				index: `${this.opensearchNoteIndex}-${this.idService.parse(note.id).date.toISOString().slice(0, 7).replace(/-/g, '')}`,
 				id: note.id,
 			}).catch((error) => {
 				this.logger.error(error);
@@ -294,7 +294,7 @@ export class SearchService {
 				return true;
 			});
 			return notes.sort((a, b) => a.id > b.id ? -1 : 1);
-		} else if (this.elasticsearch) {
+		} else if (this.opensearch) {
 			const esFilter: any = {
 				bool: {
 					must: [],
@@ -325,17 +325,19 @@ export class SearchService {
 				});
 			}
 
-			const res = await (this.elasticsearch.search)({
-				index: this.elasticsearchNoteIndex + '*' as string,
-				query: esFilter,
-				sort: [{ createdAt: { order: 'desc' } }],
-				_source: ['id', 'createdAt', this.elasticsearchIdField],
-				size: pagination.limit,
+			const res = await (this.opensearch.search)({
+				index: this.opensearchNoteIndex + '*' as string,
+				body: {
+					query: esFilter,
+					sort: [{ createdAt: { order: 'desc' } }],
+					_source: ['id', 'createdAt', this.opensearchIdField],
+					size: pagination.limit,
+				},
 			});
 
-			const noteIds = res.hits.hits.map((hit) => {
+			const noteIds = res.body.hits.hits.map((hit) => {
 				const source = hit._source as Record<string, unknown>;
-				return (source[this.elasticsearchIdField] as string) || null;
+				return (source[this.opensearchIdField] as string) || null;
 			}).filter((id): id is string => id !== null);
 			if (noteIds.length === 0) return [];
 			const [

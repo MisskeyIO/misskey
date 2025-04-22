@@ -37,6 +37,7 @@ export const paramDef = {
 		cipherAlgorithm: { type: 'string', nullable: true },
 		wantAuthnRequestsSigned: { type: 'boolean', nullable: false },
 		wantAssertionsSigned: { type: 'boolean', nullable: false },
+		wantEmailAddressNormalized: { type: 'boolean', nullable: false },
 		regenerateCertificate: { type: 'boolean', nullable: true },
 		secret: { type: 'string', nullable: true },
 	},
@@ -92,6 +93,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				cipherAlgorithm: ps.cipherAlgorithm !== '' ? ps.cipherAlgorithm : null,
 				wantAuthnRequestsSigned: ps.wantAuthnRequestsSigned,
 				wantAssertionsSigned: ps.wantAssertionsSigned,
+				wantEmailAddressNormalized: ps.wantEmailAddressNormalized,
 			});
 
 			const updatedService = await this.singleSignOnServiceProviderRepository.findOneByOrFail({ id: service.id });

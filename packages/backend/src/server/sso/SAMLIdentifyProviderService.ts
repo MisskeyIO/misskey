@@ -444,7 +444,9 @@ export class SAMLIdentifyProviderService {
 									'saml:Subject': {
 										'saml:NameID': {
 											'@Format': 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
-											'#text': profile.emailVerified ? normalizeEmailAddress(profile.email) : `${user.username}@${this.config.hostname}`,
+											'#text': profile.emailVerified
+												? (ssoServiceProvider.wantEmailAddressNormalized ? normalizeEmailAddress(profile.email) : profile.email)
+												: `${user.username}@users.${this.config.hostname}`,
 										},
 										'saml:SubjectConfirmation': {
 											'@Method': 'urn:oasis:names:tc:SAML:2.0:cm:bearer',
@@ -569,7 +571,9 @@ export class SAMLIdentifyProviderService {
 												'@NameFormat': 'urn:oasis:names:tc:SAML:2.0:attrname-format:basic',
 												'saml:AttributeValue': {
 													'@xsi:type': 'xs:string',
-													'#text': profile.emailVerified ? normalizeEmailAddress(profile.email) : `${user.username}@${this.config.hostname}`,
+													'#text': profile.emailVerified
+														? (ssoServiceProvider.wantEmailAddressNormalized ? normalizeEmailAddress(profile.email) : profile.email)
+														: `${user.username}@users.${this.config.hostname}`,
 												},
 											},
 											{

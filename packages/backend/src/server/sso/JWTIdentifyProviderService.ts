@@ -180,7 +180,9 @@ export class JWTIdentifyProviderService {
 				preferred_username: user.username,
 				profile: `${this.config.url}/@${user.username}`,
 				picture: user.avatarUrl ?? undefined,
-				email: profile.emailVerified ? normalizeEmailAddress(profile.email) : `${user.username}@${this.config.hostname}`,
+				email: profile.emailVerified
+					? (ssoServiceProvider.wantEmailAddressNormalized ? normalizeEmailAddress(profile.email) : profile.email)
+					: `${user.username}@users.${this.config.hostname}`,
 				email_verified: profile.emailVerified,
 				mfa_enabled: profile.twoFactorEnabled,
 				updated_at: Math.floor((user.updatedAt?.getTime() ?? user.createdAt.getTime()) / 1000),

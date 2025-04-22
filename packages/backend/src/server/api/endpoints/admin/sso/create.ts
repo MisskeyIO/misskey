@@ -84,6 +84,10 @@ export const meta = {
 				type: 'boolean',
 				optional: false, nullable: false,
 			},
+			wantEmailAddressNormalized: {
+				type: 'boolean',
+				optional: false, nullable: false,
+			},
 		},
 	},
 } as const;
@@ -101,6 +105,7 @@ export const paramDef = {
 		cipherAlgorithm: { type: 'string', nullable: true },
 		wantAuthnRequestsSigned: { type: 'boolean', nullable: false, default: false },
 		wantAssertionsSigned: { type: 'boolean', nullable: false, default: true },
+		wantEmailAddressNormalized: { type: 'boolean', nullable: false, default: true },
 		useCertificate: { type: 'boolean', nullable: false, default: true },
 		secret: { type: 'string', nullable: true },
 	},
@@ -157,6 +162,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				cipherAlgorithm: ps.cipherAlgorithm ? ps.cipherAlgorithm : null,
 				wantAuthnRequestsSigned: ps.wantAuthnRequestsSigned,
 				wantAssertionsSigned: ps.wantAssertionsSigned,
+				wantEmailAddressNormalized: ps.wantEmailAddressNormalized,
 			}).then(r => this.singleSignOnServiceProviderRepository.findOneByOrFail({ id: r.identifiers[0].id }));
 
 			this.moderationLogService.log(me, 'createSSOServiceProvider', {
@@ -178,6 +184,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				cipherAlgorithm: ssoServiceProvider.cipherAlgorithm,
 				wantAuthnRequestsSigned: ssoServiceProvider.wantAuthnRequestsSigned,
 				wantAssertionsSigned: ssoServiceProvider.wantAssertionsSigned,
+				wantEmailAddressNormalized: ssoServiceProvider.wantEmailAddressNormalized,
 			};
 		});
 	}

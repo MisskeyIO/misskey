@@ -357,7 +357,11 @@ async function fetchSkebStatus() {
 		return;
 	}
 
-	userSkebStatus.value = await misskeyApiGet('users/get-skeb-status', { userId: props.user.id });
+	try {
+		userSkebStatus.value = await misskeyApiGet('users/get-skeb-status', { userId: props.user.id });
+	} catch {
+		userSkebStatus.value = null;
+	}
 }
 
 function buildSkebStatus(): string {

@@ -77,6 +77,10 @@ export const meta = {
 					type: 'boolean',
 					optional: false, nullable: false,
 				},
+				wantEmailAddressNormalized: {
+					type: 'boolean',
+					optional: false, nullable: false,
+				},
 			},
 		},
 	},
@@ -116,6 +120,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				cipherAlgorithm: service.cipherAlgorithm,
 				wantAuthnRequestsSigned: service.wantAuthnRequestsSigned,
 				wantAssertionsSigned: service.wantAssertionsSigned,
+				wantEmailAddressNormalized: service.wantEmailAddressNormalized,
 			}));
 		});
 	}

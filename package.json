@@ -1,6 +1,6 @@
 {
 	"name": "misskey",
-	"version": "2024.5.0-host.9c",
+	"version": "2024.5.0-host.9f",
 	"codename": "nasubi",
 	"repository": {
 		"type": "git",
@@ -22,9 +22,9 @@
 		"build": "pnpm build-pre && pnpm -r build && pnpm build-assets",
 		"build-storybook": "pnpm --filter frontend build-storybook",
 		"build-misskey-js-with-types": "pnpm build-pre && pnpm -r build:tsc && pnpm --filter backend... --filter=!misskey-js build && pnpm --filter backend generate-api-json && ncp packages/backend/built/api.json packages/misskey-js/generator/api.json && pnpm --filter misskey-js update-autogen-code && pnpm --filter misskey-js build && pnpm --filter misskey-js api",
-		"start": "pnpm check:connect && cd packages/backend && node ./built/boot/entry.js",
-		"start:docker": "pnpm check:connect && cd packages/backend && exec node ./built/boot/entry.js",
-		"start:test": "cd packages/backend && cross-env NODE_ENV=test node ./built/boot/entry.js",
+		"start": "pnpm check:connect && cd packages/backend && cross-env-shell \"node $MK_NODE_ARGS ./built/boot/entry.js\"",
+		"start:docker": "pnpm check:connect && cd packages/backend && exec cross-env-shell \"node $MK_NODE_ARGS ./built/boot/entry.js\"",
+		"start:test": "cd packages/backend && cross-env NODE_ENV=test cross-env-shell \"node $MK_NODE_ARGS ./built/boot/entry.js\"",
 		"init": "pnpm migrate",
 		"migrate": "cd packages/backend && pnpm migrate",
 		"revert": "cd packages/backend && pnpm revert",
@@ -56,7 +56,7 @@
 		"esbuild": "0.25.2",
 		"jpeg-js": "0.4.4",
 		"lodash": "4.17.21",
-		"sharp": "0.33.5",
+		"sharp": "0.34.1",
 		"tough-cookie": "5.1.2",
 		"web-streams-polyfill": "4.1.0"
 	},
@@ -66,14 +66,14 @@
 		"js-yaml": "4.1.0",
 		"postcss": "8.5.3",
 		"terser": "5.39.0",
-		"typescript": "5.8.2"
+		"typescript": "5.8.3"
 	},
 	"devDependencies": {
-		"@types/node": "22.13.14",
+		"@types/node": "22.14.1",
 		"@typescript-eslint/eslint-plugin": "7.10.0",
 		"@typescript-eslint/parser": "7.10.0",
 		"cross-env": "7.0.3",
-		"cypress": "14.2.1",
+		"cypress": "14.3.1",
 		"eslint": "8.57.1",
 		"ncp": "2.0.0",
 		"start-server-and-test": "2.0.11"

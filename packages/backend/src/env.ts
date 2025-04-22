@@ -12,6 +12,7 @@ const envOption = {
 	logJson: false,
 	withLogTime: false,
 	quiet: false,
+	disableRegistration: false,
 };
 
 for (const key of Object.keys(envOption) as (keyof typeof envOption)[]) {

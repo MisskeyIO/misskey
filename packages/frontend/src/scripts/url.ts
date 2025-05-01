@@ -27,3 +27,20 @@ export function omitHttps(url: string): string {
 	if (url.startsWith('https%3A%2F%2F')) return url.slice(14);
 	return url;
 }
+
+export function maybeMakeRelative(urlStr: string, baseStr: string): string {
+	try {
+		const baseObj = new URL(baseStr);
+		const urlObj = new URL(urlStr);
+		/* in all places where maybeMakeRelative is used, baseStr is the
+		 * instance's public URL, which can't have path components, so the
+		 * relative URL will always have the whole path from the urlStr
+		*/
+		if (urlObj.origin === baseObj.origin) {
+			return urlObj.pathname + urlObj.search + urlObj.hash;
+		}
+		return urlStr;
+	} catch {
+		return '';
+	}
+}

@@ -37,7 +37,6 @@ export class UrlPreviewService {
 	@bindThis
 	private wrap(url?: string | null): string | null {
 		if (!url) return null;
-		if (!RegExp(/^https?:\/\//).exec(url)) return url;
 
 		return appendQuery(
 			`${this.config.mediaProxy}/preview/${encodeURIComponent(omitHttps(url))}`,

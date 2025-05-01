@@ -47,13 +47,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<component
 		:is="self ? 'MkA' : 'a'"
 		:class="[$style.link, { [$style.compact]: compact }]"
-		:[attr]="self ? url.substring(local.length) : url"
+		:[attr]="maybeRelativeUrl"
 		rel="nofollow noopener"
 		:target="target"
 		:title="url"
 		@click="(ev: MouseEvent) => warningExternalWebsite(ev, url)"
 	>
-		<div v-if="thumbnail" :class="[$style.thumbnail, { [$style.thumbnailBlur]: sensitive }]" :style="defaultStore.state.dataSaver.urlPreview ? '' : `background-image: url('${thumbnail}')`">
+		<div v-if="thumbnail" :class="[$style.thumbnail, { [$style.thumbnailBlur]: sensitive }]" :style="defaultStore.state.dataSaver.urlPreview ? '' : { backgroundImage: `url('${thumbnail}')` }">
 		</div>
 		<article :class="$style.body">
 			<header :class="$style.header">
@@ -101,6 +101,7 @@ import MkButton from '@/components/MkButton.vue';
 import { versatileLang } from '@/scripts/intl-const.js';
 import { defaultStore } from '@/store.js';
 import { warningExternalWebsite } from '@/scripts/warning-external-website.js';
+import { maybeMakeRelative } from '@/scripts/url.js';
 
 type SummalyResult = Awaited<ReturnType<typeof summaly>>;
 
@@ -118,7 +119,8 @@ const props = withDefaults(defineProps<{
 const MOBILE_THRESHOLD = 500;
 const isMobile = ref(deviceKind === 'smartphone' || window.innerWidth <= MOBILE_THRESHOLD);
 
-const self = props.url.startsWith(local);
+const maybeRelativeUrl = maybeMakeRelative(props.url, local);
+const self = maybeRelativeUrl !== props.url;
 const attr = self ? 'to' : 'href';
 const target = self ? null : '_blank';
 const fetching = ref(true);

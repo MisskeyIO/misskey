@@ -6,7 +6,7 @@
 		"type": "git",
 		"url": "https://github.com/MisskeyIO/misskey.git"
 	},
-	"packageManager": "pnpm@10.7.0",
+	"packageManager": "pnpm@10.10.0",
 	"workspaces": [
 		"packages/frontend",
 		"packages/backend",
@@ -48,12 +48,12 @@
 	"resolutions": {
 		"@aiscript-dev/aiscript-languageserver": "github:aiscript-dev/aiscript-languageserver#0.1.6",
 		"@tensorflow/tfjs-core": "4.22.0",
-		"axios": "1.8.4",
+		"axios": "1.9.0",
 		"chokidar": "4.0.3",
 		"cookie": "1.0.2",
 		"cookie-signature": "1.2.2",
 		"debug": "4.4.0",
-		"esbuild": "0.25.2",
+		"esbuild": "0.25.3",
 		"jpeg-js": "0.4.4",
 		"lodash": "4.17.21",
 		"sharp": "0.34.1",
@@ -69,11 +69,11 @@
 		"typescript": "5.8.3"
 	},
 	"devDependencies": {
-		"@types/node": "22.14.1",
+		"@types/node": "22.15.3",
 		"@typescript-eslint/eslint-plugin": "7.10.0",
 		"@typescript-eslint/parser": "7.10.0",
 		"cross-env": "7.0.3",
-		"cypress": "14.3.1",
+		"cypress": "14.3.2",
 		"eslint": "8.57.1",
 		"ncp": "2.0.0",
 		"start-server-and-test": "2.0.11"

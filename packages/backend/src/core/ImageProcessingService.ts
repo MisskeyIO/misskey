@@ -41,7 +41,6 @@ export const avifDefault: sharp.AvifOptions = {
 	quality: 60,
 	lossless: false,
 	effort: 2,
-	loop: 0,
 };
 
 import { bindThis } from '@/decorators.js';

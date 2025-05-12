@@ -9,6 +9,10 @@ on:
       - host
   pull_request:
 
+permissions:
+  contents: read
+  packages: read
+
 jobs:
   dockle:
     runs-on: ubuntu-latest

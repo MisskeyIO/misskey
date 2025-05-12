@@ -22,6 +22,9 @@ on:
       # for e2e
       - packages/backend/**
 
+permissions:
+  contents: read
+
 jobs:
   vitest:
     runs-on: ubuntu-latest

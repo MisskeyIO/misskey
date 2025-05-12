@@ -8,6 +8,10 @@ on:
       - '**-host.*'
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   push_to_registry:
     name: Push Docker image to GitHub Container Registry

@@ -9,6 +9,9 @@ on:
       - host
   pull_request:
 
+permissions:
+  contents: read
+
 env:
   NODE_ENV: production
 

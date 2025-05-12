@@ -21,6 +21,9 @@ on:
       - packages/misskey-js/**
       - packages/shared/.eslintrc.js
 
+permissions:
+  contents: read
+
 jobs:
   pnpm_install:
     runs-on: ubuntu-latest

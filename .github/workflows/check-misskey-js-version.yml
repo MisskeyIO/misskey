@@ -15,6 +15,9 @@ on:
       - packages/misskey-js/package.json
       - package.json
 
+permissions:
+  contents: read
+
 jobs:
   check-version:
     # ルートの package.json と packages/misskey-js/package.json のバージョンが一致しているかを確認する

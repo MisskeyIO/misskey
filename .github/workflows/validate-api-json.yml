@@ -13,6 +13,9 @@ on:
     paths:
       - packages/backend/**
 
+permissions:
+  contents: read
+
 jobs:
   validate-api-json:
     runs-on: ubuntu-latest

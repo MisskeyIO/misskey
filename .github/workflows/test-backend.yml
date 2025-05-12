@@ -17,6 +17,9 @@ on:
       # for permissions
       - packages/misskey-js/**
 
+permissions:
+  contents: read
+
 jobs:
   unit:
     runs-on: ubuntu-latest

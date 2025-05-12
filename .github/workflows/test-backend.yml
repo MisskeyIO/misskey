@@ -50,16 +50,22 @@ jobs:
       uses: pnpm/action-setup@v4
       with:
         run_install: false
-    - name: Cache FFmpeg binaries
-      uses: actions/cache@v4
+    - name: Restore FFmpeg binary cache
+      uses: actions/cache/restore@v4
       with:
         path: /opt/hostedtoolcache/ffmpeg
-        key: ${{ runner.os }}-${{ runner.arch }}-ffmpeg-${{ hashFiles('/opt/hostedtoolcache/ffmpeg/**/ffmpeg') }}
+        key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-latest
         restore-keys: |
-          ${{ runner.os }}-${{ runner.arch }}-ffmpeg-
+          ffmpeg-${{ runner.os }}-${{ runner.arch }}-
     - name: Install FFmpeg
       uses: FedericoCarboni/setup-ffmpeg@v3
-      id: ffmpeg
+      id: setup-ffmpeg
+    - name: Save FFmpeg binary cache
+      if: steps.setup-ffmpeg.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        path: /opt/hostedtoolcache/ffmpeg
+        key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ steps.setup-ffmpeg.outputs.ffmpeg-version }}
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4.4.0
       with:

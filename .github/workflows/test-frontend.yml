@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - beta
+      - io
       - host
     paths:
       - packages/frontend/**

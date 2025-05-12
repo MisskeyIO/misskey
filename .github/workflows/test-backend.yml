@@ -53,14 +53,12 @@ jobs:
     - name: Cache FFmpeg binaries
       uses: actions/cache@v4
       with:
-        path: /home/runner/.tool-cache/ffmpeg
+        path: /opt/hostedtoolcache/ffmpeg
         key: ${{ runner.os }}-${{ runner.arch }}-ffmpeg-${{ hashFiles('**/ffmpeg') }}
         restore-keys: |
           ${{ runner.os }}-${{ runner.arch }}-ffmpeg-
     - name: Install FFmpeg
       uses: FedericoCarboni/setup-ffmpeg@v3
-      env:
-        RUNNER_TOOL_CACHE: /home/runner/.tool-cache
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4.4.0
       with:

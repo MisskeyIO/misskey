@@ -6,8 +6,8 @@ name: Test (misskey.js)
 on:
   push:
     branches:
+      - main
       - beta
-      - io
       - host
     paths:
       - packages/misskey-js/**

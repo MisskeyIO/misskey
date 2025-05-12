@@ -3,7 +3,7 @@ name: Publish Docker image (io)
 on:
   push:
     branches:
-      - io
+      - main
     tags:
       - '**-io.*'
   workflow_dispatch:

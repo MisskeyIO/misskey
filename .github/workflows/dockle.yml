@@ -3,8 +3,8 @@ name: Dockle
 on:
   push:
     branches:
+      - main
       - beta
-      - io
       - host
   pull_request:
 

@@ -3,8 +3,8 @@ name: Test (production install and build)
 on:
   push:
     branches:
+      - main
       - beta
-      - io
       - host
   pull_request:
 

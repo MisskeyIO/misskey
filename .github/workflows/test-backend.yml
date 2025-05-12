@@ -50,6 +50,13 @@ jobs:
       uses: pnpm/action-setup@v4
       with:
         run_install: false
+    - name: Cache FFmpeg binaries
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.RUNNER_TOOL_CACHE }}/ffmpeg
+        key: ${{ runner.os }}-ffmpeg-${{ hashFiles('**/ffmpeg') }}
+        restore-keys: |
+          ${{ runner.os }}-ffmpeg-
     - name: Install FFmpeg
       uses: FedericoCarboni/setup-ffmpeg@v3
     - name: Use Node.js ${{ matrix.node-version }}

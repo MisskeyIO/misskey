@@ -54,7 +54,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: /opt/hostedtoolcache/ffmpeg
-        key: ${{ runner.os }}-${{ runner.arch }}-ffmpeg-${{ step.ffmpeg.outputs.ffmpeg-version }}
+        key: ${{ runner.os }}-${{ runner.arch }}-ffmpeg-${{ steps.ffmpeg.outputs.ffmpeg-version }}
         restore-keys: |
           ${{ runner.os }}-${{ runner.arch }}-ffmpeg-
     - name: Install FFmpeg

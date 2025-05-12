@@ -47,39 +47,47 @@
 	},
 	"resolutions": {
 		"@aiscript-dev/aiscript-languageserver": "github:aiscript-dev/aiscript-languageserver#0.1.6",
+		"@misskey-dev/summaly": "github:MisskeyIO/summaly#5.2.1-io.1",
+		"@tensorflow/tfjs": "4.22.0",
 		"@tensorflow/tfjs-core": "4.22.0",
+		"@tensorflow/tfjs-node": "4.22.0",
+		"@types/punycode": "2.1.4",
+		"@types/punycode.js": "npm:@types/punycode@2.1.4",
+		"aiscript-vscode": "github:aiscript-dev/aiscript-vscode#v0.1.16",
 		"axios": "1.9.0",
 		"chokidar": "4.0.3",
 		"cookie": "1.0.2",
 		"cookie-signature": "1.2.2",
 		"debug": "4.4.0",
-		"esbuild": "0.25.3",
+		"esbuild": "0.25.4",
 		"jpeg-js": "0.4.4",
 		"lodash": "4.17.21",
 		"sharp": "0.34.1",
+		"storybook-addon-misskey-theme": "github:misskey-dev/storybook-addon-misskey-theme",
 		"tough-cookie": "5.1.2",
+		"webgl-audiovisualizer": "github:tar-bin/webgl-audiovisualizer",
 		"web-streams-polyfill": "4.1.0"
 	},
 	"dependencies": {
-		"cssnano": "7.0.6",
-		"execa": "9.5.2",
+		"cssnano": "7.0.7",
+		"execa": "9.5.3",
 		"js-yaml": "4.1.0",
 		"postcss": "8.5.3",
 		"terser": "5.39.0",
 		"typescript": "5.8.3"
 	},
 	"devDependencies": {
-		"@types/node": "22.15.3",
+		"@types/node": "22.15.17",
 		"@typescript-eslint/eslint-plugin": "7.10.0",
 		"@typescript-eslint/parser": "7.10.0",
 		"cross-env": "7.0.3",
-		"cypress": "14.3.2",
+		"cypress": "14.3.3",
 		"eslint": "8.57.1",
 		"ncp": "2.0.0",
 		"start-server-and-test": "2.0.11"
 	},
 	"optionalDependencies": {
-		"@tensorflow/tfjs-core": "4.22.0"
+		"@tensorflow/tfjs-core": "managed"
 	},
 	"pnpm": {
 		"neverBuiltDependencies": []

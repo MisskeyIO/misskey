@@ -51,24 +51,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</MkTextarea>
 
 					<FormSection>
-						<template #label>{{ i18n.ts.files }}</template>
-
-						<div class="_gaps_m">
-							<MkSwitch v-model="cacheRemoteFiles">
-								<template #label>{{ i18n.ts.cacheRemoteFiles }}</template>
-								<template #caption>{{ i18n.ts.cacheRemoteFilesDescription }}{{ i18n.ts.youCanCleanRemoteFilesCache }}</template>
-							</MkSwitch>
-
-							<template v-if="cacheRemoteFiles">
-								<MkSwitch v-model="cacheRemoteSensitiveFiles">
-									<template #label>{{ i18n.ts.cacheRemoteSensitiveFiles }}</template>
-									<template #caption>{{ i18n.ts.cacheRemoteSensitiveFilesDescription }}</template>
-								</MkSwitch>
-							</template>
-						</div>
-					</FormSection>
-
-					<FormSection>
 						<template #label>ServiceWorker</template>
 
 						<div class="_gaps_m">
@@ -224,8 +206,6 @@ const maintainerEmail = ref<string | null>(null);
 const impressumUrl = ref<string | null>(null);
 const pinnedUsers = ref<string>('');
 const featuredGameChannels = ref<string>('');
-const cacheRemoteFiles = ref<boolean>(false);
-const cacheRemoteSensitiveFiles = ref<boolean>(false);
 const enableServiceWorker = ref<boolean>(false);
 const swPublicKey = ref<string | null>(null);
 const swPrivateKey = ref<string | null>(null);
@@ -253,8 +233,6 @@ async function init(): Promise<void> {
 	impressumUrl.value = meta.impressumUrl;
 	pinnedUsers.value = meta.pinnedUsers.join('\n');
 	featuredGameChannels.value = meta.featuredGameChannels.join('\n');
-	cacheRemoteFiles.value = meta.cacheRemoteFiles;
-	cacheRemoteSensitiveFiles.value = meta.cacheRemoteSensitiveFiles;
 	enableServiceWorker.value = meta.enableServiceWorker;
 	swPublicKey.value = meta.swPublickey;
 	swPrivateKey.value = meta.swPrivateKey;
@@ -283,8 +261,6 @@ async function save() {
 		impressumUrl: impressumUrl.value,
 		pinnedUsers: pinnedUsers.value.split('\n'),
 		featuredGameChannels: featuredGameChannels.value.split('\n'),
-		cacheRemoteFiles: cacheRemoteFiles.value,
-		cacheRemoteSensitiveFiles: cacheRemoteSensitiveFiles.value,
 		enableServiceWorker: enableServiceWorker.value,
 		swPublicKey: swPublicKey.value,
 		swPrivateKey: swPrivateKey.value,

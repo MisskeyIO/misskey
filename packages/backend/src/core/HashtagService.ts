@@ -56,10 +56,8 @@ export class HashtagService {
 	public async updateHashtag(user: { id: MiUser['id']; host: MiUser['host']; }, tag: string, isUserAttached = false, inc = true) {
 		tag = normalizeForSearch(tag);
 
-		if (this.userEntityService.isLocalUser(user)) {
-			// TODO: サンプリング
-			this.updateHashtagsRanking(tag, user.id);
-		}
+		// TODO: サンプリング
+		this.updateHashtagsRanking(tag, user.id);
 
 		const index = await this.hashtagsRepository.findOneBy({ name: tag });
 

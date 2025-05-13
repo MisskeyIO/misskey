@@ -129,6 +129,23 @@ redis:
 #  index: ''
 #  scope: local
 
+#   ┌────────────────────────────────────┐
+#───┘ File storage (Drive) configuration └──────────────────────
+
+#s3:
+#  baseUrl: s3.example.com
+#  bucket: example-bucket
+#  prefix: example-prefix
+#  endpoint: s3.example.com
+#  region: us-east-1
+#  useSSL: true
+#  accessKey: example-access-key
+#  secretKey: example-secret-key
+#  options:
+#    setPublicRead: true
+#    forcePathStyle: false
+#    useProxy: false
+
 #   ┌───────────────┐
 #───┘ ID generation └───────────────────────────────────────────
 

@@ -64,6 +64,8 @@ jobs:
     - name: Install FFmpeg
       uses: FedericoCarboni/setup-ffmpeg@v3
       id: setup-ffmpeg
+      with:
+        ffmpeg-version: 7.0.2
     - name: Save FFmpeg binary cache
       if: steps.setup-ffmpeg.outputs.cache-hit != 'true'
       uses: actions/cache/save@v4

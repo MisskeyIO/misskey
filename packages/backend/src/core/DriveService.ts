@@ -153,9 +153,7 @@ export class DriveService {
 		// thunbnail, webpublic を必要なら生成
 		const alts = await this.generateAlts(path, fileType, !file.uri);
 
-		const meta = await this.metaService.fetch();
-
-		if (meta.useObjectStorage) {
+		if (this.config.s3) {
 		//#region ObjectStorage params
 			let [ext] = (name.match(/\.([a-zA-Z0-9_-]+)$/) ?? ['']);
 
@@ -174,11 +172,11 @@ export class DriveService {
 				ext = '';
 			}
 
-			const baseUrl = meta.objectStorageBaseUrl
-				?? `${ meta.objectStorageUseSSL ? 'https' : 'http' }://${ meta.objectStorageEndpoint }${ meta.objectStoragePort ? `:${meta.objectStoragePort}` : '' }/${ meta.objectStorageBucket }`;
+			const baseUrl = this.config.s3.baseUrl
+				?? `${ this.config.s3.useSSL ? 'https' : 'http' }://${ this.config.s3.endpoint }/${ this.config.s3.bucket }`;
 
 			// for original
-			const key = `${meta.objectStoragePrefix}/${randomUUID()}${ext}`;
+			const key = `${this.config.s3.prefix}/${randomUUID()}${ext}`;
 			const url = `${ baseUrl }/${ key }`;
 
 			// for alts
@@ -195,7 +193,7 @@ export class DriveService {
 			];
 
 			if (alts.webpublic) {
-				webpublicKey = `${meta.objectStoragePrefix}/webpublic-${randomUUID()}.${alts.webpublic.ext}`;
+				webpublicKey = `${this.config.s3.prefix}/webpublic-${randomUUID()}.${alts.webpublic.ext}`;
 				webpublicUrl = `${ baseUrl }/${ webpublicKey }`;
 
 				this.registerLogger.info(`uploading webpublic: ${webpublicKey}`);
@@ -203,7 +201,7 @@ export class DriveService {
 			}
 
 			if (alts.thumbnail) {
-				thumbnailKey = `${meta.objectStoragePrefix}/thumbnail-${randomUUID()}.${alts.thumbnail.ext}`;
+				thumbnailKey = `${this.config.s3.prefix}/thumbnail-${randomUUID()}.${alts.thumbnail.ext}`;
 				thumbnailUrl = `${ baseUrl }/${ thumbnailKey }`;
 
 				this.registerLogger.info(`uploading thumbnail: ${thumbnailKey}`);
@@ -382,10 +380,8 @@ export class DriveService {
 		if (fileType === 'image/apng') type = 'image/png';
 		if (!FILE_TYPE_BROWSERSAFE.includes(fileType)) type = 'application/octet-stream';
 
-		const meta = await this.metaService.fetch();
-
 		const params = {
-			Bucket: meta.objectStorageBucket,
+			Bucket: this.config.s3?.bucket,
 			Key: key,
 			Body: stream,
 			ContentType: type,
@@ -398,9 +394,9 @@ export class DriveService {
 			// 許可されているファイル形式でしか拡張子をつけない
 			ext ? correctFilename(filename, ext) : filename,
 		);
-		if (meta.objectStorageSetPublicRead) params.ACL = 'public-read';
+		if (this.config.s3?.options?.setPublicRead) params.ACL = 'public-read';
 
-		await this.s3Service.upload(meta, params)
+		await this.s3Service.upload(params)
 			.then(
 				result => {
 					if ('Bucket' in result) { // CompleteMultipartUploadCommandOutput
@@ -834,14 +830,13 @@ export class DriveService {
 
 	@bindThis
 	public async deleteObjectStorageFile(key: string) {
-		const meta = await this.metaService.fetch();
 		try {
 			const param = {
-				Bucket: meta.objectStorageBucket,
+				Bucket: this.config.s3?.bucket,
 				Key: key,
 			} as DeleteObjectCommandInput;
 
-			await this.s3Service.delete(meta, param);
+			await this.s3Service.delete(param);
 		} catch (err: any) {
 			if (err.name === 'NoSuchKey') {
 				this.deleteLogger.warn(`The object storage had no such key to delete: ${key}. Skipping this.`, err as Error);

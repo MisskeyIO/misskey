@@ -11,7 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div class="_gaps_m">
 				<div :class="$style.banner" :style="{ backgroundImage: `url(${ instance.bannerUrl })` }">
 					<div style="overflow: clip;">
-						<img v-if="kawaiiMode" src="/client-assets/kawaii/misskey-io.png" alt="" :class="$style.bannerIconAlt"/>
+						<img v-if="kawaiiMode" src="/client-assets/kawaii/misskey.png" alt="" :class="$style.bannerIconAlt"/>
 						<img v-else :src="instance.iconUrl ?? instance.faviconUrl ?? '/favicon.ico'" alt="" :class="$style.bannerIcon"/>
 						<Mfm v-if="kawaiiMode" text="Logo by @sawaratsuki@misskey.io" :class="$style.iconCredit"/>
 						<div :class="$style.bannerName">
@@ -24,18 +24,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<template #key>{{ i18n.ts.description }}</template>
 					<template #value><div v-html="instance.description"></div></template>
 				</MkKeyValue>
-
-				<div style="display:flex;flex-direction:column;align-items:center;justify-content:center">
-					<div>© {{ new Date().getFullYear() }} MisskeyHQ Inc.</div>
-					<a href="https://go.misskey.io/legal-notice" target="_blank" rel="noopener"><u>特定商取引法に基づく表記</u></a>
-				</div>
-
-				<FormSection>
-					<template #label><Mfm text="$[jelly ❤]"/> Sponsored by</template>
-					<div style="display:flex;flex-wrap:wrap;gap:8px 8px;align-items:center;justify-content:center;">
-						<a title="Skeb" href="https://skeb.jp/" target="_blank"><img src="https://media.misskeyusercontent.jp/misskey-io/sponsors/skeb.png" alt="Skeb" width="140"></a>
-					</div>
-				</FormSection>
 
 				<FormSection>
 					<div class="_gaps_m">
@@ -98,11 +86,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<FormLink v-if="instance.feedbackUrl" :to="instance.feedbackUrl" external>
 								<template #icon><i class="ti ti-message"></i></template>
 								{{ i18n.ts.support }}
-							</FormLink>
-							<FormLink to="https://go.misskey.io/donate" external>
-								<template #icon><i class="ti ti-pig-money"></i></template>
-								{{ i18n.tsx.supportThisInstance({ name: instance.name ?? host }) }}
-								<template #suffix>pixivFANBOX</template>
 							</FormLink>
 						</div>
 					</div>

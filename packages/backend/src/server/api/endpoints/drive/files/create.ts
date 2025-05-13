@@ -86,6 +86,7 @@ export const paramDef = {
 		comment: { type: 'string', nullable: true, maxLength: DB_MAX_IMAGE_COMMENT_LENGTH, default: null },
 		isSensitive: { type: 'boolean', default: false },
 		force: { type: 'boolean', default: false },
+		watermark: { type: 'boolean' },
 	},
 	required: [],
 } as const;

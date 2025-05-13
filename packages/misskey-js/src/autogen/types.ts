@@ -3785,6 +3785,15 @@ export type paths = {
      */
     post: operations['reversi___verify'];
   };
+  '/watermark/update': {
+    /**
+     * watermark/update
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:account*
+     */
+    post: operations['watermark___update'];
+  };
 };
 
 export type webhooks = Record<string, never>;
@@ -5104,9 +5113,10 @@ export type components = {
       canManageCustomEmojis: boolean;
       canManageAvatarDecorations: boolean;
       canSearchNotes: boolean;
+      canUseReaction: boolean;
       canUseTranslator: boolean;
       canUseDriveFileInSoundSettings: boolean;
-      canUseReaction: boolean;
+      canUseWatermark: boolean;
       canHideAds: boolean;
       driveCapacityMb: number;
       alwaysMarkNsfw: boolean;
@@ -15684,6 +15694,7 @@ export type operations = {
           isSensitive?: boolean;
           /** @default false */
           force?: boolean;
+          watermark?: boolean;
           /**
            * Format: binary
            * @description The file contents.
@@ -30693,6 +30704,73 @@ export type operations = {
             game?: components['schemas']['ReversiGameDetailed'] | null;
           };
         };
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * watermark/update
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:account*
+   */
+  watermark___update: {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          fileId: string;
+          width?: number;
+          height?: number;
+          /** @enum {string} */
+          fit?: 'scale-down' | 'contain' | 'cover' | 'crop' | 'pad';
+          /** @enum {string} */
+          gravity?: 'auto' | 'left' | 'right' | 'top' | 'bottom';
+          opacity?: number;
+          /** @enum {string} */
+          repeat?: 'true' | 'x' | 'y';
+          top?: number;
+          left?: number;
+          bottom?: number;
+          right?: number;
+          background?: string;
+          rotate?: number;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
       };
       /** @description Client error */
       400: {

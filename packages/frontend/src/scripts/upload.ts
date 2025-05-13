@@ -34,6 +34,7 @@ export function uploadFile(
 	folder?: any,
 	name?: string,
 	keepOriginal: boolean = defaultStore.state.keepOriginalUploading,
+	watermark: boolean = defaultStore.state.useWatermark,
 ): Promise<Misskey.entities.DriveFile> {
 	if ($i == null) throw new Error('Not logged in');
 
@@ -83,6 +84,7 @@ export function uploadFile(
 			formData.append('force', 'true');
 			formData.append('file', resizedImage ?? file);
 			formData.append('name', ctx.name);
+			if (watermark) formData.append('watermark', 'true');
 			if (folder) formData.append('folderId', folder);
 
 			const xhr = new XMLHttpRequest();

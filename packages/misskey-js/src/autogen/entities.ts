@@ -594,3 +594,4 @@ export type ReversiShowGameResponse = operations['reversi___show-game']['respons
 export type ReversiSurrenderRequest = operations['reversi___surrender']['requestBody']['content']['application/json'];
 export type ReversiVerifyRequest = operations['reversi___verify']['requestBody']['content']['application/json'];
 export type ReversiVerifyResponse = operations['reversi___verify']['responses']['200']['content']['application/json'];
+export type WatermarkUpdateRequest = operations['watermark___update']['requestBody']['content']['application/json'];

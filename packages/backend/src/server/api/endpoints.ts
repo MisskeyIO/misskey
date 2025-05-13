@@ -399,6 +399,7 @@ import * as ep___reversi_invitations from './endpoints/reversi/invitations.js';
 import * as ep___reversi_showGame from './endpoints/reversi/show-game.js';
 import * as ep___reversi_surrender from './endpoints/reversi/surrender.js';
 import * as ep___reversi_verify from './endpoints/reversi/verify.js';
+import * as ep___watermark_update from './endpoints/watermark/update.js';
 
 const eps = [
 	['admin/meta', ep___admin_meta],
@@ -794,6 +795,7 @@ const eps = [
 	['reversi/show-game', ep___reversi_showGame],
 	['reversi/surrender', ep___reversi_surrender],
 	['reversi/verify', ep___reversi_verify],
+	['watermark/update', ep___watermark_update],
 ];
 
 interface IEndpointMetaBase {

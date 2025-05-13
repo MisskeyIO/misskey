@@ -1813,6 +1813,7 @@ declare namespace entities {
         ReversiSurrenderRequest,
         ReversiVerifyRequest,
         ReversiVerifyResponse,
+        WatermarkUpdateRequest,
         Error_2 as Error,
         UserLite,
         UserDetailedNotMeOnly,
@@ -3323,6 +3324,9 @@ type UsersStatsResponse = operations['users___stats']['responses']['200']['conte
 
 // @public (undocumented)
 type UsersUpdateMemoRequest = operations['users___update-memo']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type WatermarkUpdateRequest = operations['watermark___update']['requestBody']['content']['application/json'];
 
 // Warnings were encountered during analysis:
 //

@@ -6,7 +6,7 @@
 		"type": "git",
 		"url": "https://github.com/MisskeyIO/misskey.git"
 	},
-	"packageManager": "pnpm@10.10.0",
+	"packageManager": "pnpm@10.11.0",
 	"workspaces": [
 		"packages/frontend",
 		"packages/backend",
@@ -73,7 +73,7 @@
 		"execa": "9.5.3",
 		"js-yaml": "4.1.0",
 		"postcss": "8.5.3",
-		"terser": "5.39.0",
+		"terser": "5.39.1",
 		"typescript": "5.8.3"
 	},
 	"devDependencies": {

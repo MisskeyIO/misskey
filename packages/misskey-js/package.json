@@ -35,7 +35,7 @@
 		"url": "git+https://github.com/misskey-dev/misskey.js.git"
 	},
 	"devDependencies": {
-		"@microsoft/api-extractor": "7.52.7",
+		"@microsoft/api-extractor": "7.52.8",
 		"@misskey-dev/eslint-plugin": "1.0.0",
 		"@swc/jest": "0.2.38",
 		"@types/jest": "29.5.14",
@@ -58,7 +58,7 @@
 		"built/dts"
 	],
 	"dependencies": {
-		"@swc/cli": "0.7.5",
+		"@swc/cli": "0.7.7",
 		"@swc/core": "1.11.24",
 		"eventemitter3": "5.0.1",
 		"reconnecting-websocket": "4.4.0"

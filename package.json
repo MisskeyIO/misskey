@@ -62,7 +62,7 @@
 		"esbuild": "0.25.4",
 		"jpeg-js": "0.4.4",
 		"lodash": "4.17.21",
-		"sharp": "0.34.1",
+		"sharp": "0.34.0-rc.0",
 		"storybook-addon-misskey-theme": "github:misskey-dev/storybook-addon-misskey-theme",
 		"tough-cookie": "5.1.2",
 		"webgl-audiovisualizer": "github:tar-bin/webgl-audiovisualizer",

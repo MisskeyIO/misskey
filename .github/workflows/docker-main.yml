@@ -1,9 +1,9 @@
-name: Publish Docker image (beta)
+name: Publish Docker image (main)
 
 on:
   push:
     branches:
-      - beta
+      - main
   workflow_dispatch:
 
 permissions:
@@ -52,5 +52,5 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/misskeyio/misskey:io-buildcache
           cache-to: type=registry,ref=ghcr.io/misskeyio/misskey:io-buildcache,mode=max
           tags: |
-            ghcr.io/misskeyio/misskey:beta
+            ghcr.io/misskeyio/misskey:latest
             ghcr.io/misskeyio/misskey:${{ env.FORMATTED_BRANCH_NAME }}

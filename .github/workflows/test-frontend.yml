@@ -3,6 +3,7 @@ name: Test (frontend)
 on:
   push:
     branches:
+      - main
       - beta
       - io
       - host
@@ -20,6 +21,9 @@ on:
       - packages/misskey-js/**
       # for e2e
       - packages/backend/**
+
+permissions:
+  contents: read
 
 jobs:
   vitest:

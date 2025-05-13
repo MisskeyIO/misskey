@@ -3,6 +3,7 @@ name: Check Misskey JS version
 on:
   push:
     branches:
+      - main
       - beta
       - io
       - host
@@ -13,6 +14,9 @@ on:
     paths:
       - packages/misskey-js/package.json
       - package.json
+
+permissions:
+  contents: read
 
 jobs:
   check-version:

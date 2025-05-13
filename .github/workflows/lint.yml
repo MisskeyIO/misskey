@@ -3,6 +3,7 @@ name: Lint
 on:
   push:
     branches:
+      - main
       - beta
       - io
       - host
@@ -19,6 +20,9 @@ on:
       - packages/sw/**
       - packages/misskey-js/**
       - packages/shared/.eslintrc.js
+
+permissions:
+  contents: read
 
 jobs:
   pnpm_install:

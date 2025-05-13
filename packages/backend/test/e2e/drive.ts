@@ -25,7 +25,7 @@ describe('Drive', () => {
 
 		const marker = Math.random().toString();
 
-		const url = 'https://raw.githubusercontent.com/MisskeyIO/misskey/io/packages/backend/test/resources/Lenna.jpg';
+		const url = 'https://raw.githubusercontent.com/MisskeyIO/misskey/main/packages/backend/test/resources/Lenna.jpg';
 
 		const catcher = makeStreamCatcher(
 			alice,

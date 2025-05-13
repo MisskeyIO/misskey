@@ -8,6 +8,7 @@ import { UserEntityService } from '@/core/entities/UserEntityService.js';
 process.env.NODE_ENV = 'test';
 
 import { jest } from '@jest/globals';
+import { IsNull, Not } from 'typeorm';
 import { ModuleMocker } from 'jest-mock';
 import { Test } from '@nestjs/testing';
 import * as lolex from '@sinonjs/fake-timers';
@@ -132,10 +133,10 @@ describe('RoleService', () => {
 		clock.uninstall();
 
 		await Promise.all([
-			app.get(DI.metasRepository).delete({}),
-			usersRepository.delete({}),
-			rolesRepository.delete({}),
-			roleAssignmentsRepository.delete({}),
+			app.get(DI.metasRepository).delete({ id: Not(IsNull()) }),
+			usersRepository.delete({ id: Not(IsNull()) }),
+			rolesRepository.delete({ id: Not(IsNull()) }),
+			roleAssignmentsRepository.delete({ id: Not(IsNull()) }),
 		]);
 
 		await app.close();

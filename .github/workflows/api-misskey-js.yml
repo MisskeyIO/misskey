@@ -8,6 +8,9 @@ on:
     paths:
       - packages/misskey-js/**
 
+permissions:
+  contents: read
+
 jobs:
   report:
 

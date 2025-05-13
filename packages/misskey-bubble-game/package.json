@@ -26,7 +26,7 @@
 	"devDependencies": {
 		"@misskey-dev/eslint-plugin": "1.0.0",
 		"@types/matter-js": "0.19.8",
-		"@types/node": "22.15.3",
+		"@types/node": "22.15.17",
 		"@types/seedrandom": "3.0.8",
 		"@typescript-eslint/eslint-plugin": "7.10.0",
 		"@typescript-eslint/parser": "7.10.0",
@@ -38,7 +38,7 @@
 		"built"
 	],
 	"dependencies": {
-		"esbuild": "0.25.3",
+		"esbuild": "managed",
 		"eventemitter3": "5.0.1",
 		"glob": "11.0.2",
 		"matter-js": "0.20.0",

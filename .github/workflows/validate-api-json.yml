@@ -3,6 +3,7 @@ name: Test (backend)
 on:
   push:
     branches:
+      - main
       - beta
       - io
       - host
@@ -11,6 +12,9 @@ on:
   pull_request:
     paths:
       - packages/backend/**
+
+permissions:
+  contents: read
 
 jobs:
   validate-api-json:

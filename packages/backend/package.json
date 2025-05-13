@@ -150,7 +150,7 @@
 		"os-utils": "0.0.14",
 		"otpauth": "9.4.0",
 		"parse5": "7.3.0",
-		"pg": "8.15.6",
+		"pg": "8.16.0",
 		"pino": "9.6.0",
 		"pino-pretty": "13.0.0",
 		"pkce-challenge": "5.0.0",

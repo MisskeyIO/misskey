@@ -27,7 +27,7 @@
 		"@misskey-dev/eslint-plugin": "1.0.0",
 		"@types/node": "22.15.17",
 		"@typescript-eslint/eslint-plugin": "7.10.0",
-		"@typescript-eslint/parser": "7.10.0",
+		"@typescript-eslint/parser": "7.18.0",
 		"eslint": "8.57.1",
 		"nodemon": "3.1.10",
 		"typescript": "5.8.3"

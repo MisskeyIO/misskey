@@ -1063,8 +1063,8 @@ importers:
         specifier: 3.1.3
         version: 3.1.3(@types/debug@4.1.12)(@types/node@22.15.17)(happy-dom@17.4.7)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(msw@2.8.2(@types/node@22.15.17)(typescript@5.8.3))(sass@1.88.0)(terser@5.39.1)(tsx@4.19.4)
       vitest-fetch-mock:
-        specifier: 0.3.0
-        version: 0.3.0(encoding@0.1.13)(vitest@3.1.3(@types/debug@4.1.12)(@types/node@22.15.17)(happy-dom@17.4.7)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(msw@2.8.2(@types/node@22.15.17)(typescript@5.8.3))(sass@1.88.0)(terser@5.39.1)(tsx@4.19.4))
+        specifier: 0.4.5
+        version: 0.4.5(vitest@3.1.3(@types/debug@4.1.12)(@types/node@22.15.17)(happy-dom@17.4.7)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(msw@2.8.2(@types/node@22.15.17)(typescript@5.8.3))(sass@1.88.0)(terser@5.39.1)(tsx@4.19.4))
       vue-component-type-helpers:
         specifier: 2.2.10
         version: 2.2.10
@@ -5027,9 +5027,6 @@ packages:
 
   cross-fetch@3.2.0:
     resolution: {integrity: sha512-Q+xVJLoGOeIMXZmbUK4HYk+69cQH6LudR0Vu/pRm2YlU/hDV9CiS0gKUMaWY5f2NeUH9C1nV3bsTlCo0FsTV1Q==}
-
-  cross-fetch@4.1.0:
-    resolution: {integrity: sha512-uKm5PU+MHTootlWEY+mZ4vvXoCn4fLQxT9dSc1sXVMSFkINTJVN8cAQROpwcKm8bJ/c7rgZVIBWzH5T78sNZZw==}
 
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -9714,9 +9711,9 @@ packages:
       yaml:
         optional: true
 
-  vitest-fetch-mock@0.3.0:
-    resolution: {integrity: sha512-g6upWcL8/32fXL43/5f4VHcocuwQIi9Fj5othcK9gPO8XqSEGtnIZdenr2IaipDr61ReRFt+vaOEgo8jiUUX5w==}
-    engines: {node: '>=14.14.0'}
+  vitest-fetch-mock@0.4.5:
+    resolution: {integrity: sha512-nhWdCQIGtaSEUVl96pMm0WggyDGPDv5FUy/Q9Hx3cs2RGmh3Q/uRsLClGbdG3kXBkJ3br5yTUjB2MeW25TwdOA==}
+    engines: {node: '>=18.0.0'}
     peerDependencies:
       vitest: '>=2.0.0'
 
@@ -14675,12 +14672,6 @@ snapshots:
       cross-spawn: 7.0.6
 
   cross-fetch@3.2.0(encoding@0.1.13):
-    dependencies:
-      node-fetch: 2.7.0(encoding@0.1.13)
-    transitivePeerDependencies:
-      - encoding
-
-  cross-fetch@4.1.0(encoding@0.1.13):
     dependencies:
       node-fetch: 2.7.0(encoding@0.1.13)
     transitivePeerDependencies:
@@ -20207,12 +20198,9 @@ snapshots:
       terser: 5.39.1
       tsx: 4.19.4
 
-  vitest-fetch-mock@0.3.0(encoding@0.1.13)(vitest@3.1.3(@types/debug@4.1.12)(@types/node@22.15.17)(happy-dom@17.4.7)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(msw@2.8.2(@types/node@22.15.17)(typescript@5.8.3))(sass@1.88.0)(terser@5.39.1)(tsx@4.19.4)):
+  vitest-fetch-mock@0.4.5(vitest@3.1.3(@types/debug@4.1.12)(@types/node@22.15.17)(happy-dom@17.4.7)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(msw@2.8.2(@types/node@22.15.17)(typescript@5.8.3))(sass@1.88.0)(terser@5.39.1)(tsx@4.19.4)):
     dependencies:
-      cross-fetch: 4.1.0(encoding@0.1.13)
       vitest: 3.1.3(@types/debug@4.1.12)(@types/node@22.15.17)(happy-dom@17.4.7)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(msw@2.8.2(@types/node@22.15.17)(typescript@5.8.3))(sass@1.88.0)(terser@5.39.1)(tsx@4.19.4)
-    transitivePeerDependencies:
-      - encoding
 
   vitest@3.1.3(@types/debug@4.1.12)(@types/node@22.15.17)(happy-dom@17.4.7)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(msw@2.8.2(@types/node@22.15.17)(typescript@5.8.3))(sass@1.88.0)(terser@5.39.1)(tsx@4.19.4):
     dependencies:

@@ -433,8 +433,8 @@ importers:
         specifier: 4.2.0
         version: 4.2.0
       typeorm:
-        specifier: 0.3.23
-        version: 0.3.23(ioredis@5.6.1)(pg@8.16.0)(reflect-metadata@0.2.2)
+        specifier: 0.3.24
+        version: 0.3.24(ioredis@5.6.1)(pg@8.16.0)(reflect-metadata@0.2.2)
       typescript:
         specifier: 5.8.3
         version: 5.8.3
@@ -9439,8 +9439,8 @@ packages:
   typedarray@0.0.6:
     resolution: {integrity: sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==}
 
-  typeorm@0.3.23:
-    resolution: {integrity: sha512-CJUZWW7O5zZG0TA7bRpntJx97AvvQwsoSa1UgYlzTOtmkwODrqIyxP9wtzHpBssEKie5chnLiCVyxKNeYo65wQ==}
+  typeorm@0.3.24:
+    resolution: {integrity: sha512-4IrHG7A0tY8l5gEGXfW56VOMfUVWEkWlH/h5wmcyZ+V8oCiLj7iTPp0lEjMEZVrxEkGSdP9ErgTKHKXQApl/oA==}
     engines: {node: '>=16.13.0'}
     hasBin: true
     peerDependencies:
@@ -19981,7 +19981,7 @@ snapshots:
 
   typedarray@0.0.6: {}
 
-  typeorm@0.3.23(ioredis@5.6.1)(pg@8.16.0)(reflect-metadata@0.2.2):
+  typeorm@0.3.24(ioredis@5.6.1)(pg@8.16.0)(reflect-metadata@0.2.2):
     dependencies:
       '@sqltools/formatter': 1.2.5
       ansis: 3.17.0
@@ -19989,6 +19989,7 @@ snapshots:
       buffer: 6.0.3
       dayjs: 1.11.13
       debug: 4.4.0(supports-color@8.1.1)
+      dedent: 1.6.0
       dotenv: 16.5.0
       glob: 10.4.5
       reflect-metadata: 0.2.2
@@ -20001,6 +20002,7 @@ snapshots:
       ioredis: 5.6.1
       pg: 8.16.0
     transitivePeerDependencies:
+      - babel-plugin-macros
       - supports-color
 
   typescript@5.8.2: {}

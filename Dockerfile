@@ -15,7 +15,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 WORKDIR /misskey
 
 COPY --link pnpm-lock.yaml ./
-RUN npm install -g pnpm@9
+RUN npm install -g pnpm@10
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
 	pnpm fetch --ignore-scripts
 
@@ -48,7 +48,7 @@ RUN apt-get update \
 WORKDIR /misskey
 
 COPY --link pnpm-lock.yaml ./
-RUN npm install -g pnpm@9
+RUN npm install -g pnpm@10 && mkdir -p /root/.local/share/pnpm/.tools
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
 	pnpm fetch --ignore-scripts
 
@@ -81,8 +81,9 @@ RUN apt-get update \
 WORKDIR /misskey
 
 COPY --chown=misskey:misskey pnpm-lock.yaml ./
-RUN npm install -g pnpm@9
+RUN npm install -g pnpm@10
 
+COPY --chown=misskey:misskey --from=target-builder /root/.local/share/pnpm/.tools ./.local/share/pnpm/.tools
 COPY --chown=misskey:misskey --from=target-builder /misskey/node_modules ./node_modules
 COPY --chown=misskey:misskey --from=target-builder /misskey/packages/backend/node_modules ./packages/backend/node_modules
 COPY --chown=misskey:misskey --from=target-builder /misskey/packages/misskey-js/node_modules ./packages/misskey-js/node_modules

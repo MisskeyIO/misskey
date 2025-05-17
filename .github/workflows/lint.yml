@@ -3,6 +3,7 @@ name: Lint
 on:
   push:
     branches:
+      - main
       - beta
       - io
       - host
@@ -25,10 +26,15 @@ on:
       - packages/frontend-embed/**
       - packages/sw/**
       - packages/misskey-js/**
+      - packages/shared/.eslintrc.js
       - packages/misskey-bubble-game/**
       - packages/misskey-reversi/**
       - packages/shared/eslint.config.js
       - .github/workflows/lint.yml
+
+permissions:
+  contents: read
+
 jobs:
   pnpm_install:
     runs-on: ubuntu-latest
@@ -40,7 +46,7 @@ jobs:
     - uses: pnpm/action-setup@v4
       with:
         run_install: false
-    - uses: actions/setup-node@v4.3.0
+    - uses: actions/setup-node@v4.4.0
       with:
         node-version-file: '.node-version'
         cache: 'pnpm'
@@ -72,7 +78,7 @@ jobs:
     - uses: pnpm/action-setup@v4
       with:
         run_install: false
-    - uses: actions/setup-node@v4.3.0
+    - uses: actions/setup-node@v4.4.0
       with:
         node-version-file: '.node-version'
         cache: 'pnpm'
@@ -97,7 +103,7 @@ jobs:
     - uses: pnpm/action-setup@v4
       with:
         run_install: false
-    - uses: actions/setup-node@v4.3.0
+    - uses: actions/setup-node@v4.4.0
       with:
         node-version-file: '.node-version'
         cache: 'pnpm'

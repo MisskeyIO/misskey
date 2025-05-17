@@ -71,7 +71,7 @@ type Source = {
 	sentryForBackend?: { options: Partial<Sentry.NodeOptions>; enableNodeProfiling: boolean; };
 	sentryForFrontend?: { options: Partial<Sentry.NodeOptions> };
 
-	elasticsearch?: {
+	opensearch?: {
 		host: string;
 		port: string;
 		user: string;
@@ -133,6 +133,8 @@ type Source = {
 	perUserNotificationsMaxCount?: number;
 	deactivateAntennaThreshold?: number;
 	pidFile: string;
+
+	extraHead?: string;
 };
 
 export type Config = {
@@ -166,7 +168,7 @@ export type Config = {
 		index: string;
 		scope?: 'local' | 'global' | string[];
 	} | undefined;
-	elasticsearch: {
+	opensearch: {
 		host: string;
 		port: string;
 		user: string;
@@ -244,6 +246,7 @@ export type Config = {
 	perUserNotificationsMaxCount: number;
 	deactivateAntennaThreshold: number;
 	pidFile: string;
+	extraHead: string | undefined;
 };
 
 const _filename = fileURLToPath(import.meta.url);
@@ -314,7 +317,7 @@ export function loadConfig(): Config {
 		dbReplications: config.dbReplications,
 		dbSlaves: config.dbSlaves,
 		meilisearch: config.meilisearch,
-		elasticsearch: config.elasticsearch,
+		opensearch: config.opensearch,
 		redis,
 		redisForPubsub: config.redisForPubsub ? convertRedisOptions(config.redisForPubsub, host) : redis,
 		redisForSystemQueue: config.redisForSystemQueue ? convertRedisOptions(config.redisForSystemQueue, host) : redisForJobQueue,
@@ -368,6 +371,7 @@ export function loadConfig(): Config {
 		perUserNotificationsMaxCount: config.perUserNotificationsMaxCount ?? 500,
 		deactivateAntennaThreshold: config.deactivateAntennaThreshold ?? (1000 * 60 * 60 * 24 * 7),
 		pidFile: config.pidFile,
+		extraHead: config.extraHead,
 	};
 }
 

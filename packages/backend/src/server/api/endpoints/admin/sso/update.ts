@@ -37,6 +37,7 @@ export const paramDef = {
 		cipherAlgorithm: { type: 'string', nullable: true },
 		wantAuthnRequestsSigned: { type: 'boolean', nullable: false },
 		wantAssertionsSigned: { type: 'boolean', nullable: false },
+		wantEmailAddressNormalized: { type: 'boolean', nullable: false },
 		regenerateCertificate: { type: 'boolean', nullable: true },
 		secret: { type: 'string', nullable: true },
 	},
@@ -60,7 +61,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			const alg = ps.signatureAlgorithm ? ps.signatureAlgorithm : service.signatureAlgorithm;
 			const { publicKey, privateKey } = ps.regenerateCertificate
-				? await jose.generateKeyPair(alg).then(async keypair => ({
+				? await jose.generateKeyPair(alg, { extractable: true }).then(async keypair => ({
 					publicKey: JSON.stringify(await jose.exportJWK(keypair.publicKey)),
 					privateKey: JSON.stringify(await jose.exportJWK(keypair.privateKey)),
 				}))
@@ -76,6 +77,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				tenYearsLaterTime,
 				publicKey ?? '',
 				privateKey ?? '',
+				alg,
 			) : undefined;
 
 			await this.singleSignOnServiceProviderRepository.update(service.id, {
@@ -91,6 +93,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				cipherAlgorithm: ps.cipherAlgorithm !== '' ? ps.cipherAlgorithm : null,
 				wantAuthnRequestsSigned: ps.wantAuthnRequestsSigned,
 				wantAssertionsSigned: ps.wantAssertionsSigned,
+				wantEmailAddressNormalized: ps.wantEmailAddressNormalized,
 			});
 
 			const updatedService = await this.singleSignOnServiceProviderRepository.findOneByOrFail({ id: service.id });

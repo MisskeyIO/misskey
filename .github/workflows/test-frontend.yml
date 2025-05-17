@@ -3,6 +3,7 @@ name: Test (frontend)
 on:
   push:
     branches:
+      - main
       - beta
       - io
       - host
@@ -21,6 +22,10 @@ on:
       # for e2e
       - packages/backend/**
       - .github/workflows/test-frontend.yml
+
+permissions:
+  contents: read
+
 jobs:
   vitest:
     runs-on: ubuntu-latest
@@ -39,7 +44,7 @@ jobs:
       with:
         run_install: false
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4.3.0
+      uses: actions/setup-node@v4.4.0
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'pnpm'

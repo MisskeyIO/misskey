@@ -16,6 +16,7 @@ import { InstanceActorService } from '@/core/InstanceActorService.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { DEFAULT_POLICIES } from '@/core/RoleService.js';
+import { envOption } from '@/env.js';
 
 @Injectable()
 export class MetaEntityService {
@@ -84,7 +85,7 @@ export class MetaEntityService {
 			impressumUrl: instance.impressumUrl,
 			privacyPolicyUrl: instance.privacyPolicyUrl,
 			inquiryUrl: instance.inquiryUrl,
-			disableRegistration: instance.disableRegistration,
+			disableRegistration: instance.disableRegistration || envOption.disableRegistration,
 			emailRequiredForSignup: instance.emailRequiredForSignup,
 			enableHcaptcha: instance.enableHcaptcha,
 			hcaptchaSiteKey: instance.hcaptchaSiteKey,

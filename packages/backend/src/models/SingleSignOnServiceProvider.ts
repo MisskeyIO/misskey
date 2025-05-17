@@ -79,4 +79,9 @@ export class MiSingleSignOnServiceProvider {
 		default: true,
 	})
 	public wantAssertionsSigned: boolean;
+
+	@Column('boolean', {
+		default: true,
+	})
+	public wantEmailAddressNormalized: boolean;
 }

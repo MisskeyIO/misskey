@@ -3,10 +3,14 @@ name: Test (production install and build)
 on:
   push:
     branches:
+      - main
       - beta
       - io
       - host
   pull_request:
+
+permissions:
+  contents: read
 
 env:
   NODE_ENV: production
@@ -29,7 +33,7 @@ jobs:
       with:
         run_install: false
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4.3.0
+      uses: actions/setup-node@v4.4.0
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'pnpm'

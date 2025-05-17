@@ -223,6 +223,10 @@ const reload = (): Promise<void> => {
 	return init();
 };
 
+const deleteItem = () => {
+	items.value = [];
+};
+
 const fetchMore = async (): Promise<void> => {
 	if (!more.value || fetching.value || moreFetching.value || items.value.length === 0) return;
 	moreFetching.value = true;
@@ -426,9 +430,16 @@ defineExpose({
 	more,
 	reload,
 	prepend,
+	deleteItem,
 	append: appendItem,
 	removeItem,
 	updateItem,
+	stopFetch: () => {
+		more.value = false;
+	},
+	startFetch: () => {
+		more.value = true;
+	},
 });
 </script>
 

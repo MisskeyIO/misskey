@@ -180,7 +180,9 @@ export class JWTIdentifyProviderService {
 				preferred_username: user.username,
 				profile: `${this.config.url}/@${user.username}`,
 				picture: user.avatarUrl ?? undefined,
-				email: profile.emailVerified ? normalizeEmailAddress(profile.email) : `${user.username}@${this.config.hostname}`,
+				email: profile.emailVerified
+					? (ssoServiceProvider.wantEmailAddressNormalized ? normalizeEmailAddress(profile.email) : profile.email)
+					: `${user.username}@users.${this.config.hostname}`,
 				email_verified: profile.emailVerified,
 				mfa_enabled: profile.twoFactorEnabled,
 				updated_at: Math.floor((user.updatedAt?.getTime() ?? user.createdAt.getTime()) / 1000),
@@ -193,7 +195,7 @@ export class JWTIdentifyProviderService {
 			try {
 				if (ssoServiceProvider.cipherAlgorithm) {
 					const key = ssoServiceProvider.publicKey.startsWith('{')
-						? await jose.importJWK(JSON.parse(ssoServiceProvider.publicKey))
+						? await jose.importJWK(JSON.parse(ssoServiceProvider.publicKey), ssoServiceProvider.signatureAlgorithm)
 						: jose.base64url.decode(ssoServiceProvider.publicKey);
 
 					jwt = await new jose.EncryptJWT(payload)
@@ -211,7 +213,7 @@ export class JWTIdentifyProviderService {
 						.encrypt(key);
 				} else {
 					const key = ssoServiceProvider.privateKey
-						? await jose.importJWK(JSON.parse(ssoServiceProvider.privateKey))
+						? await jose.importJWK(JSON.parse(ssoServiceProvider.privateKey), ssoServiceProvider.signatureAlgorithm)
 						: jose.base64url.decode(ssoServiceProvider.publicKey);
 
 					jwt = await new jose.SignJWT(payload)
@@ -311,7 +313,7 @@ export class JWTIdentifyProviderService {
 			try {
 				if (ssoServiceProvider.cipherAlgorithm) {
 					const key = ssoServiceProvider.privateKey
-						? await jose.importJWK(JSON.parse(ssoServiceProvider.privateKey))
+						? await jose.importJWK(JSON.parse(ssoServiceProvider.privateKey), ssoServiceProvider.signatureAlgorithm)
 						: jose.base64url.decode(ssoServiceProvider.publicKey);
 
 					const { payload } = await jose.jwtDecrypt(jwt, key, {
@@ -323,7 +325,7 @@ export class JWTIdentifyProviderService {
 					return;
 				} else {
 					const key = ssoServiceProvider.publicKey.startsWith('{')
-						? await jose.importJWK(JSON.parse(ssoServiceProvider.publicKey))
+						? await jose.importJWK(JSON.parse(ssoServiceProvider.publicKey), ssoServiceProvider.signatureAlgorithm)
 						: jose.base64url.decode(ssoServiceProvider.publicKey);
 
 					const { payload } = await jose.jwtVerify(jwt, key, {

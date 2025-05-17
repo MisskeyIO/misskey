@@ -25,24 +25,24 @@
 	},
 	"devDependencies": {
 		"@types/matter-js": "0.19.8",
-		"@types/node": "22.13.0",
+		"@types/node": "22.15.17",
 		"@types/seedrandom": "3.0.8",
 		"@typescript-eslint/eslint-plugin": "7.10.0",
 		"@typescript-eslint/parser": "7.10.0",
 		"execa": "8.0.1",
 		"eslint": "8.57.1",
-		"nodemon": "3.1.9",
+		"nodemon": "3.1.10",
 		"esbuild": "0.19.11",
 		"glob": "10.3.10",
-		"typescript": "5.7.3"
+		"typescript": "5.8.3"
 	},
 	"files": [
 		"built"
 	],
 	"dependencies": {
-		"esbuild": "0.24.2",
+		"esbuild": "managed",
 		"eventemitter3": "5.0.1",
-		"glob": "11.0.1",
+		"glob": "11.0.2",
 		"matter-js": "0.20.0",
 		"seedrandom": "3.0.5"
 	}

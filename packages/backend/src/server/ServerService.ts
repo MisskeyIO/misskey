@@ -188,7 +188,7 @@ export class ServerService implements OnApplicationShutdown {
 
 			return reply.redirect(
 				url,
-				301,
+				302,
 			);
 		});
 

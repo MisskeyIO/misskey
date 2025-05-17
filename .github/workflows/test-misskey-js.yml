@@ -6,6 +6,7 @@ name: Test (misskey.js)
 on:
   push:
     branches:
+      - main
       - beta
       - io
       - host
@@ -16,6 +17,10 @@ on:
     paths:
       - packages/misskey-js/**
       - .github/workflows/test-misskey-js.yml
+
+permissions:
+  contents: read
+
 jobs:
   test:
 
@@ -39,7 +44,7 @@ jobs:
           run_install: false
 
       - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4.3.0
+        uses: actions/setup-node@v4.4.0
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'

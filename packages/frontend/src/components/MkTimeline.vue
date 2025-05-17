@@ -17,7 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, watch, onUnmounted, provide, shallowRef } from 'vue';
+import { computed, watch, onUnmounted, provide, shallowRef, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { BasicTimelineType } from '@/timelines.js';
 import MkNotes from '@/components/MkNotes.vue';
@@ -72,12 +72,9 @@ const prComponent = shallowRef<InstanceType<typeof MkPullToRefresh>>();
 const tlComponent = shallowRef<InstanceType<typeof MkNotes>>();
 
 let tlNotesCount = 0;
+const notVisibleNoteData = new Array<object>();
 
-async function prepend(data) {
-	if (tlComponent.value == null) return;
-
-	let note = data;
-
+async function fulfillNoteData(data) {
 	// チェックするプロパティはなんでも良い
 	// minimizeが有効でid以外が存在しない場合は取得する
 	if (!data.visibility) {
@@ -89,22 +86,62 @@ async function prepend(data) {
 				'X-Client-Transaction-Id': generateClientTransactionId('misskey'),
 			},
 		});
-		if (!res.ok) return;
-		note = deepMerge(data, await res.json());
+		if (!res.ok) return null;
+		return deepMerge(data, await res.json());
 	}
 
-	tlNotesCount++;
+	return data;
+}
 
-	if (instance.notesPerOneAd > 0 && tlNotesCount % instance.notesPerOneAd === 0) {
-		note._shouldInsertAd_ = true;
+async function prepend(data) {
+	if (tlComponent.value == null) return;
+
+	let note = data;
+
+	if (!document.hidden) {
+		note = await fulfillNoteData(data);
+		if (note == null) return;
+
+		tlNotesCount++;
+
+		if (instance.notesPerOneAd > 0 && tlNotesCount % instance.notesPerOneAd === 0) {
+			note._shouldInsertAd_ = true;
+		}
+
+		tlComponent.value.pagingComponent?.prepend(note);
+	} else {
+		notVisibleNoteData.push(data);
+
+		if (notVisibleNoteData.length > 10) {
+			notVisibleNoteData.shift();
+		}
 	}
-
-	tlComponent.value.pagingComponent?.prepend(note);
 
 	emit('note');
 
 	if (props.sound) {
 		sound.playMisskeySfx($i && (note.userId === $i.id) ? 'noteMy' : 'note');
+	}
+}
+
+async function loadUnloadedNotes() {
+	if (document.hidden) return;
+	if (tlComponent.value == null) return;
+	if (notVisibleNoteData.length === 0) return;
+
+	tlComponent.value.pagingComponent?.stopFetch();
+	try {
+		const items = [...notVisibleNoteData];
+		notVisibleNoteData.length = 0;
+
+		const notes = await Promise.allSettled(items.map(fulfillNoteData));
+		if (items.length >= 10) tlComponent.value.pagingComponent?.deleteItem();
+
+		for (const note of notes.filter(i => i.status === 'fulfilled' && i.value != null)) {
+			await prepend((note as PromiseFulfilledResult<object>).value);
+		}
+	} finally {
+		tlComponent.value.pagingComponent?.startFetch();
 	}
 }
 
@@ -297,8 +334,13 @@ watch(() => props.withSensitive, reloadTimeline);
 // 初回表示用
 refreshEndpointAndChannel();
 
+onMounted(() => {
+	document.addEventListener('visibilitychange', loadUnloadedNotes);
+});
+
 onUnmounted(() => {
 	disconnectChannel();
+	document.removeEventListener('visibilitychange', loadUnloadedNotes);
 });
 
 function reloadTimeline() {

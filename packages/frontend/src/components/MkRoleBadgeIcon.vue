@@ -24,7 +24,11 @@ async function fetchSkebStatus() {
 		return;
 	}
 
-	userSkebStatus.value = await misskeyApiGet('users/get-skeb-status', { userId: props.userId });
+	try {
+		userSkebStatus.value = await misskeyApiGet('users/get-skeb-status', { userId: props.userId });
+	} catch {
+		userSkebStatus.value = null;
+	}
 }
 
 if (props.role.behavior === 'skeb') {

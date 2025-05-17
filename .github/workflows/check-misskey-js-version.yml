@@ -3,7 +3,6 @@ name: Check Misskey JS version
 on:
   push:
     branches:
-      - beta
       - io
       - host
     paths:
@@ -15,6 +14,10 @@ on:
       - packages/misskey-js/package.json
       - package.json
       - .github/workflows/check-misskey-js-version.yml
+
+permissions:
+  contents: read
+
 jobs:
   check-version:
     # ルートの package.json と packages/misskey-js/package.json のバージョンが一致しているかを確認する

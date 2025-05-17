@@ -22,6 +22,8 @@ import MkRippleEffect from '@/components/MkRippleEffect.vue';
 import { isSupportShare } from '@/scripts/navigator.js';
 import { getAppearNote } from '@/scripts/get-appear-note.js';
 import { genEmbedCode } from '@/scripts/get-embed-code.js';
+import { isMute, playUrl } from '@/scripts/sound';
+import { isAprilFoolsDay } from '@/scripts/seasonal-events';
 
 export async function getNoteClipMenu(props: {
 	note: Misskey.entities.Note;
@@ -206,9 +208,13 @@ export function getNoteMenu(props: {
 	function del(): void {
 		os.confirm({
 			type: 'warning',
-			text: i18n.ts.noteDeleteConfirm,
+			text: isAprilFoolsDay() ? i18n.ts.deleteNotWash + '\n' + i18n.ts.noteDeleteConfirm : i18n.ts.noteDeleteConfirm,
 		}).then(({ canceled }) => {
 			if (canceled) return;
+
+			if (isAprilFoolsDay() && !isMute()) {
+				playUrl('/client-assets/sounds/flush.mp3', { volume: defaultStore.state.sound_masterVolume });
+			}
 
 			misskeyApi('notes/delete', {
 				noteId: appearNote.id,
@@ -475,8 +481,8 @@ export function getNoteMenu(props: {
 				});
 			}
 			menuItems.push({
-				icon: 'ti ti-trash',
-				text: i18n.ts.delete,
+				icon: isAprilFoolsDay() ? 'ti ti-whirl' : 'ti ti-trash',
+				text: isAprilFoolsDay() ? i18n.ts.flushItAway : i18n.ts.delete,
 				danger: true,
 				action: del,
 			});

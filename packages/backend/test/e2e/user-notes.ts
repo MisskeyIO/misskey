@@ -18,7 +18,7 @@ describe('users/notes', () => {
 	beforeAll(async () => {
 		alice = await signup({ username: 'alice' });
 		const jpg = await uploadUrl(alice, 'https://raw.githubusercontent.com/mattyatea/misskey/merge-upstream/packages/backend/test/resources/192.jpg');
-		const png = await uploadUrl(alice, 'https://raw.githubusercontent.com/MisskeyIO/misskey/io/packages/backend/test/resources/192.png');
+		const png = await uploadUrl(alice, 'https://raw.githubusercontent.com/MisskeyIO/misskey/io/packages/backend/test/resources/192.png'); // FIXME
 		jpgNote = await post(alice, {
 			fileIds: [jpg.id],
 		});

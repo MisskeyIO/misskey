@@ -200,7 +200,8 @@ import { unisonReload } from '@/scripts/unison-reload.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { instance } from '@/instance.js';
 import { host } from '@@/js/config.js';
-import { GtagConsent, GtagConsentParams } from 'vue-gtag';
+import { consent as gtagConsent } from 'vue-gtag';
+import type { GtagConsentParams } from '@/types/gtag.js';
 
 const $i = signinRequired();
 
@@ -250,18 +251,17 @@ const gaConsent = computed({
 		gaConsentInternal.value = value;
 	},
 });
-const gtagConsentInternal = ref(
-	(miLocalStorage.getItemAsJson('gtagConsent') as GtagConsentParams) ?? {
-		ad_storage: 'denied',
-		ad_user_data: 'denied',
-		ad_personalization: 'denied',
-		analytics_storage: 'denied',
-		functionality_storage: 'denied',
-		personalization_storage: 'denied',
-		security_storage: 'granted',
-	},
-);
-const gtagConsent = computed({
+const gtagConsentInternal = ref({
+	ad_storage: 'denied',
+	ad_user_data: 'denied',
+	ad_personalization: 'denied',
+	analytics_storage: 'denied',
+	functionality_storage: 'denied',
+	personalization_storage: 'denied',
+	security_storage: 'granted',
+	...(miLocalStorage.getItemAsJson('gtagConsent') as GtagConsentParams),
+});
+const gtagConsentParams = computed({
 	get: () => gtagConsentInternal.value,
 	set: (value: GtagConsentParams) => {
 		miLocalStorage.setItemAsJson('gtagConsent', value);
@@ -269,10 +269,10 @@ const gtagConsent = computed({
 	},
 });
 const gtagConsentAnalytics = computed({
-	get: () => gtagConsent.value.analytics_storage === 'granted',
+	get: () => gtagConsentParams.value.analytics_storage === 'granted',
 	set: (value: boolean) => {
-		gtagConsent.value = {
-			...gtagConsent.value,
+		gtagConsentParams.value = {
+			...gtagConsentParams.value,
 			ad_storage: value ? 'granted' : 'denied',
 			ad_user_data: value ? 'granted' : 'denied',
 			analytics_storage: value ? 'granted' : 'denied',
@@ -280,19 +280,19 @@ const gtagConsentAnalytics = computed({
 	},
 });
 const gtagConsentFunctionality = computed({
-	get: () => gtagConsent.value.functionality_storage === 'granted',
+	get: () => gtagConsentParams.value.functionality_storage === 'granted',
 	set: (value: boolean) => {
-		gtagConsent.value = {
-			...gtagConsent.value,
+		gtagConsentParams.value = {
+			...gtagConsentParams.value,
 			functionality_storage: value ? 'granted' : 'denied',
 		};
 	},
 });
 const gtagConsentPersonalization = computed({
-	get: () => gtagConsent.value.personalization_storage === 'granted',
+	get: () => gtagConsentParams.value.personalization_storage === 'granted',
 	set: (value: boolean) => {
-		gtagConsent.value = {
-			...gtagConsent.value,
+		gtagConsentParams.value = {
+			...gtagConsentParams.value,
 			ad_personalization: value ? 'granted' : 'denied',
 			personalization_storage: value ? 'granted' : 'denied',
 		};
@@ -313,8 +313,8 @@ watch(gaConsent, async () => {
 	await reloadAsk();
 });
 
-watch(gtagConsent, async () => {
-	if (typeof window['gtag'] === 'function') (window['gtag'] as GtagConsent)('consent', 'update', gtagConsent.value);
+watch(gtagConsentParams, async () => {
+	gtagConsent('update', gtagConsentParams.value as GtagConsentParams);
 });
 
 watch([makeNotesFollowersOnlyBefore, makeNotesHiddenBefore], () => {

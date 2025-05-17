@@ -5398,6 +5398,14 @@ export interface Locale extends ILocale {
      */
     "thisInfoIsNotVisibleOtherUser": string;
     /**
+     * 水に流す
+     */
+    "flushItAway": string;
+    /**
+     * 削除をしても全てが水に流れるわけではありませんが…
+     */
+    "deleteNotWash": string;
+    /**
      * もう一度お試しください。
      */
     "tryAgain": string;
@@ -10044,7 +10052,7 @@ export interface Locale extends ILocale {
          */
         "flushNotification": string;
         /**
-         * ドライブのファイルがセンシティブとして設定されました
+         * ファイルがセンシティブとして設定されました
          */
         "sensitiveFlagAssigned": string;
         /**

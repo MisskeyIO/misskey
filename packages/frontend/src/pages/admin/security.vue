@@ -203,7 +203,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<MkSwitch v-model="service.wantAssertionsSigned">
 								<template #label>Want Assertions Signed</template>
 							</MkSwitch>
-							<MkSwitch v-model="service.useCertificate" :disabled="!!service.createdAt">
+							<MkSwitch v-model="service.wantEmailAddressNormalized">
+									<template #label>Want Email Address Normalized</template>
+								</MkSwitch>
+								<MkSwitch v-model="service.useCertificate" :disabled="!!service.createdAt">
 								<template #label>Use Certificate</template>
 							</MkSwitch>
 							<MkSwitch v-if="service.useCertificate" v-model="service.regenerateCertificate">
@@ -407,6 +410,7 @@ function ssoServiceAddNew() {
 		cipherAlgorithm: '',
 		wantAuthnRequestsSigned: false,
 		wantAssertionsSigned: true,
+		wantEmailAddressNormalized: true,
 		regenerateCertificate: false,
 	});
 }
@@ -438,6 +442,7 @@ async function ssoServiceSave(service) {
 		cipherAlgorithm: service.cipherAlgorithm,
 		wantAuthnRequestsSigned: service.wantAuthnRequestsSigned,
 		wantAssertionsSigned: service.wantAssertionsSigned,
+		wantEmailAddressNormalized: service.wantEmailAddressNormalized,
 	};
 
 	if (service.createdAt !== undefined) {

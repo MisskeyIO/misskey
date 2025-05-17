@@ -3,6 +3,7 @@ name: Test (backend)
 on:
   push:
     branches:
+      - main
       - beta
       - io
       - host
@@ -13,6 +14,10 @@ on:
     paths:
       - packages/backend/**
       - .github/workflows/validate-api-json.yml
+
+permissions:
+  contents: read
+
 jobs:
   validate-api-json:
     runs-on: ubuntu-latest
@@ -31,7 +36,7 @@ jobs:
       with:
         run_install: false
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4.3.0
+      uses: actions/setup-node@v4.4.0
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'pnpm'

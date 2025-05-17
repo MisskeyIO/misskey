@@ -1,7 +1,7 @@
 {
 	"type": "module",
 	"name": "misskey-js",
-	"version": "2024.10.2-alpha.2",
+	"version": "2024.5.0-io.10",
 	"description": "Misskey SDK for JavaScript",
 	"license": "MIT",
 	"types": "./built/dts/index.d.ts",
@@ -37,11 +37,11 @@
 		"directory": "packages/misskey-js"
 	},
 	"devDependencies": {
-		"@microsoft/api-extractor": "7.49.2",
+		"@microsoft/api-extractor": "7.52.8",
 		"@misskey-dev/eslint-plugin": "1.0.0",
-		"@swc/jest": "0.2.37",
+		"@swc/jest": "0.2.38",
 		"@types/jest": "29.5.14",
-		"@types/node": "22.13.0",
+		"@types/node": "22.15.17",
 		"@typescript-eslint/eslint-plugin": "7.10.0",
 		"@typescript-eslint/parser": "7.10.0",
 		"eslint": "8.57.1",
@@ -50,12 +50,12 @@
 		"jest-websocket-mock": "2.5.0",
 		"mock-socket": "9.3.1",
 		"ncp": "2.0.0",
-		"nodemon": "3.1.9",
-		"tsd": "0.31.2",
+		"nodemon": "3.1.10",
+		"tsd": "0.32.0",
 		"esbuild": "0.23.1",
 
 		"glob": "11.0.0",
-		"typescript": "5.7.3"
+		"typescript": "5.8.3"
 	},
 	"files": [
 		"built",
@@ -64,8 +64,8 @@
 	],
 	"dependencies": {
 		"@simplewebauthn/types": "10.0.0",
-		"@swc/cli": "0.6.0",
-		"@swc/core": "1.10.12",
+		"@swc/cli": "0.7.7",
+		"@swc/core": "1.11.24",
 		"eventemitter3": "5.0.1",
 		"reconnecting-websocket": "4.4.0"
 	}

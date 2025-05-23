@@ -17,10 +17,11 @@ on:
 
 jobs:
   test:
+    name: Federation test
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [22.11.0]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -49,7 +50,9 @@ jobs:
         run: git diff --exit-code pnpm-lock.yaml
 
       - name: Build Misskey
-        run: pnpm build
+        run: |
+          pnpm i --frozen-lockfile
+          pnpm build
 
       - name: Setup
         run: |
@@ -58,17 +61,32 @@ jobs:
           sudo chmod 644 ./certificates/*.test.key
 
       - name: Start servers
+        id: start_servers
+        continue-on-error: true
         # https://github.com/docker/compose/issues/1294#issuecomment-374847206
         run: |
           cd packages/backend/test-federation
           docker compose up -d --scale tester=0
 
+      - name: Print start_servers error
+        if: ${{ steps.start_servers.outcome == 'failure' }}
+        run: |
+          cd packages/backend/test-federation
+          docker compose logs | tail -n 300
+          exit 1
       - name: Test
         run: |
           cd packages/backend/test-federation
           docker compose run --no-deps tester
 
+      - name: Log
+        if: always()
+        run: |
+          cd packages/backend/test-federation
+          docker compose logs
+
       - name: Stop servers
+        if: always()
         run: |
           cd packages/backend/test-federation
           docker compose down

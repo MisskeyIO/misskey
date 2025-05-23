@@ -115,7 +115,7 @@ describe('SigninWithPasskeyApiService', () => {
 		jest.spyOn(webAuthnService, 'verifySignInWithPasskeyAuthentication').mockImplementation(FakeWebauthnVerify);
 
 		const dummyUser = {
-			id: uid, username: uid, usernameLower: uid.toLocaleLowerCase(), uri: null, host: null };
+			id: uid, username: uid, usernameLower: uid.toLowerCase(), uri: null, host: null };
 		const dummyProfile = {
 			userId: uid,
 			password: 'qwerty',

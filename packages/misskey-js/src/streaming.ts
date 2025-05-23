@@ -53,7 +53,8 @@ export default class Stream extends EventEmitter<StreamEvents> implements IStrea
 	private idCounter = 0;
 
 	constructor(origin: string, user: { token: string; } | null, options?: {
-		WebSocket?: _ReconnectingWebSocket.Options['WebSocket'];
+		WebSocket?: Options['WebSocket'];
+		binaryType?: ReconnectingWebSocket['binaryType'];
 	}) {
 		super();
 
@@ -86,6 +87,9 @@ export default class Stream extends EventEmitter<StreamEvents> implements IStrea
 			minReconnectionDelay: 1, // https://github.com/pladaria/reconnecting-websocket/issues/91
 			WebSocket: options.WebSocket,
 		});
+		if (options.binaryType) {
+			this.stream.binaryType = options.binaryType;
+		}
 		this.stream.addEventListener('open', this.onOpen);
 		this.stream.addEventListener('close', this.onClose);
 		this.stream.addEventListener('message', this.onMessage);
@@ -193,9 +197,9 @@ export default class Stream extends EventEmitter<StreamEvents> implements IStrea
 	 * Send a message to connection
 	 * ! ストリーム上のやり取りはすべてJSONで行われます !
 	 */
-	public send(typeOrPayload: string): void
-	public send(typeOrPayload: string, payload: unknown): void
-	public send(typeOrPayload: Record<string, unknown> | unknown[]): void
+	public send(typeOrPayload: string): void;
+	public send(typeOrPayload: string, payload: unknown): void;
+	public send(typeOrPayload: Record<string, unknown> | unknown[]): void;
 	public send(typeOrPayload: string | Record<string, unknown> | unknown[], payload?: unknown): void {
 		if (typeof typeOrPayload === 'string') {
 			this.stream.send(JSON.stringify({

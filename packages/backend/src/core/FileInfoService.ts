@@ -21,6 +21,7 @@ import { AiService } from '@/core/AiService.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import type Logger from '@/logger.js';
 import { bindThis } from '@/decorators.js';
+import type { PredictionType } from 'nsfwjs';
 
 export type FileInfo = {
 	size: number;

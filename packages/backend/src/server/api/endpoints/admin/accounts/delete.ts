@@ -57,6 +57,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (user == null) throw new ApiError(meta.errors.userNotFound);
 			if (await this.roleService.isModerator(user)) throw new ApiError(meta.errors.cannotDeleteModerator);
 
+			if (user.isRoot) {
+				throw new Error('cannot delete a root account');
+			}
+
 			await this.deleteAccountService.deleteAccount(user, ps.soft, me);
 		});
 	}

@@ -11,13 +11,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 	:withOkButton="false"
 	:okButtonDisabled="false"
 	@close="dialog?.close()"
-	@closed="$emit('closed')"
+	@closed="emit('closed')"
 >
 	<template v-if="announcement" #header>:{{ announcement.title }}:</template>
 	<template v-else #header>New announcement</template>
 
 	<div>
-		<MkSpacer :marginMin="20" :marginMax="28">
+		<div class="_spacer" style="--MI_SPACER-min: 20px; --MI_SPACER-max: 28px;">
 			<div class="_gaps_m">
 				<MkInput ref="announceTitleEl" v-model="title" :large="false">
 					<template #label>{{ i18n.ts.title }}&nbsp;<button v-tooltip="i18n.ts.emoji" :class="['_button']" @click="insertEmoji"><i class="ti ti-mood-happy"></i></button></template>
@@ -61,7 +61,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<MkUserCardMini v-if="props.user.id" :user="props.user"></MkUserCardMini>
 				<MkButton v-if="announcement" danger @click="del()"><i class="ti ti-trash"></i> {{ i18n.ts.delete }}</MkButton>
 			</div>
-		</MkSpacer>
+		</div>
 		<div :class="$style.footer">
 			<MkButton primary rounded style="margin: 0 auto;" @click="done"><i class="ti ti-check"></i> {{ props.announcement ? i18n.ts.update : i18n.ts.create }}</MkButton>
 		</div>
@@ -76,16 +76,23 @@ import MkModalWindow from '@/components/MkModalWindow.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
 import * as os from '@/os.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import MkTextarea from '@/components/MkTextarea.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import MkRadios from '@/components/MkRadios.vue';
 import MkUserCardMini from '@/components/MkUserCardMini.vue';
 
+type AdminAnnouncementType = Misskey.entities.AdminAnnouncementsCreateRequest & { id: string; };
+
 const props = defineProps<{
 	user: Misskey.entities.User,
-	announcement?: Misskey.entities.Announcement,
+	announcement?: Required<AdminAnnouncementType>,
+}>();
+
+const emit = defineEmits<{
+	(ev: 'done', v: { deleted?: boolean; updated?: AdminAnnouncementType; created?: AdminAnnouncementType; }): void,
+	(ev: 'closed'): void
 }>();
 
 const dialog = ref<InstanceType<typeof MkModalWindow> | null>(null);
@@ -126,7 +133,7 @@ async function done(): Promise<void> {
 		silence: silence.value,
 		reads: reads.value,
 		userId: props.user.id,
-	};
+	} satisfies Misskey.entities.AdminAnnouncementsCreateRequest;
 
 	if (props.announcement) {
 		await os.apiWithDialog('admin/announcements/update', {

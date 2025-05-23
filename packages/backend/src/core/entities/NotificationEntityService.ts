@@ -17,6 +17,7 @@ import { isNotNull } from '@/misc/is-not-null.js';
 import { FilterUnionByProperty, groupedNotificationTypes } from '@/types.js';
 import { CacheService } from '@/core/CacheService.js';
 import { RoleEntityService } from './RoleEntityService.js';
+import { ChatEntityService } from './ChatEntityService.js';
 import type { OnModuleInit } from '@nestjs/common';
 import type { UserEntityService } from './UserEntityService.js';
 import type { NoteEntityService } from './NoteEntityService.js';
@@ -30,6 +31,7 @@ export class NotificationEntityService implements OnModuleInit {
 	private noteEntityService: NoteEntityService;
 	private roleEntityService: RoleEntityService;
 	private scheduledNoteEntityService: ScheduledNoteEntityService;
+	private chatEntityService: ChatEntityService;
 
 	constructor(
 		private moduleRef: ModuleRef,
@@ -44,9 +46,6 @@ export class NotificationEntityService implements OnModuleInit {
 		private followRequestsRepository: FollowRequestsRepository,
 
 		private cacheService: CacheService,
-
-		//private userEntityService: UserEntityService,
-		//private noteEntityService: NoteEntityService,
 	) {
 	}
 
@@ -55,6 +54,7 @@ export class NotificationEntityService implements OnModuleInit {
 		this.noteEntityService = this.moduleRef.get('NoteEntityService');
 		this.roleEntityService = this.moduleRef.get('RoleEntityService');
 		this.scheduledNoteEntityService = this.moduleRef.get('ScheduledNoteEntityService');
+		this.chatEntityService = this.moduleRef.get('ChatEntityService');
 	}
 
 	/**
@@ -101,7 +101,7 @@ export class NotificationEntityService implements OnModuleInit {
 		// if the user has been deleted, don't show this notification
 		if (needsUser && !userIfNeed) return null;
 
-		// #region Grouped notifications
+		//#region Grouped notifications
 		if (notification.type === 'reaction:grouped') {
 			const reactions = (await Promise.allSettled(notification.reactions.map(async reaction => {
 				const user = hint?.packedUsers != null
@@ -152,12 +152,19 @@ export class NotificationEntityService implements OnModuleInit {
 				users,
 			});
 		}
-		// #endregion
+		//#endregion
 
 		const needsRole = notification.type === 'roleAssigned';
 		const role = needsRole ? await this.roleEntityService.pack(notification.roleId, { id: meId }) : undefined;
 		// if the role has been deleted, don't show this notification
 		if (needsRole && !role) {
+			return null;
+		}
+
+		const needsChatRoomInvitation = notification.type === 'chatRoomInvitationReceived';
+		const chatRoomInvitation = needsChatRoomInvitation ? await this.chatEntityService.packRoomInvitation(notification.invitationId, { id: meId }).catch(() => null) : undefined;
+		// if the invitation has been deleted, don't show this notification
+		if (needsChatRoomInvitation && !chatRoomInvitation) {
 			return null;
 		}
 
@@ -174,6 +181,9 @@ export class NotificationEntityService implements OnModuleInit {
 			} : {}),
 			...(notification.type === 'roleAssigned' ? {
 				role: role,
+			} : {}),
+			...(notification.type === 'chatRoomInvitationReceived' ? {
+				invitation: chatRoomInvitation,
 			} : {}),
 			...(notification.type === 'followRequestAccepted' ? {
 				message: notification.message,

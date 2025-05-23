@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div :class="$style.banner">
 		<i class="ti ti-user-edit"></i>
 	</div>
-	<MkSpacer :marginMin="20" :marginMax="32">
+	<div class="_spacer" style="--MI_SPACER-min: 20px; --MI_SPACER-max: 32px;">
 		<form class="_gaps_m" autocomplete="new-password" @submit.prevent="onSubmit">
 			<MkInput v-if="instance.disableRegistration" v-model="invitationCode" type="text" :spellcheck="false" required>
 				<template #label>{{ i18n.ts.invitationCode }}</template>
@@ -58,7 +58,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template v-else>{{ i18n.ts.start }}</template>
 			</MkButton>
 		</form>
-	</MkSpacer>
+	</div>
 </div>
 </template>
 
@@ -70,12 +70,13 @@ import * as config from '@@/js/config.js';
 import MkButton from './MkButton.vue';
 import MkInput from './MkInput.vue';
 import MkNewPassword from '@/components/MkNewPassword.vue';
-import MkCaptcha, { type Captcha } from '@/components/MkCaptcha.vue';
+import type { Captcha } from '@/components/MkCaptcha.vue';
+import MkCaptcha from '@/components/MkCaptcha.vue';
 import * as os from '@/os.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
-import { login } from '@/account.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 import { instance } from '@/instance.js';
 import { i18n } from '@/i18n.js';
+import { login } from '@/accounts.js';
 
 const props = withDefaults(defineProps<{
 	autoSet?: boolean;
@@ -205,25 +206,37 @@ async function onSubmit(): Promise<void> {
 		'testcaptcha-response': testcaptchaResponse.value,
 	};
 
-	try {
-		await os.apiWithDialog('signup', signupPayload, undefined, (res) => {
-			if (instance.emailRequiredForSignup) {
-				os.alert({
-					type: 'success',
-					title: i18n.ts._signup.almostThere,
-					text: i18n.tsx._signup.emailSent({ email: email.value }),
-				});
-				emit('signupEmailPending');
-			} else {
-				emit('signup', { id: res.id, i: res.token });
+	const res = await window.fetch(`${config.apiUrl}/signup`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(signupPayload),
+	}).catch(() => {
+		onSignupApiError();
+		return null;
+	});
 
-				if (props.autoSet) {
-					login(res.token);
-				}
+	if (res && res.ok) {
+		if (res.status === 204 || instance.emailRequiredForSignup) {
+			os.alert({
+				type: 'success',
+				title: i18n.ts._signup.almostThere,
+				text: i18n.tsx._signup.emailSent({ email: email.value }),
+			});
+			emit('signupEmailPending');
+		} else {
+			const resJson = (await res.json()) as Misskey.entities.SignupResponse;
+			if (_DEV_) console.log(resJson);
+
+			emit('signup', resJson);
+
+			if (props.autoSet) {
+				await login(resJson.token);
 			}
-		});
-	} catch {
-		onSignupApiError()
+		}
+	} else {
+		onSignupApiError();
 	}
 }
 function onSignupApiError() {

@@ -1,6 +1,6 @@
 {
 	"name": "misskey",
-	"version": "2024.5.0-io.10",
+	"version": "2025.4.1-io.1",
 	"codename": "nasubi",
 	"repository": {
 		"type": "git",
@@ -26,7 +26,7 @@
 		"build-misskey-js-with-types": "pnpm build-pre && pnpm -r build:tsc && pnpm --filter backend... --filter=!misskey-js build && pnpm --filter backend generate-api-json --no-build && ncp packages/backend/built/api.json packages/misskey-js/generator/api.json && pnpm --filter misskey-js update-autogen-code && pnpm --filter misskey-js build && pnpm --filter misskey-js api",
 		"start": "pnpm check:connect && cd packages/backend && cross-env-shell \"node $MK_NODE_ARGS ./built/boot/entry.js\"",
 		"start:docker": "pnpm check:connect && cd packages/backend && exec cross-env-shell \"node $MK_NODE_ARGS ./built/boot/entry.js\"",
-		"start:test": "cd packages/backend && cross-env NODE_ENV=test cross-env-shell \"node $MK_NODE_ARGS ./built/boot/entry.js\"",
+		"start:test": "ncp ./.github/misskey/test.yml ./.config/test.yml && cd packages/backend && cross-env NODE_ENV=test cross-env-shell \"node $MK_NODE_ARGS ./built/boot/entry.js\"",
 		"init": "pnpm migrate",
 		"migrate": "cd packages/backend && pnpm migrate",
 		"revert": "cd packages/backend && pnpm revert",
@@ -39,7 +39,7 @@
 		"cy:open": "pnpm cypress open --browser --e2e --config-file=cypress.config.ts",
 		"cy:run": "pnpm cypress run",
 		"e2e": "pnpm start-server-and-test start:test http://localhost:61812 cy:run",
-		"e2e-dev-container": "cp ./.config/cypress-devcontainer.yml ./.config/test.yml && pnpm start-server-and-test start:test http://localhost:61812 cy:run",
+		"e2e-dev-container": "ncp ./.config/cypress-devcontainer.yml ./.config/test.yml && pnpm start-server-and-test start:test http://localhost:61812 cy:run",
 		"jest": "cd packages/backend && pnpm jest",
 		"jest-and-coverage": "cd packages/backend && pnpm jest-and-coverage",
 		"test": "pnpm -r test",
@@ -73,32 +73,32 @@
 	},
 	"dependencies": {
 		"cssnano": "7.0.7",
+		"esbuild": "0.25.3",
 		"execa": "9.5.3",
 		"fast-glob": "3.3.2",
 		"ignore-walk": "6.0.5",
 		"js-yaml": "4.1.0",
 		"postcss": "8.5.3",
+		"glob": "11.0.2",
 		"terser": "5.39.1",
 		"typescript": "5.8.3",
 		"esbuild": "0.23.1",
 		"glob": "11.0.0"
 	},
 	"devDependencies": {
-		"@misskey-dev/eslint-plugin": "2.0.3",
+		"@misskey-dev/eslint-plugin": "2.1.0",
 		"@types/node": "22.15.17",
-		"@typescript-eslint/eslint-plugin": "7.10.0",
-		"@typescript-eslint/parser": "7.10.0",
+		"@typescript-eslint/eslint-plugin": "8.31.0",
+		"@typescript-eslint/parser": "8.31.0",
 		"cross-env": "7.0.3",
 		"cypress": "14.3.3",
-		"eslint": "8.57.1",
-		"globals": "15.9.0",
+		"eslint": "9.25.1",
+		"globals": "16.0.0",
 		"ncp": "2.0.0",
+		"pnpm": "10.10.0",
 		"start-server-and-test": "2.0.11"
 	},
 	"optionalDependencies": {
 		"@tensorflow/tfjs-core": "managed"
-	},
-	"pnpm": {
-		"neverBuiltDependencies": []
 	}
 }

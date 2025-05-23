@@ -74,6 +74,7 @@ export const paramDef = {
 		excludeBots: { type: 'boolean' },
 		withReplies: { type: 'boolean' },
 		withFile: { type: 'boolean' },
+		excludeNotesInSensitiveChannel: { type: 'boolean' },
 	},
 	required: ['name', 'src', 'keywords', 'excludeKeywords', 'users', 'caseSensitive', 'withReplies', 'withFile'],
 } as const;
@@ -134,6 +135,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				excludeBots: ps.excludeBots,
 				withReplies: ps.withReplies,
 				withFile: ps.withFile,
+				excludeNotesInSensitiveChannel: ps.excludeNotesInSensitiveChannel,
 			});
 
 			this.globalEventService.publishInternalEvent('antennaCreated', antenna);

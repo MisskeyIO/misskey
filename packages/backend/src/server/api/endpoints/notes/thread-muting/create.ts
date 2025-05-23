@@ -9,7 +9,6 @@ import type { NotesRepository, NoteThreadMutingsRepository } from '@/models/_.js
 import { IdService } from '@/core/IdService.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { GetterService } from '@/server/api/GetterService.js';
-import { NoteReadService } from '@/core/NoteReadService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '../../../error.js';
 
@@ -53,7 +52,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private noteThreadMutingsRepository: NoteThreadMutingsRepository,
 
 		private getterService: GetterService,
-		private noteReadService: NoteReadService,
 		private idService: IdService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
@@ -69,8 +67,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					threadId: note.threadId ?? note.id,
 				}],
 			});
-
-			await this.noteReadService.read(me.id, mutedNotes);
 
 			await this.noteThreadMutingsRepository.insert({
 				id: this.idService.gen(),

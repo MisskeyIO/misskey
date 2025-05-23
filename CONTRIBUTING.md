@@ -83,6 +83,10 @@ One should not add property that has defined before by other implementation, or 
 ## Reviewers guide
 Be willing to comment on the good points and not just the things you want fixed 💯
 
+読んでおくといいやつ
+- https://blog.lacolaco.net/posts/1e2cf439b3c2/
+- https://konifar-zatsu.hatenadiary.jp/entry/2024/11/05/192421
+
 ### Review perspective
 - Scope
 	- Are the goals of the PR clear?
@@ -96,6 +100,22 @@ Be willing to comment on the good points and not just the things you want fixed 
 	- Does the test ensure the expected behavior?
 	- Are there any omissions or gaps?
 	- Does it check for anomalies?
+
+## Security Advisory
+### For reporter
+Thank you for your reporting!
+
+If you can also create a patch to fix the vulnerability, please create a PR on the private fork.
+
+> [!note]
+> There is a GitHub bug that prevents merging if a PR not following the develop branch of upstream, so please keep follow the develop branch.
+
+### For misskey-dev member
+修正PRがdevelopに追従されていないとマージできないので、マージできなかったら
+
+> Could you merge or rebase onto upstream develop branch?
+
+などと伝える。
 
 ## Deploy
 The `/deploy` command by issue comment can be used to deploy the contents of a PR to the preview environment.
@@ -253,7 +273,6 @@ niraxは、Misskeyで使用しているオリジナルのフロントエンド�
 	query?: Record<string, string>;
 	loginRequired?: boolean;
 	hash?: string;
-	globalCacheKey?: string;
 	children?: RouteDef[];
 }
 ```
@@ -455,6 +474,11 @@ describe('test', () => {
 例えばGoogleが自社サービスをMap、Earth、DriveではなくGoogle Map、Google Earth、Google Driveのように命名するのと同じ
 コード上でMisskeyのドメイン固有の概念には`Mi`をprefixすることで、他のドメインの同様の概念と区別できるほか、名前の衝突を防ぐ。
 ただし、文脈上Misskeyのものを指すことが明らかであり、名前の衝突の恐れがない場合は、一時的なローカル変数に限って`Mi`を省略してもよい。
+
+### Misskey.jsの型生成
+```bash
+pnpm build-misskey-js-with-types
+```
 
 ### How to resolve conflictions occurred at pnpm-lock.yaml?
 

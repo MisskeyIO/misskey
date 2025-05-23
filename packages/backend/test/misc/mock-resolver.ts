@@ -9,9 +9,7 @@ import type { ApRendererService } from '@/core/activitypub/ApRendererService.js'
 import type { ApRequestService } from '@/core/activitypub/ApRequestService.js';
 import type { IObject } from '@/core/activitypub/type.js';
 import type { HttpRequestService } from '@/core/HttpRequestService.js';
-import type { InstanceActorService } from '@/core/InstanceActorService.js';
 import type { LoggerService } from '@/core/LoggerService.js';
-import type { MetaService } from '@/core/MetaService.js';
 import type { UtilityService } from '@/core/UtilityService.js';
 import type {
 	FollowRequestsRepository,
@@ -23,6 +21,7 @@ import type {
 } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { Resolver } from '@/core/activitypub/ApResolverService.js';
+import { SystemAccountService } from '@/core/SystemAccountService.js';
 
 type MockResponse = {
 	type: string;
@@ -43,7 +42,7 @@ export class MockResolver extends Resolver {
 			{} as NoteReactionsRepository,
 			{} as FollowRequestsRepository,
 			{} as UtilityService,
-			{} as InstanceActorService,
+			{} as SystemAccountService,
 			{} as ApRequestService,
 			{} as HttpRequestService,
 			{} as ApRendererService,

@@ -4,7 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<div :class="[hide ? $style.hidden : $style.visible, (image.isSensitive && defaultStore.state.highlightSensitiveMedia) && $style.sensitive]" @click="showHiddenContent">
+<div :class="[hide ? $style.hidden : $style.visible, (image.isSensitive && prefer.s.highlightSensitiveMedia) && $style.sensitive]" @click="showHiddenContent">
 	<component
 		:is="(image.isSensitive && !$i) || disableImageLink ? 'div' : 'a'"
 		v-bind="(image.isSensitive && !$i) || disableImageLink ? {
@@ -19,7 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	>
 		<ImgWithBlurhash
 			:hash="image.blurhash"
-			:src="(image.isSensitive && !$i) || (defaultStore.state.dataSaver.media && hide) ? null : url"
+			:src="(image.isSensitive && !$i) || (prefer.s.dataSaver.media && hide) ? null : url"
 			:forceBlurhash="hide"
 			:cover="hide || cover"
 			:alt="image.comment || image.name"
@@ -32,8 +32,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template v-if="hide">
 		<div :class="$style.hiddenText">
 			<div :class="$style.hiddenTextWrapper">
-				<b v-if="image.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ i18n.ts.sensitive }}{{ defaultStore.state.dataSaver.media ? ` (${i18n.ts.image}${image.size ? ' ' + bytes(image.size) : ''})` : '' }}</b>
-				<b v-else style="display: block;"><i class="ti ti-photo"></i> {{ defaultStore.state.dataSaver.media && image.size ? bytes(image.size) : i18n.ts.image }}</b>
+				<b v-if="image.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ i18n.ts.sensitive }}{{ prefer.s.dataSaver.media ? ` (${i18n.ts.image}${image.size ? ' ' + bytes(image.size) : ''})` : '' }}</b>
+				<b v-else style="display: block;"><i class="ti ti-photo"></i> {{ prefer.s.dataSaver.media && image.size ? bytes(image.size) : i18n.ts.image }}</b>
 				<span v-if="controls" style="display: block;">{{ i18n.ts.clickToShow }}</span>
 			</div>
 		</div>
@@ -54,14 +54,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { watch, ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { MenuItem } from '@/types/menu.js';
-import { getStaticImageUrl } from '@/scripts/media-proxy.js';
+import { copyToClipboard } from '@/utility/copy-to-clipboard';
+import { getStaticImageUrl } from '@/utility/media-proxy.js';
 import bytes from '@/filters/bytes.js';
 import ImgWithBlurhash from '@/components/MkImgWithBlurhash.vue';
-import { defaultStore } from '@/store.js';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import { pleaseLogin } from '@/scripts/please-login.js';
-import { $i, iAmModerator } from '@/account.js';
+import { $i, iAmModerator } from '@/i.js';
+import { prefer } from '@/preferences.js';
 import { misskeyApi } from '@/scripts/misskey-api.js';
 
 const props = withDefaults(defineProps<{
@@ -78,9 +79,9 @@ const props = withDefaults(defineProps<{
 
 const hide = ref(true);
 
-const url = computed(() => (props.raw || defaultStore.state.loadRawImages)
+const url = computed(() => (props.raw || prefer.s.loadRawImages)
 	? props.image.url
-	: defaultStore.state.disableShowingAnimatedImages
+	: prefer.s.disableShowingAnimatedImages
 		? getStaticImageUrl(props.image.url)
 		: props.image.thumbnailUrl,
 );
@@ -131,12 +132,36 @@ function showMenu(ev: MouseEvent) {
 		}
 	}
 
+	const details: MenuItem[] = [];
 	if ($i?.id === props.image.userId) {
-		menuItems.push({
+		details.push({
 			type: 'link' as const,
 			text: i18n.ts._fileViewer.title,
 			icon: 'ti ti-info-circle',
 			to: `/my/drive/file/${props.image.id}`,
+		});
+	}
+
+	if (iAmModerator) {
+		details.push({
+			type: 'link',
+			text: i18n.ts.moderation,
+			icon: 'ti ti-photo-exclamation',
+			to: `/admin/file/${props.image.id}`,
+		});
+	}
+
+	if (details.length > 0) {
+		menuItems.push({ type: 'divider' }, ...details);
+	}
+
+	if (prefer.s.devMode) {
+		menuItems.push({ type: 'divider' }, {
+			icon: 'ti ti-hash',
+			text: i18n.ts.copyFileId,
+			action: () => {
+				copyToClipboard(props.image.id);
+			},
 		});
 	}
 
@@ -157,7 +182,7 @@ async function showHiddenContent(ev: MouseEvent) {
 
 	if (hide.value) {
 		ev.stopPropagation();
-		if (props.image.isSensitive && defaultStore.state.confirmWhenRevealingSensitiveMedia) {
+		if (props.image.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
 			const {canceled} = await os.confirm({
 				type: 'question',
 				text: i18n.ts.sensitiveMediaRevealConfirm,
@@ -224,7 +249,7 @@ watch(() => props.image, () => {
 	position: absolute;
 	border-radius: 6px;
 	background-color: var(--MI_THEME-fg);
-	color: var(--MI_THEME-accentLighten);
+	color: hsl(from var(--MI_THEME-accent) h s calc(l + 10));
 	font-size: 12px;
 	opacity: .5;
 	padding: 5px 8px;
@@ -298,7 +323,7 @@ html[data-color-scheme=light] .visible {
 	/* Hardcode to black because either --MI_THEME-bg or --MI_THEME-fg makes it hard to read in dark/light mode */
 	background-color: black;
 	border-radius: 6px;
-	color: var(--MI_THEME-accentLighten);
+	color: hsl(from var(--MI_THEME-accent) h s calc(l + 10));
 	display: inline-block;
 	font-weight: bold;
 	font-size: 0.8em;

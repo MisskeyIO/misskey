@@ -42,6 +42,7 @@ export const paramDef = {
 		isExplorable: { type: 'boolean' },
 		asBadge: { type: 'boolean' },
 		badgeBehavior: { type: 'string', nullable: true },
+		preserveAssignmentOnMoveAccount: { type: 'boolean' },
 		canEditMembersByModerator: { type: 'boolean' },
 		displayOrder: { type: 'number' },
 		policies: {
@@ -80,6 +81,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				isExplorable: ps.isExplorable,
 				asBadge: ps.asBadge,
 				badgeBehavior: ps.badgeBehavior,
+				preserveAssignmentOnMoveAccount: ps.preserveAssignmentOnMoveAccount,
 				canEditMembersByModerator: ps.canEditMembersByModerator,
 				displayOrder: ps.displayOrder,
 				policies: ps.policies,

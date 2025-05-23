@@ -113,6 +113,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				);
 
 			this.queryService.generateVisibilityQuery(query, me);
+			this.queryService.generateBlockedHostQueryForNote(query);
 
 			const reactions = (await query
 				.limit(ps.limit)

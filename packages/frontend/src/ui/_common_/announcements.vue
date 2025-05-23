@@ -38,7 +38,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { instanceName } from '@@/js/config.js';
 import { instance } from '@/instance.js';
-import { $i } from '@/account.js';
+import { $i } from '@/i.js';
 import { i18n } from '@/i18n.js';
 </script>
 

@@ -44,7 +44,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkButton transparent :class="$style.testButton" :disabled="!(active && event_renote)" @click="test('renote')"><i class="ti ti-send"></i></MkButton>
 				</div>
 				<div :class="$style.switchBox">
-					<MkSwitch v-model="event_reaction">{{ i18n.ts._webhookSettings._events.reaction }}</MkSwitch>
+					<MkSwitch v-model="event_reaction" :disabled="true">{{ i18n.ts._webhookSettings._events.reaction }}</MkSwitch>
 					<MkButton transparent :class="$style.testButton" :disabled="!(active && event_reaction)" @click="test('reaction')"><i class="ti ti-send"></i></MkButton>
 				</div>
 				<div :class="$style.switchBox">
@@ -91,10 +91,10 @@ import FormSection from '@/components/form/section.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import MkButton from '@/components/MkButton.vue';
 import * as os from '@/os.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
-import { useRouter } from '@/router/supplier.js';
+import { definePage } from '@/page.js';
+import { useRouter } from '@/router.js';
 import { $i } from '@/account.js';
 
 const router = useRouter();
@@ -177,7 +177,7 @@ const headerActions = computed(() => []);
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const headerTabs = computed(() => []);
 
-definePageMetadata(() => ({
+definePage(() => ({
 	title: 'Edit webhook',
 	icon: 'ti ti-webhook',
 }));
@@ -206,6 +206,6 @@ definePageMetadata(() => ({
 .description {
 	font-size: 0.85em;
 	padding: 8px 0 0 0;
-	color: var(--MI_THEME-fgTransparentWeak);
+	color: color(from var(--MI_THEME-fg) srgb r g b / 0.75);
 }
 </style>

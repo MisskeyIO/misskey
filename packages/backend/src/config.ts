@@ -7,7 +7,8 @@ import * as fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import * as yaml from 'js-yaml';
-import * as Sentry from '@sentry/node';
+import type * as Sentry from '@sentry/node';
+import type * as SentryVue from '@sentry/vue';
 import type * as Bull from 'bullmq';
 import type { RedisOptions } from 'ioredis';
 
@@ -60,6 +61,9 @@ type Source = {
 	redisForWebhookDeliverQueue?: RedisOptionsSource;
 	redisForTimelines?: RedisOptionsSource;
 	redisForReactions?: RedisOptionsSource;
+	fulltextSearch?: {
+		provider?: FulltextSearchProvider;
+	};
 	meilisearch?: {
 		host: string;
 		port: string;
@@ -69,7 +73,12 @@ type Source = {
 		scope?: 'local' | 'global' | string[];
 	};
 	sentryForBackend?: { options: Partial<Sentry.NodeOptions>; enableNodeProfiling: boolean; };
-	sentryForFrontend?: { options: Partial<Sentry.NodeOptions> };
+	sentryForFrontend?: {
+		options: Partial<SentryVue.BrowserOptions> & { dsn: string };
+		vueIntegration?: SentryVue.VueIntegrationOptions | null;
+		browserTracingIntegration?: Parameters<typeof SentryVue.browserTracingIntegration>[0] | null;
+		replayIntegration?: Parameters<typeof SentryVue.replayIntegration>[0] | null;
+	};
 
 	opensearch?: {
 		host: string;
@@ -97,6 +106,7 @@ type Source = {
 	proxyBypassHosts?: string[];
 
 	allowedPrivateNetworks?: string[];
+	disallowExternalApRedirect?: boolean;
 
 	contentSecurityPolicy?: string;
 
@@ -135,6 +145,13 @@ type Source = {
 	pidFile: string;
 
 	extraHead?: string;
+
+	logging?: {
+		sql?: {
+			disableQueryTruncation?: boolean,
+			enableQueryParamLogging?: boolean,
+		}
+	}
 };
 
 export type Config = {
@@ -160,6 +177,9 @@ export type Config = {
 		user: string;
 		pass: string;
 	}[] | undefined;
+	fulltextSearch?: {
+		provider?: FulltextSearchProvider;
+	};
 	meilisearch: {
 		host: string;
 		port: string;
@@ -190,6 +210,7 @@ export type Config = {
 	proxyBypassHosts: string[] | undefined;
 	allowedPrivateNetworks: string[] | undefined;
 	contentSecurityPolicy: string | undefined;
+	disallowExternalApRedirect: boolean;
 	maxFileSize: number;
 	clusterLimit: number | undefined;
 	id: string;
@@ -208,6 +229,12 @@ export type Config = {
 	proxyRemoteFiles: boolean | undefined;
 	remapDriveFileUrlForActivityPub: { target: string; replacement: string }[] | undefined;
 	signToActivityPubGet: boolean | undefined;
+	logging?: {
+		sql?: {
+			disableQueryTruncation?: boolean,
+			enableQueryParamLogging?: boolean,
+		}
+	}
 
 	version: string;
 	setupPassword: string | undefined;
@@ -241,13 +268,20 @@ export type Config = {
 	redisForTimelines: RedisOptions & RedisOptionsSource;
 	redisForReactions: RedisOptions & RedisOptionsSource;
 	sentryForBackend: { options: Partial<Sentry.NodeOptions>; enableNodeProfiling: boolean; } | undefined;
-	sentryForFrontend: { options: Partial<Sentry.NodeOptions> } | undefined;
+	sentryForFrontend: {
+		options: Partial<SentryVue.BrowserOptions> & { dsn: string };
+		vueIntegration?: SentryVue.VueIntegrationOptions | null;
+		browserTracingIntegration?: Parameters<typeof SentryVue.browserTracingIntegration>[0] | null;
+		replayIntegration?: Parameters<typeof SentryVue.replayIntegration>[0] | null;
+	} | undefined;
 	perChannelMaxNoteCacheCount: number;
 	perUserNotificationsMaxCount: number;
 	deactivateAntennaThreshold: number;
 	pidFile: string;
 	extraHead: string | undefined;
 };
+
+export type FulltextSearchProvider = 'sqlLike' | 'sqlPgroonga' | 'meilisearch';
 
 const _filename = fileURLToPath(import.meta.url);
 const _dirname = dirname(_filename);
@@ -316,6 +350,7 @@ export function loadConfig(): Config {
 		db: { ...config.db, db: dbDb, user: dbUser, pass: dbPass },
 		dbReplications: config.dbReplications,
 		dbSlaves: config.dbSlaves,
+		fulltextSearch: config.fulltextSearch,
 		meilisearch: config.meilisearch,
 		opensearch: config.opensearch,
 		redis,
@@ -339,6 +374,7 @@ export function loadConfig(): Config {
 		proxyBypassHosts: config.proxyBypassHosts,
 		allowedPrivateNetworks: config.allowedPrivateNetworks,
 		contentSecurityPolicy: config.contentSecurityPolicy,
+		disallowExternalApRedirect: config.disallowExternalApRedirect ?? false,
 		maxFileSize: config.maxFileSize ?? 262144000,
 		clusterLimit: config.clusterLimit,
 		outgoingAddress: config.outgoingAddress,
@@ -372,6 +408,7 @@ export function loadConfig(): Config {
 		deactivateAntennaThreshold: config.deactivateAntennaThreshold ?? (1000 * 60 * 60 * 24 * 7),
 		pidFile: config.pidFile,
 		extraHead: config.extraHead,
+		logging: config.logging,
 	};
 }
 

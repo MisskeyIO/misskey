@@ -20,6 +20,7 @@ import { MetaService } from '@/core/MetaService.js';
 import { ApiError } from '@/server/api/error.js';
 import { MiMeta } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
+import { ApiError } from '../../../error.js';
 
 export const meta = {
 	tags: ['drive'],
@@ -75,6 +76,12 @@ export const meta = {
 			message: 'Cannot upload the file because you have no free space of drive.',
 			code: 'NO_FREE_SPACE',
 			id: 'd08dbc37-a6a9-463a-8c47-96c32ab5f064',
+		},
+
+		maxFileSizeExceeded: {
+			message: 'Cannot upload the file because it exceeds the maximum file size.',
+			code: 'MAX_FILE_SIZE_EXCEEDED',
+			id: 'b9d8c348-33f0-4673-b9a9-5d4da058977a',
 		},
 	},
 } as const;
@@ -183,6 +190,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				if (e instanceof IdentifiableError) {
 					if (e.id === '282f77bf-5816-4f72-9264-aa14d8261a21') throw new ApiError(meta.errors.inappropriate);
 					if (e.id === 'c6244ed2-a39a-4e1c-bf93-f0fbd7764fa6') throw new ApiError(meta.errors.noFreeSpace);
+					if (e.id === 'f9e4e5f3-4df4-40b5-b400-f236945f7073') throw new ApiError(meta.errors.maxFileSizeExceeded);
 				}
 
 				const err = e as Error;
@@ -195,7 +203,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					{
 						message: err.message,
 						code: err.name,
-					},
+				},
 				);
 			} finally {
 				if (cleanup) cleanup();

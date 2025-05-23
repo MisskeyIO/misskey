@@ -4,12 +4,24 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<MkStickyContainer>
-	<template #header><XHeader :actions="headerActions" :tabs="headerTabs"/></template>
-	<MkSpacer :contentMax="700" :marginMin="16" :marginMax="32">
+<PageWithHeader :actions="headerActions" :tabs="headerTabs">
+	<div class="_spacer" style="--MI_SPACER-w: 700px; --MI_SPACER-min: 16px; --MI_SPACER-max: 32px;">
 		<FormSuspense :p="init">
-			<MkFolder>
-				<template #label>DeepL Translation</template>
+			<div class="_gaps_m">
+				<MkFolder>
+					<template #label>Google Analytics<span class="_beta">{{ i18n.ts.beta }}</span></template>
+
+					<div class="_gaps_m">
+						<MkInput v-model="googleAnalyticsMeasurementId">
+							<template #prefix><i class="ti ti-key"></i></template>
+							<template #label>Measurement ID</template>
+						</MkInput>
+						<MkButton primary @click="save_googleAnalytics">Save</MkButton>
+					</div>
+				</MkFolder>
+
+				<MkFolder>
+					<template #label>DeepL Translation</template>
 
 				<div class="_gaps_m">
 					<MkInput v-model="deeplAuthKey">
@@ -29,10 +41,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<template #prefix><i class="ti ti-report-analytics"></i></template>
 						<template #label>Google Analytics ID</template>
 					</MkInput>
-				</div>
-			</MkFolder>
+					</div>
+				</MkFolder>
+			</div>
 		</FormSuspense>
-	</MkSpacer>
+	</div>
 	<template #footer>
 		<div :class="$style.footer">
 			<MkSpacer :contentMax="700" :marginMin="16" :marginMax="16">
@@ -40,31 +53,35 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkSpacer>
 		</div>
 	</template>
-</MkStickyContainer>
+</PageWithHeader>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
-import XHeader from './_header_.vue';
 import MkInput from '@/components/MkInput.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import FormSuspense from '@/components/form/suspense.vue';
 import * as os from '@/os.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 import { fetchInstance } from '@/instance.js';
 import { i18n } from '@/i18n.js';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
+import { definePage } from '@/page.js';
 import MkFolder from '@/components/MkFolder.vue';
 
 const deeplAuthKey = ref<string>('');
 const deeplIsPro = ref<boolean>(false);
 const googleAnalyticsId = ref<string>('');
 
+const googleAnalyticsMeasurementId = ref<string>('');
+
+// FIXME atode naosu
+
 async function init() {
 	const meta = await misskeyApi('admin/meta');
-	deeplAuthKey.value = meta.deeplAuthKey;
+	deeplAuthKey.value = meta.deeplAuthKey ?? '';
 	deeplIsPro.value = meta.deeplIsPro;
+	googleAnalyticsMeasurementId.value = meta.googleAnalyticsMeasurementId ?? '';
 	googleAnalyticsId.value = meta.googleAnalyticsId;
 }
 
@@ -78,11 +95,19 @@ function save() {
 	});
 }
 
+function save_googleAnalytics() {
+	os.apiWithDialog('admin/update-meta', {
+		googleAnalyticsMeasurementId: googleAnalyticsMeasurementId.value,
+	}).then(() => {
+		fetchInstance(true);
+	});
+}
+
 const headerActions = computed(() => []);
 
 const headerTabs = computed(() => []);
 
-definePageMetadata(() => ({
+definePage(() => ({
 	title: i18n.ts.externalServices,
 	icon: 'ti ti-link',
 }));

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { URL } from 'node:url';
+import { URL, domainToASCII } from 'node:url';
 import { isIP } from 'node:net';
 import { toASCII } from 'punycode';
 import punycode from 'punycode.js';
@@ -37,6 +37,19 @@ export class UtilityService {
 	public isSelfHost(host: string | null): boolean {
 		if (host == null) return true;
 		return this.normalizeHost(this.config.host) === this.normalizeHost(host);
+	}
+
+	@bindThis
+	public isUriLocal(uri: string): boolean {
+		return this.punyHost(uri) === this.toPuny(this.config.host);
+	}
+
+	// メールアドレスのバリデーションを行う
+	// https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address
+	@bindThis
+	public validateEmailFormat(email: string): boolean {
+		const regexp = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+		return regexp.test(email);
 	}
 
 	@bindThis
@@ -112,18 +125,25 @@ export class UtilityService {
 	@bindThis
 	public extractDbHost(uri: string): string {
 		const url = new URL(uri);
-		return this.toPuny(url.hostname);
+		return this.toPuny(url.host);
 	}
 
 	@bindThis
 	public toPuny(host: string): string {
-		return toASCII(host.toLowerCase());
+		return domainToASCII(host.toLowerCase());
 	}
 
 	@bindThis
 	public toPunyNullable(host: string | null | undefined): string | null {
 		if (host == null) return null;
-		return toASCII(host.toLowerCase());
+		return domainToASCII(host.toLowerCase());
+	}
+
+	@bindThis
+	public punyHost(url: string): string {
+		const urlObj = new URL(url);
+		const host = `${this.toPuny(urlObj.hostname)}${urlObj.port.length > 0 ? ':' + urlObj.port : ''}`;
+		return host;
 	}
 	@bindThis
 	public isRelatedHosts(hostA: string, hostB: string): boolean {

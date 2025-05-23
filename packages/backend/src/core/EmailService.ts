@@ -59,9 +59,7 @@ export class EmailService {
 
 	@bindThis
 	public async sendEmail(to: string, subject: string, html: string, text: string) {
-		const meta = this.meta;
-
-		if (!meta.enableEmail) return;
+		if (!this.meta.enableEmail) return;
 
 		const iconUrl = `${this.config.url}/static-assets/mi-white.png`;
 		const emailSettingUrl = `${this.config.url}/settings/email`;
@@ -69,14 +67,14 @@ export class EmailService {
 		const enableAuth = this.meta.smtpUser != null && this.meta.smtpUser !== '';
 
 		const transporter = nodemailer.createTransport({
-			host: meta.smtpHost,
-			port: meta.smtpPort,
-			secure: meta.smtpSecure,
+			host: this.meta.smtpHost,
+			port: this.meta.smtpPort,
+			secure: this.meta.smtpSecure,
 			ignoreTLS: !enableAuth,
 			proxy: this.config.proxySmtp,
 			auth: enableAuth ? {
-				user: meta.smtpUser,
-				pass: meta.smtpPass,
+				user: this.meta.smtpUser,
+				pass: this.meta.smtpPass,
 			} : undefined,
 		} as any);
 
@@ -185,7 +183,13 @@ export class EmailService {
 		available: boolean;
 		reason: null | 'used' | 'format' | 'disposable' | 'mx' | 'smtp' | 'banned' | 'network' | 'blacklist';
 	}> {
-		const meta = this.meta;
+		if (!this.utilityService.validateEmailFormat(emailAddress)) {
+			return {
+				available: false,
+				reason: 'format',
+			};
+		}
+
 		const exist = await this.userProfilesRepository.countBy({
 			emailVerified: true,
 			email: emailAddress,
@@ -203,7 +207,7 @@ export class EmailService {
 			reason?: string | null,
 		} = { valid: true, reason: null };
 
-		if (meta.enableActiveEmailValidation) {
+		if (this.meta.enableActiveEmailValidation) {
 			validated = await validateEmail({
 				email: emailAddress,
 				validateRegex: true,
@@ -213,13 +217,13 @@ export class EmailService {
 				validateSMTP: false, // 日本だと25ポートが殆どのプロバイダーで塞がれていてタイムアウトになるので
 			});
 
-			if (validated.valid && meta.enableVerifymailApi && meta.verifymailAuthKey != null) {
+			if (validated.valid && this.meta.enableVerifymailApi && this.meta.verifymailAuthKey != null) {
 				const domain = emailAddress.split('@')[1];
 				validated = await this.verifymailResponseCache.fetch(domain);
 			}
 
-			if (validated.valid && meta.enableTruemailApi && meta.truemailInstance && meta.truemailAuthKey != null) {
-				validated = await this.trueMail(meta.truemailInstance, emailAddress, meta.truemailAuthKey);
+			if (validated.valid && this.meta.enableTruemailApi && this.meta.truemailInstance && this.meta.truemailAuthKey != null) {
+				validated = await this.trueMail(this.meta.truemailInstance, emailAddress, this.meta.truemailAuthKey);
 			}
 		}
 
@@ -240,7 +244,7 @@ export class EmailService {
 		}
 
 		const emailDomain: string = emailAddress.split('@')[1];
-		const isBanned = this.utilityService.isItemListedIn(emailDomain, meta.bannedEmailDomains);
+		const isBanned = this.utilityService.isItemListedIn(emailDomain, this.meta.bannedEmailDomains);
 
 		if (isBanned) {
 			return {
@@ -259,10 +263,9 @@ export class EmailService {
 		valid: boolean;
 		reason: 'used' | 'format' | 'disposable' | 'mx' | 'smtp' | null;
 	}> {
-		const meta = this.meta;
-		if (meta.verifymailAuthKey == null) throw new Error('verifymailAuthKey is not set');
+		if (this.meta.verifymailAuthKey == null) throw new Error('verifymailAuthKey is not set');
 
-		const endpoint = 'https://verifymail.io/api/' + domain + '?key=' + meta.verifymailAuthKey;
+		const endpoint = 'https://verifymail.io/api/' + domain + '?key=' + this.meta.verifymailAuthKey;
 		const res = await this.httpRequestService.send(endpoint, {
 			method: 'GET',
 			headers: {
@@ -308,7 +311,7 @@ export class EmailService {
 				reason: 'mx',
 			};
 		}
-		if (json.mx_host?.some(host => this.utilityService.isItemListedIn(host, meta.bannedEmailDomains))) {
+		if (json.mx_host?.some(host => this.utilityService.isItemListedIn(host, this.meta.bannedEmailDomains))) {
 			return {
 				valid: false,
 				reason: 'mx',

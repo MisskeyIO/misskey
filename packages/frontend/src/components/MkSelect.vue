@@ -39,10 +39,28 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { onMounted, nextTick, ref, watch, computed, toRefs, VNode, useSlots, VNodeChild } from 'vue';
+import { onMounted, nextTick, ref, watch, computed, toRefs, useSlots } from 'vue';
 import { useInterval } from '@@/js/use-interval.js';
+import type { VNode, VNodeChild } from 'vue';
 import type { MenuItem } from '@/types/menu.js';
 import * as os from '@/os.js';
+
+type ItemOption = {
+	type?: 'option';
+	value: string | number | null;
+	label: string;
+};
+
+type ItemGroup = {
+	type: 'group';
+	label: string;
+	items: ItemOption[];
+};
+
+export type MkSelectItem = ItemOption | ItemGroup;
+
+// TODO: itemsをslot内のoptionで指定する用法は廃止する(props.itemsを必須化する)
+// see: https://github.com/misskey-dev/misskey/issues/15558
 
 const props = defineProps<{
 	modelValue: string | number | null;
@@ -54,6 +72,7 @@ const props = defineProps<{
 	inline?: boolean;
 	small?: boolean;
 	large?: boolean;
+	items?: MkSelectItem[];
 }>();
 
 const emit = defineEmits<{
@@ -105,7 +124,30 @@ onMounted(() => {
 	});
 });
 
-watch(modelValue, () => {
+watch([modelValue, () => props.items], () => {
+	if (props.items) {
+		let found: ItemOption | null = null;
+		for (const item of props.items) {
+			if (item.type === 'group') {
+				for (const option of item.items) {
+					if (option.value === modelValue.value) {
+						found = option;
+						break;
+					}
+				}
+			} else {
+				if (item.value === modelValue.value) {
+					found = item;
+					break;
+				}
+			}
+		}
+		if (found) {
+			currentValueText.value = found.label;
+		}
+		return;
+	}
+
 	const scanOptions = (options: VNodeChild[]) => {
 		for (const vnode of options) {
 			if (typeof vnode !== 'object' || vnode === null || Array.isArray(vnode)) continue;
@@ -128,7 +170,7 @@ watch(modelValue, () => {
 	};
 
 	scanOptions(slots.default!());
-}, { immediate: true });
+}, { immediate: true, deep: true });
 
 function show() {
 	if (inputEl.value && inputEl.value.hasAttribute('disabled')) {
@@ -140,9 +182,37 @@ function show() {
 	opening.value = true;
 
 	const menu: MenuItem[] = [];
-	let options = slots.default!();
 
-	focus();
+	if (props.items) {
+		for (const item of props.items) {
+			if (item.type === 'group') {
+				menu.push({
+					type: 'label',
+					text: item.label,
+				});
+				for (const option of item.items) {
+					menu.push({
+						text: option.label,
+						active: computed(() => modelValue.value === option.value),
+						action: () => {
+							emit('update:modelValue', option.value);
+						},
+					});
+				}
+			} else {
+				menu.push({
+					text: item.label,
+					active: computed(() => modelValue.value === item.value),
+					action: () => {
+						emit('update:modelValue', item.value);
+					},
+				});
+			}
+		}
+	} else {
+		let options = slots.default!();
+
+		focus();
 
 	const pushOption = (option: VNode) => {
 		menu.push({
@@ -154,29 +224,30 @@ function show() {
 		});
 	};
 
-	const scanOptions = (options: VNodeChild[]) => {
-		for (const vnode of options) {
-			if (typeof vnode !== 'object' || vnode === null || Array.isArray(vnode)) continue;
-			if (vnode.type === 'optgroup') {
-				const optgroup = vnode;
-				menu.push({
-					type: 'label',
-					text: optgroup.props?.label,
-				});
-				if (Array.isArray(optgroup.children)) scanOptions(optgroup.children);
-			} else if (Array.isArray(vnode.children)) { // 何故かフラグメントになってくることがある
-				const fragment = vnode;
-				if (Array.isArray(fragment.children)) scanOptions(fragment.children);
-			} else if (vnode.props == null) { // v-if で条件が false のときにこうなる
-				// nop?
-			} else {
-				const option = vnode;
-				pushOption(option);
+		const scanOptions = (options: VNodeChild[]) => {
+			for (const vnode of options) {
+				if (typeof vnode !== 'object' || vnode === null || Array.isArray(vnode)) continue;
+				if (vnode.type === 'optgroup') {
+					const optgroup = vnode;
+					menu.push({
+						type: 'label',
+						text: optgroup.props?.label,
+					});
+					if (Array.isArray(optgroup.children)) scanOptions(optgroup.children);
+				} else if (Array.isArray(vnode.children)) { // 何故かフラグメントになってくることがある
+					const fragment = vnode;
+					if (Array.isArray(fragment.children)) scanOptions(fragment.children);
+				} else if (vnode.props == null) { // v-if で条件が false のときにこうなる
+					// nop?
+				} else {
+					const option = vnode;
+					pushOption(option);
+				}
 			}
-		}
-	};
+		};
 
-	scanOptions(options);
+		scanOptions(options);
+	}
 
 	os.popupMenu(menu, container.value, {
 		width: container.value?.offsetWidth,
@@ -201,7 +272,7 @@ function show() {
 .caption {
 	font-size: 0.85em;
 	padding: 8px 0 0 0;
-	color: var(--MI_THEME-fgTransparentWeak);
+	color: color(from var(--MI_THEME-fg) srgb r g b / 0.75);
 
 	&:empty {
 		display: none;

@@ -25,6 +25,8 @@ import { InstanceActorService } from '@/core/InstanceActorService.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import UsersChart from '@/core/chart/charts/users.js';
 import { UserService } from '@/core/UserService.js';
+import { SystemAccountService } from '@/core/SystemAccountService.js';
+import { MetaService } from '@/core/MetaService.js';
 
 @Injectable()
 export class SignupService {
@@ -49,7 +51,8 @@ export class SignupService {
 		private idService: IdService,
 		private utilityService: UtilityService,
 		private loggerService: LoggerService,
-		private instanceActorService: InstanceActorService,
+		private systemAccountService: SystemAccountService,
+		private metaService: MetaService,
 		private userEntityService: UserEntityService,
 		private usersChart: UsersChart,
 	) {
@@ -96,9 +99,7 @@ export class SignupService {
 			throw new Error('USED_USERNAME');
 		}
 
-		const isTheFirstUser = !await this.instanceActorService.realLocalUsersPresent();
-
-		if (!opts.ignorePreservedUsernames && !isTheFirstUser) {
+		if (!opts.ignorePreservedUsernames && this.meta.rootUserId != null) {
 			const isPreserved = this.meta.preservedUsernames.map(x => x.toLowerCase()).includes(username.toLowerCase());
 			if (isPreserved) {
 				throw new Error('USED_USERNAME');
@@ -146,7 +147,7 @@ export class SignupService {
 					usernameLower: username.toLowerCase(),
 					host: host ? this.utilityService.normalizeHost(host) : null,
 					token: secret,
-					isRoot: isTheFirstUser,
+
 				}));
 
 				await transactionalEntityManager.save(new MiUserKeypair({
@@ -170,7 +171,9 @@ export class SignupService {
 			this.usersChart.update(account, true);
 			this.userService.notifySystemWebhook(account, 'userCreated');
 
-			return { account, secret };
+			if (this.meta.rootUserId == null) {
+			await this.metaService.update({ rootUserId: account.id });
+		}return { account, secret };
 		} catch (err) {
 			this.logger.error(`Failed to create account ${username}`, { error: err });
 			throw err;

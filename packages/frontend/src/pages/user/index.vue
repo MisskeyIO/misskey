@@ -4,52 +4,52 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<MkStickyContainer>
-	<template #header><MkPageHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs"/></template>
-	<div>
-		<div v-if="user">
-			<MkHorizontalSwipe v-model:tab="tab" :tabs="headerTabs">
-				<XHome v-if="tab === 'home'" key="home" :user="user"/>
-				<MkSpacer v-else-if="tab === 'notes'" key="notes" :contentMax="800" style="padding-top: 0">
-					<XTimeline :user="user"/>
-				</MkSpacer>
-				<XActivity v-else-if="tab === 'activity'" key="activity" :user="user"/>
-				<XAchievements v-else-if="tab === 'achievements'" key="achievements" :user="user"/>
-				<XReactions v-else-if="tab === 'reactions'" key="reactions" :user="user"/>
-				<XClips v-else-if="tab === 'clips'" key="clips" :user="user"/>
-				<XLists v-else-if="tab === 'lists'" key="lists" :user="user"/>
-				<XPages v-else-if="tab === 'pages'" key="pages" :user="user"/>
-				<XFlashs v-else-if="tab === 'flashs'" key="flashs" :user="user"/>
-				<XGallery v-else-if="tab === 'gallery'" key="gallery" :user="user"/>
-				<XRaw v-else-if="tab === 'raw'" key="raw" :user="user"/>
-			</MkHorizontalSwipe>
+<PageWithHeader v-model:tab="tab" :tabs="headerTabs" :actions="headerActions" :swipable="true">
+	<div v-if="user">
+		<MkHorizontalSwipe v-model:tab="tab" :tabs="headerTabs">
+		<XHome v-if="tab === 'home'" :user="user" @unfoldFiles="() => { tab = 'files'; }"/>
+		<div v-else-if="tab === 'notes'" class="_spacer" style="--MI_SPACER-w: 800px;">
+			<XTimeline :user="user"/>
 		</div>
-		<div v-else-if="error">
-			<MkError @retry="fetchUser()"/>
-		</div>
-		<div v-else-if="userstatus">
-			<MkUserNotFound v-if="userstatus === 'notfound'"/>
-			<MkUserSuspended v-else-if="userstatus === 'suspended'"/>
-		</div>
-		<MkLoading v-else/>
+		<XFiles v-else-if="tab === 'files'" :user="user"/>
+		<XActivity v-else-if="tab === 'activity'" :user="user"/>
+		<XAchievements v-else-if="tab === 'achievements'" :user="user"/>
+		<XReactions v-else-if="tab === 'reactions'" :user="user"/>
+		<XClips v-else-if="tab === 'clips'" :user="user"/>
+		<XLists v-else-if="tab === 'lists'" :user="user"/>
+		<XPages v-else-if="tab === 'pages'" :user="user"/>
+		<XFlashs v-else-if="tab === 'flashs'" :user="user"/>
+		<XGallery v-else-if="tab === 'gallery'" :user="user"/>
+		<XRaw v-else-if="tab === 'raw'" :user="user"/>
+		</MkHorizontalSwipe>
 	</div>
-</MkStickyContainer>
+	<div v-else-if="error">
+		<MkError @retry="fetchUser()"/>
+	</div>
+	<div v-else-if="userstatus">
+		<MkUserNotFound v-if="userstatus === 'notfound'"/>
+		<MkUserSuspended v-else-if="userstatus === 'suspended'"/>
+	</div>
+	<MkLoading v-else/>
+</PageWithHeader>
 </template>
 
 <script lang="ts" setup>
 import { defineAsyncComponent, computed, watch, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { acct as getAcct } from '@/filters/user.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
+import { definePage } from '@/page.js';
 import { i18n } from '@/i18n.js';
 import { $i } from '@/account.js';
-import MkUserNotFound from '@/components/MkUserNotFound.vue';
-import MkUserSuspended from '@/components/MkUserSuspended.vue';
 import MkHorizontalSwipe from '@/components/MkHorizontalSwipe.vue';
+import MkUserNotFound from "@/components/MkUserNotFound.vue";
+import MkUserSuspended from "@/components/MkUserSuspended.vue";
+import { serverContext, assertServerContext } from '@/server-context.js';
 
 const XHome = defineAsyncComponent(() => import('./home.vue'));
 const XTimeline = defineAsyncComponent(() => import('./index.timeline.vue'));
+const XFiles = defineAsyncComponent(() => import('./files.vue'));
 const XActivity = defineAsyncComponent(() => import('./activity.vue'));
 const XAchievements = defineAsyncComponent(() => import('./achievements.vue'));
 const XReactions = defineAsyncComponent(() => import('./reactions.vue'));
@@ -60,6 +60,9 @@ const XFlashs = defineAsyncComponent(() => import('./flashs.vue'));
 const XGallery = defineAsyncComponent(() => import('./gallery.vue'));
 const XRaw = defineAsyncComponent(() => import('./raw.vue'));
 
+// contextは非ログイン状態の情報しかないためログイン時は利用できない
+const CTX_USER = !$i && assertServerContext(serverContext, 'user') ? serverContext.user : null;
+
 const props = withDefaults(defineProps<{
 	acct: string;
 	page?: string;
@@ -69,14 +72,25 @@ const props = withDefaults(defineProps<{
 
 const tab = ref(props.page);
 
-const user = ref<null | Misskey.entities.UserDetailed>(null);
+const user = ref<null | Misskey.entities.UserDetailed>(CTX_USER);
 const error = ref<null | any>(null);
 const userstatus = ref<null | any>(null);
 
 function fetchUser(): void {
 	if (props.acct == null) return;
+
+	const { username, host } = Misskey.acct.parse(props.acct);
+
+	if (CTX_USER && CTX_USER.username === username && CTX_USER.host === host) {
+		user.value = CTX_USER;
+		return;
+	}
+
 	user.value = null;
-	misskeyApi('users/show', Misskey.acct.parse(props.acct)).then(u => {
+	misskeyApi('users/show', {
+		username,
+		host,
+	}).then(u => {
 		user.value = u;
 	}).catch(err => {
 		if (err.id && err.id === '4362f8dc-731f-4ad8-a694-be5a88922a24') { // User not found
@@ -103,6 +117,10 @@ const headerTabs = computed(() => user.value ? [{
 	key: 'notes',
 	title: i18n.ts.notes,
 	icon: 'ti ti-pencil',
+}, {
+	key: 'files',
+	title: i18n.ts.files,
+	icon: 'ti ti-photo',
 }, {
 	key: 'activity',
 	title: i18n.ts.activity,
@@ -141,7 +159,7 @@ const headerTabs = computed(() => user.value ? [{
 	icon: 'ti ti-code',
 }] : []);
 
-definePageMetadata(() => ({
+definePage(() => ({
 	title: i18n.ts.user,
 	icon: 'ti ti-user',
 	...user.value ? {

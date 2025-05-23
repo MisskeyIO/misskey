@@ -475,7 +475,6 @@ export class ApInboxService {
 				await this.noteCreateService.appendNoteVisibleUser(actor, createdNote, additionalCc);
 				return 'ok: note visible user appended';
 			}
-
 			return 'ok';
 		} catch (err) {
 			if (err instanceof StatusError && !err.isRetryable) {
@@ -538,19 +537,12 @@ export class ApInboxService {
 			return `skip: delete actor ${actor.uri} !== ${uri}`;
 		}
 
-		const user = await this.usersRepository.findOneBy({ id: actor.id });
-		if (user == null) {
-			return 'skip: actor not found';
-		} else if (user.isDeleted) {
-			return 'skip: already deleted';
+		if (!(await this.usersRepository.update({ id: actor.id, isDeleted: false }, { isDeleted: true })).affected) {
+			return 'skip: already deleted or actor not found';
 		}
 
 		// リモートから消されたということなので、物理削除する
 		const job = await this.queueService.createDeleteAccountJob(actor, { force: true, soft: false });
-
-		await this.usersRepository.update(actor.id, {
-			isDeleted: true,
-		});
 
 		this.globalEventService.publishInternalEvent('remoteUserUpdated', { id: actor.id });
 
@@ -685,7 +677,7 @@ export class ApInboxService {
 
 		const object = await resolver.resolve(activity.object).catch(e => {
 			this.logger.error(`Resolution failed: ${e}`, { error: e });
-			return e;
+			throw e;
 		});
 
 		// don't queue because the sender may attempt again when timeout

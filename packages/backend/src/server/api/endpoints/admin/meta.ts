@@ -9,6 +9,7 @@ import { MetaService } from '@/core/MetaService.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { DEFAULT_POLICIES } from '@/core/RoleService.js';
+import { SystemAccountService } from '@/core/SystemAccountService.js';
 
 export const meta = {
 	tags: ['meta'],
@@ -70,6 +71,10 @@ export const meta = {
 				optional: false, nullable: true,
 			},
 			googleAnalyticsId: {
+				type: 'string',
+				optional: false, nullable: true,
+			},
+			googleAnalyticsMeasurementId: {
 				type: 'string',
 				optional: false, nullable: true,
 			},
@@ -226,7 +231,7 @@ export const meta = {
 			},
 			proxyAccountId: {
 				type: 'string',
-				optional: false, nullable: true,
+				optional: false, nullable: false,
 				format: 'id',
 			},
 			email: {
@@ -514,6 +519,19 @@ export const meta = {
 				type: 'string',
 				optional: false, nullable: true,
 			},
+			federation: {
+				type: 'string',
+				enum: ['all', 'specified', 'none'],
+				optional: false, nullable: false,
+			},
+			federationHosts: {
+				type: 'array',
+				optional: false, nullable: false,
+				items: {
+					type: 'string',
+					optional: false, nullable: false,
+				},
+			},
 		},
 	},
 } as const;
@@ -532,9 +550,12 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private config: Config,
 
 		private metaService: MetaService,
+		private systemAccountService: SystemAccountService,
 	) {
 		super(meta, paramDef, async () => {
 			const instance = await this.metaService.fetch(true);
+
+			const proxy = await this.systemAccountService.fetch('proxy');
 
 			return {
 				maintainerName: instance.maintainerName,
@@ -562,6 +583,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				enableTurnstile: instance.enableTurnstile,
 				turnstileSiteKey: instance.turnstileSiteKey,
 				googleAnalyticsId: instance.googleAnalyticsId,
+				googleAnalyticsMeasurementId: instance.googleAnalyticsMeasurementId,
 				swPublickey: instance.swPublicKey,
 				themeColor: instance.themeColor,
 				mascotImageUrl: instance.mascotImageUrl,
@@ -597,7 +619,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				sensitiveMediaDetectionSensitivity: instance.sensitiveMediaDetectionSensitivity,
 				setSensitiveFlagAutomatically: instance.setSensitiveFlagAutomatically,
 				enableSensitiveMediaDetectionForVideos: instance.enableSensitiveMediaDetectionForVideos,
-				proxyAccountId: instance.proxyAccountId,
+				proxyAccountId: proxy.id,
 				email: instance.email,
 				smtpSecure: instance.smtpSecure,
 				smtpHost: instance.smtpHost,

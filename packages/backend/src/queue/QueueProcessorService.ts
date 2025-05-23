@@ -383,7 +383,13 @@ export class QueueProcessorService implements OnApplicationShutdown {
 
 		// #region user-webhook deliver
 		{
-			this.userWebhookDeliverQueueWorker = new Bull.Worker(QUEUE.USER_WEBHOOK_DELIVER, (job) => this.userWebhookDeliverProcessorService.process(job), {
+			this.userWebhookDeliverQueueWorker = new Bull.Worker(QUEUE.USER_WEBHOOK_DELIVER, (job) => {
+				if (this.config.sentryForBackend) {
+					return Sentry.startSpan({ name: 'Queue: UserWebhookDeliver' }, () => this.userWebhookDeliverProcessorService.process(job));
+				} else {
+					return this.userWebhookDeliverProcessorService.process(job);
+				}
+			}, {
 				...baseWorkerOptions(this.config.redisForWebhookDeliverQueue, this.config.bullmqWorkerOptions, QUEUE.USER_WEBHOOK_DELIVER),
 				autorun: false,
 				concurrency: 64,
@@ -407,7 +413,13 @@ export class QueueProcessorService implements OnApplicationShutdown {
 
 		//#region system-webhook deliver
 		{
-			this.systemWebhookDeliverQueueWorker = new Bull.Worker(QUEUE.SYSTEM_WEBHOOK_DELIVER, (job) => this.systemWebhookDeliverProcessorService.process(job), {
+			this.systemWebhookDeliverQueueWorker = new Bull.Worker(QUEUE.SYSTEM_WEBHOOK_DELIVER, (job) => {
+				if (this.config.sentryForBackend) {
+					return Sentry.startSpan({ name: 'Queue: SystemWebhookDeliver' }, () => this.systemWebhookDeliverProcessorService.process(job));
+				} else {
+					return this.systemWebhookDeliverProcessorService.process(job);
+				}
+			}, {
 				...baseWorkerOptions(this.config.redisForWebhookDeliverQueue, this.config.bullmqWorkerOptions, QUEUE.SYSTEM_WEBHOOK_DELIVER),
 				autorun: false,
 				concurrency: 64,
@@ -440,6 +452,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 					default: throw new Error(`unrecognized job type ${job.name} for relationship`);
 				}
 			};
+
 			this.relationshipQueueWorkers = this.config.redisForRelationshipQueues
 				.filter((_, index) => process.env.QUEUE_WORKER_INDEX == null || index === Number.parseInt(process.env.QUEUE_WORKER_INDEX, 10))
 				.map(config => new Bull.Worker(formatQueueName(config, QUEUE.RELATIONSHIP), (job) => {

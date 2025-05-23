@@ -25,8 +25,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<i v-else-if="type === 'question'" :class="$style.iconInner" class="ti ti-help-circle"></i>
 			<MkLoading v-else-if="type === 'waiting'" :class="$style.iconInner" :em="true"/>
 		</div>
-		<header v-if="title" :class="$style.title"><Mfm :text="title"/></header>
-		<div v-if="text" :class="$style.text"><Mfm :text="text"/></div>
+		<header v-if="title" :class="$style.title" class="_selectable"><Mfm :text="title"/></header>
+		<div v-if="text" :class="$style.text" class="_selectable"><Mfm :text="text"/></div>
 		<template v-if="input">
 			<MkInput v-if="input.type !== 'textarea'" v-model="inputValue" autofocus :type="input.type || 'text'" :placeholder="input.placeholder || undefined" :autocomplete="input.autocomplete" @keydown="onInputKeydown">
 				<template v-if="input.type === 'password'" #prefix><i class="ti ti-lock"></i></template>
@@ -64,7 +64,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 		</details>
 		<div v-if="(showOkButton || showCancelButton) && !actions" :class="$style.buttons">
-			<MkButton v-if="showOkButton" data-cy-modal-dialog-ok inline primary rounded :autofocus="!input && !select" :disabled="okDisabled || okButtonDisabledReason" @click="ok">{{ okText ?? ((showCancelButton || input || select) ? i18n.ts.ok : i18n.ts.gotIt) }}<span v-if="okDisabled && okWaitInitiated"> ({{ sec }})</span></MkButton>
+			<MkButton v-if="showOkButton" data-cy-modal-dialog-ok inline primary rounded :autofocus="!input && !select" :disabled="okDisabled || okButtonDisabledReason != null" @click="ok">{{ okText ?? ((showCancelButton || input || select) ? i18n.ts.ok : i18n.ts.gotIt) }}<span v-if="okDisabled && okWaitInitiated"> ({{ sec }})</span></MkButton>
 			<MkButton v-if="showCancelButton || input || select" data-cy-modal-dialog-cancel inline rounded @click="cancel">{{ cancelText ?? i18n.ts.cancel }}</MkButton>
 		</div>
 		<div v-if="actions" :class="$style.buttons">
@@ -75,7 +75,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import {ref, shallowRef, computed, watch, onMounted, onBeforeUnmount} from 'vue';
+import {ref, useTemplateRef, computed, watch, onMounted, onBeforeUnmount} from 'vue';
 import MkModal from '@/components/MkModal.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
@@ -122,7 +122,7 @@ const props = withDefaults(defineProps<{
 		text: string;
 		primary?: boolean,
 		danger?: boolean,
-		callback: (...args: any[]) => void;
+		callback: (...args: unknown[]) => void;
 	}[];
 	showOkButton?: boolean;
 	showCancelButton?: boolean;
@@ -155,7 +155,7 @@ const emit = defineEmits<{
 	(ev: 'closed'): void;
 }>();
 
-const modal = shallowRef<InstanceType<typeof MkModal>>();
+const modal = useTemplateRef('modal');
 
 const inputValue = ref<string | number | null>(props.input?.default ?? null);
 const selectedValue = ref(props.select?.default ?? null);
@@ -190,6 +190,7 @@ const okButtonDisabledReason = computed<null | 'charactersExceeded' | 'character
 // overload function を使いたいので lint エラーを無視する
 function done(canceled: true): void;
 function done(canceled: false, result: Result, toggle: boolean): void; // eslint-disable-line no-redeclare
+
 function done(canceled: boolean, result?: Result, toggle?: boolean ): void { // eslint-disable-line no-redeclare
 	emit('done', { canceled, result, toggle } as { canceled: true } | { canceled: false, result: Result, toggle: boolean });
 	modal.value?.close();

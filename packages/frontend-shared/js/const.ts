@@ -66,6 +66,7 @@ export const notificationTypes = [
 	'receiveFollowRequest',
 	'followRequestAccepted',
 	'roleAssigned',
+	'chatRoomInvitationReceived',
 	'achievementEarned',
 	'noteScheduled',
 	'scheduledNotePosted',
@@ -73,6 +74,7 @@ export const notificationTypes = [
 	'sensitiveFlagAssigned',
 	'exportCompleted',
 	'login',
+	'createToken',
 	'test',
 	'app',
 ] as const;
@@ -105,6 +107,7 @@ export const ROLE_POLICIES = [
 	'canUseReaction',
 	'canHideAds',
 	'driveCapacityMb',
+	'maxFileSizeMb',
 	'alwaysMarkNsfw',
 	'canUpdateBioMedia',
 	'skipNsfwDetection',
@@ -126,13 +129,8 @@ export const ROLE_POLICIES = [
 	'canImportUserLists',
 	'mutualLinkSectionLimit',
 	'mutualLinkLimit',
+	'chatAvailability',
 ] as const;
-
-// なんか動かない
-//export const CURRENT_STICKY_TOP = Symbol('CURRENT_STICKY_TOP');
-//export const CURRENT_STICKY_BOTTOM = Symbol('CURRENT_STICKY_BOTTOM');
-export const CURRENT_STICKY_TOP = 'CURRENT_STICKY_TOP';
-export const CURRENT_STICKY_BOTTOM = 'CURRENT_STICKY_BOTTOM';
 
 export const DEFAULT_SERVER_ERROR_IMAGE_URL = 'https://xn--931a.moe/assets/error.jpg';
 export const DEFAULT_NOT_FOUND_IMAGE_URL = 'https://xn--931a.moe/assets/not-found.jpg';

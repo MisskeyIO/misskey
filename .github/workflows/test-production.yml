@@ -17,19 +17,20 @@ env:
 
 jobs:
   production:
+    name: Production build
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [22.11.0]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v4.2.2
       with:
         fetch-depth: 0
         submodules: true
     - name: Install pnpm
-      uses: pnpm/action-setup@v4
+      uses: pnpm/action-setup@v4.1.0
       with:
         run_install: false
     - name: Use Node.js ${{ matrix.node-version }}

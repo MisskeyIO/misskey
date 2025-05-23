@@ -7,16 +7,12 @@ import { randomUUID, randomBytes } from 'node:crypto';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Inject, Injectable } from '@nestjs/common';
-import { createBullBoard } from '@bull-board/api';
-import { BullMQAdapter } from '@bull-board/api/bullMQAdapter.js';
-import { FastifyAdapter as BullBoardFastifyAdapter } from '@bull-board/fastify';
 import ms from 'ms';
 import sharp from 'sharp';
 import pug from 'pug';
 import { In, IsNull } from 'typeorm';
 import fastifyStatic from '@fastify/static';
 import fastifyView from '@fastify/view';
-import fastifyCookie from '@fastify/cookie';
 import fastifyProxy from '@fastify/http-proxy';
 import vary from 'vary';
 import htmlSafeJsonStringify from 'htmlescape';
@@ -42,13 +38,26 @@ import { MetaEntityService } from '@/core/entities/MetaEntityService.js';
 import { GalleryPostEntityService } from '@/core/entities/GalleryPostEntityService.js';
 import { ClipEntityService } from '@/core/entities/ClipEntityService.js';
 import { ChannelEntityService } from '@/core/entities/ChannelEntityService.js';
-import type { ChannelsRepository, ClipsRepository, FlashsRepository, GalleryPostsRepository, MiMeta, NotesRepository, PagesRepository, ReversiGamesRepository, UserProfilesRepository, UsersRepository } from '@/models/_.js';
+import type {
+	AnnouncementsRepository,
+	ChannelsRepository,
+	ClipsRepository,
+	FlashsRepository,
+	GalleryPostsRepository,
+	MiMeta,
+	NotesRepository,
+	PagesRepository,
+	ReversiGamesRepository,
+	UserProfilesRepository,
+	UsersRepository,
+} from '@/models/_.js';
 import type Logger from '@/logger.js';
 import { handleRequestRedirectToOmitSearch } from '@/misc/fastify-hook-handlers.js';
 import { bindThis } from '@/decorators.js';
 import { FlashEntityService } from '@/core/entities/FlashEntityService.js';
 import { RoleService } from '@/core/RoleService.js';
 import { ReversiGameEntityService } from '@/core/entities/ReversiGameEntityService.js';
+import { AnnouncementEntityService } from '@/core/entities/AnnouncementEntityService.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { FeedService } from './FeedService.js';
 import { UrlPreviewService } from './UrlPreviewService.js';
@@ -103,6 +112,9 @@ export class ClientServerService {
 		@Inject(DI.reversiGamesRepository)
 		private reversiGamesRepository: ReversiGamesRepository,
 
+		@Inject(DI.announcementsRepository)
+		private announcementsRepository: AnnouncementsRepository,
+
 		private flashEntityService: FlashEntityService,
 		private userEntityService: UserEntityService,
 		private noteEntityService: NoteEntityService,
@@ -112,6 +124,7 @@ export class ClientServerService {
 		private clipEntityService: ClipEntityService,
 		private channelEntityService: ChannelEntityService,
 		private reversiGameEntityService: ReversiGameEntityService,
+		private announcementEntityService: AnnouncementEntityService,
 		private urlPreviewService: UrlPreviewService,
 		private feedService: FeedService,
 		private roleService: RoleService,
@@ -325,7 +338,7 @@ export class ClientServerService {
 
 			const embedPort = (process.env.EMBED_VITE_PORT ?? '5174');
 			fastify.register(fastifyProxy, {
-				upstream: 'http://localhost:' + embedPort,
+				upstream: urlOriginWithoutPort + ':' + embedPort,
 				prefix: '/embed_vite',
 				rewritePrefix: '/embed_vite',
 			});
@@ -496,6 +509,7 @@ export class ClientServerService {
 				usernameLower: username.toLowerCase(),
 				host: host ?? IsNull(),
 				isSuspended: false,
+				requireSigninToViewContents: false,
 			});
 
 			return user && await this.feedService.packFeed(user);
@@ -546,7 +560,7 @@ export class ClientServerService {
 			}
 		});
 
-		//#region SSR (for crawlers)
+		//#region SSR
 		// User
 		fastify.get<{ Params: { user: string; sub?: string; } }>('/@:user/:sub?', async (request, reply) => {
 			const { username, host } = Acct.parse(request.params.user);
@@ -571,11 +585,20 @@ export class ClientServerService {
 					reply.header('X-Robots-Tag', 'noimageai');
 					reply.header('X-Robots-Tag', 'noai');
 				}
+
+				const _user = await this.userEntityService.pack(user, null, {
+					schema: 'UserDetailed',
+					userProfile: profile,
+				});
+
 				return await reply.view('user', {
 					user, profile, me,
-					avatarUrl: user.avatarUrl ?? this.userEntityService.getIdenticonUrl(user),
+					avatarUrl: _user.avatarUrl,
 					sub: request.params.sub,
 					...await this.generateCommonPugData(this.meta),
+					clientCtx: htmlSafeJsonStringify({
+						user: _user,
+					}),
 				});
 			} else {
 				// リモートユーザーなので
@@ -628,7 +651,9 @@ export class ClientServerService {
 						// TODO: Let locale changeable by instance setting
 						summary: getNoteSummary(_note),
 						...await this.generateCommonPugData(this.meta),
-					});
+					clientCtx: htmlSafeJsonStringify({
+						note: _note,
+					}),});
 				} catch (err) {
 					if ((err as IdentifiableError).id === '85ab9bd7-3a41-4530-959d-f07073900109') {
 						return await renderBase(reply);
@@ -815,7 +840,9 @@ export class ClientServerService {
 						profile,
 						avatarUrl: _clip.user.avatarUrl,
 						...await this.generateCommonPugData(this.meta),
-					});
+					clientCtx: htmlSafeJsonStringify({
+						clip: _clip,
+					}),});
 				} catch (err) {
 					if ((err as IdentifiableError).id === '85ab9bd7-3a41-4530-959d-f07073900109') {
 						return await renderBase(reply);
@@ -893,6 +920,25 @@ export class ClientServerService {
 				return await renderBase(reply);
 			}
 		});
+
+		// 個別お知らせページ
+		fastify.get<{ Params: { announcementId: string; } }>('/announcements/:announcementId', async (request, reply) => {
+			const announcement = await this.announcementsRepository.findOneBy({
+				id: request.params.announcementId,
+				userId: IsNull(),
+			});
+
+			if (announcement) {
+				const _announcement = await this.announcementEntityService.pack(announcement);
+				reply.header('Cache-Control', 'public, max-age=3600');
+				return await reply.view('announcement', {
+					announcement: _announcement,
+					...await this.generateCommonPugData(this.meta),
+				});
+			} else {
+				return await renderBase(reply);
+			}
+		});
 		//#endregion
 
 		//#region noindex pages
@@ -938,7 +984,7 @@ export class ClientServerService {
 			});
 
 			if (note == null) return;
-			if (note.visibility !== 'public') return;
+			if (['specified', 'followers'].includes(note.visibility)) return;
 			if (note.userHost != null) return;
 
 			const _note = await this.noteEntityService.pack(note, null, { detail: true });

@@ -50,6 +50,9 @@ class GlobalTimelineChannel extends Channel {
 	private async onNote(note: Packed<'Note'>) {
 		if (note.visibility !== 'public') return;
 		if (note.channelId != null) return;
+		if (note.user.requireSigninToViewContents && this.user == null) return;
+		if (note.renote && note.renote.user.requireSigninToViewContents && this.user == null) return;
+		if (note.reply && note.reply.user.requireSigninToViewContents && this.user == null) return;
 
 		// ファイルを含まない投稿は除外
 		if (this.withFiles && (note.fileIds == null || note.fileIds.length === 0)) return;

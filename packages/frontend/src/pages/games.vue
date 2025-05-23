@@ -4,9 +4,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<MkStickyContainer>
-	<template #header><MkPageHeader/></template>
-	<MkSpacer :contentMax="800">
+<PageWithHeader>
+	<div class="_spacer" style="--MI_SPACER-w: 800px;">
 		<div class="_gaps">
 			<div class="_panel" :class="$style.link">
 				<MkA to="/bubble-game">
@@ -22,16 +21,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<MkPagination v-slot="{items}" :pagination="featuredPagination">
 			<MkChannelPreview v-for="channel in items" :key="channel.id" class="_margin" :channel="channel"/>
 		</MkPagination>
-	</MkSpacer>
-</MkStickyContainer>
+	</div>
+</PageWithHeader>
 </template>
 
 <script lang="ts" setup>
-import { definePageMetadata } from '@/scripts/page-metadata.js';
+import { definePage } from '@/page.js';
 import MkPagination from '@/components/MkPagination.vue';
 import MkChannelPreview from '@/components/MkChannelPreview.vue';
 
-definePageMetadata(() => ({
+definePage(() => ({
 	title: 'Misskey Games',
 	icon: 'ti ti-device-gamepad',
 }));

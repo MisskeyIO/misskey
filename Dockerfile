@@ -1,5 +1,7 @@
 # syntax = docker/dockerfile:1.4
 
+ARG NODE_VERSION=22.11.0-bookworm
+
 # build assets & compile TypeScript
 
 FROM --platform=$BUILDPLATFORM node:22 AS native-builder
@@ -30,8 +32,12 @@ COPY --link ["packages/misskey-js/package.json", "./packages/misskey-js/"]
 COPY --link ["packages/misskey-reversi/package.json", "./packages/misskey-reversi/"]
 COPY --link ["packages/misskey-bubble-game/package.json", "./packages/misskey-bubble-game/"]
 
-RUN pnpm i --frozen-lockfile --aggregate-output --prefer-offline \
-	&& pnpm rebuild -r
+ARG NODE_ENV=production
+
+RUN node -e "console.log(JSON.parse(require('node:fs').readFileSync('./package.json')).packageManager)" | xargs npm install -g
+
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
+	pnpm i --frozen-lockfile --aggregate-output
 
 COPY --link . ./
 
@@ -62,7 +68,12 @@ COPY --link ["packages/misskey-bubble-game/package.json", "./packages/misskey-bu
 RUN pnpm i --frozen-lockfile --aggregate-output --prefer-offline \
 	&& pnpm rebuild -r
 
-FROM --platform=$TARGETPLATFORM node:22-slim AS runner
+RUN node -e "console.log(JSON.parse(require('node:fs').readFileSync('./package.json')).packageManager)" | xargs npm install -g
+
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
+	pnpm i --frozen-lockfile --aggregate-output
+
+FROM --platform=$TARGETPLATFORM node:${NODE_VERSION}-slim AS runner
 
 ARG UID="991"
 ARG GID="991"
@@ -78,6 +89,11 @@ RUN apt-get update \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists
 
+# add package.json to add pnpm
+COPY ./package.json ./package.json
+RUN node -e "console.log(JSON.parse(require('node:fs').readFileSync('./package.json')).packageManager)" | xargs npm install -g
+
+USER misskey
 WORKDIR /misskey
 
 COPY --chown=misskey:misskey pnpm-lock.yaml ./

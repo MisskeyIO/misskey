@@ -14,9 +14,10 @@ import type {
 	ReversiGameDetailed,
 	SystemWebhook,
 	UserLite,
+	ChatRoom,
 } from './autogen/models.js';
 
-export const notificationTypes = ['note', 'follow', 'mention', 'reply', 'renote', 'quote', 'reaction', 'pollVote', 'pollEnded', 'receiveFollowRequest', 'followRequestAccepted', 'groupInvited', 'app', 'roleAssigned', 'achievementEarned', 'noteScheduled', 'scheduledNotePosted', 'scheduledNoteError'] as const;
+export const notificationTypes = ['note', 'follow', 'mention', 'reply', 'renote', 'quote', 'reaction', 'pollVote', 'pollEnded', 'receiveFollowRequest', 'followRequestAccepted', 'groupInvited', 'app', 'roleAssigned', 'chatRoomInvitationReceived', 'achievementEarned', 'noteScheduled', 'scheduledNotePosted', 'scheduledNoteError'] as const;
 
 export const noteVisibilities = ['public', 'home', 'followers', 'specified'] as const;
 
@@ -37,8 +38,8 @@ export const permissions = [
 	'write:favorites',
 	'read:following',
 	'write:following',
-	'read:messaging',
-	'write:messaging',
+	'read:messaging', // deprecated
+	'write:messaging', // deprecated
 	'read:mutes',
 	'write:mutes',
 	'write:notes',
@@ -118,6 +119,8 @@ export const permissions = [
 	'read:clip-favorite',
 	'read:federation',
 	'write:report-abuse',
+	'write:chat',
+	'read:chat',
 ] as const;
 
 export const moderationLogTypes = [
@@ -180,6 +183,7 @@ export const moderationLogTypes = [
 	'deletePage',
 	'deleteFlash',
 	'deleteGalleryPost',
+	'deleteChatRoom',
 ] as const;
 
 // See: packages/backend/src/core/ReversiService.ts@L410
@@ -496,5 +500,9 @@ export type ModerationLogPayloads = {
 		postUserId: string;
 		postUserUsername: string;
 		post: GalleryPost;
+	};
+	deleteChatRoom: {
+		roomId: string;
+		room: ChatRoom;
 	};
 };

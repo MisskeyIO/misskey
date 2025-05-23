@@ -184,7 +184,7 @@ export class ApRequestService {
 	 * @param followAlternate If true, follow alternate link tag in HTML
 	 */
 	@bindThis
-	public async signedGet(url: string, user: { id: MiUser['id'] }, followAlternate?: boolean): Promise<unknown> {
+	public async signedGet(url: string, user: { id: MiUser['id'] }, allowSoftfail: FetchAllowSoftFailMask = FetchAllowSoftFailMask.Strict, followAlternate?: boolean): Promise<unknown> {
 		const _followAlternate = followAlternate ?? true;
 		const keypair = await this.userKeypairService.getUserKeypair(user.id);
 
@@ -231,6 +231,8 @@ export class ApRequestService {
 		//#endregion
 
 		validateContentTypeSetAsActivityPub(res);
+		const finalUrl = res.url; // redirects may have been involved
+		const activity = await res.json() as IObject;
 
 		const finalUrl = res.url; // redirects may have been involved
 		const activity = await res.json() as IObject;

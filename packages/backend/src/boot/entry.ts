@@ -89,10 +89,10 @@ process.on('warning', warning => {
 
 //#endregion
 
-if (cluster.isPrimary || envOption.disableClustering) {
-	await masterMain();
-
+if (!envOption.disableClustering) {
 	if (cluster.isPrimary) {
+		logger.info(`Start main process... pid: ${process.pid}`);
+		await masterMain();
 		ev.mount();
 	}
 }

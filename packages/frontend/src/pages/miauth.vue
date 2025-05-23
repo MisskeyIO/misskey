@@ -1,6 +1,5 @@
 <template>
-<div>
-	<MkAnimBg style="position: fixed; top: 0;"/>
+<PageWithAnimBg>
 	<div :class="$style.formContainer">
 		<div :class="$style.form">
 			<MkAuthConfirm
@@ -20,19 +19,16 @@
 			</MkAuthConfirm>
 		</div>
 	</div>
-</div>
+</PageWithAnimBg>
 </template>
 
 <script lang="ts" setup>
 import { computed, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
-
-import MkAnimBg from '@/components/MkAnimBg.vue';
 import MkAuthConfirm from '@/components/MkAuthConfirm.vue';
-
 import { i18n } from '@/i18n.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
+import { definePage } from '@/page.js';
 
 const props = defineProps<{
 	session: string;
@@ -59,7 +55,7 @@ async function onAccept(token: string) {
 			const cbUrl = new URL(props.callback);
 			if (['javascript:', 'file:', 'data:', 'mailto:', 'tel:', 'vbscript:'].includes(cbUrl.protocol)) throw new Error('invalid url');
 			cbUrl.searchParams.set('session', props.session);
-			location.href = cbUrl.toString();
+			window.location.href = cbUrl.toString();
 		} else {
 			authRoot.value?.showUI('success');
 		}
@@ -72,7 +68,7 @@ function onDeny() {
 	authRoot.value?.showUI('denied');
 }
 
-definePageMetadata(() => ({
+definePage(() => ({
 	title: 'MiAuth',
 	icon: 'ti ti-apps',
 }));
@@ -112,5 +108,6 @@ definePageMetadata(() => ({
 	border-radius: var(--MI-radius);
 	background-color: var(--MI_THEME-panel);
 	overflow-x: scroll;
+	white-space: nowrap;
 }
 </style>

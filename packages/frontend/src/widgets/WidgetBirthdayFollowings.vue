@@ -39,15 +39,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
 import * as Misskey from 'misskey-js';
-import { useWidgetPropsManager, WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from './widget.js';
+import { useWidgetPropsManager } from './widget.js';
+import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from './widget.js';
 import type { MisskeyEntity } from '@/types/date-separated-list.js';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
 import { userPage } from '@/filters/user.js';
 import { infoImageUrl } from '@/instance.js';
-import { GetFormResultType } from '@/scripts/form.js';
+import type { GetFormResultType } from '@/utility/form.js';
 import { useInterval } from '@@/js/use-interval.js';
-import MkContainer from '@/components/MkContainer.vue';
 import MkPagination from '@/components/MkPagination.vue';
 import MkDateSeparatedList from '@/components/MkDateSeparatedList.vue';
 import MkUserCardMini from '@/components/MkUserCardMini.vue';

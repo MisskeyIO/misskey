@@ -205,6 +205,7 @@ export const paramDef = {
 		autoSensitive: { type: 'boolean' },
 		followingVisibility: { type: 'string', enum: ['public', 'followers', 'private'] },
 		followersVisibility: { type: 'string', enum: ['public', 'followers', 'private'] },
+		chatScope: { type: 'string', enum: ['everyone', 'followers', 'following', 'mutual', 'none'] },
 		pinnedPageId: { type: 'string', format: 'misskey:id', nullable: true },
 		mutedWords: { type: 'array', items: {
 			oneOf: [
@@ -230,6 +231,7 @@ export const paramDef = {
 				receiveFollowRequest: notificationRecieveConfig,
 				followRequestAccepted: notificationRecieveConfig,
 				roleAssigned: notificationRecieveConfig,
+				chatRoomInvitationReceived: notificationRecieveConfig,
 				achievementEarned: notificationRecieveConfig,
 				app: notificationRecieveConfig,
 				test: notificationRecieveConfig,
@@ -333,11 +335,47 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (ps.birthday !== undefined) profileUpdates.birthday = ps.birthday;
 			if (ps.followingVisibility !== undefined) profileUpdates.followingVisibility = ps.followingVisibility;
 			if (ps.followersVisibility !== undefined) profileUpdates.followersVisibility = ps.followersVisibility;
-			if (ps.mutedWords !== undefined) {
-				const length = ps.mutedWords.length;
-				if (length > policy.wordMuteLimit) {
+			if (ps.chatScope !== undefined) updates.chatScope = ps.chatScope;
+
+			function checkMuteWordCount(mutedWords: (string[] | string)[], limit: number) {
+				// TODO: ちゃんと数える
+				const length = JSON.stringify(mutedWords).length;
+				if (length > limit) {
 					throw new ApiError(meta.errors.tooManyMutedWords);
 				}
+			}
+
+			function validateMuteWordRegex(mutedWords: (string[] | string)[]) {
+				for (const mutedWord of mutedWords) {
+					if (typeof mutedWord !== 'string') continue;
+
+					const regexp = mutedWord.match(/^\/(.+)\/(.*)$/);
+					if (!regexp) throw new ApiError(meta.errors.invalidRegexp);
+
+					try {
+						new RE2(regexp[1], regexp[2]);
+					} catch (err) {
+						throw new ApiError(meta.errors.invalidRegexp);
+					}
+				}
+			}
+
+			if (ps.mutedWords !== undefined) {
+				policies ??= await this.roleService.getUserPolicies(user.id);
+				checkMuteWordCount(ps.mutedWords, policies.wordMuteLimit);
+				validateMuteWordRegex(ps.mutedWords);
+
+				profileUpdates.mutedWords = ps.mutedWords;
+				profileUpdates.enableWordMute = ps.mutedWords.length > 0;
+			}
+
+			function checkMuteWordCount(mutedWords: (string[] | string)[], limit: number) {
+				// TODO: ちゃんと数える
+				const length = JSON.stringify(mutedWords).length;
+				if (length > limit) {
+					throw new ApiError(meta.errors.tooManyMutedWords);
+				}
+			}
 
 				// validate regular expression syntax
 				ps.mutedWords.filter(x => !Array.isArray(x)).forEach(x => {
@@ -515,6 +553,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const newName = updates.name === undefined ? user.name : updates.name;
 			const newDescription = profileUpdates.description === undefined ? profile.description : profileUpdates.description;
 			const newFields = profileUpdates.fields === undefined ? profile.fields : profileUpdates.fields;
+			const newFollowedMessage = profileUpdates.followedMessage === undefined ? profile.followedMessage : profileUpdates.followedMessage;
 
 			if (newName != null) {
 				let hasProhibitedWords = false;
@@ -542,6 +581,11 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					...extractCustomEmojisFromMfm(nameTokens),
 					...extractCustomEmojisFromMfm(valueTokens),
 				]);
+			}
+
+			if (newFollowedMessage != null) {
+				const tokens = mfm.parse(newFollowedMessage);
+				emojis = emojis.concat(extractCustomEmojisFromMfm(tokens));
 			}
 
 			updates.emojis = emojis;
@@ -597,7 +641,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const html = await this.httpRequestService.getHtml(url);
 
 			const { window } = new JSDOM(html);
-			const doc = window.document as Document;
+			const doc: Document = window.document as Document;
 
 			const myLink = `${this.config.url}/@${user.username}`;
 

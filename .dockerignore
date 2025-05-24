@@ -11,13 +11,25 @@ built/
 db/
 compose.yml
 docker-compose.yml
+.devcontainer/compose.yml
 node_modules/
 packages/*/node_modules
 redis/
 files/
+fluent-emojis/
+.pnp.*
+
+# .yarn関連
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
 .pnpm-store
 
 .idea/
 packages/*/.vscode/
 packages/backend/test/compose.yml
-packages/backend/test/docker-compose.yml
+packages/backend/test/compose.yml

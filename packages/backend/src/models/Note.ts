@@ -10,6 +10,7 @@ import { MiUser } from './User.js';
 import { MiChannel } from './Channel.js';
 import type { MiDriveFile } from './DriveFile.js';
 
+@Index(['userId', 'id'])
 @Entity('note')
 @Index('IDX_NOTE_TAGS', { synchronize: false })
 @Index('IDX_NOTE_MENTIONS', { synchronize: false })
@@ -76,7 +77,6 @@ export class MiNote {
 	})
 	public cw: string | null;
 
-	@Index()
 	@Column({
 		...id(),
 		comment: 'The ID of author.',

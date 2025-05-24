@@ -29,6 +29,11 @@ export class AbuseUserReportEntityService {
 	public async pack(
 		src: MiAbuseUserReport['id'] | MiAbuseUserReport,
 		me: { id: MiUser['id'] } | null | undefined,
+		hint?: {
+			packedReporter?: Packed<'UserDetailedNotMe'>,
+			packedTargetUser?: Packed<'UserDetailedNotMe'>,
+			packedAssignee?: Packed<'UserDetailedNotMe'>,
+		},
 	) : Promise<Packed<'AbuseUserReport'>> {
 		const report = typeof src === 'object' ? src : await this.abuseUserReportsRepository.findOneByOrFail({ id: src });
 
@@ -40,17 +45,19 @@ export class AbuseUserReportEntityService {
 			reporterId: report.reporterId,
 			targetUserId: report.targetUserId,
 			assigneeId: report.assigneeId,
-			reporter: this.userEntityService.pack(report.reporter ?? report.reporterId, me, {
+			reporter: hint?.packedReporter ?? this.userEntityService.pack(report.reporter ?? report.reporterId, me, {
 				schema: 'UserDetailed',
 			}),
-			targetUser: this.userEntityService.pack(report.targetUser ?? report.targetUserId, me, {
+			targetUser: hint?.packedTargetUser ?? this.userEntityService.pack(report.targetUser ?? report.targetUserId, me, {
 				schema: 'UserDetailed',
 			}),
-			assignee: report.assigneeId ? this.userEntityService.pack(report.assignee ?? report.assigneeId, me, {
+			assignee: report.assigneeId ? hint?.packedAssignee ?? this.userEntityService.pack(report.assignee ?? report.assigneeId, me, {
 				schema: 'UserDetailed',
 			}) : null,
 			forwarded: report.forwarded,
 			category: report.category,
+			resolvedAs: report.resolvedAs,
+			moderationNote: report.moderationNote,
 		});
 	}
 

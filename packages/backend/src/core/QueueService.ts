@@ -5,20 +5,54 @@
 
 import { randomUUID } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
+import { MetricsTime, type JobType } from 'bullmq';
+import { parse as parseRedisInfo } from 'redis-info';
 import type { IActivity } from '@/core/activitypub/type.js';
 import type { MiDriveFile } from '@/models/DriveFile.js';
 import type { MiScheduledNote } from '@/models/ScheduledNote.js';
 import type { MiAbuseUserReport } from '@/models/AbuseUserReport.js';
-import type { MiWebhook, webhookEventTypes } from '@/models/Webhook.js';
+import type { MiWebhook, WebhookEventTypes } from '@/models/Webhook.js';
+import type { MiSystemWebhook, SystemWebhookEventType } from '@/models/SystemWebhook.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import type { Antenna } from '@/server/api/endpoints/i/import-antennas.js';
 import { ApRequestCreator } from '@/core/activitypub/ApRequestService.js';
-import type { DbQueue, DeliverQueue, EndedPollNotificationQueue, InboxQueue, ObjectStorageQueue, RelationshipQueue, SystemQueue, WebhookDeliverQueue } from './QueueModule.js';
-import type { DbJobData, DeliverJobData, RelationshipJobData, ThinUser } from '../queue/types.js';
+import { type SystemWebhookPayload } from '@/core/SystemWebhookService.js';
+import { type UserWebhookPayload } from './UserWebhookService.js';
+import type {
+	DbJobData,
+	DeliverJobData,
+	RelationshipJobData,
+	SystemWebhookDeliverJobData,
+	ThinUser,
+	UserWebhookDeliverJobData,
+} from '../queue/types.js';
+import type {
+	DbQueue,
+	DeliverQueue,
+	EndedPollNotificationQueue,
+	InboxQueue,
+	ObjectStorageQueue,
+	RelationshipQueue,
+	SystemQueue,
+	SystemWebhookDeliverQueue,
+	UserWebhookDeliverQueue,
+} from './QueueModule.js';
 import type httpSignature from '@peertube/http-signature';
 import type * as Bull from 'bullmq';
+
+export const QUEUE_TYPES = [
+	'system',
+	'endedPollNotification',
+	'deliver',
+	'inbox',
+	'db',
+	'relationship',
+	'objectStorage',
+	'userWebhookDeliver',
+	'systemWebhookDeliver',
+] as const;
 
 @Injectable()
 export class QueueService {
@@ -33,53 +67,75 @@ export class QueueService {
 		@Inject('queue:db') public dbQueue: DbQueue,
 		@Inject('queue:relationship') public relationshipQueue: RelationshipQueue,
 		@Inject('queue:objectStorage') public objectStorageQueue: ObjectStorageQueue,
-		@Inject('queue:webhookDeliver') public webhookDeliverQueue: WebhookDeliverQueue,
+		@Inject('queue:userWebhookDeliver') public userWebhookDeliverQueue: UserWebhookDeliverQueue,
+		@Inject('queue:systemWebhookDeliver') public systemWebhookDeliverQueue: SystemWebhookDeliverQueue,
 	) {
 		this.ensureRepeatJobs();
 	}
 
 	@bindThis
 	private ensureRepeatJobs() {
-		this.systemQueue.add('tickCharts', {
+		void this.systemQueue.add('tickCharts', {
 		}, {
 			repeat: { pattern: '55 * * * *' },
-			removeOnComplete: true,
+			removeOnComplete: 10,
+			removeOnFail: 30,
 		});
 
-		this.systemQueue.add('resyncCharts', {
+		void this.systemQueue.add('resyncCharts', {
 		}, {
 			repeat: { pattern: '0 0 * * *' },
-			removeOnComplete: true,
+			removeOnComplete: 10,
+			removeOnFail: 30,
 		});
 
-		this.systemQueue.add('cleanCharts', {
+		void this.systemQueue.add('cleanCharts', {
 		}, {
 			repeat: { pattern: '0 0 * * *' },
-			removeOnComplete: true,
+			removeOnComplete: 10,
+			removeOnFail: 30,
 		});
 
-		this.systemQueue.add('aggregateRetention', {
+		void this.systemQueue.add('aggregateRetention', {
 		}, {
 			repeat: { pattern: '0 0 * * *' },
-			removeOnComplete: true,
+			removeOnComplete: 10,
+			removeOnFail: 30,
 		});
 
-		this.systemQueue.add('clean', {
+		void this.systemQueue.add('clean', {
 		}, {
 			repeat: { pattern: '0 0 * * *' },
-			removeOnComplete: true,
+			removeOnComplete: 10,
+			removeOnFail: 30,
 		});
 
-		this.systemQueue.add('checkExpiredMutings', {
+		void this.systemQueue.add('checkExpiredMutings', {
+		}, {
+			repeat: { pattern: '*/5 * * * *' },
+			removeOnComplete: 10,
+			removeOnFail: 30,
+		});
+
+		void this.systemQueue.add('checkMissingScheduledNote', {
 		}, {
 			repeat: { pattern: '*/5 * * * *' },
 			removeOnComplete: true,
 		});
 
-		this.systemQueue.add('checkMissingScheduledNote', {
+		void this.systemQueue.add('bakeBufferedReactions', {
 		}, {
-			repeat: { pattern: '*/5 * * * *' },
-			removeOnComplete: true,
+			repeat: { pattern: '0 0 * * *' },
+			removeOnComplete: 10,
+			removeOnFail: 30,
+		});
+
+		void this.systemQueue.add('checkModeratorsActivity', {
+		}, {
+			// 毎時30分に起動
+			repeat: { pattern: '30 * * * *' },
+			removeOnComplete: 10,
+			removeOnFail: 30,
 		});
 	}
 
@@ -101,13 +157,21 @@ export class QueueService {
 			isSharedInbox,
 		};
 
-		return this.deliverQueue.add(to, data, {
+		const label = to.replace('https://', '').replace('/inbox', '');
+
+		return this.deliverQueue.add(label, data, {
 			attempts: this.config.deliverJobMaxAttempts ?? 12,
 			backoff: {
 				type: 'custom',
 			},
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
@@ -129,12 +193,18 @@ export class QueueService {
 			backoff: {
 				type: 'custom',
 			},
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		};
 
 		await this.deliverQueue.addBulk(Array.from(inboxes.entries(), d => ({
-			name: d[0],
+			name: d[0].replace('https://', '').replace('/inbox', ''),
 			data: {
 				user,
 				content: contentBody,
@@ -156,13 +226,21 @@ export class QueueService {
 			signature,
 		};
 
-		return this.inboxQueue.add('', data, {
+		const label = (activity.id ?? '').replace('https://', '').replace('/activity', '');
+
+		return this.inboxQueue.add(label, data, {
 			attempts: this.config.inboxJobMaxAttempts ?? 8,
 			backoff: {
 				type: 'custom',
 			},
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
@@ -171,8 +249,14 @@ export class QueueService {
 		return this.dbQueue.add('deleteDriveFiles', {
 			user: { id: user.id },
 		}, {
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
@@ -181,8 +265,14 @@ export class QueueService {
 		return this.dbQueue.add('exportCustomEmojis', {
 			user: { id: user.id },
 		}, {
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
@@ -191,8 +281,14 @@ export class QueueService {
 		return this.dbQueue.add('exportNotes', {
 			user: { id: user.id },
 		}, {
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
@@ -201,8 +297,14 @@ export class QueueService {
 		return this.dbQueue.add('exportClips', {
 			user: { id: user.id },
 		}, {
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
@@ -211,8 +313,14 @@ export class QueueService {
 		return this.dbQueue.add('exportFavorites', {
 			user: { id: user.id },
 		}, {
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
@@ -223,8 +331,14 @@ export class QueueService {
 			excludeMuting,
 			excludeInactive,
 		}, {
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
@@ -233,8 +347,14 @@ export class QueueService {
 		return this.dbQueue.add('exportMuting', {
 			user: { id: user.id },
 		}, {
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
@@ -243,8 +363,14 @@ export class QueueService {
 		return this.dbQueue.add('exportBlocking', {
 			user: { id: user.id },
 		}, {
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
@@ -253,8 +379,14 @@ export class QueueService {
 		return this.dbQueue.add('exportUserLists', {
 			user: { id: user.id },
 		}, {
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
@@ -263,8 +395,14 @@ export class QueueService {
 		return this.dbQueue.add('exportAntennas', {
 			user: { id: user.id },
 		}, {
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
@@ -275,8 +413,14 @@ export class QueueService {
 			fileId: fileId,
 			withReplies,
 		}, {
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
@@ -292,8 +436,14 @@ export class QueueService {
 			user: { id: user.id },
 			fileId: fileId,
 		}, {
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
@@ -303,8 +453,14 @@ export class QueueService {
 			user: { id: user.id },
 			fileId: fileId,
 		}, {
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
@@ -324,8 +480,14 @@ export class QueueService {
 			name,
 			data,
 			opts: {
-				removeOnComplete: true,
-				removeOnFail: true,
+				removeOnComplete: {
+					age: 3600 * 24 * 7, // keep up to 7 days
+					count: 30,
+				},
+				removeOnFail: {
+					age: 3600 * 24 * 7, // keep up to 7 days
+					count: 100,
+				},
 			},
 		};
 	}
@@ -336,8 +498,14 @@ export class QueueService {
 			user: { id: user.id },
 			fileId: fileId,
 		}, {
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
@@ -347,8 +515,14 @@ export class QueueService {
 			user: { id: user.id },
 			fileId: fileId,
 		}, {
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
@@ -358,8 +532,14 @@ export class QueueService {
 			user: { id: user.id },
 			antenna,
 		}, {
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
@@ -381,8 +561,14 @@ export class QueueService {
 		return this.dbQueue.add('userSuspend', {
 			user: { id: user.id },
 		}, {
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
@@ -452,8 +638,14 @@ export class QueueService {
 				withReplies: data.withReplies,
 			},
 			opts: {
-				removeOnComplete: true,
-				removeOnFail: true,
+				removeOnComplete: {
+					age: 3600 * 24 * 7, // keep up to 7 days
+					count: 30,
+				},
+				removeOnFail: {
+					age: 3600 * 24 * 7, // keep up to 7 days
+					count: 100,
+				},
 				...opts,
 			},
 		};
@@ -464,22 +656,43 @@ export class QueueService {
 		return this.objectStorageQueue.add('deleteFile', {
 			key: key,
 		}, {
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
 	@bindThis
 	public createCleanRemoteFilesJob() {
 		return this.objectStorageQueue.add('cleanRemoteFiles', {}, {
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
+	/**
+	 * @see UserWebhookDeliverJobData
+	 * @see UserWebhookDeliverProcessorService
+	 */
 	@bindThis
-	public webhookDeliver(webhook: MiWebhook, type: typeof webhookEventTypes[number], content: unknown) {
-		const data = {
+	public userWebhookDeliver<T extends WebhookEventTypes>(
+		webhook: MiWebhook,
+		type: T,
+		content: UserWebhookPayload<T>,
+		opts?: { attempts?: number },
+	) {
+		const data: UserWebhookDeliverJobData = {
 			type,
 			content,
 			webhookId: webhook.id,
@@ -490,26 +703,243 @@ export class QueueService {
 			eventId: randomUUID(),
 		};
 
-		return this.webhookDeliverQueue.add(webhook.id, data, {
-			attempts: 4,
+		return this.userWebhookDeliverQueue.add(webhook.id, data, {
+			attempts: opts?.attempts ?? 4,
 			backoff: {
 				type: 'custom',
 			},
-			removeOnComplete: true,
-			removeOnFail: true,
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
+		});
+	}
+
+	/**
+	 * @see SystemWebhookDeliverJobData
+	 * @see SystemWebhookDeliverProcessorService
+	 */
+	@bindThis
+	public systemWebhookDeliver<T extends SystemWebhookEventType>(
+		webhook: MiSystemWebhook,
+		type: T,
+		content: SystemWebhookPayload<T>,
+		opts?: { attempts?: number },
+	) {
+		const data: SystemWebhookDeliverJobData = {
+			type,
+			content,
+			webhookId: webhook.id,
+			to: webhook.url,
+			secret: webhook.secret,
+			createdAt: Date.now(),
+			eventId: randomUUID(),
+		};
+
+		return this.systemWebhookDeliverQueue.add(webhook.id, data, {
+			attempts: opts?.attempts ?? 4,
+			backoff: {
+				type: 'custom',
+			},
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
 		});
 	}
 
 	@bindThis
-	public destroy() {
-		this.deliverQueue.once('cleaned', (jobs, status) => {
-			//deliverLogger.succ(`Cleaned ${jobs.length} ${status} jobs`);
-		});
-		this.deliverQueue.clean(0, 0, 'delayed');
+	private getQueue(type: typeof QUEUE_TYPES[number]): Bull.Queue<any, any, string> {
+		switch (type) {
+			case 'system': return this.systemQueue as any;
+			case 'endedPollNotification': return this.endedPollNotificationQueue as any;
+			case 'deliver': return this.deliverQueue as any;
+			case 'inbox': return this.inboxQueue as any;
+			case 'db': return this.dbQueue as any;
+			case 'relationship': return this.relationshipQueue as any;
+			case 'objectStorage': return this.objectStorageQueue as any;
+			case 'userWebhookDeliver': return this.userWebhookDeliverQueue as any;
+			case 'systemWebhookDeliver': return this.systemWebhookDeliverQueue as any;
+			default: throw new Error(`Unrecognized queue type: ${type}`);
+		}
+	}
 
-		this.inboxQueue.once('cleaned', (jobs, status) => {
-			//inboxLogger.succ(`Cleaned ${jobs.length} ${status} jobs`);
+	@bindThis
+	public async queueClear(queueType: typeof QUEUE_TYPES[number], state: '*' | 'completed' | 'wait' | 'active' | 'paused' | 'prioritized' | 'delayed' | 'failed') {
+		const queue = this.getQueue(queueType);
+
+		if (state === '*') {
+			await Promise.all([
+				queue.clean(0, 0, 'completed'),
+				queue.clean(0, 0, 'wait'),
+				queue.clean(0, 0, 'active'),
+				queue.clean(0, 0, 'paused'),
+				queue.clean(0, 0, 'prioritized'),
+				queue.clean(0, 0, 'delayed'),
+				queue.clean(0, 0, 'failed'),
+			]);
+		} else {
+			await queue.clean(0, 0, state);
+		}
+	}
+
+	@bindThis
+	public async queuePromoteJobs(queueType: typeof QUEUE_TYPES[number]) {
+		const queue = this.getQueue(queueType);
+		await queue.promoteJobs();
+	}
+
+	@bindThis
+	public async queueRetryJob(queueType: typeof QUEUE_TYPES[number], jobId: string) {
+		const queue = this.getQueue(queueType);
+		const job: Bull.Job | null = await queue.getJob(jobId);
+		if (job) {
+			if (job.finishedOn != null) {
+				await job.retry();
+			} else {
+				await job.promote();
+			}
+		}
+	}
+
+	@bindThis
+	public async queueRemoveJob(queueType: typeof QUEUE_TYPES[number], jobId: string) {
+		const queue = this.getQueue(queueType);
+		const job: Bull.Job | null = await queue.getJob(jobId);
+		if (job) {
+			await job.remove();
+		}
+	}
+
+	@bindThis
+	private packJobData(job: Bull.Job) {
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+		const stacktrace = job.stacktrace ? job.stacktrace.filter(Boolean) : [];
+		stacktrace.reverse();
+
+		return {
+			id: job.id,
+			name: job.name,
+			data: job.data,
+			opts: job.opts,
+			timestamp: job.timestamp,
+			processedOn: job.processedOn,
+			processedBy: job.processedBy,
+			finishedOn: job.finishedOn,
+			progress: job.progress,
+			attempts: job.attemptsMade,
+			delay: job.delay,
+			failedReason: job.failedReason,
+			stacktrace: stacktrace,
+			returnValue: job.returnvalue,
+			isFailed: !!job.failedReason || (Array.isArray(stacktrace) && stacktrace.length > 0),
+		};
+	}
+
+	@bindThis
+	public async queueGetJob(queueType: typeof QUEUE_TYPES[number], jobId: string) {
+		const queue = this.getQueue(queueType);
+		const job: Bull.Job | null = await queue.getJob(jobId);
+		if (job) {
+			return this.packJobData(job);
+		} else {
+			throw new Error(`Job not found: ${jobId}`);
+		}
+	}
+
+	@bindThis
+	public async queueGetJobs(queueType: typeof QUEUE_TYPES[number], jobTypes: JobType[], search?: string) {
+		const RETURN_LIMIT = 100;
+		const queue = this.getQueue(queueType);
+		let jobs: Bull.Job[];
+
+		if (search) {
+			jobs = await queue.getJobs(jobTypes, 0, 1000);
+
+			jobs = jobs.filter(job => {
+				const jobString = JSON.stringify(job).toLowerCase();
+				return search.toLowerCase().split(' ').every(term => {
+					return jobString.includes(term);
+				});
+			});
+
+			jobs = jobs.slice(0, RETURN_LIMIT);
+		} else {
+			jobs = await queue.getJobs(jobTypes, 0, RETURN_LIMIT);
+		}
+
+		return jobs.map(job => this.packJobData(job));
+	}
+
+	@bindThis
+	public async queueGetQueues() {
+		const fetchings = QUEUE_TYPES.map(async type => {
+			const queue = this.getQueue(type);
+
+			const counts = await queue.getJobCounts();
+			const isPaused = await queue.isPaused();
+			const metrics_completed = await queue.getMetrics('completed', 0, MetricsTime.ONE_WEEK);
+			const metrics_failed = await queue.getMetrics('failed', 0, MetricsTime.ONE_WEEK);
+
+			return {
+				name: type,
+				counts: counts,
+				isPaused,
+				metrics: {
+					completed: metrics_completed,
+					failed: metrics_failed,
+				},
+			};
 		});
-		this.inboxQueue.clean(0, 0, 'delayed');
+
+		return await Promise.all(fetchings);
+	}
+
+	@bindThis
+	public async queueGetQueue(queueType: typeof QUEUE_TYPES[number]) {
+		const queue = this.getQueue(queueType);
+		const counts = await queue.getJobCounts();
+		const isPaused = await queue.isPaused();
+		const metrics_completed = await queue.getMetrics('completed', 0, MetricsTime.ONE_WEEK);
+		const metrics_failed = await queue.getMetrics('failed', 0, MetricsTime.ONE_WEEK);
+		const db = parseRedisInfo(await (await queue.client).info());
+
+		return {
+			name: queueType,
+			qualifiedName: queue.qualifiedName,
+			counts: counts,
+			isPaused,
+			metrics: {
+				completed: metrics_completed,
+				failed: metrics_failed,
+			},
+			db: {
+				version: db.redis_version,
+				mode: db.redis_mode,
+				runId: db.run_id,
+				processId: db.process_id,
+				port: parseInt(db.tcp_port),
+				os: db.os,
+				uptime: parseInt(db.uptime_in_seconds),
+				memory: {
+					total: parseInt(db.total_system_memory) || parseInt(db.maxmemory),
+					used: parseInt(db.used_memory),
+					fragmentationRatio: parseInt(db.mem_fragmentation_ratio),
+					peak: parseInt(db.used_memory_peak),
+				},
+				clients: {
+					connected: parseInt(db.connected_clients),
+					blocked: parseInt(db.blocked_clients),
+				},
+			},
+		};
 	}
 }

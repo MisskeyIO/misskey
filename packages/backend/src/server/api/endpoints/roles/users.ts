@@ -10,8 +10,8 @@ import { Endpoint } from '@/server/api/endpoint-base.js';
 import { QueryService } from '@/core/QueryService.js';
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { ApiError } from '../../error.js';
 import type { Packed } from '@/misc/json-schema.js';
+import { ApiError } from '../../error.js';
 
 export const meta = {
 	tags: ['role', 'users'],
@@ -93,9 +93,12 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				.limit(ps.limit)
 				.getMany();
 
+			const _users = assigns.map(({ user, userId }) => user ?? userId);
+			const _userMap = await this.userEntityService.packMany(_users, me, { schema: 'UserDetailed' })
+				.then(users => new Map(users.map(u => [u.id, u])));
 			return (await Promise.allSettled(assigns.map(async assign => ({
 				id: assign.id,
-				user: await this.userEntityService.pack(assign.user!, me, { schema: 'UserDetailed' }),
+				user: _userMap.get(assign.userId) ?? await this.userEntityService.pack(assign.user!, me, { schema: 'UserDetailed' }),
 			}))))
 				.filter((result): result is PromiseFulfilledResult<{ id: string; user: Packed<'UserDetailed'> }> => result.status === 'fulfilled')
 				.map(result => result.value);

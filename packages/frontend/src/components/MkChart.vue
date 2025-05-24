@@ -13,68 +13,86 @@ SPDX-License-Identifier: AGPL-3.0-only
 </div>
 </template>
 
+<script lang="ts">
+export type ChartSrc =
+	| 'federation'
+	| 'ap-request'
+	| 'users'
+	| 'users-total'
+	| 'active-users'
+	| 'notes'
+	| 'local-notes'
+	| 'remote-notes'
+	| 'notes-total'
+	| 'drive'
+	| 'drive-files'
+	| 'instance-requests'
+	| 'instance-users'
+	| 'instance-users-total'
+	| 'instance-notes'
+	| 'instance-notes-total'
+	| 'instance-ff'
+	| 'instance-ff-total'
+	| 'instance-drive-usage'
+	| 'instance-drive-usage-total'
+	| 'instance-drive-files'
+	| 'instance-drive-files-total'
+	| 'per-user-notes'
+	| 'per-user-pv'
+	| 'per-user-following'
+	| 'per-user-followers'
+	| 'per-user-drive';
+</script>
+
 <script lang="ts" setup>
-/* eslint-disable id-denylist --
-  Chart.js has a `data` attribute in most chart definitions, which triggers the
-  id-denylist violation when setting it. This is causing about 60+ lint issues.
-  As this is part of Chart.js's API it makes sense to disable the check here.
-*/
-import { onMounted, ref, shallowRef, watch, PropType } from 'vue';
+
+import { onMounted, ref, useTemplateRef, watch } from 'vue';
 import { Chart } from 'chart.js';
-import { misskeyApiGet } from '@/scripts/misskey-api.js';
-import { defaultStore } from '@/store.js';
-import { useChartTooltip } from '@/scripts/use-chart-tooltip.js';
-import { chartVLine } from '@/scripts/chart-vline.js';
-import { alpha } from '@/scripts/color.js';
+import * as Misskey from 'misskey-js';
+import { misskeyApiGet } from '@/utility/misskey-api.js';
+import { store } from '@/store.js';
+import { useChartTooltip } from '@/use/use-chart-tooltip.js';
+import { chartVLine } from '@/utility/chart-vline.js';
+import { alpha } from '@/utility/color.js';
 import date from '@/filters/date.js';
 import bytes from '@/filters/bytes.js';
-import { initChart } from '@/scripts/init-chart.js';
-import { chartLegend } from '@/scripts/chart-legend.js';
+import { initChart } from '@/utility/init-chart.js';
+import { chartLegend } from '@/utility/chart-legend.js';
 import MkChartLegend from '@/components/MkChartLegend.vue';
 
 initChart();
 
-const props = defineProps({
-	src: {
-		type: String,
-		required: true,
-	},
-	args: {
-		type: Object,
-		required: false,
-	},
-	limit: {
-		type: Number,
-		required: false,
-		default: 90,
-	},
-	span: {
-		type: String as PropType<'hour' | 'day'>,
-		required: true,
-	},
-	detailed: {
-		type: Boolean,
-		required: false,
-		default: false,
-	},
-	stacked: {
-		type: Boolean,
-		required: false,
-		default: false,
-	},
-	bar: {
-		type: Boolean,
-		required: false,
-		default: false,
-	},
-	aspectRatio: {
-		type: Number,
-		required: false,
-		default: null,
-	},
+const props = withDefaults(defineProps<{
+	src: ChartSrc;
+	args?: {
+		host?: string;
+		user?: Misskey.entities.UserLite;
+		withoutAll?: boolean;
+	};
+	limit?: number;
+	span: 'hour' | 'day';
+	detailed?: boolean;
+	stacked?: boolean;
+	bar?: boolean;
+	aspectRatio?: number | null;
+	nowForChromatic?: number;
+}>(), {
+	args: undefined,
+	limit: 90,
+	detailed: false,
+	stacked: false,
+	bar: false,
+	aspectRatio: null,
+
+	/**
+	 * @desc Overwrites current date to fix background lines of chart.
+	 * @ignore Only used for Chromatic. Don't use this for production.
+	 * @see https://github.com/misskey-dev/misskey/pull/13830#issuecomment-2155886151
+	 */
+	nowForChromatic: undefined,
 });
 
-const legendEl = shallowRef<InstanceType<typeof MkChartLegend>>();
+const legendEl = useTemplateRef('legendEl');
 
 const sum = (...arr) => arr.reduce((r, a) => r.map((b, i) => a[i] + b));
 const negate = arr => arr.map(x => -x);
@@ -94,7 +112,8 @@ const getColor = (i) => {
 	return colorSets[i % colorSets.length];
 };
 
-const now = new Date();
+// eslint-disable-next-line vue/no-setup-props-reactivity-loss
+const now = props.nowForChromatic != null ? new Date(props.nowForChromatic) : new Date();
 let chartInstance: Chart | null = null;
 let chartData: {
 	series: {
@@ -111,7 +130,7 @@ let chartData: {
 	bytes?: boolean;
 } | null = null;
 
-const chartEl = shallowRef<HTMLCanvasElement | null>(null);
+const chartEl = useTemplateRef('chartEl');
 const fetching = ref(true);
 
 const getDate = (ago: number) => {
@@ -138,7 +157,7 @@ const render = () => {
 		chartInstance.destroy();
 	}
 
-	const vLineColor = defaultStore.state.darkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)';
+	const vLineColor = store.s.darkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)';
 
 	const maxes = chartData.series.map((x, i) => Math.max(...x.data.map(d => d.y)));
 
@@ -826,7 +845,7 @@ watch(() => [props.src, props.span], fetchAndRender);
 onMounted(() => {
 	fetchAndRender();
 });
-/* eslint-enable id-denylist */
+
 </script>
 
 <style lang="scss" module>
@@ -840,8 +859,8 @@ onMounted(() => {
 	left: 0;
 	width: 100%;
 	height: 100%;
-	-webkit-backdrop-filter: var(--blur, blur(12px));
-	backdrop-filter: var(--blur, blur(12px));
+	-webkit-backdrop-filter: var(--MI-blur, blur(12px));
+	backdrop-filter: var(--MI-blur, blur(12px));
 	display: flex;
 	justify-content: center;
 	align-items: center;

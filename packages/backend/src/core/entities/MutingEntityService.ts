@@ -29,6 +29,9 @@ export class MutingEntityService {
 	public async pack(
 		src: MiMuting['id'] | MiMuting,
 		me: { id: MiUser['id'] } | null | undefined,
+		hints?: {
+			packedMutee?: Packed<'UserDetailedNotMe'>,
+		},
 	): Promise<Packed<'Muting'>> {
 		const muting = typeof src === 'object' ? src : await this.mutingsRepository.findOneByOrFail({ id: src });
 
@@ -37,7 +40,7 @@ export class MutingEntityService {
 			createdAt: this.idService.parse(muting.id).date.toISOString(),
 			expiresAt: muting.expiresAt ? muting.expiresAt.toISOString() : null,
 			muteeId: muting.muteeId,
-			mutee: this.userEntityService.pack(muting.muteeId, me, {
+			mutee: hints?.packedMutee ?? this.userEntityService.pack(muting.muteeId, me, {
 				schema: 'UserDetailedNotMe',
 			}),
 		});

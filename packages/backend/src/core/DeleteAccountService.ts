@@ -15,6 +15,7 @@ import { QueueService } from '@/core/QueueService.js';
 import { UserSuspendService } from '@/core/UserSuspendService.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
 import { LoggerService } from '@/core/LoggerService.js';
+import { SystemAccountService } from '@/core/SystemAccountService.js';
 
 @Injectable()
 export class DeleteAccountService {
@@ -31,6 +32,7 @@ export class DeleteAccountService {
 		private userSuspendService: UserSuspendService,
 		private globalEventService: GlobalEventService,
 		private loggerService: LoggerService,
+		private systemAccountService: SystemAccountService,
 	) {
 		this.logger = this.loggerService.getLogger('account:delete');
 	}
@@ -40,7 +42,10 @@ export class DeleteAccountService {
 		this.logger.warn(`Delete account requested by ${me ? me.id : 'remote'} for ${user.id} (soft: ${soft})`);
 
 		const _user = await this.usersRepository.findOneByOrFail({ id: user.id });
-		if (_user.isRoot) throw new Error('cannot delete a root account');
+
+		if (user.host === null && _user.username.includes('.')) {
+			throw new Error('cannot delete a system account');
+		}
 
 		// 5分間の間に同じアカウントに対して削除リクエストが複数回来た場合、最初のリクエストのみを処理する
 		const lock = await this.redisClient.set(`account:delete:lock:${user.id}`, Date.now(), 'EX', 60 * 5, 'NX');

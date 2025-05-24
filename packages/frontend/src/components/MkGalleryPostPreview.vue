@@ -35,13 +35,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 import * as Misskey from 'misskey-js';
 import { computed, ref } from 'vue';
 import ImgWithBlurhash from '@/components/MkImgWithBlurhash.vue';
-import { defaultStore } from '@/store.js';
+import { prefer } from '@/preferences.js';
 
 const props = defineProps<{
 	post: Misskey.entities.GalleryPost;
 }>();
 
-const safe = computed(() => defaultStore.state.nsfw === 'ignore' || defaultStore.state.nsfw === 'respect' && !props.post.isSensitive);
+const safe = computed(() => prefer.s.nsfw === 'ignore' || prefer.s.nsfw === 'respect' && !props.post.isSensitive);
 const show = computed(() => safe.value);
 </script>
 
@@ -66,7 +66,7 @@ const show = computed(() => safe.value);
 
 	&:hover {
 		text-decoration: none;
-		color: var(--accent);
+		color: var(--MI_THEME-accent);
 
 		> .thumbnail {
 			transform: scale(1.1);
@@ -74,7 +74,7 @@ const show = computed(() => safe.value);
 
 		> article {
 			> footer {
-				&:before {
+				&::before {
 					opacity: 1;
 				}
 			}
@@ -130,7 +130,7 @@ const show = computed(() => safe.value);
 			text-shadow: 0 0 8px #000;
 			background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
 
-			&:before {
+			&::before {
 				content: "";
 				display: block;
 				position: absolute;

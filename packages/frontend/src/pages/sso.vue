@@ -1,25 +1,25 @@
 <template>
-	<div>
-		<MkAnimBg style="position: fixed; top: 0;"/>
-		<div :class="$style.formContainer">
-			<div :class="$style.form">
-				<MkAuthConfirm
-					ref="authRoot"
-					:name="name"
-					@accept="onAccept"
-					@deny="onDeny"
-				/>
-			</div>
+<div>
+	<MkAnimBg style="position: fixed; top: 0;"/>
+	<div :class="$style.formContainer">
+		<div :class="$style.form">
+			<MkAuthConfirm
+				ref="authRoot"
+				:name="name"
+				@accept="onAccept"
+				@deny="onDeny"
+			/>
 		</div>
 	</div>
+</div>
 </template>
 
 <script lang="ts" setup>
 import MkAnimBg from '@/components/MkAnimBg.vue';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
+import { definePage } from '@/page.js';
 import MkAuthConfirm from '@/components/MkAuthConfirm.vue';
 import { nextTick, onMounted, useTemplateRef } from "vue";
-import { $i } from '@/account.js';
+import { $i } from '@/i.js';
 
 const transactionIdMeta = document.querySelector<HTMLMetaElement>('meta[name="misskey:sso:transaction-id"]');
 if (transactionIdMeta) {
@@ -84,8 +84,7 @@ onMounted(() => {
 		}
 	});
 });
-
-definePageMetadata(() => ({
+definePage(() => ({
 	title: 'Single Sign-On',
 	icon: 'ti ti-apps',
 }));
@@ -103,8 +102,8 @@ definePageMetadata(() => ({
 .form {
 	position: relative;
 	z-index: 10;
-	border-radius: var(--radius);
-	background-color: var(--panel);
+	border-radius: var(--MI-radius);
+	background-color: var(--MI_THEME-panel);
 	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 	overflow: clip;
 	max-width: 500px;

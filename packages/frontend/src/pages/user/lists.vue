@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <MkStickyContainer>
-	<MkSpacer :contentMax="700">
+	<div class="_spacer" style="--MI_SPACER-w: 700px;">
 		<div>
 			<MkPagination v-slot="{items}" ref="pagingComponent" :pagination="pagination" class="lists">
 				<MkA v-for="list in items" :key="list.id" class="_panel" :class="$style.list" :to="`/list/${ list.id }`">
@@ -14,7 +14,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</MkA>
 			</MkPagination>
 		</div>
-	</MkSpacer>
+	</div>
 </MkStickyContainer>
 </template>
 
@@ -23,7 +23,6 @@ import {} from 'vue';
 import * as Misskey from 'misskey-js';
 import MkPagination from '@/components/MkPagination.vue';
 import MkStickyContainer from '@/components/global/MkStickyContainer.vue';
-import MkSpacer from '@/components/global/MkSpacer.vue';
 import MkAvatars from '@/components/MkAvatars.vue';
 
 const props = defineProps<{
@@ -44,12 +43,12 @@ const pagination = {
 .list {
 	display: block;
 	padding: 16px;
-	border: solid 1px var(--divider);
+	border: solid 1px var(--MI_THEME-divider);
 	border-radius: 6px;
 	margin-bottom: 8px;
 
 	&:hover {
-		border: solid 1px var(--accent);
+		border: solid 1px var(--MI_THEME-accent);
 		text-decoration: none;
 	}
 }

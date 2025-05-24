@@ -5,33 +5,60 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <MkPullToRefresh ref="prComponent" :refresher="() => reloadTimeline()">
-	<MkNotes
-		v-if="paginationQuery"
-		ref="tlComponent"
-		:pagination="paginationQuery"
-		:noGap="!defaultStore.state.showGapBetweenNotesInTimeline"
-		@queue="emit('queue', $event)"
-		@status="prComponent?.setDisabled($event)"
-	/>
+	<MkPagination v-if="paginationQuery" ref="pagingComponent" :pagination="paginationQuery" @queue="emit('queue', $event)" @status="prComponent?.setDisabled($event)">
+		<template #empty>
+			<div class="_fullinfo">
+				<img :src="infoImageUrl" draggable="false"/>
+				<div>{{ i18n.ts.noNotes }}</div>
+			</div>
+		</template>
+
+		<template #default="{ items: notes }">
+			<component
+				:is="prefer.s.animation ? TransitionGroup : 'div'"
+				:class="[$style.root, { [$style.noGap]: noGap, '_gaps': !noGap, [$style.reverse]: paginationQuery.reversed }]"
+				:enterActiveClass="$style.transition_x_enterActive"
+				:leaveActiveClass="$style.transition_x_leaveActive"
+				:enterFromClass="$style.transition_x_enterFrom"
+				:leaveToClass="$style.transition_x_leaveTo"
+				:moveClass=" $style.transition_x_move"
+				tag="div"
+			>
+				<template v-for="(note, i) in notes" :key="note.id">
+					<div v-if="note._shouldInsertAd_" :class="[$style.noteWithAd, { '_gaps': !noGap }]" :data-scroll-anchor="note.id">
+						<MkNote :class="$style.note" :note="note" :withHardMute="true"/>
+						<div :class="$style.ad">
+							<MkAd :preferForms="['horizontal', 'horizontal-big']"/>
+						</div>
+					</div>
+					<MkNote v-else :class="$style.note" :note="note" :withHardMute="true" :data-scroll-anchor="note.id"/>
+				</template>
+			</component>
+		</template>
+	</MkPagination>
 </MkPullToRefresh>
 </template>
 
 <script lang="ts" setup>
-import { computed, watch, onUnmounted, provide, shallowRef, onMounted } from 'vue';
+import { computed, watch, onUnmounted, provide, useTemplateRef, TransitionGroup,onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
-import MkNotes from '@/components/MkNotes.vue';
+import type { BasicTimelineType } from '@/timelines.js';
+import type { Paging } from '@/components/MkPagination.vue';
 import MkPullToRefresh from '@/components/MkPullToRefresh.vue';
 import { useStream } from '@/stream.js';
-import * as sound from '@/scripts/sound.js';
-import { deepMerge } from '@/scripts/merge.js';
-import { $i } from '@/account.js';
+import * as sound from '@/utility/sound.js';
+import { deepMerge } from '@/utility/merge.js';
+import { $i } from '@/i.js';
 import { instance } from '@/instance.js';
-import { defaultStore } from '@/store.js';
-import { Paging } from '@/components/MkPagination.vue';
-import { generateClientTransactionId } from '@/scripts/misskey-api.js';
+import { prefer } from '@/preferences.js';
+import MkNote from '@/components/MkNote.vue';
+import MkPagination from '@/components/MkPagination.vue';
+import { i18n } from '@/i18n.js';
+import { infoImageUrl } from '@/instance.js';
+import { generateClientTransactionId } from '@/utility/misskey-api.js';
 
 const props = withDefaults(defineProps<{
-	src: 'home' | 'local' | 'media' | 'social' | 'global' | 'mentions' | 'directs' | 'list' | 'antenna' | 'channel' | 'role';
+	src: BasicTimelineType | 'media' | 'mentions' | 'directs' | 'list' | 'antenna' | 'channel' | 'role';
 	list?: string;
 	antenna?: string;
 	channel?: string;
@@ -39,10 +66,12 @@ const props = withDefaults(defineProps<{
 	sound?: boolean;
 	withRenotes?: boolean;
 	withReplies?: boolean;
+	withSensitive?: boolean;
 	onlyFiles?: boolean;
 }>(), {
 	withRenotes: true,
 	withReplies: false,
+	withSensitive: true,
 	onlyFiles: false,
 });
 
@@ -52,21 +81,22 @@ const emit = defineEmits<{
 }>();
 
 provide('inTimeline', true);
+provide('tl_withSensitive', computed(() => props.withSensitive));
 provide('inChannel', computed(() => props.src === 'channel'));
 
 type TimelineQueryType = {
-  antennaId?: string,
-  withRenotes?: boolean,
-  withReplies?: boolean,
-  withFiles?: boolean,
-  visibility?: string,
-  listId?: string,
-  channelId?: string,
-  roleId?: string
-}
+	antennaId?: string,
+	withRenotes?: boolean,
+	withReplies?: boolean,
+	withFiles?: boolean,
+	visibility?: string,
+	listId?: string,
+	channelId?: string,
+	roleId?: string
+};
 
-const prComponent = shallowRef<InstanceType<typeof MkPullToRefresh>>();
-const tlComponent = shallowRef<InstanceType<typeof MkNotes>>();
+const prComponent = useTemplateRef('prComponent');
+const pagingComponent = useTemplateRef('pagingComponent');
 
 let tlNotesCount = 0;
 const notVisibleNoteData = new Array<object>();
@@ -91,7 +121,7 @@ async function fulfillNoteData(data) {
 }
 
 async function prepend(data) {
-	if (tlComponent.value == null) return;
+	if (pagingComponent.value == null) return;
 
 	let note = data;
 
@@ -105,7 +135,7 @@ async function prepend(data) {
 			note._shouldInsertAd_ = true;
 		}
 
-		tlComponent.value.pagingComponent?.prepend(note);
+		pagingComponent.value.prepend(note);
 	} else {
 		notVisibleNoteData.push(data);
 
@@ -145,6 +175,7 @@ async function loadUnloadedNotes() {
 let connection: Misskey.ChannelConnection | null = null;
 let connection2: Misskey.ChannelConnection | null = null;
 let paginationQuery: Paging | null = null;
+const noGap = !prefer.s.showGapBetweenNotesInTimeline;
 
 const stream = useStream();
 
@@ -313,7 +344,7 @@ function updatePaginationQuery() {
 }
 
 function refreshEndpointAndChannel() {
-	if (!defaultStore.state.disableStreamingTimeline) {
+	if (!prefer.s.disableStreamingTimeline) {
 		disconnectChannel();
 		connectChannel();
 	}
@@ -324,6 +355,9 @@ function refreshEndpointAndChannel() {
 // デッキのリストカラムでwithRenotesを変更した場合に自動的に更新されるようにさせる
 // IDが切り替わったら切り替え先のTLを表示させたい
 watch(() => [props.list, props.antenna, props.channel, props.role, props.withRenotes], refreshEndpointAndChannel);
+
+// withSensitiveはクライアントで完結する処理のため、単にリロードするだけでOK
+watch(() => props.withSensitive, reloadTimeline);
 
 // 初回表示用
 refreshEndpointAndChannel();
@@ -339,11 +373,11 @@ onUnmounted(() => {
 
 function reloadTimeline() {
 	return new Promise<void>((res) => {
-		if (tlComponent.value == null) return;
+		if (pagingComponent.value == null) return;
 
 		tlNotesCount = 0;
 
-		tlComponent.value.pagingComponent?.reload().then(() => {
+		pagingComponent.value.reload().then(() => {
 			res();
 		});
 	});
@@ -353,3 +387,56 @@ defineExpose({
 	reloadTimeline,
 });
 </script>
+
+<style lang="scss" module>
+.transition_x_move,
+.transition_x_enterActive,
+.transition_x_leaveActive {
+	transition: opacity 0.3s cubic-bezier(0,.5,.5,1), transform 0.3s cubic-bezier(0,.5,.5,1) !important;
+}
+.transition_x_enterFrom,
+.transition_x_leaveTo {
+	opacity: 0;
+	transform: translateY(-50%);
+}
+.transition_x_leaveActive {
+	position: absolute;
+}
+
+.reverse {
+	display: flex;
+	flex-direction: column-reverse;
+}
+
+.root {
+	container-type: inline-size;
+
+	&.noGap {
+		background: var(--MI_THEME-panel);
+
+		.note {
+			border-bottom: solid 0.5px var(--MI_THEME-divider);
+		}
+
+		.ad {
+			padding: 8px;
+			background-size: auto auto;
+			background-image: repeating-linear-gradient(45deg, transparent, transparent 8px, var(--MI_THEME-bg) 8px, var(--MI_THEME-bg) 14px);
+			border-bottom: solid 0.5px var(--MI_THEME-divider);
+		}
+	}
+
+	&:not(.noGap) {
+		background: var(--MI_THEME-bg);
+
+		.note {
+			background: var(--MI_THEME-panel);
+			border-radius: var(--MI-radius);
+		}
+	}
+}
+
+.ad:empty {
+	display: none;
+}
+</style>

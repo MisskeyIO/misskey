@@ -10,6 +10,7 @@ import * as nsfw from 'nsfwjs';
 import si from 'systeminformation';
 import { Mutex } from 'async-mutex';
 import { sharpBmp } from '@misskey-dev/sharp-read-bmp';
+import fetch from 'node-fetch';
 import { bindThis } from '@/decorators.js';
 import type Logger from '@/logger.js';
 import { LoggerService } from '@/core/LoggerService.js';
@@ -17,7 +18,7 @@ import { LoggerService } from '@/core/LoggerService.js';
 const _filename = fileURLToPath(import.meta.url);
 const _dirname = dirname(_filename);
 
-const REQUIRED_CPU_FLAGS = ['avx2', 'fma'];
+const REQUIRED_CPU_FLAGS_X64 = ['avx2', 'fma'];
 let isSupportedCpu: undefined | boolean = undefined;
 
 @Injectable()
@@ -36,8 +37,7 @@ export class AiService {
 	public async detectSensitive(path: string, mime: string): Promise<nsfw.PredictionType[] | null> {
 		try {
 			if (isSupportedCpu === undefined) {
-				const cpuFlags = await this.getCpuFlags();
-				isSupportedCpu = REQUIRED_CPU_FLAGS.every(required => cpuFlags.includes(required));
+				isSupportedCpu = await this.computeIsSupportedCpu();
 			}
 
 			if (!isSupportedCpu) {
@@ -46,6 +46,7 @@ export class AiService {
 			}
 
 			const tf = await import('@tensorflow/tfjs-node');
+			tf.env().global.fetch = fetch;
 
 			if (this.model == null) {
 				await this.modelLoadMutex.runExclusive(async () => {
@@ -71,6 +72,22 @@ export class AiService {
 		} catch (err) {
 			this.logger.error('Failed to detect sensitive', { error: err });
 			return null;
+		}
+	}
+
+	private async computeIsSupportedCpu(): Promise<boolean> {
+		switch (process.arch) {
+			case 'x64': {
+				const cpuFlags = await this.getCpuFlags();
+				return REQUIRED_CPU_FLAGS_X64.every(required => cpuFlags.includes(required));
+			}
+			case 'arm64': {
+				// As far as I know, no required CPU flags for ARM64.
+				return true;
+			}
+			default: {
+				return false;
+			}
 		}
 	}
 

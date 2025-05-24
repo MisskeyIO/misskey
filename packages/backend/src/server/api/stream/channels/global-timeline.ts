@@ -10,6 +10,7 @@ import { MetaService } from '@/core/MetaService.js';
 import { RoleService } from '@/core/RoleService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
+import type { JsonObject } from '@/misc/json-value.js';
 import Channel, { type MiChannelService } from '../channel.js';
 
 class GlobalTimelineChannel extends Channel {
@@ -33,13 +34,13 @@ class GlobalTimelineChannel extends Channel {
 	}
 
 	@bindThis
-	public async init(params: any) {
+	public async init(params: JsonObject) {
 		const policies = await this.roleService.getUserPolicies(this.user ? this.user.id : null);
 		if (!policies.gtlAvailable) return;
 
-		this.withRenotes = params.withRenotes ?? true;
-		this.withFiles = params.withFiles ?? false;
-		this.minimize = params.minimize ?? false;
+		this.withRenotes = !!(params.withRenotes ?? true);
+		this.withFiles = !!(params.withFiles ?? false);
+		this.minimize = !!(params.minimize ?? false);
 
 		// Subscribe events
 		this.subscriber.on('notesStream', this.onNote);
@@ -49,6 +50,9 @@ class GlobalTimelineChannel extends Channel {
 	private async onNote(note: Packed<'Note'>) {
 		if (note.visibility !== 'public') return;
 		if (note.channelId != null) return;
+		if (note.user.requireSigninToViewContents && this.user == null) return;
+		if (note.renote && note.renote.user.requireSigninToViewContents && this.user == null) return;
+		if (note.reply && note.reply.user.requireSigninToViewContents && this.user == null) return;
 
 		// ファイルを含まない投稿は除外
 		if (this.withFiles && (note.fileIds == null || note.fileIds.length === 0)) return;

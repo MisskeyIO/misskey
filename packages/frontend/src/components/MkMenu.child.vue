@@ -10,16 +10,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onMounted, onUnmounted, shallowRef, watch } from 'vue';
+import { nextTick, onMounted, onUnmounted, provide, useTemplateRef, watch } from 'vue';
 import MkMenu from './MkMenu.vue';
-import { MenuItem } from '@/types/menu.js';
+import type { MenuItem } from '@/types/menu.js';
 
 const props = defineProps<{
 	items: MenuItem[];
 	targetElement: HTMLElement;
 	rootElement: HTMLElement;
 	width?: number;
-	viaKeyboard?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -27,7 +26,9 @@ const emit = defineEmits<{
 	(ev: 'actioned'): void;
 }>();
 
-const el = shallowRef<HTMLElement>();
+provide('isNestingMenu', true);
+
+const el = useTemplateRef('el');
 const align = 'left';
 
 const SCROLLBAR_THICKNESS = 16;

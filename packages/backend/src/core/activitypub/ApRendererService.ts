@@ -19,18 +19,18 @@ import type { MiEmoji } from '@/models/Emoji.js';
 import type { MiPoll } from '@/models/Poll.js';
 import type { MiPollVote } from '@/models/PollVote.js';
 import { UserKeypairService } from '@/core/UserKeypairService.js';
-import { MfmService } from '@/core/MfmService.js';
+import { MfmService, type Appender } from '@/core/MfmService.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
 import type { MiUserKeypair } from '@/models/UserKeypair.js';
-import type { UsersRepository, UserProfilesRepository, NotesRepository, DriveFilesRepository, PollsRepository } from '@/models/_.js';
+import type { UsersRepository, UserProfilesRepository, NotesRepository, DriveFilesRepository, PollsRepository, MiMeta } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { CustomEmojiService } from '@/core/CustomEmojiService.js';
-import { isNotNull } from '@/misc/is-not-null.js';
 import { IdService } from '@/core/IdService.js';
+import { UtilityService } from '@/core/UtilityService.js';
 import { JsonLdService } from './JsonLdService.js';
 import { ApMfmService } from './ApMfmService.js';
-import { CONTEXTS } from './misc/contexts.js';
+import { CONTEXT } from './misc/contexts.js';
 import type { IAccept, IActivity, IAdd, IAnnounce, IApDocument, IApEmoji, IApHashtag, IApImage, IApMention, IBlock, ICreate, IDelete, IFlag, IFollow, IKey, ILike, IMove, IObject, IPost, IQuestion, IReject, IRemove, ITombstone, IUndo, IUpdate } from './type.js';
 
 @Injectable()
@@ -38,6 +38,9 @@ export class ApRendererService {
 	constructor(
 		@Inject(DI.config)
 		private config: Config,
+
+		@Inject(DI.meta)
+		private meta: MiMeta,
 
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
@@ -62,6 +65,7 @@ export class ApRendererService {
 		private apMfmService: ApMfmService,
 		private mfmService: MfmService,
 		private idService: IdService,
+		private utilityService: UtilityService,
 	) {
 	}
 
@@ -190,6 +194,9 @@ export class ApRendererService {
 				mediaType: emoji.type ?? 'image/png',
 				url: url,
 			},
+			_misskey_license: {
+				freeText: emoji.license,
+			},
 		};
 	}
 
@@ -254,6 +261,38 @@ export class ApRendererService {
 			url: this.driveFileEntityService.getPublicUrl(file, { remapActivityPub: true }),
 			sensitive: file.isSensitive,
 			name: file.comment,
+		};
+	}
+
+	@bindThis
+	public renderIdenticon(user: MiLocalUser): IApImage {
+		return {
+			type: 'Image',
+			url: this.userEntityService.getIdenticonUrl(user),
+			sensitive: false,
+			name: null,
+		};
+	}
+
+	@bindThis
+	public renderSystemAvatar(user: MiLocalUser): IApImage {
+		if (this.meta.iconUrl == null) return this.renderIdenticon(user);
+		return {
+			type: 'Image',
+			url: this.meta.iconUrl,
+			sensitive: false,
+			name: null,
+		};
+	}
+
+	@bindThis
+	public renderSystemBanner(): IApImage | null {
+		if (this.meta.bannerUrl == null) return null;
+		return {
+			type: 'Image',
+			url: this.meta.bannerUrl,
+			sensitive: false,
+			name: null,
 		};
 	}
 
@@ -323,7 +362,7 @@ export class ApRendererService {
 		const getPromisedFiles = async (ids: string[]): Promise<MiDriveFile[]> => {
 			if (ids.length === 0) return [];
 			const items = await this.driveFilesRepository.findBy({ id: In(ids) });
-			return ids.map(id => items.find(item => item.id === id)).filter(isNotNull);
+			return ids.map(id => items.find(item => item.id === id)).filter(x => x != null);
 		};
 
 		let inReplyTo;
@@ -397,10 +436,24 @@ export class ApRendererService {
 			poll = await this.pollsRepository.findOneBy({ noteId: note.id });
 		}
 
-		let apAppend = '';
+		const apAppend: Appender[] = [];
 
 		if (quote) {
-			apAppend += `\n\nRE: ${quote}`;
+			// Append quote link as `<br><br><span class="quote-inline">RE: <a href="...">...</a></span>`
+			// the claas name `quote-inline` is used in non-misskey clients for styling quote notes.
+			// For compatibility, the span part should be kept as possible.
+			apAppend.push((doc, body) => {
+				body.appendChild(doc.createElement('br'));
+				body.appendChild(doc.createElement('br'));
+				const span = doc.createElement('span');
+				span.className = 'quote-inline';
+				span.appendChild(doc.createTextNode('RE: '));
+				const link = doc.createElement('a');
+				link.setAttribute('href', quote);
+				link.textContent = quote;
+				span.appendChild(link);
+				body.appendChild(span);
+			});
 		}
 
 		const summary = note.cw === '' ? String.fromCharCode(0x200B) : note.cw;
@@ -466,11 +519,28 @@ export class ApRendererService {
 			this.userProfilesRepository.findOneByOrFail({ userId: user.id }),
 		]);
 
+		const tryRewriteUrl = (maybeUrl: string) => {
+			const urlSafeRegex = /^(?:http[s]?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/;
+			try {
+				const match = maybeUrl.match(urlSafeRegex);
+				if (!match) {
+					return maybeUrl;
+				}
+				const urlPart = match[0];
+				const urlPartParsed = new URL(urlPart);
+				const restPart = maybeUrl.slice(match[0].length);
+
+				return `<a href="${urlPartParsed.href}" rel="me nofollow noopener" target="_blank">${urlPart}</a>${restPart}`;
+			} catch (e) {
+				return maybeUrl;
+			}
+		};
+
 		const profileFields = profile.fields.map(field => ({
 			type: 'PropertyValue',
 			name: field.name,
 			value: (field.value.startsWith('http://') || field.value.startsWith('https://'))
-				? `<a href="${new URL(field.value).href}" rel="me nofollow noopener" target="_blank">${new URL(field.value).href}</a>`
+				? tryRewriteUrl(field.value)
 				: field.value,
 		}));
 
@@ -511,8 +581,12 @@ export class ApRendererService {
 			name: user.name,
 			summary: profile.description ? this.mfmService.toHtml(mfm.parse(profile.description)) : null,
 			_misskey_summary: profile.description,
-			icon: avatar ? this.renderImage(avatar) : null,
-			image: banner ? this.renderImage(banner) : null,
+			_misskey_followedMessage: profile.followedMessage,
+			_misskey_requireSigninToViewContents: user.requireSigninToViewContents,
+			_misskey_makeNotesFollowersOnlyBefore: user.makeNotesFollowersOnlyBefore,
+			_misskey_makeNotesHiddenBefore: user.makeNotesHiddenBefore,
+			icon: avatar ? this.renderImage(avatar) : isSystem ? this.renderSystemAvatar(user) : this.renderIdenticon(user),
+			image: banner ? this.renderImage(banner) : isSystem ? this.renderSystemBanner() : null,
 			tag,
 			manuallyApprovesFollowers: user.isLocked,
 			discoverable: user.isExplorable,
@@ -635,7 +709,7 @@ export class ApRendererService {
 			x.id = `${this.config.url}/${randomUUID()}`;
 		}
 
-		return { '@context': CONTEXTS, ...(x as T & { id: string }) };
+		return { '@context': CONTEXT, ...(x as T & { id: string }) };
 	}
 
 	@bindThis
@@ -702,7 +776,7 @@ export class ApRendererService {
 		if (names.length === 0) return [];
 
 		const allEmojis = await this.customEmojiService.localEmojisCache.fetch();
-		const emojis = names.map(name => allEmojis.get(name)).filter(isNotNull);
+		const emojis = names.map(name => allEmojis.get(name)).filter(x => x != null);
 
 		return emojis;
 	}

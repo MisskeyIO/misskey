@@ -29,6 +29,10 @@ export class InviteCodeEntityService {
 	public async pack(
 		src: MiRegistrationTicket['id'] | MiRegistrationTicket,
 		me: { id: MiUser['id'] } | null | undefined,
+		hints?: {
+			packedCreatedBy?: Packed<'UserLite'>,
+			packedUsedBy?: Packed<'UserLite'>,
+		},
 	): Promise<Packed<'InviteCode'>> {
 		const target = typeof src === 'object' ? src : await this.registrationTicketsRepository.findOneOrFail({
 			where: {
@@ -42,8 +46,8 @@ export class InviteCodeEntityService {
 			code: target.code,
 			expiresAt: target.expiresAt ? target.expiresAt.toISOString() : null,
 			createdAt: this.idService.parse(target.id).date.toISOString(),
-			createdBy: target.createdBy ? await this.userEntityService.pack(target.createdBy, me) : null,
-			usedBy: target.usedBy ? await this.userEntityService.pack(target.usedBy, me) : null,
+			createdBy: target.createdBy ? hints?.packedCreatedBy ?? await this.userEntityService.pack(target.createdBy, me) : null,
+			usedBy: target.usedBy ? hints?.packedUsedBy ?? await this.userEntityService.pack(target.usedBy, me) : null,
 			usedAt: target.usedAt ? target.usedAt.toISOString() : null,
 			used: !!target.usedAt,
 		});

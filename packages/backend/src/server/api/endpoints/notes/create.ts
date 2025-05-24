@@ -165,7 +165,7 @@ export const meta = {
 			message: 'You cannot schedule notes any more.',
 			code: 'TOO_MANY_SCHEDULED_NOTES',
 			kind: 'permission',
-			id: '9e33041f-f6fb-414d-98c1-591466e55287'
+			id: '9e33041f-f6fb-414d-98c1-591466e55287',
 		},
 
 		cannotScheduleToFarFuture: {
@@ -503,7 +503,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				if (!scheduledAt) {
 					logger.info('Successfully created a note.', { noteId: note.id });
 				} else {
-					this.notificationService.createNotification(me.id, "noteScheduled", {
+					this.notificationService.createNotification(me.id, 'noteScheduled', {
 						draftId: note.id,
 					});
 					logger.info('Successfully scheduled a note.', { draftId: note.id });

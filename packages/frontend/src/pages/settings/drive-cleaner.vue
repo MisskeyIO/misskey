@@ -49,16 +49,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import type { StyleValue } from 'vue';
 import tinycolor from 'tinycolor2';
 import * as os from '@/os.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 import MkPagination from '@/components/MkPagination.vue';
 import MkDriveFileThumbnail from '@/components/MkDriveFileThumbnail.vue';
 import { i18n } from '@/i18n.js';
 import bytes from '@/filters/bytes.js';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
+import { definePage } from '@/page.js';
 import MkSelect from '@/components/MkSelect.vue';
-import { getDriveFileMenu } from '@/scripts/get-drive-file-menu.js';
+import { getDriveFileMenu } from '@/utility/get-drive-file-menu.js';
 
 const sortMode = ref('+size');
 const pagination = {
@@ -102,10 +103,10 @@ function fetchDriveInfo(): void {
 	});
 }
 
-function genUsageBar(fsize: number): object {
+function genUsageBar(fsize: number): StyleValue {
 	return {
 		width: `${fsize / usage.value * 100}%`,
-		background: tinycolor({ h: 180 - (fsize / usage.value * 180), s: 0.7, l: 0.5 }),
+		background: tinycolor({ h: 180 - (fsize / usage.value * 180), s: 0.7, l: 0.5 }).toHslString(),
 	};
 }
 
@@ -117,7 +118,7 @@ function onContextMenu(ev: MouseEvent, file): void {
 	os.contextMenu(getDriveFileMenu(file), ev);
 }
 
-definePageMetadata(() => ({
+definePage(() => ({
 	title: i18n.ts.drivecleaner,
 	icon: 'ti ti-trash',
 }));
@@ -132,7 +133,7 @@ definePageMetadata(() => ({
 	align-items: center;
 
 	&:hover {
-		color: var(--accent);
+		color: var(--MI_THEME-accent);
 	}
 }
 

@@ -45,6 +45,11 @@ export const packedFederationInstanceSchema = {
 			type: 'boolean',
 			optional: false, nullable: false,
 		},
+		suspensionState: {
+			type: 'string',
+			nullable: false, optional: false,
+			enum: ['none', 'manuallySuspended', 'goneSuspended', 'autoSuspendedForNotResponding'],
+		},
 		isBlocked: {
 			type: 'boolean',
 			optional: false, nullable: false,
@@ -84,6 +89,10 @@ export const packedFederationInstanceSchema = {
 			optional: false, nullable: false,
 		},
 		isSensitiveMedia: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
+		isMediaSilenced: {
 			type: 'boolean',
 			optional: false, nullable: false,
 		},

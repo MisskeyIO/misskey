@@ -67,7 +67,7 @@ export class ScheduledNoteProcessorService {
 
 			await this.scheduledNotesRepository.delete({ id: draft.id });
 
-			this.notificationService.createNotification(draft.userId, "scheduledNotePosted", {
+			this.notificationService.createNotification(draft.userId, 'scheduledNotePosted', {
 				noteId: note.id,
 			});
 
@@ -88,7 +88,7 @@ export class ScheduledNoteProcessorService {
 						reason: e.message,
 					});
 
-					this.notificationService.createNotification(draft.userId, "scheduledNoteError", {
+					this.notificationService.createNotification(draft.userId, 'scheduledNoteError', {
 						draftId: draft.id,
 					});
 

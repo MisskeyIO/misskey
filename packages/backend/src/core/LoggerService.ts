@@ -15,7 +15,7 @@ export class LoggerService {
 	}
 
 	@bindThis
-	public getLogger(domain: string, color?: KEYWORD | undefined, store?: boolean) {
-		return rootLogger.createSubLogger(domain, color, store);
+	public getLogger(domain: string, color?: KEYWORD | undefined) {
+		return rootLogger.createSubLogger(domain, color);
 	}
 }

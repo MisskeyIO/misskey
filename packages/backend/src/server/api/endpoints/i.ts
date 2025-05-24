@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { randomUUID } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import type { UserProfilesRepository } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
@@ -10,7 +11,6 @@ import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '@/server/api/error.js';
 import { LoggerService } from '@/core/LoggerService.js';
-import { randomUUID } from 'node:crypto';
 
 export const meta = {
 	tags: ['account'],
@@ -53,7 +53,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const isSecure = token == null;
 
 			const logger = this.loggerService.getLogger('api:account:i');
-			logger.setContext({ userId: user?.id, username: user?.username, client: isSecure ? 'misskey' : 'app', ip, headers, span: (headers ? headers['x-client-transaction-id'] : undefined) ?? randomUUID() });
+			logger.setContext({ userId: user.id, username: user.username, client: isSecure ? 'misskey' : 'app', ip, headers, span: (headers ? headers['x-client-transaction-id'] : undefined) ?? randomUUID() });
 			logger.info('Fetching account information');
 
 			const now = new Date();

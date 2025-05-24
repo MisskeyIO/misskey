@@ -4,8 +4,8 @@
  */
 
 import { In } from 'typeorm';
-import { DI } from '@/di-symbols.js';
 import { Inject, Injectable } from '@nestjs/common';
+import { DI } from '@/di-symbols.js';
 import type { ChannelsRepository } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { MetaService } from '@/core/MetaService.js';
@@ -48,7 +48,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (meta.featuredGameChannels.length === 0) return [];
 
 			const channels = await this.channelsRepository.findBy({
-				id: In(meta.featuredGameChannels)
+				id: In(meta.featuredGameChannels),
 			});
 
 			return await this.channelEntityService.packMany(channels, me);

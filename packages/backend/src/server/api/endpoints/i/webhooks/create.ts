@@ -13,6 +13,7 @@ import { DI } from '@/di-symbols.js';
 import { RoleService } from '@/core/RoleService.js';
 import { ApiError } from '@/server/api/error.js';
 
+// TODO: UserWebhook schemaの適用
 export const meta = {
 	tags: ['webhooks'],
 
@@ -101,14 +102,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				}
 			}
 
-			const webhook = await this.webhooksRepository.insert({
+			const webhook = await this.webhooksRepository.insertOne({
 				id: this.idService.gen(),
 				userId: me.id,
 				name: ps.name,
 				url: ps.url,
 				secret: ps.secret,
 				on: ps.on,
-			}).then(x => this.webhooksRepository.findOneByOrFail(x.identifiers[0]));
+			});
 
 			this.globalEventService.publishInternalEvent('webhookCreated', webhook);
 

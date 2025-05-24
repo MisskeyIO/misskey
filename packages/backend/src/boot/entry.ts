@@ -12,10 +12,11 @@ import { EventEmitter } from 'node:events';
 import process from 'node:process';
 import chalk from 'chalk';
 import Xev from 'xev';
-import { coreLogger } from '@/logger.js';
+import logger, { coreLogger } from '@/logger.js';
 import { envOption } from '../env.js';
 import { masterMain } from './master.js';
 import { workerMain } from './worker.js';
+import { readyRef } from './ready.js';
 
 import 'reflect-metadata';
 
@@ -88,10 +89,10 @@ process.on('warning', warning => {
 
 //#endregion
 
-if (cluster.isPrimary || envOption.disableClustering) {
-	await masterMain();
-
+if (!envOption.disableClustering) {
 	if (cluster.isPrimary) {
+		coreLogger.info(`Start main process... pid: ${process.pid}`);
+		await masterMain();
 		ev.mount();
 	}
 }
@@ -99,6 +100,8 @@ if (cluster.isPrimary || envOption.disableClustering) {
 if (cluster.isWorker) {
 	await workerMain();
 }
+
+readyRef.value = true;
 
 // ユニットテスト時にMisskeyが子プロセスで起動された時のため
 // それ以外のときは process.send は使えないので弾く

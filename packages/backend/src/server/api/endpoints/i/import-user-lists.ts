@@ -11,12 +11,12 @@ import { AccountMoveService } from '@/core/AccountMoveService.js';
 import type { DriveFilesRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '../../error.js';
+//TODO: requireRolePolicy: 'canImportUserLists',
 
 export const meta = {
 	secure: true,
 	requireCredential: true,
-	requireRolePolicy: 'canCreateContent',
-
+	requiredRolePolicy: 'canCreateContent',
 	prohibitMoved: true,
 
 	limit: {

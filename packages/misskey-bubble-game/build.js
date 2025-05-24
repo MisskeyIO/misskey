@@ -1,7 +1,7 @@
 import { build } from "esbuild";
 import { globSync } from "glob";
 
-const entryPoints = globSync("./src/**/**.{ts,tsx}");
+const entryPoints = globSync('./src/**/**.{ts,tsx}');
 
 /** @type {import('esbuild').BuildOptions} */
 const options = {

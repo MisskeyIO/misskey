@@ -852,7 +852,7 @@ export class ChatService {
 		if (room) {
 			this.globalEventService.publishChatRoomStream(room.id, 'react', {
 				messageId: message.id,
-				user: await this.userEntityService.pack(userId),
+				user: await this.userEntityService.pack(userId, {id:room.ownerId}),
 				reaction,
 			});
 		} else {
@@ -898,7 +898,7 @@ export class ChatService {
 		if (room) {
 			this.globalEventService.publishChatRoomStream(room.id, 'unreact', {
 				messageId: message.id,
-				user: await this.userEntityService.pack(userId),
+				user: await this.userEntityService.pack(userId,{id:userId}),
 				reaction,
 			});
 		} else {

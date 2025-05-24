@@ -11,10 +11,6 @@ import { QueryResultCache } from 'typeorm/cache/QueryResultCache.js';
 import { QueryResultCacheOptions } from 'typeorm/cache/QueryResultCacheOptions.js';
 import * as highlight from 'cli-highlight';
 import { entities as charts } from '@/core/chart/entities.js';
-import { Config } from '@/config.js';
-import MisskeyLogger from '@/logger.js';
-import { bindThis } from '@/decorators.js';
-
 import { MiAbuseReportResolver } from '@/models/AbuseReportResolver.js';
 import { MiAbuseUserReport } from '@/models/AbuseUserReport.js';
 import { MiAbuseReportNotificationRecipient } from '@/models/AbuseReportNotificationRecipient.js';
@@ -159,7 +155,7 @@ class MyCustomLogger implements Logger {
 
 	@bindThis
 	public logQuery(query: string, parameters?: any[]) {
-		sqlLogger.debug(this.highlight(query));
+		sqlLogger.debug(this.transformQueryLog(query));
 	}
 
 	@bindThis

@@ -17,41 +17,6 @@ import { ModeratorInactivityRemainingTime } from '@/queue/processors/CheckModera
 
 const oneDayMillis = 24 * 60 * 60 * 1000;
 
-type AbuseUserReportDto = Omit<MiAbuseUserReport, 'targetUser' | 'reporter' | 'assignee'> & {
-	targetUser: Packed<'UserLite'> | null,
-	reporter: Packed<'UserLite'> | null,
-	assignee: Packed<'UserLite'> | null,
-};
-
-function generateAbuseReport(override?: Partial<MiAbuseUserReport>): AbuseUserReportDto {
-	const result: MiAbuseUserReport = {
-		id: 'dummy-abuse-report1',
-		targetUserId: 'dummy-target-user',
-		targetUser: null,
-		reporterId: 'dummy-reporter-user',
-		reporter: null,
-		assigneeId: null,
-		assignee: null,
-		resolved: false,
-		forwarded: false,
-		comment: 'This is a dummy report for testing purposes.',
-		targetUserHost: null,
-		reporterHost: null,
-		resolvedAs: null,
-		moderationNote: 'foo',
-		category: 'other',
-		createdAt: new Date(),
-		...override,
-	};
-
-	return {
-		...result,
-		targetUser: result.targetUser ? toPackedUserLite(result.targetUser) : null,
-		reporter: result.reporter ? toPackedUserLite(result.reporter) : null,
-		assignee: result.assignee ? toPackedUserLite(result.assignee) : null,
-	};
-}
-
 function generateDummyUser(override?: Partial<MiUser>): MiUser {
 	return {
 		id: 'dummy-user-1',
@@ -142,125 +107,6 @@ function generateDummyNote(override?: Partial<MiNote>): MiNote {
 		renoteUserId: null,
 		renoteUserHost: null,
 		createdAt: new Date(),
-		...override,
-	};
-}
-
-function toPackedNote(note: MiNote, detail = true, override?: Packed<'Note'>): Packed<'Note'> {
-	return {
-		id: note.id,
-		createdAt: new Date().toISOString(),
-		deletedAt: null,
-		text: note.text,
-		cw: note.cw,
-		userId: note.userId,
-		user: toPackedUserLite(note.user ?? generateDummyUser()),
-		replyId: note.replyId,
-		renoteId: note.renoteId,
-		isHidden: false,
-		visibility: note.visibility,
-		mentions: note.mentions,
-		visibleUserIds: note.visibleUserIds,
-		fileIds: note.fileIds,
-		files: [],
-		tags: note.tags,
-		poll: null,
-		emojis: note.emojis,
-		channelId: note.channelId,
-		channel: note.channel,
-		localOnly: note.localOnly,
-		reactionAcceptance: note.reactionAcceptance,
-		reactionEmojis: {},
-		reactions: {},
-		reactionCount: 0,
-		renoteCount: note.renoteCount,
-		repliesCount: note.repliesCount,
-		uri: note.uri ?? undefined,
-		url: note.url ?? undefined,
-		reactionAndUserPairCache: note.reactionAndUserPairCache,
-		...(detail ? {
-			clippedCount: note.clippedCount,
-			reply: note.reply ? toPackedNote(note.reply, false) : null,
-			renote: note.renote ? toPackedNote(note.renote, true) : null,
-			myReaction: null,
-		} : {}),
-		...override,
-	};
-}
-
-function toPackedUserLite(user: MiUser, override?: Packed<'UserLite'>): Packed<'UserLite'> {
-	return {
-		id: user.id,
-		name: user.name,
-		username: user.username,
-		host: user.host,
-		avatarUrl: user.avatarUrl,
-		avatarBlurhash: user.avatarBlurhash,
-		avatarDecorations: user.avatarDecorations.map(it => ({
-			id: it.id,
-			angle: it.angle,
-			flipH: it.flipH,
-			url: 'https://example.com/dummy-image001.png',
-			offsetX: it.offsetX,
-			offsetY: it.offsetY,
-		})),
-		isBot: user.isBot,
-		isCat: user.isCat,
-		emojis: user.emojis,
-		onlineStatus: 'active',
-		badgeRoles: [],
-		...override,
-	};
-}
-
-function toPackedUserDetailedNotMe(user: MiUser, override?: Packed<'UserDetailedNotMe'>): Packed<'UserDetailedNotMe'> {
-	return {
-		...toPackedUserLite(user),
-		url: null,
-		uri: null,
-		movedTo: null,
-		alsoKnownAs: [],
-		createdAt: new Date().toISOString(),
-		updatedAt: user.updatedAt?.toISOString() ?? null,
-		lastFetchedAt: user.lastFetchedAt?.toISOString() ?? null,
-		bannerUrl: user.bannerUrl,
-		bannerBlurhash: user.bannerBlurhash,
-		isLocked: user.isLocked,
-		isSilenced: false,
-		isSuspended: user.isSuspended,
-		description: null,
-		location: null,
-		birthday: null,
-		lang: null,
-		fields: [],
-		verifiedLinks: [],
-		followersCount: user.followersCount,
-		followingCount: user.followingCount,
-		notesCount: user.notesCount,
-		pinnedNoteIds: [],
-		pinnedNotes: [],
-		pinnedPageId: null,
-		pinnedPage: null,
-		publicReactions: true,
-		followersVisibility: 'public',
-		followingVisibility: 'public',
-		twoFactorEnabled: false,
-		usePasswordLessLogin: false,
-		securityKeys: false,
-		roles: [],
-		memo: null,
-		moderationNote: undefined,
-		isFollowing: false,
-		isFollowed: false,
-		hasPendingFollowRequestFromYou: false,
-		hasPendingFollowRequestToYou: false,
-		isBlocking: false,
-		isBlocked: false,
-		isMuted: false,
-		isRenoteMuted: false,
-		notify: 'none',
-		withReplies: true,
-		isLimited: false,
 		...override,
 	};
 }
@@ -399,9 +245,8 @@ export class WebhookTestService {
 			case 'reaction':
 				return;
 			default: {
-				// eslint-disable-next-line @typescript-eslint/no-unused-vars
-				const _exhaustiveAssertion: never = params.type;
-				return;
+				const exhaustiveCheck = params.type;
+				throw new Error(`Unhandled webhook type: ${exhaustiveCheck}`);
 			}
 		}
 	}
@@ -482,9 +327,8 @@ export class WebhookTestService {
 				break;
 			}
 			default: {
-				// eslint-disable-next-line @typescript-eslint/no-unused-vars
-				const _exhaustiveAssertion: never = params.type;
-				return;
+				const exhaustiveCheck = params.type;
+				throw new Error(`Unhandled system webhook type: ${exhaustiveCheck}`);
 			}
 		}
 	}
@@ -506,6 +350,8 @@ export class WebhookTestService {
 			reporterHost: null,
 			resolvedAs: null,
 			moderationNote: 'foo',
+			category: 'other',
+			createdAt: new Date(),
 			...override,
 		};
 
@@ -618,7 +464,7 @@ export class WebhookTestService {
 			publicReactions: true,
 			followersVisibility: 'public',
 			followingVisibility: 'public',
-			chatScope: 'mutual',
+			chatScope: user.chatScope,
 			canChat: true,
 			twoFactorEnabled: false,
 			usePasswordLessLogin: false,
@@ -636,6 +482,7 @@ export class WebhookTestService {
 			isRenoteMuted: false,
 			notify: 'none',
 			withReplies: true,
+			isLimited: user.isSuspended || false,
 			...override,
 		};
 	}

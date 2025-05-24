@@ -236,7 +236,7 @@ export class AccountMoveService {
 			if (!role.preserveAssignmentOnMoveAccount) continue;
 
 			try {
-				await this.roleService.assign(dst.id, role.id, oldRoleAssignment.expiresAt);
+				await this.roleService.assign(dst.id, role.id, oldRoleAssignment.expiresAt ? oldRoleAssignment.expiresAt.toISOString() : null);
 			} catch (e) {
 				if (e instanceof RoleService.AlreadyAssignedError) continue;
 				throw e;

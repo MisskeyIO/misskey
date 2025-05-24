@@ -15,7 +15,7 @@ import * as os from '@/os.js';
 import { instance } from '@/instance.js';
 import { prefer } from '@/preferences.js';
 import { getDateText } from '@/utility/timeline-date-separate.js';
-import { isAprilFoolsDay } from '@/scripts/seasonal-events';
+import { isAprilFoolsDay } from '@/utility/seasonal-events';
 
 export default defineComponent({
 	props: {
@@ -141,7 +141,7 @@ export default defineComponent({
 			[$style['date-separated-list-nogap']]: props.noGap,
 			[$style['direction-down']]: props.direction === 'down',
 			[$style['direction-up']]: props.direction === 'up',
-			[$style['april-fool']]: defaultStore.state.animation ? isAprilFoolsDay() : false,
+			[$style['april-fool']]: prefer.s.animation ? isAprilFoolsDay() : false,
 		};
 
 		return () => prefer.s.animation ? h(TransitionGroup, {

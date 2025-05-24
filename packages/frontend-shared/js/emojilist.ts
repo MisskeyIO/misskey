@@ -14,6 +14,19 @@ export type UnicodeEmojiDef = {
 // initial converted from https://github.com/muan/emojilib/commit/242fe68be86ed6536843b83f7e32f376468b38fb
 import _emojilist from './emojilist.json' with { type: 'json' };
 
+const unicodeEmojisMap = new Map<string, UnicodeEmojiDef>(
+	_emojilist.map(x => [x.char, x]),
+);
+
+export function getUnicodeEmoji(char: string): UnicodeEmojiDef | string {
+	// Colorize it because emojilist.json assumes that
+	return unicodeEmojisMap.get(colorizeEmoji(char))
+		// カラースタイル絵文字がjsonに無い場合はテキストスタイル絵文字にフォールバックする
+		?? unicodeEmojisMap.get(char)
+		// それでも見つからない場合はそのまま返す（絵文字情報がjsonに無い場合、このフォールバックが無いとレンダリングに失敗する）
+		?? char;
+}
+
 export const emojilist: UnicodeEmojiDef[] = _emojilist.map(x => ({
 	name: x[1] as string,
 	char: x[0] as string,

@@ -8,7 +8,6 @@ import { Global, Inject, Module } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { DataSource } from 'typeorm';
 import { MeiliSearch } from 'meilisearch';
-import { MiMeta } from '@/models/Meta.js';
 import { Client as OpenSearch } from '@opensearch-project/opensearch';
 import { MiMeta } from '@/models/Meta.js';
 import { DI } from './di-symbols.js';

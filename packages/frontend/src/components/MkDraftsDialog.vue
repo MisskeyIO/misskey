@@ -149,7 +149,7 @@ import * as os from '@/os.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { infoImageUrl } from '@/instance.js';
 import { i18n } from '@/i18n.js';
-import { $i } from '@/account.js';
+import { $i } from '@/i.js';
 import MkSubNoteContent from '@/components/MkSubNoteContent.vue';
 import MkModalWindow from '@/components/MkModalWindow.vue';
 import MkPagination from '@/components/MkPagination.vue';

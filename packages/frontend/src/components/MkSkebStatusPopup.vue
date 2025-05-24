@@ -1,7 +1,7 @@
 <template>
 <div ref="el" :class="$style.root" :style="{ zIndex }">
 	<Transition
-		:name="defaultStore.state.animation ? '_transition_zoom' : ''"
+		:name="prefer.s.animation ? '_transition_zoom' : ''"
 		@afterLeave="emit('closed')"
 	>
 		<div v-if="showing" class="_popup _shadow">
@@ -35,7 +35,8 @@ import * as Misskey from 'misskey-js';
 import * as os from '@/os.js';
 import { defaultStore } from '@/store.js';
 import { i18n } from '@/i18n.js';
-import { calcPopupPosition } from '@/scripts/popup-position.js';
+import { calcPopupPosition } from '@/utility/popup-position.js';
+import {prefer} from "@/preferences";
 
 const props = defineProps<{
 	showing: boolean;

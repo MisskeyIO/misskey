@@ -420,10 +420,7 @@ export const store = markRaw(new Pizzax('base', {
 		where: 'device',
 		default: true,
 	},
-	trustedExternalWebsites: {
-		where: 'device',
-		default: [] as string[],
-	},
+
 	useNativeUIForVideoAudioPlayer: {
 		where: 'device',
 		default: false,

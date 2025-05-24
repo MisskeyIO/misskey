@@ -116,7 +116,7 @@ export class Resolver {
 
 		const object = (this.user
 			? await this.apRequestService.signedGet(value, this.user, allowSoftfail) as IObject
-			: await this.httpRequestService.getActivityJson(value, undefined, allowSoftfail)) as IObject;
+			: await this.httpRequestService.getActivityJson(value, undefined, )) as IObject; // FIXME allowSoftfail
 
 		if (
 			Array.isArray(object['@context']) ?

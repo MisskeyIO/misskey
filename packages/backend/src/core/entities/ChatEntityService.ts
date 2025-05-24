@@ -59,7 +59,7 @@ export class ChatEntityService {
 		for (const record of message.reactions) {
 			const [userId, reaction] = record.split('/');
 			reactions.push({
-				user: packedUsers?.get(userId) ?? await this.userEntityService.pack(userId),
+				user: packedUsers?.get(userId) ?? await this.userEntityService.pack(userId, me),
 				reaction,
 			});
 		}
@@ -75,7 +75,7 @@ export class ChatEntityService {
 			toRoomId: message.toRoomId,
 			toRoom: message.toRoomId ? (packedRooms?.get(message.toRoomId) ?? await this.packRoom(message.toRoom ?? message.toRoomId, me)) : undefined,
 			fileId: message.fileId,
-			file: message.fileId ? (packedFiles?.get(message.fileId) ?? await this.driveFileEntityService.pack(message.file ?? message.fileId)) : null,
+			file: message.fileId ? (packedFiles?.get(message.fileId) ?? await this.driveFileEntityService.pack(message.file ?? message.fileId, me)) : null,
 			reactions,
 		};
 	}
@@ -111,7 +111,7 @@ export class ChatEntityService {
 		const [packedUsers, packedFiles, packedRooms] = await Promise.all([
 			this.userEntityService.packMany(users, me)
 				.then(users => new Map(users.map(u => [u.id, u]))),
-			this.driveFileEntityService.packMany(messages.map(m => m.file).filter(x => x != null))
+			this.driveFileEntityService.packMany(messages.map(m => m.file).filter(x => x != null), me)
 				.then(files => new Map(files.map(f => [f.id, f]))),
 			this.packRooms(messages.map(m => m.toRoom ?? m.toRoomId).filter(x => x != null), me)
 				.then(rooms => new Map(rooms.map(r => [r.id, r]))),
@@ -123,6 +123,7 @@ export class ChatEntityService {
 	@bindThis
 	public async packMessageLiteFor1on1(
 		src: MiChatMessage['id'] | MiChatMessage,
+		me?: { id: MiUser['id'] } | null,
 		options?: {
 			_hint_?: {
 				packedFiles: Map<MiChatMessage['fileId'], Packed<'DriveFile'> | null>;
@@ -149,7 +150,7 @@ export class ChatEntityService {
 			fromUserId: message.fromUserId,
 			toUserId: message.toUserId!,
 			fileId: message.fileId,
-			file: message.fileId ? (packedFiles?.get(message.fileId) ?? await this.driveFileEntityService.pack(message.file ?? message.fileId)) : null,
+			file: message.fileId ? (packedFiles?.get(message.fileId) ?? await this.driveFileEntityService.pack(message.file ?? message.fileId, me)) : null,
 			reactions,
 		};
 	}
@@ -157,20 +158,22 @@ export class ChatEntityService {
 	@bindThis
 	public async packMessagesLiteFor1on1(
 		messages: MiChatMessage[],
+		me?: { id: MiUser['id'] } | null,
 	) {
 		if (messages.length === 0) return [];
 
 		const [packedFiles] = await Promise.all([
-			this.driveFileEntityService.packMany(messages.map(m => m.file).filter(x => x != null))
+			this.driveFileEntityService.packMany(messages.map(m => m.file).filter(x => x != null), me)
 				.then(files => new Map(files.map(f => [f.id, f]))),
 		]);
 
-		return Promise.all(messages.map(message => this.packMessageLiteFor1on1(message, { _hint_: { packedFiles } })));
+		return Promise.all(messages.map(message => this.packMessageLiteFor1on1(message, me, { _hint_: { packedFiles } })));
 	}
 
 	@bindThis
 	public async packMessageLiteForRoom(
 		src: MiChatMessage['id'] | MiChatMessage,
+		me?: { id: MiUser['id'] } | null,
 		options?: {
 			_hint_?: {
 				packedFiles: Map<MiChatMessage['fileId'], Packed<'DriveFile'> | null>;
@@ -188,7 +191,7 @@ export class ChatEntityService {
 		for (const record of message.reactions) {
 			const [userId, reaction] = record.split('/');
 			reactions.push({
-				user: packedUsers?.get(userId) ?? await this.userEntityService.pack(userId),
+				user: packedUsers?.get(userId) ?? await this.userEntityService.pack(userId, me),
 				reaction,
 			});
 		}
@@ -198,10 +201,10 @@ export class ChatEntityService {
 			createdAt: this.idService.parse(message.id).date.toISOString(),
 			text: message.text,
 			fromUserId: message.fromUserId,
-			fromUser: packedUsers?.get(message.fromUserId) ?? await this.userEntityService.pack(message.fromUser ?? message.fromUserId),
+			fromUser: packedUsers?.get(message.fromUserId) ?? await this.userEntityService.pack(message.fromUser ?? message.fromUserId, me),
 			toRoomId: message.toRoomId!,
 			fileId: message.fileId,
-			file: message.fileId ? (packedFiles?.get(message.fileId) ?? await this.driveFileEntityService.pack(message.file ?? message.fileId)) : null,
+			file: message.fileId ? (packedFiles?.get(message.fileId) ?? await this.driveFileEntityService.pack(message.file ?? message.fileId, me)) : null,
 			reactions,
 		};
 	}
@@ -209,6 +212,7 @@ export class ChatEntityService {
 	@bindThis
 	public async packMessagesLiteForRoom(
 		messages: MiChatMessage[],
+		me?: { id: MiUser['id'] } | null,
 	) {
 		if (messages.length === 0) return [];
 
@@ -222,13 +226,13 @@ export class ChatEntityService {
 		}
 
 		const [packedUsers, packedFiles] = await Promise.all([
-			this.userEntityService.packMany(users)
+			this.userEntityService.packMany(users, me)
 				.then(users => new Map(users.map(u => [u.id, u]))),
-			this.driveFileEntityService.packMany(messages.map(m => m.file).filter(x => x != null))
+			this.driveFileEntityService.packMany(messages.map(m => m.file).filter(x => x != null), me)
 				.then(files => new Map(files.map(f => [f.id, f]))),
 		]);
 
-		return Promise.all(messages.map(message => this.packMessageLiteForRoom(message, { _hint_: { packedFiles, packedUsers } })));
+		return Promise.all(messages.map(message => this.packMessageLiteForRoom(message, me, { _hint_: { packedFiles, packedUsers } })));
 	}
 
 	@bindThis

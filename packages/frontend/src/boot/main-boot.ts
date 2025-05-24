@@ -14,7 +14,6 @@ import { i18n } from '@/i18n.js';
 import { alert, confirm, popup, post } from '@/os.js';
 import { useStream } from '@/stream.js';
 import * as sound from '@/utility/sound.js';
-import { $i, signout, updateAccount, updateAccountPartial } from '@/account.js';
 import { $i } from '@/i.js';
 import { instance } from '@/instance.js';
 import { store } from '@/store.js';

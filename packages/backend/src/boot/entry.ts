@@ -12,7 +12,7 @@ import { EventEmitter } from 'node:events';
 import process from 'node:process';
 import chalk from 'chalk';
 import Xev from 'xev';
-import { coreLogger } from '@/logger.js';
+import logger, { coreLogger } from '@/logger.js';
 import { envOption } from '../env.js';
 import { masterMain } from './master.js';
 import { workerMain } from './worker.js';
@@ -91,7 +91,7 @@ process.on('warning', warning => {
 
 if (!envOption.disableClustering) {
 	if (cluster.isPrimary) {
-		logger.info(`Start main process... pid: ${process.pid}`);
+		coreLogger.info(`Start main process... pid: ${process.pid}`);
 		await masterMain();
 		ev.mount();
 	}

@@ -6,8 +6,8 @@
 import type { SoundStore } from '@/preferences/def.js';
 import { prefer } from '@/preferences.js';
 import { PREF_DEF } from '@/preferences/def.js';
-import { $i } from '@/account.js';
-import { RateLimiter } from '@/scripts/rate-limiter.js';
+import { $i } from '@/i.js';
+import { RateLimiter } from '@/utility/rate-limiter.js';
 
 let ctx: AudioContext;
 const cache = new Map<string, AudioBuffer>();

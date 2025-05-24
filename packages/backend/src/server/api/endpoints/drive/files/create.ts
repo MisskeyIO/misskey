@@ -17,7 +17,6 @@ import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { DB_MAX_IMAGE_COMMENT_LENGTH } from '@/const.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import { MetaService } from '@/core/MetaService.js';
-import { ApiError } from '@/server/api/error.js';
 import { MiMeta } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '../../../error.js';

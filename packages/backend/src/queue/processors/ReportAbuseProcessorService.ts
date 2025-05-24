@@ -10,7 +10,7 @@ import { bindThis } from '@/decorators.js';
 import type Logger from '@/logger.js';
 import { RoleService } from '@/core/RoleService.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { InstanceActorService } from '@/core/InstanceActorService.js';
+import { SystemAccountService } from '@/core/SystemAccountService.js';
 import type { AbuseReportResolversRepository, AbuseUserReportsRepository, UsersRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
@@ -36,7 +36,7 @@ export class ReportAbuseProcessorService {
 
 		private queueLoggerService: QueueLoggerService,
 		private globalEventService: GlobalEventService,
-		private instanceActorService: InstanceActorService,
+		private systemAccountService: SystemAccountService,
 		private apRendererService: ApRendererService,
 		private roleService: RoleService,
 		private queueService: QueueService,
@@ -64,7 +64,7 @@ export class ReportAbuseProcessorService {
 			id: job.data.reporterId,
 		});
 
-		const actor = await this.instanceActorService.getInstanceActor();
+		const actor = await this.systemAccountService.fetch('actor');
 
 		const targetUserAcct = targetUser.host ? `${targetUser.username.toLowerCase()}@${targetUser.host}` : targetUser.username.toLowerCase();
 		const reporterAcct = reporter.host ? `${reporter.username.toLowerCase()}@${reporter.host}` : reporter.username.toLowerCase();
@@ -90,7 +90,7 @@ export class ReportAbuseProcessorService {
 
 				const webhooks = (await this.userWebhookService.fetchWebhooks()).filter(x => x.on.includes('reportAutoResolved'));
 				for (const webhook of webhooks) {
-					if (await this.roleService.isAdministrator({ id: webhook.userId, isRoot: false })) {
+					if (await this.roleService.isAdministrator({ id: webhook.userId })) {
 						this.queueService.userWebhookDeliver(webhook, 'reportAutoResolved', {
 							resolver: resolver,
 							report: job.data,

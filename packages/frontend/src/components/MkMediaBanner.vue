@@ -29,8 +29,8 @@ import * as Misskey from 'misskey-js';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import MkMediaAudio from '@/components/MkMediaAudio.vue';
-import { pleaseLogin } from '@/scripts/please-login.js';
-import { $i } from '@/account.js';
+import { pleaseLogin } from '@/utility/please-login.js';
+import { $i } from '@/i.js';
 import { prefer } from '@/preferences.js';
 
 const props = defineProps<{
@@ -40,7 +40,7 @@ const props = defineProps<{
 
 const hide = ref(true);
 
-function show(ev: MouseEvent) {
+async function show(ev: MouseEvent) {
 	if (props.media.isSensitive && !$i && prefer.s.confirmWhenRevealingSensitiveMedia) {
 		ev.preventDefault();
 		ev.stopPropagation();

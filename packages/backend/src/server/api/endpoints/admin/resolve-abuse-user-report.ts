@@ -6,13 +6,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { UsersRepository, AbuseUserReportsRepository } from '@/models/_.js';
-import { InstanceActorService } from '@/core/InstanceActorService.js';
 import { QueueService } from '@/core/QueueService.js';
 import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
 import { DI } from '@/di-symbols.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
 import { UserWebhookService } from '@/core/UserWebhookService.js';
 import { RoleService } from '@/core/RoleService.js';
+import {SystemAccountService} from "@/core/SystemAccountService.js";
 
 export const meta = {
 	tags: ['admin'],
@@ -43,11 +43,11 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private abuseUserReportsRepository: AbuseUserReportsRepository,
 
 		private queueService: QueueService,
-		private instanceActorService: InstanceActorService,
 		private apRendererService: ApRendererService,
 		private moderationLogService: ModerationLogService,
 		private userWebhookService: UserWebhookService,
 		private roleService: RoleService,
+		private systemAccountService: SystemAccountService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const report = await this.abuseUserReportsRepository.findOneBy({ id: ps.reportId });
@@ -57,7 +57,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			}
 
 			if (ps.forward && report.targetUserHost != null) {
-				const actor = await this.instanceActorService.getInstanceActor();
+				const actor = await this.systemAccountService.fetch("actor")
 				const targetUser = await this.usersRepository.findOneByOrFail({ id: report.targetUserId });
 
 				this.queueService.deliver(actor, this.apRendererService.addContext(this.apRendererService.renderFlag(actor, targetUser.uri!, report.comment)), targetUser.inbox, false);
@@ -69,16 +69,21 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				forwarded: ps.forward && report.targetUserHost != null,
 			}).then(() => this.abuseUserReportsRepository.findOneBy({ id: ps.reportId }));
 
-			const webhooks = (await this.userWebhookService.getActiveWebhooks()).filter(x => x.on.includes('reportResolved'));
-			for (const webhook of webhooks) {
-				if (await this.roleService.isAdministrator({ id: webhook.userId, isRoot: false })) {
-					this.queueService.userWebhookDeliver(webhook, 'reportResolved', {
-						updatedReport,
-					});
-				}
+			if (updatedReport == null) {
+				throw new Error('report not found');
 			}
 
-			this.moderationLogService.log(me, 'resolveAbuseReport', {
+			const webhooks = (await this.userWebhookService.getActiveWebhooks()).filter(x => x.on.includes('reportResolved'));
+			// for (const webhook of webhooks) {
+			// 	if (await this.roleService.isAdministrator({ id: webhook.userId })) {
+			// 		await this.queueService.userWebhookDeliver(webhook, 'reportResolved', {
+			// 			updatedReport
+			// 		});
+			// 	}
+			// }
+			// FIXME 後で直す
+
+			await this.moderationLogService.log(me, 'resolveAbuseReport', {
 				reportId: report.id,
 				report: report,
 				forwarded: ps.forward && report.targetUserHost != null,

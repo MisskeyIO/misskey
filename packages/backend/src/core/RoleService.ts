@@ -141,6 +141,8 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	private rolesCache: MemorySingleCache<MiRole[]>;
 	private roleAssignmentByUserIdCache: MemoryKVCache<MiRoleAssignment[]>;
 	private notificationService: NotificationService;
+	public static AlreadyAssignedError = class extends Error {};
+	public static NotAssignedError = class extends Error {};
 
 	constructor(
 		private moduleRef: ModuleRef,
@@ -587,14 +589,16 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			userId: userId,
 		});
 
-		if (existing?.expiresAt && (existing.expiresAt.getTime() < now)) {
-			await this.roleAssignmentsRepository.delete({
-				roleId: roleId,
-				userId: userId,
-			});
-			existing = null;
+		if (existing) {
+			if (existing.expiresAt && (existing.expiresAt.getTime() < now)) {
+				await this.roleAssignmentsRepository.delete({
+					roleId: roleId,
+					userId: userId,
+				});
+			} else {
+				throw new RoleService.AlreadyAssignedError();
+			}
 		}
-
 		if (!existing) {
 			const created = await this.roleAssignmentsRepository.insertOne({
 				id: this.idService.gen(now),
@@ -646,16 +650,14 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		const now = new Date();
 
 		let existing = await this.roleAssignmentsRepository.findOneBy({ roleId, userId });
-		if (existing?.expiresAt && (existing.expiresAt.getTime() < now.getTime())) {
+		if (existing == null) {
+			throw new RoleService.NotAssignedError();
+		} else if (existing.expiresAt && (existing.expiresAt.getTime() < now.getTime())) {
 			await this.roleAssignmentsRepository.delete({
 				roleId: roleId,
 				userId: userId,
 			});
-			existing = null;
-		}
-
-		if (!existing) {
-			throw new IdentifiableError('b9060ac7-5c94-4da4-9f55-2047c953df44', 'User was not assigned to this role.');
+			throw new RoleService.NotAssignedError();
 		}
 
 		await this.roleAssignmentsRepository.delete(existing.id);

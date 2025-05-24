@@ -620,7 +620,7 @@ export class ActivityPubServerService {
 			}
 		};
 
-		fastify.register(fastifyAccepts);
+		fastify.register(fastifyAccepts, { decorateReply: true });
 		fastify.addContentTypeParser('application/activity+json', { parseAs: 'buffer' }, almostDefaultJsonParser);
 		fastify.addContentTypeParser('application/ld+json', { parseAs: 'buffer' }, almostDefaultJsonParser);
 

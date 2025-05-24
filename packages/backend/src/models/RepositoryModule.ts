@@ -82,7 +82,6 @@ import {
 	MiUserAccountMoveLog,
 	MiUserSecurityKey,
 	MiWebhook,
-	MiWebhook,
 	MiChatMessage,
 	MiChatRoom,
 	MiChatRoomMembership,

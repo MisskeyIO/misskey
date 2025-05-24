@@ -4,7 +4,7 @@
  */
 
 import { MetricsTime } from 'bullmq';
-import type { RedisOptionsSource } from '@/config.js';
+import type {Config, RedisOptionsSource} from '@/config.js';
 import type * as Bull from 'bullmq';
 import type { RedisOptions } from 'ioredis';
 
@@ -61,14 +61,5 @@ export function baseWorkerOptions(config: RedisOptions & RedisOptionsSource, wor
 			},
 		},
 		prefix: config.prefix ? `{${config.prefix}:queue:${name}}` : `{queue:${name}}`,
-	};
-}
-
-export function baseWorkerOptions(config: Config, queueName: typeof QUEUE[keyof typeof QUEUE]): Bull.WorkerOptions {
-	return {
-		...baseQueueOptions(config, queueName),
-		metrics: {
-			maxDataPoints: MetricsTime.ONE_WEEK,
-		},
 	};
 }

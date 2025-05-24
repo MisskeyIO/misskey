@@ -8,8 +8,9 @@ import { compareVersions } from 'compare-versions';
 import { version, lang, updateLocale, locale, apiUrl } from '@@/js/config.js';
 import defaultLightTheme from '@@/themes/l-light.json5';
 import defaultDarkTheme from '@@/themes/d-green-lime.json5';
+import { createGtag, addGtag, consent as gtagConsent } from 'vue-gtag';// FIXME Google Analytics 周りの機能のチェック
 import type { App } from 'vue';
-import VueGtag, { bootstrap as gtagBootstrap, GtagConsent, GtagConsentParams } from 'vue-gtag';
+import type {GtagConsentParams} from "@/types/gtag";
 import widgets from '@/widgets/index.js';
 import directives from '@/directives/index.js';
 import components from '@/components/index.js';
@@ -29,9 +30,7 @@ import { miLocalStorage } from '@/local-storage.js';
 import { fetchCustomEmojis } from '@/custom-emojis.js';
 import { prefer } from '@/preferences.js';
 import { $i } from '@/i.js';
-import { mainRouter } from '@/router/main.js';
-import { createGtag, addGtag, consent as gtagConsent } from 'vue-gtag';
-import type { GtagConsentParams } from '@/types/gtag.js';
+import { mainRouter } from '@/router.js';
 
 export async function common(createVue: () => Promise<App<Element>>) {
 	console.info(`Misskey v${version}`);
@@ -107,8 +106,8 @@ export async function common(createVue: () => Promise<App<Element>>) {
 	}
 
 	// URLに#pswpを含む場合は取り除く
-	if (location.hash === '#pswp') {
-		history.replaceState(null, '', location.href.replace('#pswp', ''));
+	if (window.location.hash === '#pswp') {
+		window.history.replaceState(null, '', window.location.href.replace('#pswp', ''));
 	}
 
 	// 一斉リロード

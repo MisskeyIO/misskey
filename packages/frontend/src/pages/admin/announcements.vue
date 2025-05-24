@@ -115,7 +115,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch, useTempleteRef } from 'vue';
+import { ref, computed, watch, useTemplateRef } from 'vue';
 import * as misskey from 'misskey-js';
 import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
@@ -130,7 +130,7 @@ import { definePage } from '@/page.js';
 import MkFolder from '@/components/MkFolder.vue';
 import MkUserCardMini from '@/components/MkUserCardMini.vue';
 
-const announceTitleEl = useTempleteRef('announceTitleEl');
+const announceTitleEl = useTemplateRef('announceTitleEl');
 const user = ref<misskey.entities.UserLite | null>(null);
 const offset = ref(0);
 const hasMore = ref(false);

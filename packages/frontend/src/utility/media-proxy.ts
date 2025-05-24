@@ -5,7 +5,6 @@
 
 import { MediaProxy } from '@@/js/media-proxy.js';
 import { url } from '@@/js/config.js';
-import { appendQuery, omitHttps, query } from '@/scripts/url.js';
 import { instance } from '@/instance.js';
 
 let _mediaProxy: MediaProxy | null = null;

@@ -20,6 +20,7 @@ import type { Config } from '@/config.js';
 import { getNoteSummary } from '@/misc/get-note-summary.js';
 import { DI } from '@/di-symbols.js';
 import * as Acct from '@/misc/acct.js';
+import { FastifyAdapter as BullBoardFastifyAdapter } from '@bull-board/fastify';
 import type {
 	DbQueue,
 	DeliverQueue,
@@ -63,6 +64,9 @@ import { FeedService } from './FeedService.js';
 import { UrlPreviewService } from './UrlPreviewService.js';
 import { ClientLoggerService } from './ClientLoggerService.js';
 import type { FastifyInstance, FastifyPluginOptions, FastifyReply } from 'fastify';
+import fastifyCookie from "@fastify/cookie";
+import {BullMQAdapter} from "@bull-board/api/bullMQAdapter.js";
+import {createBullBoard} from "@bull-board/api";
 
 const _filename = fileURLToPath(import.meta.url);
 const _dirname = dirname(_filename);
@@ -268,13 +272,13 @@ export class ClientServerService {
 				this.objectStorageQueue,
 				this.userWebhookDeliverQueue,
 				this.systemWebhookDeliverQueue,
-			].map(q => new BullMQAdapter(q)),
+			].map(q => new BullMQAdapter(q)) as any,
 			serverAdapter: bullBoardServerAdapter,
 		});
 
 		bullBoardServerAdapter.setBasePath(bullBoardPath);
 		(fastify.register as any)(bullBoardServerAdapter.registerPlugin(), { prefix: bullBoardPath });
-		//#endregion
+		// #endregion
 
 		fastify.register(fastifyView, {
 			root: _dirname + '/views',
@@ -929,7 +933,7 @@ export class ClientServerService {
 			});
 
 			if (announcement) {
-				const _announcement = await this.announcementEntityService.pack(announcement);
+				const _announcement = await this.announcementEntityService.pack(announcement,null);
 				reply.header('Cache-Control', 'public, max-age=3600');
 				return await reply.view('announcement', {
 					announcement: _announcement,

@@ -5,7 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
-import { MiUser, type WebhooksRepository } from '@/models/_.js';
+import {MiAbuseReportResolver, MiAbuseUserReport, MiUser, type WebhooksRepository} from '@/models/_.js';
 import { MiWebhook, WebhookEventTypes } from '@/models/Webhook.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
@@ -23,7 +23,11 @@ export type UserWebhookPayload<T extends WebhookEventTypes> =
 	} :
 	T extends 'followed' ? {
 		user: Packed<'UserLite'>,
-	} : never;
+	} :
+  T extends 'reportAutoResolved' ? {
+		report: MiAbuseUserReport,
+		resolver: MiAbuseReportResolver,
+	} : never
 
 @Injectable()
 export class UserWebhookService implements OnApplicationShutdown {

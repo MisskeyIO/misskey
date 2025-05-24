@@ -57,7 +57,7 @@ import { miLocalStorage } from '@/local-storage.js';
 import { instance } from '@/instance.js';
 import { host } from '@@/js/config.js';
 import { i18n } from '@/i18n.js';
-import { $i } from '@/account.js';
+import { $i } from '@/i.js';
 import * as os from '@/os.js';
 import { addGtag, consent as gtagConsent, set as gtagSet } from 'vue-gtag';
 import type { GtagConsentParams } from '@/types/gtag.js';

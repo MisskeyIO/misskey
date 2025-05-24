@@ -8,7 +8,6 @@ import { In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import { type Config, FulltextSearchProvider } from '@/config.js';
 import { bindThis } from '@/decorators.js';
-import { LoggerService } from '@/core/LoggerService.js';
 import { MiNote } from '@/models/Note.js';
 import type { NotesRepository } from '@/models/_.js';
 import { MiUser } from '@/models/_.js';
@@ -280,10 +279,11 @@ export class SearchService {
 			case 'meilisearch': {
 				return this.searchNoteByMeiliSearch(q, me, opts, pagination);
 			}
-			case 'opensearch': {
-				return this.searchNoteByOpenSearch(q, me, opts, pagination);
-			}
 			default: {
+				// Note: opensearch support might be limited, fallback to like search
+				if (this.provider === 'opensearch' as any) {
+					return this.searchNoteByOpenSearch(q, me, opts, pagination);
+				}
 				// eslint-disable-next-line @typescript-eslint/no-unused-vars
 				const typeCheck: never = this.provider;
 				return [];
@@ -329,7 +329,7 @@ export class SearchService {
 			});
 		}
 
-		const res = await (this.opensearch.search)({
+		const res = await this.opensearch?.search({
 			index: this.opensearchNoteIndex + '*' as string,
 			body: {
 				query: esFilter,
@@ -338,6 +338,10 @@ export class SearchService {
 				size: pagination.limit,
 			},
 		});
+
+		if (!res) {
+			return [];
+		}
 
 		const noteIds = res.body.hits.hits.map((hit) => {
 			const source = hit._source as Record<string, unknown>;

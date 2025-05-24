@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { UsersRepository } from '@/models/_.js';
-import generateUserToken from '@/misc/generate-native-user-token.js';
+import { generateNativeUserToken } from '@/misc/token.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
@@ -42,7 +42,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 			const oldToken = user.token;
 			if (oldToken == null) return;
 
-			const newToken = generateUserToken();
+			const newToken = generateNativeUserToken();
 			await this.usersRepository.update(user.id, {
 				token: newToken,
 			});

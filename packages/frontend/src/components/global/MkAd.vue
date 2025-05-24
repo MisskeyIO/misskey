@@ -50,7 +50,7 @@ import { store } from '@/store.js';
 import * as os from '@/os.js';
 import { $i } from '@/i.js';
 import { prefer } from '@/preferences.js';
-import { usageReport } from '@/scripts/usage-report.js';
+import { usageReport } from '@/utility/usage-report.js';
 
 type Ad = (typeof instance)['ads'][number];
 

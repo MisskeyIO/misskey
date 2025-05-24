@@ -108,11 +108,6 @@ const silence = ref<boolean>(props.announcement ? props.announcement.silence : f
 const reads = ref<number>(props.announcement ? props.announcement.reads : 0);
 const lastReadAt = ref<string | null>(props.announcement ? props.announcement.lastReadAt : null);
 
-const emit = defineEmits<{
-	(ev: 'done', v: { deleted?: boolean; updated?: any; created?: any }): void,
-	(ev: 'closed'): void
-}>();
-
 const announceTitleEl = shallowRef<HTMLInputElement | null>(null);
 
 function insertEmoji(ev: MouseEvent): void {

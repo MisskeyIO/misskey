@@ -105,7 +105,7 @@ import { swInject } from './sw-inject.js';
 import XNotification from './notification.vue';
 import { popups } from '@/os.js';
 import { pendingApiRequestsCount } from '@/utility/misskey-api.js';
-import { filterMutedNotification } from '@/scripts/filter-muted-notification.js';
+import { filterMutedNotification } from '@/utility/filter-muted-notification.js';
 import { uploads } from '@/utility/upload.js';
 import * as sound from '@/utility/sound.js';
 import { $i } from '@/i.js';

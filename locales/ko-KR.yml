@@ -1371,9 +1371,6 @@ prohibitedWordsForNameOfUserDescription: "이 목록에 포함되는 키워드�
 yourNameContainsProhibitedWords: "바꾸려는 이름에 금지된 키워드가 포함되어 있습니다."
 yourNameContainsProhibitedWordsDescription: "이름에 금지된 키워드가 있습니다. 이름을 사용해야 하는 경우, 서버 관리자에 문의하세요."
 thisContentsAreMarkedAsSigninRequiredByAuthor: "게시자에 의해 로그인해야 볼 수 있도록 설정되어 있습니다."
-lockdown: "잠금"
-pleaseSelectAccount: "계정을 선택해주세요."
-availableRoles: "사용 가능한 역할"
 acknowledgeNotesAndEnable: "활성화 하기 전에 주의 사항을 확인했습니다."
 federationSpecified: "이 서버는 화이트 리스트 제도로 운영 중 입니다. 정해진 리모트 서버가 아닌 경우 연합되지 않습니다."
 federationDisabled: "이 서버는 연합을 하지 않고 있습니다. 리모트 서버 유저와 통신을 할 수 없습니다."
@@ -3116,12 +3113,6 @@ _embedCodeGen:
   generateCode: "임베디드 코드를 만들기"
   codeGenerated: "코드를 만들었습니다."
   codeGeneratedDescription: "만들어진 코드를 웹 사이트에 붙여서 사용하세요."
-_selfXssPrevention:
-  warning: "경고"
-  title: "“이 화면에 뭔가를 붙여넣어라\"는 것은 모두 사기입니다."
-  description1: "여기에 무언가를 붙여넣으면 악의적인 유저에게 계정을 탈취당하거나 개인정보를 도용당할 수 있습니다."
-  description2: "붙여 넣으려는 항목이 무엇인지 정확히 이해하지 못하는 경우, %c지금 바로 작업을 중단하고 이 창을 닫으십시오."
-  description3: "자세한 내용은 여기를 확인해 주세요.  {link}"
 _followRequest:
   recieved: "받은 신청"
   sent: "보낸 신청"

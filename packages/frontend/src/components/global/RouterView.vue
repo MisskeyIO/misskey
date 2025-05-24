@@ -18,13 +18,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { inject, onBeforeUnmount,provide, ref, shallowRef } from 'vue';
+import { inject, onBeforeUnmount,provide, ref, shallowRef,computed,nextTick } from 'vue';
 import type { Router } from '@/router.js';
 import { prefer } from '@/preferences.js';
 import MkLoadingPage from '@/pages/_loading_.vue';
 import { DI } from '@/di.js';
 import { randomId } from '@/utility/random-id.js';
 import { deepEqual } from '@/utility/deep-equal.js';
+import { globalEvents } from '@/events.js';
 
 const props = defineProps<{
 	router?: Router;
@@ -90,7 +91,7 @@ globalEvents.on('requestClearPageCache', () => {
 // #endregion
 
 onBeforeUnmount(() => {
-	router.removeListener('change', onChange);
+	// router.removeListener('change', onChange);
 });
 </script>
 

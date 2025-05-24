@@ -16,10 +16,10 @@
 
 <script lang="ts" setup>
 import MkAnimBg from '@/components/MkAnimBg.vue';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
+import { definePage } from '@/page.js';
 import MkAuthConfirm from '@/components/MkAuthConfirm.vue';
 import { nextTick, onMounted, useTemplateRef } from "vue";
-import { $i } from '@/account.js';
+import { $i } from '@/i.js';
 
 const transactionIdMeta = document.querySelector<HTMLMetaElement>('meta[name="misskey:sso:transaction-id"]');
 if (transactionIdMeta) {
@@ -84,8 +84,7 @@ onMounted(() => {
 		}
 	});
 });
-
-definePageMetadata(() => ({
+definePage(() => ({
 	title: 'Single Sign-On',
 	icon: 'ti ti-apps',
 }));

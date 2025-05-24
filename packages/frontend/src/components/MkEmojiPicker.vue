@@ -122,7 +122,7 @@ import {
 	emojiCharByCategory,
 	unicodeEmojiCategories as categories,
 	getEmojiName,
-	getUnicodeEmoji,
+	getUnicodeEmoji
 } from '@@/js/emojilist.js';
 import type {
 	UnicodeEmojiDef,

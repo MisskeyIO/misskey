@@ -6,7 +6,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <PageWithHeader v-model:tab="tab" :tabs="headerTabs" :actions="headerActions" :swipable="true">
 	<div v-if="user">
-		<MkHorizontalSwipe v-model:tab="tab" :tabs="headerTabs">
 		<XHome v-if="tab === 'home'" :user="user" @unfoldFiles="() => { tab = 'files'; }"/>
 		<div v-else-if="tab === 'notes'" class="_spacer" style="--MI_SPACER-w: 800px;">
 			<XTimeline :user="user"/>
@@ -21,7 +20,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<XFlashs v-else-if="tab === 'flashs'" :user="user"/>
 		<XGallery v-else-if="tab === 'gallery'" :user="user"/>
 		<XRaw v-else-if="tab === 'raw'" :user="user"/>
-		</MkHorizontalSwipe>
 	</div>
 	<div v-else-if="error">
 		<MkError @retry="fetchUser()"/>
@@ -41,8 +39,7 @@ import { acct as getAcct } from '@/filters/user.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { definePage } from '@/page.js';
 import { i18n } from '@/i18n.js';
-import { $i } from '@/account.js';
-import MkHorizontalSwipe from '@/components/MkHorizontalSwipe.vue';
+import { $i } from '@/i.js';
 import MkUserNotFound from "@/components/MkUserNotFound.vue";
 import MkUserSuspended from "@/components/MkUserSuspended.vue";
 import { serverContext, assertServerContext } from '@/server-context.js';

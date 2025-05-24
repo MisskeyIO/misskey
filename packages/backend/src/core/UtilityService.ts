@@ -39,11 +39,6 @@ export class UtilityService {
 		return this.normalizeHost(this.config.host) === this.normalizeHost(host);
 	}
 
-	@bindThis
-	public isUriLocal(uri: string): boolean {
-		return this.punyHost(uri) === this.toPuny(this.config.host);
-	}
-
 	// メールアドレスのバリデーションを行う
 	// https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address
 	@bindThis

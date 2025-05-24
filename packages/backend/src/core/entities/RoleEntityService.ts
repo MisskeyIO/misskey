@@ -14,7 +14,6 @@ import { bindThis } from '@/decorators.js';
 import { DEFAULT_POLICIES } from '@/core/RoleService.js';
 import { Packed } from '@/misc/json-schema.js';
 import { IdService } from '@/core/IdService.js';
-import { Packed } from '@/misc/json-schema.js';
 
 @Injectable()
 export class RoleEntityService {

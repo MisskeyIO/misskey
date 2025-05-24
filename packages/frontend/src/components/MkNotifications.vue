@@ -43,8 +43,7 @@ import MkNote from '@/components/MkNote.vue';
 import { useStream } from '@/stream.js';
 import { i18n } from '@/i18n.js';
 import { infoImageUrl } from '@/instance.js';
-import { defaultStore } from '@/store.js';
-import { filterMutedNotification } from '@/scripts/filter-muted-notification.js';
+import { filterMutedNotification } from '@/utility/filter-muted-notification.js';
 import MkPullToRefresh from '@/components/MkPullToRefresh.vue';
 import { prefer } from '@/preferences.js';
 

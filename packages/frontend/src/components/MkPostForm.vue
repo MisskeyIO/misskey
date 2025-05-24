@@ -680,8 +680,8 @@ function clear() {
 	text.value = '';
 	useCw.value = false;
 	cw.value = null;
-	visibility.value = defaultStore.state.rememberNoteVisibility ? defaultStore.state.visibility : defaultStore.state.defaultNoteVisibility;
-	localOnly.value = defaultStore.state.rememberNoteVisibility ? defaultStore.state.localOnly : defaultStore.state.defaultNoteLocalOnly;
+	visibility.value = store.s.rememberNoteVisibility ? store.s.visibility : store.s.defaultNoteVisibility;
+	localOnly.value = store.s.rememberNoteVisibility ? store.s.localOnly : store.s.defaultNoteLocalOnly;
 	files.value = [];
 	poll.value = null;
 	visibleUsers.value = [];

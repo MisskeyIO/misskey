@@ -46,8 +46,6 @@ export class S3Service {
 			tls: meta.objectStorageUseSSL,
 			forcePathStyle: meta.objectStorageEndpoint ? meta.objectStorageS3ForcePathStyle : false, // AWS with endPoint omitted
 			requestHandler: new NodeHttpHandler(handlerOption),
-			requestChecksumCalculation: 'WHEN_REQUIRED',
-			responseChecksumValidation: 'WHEN_REQUIRED',
 		});
 	}
 

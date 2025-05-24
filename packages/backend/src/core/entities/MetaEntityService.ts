@@ -12,6 +12,7 @@ import type { AdsRepository } from '@/models/_.js';
 import { MAX_NOTE_TEXT_LENGTH } from '@/const.js';
 import { bindThis } from '@/decorators.js';
 import { SystemAccountService } from '@/core/SystemAccountService.js';
+import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { DEFAULT_POLICIES } from '@/core/RoleService.js';
@@ -30,6 +31,7 @@ export class MetaEntityService {
 		private adsRepository: AdsRepository,
 
 		private systemAccountService: SystemAccountService,
+		private userEntityService: UserEntityService,
 	) { }
 
 	@bindThis
@@ -151,7 +153,7 @@ export class MetaEntityService {
 
 		const packed = await this.pack(instance);
 
-		const proxyAccount = instance.proxyAccountId ? await this.userEntityService.pack(instance.proxyAccountId, null).catch(() => null) : null;
+		const proxyAccount = await this.systemAccountService.fetch('proxy');
 
 		return {
 			...packed,

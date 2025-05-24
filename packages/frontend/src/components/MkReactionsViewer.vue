@@ -25,7 +25,8 @@ import { TransitionGroup } from 'vue';
 import XReaction from '@/components/MkReactionsViewer.reaction.vue';
 import { prefer } from '@/preferences.js';
 import { DI } from '@/di.js';
-import { $i } from '@/account.js';
+import { $i } from '@/i.js';
+import {store} from "@/store";
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;
@@ -52,7 +53,7 @@ if (props.note.myReaction && !Object.keys(reactions.value).includes(props.note.m
 function shouldDisplayReaction([reaction]: [string, number]): boolean {
 	if (!$i) return true; // 非ログイン状態なら全部のリアクションを見れるように
 	if (reaction === props.note.myReaction) return true; // 自分がつけたリアクションなら表示する
-	if (!defaultStore.state.mutedReactions.includes(reaction.replace('@.', ''))) return true; // ローカルの絵文字には @. というsuffixがつくのでそれを消してから比較してあげる
+	if (!store.s.mutedReactions.includes(reaction.replace('@.', ''))) return true; // ローカルの絵文字には @. というsuffixがつくのでそれを消してから比較してあげる
 	return false;
 }
 

@@ -48,7 +48,6 @@ import { markRaw, ref, useTemplateRef, computed, onUpdated, onMounted, onBeforeU
 import sanitizeHtml from 'sanitize-html';
 import { emojilist, getEmojiName } from '@@/js/emojilist.js';
 import { debounce } from 'throttle-debounce';
-import contains from '@/scripts/contains.js';
 import { char2twemojiFilePath, char2fluentEmojiFilePath } from '@@/js/emoji-base.js';
 import { MFM_TAGS, MFM_PARAMS } from '@@/js/const.js';
 import type { EmojiDef } from '@/utility/search-emoji.js';
@@ -95,38 +94,6 @@ export type CompleteInfo = {
 	},
 };
 
-export type CompleteInfo = {
-	user: {
-		payload: any;
-		query: string | null;
-	},
-	hashtag: {
-		payload: string;
-		query: string;
-	},
-	// `:emo` -> `:emoji:` or some unicode emoji
-	emoji: {
-		payload: string;
-		query: string;
-	},
-	// like emoji but for `:emoji:` -> unicode emoji
-	emojiComplete: {
-		payload: string;
-		query: string;
-	},
-	mfmTag: {
-		payload: string;
-		query: string;
-	},
-	mfmParam: {
-		payload: string;
-		query: {
-			tag: string;
-			params: string[];
-		};
-	},
-}
-
 const lib = emojilist.filter(x => x.category !== 'flags');
 
 const unicodeEmojiDB = computed(() => {
@@ -153,13 +120,6 @@ const unicodeEmojiDB = computed(() => {
 	}
 
 	unicodeEmojiDB.sort((a, b) => a.name.length - b.name.length);
-
-	return unicodeEmojiDB;
-});
-
-const emojiDb = computed(() => {
-	//#region Unicode Emoji
-	//#endregion
 
 	return unicodeEmojiDB;
 });

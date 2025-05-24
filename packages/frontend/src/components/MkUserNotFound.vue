@@ -4,7 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<Transition :name="defaultStore.state.animation ? '_transition_zoom' : ''" appear>
+<Transition :name="prefer.s.animation ? '_transition_zoom' : ''" appear>
 	<div :class="$style.root">
 		<img :class="$style.img" :src="serverErrorImageUrl" class="_ghost"/>
 		<p :class="$style.text"><i class="ti ti-alert-triangle"></i> {{ i18n.ts.noSuchUser }}</p>
@@ -16,6 +16,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { i18n } from '@/i18n.js';
 import { defaultStore } from '@/store.js';
 import { serverErrorImageUrl } from '@/instance.js';
+import {prefer} from "@/preferences";
 
 </script>
 

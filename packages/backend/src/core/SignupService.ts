@@ -11,21 +11,18 @@ import { DataSource, IsNull } from 'typeorm';
 import { bindThis } from '@/decorators.js';
 import { DI } from '@/di-symbols.js';
 import type Logger from '@/logger.js';
-import generateUserToken from '@/misc/generate-native-user-token.js';
+import { generateNativeUserToken } from '@/misc/token.js';
 import type { MiMeta, UsedUsernamesRepository, UsersRepository } from '@/models/_.js';
 import { MiUser } from '@/models/User.js';
 import { MiUserProfile } from '@/models/UserProfile.js';
 import { MiUserKeypair } from '@/models/UserKeypair.js';
 import { MiUsedUsername } from '@/models/UsedUsername.js';
 import { IdService } from '@/core/IdService.js';
-import { MetaService } from '@/core/MetaService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { LoggerService } from '@/core/LoggerService.js';
-import { InstanceActorService } from '@/core/InstanceActorService.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import UsersChart from '@/core/chart/charts/users.js';
 import { UserService } from '@/core/UserService.js';
-import { SystemAccountService } from '@/core/SystemAccountService.js';
 import { MetaService } from '@/core/MetaService.js';
 
 @Injectable()
@@ -51,7 +48,6 @@ export class SignupService {
 		private idService: IdService,
 		private utilityService: UtilityService,
 		private loggerService: LoggerService,
-		private systemAccountService: SystemAccountService,
 		private metaService: MetaService,
 		private userEntityService: UserEntityService,
 		private usersChart: UsersChart,
@@ -87,7 +83,7 @@ export class SignupService {
 		}
 
 		// Generate secret
-		const secret = generateUserToken();
+		const secret = generateNativeUserToken();
 
 		// Check username duplication
 		if (await this.usersRepository.exists({ where: { usernameLower: username.toLowerCase(), host: IsNull() } })) {

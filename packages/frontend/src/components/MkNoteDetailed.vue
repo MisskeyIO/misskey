@@ -127,7 +127,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkReactionsViewer v-if="appearNote.reactionAcceptance !== 'likeOnly'" ref="reactionsViewer" style="margin-top: 6px;" :note="appearNote"/>
 			<button class="_button" :class="$style.noteFooterButton" @click="reply()">
 				<i class="ti ti-arrow-back-up"></i>
-				<p v-if="defaultStore.state.showRepliesCount && appearNote.repliesCount > 0" :class="$style.noteFooterButtonCount">{{ number(appearNote.repliesCount) }}</p>
+				<p v-if="store.s.showRepliesCount  && appearNote.repliesCount > 0" :class="$style.noteFooterButtonCount">{{ number(appearNote.repliesCount) }}</p>
 			</button>
 			<button
 				v-if="canRenote"
@@ -137,7 +137,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				@mousedown.prevent="renote()"
 			>
 				<i class="ti ti-repeat"></i>
-				<p v-if="defaultStore.state.showRenotesCount && appearNote.renoteCount > 0" :class="$style.noteFooterButtonCount">{{ number(appearNote.renoteCount) }}</p>
+				<p v-if="store.s.showRenotesCount && appearNote.renoteCount > 0" :class="$style.noteFooterButtonCount">{{ number(appearNote.renoteCount) }}</p>
 			</button>
 			<button v-else class="_button" :class="$style.noteFooterButton" disabled>
 				<i class="ti ti-ban"></i>
@@ -261,6 +261,7 @@ import { getAppearNote } from '@/utility/get-appear-note.js';
 import { prefer } from '@/preferences.js';
 import { getPluginHandlers } from '@/plugin.js';
 import { DI } from '@/di.js';
+import {store} from "@/store";
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;

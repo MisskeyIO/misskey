@@ -75,62 +75,62 @@ export class QueueService {
 
 	@bindThis
 	private ensureRepeatJobs() {
-		this.systemQueue.add('tickCharts', {
+		void this.systemQueue.add('tickCharts', {
 		}, {
 			repeat: { pattern: '55 * * * *' },
 			removeOnComplete: 10,
 			removeOnFail: 30,
 		});
 
-		this.systemQueue.add('resyncCharts', {
+		void this.systemQueue.add('resyncCharts', {
 		}, {
 			repeat: { pattern: '0 0 * * *' },
 			removeOnComplete: 10,
 			removeOnFail: 30,
 		});
 
-		this.systemQueue.add('cleanCharts', {
+		void this.systemQueue.add('cleanCharts', {
 		}, {
 			repeat: { pattern: '0 0 * * *' },
 			removeOnComplete: 10,
 			removeOnFail: 30,
 		});
 
-		this.systemQueue.add('aggregateRetention', {
+		void this.systemQueue.add('aggregateRetention', {
 		}, {
 			repeat: { pattern: '0 0 * * *' },
 			removeOnComplete: 10,
 			removeOnFail: 30,
 		});
 
-		this.systemQueue.add('clean', {
+		void this.systemQueue.add('clean', {
 		}, {
 			repeat: { pattern: '0 0 * * *' },
 			removeOnComplete: 10,
 			removeOnFail: 30,
 		});
 
-		this.systemQueue.add('checkExpiredMutings', {
+		void this.systemQueue.add('checkExpiredMutings', {
 		}, {
 			repeat: { pattern: '*/5 * * * *' },
 			removeOnComplete: 10,
 			removeOnFail: 30,
 		});
 
-		this.systemQueue.add('checkMissingScheduledNote', {
+		void this.systemQueue.add('checkMissingScheduledNote', {
 		}, {
 			repeat: { pattern: '*/5 * * * *' },
 			removeOnComplete: true,
 		});
 
-		this.systemQueue.add('bakeBufferedReactions', {
+		void this.systemQueue.add('bakeBufferedReactions', {
 		}, {
 			repeat: { pattern: '0 0 * * *' },
 			removeOnComplete: 10,
 			removeOnFail: 30,
 		});
 
-		this.systemQueue.add('checkModeratorsActivity', {
+		void this.systemQueue.add('checkModeratorsActivity', {
 		}, {
 			// 毎時30分に起動
 			repeat: { pattern: '30 * * * *' },
@@ -757,17 +757,17 @@ export class QueueService {
 	}
 
 	@bindThis
-	private getQueue(type: typeof QUEUE_TYPES[number]): Bull.Queue {
+	private getQueue(type: typeof QUEUE_TYPES[number]): Bull.Queue<any, any, string> {
 		switch (type) {
-			case 'system': return this.systemQueue;
-			case 'endedPollNotification': return this.endedPollNotificationQueue;
-			case 'deliver': return this.deliverQueue;
-			case 'inbox': return this.inboxQueue;
-			case 'db': return this.dbQueue;
-			case 'relationship': return this.relationshipQueue;
-			case 'objectStorage': return this.objectStorageQueue;
-			case 'userWebhookDeliver': return this.userWebhookDeliverQueue;
-			case 'systemWebhookDeliver': return this.systemWebhookDeliverQueue;
+			case 'system': return this.systemQueue as any;
+			case 'endedPollNotification': return this.endedPollNotificationQueue as any;
+			case 'deliver': return this.deliverQueue as any;
+			case 'inbox': return this.inboxQueue as any;
+			case 'db': return this.dbQueue as any;
+			case 'relationship': return this.relationshipQueue as any;
+			case 'objectStorage': return this.objectStorageQueue as any;
+			case 'userWebhookDeliver': return this.userWebhookDeliverQueue as any;
+			case 'systemWebhookDeliver': return this.systemWebhookDeliverQueue as any;
 			default: throw new Error(`Unrecognized queue type: ${type}`);
 		}
 	}

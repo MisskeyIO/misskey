@@ -65,7 +65,6 @@ import { dateString } from '@/filters/date.js';
 import MkClipPreview from '@/components/MkClipPreview.vue';
 import { prefer } from '@/preferences.js';
 import MkInfo from '@/components/MkInfo.vue';
-import { $i } from '@/account.js';
 import { pleaseLogin } from '@/utility/please-login.js';
 import { getAppearNote } from '@/utility/get-appear-note.js';
 import { serverContext, assertServerContext } from '@/server-context.js';

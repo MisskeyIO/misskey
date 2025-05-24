@@ -124,7 +124,7 @@ import * as os from '@/os.js';
 import { exitFullscreen, requestFullscreen } from '@/utility/fullscreen.js';
 import hasAudio from '@/utility/media-has-audio.js';
 import MkMediaRange from '@/components/MkMediaRange.vue';
-import { pleaseLogin } from '@/scripts/please-login.js';
+import { pleaseLogin } from '@/utility/please-login.js';
 import { $i, iAmModerator } from '@/i.js';
 import { prefer } from '@/preferences.js';
 
@@ -314,7 +314,7 @@ async function showHiddenContent(ev: MouseEvent) {
 		return;
 	}
 
-	if (props.video.isSensitive && defaultStore.state.confirmWhenRevealingSensitiveMedia) {
+	if (props.video.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
 		const {canceled} = await os.confirm({
 			type: 'question',
 			text: i18n.ts.sensitiveMediaRevealConfirm,

@@ -90,7 +90,7 @@ import * as os from '@/os.js';
 import bytes from '@/filters/bytes.js';
 import { hms } from '@/filters/hms.js';
 import MkMediaRange from '@/components/MkMediaRange.vue';
-import { pleaseLogin } from '@/scripts/please-login.js';
+import { pleaseLogin } from '@/utility/please-login.js';
 import { $i, iAmModerator } from '@/i.js';
 import { prefer } from '@/preferences.js';
 

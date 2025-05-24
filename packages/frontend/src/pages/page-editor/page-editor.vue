@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <PageWithHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs">
 	<div class="_spacer" style="--MI_SPACER-w: 700px;">
 		<div class="jqqmcavi">
-			<MkButton v-if="pageId" class="button" inline link :to="`/@${ author.username }/pages/${ currentName }`"><i class="ti ti-external-link"></i> {{ i18n.ts._pages.viewPage }}</MkButton>
+			<MkButton v-if="pageId" class="button" inline link :to="`/@${ author?.username }/pages/${ currentName }`"><i class="ti ti-external-link"></i> {{ i18n.ts._pages.viewPage }}</MkButton>
 			<MkButton v-if="!readonly" inline primary class="button" @click="save"><i class="ti ti-device-floppy"></i> {{ i18n.ts.save }}</MkButton>
 			<MkButton v-if="pageId" inline class="button" @click="duplicate"><i class="ti ti-copy"></i> {{ i18n.ts.duplicate }}</MkButton>
 			<MkButton v-if="pageId && !readonly" inline class="button" danger @click="del"><i class="ti ti-trash"></i> {{ i18n.ts.delete }}</MkButton>
@@ -24,7 +24,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</MkInput>
 
 				<MkInput v-model="name" type="text" pattern="^[a-zA-Z0-9_-]+$" autocapitalize="off">
-					<template #prefix>{{ url }}/@{{ author.username }}/pages/</template>
+					<template #prefix>{{ url }}/@{{ author?.username }}/pages/</template>
 					<template #label>{{ i18n.ts._pages.url }}</template>
 				</MkInput>
 
@@ -102,7 +102,7 @@ const name = ref(Date.now().toString());
 const eyeCatchingImage = ref<Misskey.entities.DriveFile | null>(null);
 const eyeCatchingImageId = ref<string | null>(null);
 const font = ref<'sans-serif' | 'serif'>('sans-serif');
-const visibility = ref('public');
+const visibility = ref<'public' | 'private'>('public');
 const content = ref<Misskey.entities.Page['content']>([]);
 const alignCenter = ref(false);
 const hideTitleWhenPinned = ref(false);
@@ -125,7 +125,6 @@ function getSaveOptions(): Misskey.entities.PagesCreateRequest {
 		name: name.value.trim(),
 		summary: summary.value,
 		font: font.value,
-		visibility: visibility.value,
 		script: '',
 		hideTitleWhenPinned: hideTitleWhenPinned.value,
 		alignCenter: alignCenter.value,
@@ -133,6 +132,14 @@ function getSaveOptions(): Misskey.entities.PagesCreateRequest {
 		variables: [],
 		eyeCatchingImageId: eyeCatchingImageId.value,
 	};
+}
+
+function onError(error: any) {
+	console.error('Error occurred:', error);
+	os.alert({
+		type: 'error',
+		text: i18n.ts.somethingHappened,
+	});
 }
 
 async function save() {
@@ -144,34 +151,38 @@ async function save() {
 			...options,
 		};
 
-		await os.apiWithDialog('pages/update', updateOptions, undefined, {
-			'2298a392-d4a1-44c5-9ebb-ac1aeaa5a9ab': {
-				title: i18n.ts.somethingHappened,
-				text: i18n.ts._pages.nameAlreadyExists,
-			},
-		});
+		try {
+			await os.apiWithDialog('pages/update', updateOptions);
 
-	if (pageId.value) {
-		options.pageId = pageId.value;
-		os.apiWithDialog('pages/update', options)
-			.then(page => {
-				currentName.value = name.value.trim();
-				os.alert({
-					type: 'success',
-					text: i18n.ts._pages.updated,
+			currentName.value = name.value.trim();
+			await os.alert({
+				type: 'success',
+				text: i18n.ts.saved,
+			});
+		} catch (error) {
+			if (error && typeof error === 'object' && 'code' in error && error.code === '2298a392-d4a1-44c5-9ebb-ac1aeaa5a9ab') {
+				await os.alert({
+					type: 'error',
+					title: i18n.ts.somethingHappened,
+					text: i18n.ts._pages.nameAlreadyExists,
 				});
-			}).catch(onError);
+			} else {
+				onError(error);
+			}
+		}
 	} else {
-		os.apiWithDialog('pages/create', options)
-			.then(created => {
-				pageId.value = created.id;
-				currentName.value = name.value.trim();
-				os.alert({
-					type: 'success',
-					text: i18n.ts._pages.created,
-				});
-				mainRouter.push(`/pages/edit/${pageId.value}`);
-			}).catch(onError);
+		try {
+			const created = await os.apiWithDialog('pages/create', options);
+			pageId.value = created.id;
+			currentName.value = name.value.trim();
+			await os.alert({
+				type: 'success',
+				text: 'Page created successfully',
+			});
+			mainRouter.push(`/pages/edit/${pageId.value}`);
+		} catch (error) {
+			onError(error);
+		}
 	}
 }
 
@@ -193,32 +204,38 @@ async function del() {
 }
 
 async function duplicate() {
-	title.value = title.value + ' - copy';
-	name.value = name.value + '-copy';
+	try {
+		title.value = title.value + ' - copy';
+		name.value = name.value + '-copy';
 
-	const created = await os.apiWithDialog('pages/create', getSaveOptions(), undefined, {
-		'4650348e-301c-499a-83c9-6aa988c66bc1': {
-			title: i18n.ts.somethingHappened,
-			text: i18n.ts._pages.nameAlreadyExists,
-		},
-	});
+		const created = await os.apiWithDialog('pages/create', getSaveOptions());
 
-	pageId.value = created.id;
-	currentName.value = name.value.trim();
+		pageId.value = created.id;
+		currentName.value = name.value.trim();
 
-	mainRouter.push(`/pages/edit/${pageId.value}`);
+		mainRouter.push(`/pages/edit/${pageId.value}`);
+	} catch (error) {
+		if (error && typeof error === 'object' && 'code' in error && error.code === '4650348e-301c-499a-83c9-6aa988c66bc1') {
+			await os.alert({
+				type: 'error',
+				title: i18n.ts.somethingHappened,
+				text: i18n.ts._pages.nameAlreadyExists,
+			});
+		} else {
+			onError(error);
+		}
+	}
 }
 
 async function add() {
 	const { canceled, result: type } = await os.select({
-		type: null,
 		title: i18n.ts._pages.chooseBlock,
 		items: getPageBlockList(),
 	});
 	if (canceled) return;
 
 	const id = uuid();
-	content.value.push({ id, type });
+	content.value.push({ id, type } as any);
 }
 
 function setEyeCatchingImage(img: Event) {
@@ -245,14 +262,13 @@ async function init() {
 	}
 
 	if (page.value) {
-		author.value = page.value.user;
+		author.value = page.value.user as any;
 		pageId.value = page.value.id;
 		title.value = page.value.title;
 		name.value = page.value.name;
 		currentName.value = page.value.name;
 		summary.value = page.value.summary;
-		font.value = page.value.font;
-		visibility.value = page.value.visibility;
+		font.value = page.value.font as 'serif' | 'sans-serif';
 		hideTitleWhenPinned.value = page.value.hideTitleWhenPinned;
 		alignCenter.value = page.value.alignCenter;
 		content.value = page.value.content;
@@ -267,7 +283,7 @@ async function init() {
 	}
 }
 
-init();
+await init();
 
 const headerActions = computed(() => []);
 
@@ -283,8 +299,8 @@ const headerTabs = computed(() => [{
 
 definePage(() => ({
 	title: props.initPageId ? i18n.ts._pages.editPage
-	: props.initPageName && props.initUser ? i18n.ts._pages.readPage
-	: i18n.ts._pages.newPage,
+		: props.initPageName && props.initUser ? i18n.ts._pages.readPage
+		: i18n.ts._pages.newPage,
 	icon: 'ti ti-pencil',
 }));
 </script>

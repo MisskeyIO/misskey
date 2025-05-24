@@ -36,7 +36,7 @@ export class WellKnownServerService {
 		private userEntityService: UserEntityService,
 		private oauth2ProviderService: OAuth2ProviderService,
 	) {
-		//this.createServer = this.createServer.bind(this);
+		// this.createServer = this.createServer.bind(this);
 	}
 
 	@bindThis
@@ -54,7 +54,7 @@ export class WellKnownServerService {
 		const jrd = 'application/jrd+json';
 		const xrd = 'application/xrd+xml';
 
-		fastify.register(fastifyAccepts);
+		fastify.register(fastifyAccepts, { decorateReply: true });
 
 		fastify.addHook('onRequest', (request, reply, done) => {
 			reply.header('Access-Control-Allow-Headers', 'Accept');

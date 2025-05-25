@@ -4,8 +4,8 @@
  */
 
 import { onUnmounted } from 'vue';
-import type { Ref, ShallowRef } from 'vue';
 import * as Misskey from 'misskey-js';
+import type { Ref, ShallowRef } from 'vue';
 import { useStream } from '@/stream.js';
 import { $i } from '@/i.js';
 
@@ -21,7 +21,7 @@ export function useNoteCapture(props: {
 
 	function onStreamNoteUpdated(noteData): void {
 		const { type, id, body } = noteData;
-
+		console.log('useNoteCapture: onStreamNoteUpdated', type, id, body);
 		if ((id !== note.value.id) && (id !== pureNote.value.id)) return;
 
 		switch (type) {
@@ -93,6 +93,8 @@ export function useNoteCapture(props: {
 			} else {
 				command = 's';
 			}
+
+			connection.send(command, { id: note.value.id });
 
 			if (pureNote.value.id !== note.value.id) connection.send('s', { id: pureNote.value.id });
 			if (withHandler) connection.on('noteUpdated', onStreamNoteUpdated);

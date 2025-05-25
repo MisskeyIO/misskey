@@ -5,14 +5,14 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import type { UsersRepository, AbuseUserReportsRepository } from '@/models/_.js';
+import type { AbuseUserReportsRepository, UsersRepository } from '@/models/_.js';
 import { QueueService } from '@/core/QueueService.js';
 import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
 import { DI } from '@/di-symbols.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
 import { UserWebhookService } from '@/core/UserWebhookService.js';
 import { RoleService } from '@/core/RoleService.js';
-import {SystemAccountService} from "@/core/SystemAccountService.js";
+import { SystemAccountService } from '@/core/SystemAccountService.js';
 
 export const meta = {
 	tags: ['admin'],
@@ -38,10 +38,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 	constructor(
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
-
 		@Inject(DI.abuseUserReportsRepository)
 		private abuseUserReportsRepository: AbuseUserReportsRepository,
-
 		private queueService: QueueService,
 		private apRendererService: ApRendererService,
 		private moderationLogService: ModerationLogService,
@@ -57,7 +55,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			}
 
 			if (ps.forward && report.targetUserHost != null) {
-				const actor = await this.systemAccountService.fetch("actor")
+				const actor = await this.systemAccountService.fetch('actor');
 				const targetUser = await this.usersRepository.findOneByOrFail({ id: report.targetUserId });
 
 				this.queueService.deliver(actor, this.apRendererService.addContext(this.apRendererService.renderFlag(actor, targetUser.uri!, report.comment)), targetUser.inbox, false);
@@ -74,14 +72,13 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			}
 
 			const webhooks = (await this.userWebhookService.getActiveWebhooks()).filter(x => x.on.includes('reportResolved'));
-			// for (const webhook of webhooks) {
-			// 	if (await this.roleService.isAdministrator({ id: webhook.userId })) {
-			// 		await this.queueService.userWebhookDeliver(webhook, 'reportResolved', {
-			// 			updatedReport
-			// 		});
-			// 	}
-			// }
-			// FIXME 後で直す
+			for (const webhook of webhooks) {
+				if (await this.roleService.isAdministrator({ id: webhook.userId })) {
+					await this.queueService.userWebhookDeliver(webhook, 'reportResolved', {
+						updatedReport,
+					});
+				}
+			}
 
 			await this.moderationLogService.log(me, 'resolveAbuseReport', {
 				reportId: report.id,

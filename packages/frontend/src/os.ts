@@ -5,7 +5,7 @@
 
 // TODO: なんでもかんでもos.tsに突っ込むのやめたいのでよしなに分割する
 
-import { markRaw, ref, defineAsyncComponent, nextTick } from 'vue';
+import { defineAsyncComponent, markRaw, nextTick, ref } from 'vue';
 import { EventEmitter } from 'eventemitter3';
 import insertTextAtCursor from 'insert-text-at-cursor';
 import * as Misskey from 'misskey-js';
@@ -24,8 +24,6 @@ import MkWaitingDialog from '@/components/MkWaitingDialog.vue';
 import MkPageWindow from '@/components/MkPageWindow.vue';
 import MkToast from '@/components/MkToast.vue';
 import MkDialog from '@/components/MkDialog.vue';
-import MkPasswordDialog from '@/components/MkPasswordDialog.vue';
-import MkEmojiPickerDialog from '@/components/MkEmojiPickerDialog.vue';
 import MkEmojiPickerWindow from '@/components/MkEmojiPickerWindow.vue';
 import MkPopupMenu from '@/components/MkPopupMenu.vue';
 import MkContextMenu from '@/components/MkContextMenu.vue';
@@ -34,6 +32,7 @@ import { pleaseLogin } from '@/utility/please-login.js';
 import { showMovedDialog } from '@/utility/show-moved-dialog.js';
 import { getHTMLElementOrNull } from '@/utility/get-dom-node-or-null.js';
 import { focusParent } from '@/utility/focus.js';
+import { store } from '@/store';
 
 export const openingWindowsCount = ref(0);
 
@@ -75,7 +74,6 @@ export async function apiErrorHandler(err: Misskey.api.APIError, endpoint?: stri
 		});
 		if (result === 'copy') {
 			copyToClipboard(`Endpoint: ${endpoint}\nInfo: ${JSON.stringify(err.info)}\nDate: ${date}`);
-
 		}
 		return;
 	} else if (err.code === 'RATE_LIMIT_EXCEEDED') {
@@ -176,6 +174,7 @@ const zIndexes = {
 	middle: 2000000,
 	high: 3000000,
 };
+
 export function claimZIndex(priority: keyof typeof zIndexes = 'low'): number {
 	zIndexes[priority] += 100;
 	return zIndexes[priority];
@@ -618,7 +617,10 @@ export function form<F extends Form>(title: string, f: F): Promise<{
 	});
 }
 
-export async function selectUser(opts: { includeSelf?: boolean; localOnly?: boolean; } = {}): Promise<Misskey.entities.UserDetailed> {
+export async function selectUser(opts: {
+	includeSelf?: boolean;
+	localOnly?: boolean;
+} = {}): Promise<Misskey.entities.UserDetailed> {
 	return new Promise(resolve => {
 		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkUserSelectDialog.vue')), {
 			includeSelf: opts.includeSelf,
@@ -719,6 +721,7 @@ type AwaitType<T> =
 	T;
 let openingEmojiPicker: AwaitType<ReturnType<typeof popup>> | null = null;
 let activeTextarea: HTMLTextAreaElement | HTMLInputElement | null = null;
+
 export async function openEmojiPicker(src: HTMLElement, opts: ComponentProps<typeof MkEmojiPickerWindow>, initialTextarea: typeof activeTextarea) {
 	if (openingEmojiPicker) return;
 
@@ -756,7 +759,7 @@ export async function openEmojiPicker(src: HTMLElement, opts: ComponentProps<typ
 
 	openingEmojiPicker = await popup(MkEmojiPickerWindow, {
 		src,
-		pinnedEmojis: opts.asReactionPicker ? prefer.s.reactions : prefer.s.pinnedEmojis, //FIXME ReactiveState nani
+		pinnedEmojis: opts.asReactionPicker ? store.r.reactions : store.r.pinnedEmojis,
 		...opts,
 	}, {
 		chosen: emoji => {

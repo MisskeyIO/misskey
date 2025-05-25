@@ -292,7 +292,7 @@ const renoteCollapsed = ref(
 		(appearNote.value.myReaction != null)
 	),
 );
-const hideMutedNotes = $i ? defaultStore.state.hideMutedNotes : true;
+const hideMutedNotes = $i ? store.s.hideMutedNotes : true;
 
 const pleaseLoginContext = computed<OpenOnRemoteOptions>(() => ({
 	type: 'lookup',

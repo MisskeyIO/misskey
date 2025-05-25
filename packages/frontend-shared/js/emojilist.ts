@@ -15,9 +15,12 @@ export type UnicodeEmojiDef = {
 import _emojilist from './emojilist.json' with { type: 'json' };
 
 const unicodeEmojisMap = new Map<string, UnicodeEmojiDef>(
-	_emojilist.map(x => [x.char, x]),
+	_emojilist.map(x => [x[0] as string, {
+		char: x[0] as string,
+		name: x[1] as string,
+		category: unicodeEmojiCategories[x[2] as number],
+	}]),
 );
-
 export function getUnicodeEmoji(char: string): UnicodeEmojiDef | string {
 	// Colorize it because emojilist.json assumes that
 	return unicodeEmojisMap.get(colorizeEmoji(char))

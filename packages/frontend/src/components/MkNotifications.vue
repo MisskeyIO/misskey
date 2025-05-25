@@ -34,7 +34,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { onUnmounted, onMounted, computed, useTemplateRef, TransitionGroup,onActivated } from 'vue';
+import { onUnmounted, onMounted, computed, useTemplateRef, TransitionGroup,onActivated,ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { notificationTypes } from '@@/js/const.js';
 import MkPagination from '@/components/MkPagination.vue';

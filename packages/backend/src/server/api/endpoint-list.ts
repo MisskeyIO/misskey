@@ -9,7 +9,6 @@
  * When you add new endpoint, you should add it to this file.
  * This file is used to generate API documentation and EndpointsModule.
  */
-
 export * as 'admin/abuse-report/notification-recipient/create' from './endpoints/admin/abuse-report/notification-recipient/create.js';
 export * as 'admin/abuse-report/notification-recipient/delete' from './endpoints/admin/abuse-report/notification-recipient/delete.js';
 export * as 'admin/abuse-report/notification-recipient/list' from './endpoints/admin/abuse-report/notification-recipient/list.js';
@@ -33,7 +32,6 @@ export * as 'admin/avatar-decorations/list' from './endpoints/admin/avatar-decor
 export * as 'admin/avatar-decorations/update' from './endpoints/admin/avatar-decorations/update.js';
 export * as 'admin/captcha/current' from './endpoints/admin/captcha/current.js';
 export * as 'admin/captcha/save' from './endpoints/admin/captcha/save.js';
-export * as 'admin/delete-all-files-of-a-user' from './endpoints/admin/drive/delete-all-files-of-a-user.js';
 export * as 'admin/drive/clean-remote-files' from './endpoints/admin/drive/clean-remote-files.js';
 export * as 'admin/drive/cleanup' from './endpoints/admin/drive/cleanup.js';
 export * as 'admin/drive/files' from './endpoints/admin/drive/files.js';
@@ -426,3 +424,33 @@ export * as 'chat/rooms/invitations/inbox' from './endpoints/chat/rooms/invitati
 export * as 'chat/rooms/invitations/outbox' from './endpoints/chat/rooms/invitations/outbox.js';
 export * as 'chat/history' from './endpoints/chat/history.js';
 export * as 'v2/admin/emoji/list' from './endpoints/v2/admin/emoji/list.js';
+export * as 'admin/accounts/pending/list' from './endpoints/admin/accounts/pending/list.js';
+export * as 'admin/accounts/pending/revoke' from './endpoints/admin/accounts/pending/revoke.js';
+export * as 'admin/abuse-report-resolver/create' from './endpoints/admin/abuse-report-resolver/create.js';
+export * as 'admin/abuse-report-resolver/update' from './endpoints/admin/abuse-report-resolver/update.js';
+export * as 'admin/abuse-report-resolver/delete' from './endpoints/admin/abuse-report-resolver/delete.js';
+export * as 'admin/abuse-report-resolver/list' from './endpoints/admin/abuse-report-resolver/list.js';
+export * as 'admin/unset-user-mutual-link' from './endpoints/admin/unset-user-mutual-link.js';
+export * as 'admin/drive/delete-all-files-of-auser' from './endpoints/admin/drive/delete-all-files-of-a-user.js';
+export * as 'admin/indie-auth/create' from './endpoints/admin/indie-auth/create.js';
+export * as 'admin/indie-auth/delete' from './endpoints/admin/indie-auth/delete.js';
+export * as 'admin/indie-auth/list' from './endpoints/admin/indie-auth/list.js';
+export * as 'admin/indie-auth/update' from './endpoints/admin/indie-auth/update.js';
+export * as 'admin/regenerate-user-token' from './endpoints/admin/regenerate-user-token.js';
+export * as 'admin/show-user-account-move-logs' from './endpoints/admin/show-user-account-move-logs.js';
+export * as 'admin/update-user-name' from './endpoints/admin/update-user-name.js';
+export * as 'admin/sso/create' from './endpoints/admin/sso/create.js';
+export * as 'admin/sso/delete' from './endpoints/admin/sso/delete.js';
+export * as 'admin/sso/list' from './endpoints/admin/sso/list.js';
+export * as 'admin/sso/update' from './endpoints/admin/sso/update.js';
+export * as 'announcement' from './endpoints/announcement.js';
+export * as 'channels/featured/games' from './endpoints/channels/featured-games.js';
+export * as 'following/update/all' from './endpoints/following/update-all.js';
+export * as 'notes/scheduled/cancel' from './endpoints/notes/scheduled/cancel.js';
+export * as 'notes/scheduled/list' from './endpoints/notes/scheduled/list.js';
+export * as 'sw/show/registration' from './endpoints/sw/show-registration.js';
+export * as 'sw/update/registration' from './endpoints/sw/update-registration.js';
+export * as 'users/get-following-birthday-users' from './endpoints/users/get-following-birthday-users.js';
+export * as 'users/get-skeb-status' from './endpoints/users/get-skeb-status.js';
+export * as 'users/get/security/info' from './endpoints/users/get-security-info.js';
+export * as 'users/stats' from './endpoints/users/stats.js';

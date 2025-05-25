@@ -40,7 +40,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, watch, onUnmounted, provide, useTemplateRef, TransitionGroup,onMounted } from 'vue';
+import { computed, watch, onUnmounted, provide, useTemplateRef, TransitionGroup,onMounted ,} from 'vue';
 import * as Misskey from 'misskey-js';
 import type { BasicTimelineType } from '@/timelines.js';
 import type { Paging } from '@/components/MkPagination.vue';
@@ -153,22 +153,22 @@ async function prepend(data) {
 
 async function loadUnloadedNotes() {
 	if (document.hidden) return;
-	if (tlComponent.value == null) return;
+	if (pagingComponent.value == null) return;
 	if (notVisibleNoteData.length === 0) return;
 
-	tlComponent.value.pagingComponent?.stopFetch();
+	pagingComponent.value.stopFetch();
 	try {
 		const items = [...notVisibleNoteData];
 		notVisibleNoteData.length = 0;
 
 		const notes = await Promise.allSettled(items.map(fulfillNoteData));
-		if (items.length >= 10) tlComponent.value.pagingComponent?.deleteItem();
+		if (items.length >= 10) pagingComponent.value.deleteItem();
 
 		for (const note of notes.filter(i => i.status === 'fulfilled' && i.value != null)) {
 			await prepend((note as PromiseFulfilledResult<object>).value);
 		}
 	} finally {
-		tlComponent.value.pagingComponent?.startFetch();
+		pagingComponent.value.startFetch();
 	}
 }
 

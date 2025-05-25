@@ -50,7 +50,6 @@ export default defineComponent({
 				value: option.props?.value,
 				disabled: option.props?.disabled,
 				modelValue: value.value,
-				disabled: props.disabled,
 				'onUpdate:modelValue': _v => value.value = _v,
 			}, () => option.children)),
 			),

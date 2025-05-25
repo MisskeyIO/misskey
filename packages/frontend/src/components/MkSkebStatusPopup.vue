@@ -33,7 +33,6 @@
 import { nextTick, onMounted, onUnmounted, shallowRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import * as os from '@/os.js';
-import { defaultStore } from '@/store.js';
 import { i18n } from '@/i18n.js';
 import { calcPopupPosition } from '@/utility/popup-position.js';
 import {prefer} from "@/preferences";

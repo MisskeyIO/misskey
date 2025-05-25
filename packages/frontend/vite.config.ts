@@ -1,7 +1,6 @@
 import path from 'path';
 import pluginReplace from '@rollup/plugin-replace';
 import pluginVue from '@vitejs/plugin-vue';
-import typescript from '@rollup/plugin-typescript';
 import { defineConfig } from 'vite';
 import type { UserConfig } from 'vite';
 import * as yaml from 'js-yaml';
@@ -98,7 +97,6 @@ export function getConfig(): UserConfig {
 
 		plugins: [
 			...searchIndexes.map(options => pluginCreateSearchIndex(options)),
-			typescript(),
 			pluginVue(),
 			pluginUnwindCssModuleClassName(),
 			pluginJson5(),

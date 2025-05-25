@@ -61,7 +61,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue';
-import { shallowRef, Ref } from 'vue';
+import type { Ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkWindow from '@/components/MkWindow.vue';
 import MkSelect from '@/components/MkSelect.vue';
@@ -80,8 +80,10 @@ const emit = defineEmits<{
 	(ev: 'closed'): void;
 }>();
 
-const uiWindow = useTemplateRef('uiWindow');
-const uiWindow2 = useTemplateRef('uiWindow2');
+// FIXME 確認
+
+const uiWindow = useTemplateRef<InstanceType<typeof MkWindow>>('uiWindow');
+const uiWindow2 = useTemplateRef<InstanceType<typeof MkWindow>>('uiWindow2');
 const comment = ref(props.initialComment ?? '');
 const category = ref('');
 const page = ref(1);

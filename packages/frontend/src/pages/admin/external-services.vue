@@ -48,9 +48,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 	<template #footer>
 		<div :class="$style.footer">
-			<MkSpacer :contentMax="700" :marginMin="16" :marginMax="16">
+			<div class="_spacer" style="--MI_SPACER-w: 700px; --MI_SPACER-min: 16px; --MI_SPACER-max: 16px;">
 				<MkButton primary rounded @click="save"><i class="ti ti-check"></i> {{ i18n.ts.save }}</MkButton>
-			</MkSpacer>
+			</div>
 		</div>
 	</template>
 </PageWithHeader>
@@ -112,3 +112,10 @@ definePage(() => ({
 	icon: 'ti ti-link',
 }));
 </script>
+
+<style lang="scss" module>
+.footer {
+	-webkit-backdrop-filter: var(--MI-blur, blur(15px));
+	backdrop-filter: var(--MI-blur, blur(15px));
+}
+</style>

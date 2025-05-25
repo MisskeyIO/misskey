@@ -533,6 +533,22 @@ export const meta = {
 					optional: false, nullable: false,
 				},
 			},
+			prohibitedWordsForNameOfUser: {
+				type: 'array',
+				optional: false, nullable: false,
+				items: {
+					type: 'string',
+					optional: false, nullable: false,
+				},
+			},
+			mediaSilencedHosts: {
+				type: 'array',
+				optional: true, nullable: false,
+				items: {
+					type: 'string',
+					optional: false, nullable: false,
+				},
+			}
 		},
 	},
 } as const;
@@ -676,6 +692,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				urlPreviewSummaryProxyUrl: instance.urlPreviewSummaryProxyUrl,
 				federation: instance.federation,
 				federationHosts: instance.federationHosts,
+				prohibitedWordsForNameOfUser: instance.prohibitedWordsForNameOfUser,
+				mediaSilencedHosts: instance.mediaSilencedHosts,
 			};
 		});
 	}

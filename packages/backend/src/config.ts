@@ -281,7 +281,7 @@ export type Config = {
 	extraHead: string | undefined;
 };
 
-export type FulltextSearchProvider = 'sqlLike' | 'sqlPgroonga' | 'meilisearch';
+export type FulltextSearchProvider = 'sqlLike' | 'sqlPgroonga' | 'meilisearch' | 'opensearch';
 
 const _filename = fileURLToPath(import.meta.url);
 const _dirname = dirname(_filename);

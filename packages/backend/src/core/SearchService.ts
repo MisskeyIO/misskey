@@ -84,7 +84,6 @@ export class SearchService {
 	private readonly opensearchIdField: string;
 	private readonly logger: Logger;
 	private readonly provider: FulltextSearchProvider;
-	// FIXME 多分処理を書き直す必要がある
 	constructor(
 		@Inject(DI.config)
 		private config: Config,
@@ -105,8 +104,8 @@ export class SearchService {
 	) {
 		this.logger = this.loggerService.getLogger('note:search');
 
-		if (meilisearch) {
-			this.meilisearchNoteIndex = meilisearch.index(`${config.meilisearch!.index}---notes`);
+		if (this.meilisearch) {
+			this.meilisearchNoteIndex = this.meilisearch.index(`${config.meilisearch!.index}---notes`);
 			if (config.meilisearch?.scope) {
 				this.meilisearchIndexScope = config.meilisearch.scope;
 			}
@@ -189,7 +188,6 @@ export class SearchService {
 
 	@bindThis
 	public async indexNote(note: MiNote): Promise<void> {
-		if (!this.meilisearch) return;
 		if (note.text == null && note.cw == null) return;
 		if (!['home', 'public'].includes(note.visibility)) return;
 
@@ -198,16 +196,16 @@ export class SearchService {
 				case 'global':
 					break;
 
-			case 'local':
-				if (note.userHost == null) break;
-				return;
+				case 'local':
+					if (note.userHost == null) break;
+					return;
 
-			default: {
-				if (note.userHost == null) break;
-				if (this.meilisearchIndexScope.includes(note.userHost)) break;
-				return;
+				default: {
+					if (note.userHost == null) break;
+					if (this.meilisearchIndexScope.includes(note.userHost)) break;
+					return;
+				}
 			}
-		}
 
 			await this.meilisearchNoteIndex?.addDocuments([{
 				id: note.id,
@@ -245,7 +243,6 @@ export class SearchService {
 
 	@bindThis
 	public async unindexNote(note: MiNote): Promise<void> {
-		if (!this.meilisearch) return;
 		if (!['home', 'public'].includes(note.visibility)) return;
 
 		if (this.meilisearch) {
@@ -279,18 +276,15 @@ export class SearchService {
 			case 'meilisearch': {
 				return this.searchNoteByMeiliSearch(q, me, opts, pagination);
 			}
+			case 'opensearch': {
+				return this.searchNoteByOpenSearch(q, me, opts, pagination);
+			}
 			default: {
-				// Note: opensearch support might be limited, fallback to like search
-				if (this.provider === 'opensearch' as any) {
-					return this.searchNoteByOpenSearch(q, me, opts, pagination);
-				}
-				// eslint-disable-next-line @typescript-eslint/no-unused-vars
-				const typeCheck: never = this.provider;
-				return [];
+				// 最終的にサポートされていないプロバイダが指定された場合は、like検索にフォールバックする
+				return this.searchNoteByLike(q, me, opts, pagination);
 			}
 		}
 	}
-
 
 	@bindThis
 	private async searchNoteByOpenSearch(
@@ -299,6 +293,10 @@ export class SearchService {
 		opts: SearchOpts,
 		pagination: SearchPagination,
 	): Promise<MiNote[]> {
+		if (!this.opensearch || !this.opensearchNoteIndex) {
+			throw new Error('MeiliSearch is not available');
+		}
+
 		const esFilter: any = {
 			bool: {
 				must: [],
@@ -329,7 +327,7 @@ export class SearchService {
 			});
 		}
 
-		const res = await this.opensearch?.search({
+		const res = await this.opensearch.search({
 			index: this.opensearchNoteIndex + '*' as string,
 			body: {
 				query: esFilter,
@@ -376,9 +374,9 @@ export class SearchService {
 		const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), pagination.sinceId, pagination.untilId);
 
 		if (opts.userId) {
-			query.andWhere('note.userId = :userId', {userId: opts.userId});
+			query.andWhere('note.userId = :userId', { userId: opts.userId });
 		} else if (opts.channelId) {
-			query.andWhere('note.channelId = :channelId', {channelId: opts.channelId});
+			query.andWhere('note.channelId = :channelId', { channelId: opts.channelId });
 		}
 
 		query
@@ -389,9 +387,9 @@ export class SearchService {
 			.leftJoinAndSelect('renote.user', 'renoteUser');
 
 		if (this.config.fulltextSearch?.provider === 'sqlPgroonga') {
-			query.andWhere('note.text &@~ :q', {q});
+			query.andWhere('note.text &@~ :q', { q });
 		} else {
-			query.andWhere('LOWER(note.text) LIKE :q', {q: `%${sqlLikeEscape(q.toLowerCase()) }%` });
+			query.andWhere('LOWER(note.text) LIKE :q', { q: `%${sqlLikeEscape(q.toLowerCase()) }%` });
 		}
 
 		if (opts.host) {
@@ -465,13 +463,13 @@ export class SearchService {
 				this.cacheService.userBlockedCache.fetch(me.id),
 			]) : [new Set<string>(), new Set<string>()];
 
-			const notes = (await this.notesRepository.findBy({
-				id: In(res.hits.map(x => x.id)),
-			})).filter(note => {
-				if (me && isUserRelated(note, userIdsWhoBlockingMe)) return false;
-				if (me && isUserRelated(note, userIdsWhoMeMuting)) return false;
-				return true;
-			});
-			return notes.sort((a, b) => a.id > b.id ? -1 : 1);
-		}
+		const notes = (await this.notesRepository.findBy({
+			id: In(res.hits.map(x => x.id)),
+		})).filter(note => {
+			if (me && isUserRelated(note, userIdsWhoBlockingMe)) return false;
+			if (me && isUserRelated(note, userIdsWhoMeMuting)) return false;
+			return true;
+		});
+		return notes.sort((a, b) => a.id > b.id ? -1 : 1);
+	}
 }

@@ -21,7 +21,6 @@ export function useNoteCapture(props: {
 
 	function onStreamNoteUpdated(noteData): void {
 		const { type, id, body } = noteData;
-		console.log('useNoteCapture: onStreamNoteUpdated', type, id, body);
 		if ((id !== note.value.id) && (id !== pureNote.value.id)) return;
 
 		switch (type) {

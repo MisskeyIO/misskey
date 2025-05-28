@@ -194,7 +194,7 @@ import MkInfo from "@/components/MkInfo.vue";
 import MkFeatureBanner from '@/components/MkFeatureBanner.vue';
 import MkCustomEmoji from '@/components/global/MkCustomEmoji.vue';
 import MkEmoji from '@/components/global/MkEmoji.vue';
-import {prefer} from "@/preferences";
+import {store} from "@/store";
 
 const $i = ensureSignin();
 
@@ -217,10 +217,10 @@ const expandedRenoteMuteItems = ref([]);
 const expandedMuteItems = ref([]);
 const expandedBlockItems = ref([]);
 
-const mutedReactions = ref<string[]>(prefer.s.mutedReactions);
+const mutedReactions = ref<string[]>(store.s.mutedReactions);
 
 watch(mutedReactions, () => {
-	defaultStore.set('mutedReactions', mutedReactions.value);
+	store.set('mutedReactions', mutedReactions.value);
 }, {
 	deep: true,
 });

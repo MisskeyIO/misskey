@@ -317,7 +317,7 @@ const showTicker = (prefer.s.instanceTicker === 'always') || (prefer.s.instanceT
 const conversation = ref<Misskey.entities.Note[]>([]);
 const replies = ref<Misskey.entities.Note[]>([]);
 const canRenote = computed(() => ['public', 'home'].includes(appearNote.value.visibility) || appearNote.value.userId === $i?.id);
-const mutedReactions = ref<string[]>(defaultStore.state.mutedReactions);
+const mutedReactions = ref<string[]>(store.s.mutedReactions);
 
 const pleaseLoginContext = computed<OpenOnRemoteOptions>(() => ({
 	type: 'lookup',
@@ -533,10 +533,10 @@ async function reactionMuteToggle(reactionName: string | null) {
 
 	if (!mutedReactions.value.includes(reactionName)) {
 		mutedReactions.value.push(reactionName);
-		defaultStore.set('mutedReactions', mutedReactions.value);
+		store.set('mutedReactions', mutedReactions.value);
 	} else {
 		mutedReactions.value = mutedReactions.value.filter(x => x !== reactionName);
-		defaultStore.set('mutedReactions', mutedReactions.value);
+		store.set('mutedReactions', mutedReactions.value);
 	}
 }
 

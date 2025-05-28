@@ -249,7 +249,7 @@ definePage(() => ({
 }
 
 .margin {
-	margin: 0 auto var(--margin) auto;
+	margin: 0 auto var(--MI-margin) auto;
 }
 
 .resolverList {

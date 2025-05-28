@@ -137,12 +137,12 @@ function bootstrap() {
 .root {
 	position: fixed;
 	z-index: v-bind(zIndex);
-	bottom: var(--margin);
+	bottom: var(--MI-margin);
 	left: 0;
 	right: 0;
 	margin: auto;
 	box-sizing: border-box;
-	width: calc(100% - (var(--margin) * 2));
+	width: calc(100% - (var(--MI-margin) * 2));
 	max-width: 500px;
 	display: flex;
 }
@@ -156,7 +156,7 @@ function bootstrap() {
 .headerIcon {
 	margin-right: 8px;
 	font-size: 40px;
-	color: var(--accent);
+	color: var(--MI_THEME-accent);
 }
 
 .headerTitle {

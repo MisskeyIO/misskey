@@ -705,23 +705,23 @@ definePage(() => ({
 			}
 
 			> .silenced {
-				color: var(--warn);
-				border-color: var(--warn);
+				color: var(--MI_THEME-warn);
+				border-color: var(--MI_THEME-warn);
 			}
 
 			> .limited {
-				color: var(--error);
-				border-color: var(--error);
+				color: var(--MI_THEME-error);
+				border-color: var(--MI_THEME-error);
 			}
 
 			> .suspended {
-				color: var(--error);
-				border-color: var(--error);
+				color: var(--MI_THEME-error);
+				border-color: var(--MI_THEME-error);
 			}
 
 			> .deleted {
-				color: var(--error);
-				border-color: var(--error);
+				color: var(--MI_THEME-error);
+				border-color: var(--MI_THEME-error);
 			}
 		}
 	}
@@ -792,7 +792,7 @@ definePage(() => ({
 }
 .fields {
 	padding: 24px;
-	border-bottom: solid 0.5px var(--divider);
+	border-bottom: solid 0.5px var(--MI_THEME-divider);
 	&:last-child {
 		border-bottom: none;
 	}

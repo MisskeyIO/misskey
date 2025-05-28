@@ -109,7 +109,7 @@ onUnmounted(() => {
 
 .divider {
 	margin: 8px auto;
-	border-top: solid 0.5px var(--divider);
+	border-top: solid 0.5px var(--MI_THEME-divider);
 }
 
 .skebAcceptable,

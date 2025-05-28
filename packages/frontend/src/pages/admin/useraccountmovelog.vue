@@ -1,7 +1,7 @@
 <template>
 <PageWithHeader :actions="headerActions" :tabs="headerTabs">
 	<div class="_spacer" style="--MI_SPACER-w: 900px;">
-		<div style="display: flex; flex-direction: column; gap: var(--margin); flex-wrap: wrap;">
+		<div style="display: flex; flex-direction: column; gap: var(--MI-margin); flex-wrap: wrap;">
 			<div :class="$style.inputs">
 				<MkSelect v-model="from" :class="$style.input">
 					<template #label>{{ i18n.ts._accountMigration.movedFromServer }}</template>
@@ -26,7 +26,7 @@
 			</div>
 		</div>
 
-		<MkPagination v-slot="{items}" ref="logs" :pagination="pagination" style="margin-top: var(--margin);">
+		<MkPagination v-slot="{items}" ref="logs" :pagination="pagination" style="margin-top: var(--MI-margin);">
 			<div class="_gaps_s">
 				<MkFolder v-for="item in items" :key="item.id">
 					<template #label>
@@ -95,9 +95,9 @@ definePage(() => ({
 <style lang="scss" module>
 .card {
 	display: flex;
-	gap: var(--margin);
+	gap: var(--MI-margin);
 	border-radius: var(--MI-radius);
-	padding: var(--margin);
+	padding: var(--MI-margin);
 	align-items: center;
 	justify-content: center;
 	flex-wrap: wrap;
@@ -109,7 +109,7 @@ definePage(() => ({
 
 .cardContent{
 	display: flex;
-	gap: var(--margin);
+	gap: var(--MI-margin);
 	align-items: center;
 	flex-direction: column;
 }

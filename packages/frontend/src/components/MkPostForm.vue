@@ -82,13 +82,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<input v-show="withHashtags" ref="hashtagsInputEl" v-model="hashtags" class="mk-input-text" :class="$style.hashtags" :placeholder="i18n.ts.hashtags" list="hashtags">
 	<div v-if="scheduledTime" :class="$style.scheduledTime">
 		<div>
-			<div style="display: flex; gap: 4px" :style="scheduledTimeExceededPolicy ? 'color: var(--error)' : undefined">
+			<div style="display: flex; gap: 4px" :style="scheduledTimeExceededPolicy ? 'color: var(--MI_THEME-error)' : undefined">
 				<span style="margin-right: 4px"><i class="ti ti-calendar-clock"></i></span>
 				<component :is="scheduledTimeExceededPolicy ? 'del' : 'span'" :style="scheduledTimeExceededPolicy ? 'opacity: 0.6' : undefined">
 					{{ i18n.tsx.willBePostedAt({ x: dateTimeFormat.format(scheduledTime) }) }}
 				</component>
 			</div>
-			<div v-if="scheduledTimeExceededPolicy" style="display: flex; gap: 4px; margin-top: 4px; color: var(--infoWarnFg)">
+			<div v-if="scheduledTimeExceededPolicy" style="display: flex; gap: 4px; margin-top: 4px; color: var(--MI_THEME-infoWarnFg)">
 				<span style="margin-right: 4px"><i class="ti ti-exclamation-circle"></i></span>
 				<Mfm :text="i18n.tsx._postForm.policyScheduleNoteMaxDaysExceeded({ max: $i.policies.scheduleNoteMaxDays })"/>
 			</div>
@@ -1574,7 +1574,7 @@ html[data-color-scheme=light] .preview {
 	gap: 4px;
 	align-items: center;
 	font-size: 90%;
-	background: var(--infoBg);
+	background: var(--MI_THEME-infoBg);
 }
 
 .footer {

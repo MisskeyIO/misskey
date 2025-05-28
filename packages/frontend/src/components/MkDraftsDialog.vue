@@ -10,7 +10,7 @@
 	<template #header>
 		{{ i18n.ts.drafts }}
 	</template>
-	<MkTab v-if="$i!.policies.canScheduleNote" v-model="tab" style="margin-bottom: var(--margin);">
+	<MkTab v-if="$i!.policies.canScheduleNote" v-model="tab" style="margin-bottom: var(--MI-margin);">
 		<option value="unsent">{{ i18n.ts.unsent }}</option>
 		<option value="scheduled">{{ i18n.ts.scheduled }}</option>
 	</MkTab>
@@ -253,13 +253,13 @@ const scheduledPagination = {
 .draftItem {
 	display: flex;
 	padding: 8px 0 8px 0;
-	border-bottom: 1px solid var(--divider);
+	border-bottom: 1px solid var(--MI_THEME-divider);
 }
 
 .draftItemHover {
 	&:hover {
-		color: var(--accent);
-		background: var(--accentedBg);
+		color: var(--MI_THEME-accent);
+		background: var(--MI_THEME-accentedBg);
 	}
 }
 

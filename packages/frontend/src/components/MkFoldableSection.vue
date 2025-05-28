@@ -110,7 +110,7 @@ onMounted(() => {
 	top: var(--MI-stickyTop, 0px);
 	-webkit-backdrop-filter: var(--MI-blur, blur(8px));
 	backdrop-filter: var(--MI-blur, blur(20px));
-	background-color: color(from v-bind("parentBg ?? 'var(--bg)'") srgb r g b / 0.85);
+	background-color: color(from v-bind("parentBg ?? 'var(--MI_THEME-bg)'") srgb r g b / 0.85);
 }
 
 .title {

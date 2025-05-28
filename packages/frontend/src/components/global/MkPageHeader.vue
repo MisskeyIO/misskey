@@ -205,12 +205,12 @@ onUnmounted(() => {
 
 .buttonsLeft {
 	composes: buttons;
-	margin: 0 var(--margin) 0 0;
+	margin: 0 var(--MI-margin) 0 0;
 }
 
 .buttonsRight {
 	composes: buttons;
-	margin: 0 0 0 var(--margin);
+	margin: 0 0 0 var(--MI-margin);
 }
 
 .avatar {

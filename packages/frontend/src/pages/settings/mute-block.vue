@@ -36,7 +36,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<template #label>{{ i18n.ts.mutedReactions }}</template>
 
 						<div class="_gaps">
-							<div v-panel style="border-radius: var(--MI-radius); padding: var(--margin);">
+							<div v-panel style="border-radius: var(--MI-radius); padding: var(--MI-margin);">
 								<button v-for="emoji in mutedReactions" class="_button" :class="$style.emojisItem" @click="removeReaction(emoji, $event)">
 									<MkCustomEmoji v-if="emoji && emoji[0] === ':'" :name="emoji"/>
 									<MkEmoji v-else :emoji="emoji ? emoji : 'null'"/>

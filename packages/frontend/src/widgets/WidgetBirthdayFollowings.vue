@@ -208,16 +208,16 @@ defineExpose<WidgetComponentExpose>({
 	margin: auto;
 	aspect-ratio: 1/1;
 	border-radius: 100%;
-	background: linear-gradient(90deg, var(--buttonGradateA), var(--buttonGradateB));
+	background: linear-gradient(90deg, var(--MI_THEME-buttonGradateA), var(--MI_THEME-buttonGradateB));
 
 	&:hover, &.active {
 		&:before {
-			background: var(--accentLighten);
+			background: hsl(from var(--MI_THEME-accent) h s calc(l + 10));
 		}
 	}
 }
 
 .postIcon {
-	color: var(--fgOnAccent);
+	color: var(--MI_THEME-fgOnAccent);
 }
 </style>

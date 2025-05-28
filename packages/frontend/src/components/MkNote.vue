@@ -1100,7 +1100,7 @@ function emitUpdReaction(emoji: string, delta: number) {
 	align-items: center;
 	justify-content: center;
 	cursor: pointer;
-	border: dashed 1px var(--divider);
+	border: dashed 1px var(--MI_THEME-divider);
 
 	&.small {
 		height: 32px;

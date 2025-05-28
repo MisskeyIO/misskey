@@ -78,19 +78,19 @@ const choseAd = (): Ad | null => {
 	const lowPriorityAds = allAds.filter(ad => ad.ratio === 0);
 
 	let ads: Ad[];
-	const preferredAds = valuableAds.filter(ad => props.prefer.includes(ad.place));
+	const preferredAds = valuableAds.filter(ad => props.preferForms.includes(ad.place));
 	if (preferredAds.length !== 0) {
 		ads = preferredAds;
 	} else {
-		ads = lowPriorityAds.filter(ad => props.prefer.includes(ad.place));
+		ads = lowPriorityAds.filter(ad => props.preferForms.includes(ad.place));
 	}
 
 	if (ads.length === 0) {
-		const nonPreferredAds = valuableAds.filter(ad => !props.prefer.includes(ad.place));
+		const nonPreferredAds = valuableAds.filter(ad => !props.preferForms.includes(ad.place));
 		if (nonPreferredAds.length !== 0) {
 			ads = nonPreferredAds;
 		} else {
-			ads = lowPriorityAds.filter(ad => !props.prefer.includes(ad.place));
+			ads = lowPriorityAds.filter(ad => !props.preferForms.includes(ad.place));
 		}
 	}
 

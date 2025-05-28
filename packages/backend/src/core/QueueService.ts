@@ -187,7 +187,6 @@ export class QueueService {
 		if (content == null) return null;
 		const contentBody = JSON.stringify(content);
 		const digest = ApRequestCreator.createDigest(contentBody);
-
 		const opts = {
 			attempts: this.config.deliverJobMaxAttempts ?? 12,
 			backoff: {

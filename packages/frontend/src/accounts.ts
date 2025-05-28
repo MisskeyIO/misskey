@@ -151,7 +151,7 @@ export async function refreshCurrentAccount() {
 	if (!$i) return;
 	return fetchAccount($i.token, $i.id).then(updateCurrentAccount).catch(reason => {
 		if (reason === isAccountDeleted) {
-			removeAccount(host, $i.id);
+			removeAccount(host, $i!.id);
 			if (Object.keys(store.s.accountTokens).length > 0) {
 				login(Object.values(store.s.accountTokens)[0]);
 			} else {

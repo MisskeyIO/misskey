@@ -150,6 +150,7 @@ export const operationTypes = [
 	'notification',
 	'reaction',
 	'chatMessage',
+	'antenna',
 ] as const;
 
 /** サウンドの種類 */

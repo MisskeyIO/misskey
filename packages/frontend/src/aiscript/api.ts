@@ -5,12 +5,13 @@
 
 import { errors, utils, values } from '@syuilo/aiscript';
 import * as Misskey from 'misskey-js';
+import { url, lang } from '@@/js/config.js';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { $i } from '@/i.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { customEmojis } from '@/custom-emojis.js';
-import { url, lang } from '@@/js/config.js';
+import { RateLimiter } from '@/utility/rate-limiter';
 
 export function aiScriptReadline(q: string): Promise<string> {
 	return new Promise(ok => {
@@ -67,7 +68,7 @@ export function createAiScriptEnv(opts: { storageKey: string, token?: string }) 
 				// バグがあればundefinedもあり得るため念のため
 				if (typeof token.value !== 'string') throw new Error('invalid token');
 			}
-			const actualToken: string|null = token?.value ?? opts.token ?? null;
+			const actualToken: string | null = token?.value ?? opts.token ?? null;
 			if (param == null) {
 				throw new errors.AiScriptRuntimeError('expected param');
 			}

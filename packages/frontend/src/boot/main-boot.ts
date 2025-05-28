@@ -323,7 +323,7 @@ export async function mainBoot() {
 		//}
 		//miLocalStorage.setItem('lastUsed', Date.now().toString());
 
-		if (!location.pathname.startsWith('/miauth') && !location.pathname.startsWith('/sso') && !location.pathname.startsWith('/oauth')) {
+		if (!window.location.pathname.startsWith('/miauth') && !window.location.pathname.startsWith('/sso') && !window.location.pathname.startsWith('/oauth')) {
 			const latestDonationInfoShownAt = miLocalStorage.getItem('latestDonationInfoShownAt');
 			const neverShowDonationInfo = miLocalStorage.getItem('neverShowDonationInfo');
 			if (neverShowDonationInfo !== 'true' && (createdAt.getTime() < (Date.now() - (1000 * 60 * 60 * 24 * 3)))) {
@@ -340,9 +340,9 @@ export async function mainBoot() {
 			// }
 
 			if (instance.googleAnalyticsId && miLocalStorage.getItem('gaConsent') === null) {
-				const {dispose} = popup(defineAsyncComponent(() => import('@/components/MkTrackingConsent.vue')), {}, {
+				const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkTrackingConsent.vue')), {}, {
 					closed: () => dispose(),
-				}, 'closed');
+				});
 			}
 		}
 

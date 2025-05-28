@@ -31,7 +31,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [22.11.0]
+        node-version: [22.x]
 
     services:
       postgres:
@@ -103,7 +103,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [22.11.0]
+        node-version: [22.x]
 
     services:
       postgres:

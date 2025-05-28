@@ -109,7 +109,6 @@ export class EmojiEntityService {
 		};
 	}
 
-
 	@bindThis
 	public async packDetailedAdmin(
 		src: MiEmoji['id'] | MiEmoji,
@@ -189,7 +188,9 @@ export class EmojiEntityService {
 			hintRoles = new Map(roles.map(x => [x.id, x]));
 		}
 
-		return Promise.all(emojis.map(x => this.packDetailedAdmin(x, { roles: hintRoles })));
+		return (await Promise.allSettled(emojis.map(x => this.packDetailedAdmin(x, { roles: hintRoles }))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'EmojiDetailedAdmin'>>).value);
 	}
 
 	@bindThis

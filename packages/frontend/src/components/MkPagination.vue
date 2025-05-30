@@ -104,15 +104,14 @@ const scrollRemove = ref<(() => void) | null>(null);
  * 表示するアイテムのソース
  * 最新が0番目
  */
-const items = ref<MisskeyEntityMap>(new Map());
+const items = ref<MisskeyEntity[]>([]);
 
 /**
  * タブが非アクティブなどの場合に更新を貯めておく
  * 最新が0番目
  */
-const queue = ref<MisskeyEntityMap>(new Map());
+const queue = ref<MisskeyEntity[]>([]);
 
-const offset = ref(0);
 /**
  * 初期化中かどうか（trueならMkLoadingで全て隠す）
  */
@@ -126,8 +125,7 @@ const {
 	enableInfiniteScroll,
 } = prefer.r;
 
-const contentEl = computed(() => props.pagination.pageEl ?? rootEl.value);
-const scrollableElement = computed(() => getScrollContainer(contentEl.value));
+const scrollableElement = computed(() => rootEl.value ? getScrollContainer(rootEl.value) : window.document.body);
 
 const visibility = useDocumentVisibility();
 
@@ -234,7 +232,7 @@ const fetchMore = async (): Promise<void> => {
 		...params,
 		limit: SECOND_FETCH_LIMIT,
 		...(props.pagination.offsetMode ? {
-			offset: items.value.size,
+			offset: items.value.length,
 		} : {
 			untilId: items.value[items.value.length - 1].id,
 		}),
@@ -299,7 +297,7 @@ const fetchMoreAhead = async (): Promise<void> => {
 		...params,
 		limit: SECOND_FETCH_LIMIT,
 		...(props.pagination.offsetMode ? {
-			offset: items.value.size,
+			offset: items.value.length,
 		} : {
 			sinceId: items.value[0].id,
 		}),

@@ -21,9 +21,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 			v-adaptive-border
 			tabindex="-1"
 			:class="$style.inputCore"
-			:disabled="disabled"
-			:required="required"
-			:placeholder="placeholder"
 			@mousedown.prevent="() => {}"
 			@keydown.prevent="() => {}"
 		>
@@ -39,7 +36,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { onMounted, nextTick, ref, watch, computed, toRefs, useSlots } from 'vue';
+import {onMounted, nextTick, ref, watch, computed, toRefs, useSlots, useTemplateRef} from 'vue';
 import { useInterval } from '@@/js/use-interval.js';
 import type { VNode, VNodeChild } from 'vue';
 import type { MenuItem } from '@/types/menu.js';
@@ -85,10 +82,11 @@ const { modelValue, autofocus } = toRefs(props);
 const focused = ref(false);
 const opening = ref(false);
 const currentValueText = ref<string | null>(null);
-const inputEl = ref<HTMLSelectElement | null>(null);
-const prefixEl = ref<HTMLElement | null>(null);
-const suffixEl = ref<HTMLElement | null>(null);
-const container = ref<HTMLElement | null>(null);
+const inputEl = useTemplateRef("inputEl")
+const prefixEl =  useTemplateRef("prefixEl")
+const suffixEl =  useTemplateRef("suffixEl")
+const container = useTemplateRef("container")
+
 const height =
 	props.small ? 33 :
 	props.large ? 39 :
@@ -173,10 +171,9 @@ watch([modelValue, () => props.items], () => {
 }, { immediate: true, deep: true });
 
 function show() {
-	if (inputEl.value && inputEl.value.hasAttribute('disabled')) {
-		return;
-	}
+	if (!inputEl.value) return;
 	if (opening.value) return;
+	if (props.readonly || props.disabled) return;
 
 	focused.value = true;
 	opening.value = true;

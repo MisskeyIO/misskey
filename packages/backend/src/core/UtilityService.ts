@@ -61,12 +61,6 @@ export class UtilityService {
 	}
 
 	@bindThis
-	public isMediaSilencedHost(silencedHosts: string[] | undefined, host: string | null): boolean {
-		if (!silencedHosts || host == null) return false;
-		return silencedHosts.some(x => host.toLowerCase() === x);
-	}
-
-	@bindThis
 	public concatNoteContentsForKeyWordCheck(content: {
 		cw?: string | null;
 		text?: string | null;

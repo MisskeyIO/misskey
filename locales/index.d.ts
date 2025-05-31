@@ -902,10 +902,7 @@ export interface Locale extends ILocale {
      * このサーバーのメディアを全てセンシティブとして設定
      */
     "sensitiveMediaThisInstance": string;
-    /**
-     * サーバーをメディアサイレンス
-     */
-    "mediaSilenceThisInstance": string;
+
     /**
      * 操作
      */
@@ -998,14 +995,6 @@ export interface Locale extends ILocale {
      * センシティブなメディアを含むサーバーのホストを改行で区切って設定します。このサーバーからのメディアは全てセンシティブとして扱われます。
      */
     "sensitiveMediaInstancesDescription": string;
-    /**
-     * メディアサイレンスしたサーバー
-     */
-    "mediaSilencedInstances": string;
-    /**
-     * メディアサイレンスしたいサーバーのホストを改行で区切って設定します。メディアサイレンスされたサーバーに所属するアカウントによるファイルはすべてセンシティブとして扱われ、カスタム絵文字が使用できないようになります。ブロックしたインスタンスには影響しません。
-     */
-    "mediaSilencedInstancesDescription": string;
     /**
      * 連合を許可するサーバー
      */

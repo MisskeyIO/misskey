@@ -155,11 +155,6 @@ export class ReactionService {
 						if ((note.reactionAcceptance === 'nonSensitiveOnly' || note.reactionAcceptance === 'nonSensitiveOnlyForLocalLikeOnlyForRemote') && emoji.isSensitive) {
 							reaction = FALLBACK;
 						}
-
-						// for media silenced host, custom emoji reactions are not allowed
-						if (reacterHost != null && this.utilityService.isMediaSilencedHost(this.meta.mediaSilencedHosts, reacterHost)) {
-							reaction = FALLBACK;
-						}
 					} else {
 						// リアクションとして使う権限がない
 						reaction = FALLBACK;

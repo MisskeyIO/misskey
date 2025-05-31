@@ -220,6 +220,8 @@ export function federationInstance(): entities.FederationInstance {
 		themeColor: '',
 		infoUpdatedAt: '',
 		latestRequestReceivedAt: '',
+		isMediaSilenced: false,
+		isSensitiveMedia: false,
 	};
 }
 
@@ -259,6 +261,88 @@ export function userLite(id = 'someuserid', username = 'miskist', host: entities
 
 export function userDetailed(id = 'someuserid', username = 'miskist', host: entities.UserDetailed['host'] = 'misskey-hub.net', name: entities.UserDetailed['name'] = 'Misskey User'): entities.UserDetailed {
 	return {
+		achievements: [],
+		alwaysMarkNsfw: false,
+		autoAcceptFollowed: false,
+		autoSensitive: false,
+		bannerId: null,
+		canChat: false,
+		carefulBot: false,
+		chatScope: "none",
+		email: undefined,
+		emailNotificationTypes: [],
+		emailVerified: undefined,
+		hasPendingReceivedFollowRequest: false,
+		hasUnreadAntenna: false,
+		hasUnreadChannel: false,
+		hasUnreadChatMessages: false,
+		hasUnreadMentions: false,
+		hasUnreadNotification: false,
+		hasUnreadSpecifiedNotes: false,
+		hideOnlineStatus: false,
+		injectFeaturedNote: false,
+		isExplorable: false,
+		isRenoteMuted: false,
+		moderationNote: "",
+		mutedWords: [],
+		mutualLinkSections: [],
+		notificationRecieveConfig: {},
+		policies: {
+			alwaysMarkNsfw: false,
+			antennaLimit: 0,
+			antennaNotesLimit: 0,
+			avatarDecorationLimit: 0,
+			canCreateContent: false,
+			canDeleteContent: false,
+			canHideAds: false,
+			canImportAntennas: false,
+			canImportBlocking: false,
+			canImportFollowing: false,
+			canImportMuting: false,
+			canImportUserLists: false,
+			canInitiateConversation: false,
+			canInvite: false,
+			canManageAvatarDecorations: false,
+			canManageCustomEmojis: false,
+			canPublicNote: false,
+			canPurgeAccount: false,
+			canScheduleNote: false,
+			canSearchNotes: false,
+			canUpdateAvatar: false,
+			canUpdateBanner: false,
+			canUpdateBioMedia: false,
+			canUpdateContent: false,
+			canUseDriveFileInSoundSettings: false,
+			canUseReaction: false,
+			canUseTranslator: false,
+			chatAvailability: "available",
+			clipLimit: 0,
+			driveCapacityMb: 0,
+			gtlAvailable: false,
+			inviteExpirationTime: 0,
+			inviteLimit: 0,
+			inviteLimitCycle: 0,
+			ltlAvailable: false,
+			maxFileSizeMb: 0,
+			mentionLimit: 0,
+			mutualLinkLimit: 0,
+			mutualLinkSectionLimit: 0,
+			noteEachClipsLimit: 0,
+			pinLimit: 0,
+			rateLimitFactor: 0,
+			scheduleNoteLimit: 0,
+			scheduleNoteMaxDays: 0,
+			skipNsfwDetection: false,
+			userEachUserListsLimit: 0,
+			userListLimit: 0,
+			webhookLimit: 0,
+			wordMuteLimit: 0
+		},
+		preventAiLearning: false,
+		securityKeysList: [],
+		unreadAnnouncements: [],
+		withReplies: false,
+		followedMessage: undefined,
 		...userLite(id, username, host, name),
 		bannerBlurhash: 'eQA^IW^-MH8w9tE8I=S^o{$*R4RikXtSxutRozjEnNR.RQadoyozog',
 		bannerUrl: 'https://github.com/misskey-dev/misskey/blob/master/packages/frontend/assets/fedi.jpg?raw=true',
@@ -312,7 +396,7 @@ export function userDetailed(id = 'someuserid', username = 'miskist', host: enti
 		movedTo: null,
 		alsoKnownAs: null,
 		notify: 'none',
-		memo: null,
+		memo: null
 	};
 }
 
@@ -357,7 +441,26 @@ export function role(params: {
 	asBadge?: boolean,
 	canEditMembersByModerator?: boolean,
 	usersCount?: number,
-}, seed?: string): entities.Role {
+}, seed?: string): {
+	id: string;
+	name: string;
+	color: string;
+	iconUrl: string | null;
+	description: string;
+	isModerator: boolean;
+	isAdministrator: boolean;
+	displayOrder: number;
+	createdAt: string;
+	updatedAt: string;
+	target: "manual" | "conditional";
+	isPublic: boolean;
+	isExplorable: boolean;
+	asBadge: boolean;
+	canEditMembersByModerator: boolean;
+	usersCount: number;
+	condFormula: { id: string; type: string; values: any[] };
+	policies: {}
+} {
 	const prefix = params.displayOrder ? params.displayOrder.toString().padStart(3, '0') + '-' : '';
 	const genId = text(36, seed);
 	const createdAt = params.createdAt ?? date({}, seed).toISOString();

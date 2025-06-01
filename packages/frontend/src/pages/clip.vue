@@ -44,7 +44,6 @@ import MkButton from '@/components/MkButton.vue';
 import { clipsCache } from '@/cache.js';
 import { isSupportShare } from '@/utility/navigator.js';
 import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
-import { genEmbedCode } from '@/utility/get-embed-code.js';
 import { assertServerContext, serverContext } from '@/server-context.js';
 
 // contextは非ログイン状態の情報しかないためログイン時は利用できない
@@ -148,13 +147,15 @@ const headerActions = computed(() => clip.value && isOwned.value ? [{
 			action: () => {
 				copyToClipboard(`${url}/clips/${clip.value!.id}`);
 			},
-		}, {
-			icon: 'ti ti-code',
-			text: i18n.ts.embed,
-			action: () => {
-				genEmbedCode('clips', clip.value!.id);
-			},
-		});
+		}
+		// , {
+		// 	icon: 'ti ti-code',
+		// 	text: i18n.ts.embed,
+		// 	action: () => {
+		// 		genEmbedCode('clips', clip.value!.id);
+		// 	},
+		// }
+		);
 
 		if (isSupportShare()) {
 			menuItems.push({

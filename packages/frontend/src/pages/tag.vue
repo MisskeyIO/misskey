@@ -35,7 +35,6 @@ import { i18n } from '@/i18n.js';
 import { $i } from '@/i.js';
 import { store } from '@/store.js';
 import * as os from '@/os.js';
-import { genEmbedCode } from '@/utility/get-embed-code.js';
 
 const tab = ref('all');
 
@@ -79,19 +78,23 @@ async function post() {
 	notes.value?.pagingComponent?.reload();
 }
 
-const headerActions = computed(() => [{
-	icon: 'ti ti-dots',
-	label: i18n.ts.more,
-	handler: (ev: MouseEvent) => {
-		os.popupMenu([{
-			text: i18n.ts.embed,
-			icon: 'ti ti-code',
-			action: () => {
-				genEmbedCode('tags', props.tag);
-			},
-		}], ev.currentTarget ?? ev.target);
-	},
-}]);
+const headerActions = []
+
+// computed(() => [
+// 	{
+// 	icon: 'ti ti-dots',
+// 	label: i18n.ts.more,
+// 	handler: (ev: MouseEvent) => {
+// 		os.popupMenu([{
+// 			text: i18n.ts.embed,
+// 			icon: 'ti ti-code',
+// 			action: () => {
+// 				genEmbedCode('tags', props.tag);
+// 			},
+// 		}], ev.currentTarget ?? ev.target);
+// 	},
+// }
+// 	]);
 
 const headerTabs = computed(() => [{
 	key: 'all',

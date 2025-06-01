@@ -173,18 +173,18 @@ export function getCopyNoteLinkMenu(note: Misskey.entities.Note, text: string): 
 	};
 }
 
-function getNoteEmbedCodeMenu(note: Misskey.entities.Note, text: string): MenuItem | undefined {
-	if (note.url != null || note.uri != null) return undefined;
-	if (['specified', 'followers'].includes(note.visibility)) return undefined;
-
-	return {
-		icon: 'ti ti-code',
-		text,
-		action: (): void => {
-			genEmbedCode('notes', note.id);
-		},
-	};
-}
+// function getNoteEmbedCodeMenu(note: Misskey.entities.Note, text: string): MenuItem | undefined {
+// 	if (note.url != null || note.uri != null) return undefined;
+// 	if (['specified', 'followers'].includes(note.visibility)) return undefined;
+//
+// 	return {
+// 		icon: 'ti ti-code',
+// 		text,
+// 		action: (): void => {
+// 			genEmbedCode('notes', note.id);
+// 		},
+// 	};
+// }
 
 export function getNoteMenu(props: {
 	note: Misskey.entities.Note;
@@ -215,7 +215,7 @@ export function getNoteMenu(props: {
 			if (canceled) return;
 
 			if (isAprilFoolsDay() && !isMute()) {
-				playUrl('/client-assets/sounds/flush.mp3', { volume: prefer.s.sound_masterVolume });
+				playUrl('/client-assets/sounds/flush.mp3', { volume: store.s.sound_masterVolume });
 			}
 
 			misskeyApi('notes/delete', {
@@ -357,7 +357,7 @@ export function getNoteMenu(props: {
 				},
 			});
 		} else {
-			menuItems.push(getNoteEmbedCodeMenu(appearNote, i18n.ts.embed));
+			// menuItems.push(getNoteEmbedCodeMenu(appearNote, i18n.ts.embed));
 		}
 
 		if (isSupportShare()) {
@@ -515,7 +515,7 @@ export function getNoteMenu(props: {
 				},
 			});
 		} else {
-			menuItems.push(getNoteEmbedCodeMenu(appearNote, i18n.ts.embed));
+			// menuItems.push(getNoteEmbedCodeMenu(appearNote, i18n.ts.embed));
 		}
 	}
 

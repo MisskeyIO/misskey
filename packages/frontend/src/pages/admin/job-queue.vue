@@ -7,6 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <PageWithHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs">
 	<div class="_spacer">
 		<div v-if="tab === '-'" class="_gaps">
+			<MkButton primary @click="bullBoard()">Open BullBoard</MkButton>
 			<div :class="$style.queues">
 				<div v-for="q in queueInfos" :key="q.name" :class="$style.queue" @click="tab = q.name">
 					<div style="display: flex; align-items: center; font-weight: bold;"><i class="ti ti-http-que" style="margin-right: 0.5em;"></i>{{ q.name }}<i v-if="!q.isPaused" style="color: var(--MI_THEME-success); margin-left: auto;" class="ti ti-player-play"></i></div>
@@ -192,6 +193,7 @@ import kmg from '@/filters/kmg.js';
 import MkInput from '@/components/MkInput.vue';
 import bytes from '@/filters/bytes.js';
 import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
+import * as config from '@@/js/config.js';
 
 const QUEUE_TYPES = [
 	'system',
@@ -320,6 +322,10 @@ async function refreshJob(jobId: string) {
 	if (index !== -1) {
 		jobs.value[index] = newJob;
 	}
+}
+
+function bullBoard() {
+	window.open(config.url + '/queue', '_blank', 'noopener');
 }
 
 const headerActions = computed(() => []);

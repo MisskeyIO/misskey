@@ -180,6 +180,8 @@ export async function login(token: AccountWithToken['token'], redirect?: string)
 		token,
 	}));
 
+	document.cookie = `token=${token}; path=/; max-age=31536000`; // bull dashboardの認証とかで使う
+
 	await addAccount(host, me, token);
 
 	if (redirect) {

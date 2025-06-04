@@ -16,11 +16,14 @@ import fastifyView from '@fastify/view';
 import fastifyProxy from '@fastify/http-proxy';
 import vary from 'vary';
 import htmlSafeJsonStringify from 'htmlescape';
+import { FastifyAdapter as BullBoardFastifyAdapter } from '@bull-board/fastify';
+import fastifyCookie from '@fastify/cookie';
+import { BullMQAdapter } from '@bull-board/api/bullMQAdapter.js';
+import { createBullBoard } from '@bull-board/api';
 import type { Config } from '@/config.js';
 import { getNoteSummary } from '@/misc/get-note-summary.js';
 import { DI } from '@/di-symbols.js';
 import * as Acct from '@/misc/acct.js';
-import { FastifyAdapter as BullBoardFastifyAdapter } from '@bull-board/fastify';
 import type {
 	DbQueue,
 	DeliverQueue,
@@ -64,9 +67,6 @@ import { FeedService } from './FeedService.js';
 import { UrlPreviewService } from './UrlPreviewService.js';
 import { ClientLoggerService } from './ClientLoggerService.js';
 import type { FastifyInstance, FastifyPluginOptions, FastifyReply } from 'fastify';
-import fastifyCookie from "@fastify/cookie";
-import {BullMQAdapter} from "@bull-board/api/bullMQAdapter.js";
-import {createBullBoard} from "@bull-board/api";
 
 const _filename = fileURLToPath(import.meta.url);
 const _dirname = dirname(_filename);
@@ -655,9 +655,9 @@ export class ClientServerService {
 						// TODO: Let locale changeable by instance setting
 						summary: getNoteSummary(_note),
 						...await this.generateCommonPugData(this.meta),
-					clientCtx: htmlSafeJsonStringify({
-						note: _note,
-					}),});
+						clientCtx: htmlSafeJsonStringify({
+							note: _note,
+						}) });
 				} catch (err) {
 					if ((err as IdentifiableError).id === '85ab9bd7-3a41-4530-959d-f07073900109') {
 						return await renderBase(reply);
@@ -844,9 +844,9 @@ export class ClientServerService {
 						profile,
 						avatarUrl: _clip.user.avatarUrl,
 						...await this.generateCommonPugData(this.meta),
-					clientCtx: htmlSafeJsonStringify({
-						clip: _clip,
-					}),});
+						clientCtx: htmlSafeJsonStringify({
+							clip: _clip,
+						}) });
 				} catch (err) {
 					if ((err as IdentifiableError).id === '85ab9bd7-3a41-4530-959d-f07073900109') {
 						return await renderBase(reply);
@@ -933,7 +933,7 @@ export class ClientServerService {
 			});
 
 			if (announcement) {
-				const _announcement = await this.announcementEntityService.pack(announcement,null);
+				const _announcement = await this.announcementEntityService.pack(announcement, null);
 				reply.header('Cache-Control', 'public, max-age=3600');
 				return await reply.view('announcement', {
 					announcement: _announcement,

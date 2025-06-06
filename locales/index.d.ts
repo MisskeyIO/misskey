@@ -902,7 +902,6 @@ export interface Locale extends ILocale {
      * このサーバーのメディアを全てセンシティブとして設定
      */
     "sensitiveMediaThisInstance": string;
-
     /**
      * 操作
      */

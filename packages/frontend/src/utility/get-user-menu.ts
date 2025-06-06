@@ -17,7 +17,6 @@ import { $i, iAmModerator } from '@/i.js';
 import { notesSearchAvailable, canSearchNonLocalNotes } from '@/utility/check-permissions.js';
 import { antennasCache, rolesCache, userListsCache } from '@/cache.js';
 import { mainRouter } from '@/router.js';
-import { genEmbedCode } from '@/utility/get-embed-code.js';
 import { prefer } from '@/preferences.js';
 import { getPluginHandlers } from '@/plugin.js';
 
@@ -195,19 +194,21 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 				window.open(user.url, '_blank', 'noopener');
 			},
 		});
-	} else {
-		menuItems.push({
-			icon: 'ti ti-code',
-			text: i18n.ts.embed,
-			type: 'parent',
-			children: [{
-				text: i18n.ts.noteOfThisUser,
-				action: () => {
-					genEmbedCode('user-timeline', user.id);
-				},
-			}], // TODO: ユーザーカードの埋め込みなど
-		});
 	}
+
+	// else {
+	// menuItems.push({
+	// 	icon: 'ti ti-code',
+	// 	text: i18n.ts.embed,
+	// 	type: 'parent',
+	// 	children: [{
+	// 		text: i18n.ts.noteOfThisUser,
+	// 		action: () => {
+	// 			genEmbedCode('user-timeline', user.id);
+	// 		},
+	// 	}], // TODO: ユーザーカードの埋め込みなど
+	// });
+	// }
 
 	if (notesSearchAvailable && (user.host == null || canSearchNonLocalNotes)) {
 		menuItems.push({

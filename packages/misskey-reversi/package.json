@@ -14,21 +14,28 @@
 		}
 	},
 	"scripts": {
-		"build": "pnpm run build:tsc",
+		"build": "node ./build.js",
 		"build:tsc": "pnpm tsc-esm && pnpm tsc-dts",
 		"tsc-esm": "tsc --outDir built/esm",
 		"tsc-dts": "tsc --outDir built/dts --declaration true --emitDeclarationOnly true --declarationMap true",
 		"watch": "nodemon -w src -e ts,js,cjs,mjs,json --exec \"pnpm run build:tsc\"",
-		"eslint": "eslint . --ext .js,.jsx,.ts,.tsx",
+		"eslint": "eslint './**/*.{js,jsx,ts,tsx}'",
 		"typecheck": "tsc --noEmit",
 		"lint": "pnpm typecheck && pnpm eslint"
 	},
 	"devDependencies": {
+		"@misskey-dev/eslint-plugin": "1.0.0",
 		"@types/node": "22.15.17",
+		"@typescript-eslint/eslint-plugin": "8.32.1",
+		"@typescript-eslint/parser": "8.32.1",
+		"execa": "9.5.2",
+		"eslint": "8.57.1",
+		"nodemon": "3.1.10",
 		"typescript": "5.8.3"
 	},
 	"dependencies": {
 		"crc-32": "1.2.2",
+		"esbuild": "managed",
 		"glob": "11.0.2"
 	},
 	"files": [

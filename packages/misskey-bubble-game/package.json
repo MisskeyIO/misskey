@@ -27,12 +27,12 @@
 		"@types/matter-js": "0.19.8",
 		"@types/node": "22.15.17",
 		"@types/seedrandom": "3.0.8",
-		"@typescript-eslint/eslint-plugin": "7.10.0",
-		"@typescript-eslint/parser": "7.10.0",
+		"@typescript-eslint/eslint-plugin": "8.33.1",
+		"@typescript-eslint/parser": "8.33.1",
 		"execa": "8.0.1",
 		"eslint": "9.27.0",
 		"nodemon": "3.1.10",
-		"esbuild": "0.19.11",
+		"esbuild": "managed",
 		"typescript": "5.8.3"
 	},
 	"files": [

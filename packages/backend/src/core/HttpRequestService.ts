@@ -234,7 +234,6 @@ export class HttpRequestService {
 		}
 	}
 
-
 	/**
 	 * Get agent for https by URL
 	 * @param url URL

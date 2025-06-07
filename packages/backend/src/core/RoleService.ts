@@ -584,7 +584,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 
 		const role = await this.rolesRepository.findOneByOrFail({ id: roleId });
 
-		let existing = await this.roleAssignmentsRepository.findOneBy({
+		const existing = await this.roleAssignmentsRepository.findOneBy({
 			roleId: roleId,
 			userId: userId,
 		});
@@ -649,7 +649,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	public async unassign(userId: MiUser['id'], roleId: MiRole['id'], moderator?: MiUser): Promise<void> {
 		const now = new Date();
 
-		let existing = await this.roleAssignmentsRepository.findOneBy({ roleId, userId });
+		const existing = await this.roleAssignmentsRepository.findOneBy({ roleId, userId });
 		if (existing == null) {
 			throw new RoleService.NotAssignedError();
 		} else if (existing.expiresAt && (existing.expiresAt.getTime() < now.getTime())) {

@@ -18,7 +18,7 @@ import { bindThis } from '@/decorators.js';
 import type Logger from '@/logger.js';
 import { validateContentTypeSetAsActivityPub } from '@/core/activitypub/misc/validator.js';
 import type { IObject } from './type.js';
-import {FetchAllowSoftFailMask} from "@/core/activitypub/misc/check-against-url.js";
+import { FetchAllowSoftFailMask } from "@/core/activitypub/misc/check-against-url.js";
 
 type Request = {
 	url: string;

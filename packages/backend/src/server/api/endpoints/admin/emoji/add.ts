@@ -71,7 +71,7 @@ export const paramDef = {
 		roleIdsThatCanNotBeUsedThisEmojiAsReaction: { type: 'array', items: {
 			type: 'string',
 			format: 'misskey:id',
-		} ,
+		},
 		},
 	},
 	required: ['name', 'fileId'],

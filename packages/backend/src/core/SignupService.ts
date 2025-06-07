@@ -169,7 +169,7 @@ export class SignupService {
 
 			if (this.meta.rootUserId == null) {
 			await this.metaService.update({ rootUserId: account.id });
-		}return { account, secret };
+		} return { account, secret };
 		} catch (err) {
 			this.logger.error(`Failed to create account ${username}`, { error: err });
 			throw err;

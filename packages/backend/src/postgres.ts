@@ -6,7 +6,7 @@
 // https://github.com/typeorm/typeorm/issues/2400
 import pg from 'pg';
 
-import { DataSource, Logger,type QueryRunner } from 'typeorm';
+import { DataSource, Logger, type QueryRunner } from 'typeorm';
 import { QueryResultCache } from 'typeorm/cache/QueryResultCache.js';
 import { QueryResultCacheOptions } from 'typeorm/cache/QueryResultCacheOptions.js';
 import * as highlight from 'cli-highlight';

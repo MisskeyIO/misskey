@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type {Config, RedisOptionsSource} from '@/config.js';
+import type { Config, RedisOptionsSource } from '@/config.js';
 import type * as Bull from 'bullmq';
 import type { RedisOptions } from 'ioredis';
 

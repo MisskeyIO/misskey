@@ -5,7 +5,6 @@
 
 import { URL, domainToASCII } from 'node:url';
 import { isIP } from 'node:net';
-import { toASCII } from 'punycode';
 import punycode from 'punycode.js';
 import psl from 'psl';
 import RE2 from 're2';

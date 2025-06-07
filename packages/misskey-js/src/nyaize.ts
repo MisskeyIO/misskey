@@ -9,7 +9,7 @@ let enRegex3: RegExp;
 let koRegex1: RegExp;
 let koRegex2: RegExp;
 let koRegex3: RegExp;
-let fallback: boolean = true;
+let fallback = true;
 
 try {
 	enRegex1 = new RegExp('(?<=n)a', 'gi');

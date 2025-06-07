@@ -1,5 +1,5 @@
 import * as Misskey from 'misskey-js';
-import {store} from '@/store.js';
+import { store } from '@/store.js';
 
 export function filterMutedNotification(notification: Misskey.entities.Notification): boolean {
 	switch (notification.type) {

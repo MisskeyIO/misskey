@@ -15,25 +15,25 @@
 </template>
 
 <script lang="ts" setup>
+import { nextTick, onMounted, useTemplateRef } from 'vue';
 import MkAnimBg from '@/components/MkAnimBg.vue';
 import { definePage } from '@/page.js';
 import MkAuthConfirm from '@/components/MkAuthConfirm.vue';
-import { nextTick, onMounted, useTemplateRef } from "vue";
 import { $i } from '@/i.js';
 
-const transactionIdMeta = document.querySelector<HTMLMetaElement>('meta[name="misskey:sso:transaction-id"]');
+const transactionIdMeta = window.document.querySelector<HTMLMetaElement>('meta[name="misskey:sso:transaction-id"]');
 if (transactionIdMeta) {
 	transactionIdMeta.remove();
 }
 
-const name = document.querySelector<HTMLMetaElement>('meta[name="misskey:sso:service-name"]')?.content;
-const kind = document.querySelector<HTMLMetaElement>('meta[name="misskey:sso:kind"]')?.content;
-const prompt = document.querySelector<HTMLMetaElement>('meta[name="misskey:sso:prompt"]')?.content;
+const name = window.document.querySelector<HTMLMetaElement>('meta[name="misskey:sso:service-name"]')?.content;
+const kind = window.document.querySelector<HTMLMetaElement>('meta[name="misskey:sso:kind"]')?.content;
+const prompt = window.document.querySelector<HTMLMetaElement>('meta[name="misskey:sso:prompt"]')?.content;
 
 const authRoot = useTemplateRef('authRoot');
 
 async function onAccept(token: string) {
-	const result = await fetch(`/sso/${kind}/authorize`, {
+	const result = await window.fetch(`/sso/${kind}/authorize`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -50,14 +50,14 @@ async function onAccept(token: string) {
 	authRoot.value?.showUI('success');
 
 	if (result.binding === 'post') {
-		const form = document.createElement('form');
+		const form = window.document.createElement('form');
 		form.style.display = 'none';
 		form.action = result.action;
 		form.method = 'post';
 		form.acceptCharset = 'utf-8';
 
 		for (const [name, value] of Object.entries(result.context)) {
-			const input = document.createElement('input');
+			const input = window.document.createElement('input');
 			input.type = 'hidden';
 			input.name = name;
 			input.value = value as string;
@@ -65,11 +65,11 @@ async function onAccept(token: string) {
 		}
 
 		nextTick(() => {
-			document.body.appendChild(form);
+			window.document.body.appendChild(form);
 			form.submit();
 		});
 	} else {
-		location.href = result.action;
+		window.location.href = result.action;
 	}
 }
 

@@ -297,7 +297,7 @@ const memoDraft = ref(props.user.memo);
 const isEditingMemo = ref(false);
 const moderationNote = ref(props.user.moderationNote);
 const editModerationNote = ref(false);
-const movedFromLog = ref<null | {movedFromId:string;}[]>(null);
+const movedFromLog = ref<null | { movedFromId: string; }[]>(null);
 
 watch(moderationNote, async () => {
 	await misskeyApi('admin/update-user-note', { userId: props.user.id, text: moderationNote.value });

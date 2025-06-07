@@ -83,7 +83,7 @@ async function getPasswordStrength(source: string): Promise<number> {
 		const hashHex = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 		const hashPrefix = hashHex.slice(0, 5).toUpperCase();
 		const hashSuffix = hashHex.slice(5).toUpperCase();
-		await fetch(`https://api.pwnedpasswords.com/range/${hashPrefix}`, { signal: passwordAbortController.value.signal })
+		await window.fetch(`https://api.pwnedpasswords.com/range/${hashPrefix}`, { signal: passwordAbortController.value.signal })
 			.then(response => {
 				if (!response.ok) {
 					throw new Error(`HTTP error! status: ${response.status}`);

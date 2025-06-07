@@ -26,7 +26,7 @@ import XReaction from '@/components/MkReactionsViewer.reaction.vue';
 import { prefer } from '@/preferences.js';
 import { DI } from '@/di.js';
 import { $i } from '@/i.js';
-import {store} from "@/store";
+import { store } from "@/store";
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;

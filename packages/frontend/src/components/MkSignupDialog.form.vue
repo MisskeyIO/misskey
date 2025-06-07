@@ -239,6 +239,7 @@ async function onSubmit(): Promise<void> {
 		onSignupApiError();
 	}
 }
+
 function onSignupApiError() {
 	submitting.value = false;
 	hcaptcha.value?.reset?.();

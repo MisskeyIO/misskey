@@ -34,7 +34,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { onUnmounted, onMounted, computed, useTemplateRef, TransitionGroup,onActivated,ref } from 'vue';
+import { onUnmounted, onMounted, computed, useTemplateRef, TransitionGroup, onActivated, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { notificationTypes } from '@@/js/const.js';
 import MkPagination from '@/components/MkPagination.vue';
@@ -74,11 +74,11 @@ function onNotification(notification) {
 		useStream().send('readNotification');
 	}
 
-	if (!document.hidden && !isMuted && filterMutedNotification(notification)) {
+	if (!window.document.hidden && !isMuted && filterMutedNotification(notification)) {
 		pagingComponent.value?.prepend(notification);
 	}
 
-	if (document.hidden && !hasNewNotificationWhileTabHidden.value) {
+	if (window.document.hidden && !hasNewNotificationWhileTabHidden.value) {
 		hasNewNotificationWhileTabHidden.value = true;
 	}
 }
@@ -92,7 +92,7 @@ function reload() {
 }
 
 function onVisibilityChange() {
-	if (document.visibilityState === 'visible') {
+	if (window.document.visibilityState === 'visible') {
 		if (hasNewNotificationWhileTabHidden.value) {
 			hasNewNotificationWhileTabHidden.value = false;
 			reload();
@@ -106,7 +106,7 @@ onMounted(() => {
 	connection = useStream().useChannel('main');
 	connection.on('notification', onNotification);
 	connection.on('notificationFlushed', reload);
-	document.addEventListener('visibilitychange', onVisibilityChange);
+	window.document.addEventListener('visibilitychange', onVisibilityChange);
 });
 
 onActivated(() => {
@@ -115,7 +115,7 @@ onActivated(() => {
 
 onUnmounted(() => {
 	if (connection) connection.dispose();
-	document.removeEventListener('visibilitychange', onVisibilityChange);
+	window.document.removeEventListener('visibilitychange', onVisibilityChange);
 });
 
 defineExpose({

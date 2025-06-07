@@ -78,7 +78,7 @@ async function post() {
 	notes.value?.pagingComponent?.reload();
 }
 
-const headerActions = []
+const headerActions = [];
 
 // computed(() => [
 // 	{

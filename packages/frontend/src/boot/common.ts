@@ -10,7 +10,7 @@ import defaultLightTheme from '@@/themes/l-light.json5';
 import defaultDarkTheme from '@@/themes/d-green-lime.json5';
 import { createGtag, addGtag, consent as gtagConsent } from 'vue-gtag';// FIXME Google Analytics 周りの機能のチェック
 import type { App } from 'vue';
-import type {GtagConsentParams} from "@/types/gtag";
+import type { GtagConsentParams } from "@/types/gtag";
 import widgets from '@/widgets/index.js';
 import directives from '@/directives/index.js';
 import components from '@/components/index.js';

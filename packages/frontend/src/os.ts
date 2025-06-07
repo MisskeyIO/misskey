@@ -728,7 +728,7 @@ export async function openEmojiPicker(src: HTMLElement, opts: ComponentProps<typ
 	activeTextarea = initialTextarea;
 
 	for (const textarea of Array.from(
-		document.querySelectorAll('textarea, input'),
+		window.document.querySelectorAll('textarea, input'),
 	)) {
 		textarea.addEventListener('focus', () => {
 			activeTextarea = textarea as HTMLTextAreaElement | HTMLInputElement;
@@ -741,7 +741,7 @@ export async function openEmojiPicker(src: HTMLElement, opts: ComponentProps<typ
 				for (const textarea of Array.from(
 					node.querySelectorAll('textarea, input'),
 				).filter(el => (el as HTMLTextAreaElement | HTMLInputElement).dataset.preventEmojiInsert == null)) {
-					if (document.activeElement === textarea) activeTextarea = textarea as HTMLTextAreaElement | HTMLInputElement;
+					if (window.document.activeElement === textarea) activeTextarea = textarea as HTMLTextAreaElement | HTMLInputElement;
 					textarea.addEventListener('focus', () => {
 						activeTextarea = textarea as HTMLTextAreaElement | HTMLInputElement;
 					});
@@ -750,7 +750,7 @@ export async function openEmojiPicker(src: HTMLElement, opts: ComponentProps<typ
 		}
 	});
 
-	observer.observe(document.body, {
+	observer.observe(window.document.body, {
 		childList: true,
 		subtree: true,
 		attributes: false,

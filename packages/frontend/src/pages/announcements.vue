@@ -35,9 +35,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</div>
 					<div v-if="$i && !announcement.silence && !announcement.isRead" :class="$style.footer">
 						<MkButton primary gradate @click="read(announcement)">
-								<i :class="!announcement.needEnrollmentTutorialToRead ? 'ti ti-check' : 'ti ti-presentation'"/>
-								{{ !announcement.needEnrollmentTutorialToRead ? i18n.ts.gotIt : i18n.ts._initialAccountSetting.startTutorial }}
-							</MkButton>
+							<i :class="!announcement.needEnrollmentTutorialToRead ? 'ti ti-check' : 'ti ti-presentation'"/>
+							{{ !announcement.needEnrollmentTutorialToRead ? i18n.ts.gotIt : i18n.ts._initialAccountSetting.startTutorial }}
+						</MkButton>
 					</div>
 				</section>
 			</MkPagination>
@@ -81,7 +81,7 @@ const paginationEl = ref<InstanceType<typeof MkPagination>>();
 const tab = ref('current');
 
 async function read(target): Promise<void> {
-	if (announcement.needEnrollmentTutorialToRead) {
+	if (target.value.needEnrollmentTutorialToRead) {
 		const tutorialCompleted = await (new Promise<boolean>(resolve => {
 			os.popup(defineAsyncComponent(() => import('@/components/MkTutorialDialog.vue')), {}, {
 				done: () => {

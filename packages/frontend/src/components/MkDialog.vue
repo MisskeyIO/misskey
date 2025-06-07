@@ -75,7 +75,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import {ref, useTemplateRef, computed, watch, onMounted, onBeforeUnmount} from 'vue';
+import { ref, useTemplateRef, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import MkModal from '@/components/MkModal.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
@@ -227,15 +227,15 @@ watch(okWaitInitiated, () => {
 });
 
 onMounted(() => {
-	document.addEventListener('keydown', onKeydown);
+	window.document.addEventListener('keydown', onKeydown);
 
 	sec.value = props.okWaitDuration;
 	if (sec.value > 0) {
-		const waitTimer = setInterval(() => {
+		const waitTimer = window.setInterval(() => {
 			if (!okWaitInitiated.value) return;
 
 			if (sec.value < 0) {
-				clearInterval(waitTimer);
+				window.clearInterval(waitTimer);
 			}
 			sec.value = sec.value - 1;
 		}, 1000);
@@ -243,7 +243,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-	document.removeEventListener('keydown', onKeydown);
+	window.document.removeEventListener('keydown', onKeydown);
 });
 </script>
 

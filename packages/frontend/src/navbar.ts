@@ -185,7 +185,7 @@ export const navbarItemDef = reactive({
 		action: (ev) => {
 			if (kawaiiMode) miLocalStorage.removeItem('kawaii');
 			else miLocalStorage.setItem('kawaii', 'true');
-			location.reload();
+			window.location.reload();
 		},
 	},
 	support: {

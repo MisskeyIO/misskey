@@ -162,6 +162,7 @@ function insertEmoji(ev: MouseEvent): void {
 		announceTitleEl.value
 	);
 }
+
 watch(announcementsStatus, (to) => {
 	loading.value = true;
 	misskeyApi('admin/announcements/list', {
@@ -171,6 +172,7 @@ watch(announcementsStatus, (to) => {
 		loading.value = false;
 	});
 }, { immediate: true });
+
 function add() {
 	announcements.value.unshift({
 		_id: Math.random().toString(36),
@@ -241,7 +243,6 @@ function fetch(resetOffset = false): void {
 		offset.value += announcementResponse?.length ?? 0;
 	});
 }
-
 
 function refresh() {
 	loading.value = true;

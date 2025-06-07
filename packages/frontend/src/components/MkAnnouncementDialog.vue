@@ -28,7 +28,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { onMounted, useTemplateRef,defineAsyncComponent } from 'vue';
+import { onMounted, useTemplateRef, defineAsyncComponent, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
@@ -95,9 +95,9 @@ function onBgClick() {
 
 onMounted(() => {
 	if (sec.value > 0) {
-		const waitTimer = setInterval(() => {
+		const waitTimer = window.setInterval(() => {
 			if (sec.value === 0) {
-				clearInterval(waitTimer);
+				window.clearInterval(waitTimer);
 				gotItDisabled.value = false;
 				secVisible.value = false;
 			} else {

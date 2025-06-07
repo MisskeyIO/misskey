@@ -10,7 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div :class="$style.root">
 		<MkLoading v-if="fetching"/>
 		<div v-if="!fetching && medias.length > 0" :class="$style.stream">
-			<MkNoteMediaGrid v-for="media in medias" :note="media.note" :key="media.note.id + media.file.id"/>
+			<MkNoteMediaGrid v-for="media in medias" :key="media.note.id + media.file.id" :note="media.note"/>
 		</div>
 		<p v-if="!fetching && medias.length == 0" :class="$style.empty">{{ i18n.ts.nothing }}</p>
 	</div>

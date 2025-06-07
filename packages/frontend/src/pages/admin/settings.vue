@@ -268,7 +268,7 @@ import MkInfo from '@/components/MkInfo.vue';
 import FormSplit from '@/components/form/split.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
-import {fetchInstance, instance} from '@/instance.js';
+import { fetchInstance, instance } from '@/instance.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import MkButton from '@/components/MkButton.vue';

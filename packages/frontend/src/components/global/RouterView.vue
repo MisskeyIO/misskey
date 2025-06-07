@@ -18,7 +18,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { inject, onBeforeUnmount,provide, ref, shallowRef,computed,nextTick } from 'vue';
+import { inject, onBeforeUnmount, provide, ref, shallowRef, computed, nextTick } from 'vue';
 import type { Router } from '@/router.js';
 import { prefer } from '@/preferences.js';
 import MkLoadingPage from '@/pages/_loading_.vue';

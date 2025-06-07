@@ -194,7 +194,7 @@ import MkInfo from "@/components/MkInfo.vue";
 import MkFeatureBanner from '@/components/MkFeatureBanner.vue';
 import MkCustomEmoji from '@/components/global/MkCustomEmoji.vue';
 import MkEmoji from '@/components/global/MkEmoji.vue';
-import {store} from "@/store";
+import { store } from "@/store";
 
 const $i = ensureSignin();
 

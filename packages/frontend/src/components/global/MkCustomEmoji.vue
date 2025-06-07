@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <span v-if="errored && !fallbackToImage">:{{ customEmojiName }}:</span>
-<img v-else-if="errored" src="/client-assets/dummy.png" :alt="alt" :title="alt" decoding="async" 	style="-webkit-user-drag: none;" :class="[$style.root, { [$style.normal]: normal, [$style.noStyle]: noStyle }]"/>
+<img v-else-if="errored" src="/client-assets/dummy.png" :alt="alt" :title="alt" decoding="async" style="-webkit-user-drag: none;" :class="[$style.root, { [$style.normal]: normal, [$style.noStyle]: noStyle }]"/>
 <img
 	v-else
 	:class="[$style.root, { [$style.normal]: normal, [$style.noStyle]: noStyle }]"

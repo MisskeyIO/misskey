@@ -218,7 +218,7 @@ import { getAppearNote } from '@/utility/get-appear-note.js';
 import { prefer } from '@/preferences.js';
 import { getPluginHandlers } from '@/plugin.js';
 import { DI } from '@/di.js';
-import {store} from "@/store";
+import { store } from "@/store";
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;

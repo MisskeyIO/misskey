@@ -2,7 +2,7 @@ import { url as local } from '@@/js/config.js';
 import { instance } from '@/instance.js';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
-import {prefer} from "@/preferences";
+import { prefer } from "@/preferences";
 
 const extractDomain = /^(https?:\/\/|\/\/)?([^@/\s]+@)?(www\.)?([^:/\s]+)/i;
 const isRegExp = /^\/(.+)\/(.*)$/;

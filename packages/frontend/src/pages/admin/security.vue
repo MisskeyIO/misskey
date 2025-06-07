@@ -203,9 +203,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<template #label>Want Assertions Signed</template>
 							</MkSwitch>
 							<MkSwitch v-model="service.wantEmailAddressNormalized">
-									<template #label>Want Email Address Normalized</template>
-								</MkSwitch>
-								<MkSwitch v-model="service.useCertificate" :disabled="!!service.createdAt">
+								<template #label>Want Email Address Normalized</template>
+							</MkSwitch>
+							<MkSwitch v-model="service.useCertificate" :disabled="!!service.createdAt">
 								<template #label>Use Certificate</template>
 							</MkSwitch>
 							<MkSwitch v-if="service.useCertificate" v-model="service.regenerateCertificate">
@@ -245,6 +245,31 @@ import { useForm } from '@/use/use-form.js';
 import MkFormFooter from '@/components/MkFormFooter.vue';
 
 const meta = await misskeyApi('admin/meta');
+
+const enableHcaptcha = ref<boolean>(false);
+const enableMcaptcha = ref<boolean>(false);
+const enableRecaptcha = ref<boolean>(false);
+const enableTurnstile = ref<boolean>(false);
+const sensitiveMediaDetection = ref<string>('none');
+const sensitiveMediaDetectionSensitivity = ref<number>(0);
+const setSensitiveFlagAutomatically = ref<boolean>(false);
+const enableSensitiveMediaDetectionForVideos = ref<boolean>(false);
+const enableIpLogging = ref<boolean>(false);
+const enableActiveEmailValidation = ref<boolean>(false);
+const enableVerifymailApi = ref<boolean>(false);
+const verifymailAuthKey = ref<string | null>(null);
+const enableTruemailApi = ref<boolean>(false);
+const truemailInstance = ref<string | null>(null);
+const truemailAuthKey = ref<string | null>(null);
+const bannedEmailDomains = ref<string>('');
+const indieAuthClients = ref<any[]>([]);
+const indieAuthTimestamp = ref(0);
+const indieAuthOffset = ref(0);
+const indieAuthHasMore = ref(false);
+const ssoServices = ref<any[]>([]);
+const ssoServiceTimestamp = ref(0);
+const ssoServiceOffset = ref(0);
+const ssoServiceHasMore = ref(false);
 
 const sensitiveMediaDetectionForm = useForm({
 	sensitiveMediaDetection: meta.sensitiveMediaDetection,

@@ -137,7 +137,8 @@ import type { PostFormProps } from '@/types/post-form.js';
 import type { MenuItem } from '@/types/menu.js';
 import MkNotePreview from '@/components/MkNotePreview.vue';
 import XPostFormAttaches from '@/components/MkPostFormAttaches.vue';
-import MkPollEditor, { type PollEditorModelValue } from '@/components/MkPollEditor.vue';
+import MkPollEditor from '@/components/MkPollEditor.vue';
+import type { PollEditorModelValue } from '@/components/MkPollEditor.vue';
 import MkDraftsDialog from '@/components/MkDraftsDialog.vue';
 import { host, url } from '@@/js/config.js';
 import XTextCounter from '@/components/MkPostForm.TextCounter.vue';
@@ -889,7 +890,7 @@ function isAnnoying(text: string): boolean {
 }
 
 async function openDrafts() {
-	const { canceled, selected } = await new Promise<{canceled: boolean, selected: string | undefined}>(resolve => {
+	const { canceled, selected } = await new Promise<{ canceled: boolean, selected: string | undefined }>(resolve => {
 		os.popup(MkDraftsDialog, {}, {
 			done: result => {
 				resolve(typeof result.selected === 'string' ? result : { canceled: true, selected: undefined });
@@ -1134,6 +1135,7 @@ async function insertEmoji(ev: MouseEvent) {
 		textareaEl.value,
 	);
 }
+
 // async function insertEmoji(ev: MouseEvent) { TODO
 // 	textAreaReadOnly.value = true;
 // 	const target = ev.currentTarget ?? ev.target;

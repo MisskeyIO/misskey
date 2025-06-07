@@ -192,7 +192,6 @@ if (iAmModerator) {
 	});
 }
 
-
 watch(moderationNote, async () => {
 	if (!instance.value) return;
 

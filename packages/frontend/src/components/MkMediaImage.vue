@@ -106,7 +106,7 @@ function showMenu(ev: MouseEvent) {
 				});
 			});
 		},
-	})
+	});
 
 	if ($i?.id === props.image.userId || iAmModerator) {
 		menuItems.push({
@@ -183,7 +183,7 @@ async function showHiddenContent(ev: MouseEvent) {
 	if (hide.value) {
 		ev.stopPropagation();
 		if (props.image.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
-			const {canceled} = await os.confirm({
+			const { canceled } = await os.confirm({
 				type: 'question',
 				text: i18n.ts.sensitiveMediaRevealConfirm,
 			});

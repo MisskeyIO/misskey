@@ -72,21 +72,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 				<MkFolder>
 					<template #icon><i class="ti ti-user-x"></i></template>
-						<template #label>{{ i18n.ts.prohibitedWordsForNameOfUser }}</template>
+					<template #label>{{ i18n.ts.prohibitedWordsForNameOfUser }}</template>
 
+					<MkTextarea v-model="hiddenTags">
+						<template #label>{{ i18n.ts.hiddenTags }}</template>
 
-
-						<MkTextarea v-model="hiddenTags">
-							<template #label>{{ i18n.ts.hiddenTags }}</template>
-
-							<div class="_gaps">
-								<MkTextarea v-model="hiddenTags">
-									<template #caption>{{ i18n.ts.hiddenTagsDescription }}</template>
-								</MkTextarea>
-								<MkButton primary @click="save_hiddenTags">{{ i18n.ts.save }}</MkButton>
-							</div>
-						</MkTextarea>
-					</MkFolder>
+						<div class="_gaps">
+							<MkTextarea v-model="hiddenTags">
+								<template #caption>{{ i18n.ts.hiddenTagsDescription }}</template>
+							</MkTextarea>
+							<MkButton primary @click="save_hiddenTags">{{ i18n.ts.save }}</MkButton>
+						</div>
+					</MkTextarea>
+				</MkFolder>
 
 				<MkFolder>
 					<template #icon><i class="ti ti-eye-off"></i></template>
@@ -101,20 +99,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</MkFolder>
 
 				<MkFolder>
-						<template #icon><i class="ti ti-user-x"></i></template>
-						<template #label>FIXME</template>
-						<MkTextarea v-model="wellKnownWebsites">
-							<template #label>{{ i18n.ts.wellKnownWebsites }}</template>
-							<template #caption>{{ i18n.ts.wellKnownWebsitesDescription }}</template>
-						</MkTextarea>
+					<template #icon><i class="ti ti-user-x"></i></template>
+					<template #label>FIXME</template>
+					<MkTextarea v-model="wellKnownWebsites">
+						<template #label>{{ i18n.ts.wellKnownWebsites }}</template>
+						<template #caption>{{ i18n.ts.wellKnownWebsitesDescription }}</template>
+					</MkTextarea>
 
-						<MkTextarea v-model="urlPreviewDenyList">
-							<template #label>{{ i18n.ts.urlPreviewDenyList }}</template>
-							<template #caption>{{ i18n.ts.urlPreviewDenyListDescription }}</template>
-						</MkTextarea>
-					</MkFolder>
+					<MkTextarea v-model="urlPreviewDenyList">
+						<template #label>{{ i18n.ts.urlPreviewDenyList }}</template>
+						<template #caption>{{ i18n.ts.urlPreviewDenyListDescription }}</template>
+					</MkTextarea>
+				</MkFolder>
 
-					<MkFolder>
+				<MkFolder>
 					<template #icon><i class="ti ti-eye-off"></i></template>
 					<template #label>{{ i18n.ts.mediaSilencedInstances }}</template>
 
@@ -203,12 +201,13 @@ async function onChange_enableRegistration(value: boolean) {
 	});
 }
 
-function onChange_emailRequiredForSignup(value: boolean) {
+async function onChange_emailRequiredForSignup(value: boolean) {
 	os.apiWithDialog('admin/update-meta', {
 		emailRequiredForSignup: value,
 	}).then(() => {
 		fetchInstance(true);
 	});
+	const meta = await misskeyApi('admin/meta');
 	wellKnownWebsites.value = meta.wellKnownWebsites.join('\n');
 	urlPreviewDenyList.value = meta.urlPreviewDenyList.join('\n');
 }

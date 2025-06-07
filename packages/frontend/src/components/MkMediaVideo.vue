@@ -315,7 +315,7 @@ async function showHiddenContent(ev: MouseEvent) {
 	}
 
 	if (props.video.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
-		const {canceled} = await os.confirm({
+		const { canceled } = await os.confirm({
 			type: 'question',
 			text: i18n.ts.sensitiveMediaRevealConfirm,
 		});

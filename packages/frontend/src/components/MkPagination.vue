@@ -350,7 +350,7 @@ const prepend = (item: MisskeyEntity): void => {
 
 	if (isHead() && !isPausingUpdate) unshiftItems([item]);
 	else prependQueue(item);
-}
+};
 
 function unshiftItems(newItems: MisskeyEntity[]) {
 	const length = newItems.length + items.value.length;

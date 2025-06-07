@@ -40,7 +40,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, watch, onUnmounted, provide, useTemplateRef, TransitionGroup,onMounted ,} from 'vue';
+import { computed, watch, onUnmounted, provide, useTemplateRef, TransitionGroup, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { BasicTimelineType } from '@/timelines.js';
 import type { Paging } from '@/components/MkPagination.vue';
@@ -125,7 +125,7 @@ async function prepend(data) {
 
 	let note = data;
 
-	if (!document.hidden) {
+	if (!window.document.hidden) {
 		note = await fulfillNoteData(data);
 		if (note == null) return;
 
@@ -152,7 +152,7 @@ async function prepend(data) {
 }
 
 async function loadUnloadedNotes() {
-	if (document.hidden) return;
+	if (window.document.hidden) return;
 	if (pagingComponent.value == null) return;
 	if (notVisibleNoteData.length === 0) return;
 
@@ -363,12 +363,12 @@ watch(() => props.withSensitive, reloadTimeline);
 refreshEndpointAndChannel();
 
 onMounted(() => {
-	document.addEventListener('visibilitychange', loadUnloadedNotes);
+	window.document.addEventListener('visibilitychange', loadUnloadedNotes);
 });
 
 onUnmounted(() => {
 	disconnectChannel();
-	document.removeEventListener('visibilitychange', loadUnloadedNotes);
+	window.document.removeEventListener('visibilitychange', loadUnloadedNotes);
 });
 
 function reloadTimeline() {

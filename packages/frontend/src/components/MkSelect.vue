@@ -36,7 +36,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import {onMounted, nextTick, ref, watch, computed, toRefs, useSlots, useTemplateRef} from 'vue';
+import { onMounted, nextTick, ref, watch, computed, toRefs, useSlots, useTemplateRef } from 'vue';
 import { useInterval } from '@@/js/use-interval.js';
 import type { VNode, VNodeChild } from 'vue';
 import type { MenuItem } from '@/types/menu.js';
@@ -82,10 +82,10 @@ const { modelValue, autofocus } = toRefs(props);
 const focused = ref(false);
 const opening = ref(false);
 const currentValueText = ref<string | null>(null);
-const inputEl = useTemplateRef("inputEl")
-const prefixEl =  useTemplateRef("prefixEl")
-const suffixEl =  useTemplateRef("suffixEl")
-const container = useTemplateRef("container")
+const inputEl = useTemplateRef("inputEl");
+const prefixEl = useTemplateRef("prefixEl");
+const suffixEl = useTemplateRef("suffixEl");
+const container = useTemplateRef("container");
 
 const height =
 	props.small ? 33 :

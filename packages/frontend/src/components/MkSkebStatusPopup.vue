@@ -35,7 +35,7 @@ import * as Misskey from 'misskey-js';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
 import { calcPopupPosition } from '@/utility/popup-position.js';
-import {prefer} from "@/preferences";
+import { prefer } from "@/preferences";
 
 const props = defineProps<{
 	showing: boolean;

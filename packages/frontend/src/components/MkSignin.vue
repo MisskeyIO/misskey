@@ -232,7 +232,6 @@ async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>): Promi
 		throw new Error('Invalid request');
 	}
 
-
 	return await misskeyApi('signin-flow', _req).then(async (res) => {
 		if (res.finished) {
 			emit('login', res);

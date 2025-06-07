@@ -62,18 +62,18 @@
 		"cookie": "1.0.2",
 		"cookie-signature": "1.2.2",
 		"debug": "4.4.0",
-		"esbuild": "0.25.4",
 		"jpeg-js": "0.4.4",
 		"lodash": "4.17.21",
 		"sharp": "0.34.0-rc.0",
 		"storybook-addon-misskey-theme": "github:misskey-dev/storybook-addon-misskey-theme",
 		"tough-cookie": "5.1.2",
 		"webgl-audiovisualizer": "github:tar-bin/webgl-audiovisualizer",
-		"web-streams-polyfill": "4.1.0"
+		"web-streams-polyfill": "4.1.0",
+		"eslint-plugin-import": "2.31.0"
 	},
 	"dependencies": {
 		"cssnano": "7.0.7",
-		"esbuild": "0.25.3",
+		"esbuild": "0.25.4",
 		"execa": "9.5.3",
 		"fast-glob": "3.3.2",
 		"ignore-walk": "6.0.5",
@@ -86,15 +86,15 @@
 	"devDependencies": {
 		"@misskey-dev/eslint-plugin": "2.1.0",
 		"@types/node": "22.15.17",
-		"@typescript-eslint/eslint-plugin": "8.31.0",
-		"@typescript-eslint/parser": "8.31.0",
+		"@typescript-eslint/eslint-plugin": "8.32.1",
+		"@typescript-eslint/parser": "8.32.1",
 		"cross-env": "7.0.3",
 		"cypress": "14.3.3",
 		"eslint": "9.25.1",
 		"globals": "16.0.0",
 		"ncp": "2.0.0",
-		"pnpm": "10.10.0",
-		"start-server-and-test": "2.0.11"
+		"start-server-and-test": "2.0.11",
+		"nodemon": "3.1.10"
 	},
 	"optionalDependencies": {
 		"@tensorflow/tfjs-core": "managed"

@@ -1563,12 +1563,6 @@ importers:
         specifier: workspace:*
         version: link:../misskey-js
     devDependencies:
-      '@misskey-dev/eslint-plugin':
-        specifier: 2.1.0
-        version: 2.1.0(@eslint/compat@1.2.9(eslint@9.27.0))(@stylistic/eslint-plugin@4.2.0(eslint@9.27.0)(typescript@5.8.3))(@typescript-eslint/eslint-plugin@8.33.1(@typescript-eslint/parser@8.33.1(eslint@9.27.0)(typescript@5.8.3))(eslint@9.27.0)(typescript@5.8.3))(@typescript-eslint/parser@8.33.1(eslint@9.27.0)(typescript@5.8.3))(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.33.1(eslint@9.27.0)(typescript@5.8.3))(eslint@9.27.0))(eslint@9.27.0)(globals@16.0.0)
-      '@types/serviceworker':
-        specifier: 0.0.134
-        version: 0.0.134
       '@typescript-eslint/parser':
         specifier: 8.33.1
         version: 8.33.1(eslint@9.27.0)(typescript@5.8.3)
@@ -4757,9 +4751,6 @@ packages:
 
   '@types/serve-static@1.15.7':
     resolution: {integrity: sha512-W8Ym+h8nhuRwaKPaDw34QUkwsGi6Rc4yYqvKFo5rm2FUEhCFbzVWrxXUxuKK8TASjWsysJY0nsmNCGhCOIsrOw==}
-
-  '@types/serviceworker@0.0.134':
-    resolution: {integrity: sha512-5c2LjDitzjNaxTAfCsYRiElyAAV66iQvjuSRIvdGcb33y0em6tsg2wUHxRz7ELRnOfrevP3VmoLndcwJyIgLwg==}
 
   '@types/serviceworker@0.0.74':
     resolution: {integrity: sha512-HNt7NJHrjGtCmI3h1+rsb1g/ZY0iy5KaeenfEV7zAWPSaCs49hEUvgH++V1BHNwlLfB3sbjPh3pSiNixfYjb1w==}
@@ -15365,8 +15356,6 @@ snapshots:
       '@types/http-errors': 2.0.4
       '@types/node': 22.15.17
       '@types/send': 0.17.4
-
-  '@types/serviceworker@0.0.134': {}
 
   '@types/serviceworker@0.0.74': {}
 

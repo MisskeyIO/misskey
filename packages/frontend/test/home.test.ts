@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { afterEach, assert, describe, test } from 'vitest';
+import { vi, afterEach,beforeEach, assert, describe, test } from 'vitest';
 import { cleanup, render, type RenderResult } from '@testing-library/vue';
 import './init';
 import * as Misskey from 'misskey-js';
@@ -12,6 +12,10 @@ import { components } from '@/components/index.js';
 import XHome from '@/pages/user/home.vue';
 import 'intersection-observer';
 
+vi.mock('@/utility/misskey-api.js', () => ({
+	misskeyApi: vi.fn().mockResolvedValue({})
+}));
+
 describe('XHome', () => {
 	const renderHome = (user: Partial<Misskey.entities.UserDetailed>): RenderResult => {
 		return render(XHome, {
@@ -19,6 +23,7 @@ describe('XHome', () => {
 			global: { directives, components },
 		});
 	};
+
 
 	afterEach(() => {
 		cleanup();

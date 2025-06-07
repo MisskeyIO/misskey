@@ -111,6 +111,7 @@
 		"@types/estree": "1.0.7",
 		"@types/matter-js": "0.19.8",
 		"@types/micromatch": "4.0.9",
+		"@types/node": "22.15.17",
 		"@types/punycode.js": "managed",
 		"@types/sanitize-html": "2.16.0",
 		"@types/seedrandom": "3.0.8",

@@ -25,6 +25,7 @@
 	},
 	"devDependencies": {
 		"@types/matter-js": "0.19.8",
+		"@types/node": "22.15.17",
 		"@types/seedrandom": "3.0.8",
 		"execa": "8.0.1",
 		"typescript": "5.8.3"

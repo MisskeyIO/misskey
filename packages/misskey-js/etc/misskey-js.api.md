@@ -477,13 +477,13 @@ type AdminUpdateAbuseUserReportRequest = operations['admin___update-abuse-user-r
 type AdminUpdateMetaRequest = operations['admin___update-meta']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminUpdateUserNameRequest = operations['admin___update-user-name']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
 type AdminUpdateProxyAccountRequest = operations['admin___update-proxy-account']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 type AdminUpdateProxyAccountResponse = operations['admin___update-proxy-account']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type AdminUpdateUserNameRequest = operations['admin___update-user-name']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 type AdminUpdateUserNoteRequest = operations['admin___update-user-note']['requestBody']['content']['application/json'];
@@ -1525,6 +1525,12 @@ declare namespace entities {
         PartialRolePolicyOverride,
         EmptyRequest,
         EmptyResponse,
+        AdminAbuseReportResolverCreateRequest,
+        AdminAbuseReportResolverCreateResponse,
+        AdminAbuseReportResolverDeleteRequest,
+        AdminAbuseReportResolverListRequest,
+        AdminAbuseReportResolverListResponse,
+        AdminAbuseReportResolverUpdateRequest,
         AdminAbuseReportNotificationRecipientCreateRequest,
         AdminAbuseReportNotificationRecipientCreateResponse,
         AdminAbuseReportNotificationRecipientDeleteRequest,
@@ -1556,26 +1562,15 @@ declare namespace entities {
         AdminAnnouncementsListRequest,
         AdminAnnouncementsListResponse,
         AdminAnnouncementsUpdateRequest,
-        AdminAbuseReportResolverCreateRequest,
-        AdminAbuseReportResolverCreateResponse,
-        AdminAbuseReportResolverListRequest,
-        AdminAbuseReportResolverListResponse,
-        AdminAbuseReportResolverDeleteRequest,
-        AdminAbuseReportResolverUpdateRequest,
         AdminAvatarDecorationsCreateRequest,
         AdminAvatarDecorationsCreateResponse,
         AdminAvatarDecorationsDeleteRequest,
         AdminAvatarDecorationsListRequest,
         AdminAvatarDecorationsListResponse,
         AdminAvatarDecorationsUpdateRequest,
-        AdminUnsetUserAvatarRequest,
-        AdminUnsetUserBannerRequest,
-        AdminUnsetUserMutualLinkRequest,
-        AdminDriveDeleteAllFilesOfAUserRequest,
         AdminCaptchaCurrentResponse,
         AdminCaptchaSaveRequest,
-        AdminDeleteAccountRequest,
-        AdminDeleteAllFilesOfAUserRequest,
+        AdminDriveDeleteAllFilesOfAUserRequest,
         AdminDriveFilesRequest,
         AdminDriveFilesResponse,
         AdminDriveShowFileRequest,
@@ -1601,17 +1596,17 @@ declare namespace entities {
         AdminFederationRefreshRemoteInstanceMetadataRequest,
         AdminFederationRemoveAllFollowingRequest,
         AdminFederationUpdateInstanceRequest,
+        AdminForwardAbuseUserReportRequest,
+        AdminGetIndexStatsResponse,
+        AdminGetTableStatsResponse,
+        AdminGetUserIpsRequest,
+        AdminGetUserIpsResponse,
         AdminIndieAuthCreateRequest,
         AdminIndieAuthCreateResponse,
         AdminIndieAuthDeleteRequest,
         AdminIndieAuthListRequest,
         AdminIndieAuthListResponse,
         AdminIndieAuthUpdateRequest,
-        AdminForwardAbuseUserReportRequest,
-        AdminGetIndexStatsResponse,
-        AdminGetTableStatsResponse,
-        AdminGetUserIpsRequest,
-        AdminGetUserIpsResponse,
         AdminInviteCreateRequest,
         AdminInviteCreateResponse,
         AdminInviteListRequest,
@@ -1623,31 +1618,14 @@ declare namespace entities {
         AdminQueueInboxDelayedResponse,
         AdminQueuePromoteRequest,
         AdminQueueStatsResponse,
+        AdminRegenerateUserTokenRequest,
         AdminRelaysAddRequest,
         AdminRelaysAddResponse,
         AdminRelaysListResponse,
         AdminRelaysRemoveRequest,
         AdminResetPasswordRequest,
         AdminResetPasswordResponse,
-        AdminRegenerateUserTokenRequest,
         AdminResolveAbuseUserReportRequest,
-        AdminForwardAbuseUserReportRequest,
-        AdminUpdateAbuseUserReportRequest,
-        AdminSendEmailRequest,
-        AdminServerInfoResponse,
-        AdminShowModerationLogsRequest,
-        AdminShowModerationLogsResponse,
-        AdminShowUserAccountMoveLogsRequest,
-        AdminShowUserAccountMoveLogsResponse,
-        AdminShowUserRequest,
-        AdminShowUserResponse,
-        AdminShowUsersRequest,
-        AdminShowUsersResponse,
-        AdminSuspendUserRequest,
-        AdminUnsuspendUserRequest,
-        AdminUpdateMetaRequest,
-        AdminUpdateUserNameRequest,
-        AdminUpdateUserNoteRequest,
         AdminRolesAssignRequest,
         AdminRolesCreateRequest,
         AdminRolesCreateResponse,
@@ -1660,22 +1638,22 @@ declare namespace entities {
         AdminRolesUpdateDefaultPoliciesRequest,
         AdminRolesUsersRequest,
         AdminRolesUsersResponse,
-        AdminSsoCreateRequest,
-        AdminSsoCreateResponse,
-        AdminSsoDeleteRequest,
-        AdminSsoListRequest,
-        AdminSsoListResponse,
-        AdminSsoUpdateRequest,
-        AnnouncementRequest,
-        AnnouncementResponse,
         AdminSendEmailRequest,
         AdminServerInfoResponse,
         AdminShowModerationLogsRequest,
         AdminShowModerationLogsResponse,
         AdminShowUserRequest,
         AdminShowUserResponse,
+        AdminShowUserAccountMoveLogsRequest,
+        AdminShowUserAccountMoveLogsResponse,
         AdminShowUsersRequest,
         AdminShowUsersResponse,
+        AdminSsoCreateRequest,
+        AdminSsoCreateResponse,
+        AdminSsoDeleteRequest,
+        AdminSsoListRequest,
+        AdminSsoListResponse,
+        AdminSsoUpdateRequest,
         AdminSuspendUserRequest,
         AdminSystemWebhookCreateRequest,
         AdminSystemWebhookCreateResponse,
@@ -1689,12 +1667,16 @@ declare namespace entities {
         AdminSystemWebhookUpdateResponse,
         AdminUnsetUserAvatarRequest,
         AdminUnsetUserBannerRequest,
+        AdminUnsetUserMutualLinkRequest,
         AdminUnsuspendUserRequest,
         AdminUpdateAbuseUserReportRequest,
         AdminUpdateMetaRequest,
         AdminUpdateProxyAccountRequest,
         AdminUpdateProxyAccountResponse,
+        AdminUpdateUserNameRequest,
         AdminUpdateUserNoteRequest,
+        AnnouncementRequest,
+        AnnouncementResponse,
         AnnouncementsRequest,
         AnnouncementsResponse,
         AnnouncementsShowRequest,
@@ -2048,9 +2030,6 @@ declare namespace entities {
         NotesCreateRequest,
         NotesCreateResponse,
         NotesDeleteRequest,
-        NotesScheduledCancelRequest,
-        NotesScheduledListRequest,
-        NotesScheduledListResponse,
         NotesFavoritesCreateRequest,
         NotesFavoritesDeleteRequest,
         NotesFeaturedRequest,
@@ -2074,6 +2053,9 @@ declare namespace entities {
         NotesRenotesResponse,
         NotesRepliesRequest,
         NotesRepliesResponse,
+        NotesScheduledCancelRequest,
+        NotesScheduledListRequest,
+        NotesScheduledListResponse,
         NotesSearchRequest,
         NotesSearchResponse,
         NotesSearchByTagRequest,
@@ -2163,10 +2145,10 @@ declare namespace entities {
         UsersGetFollowingBirthdayUsersResponse,
         UsersGetFrequentlyRepliedUsersRequest,
         UsersGetFrequentlyRepliedUsersResponse,
+        UsersGetSecurityInfoRequest,
+        UsersGetSecurityInfoResponse,
         UsersGetSkebStatusRequest,
         UsersGetSkebStatusResponse,
-        UsersFeaturedNotesRequest,
-        UsersFeaturedNotesResponse,
         UsersListsCreateRequest,
         UsersListsCreateResponse,
         UsersListsCreateFromPublicRequest,
@@ -2202,12 +2184,8 @@ declare namespace entities {
         UsersSearchByUsernameAndHostResponse,
         UsersShowRequest,
         UsersShowResponse,
-        UsersGetSecurityInfoRequest,
-        UsersGetSecurityInfoResponse,
         UsersStatsRequest,
         UsersStatsResponse,
-        UsersAchievementsRequest,
-        UsersAchievementsResponse,
         UsersUpdateMemoRequest,
         V2AdminEmojiListRequest,
         V2AdminEmojiListResponse,
@@ -3615,7 +3593,6 @@ export class Stream extends EventEmitter<StreamEvents> implements IStream {
     constructor(origin: string, user: {
         token: string;
     } | null, options?: {
-        WebSocket?: _ReconnectingWebSocket.Options['WebSocket'];
         WebSocket?: Options['WebSocket'];
         binaryType?: ReconnectingWebSocket['binaryType'];
     });
@@ -3917,8 +3894,8 @@ type V2AdminEmojiListResponse = operations['v2___admin___emoji___list']['respons
 //
 // src/entities.ts:50:2 - (ae-forgotten-export) The symbol "ModerationLogPayloads" needs to be exported by the entry point index.d.ts
 // src/streaming.ts:57:3 - (ae-forgotten-export) The symbol "ReconnectingWebSocket" needs to be exported by the entry point index.d.ts
-// src/streaming.types.ts:218:4 - (ae-forgotten-export) The symbol "ReversiUpdateKey" needs to be exported by the entry point index.d.ts
-// src/streaming.types.ts:228:4 - (ae-forgotten-export) The symbol "ReversiUpdateSettings" needs to be exported by the entry point index.d.ts
+// src/streaming.types.ts:226:4 - (ae-forgotten-export) The symbol "ReversiUpdateKey" needs to be exported by the entry point index.d.ts
+// src/streaming.types.ts:236:4 - (ae-forgotten-export) The symbol "ReversiUpdateSettings" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

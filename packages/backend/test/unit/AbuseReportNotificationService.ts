@@ -378,6 +378,8 @@ describe('AbuseReportNotificationService', () => {
 					resolvedAs: null,
 					targetUserHost: null,
 					reporterHost: null,
+					createdAt: new Date(),
+					category: '',
 				},
 			];
 

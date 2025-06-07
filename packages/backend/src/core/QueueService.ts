@@ -19,6 +19,7 @@ import { bindThis } from '@/decorators.js';
 import type { Antenna } from '@/server/api/endpoints/i/import-antennas.js';
 import { ApRequestCreator } from '@/core/activitypub/ApRequestService.js';
 import { type SystemWebhookPayload } from '@/core/SystemWebhookService.js';
+import { Queues } from '@/misc/queues.js';
 import { type UserWebhookPayload } from './UserWebhookService.js';
 import type {
 	DbJobData,
@@ -756,17 +757,17 @@ export class QueueService {
 	}
 
 	@bindThis
-	private getQueue(type: typeof QUEUE_TYPES[number]): Bull.Queue<any, any, string> {
+	private getQueue(type: typeof QUEUE_TYPES[number]): Bull.Queue {
 		switch (type) {
-			case 'system': return this.systemQueue as any;
-			case 'endedPollNotification': return this.endedPollNotificationQueue as any;
-			case 'deliver': return this.deliverQueue as any;
-			case 'inbox': return this.inboxQueue as any;
-			case 'db': return this.dbQueue as any;
-			case 'relationship': return this.relationshipQueue as any;
-			case 'objectStorage': return this.objectStorageQueue as any;
-			case 'userWebhookDeliver': return this.userWebhookDeliverQueue as any;
-			case 'systemWebhookDeliver': return this.systemWebhookDeliverQueue as any;
+			case 'system': return this.systemQueue;
+			case 'endedPollNotification': return this.endedPollNotificationQueue;
+			case 'deliver': return this.deliverQueue;
+			case 'inbox': return this.inboxQueue;
+			case 'db': return this.dbQueue;
+			case 'relationship': return this.relationshipQueue;
+			case 'objectStorage': return this.objectStorageQueue;
+			case 'userWebhookDeliver': return this.userWebhookDeliverQueue;
+			case 'systemWebhookDeliver': return this.systemWebhookDeliverQueue;
 			default: throw new Error(`Unrecognized queue type: ${type}`);
 		}
 	}
@@ -774,7 +775,6 @@ export class QueueService {
 	@bindThis
 	public async queueClear(queueType: typeof QUEUE_TYPES[number], state: '*' | 'completed' | 'wait' | 'active' | 'paused' | 'prioritized' | 'delayed' | 'failed') {
 		const queue = this.getQueue(queueType);
-
 		if (state === '*') {
 			await Promise.all([
 				queue.clean(0, 0, 'completed'),

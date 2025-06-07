@@ -30,6 +30,7 @@ export default [
 		files: ['**/*.js', '**/*.cjs'],
 		rules: {
 			'@typescript-eslint/no-var-requires': 'off',
+			'@typescript-eslint/no-explicit-any': 'error',
 		},
 	},
 	{

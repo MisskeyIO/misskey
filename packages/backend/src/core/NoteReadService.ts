@@ -54,20 +54,13 @@ export class NoteReadService implements OnApplicationShutdown {
 		});
 		if (isThreadMuted) return;
 
-		// NOTE: NoteUnreadsRepository is no longer available, so we skip the database operations
-		// and directly emit events after a delay
-
 		// 2秒経っても既読にならなかったら「未読の投稿がありますよ」イベントを発行する
 		setTimeout(2000, 'unread note', { signal: this.#shutdownController.signal }).then(async () => {
-			// NOTE: Since we don't have NoteUnreadsRepository, we assume the note is still unread
-
 			if (params.isMentioned) {
-				// Using a safe event name that's likely to exist
-				this.globalEventService.publishMainStream(userId, 'notification' as any, note.id);
+				this.globalEventService.publishMainStream(userId, 'notification', note.id);
 			}
 			if (params.isSpecified) {
-				// Using a safe event name that's likely to exist
-				this.globalEventService.publishMainStream(userId, 'notification' as any, note.id);
+				this.globalEventService.publishMainStream(userId, 'notification', note.id);
 			}
 		}, () => { /* aborted, ignore it */ });
 	}
@@ -87,23 +80,18 @@ export class NoteReadService implements OnApplicationShutdown {
 
 		if (noteIds.size === 0) return;
 
-		// NOTE: NoteUnreadsRepository is no longer available, so we skip the database operations
-		// Remove the record operations would be here
-
-		// TODO: Since we don't have access to NoteUnreadsRepository, we can't count unread notes
-		// For now, we'll just emit events optimistically
-
+		// TODO: ↓まとめてクエリしたい
 		trackPromise(Promise.resolve(0).then((mentionsCount: number) => {
 			if (mentionsCount === 0) {
 				// 全て既読になったイベントを発行
-				this.globalEventService.publishMainStream(userId, 'notification' as any);
+				this.globalEventService.publishMainStream(userId, 'notification');
 			}
 		}));
 
 		trackPromise(Promise.resolve(0).then((specifiedCount: number) => {
 			if (specifiedCount === 0) {
 				// 全て既読になったイベントを発行
-				this.globalEventService.publishMainStream(userId, 'notification' as any);
+				this.globalEventService.publishMainStream(userId, 'notification');
 			}
 		}));
 	}

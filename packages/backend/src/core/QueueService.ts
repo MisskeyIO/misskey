@@ -5,8 +5,6 @@
 
 import { randomUUID } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
-import { MetricsTime, type JobType } from 'bullmq';
-import { parse as parseRedisInfo } from 'redis-info';
 import type { IActivity } from '@/core/activitypub/type.js';
 import type { MiDriveFile } from '@/models/DriveFile.js';
 import type { MiScheduledNote } from '@/models/ScheduledNote.js';
@@ -79,43 +77,37 @@ export class QueueService {
 		void this.systemQueue.add('tickCharts', {
 		}, {
 			repeat: { pattern: '55 * * * *' },
-			removeOnComplete: 10,
-			removeOnFail: 30,
+			removeOnComplete: true,
 		});
 
 		void this.systemQueue.add('resyncCharts', {
 		}, {
 			repeat: { pattern: '0 0 * * *' },
-			removeOnComplete: 10,
-			removeOnFail: 30,
+			removeOnComplete: true,
 		});
 
 		void this.systemQueue.add('cleanCharts', {
 		}, {
 			repeat: { pattern: '0 0 * * *' },
-			removeOnComplete: 10,
-			removeOnFail: 30,
+			removeOnComplete: true,
 		});
 
 		void this.systemQueue.add('aggregateRetention', {
 		}, {
 			repeat: { pattern: '0 0 * * *' },
-			removeOnComplete: 10,
-			removeOnFail: 30,
+			removeOnComplete: true,
 		});
 
 		void this.systemQueue.add('clean', {
 		}, {
 			repeat: { pattern: '0 0 * * *' },
-			removeOnComplete: 10,
-			removeOnFail: 30,
+			removeOnComplete: true,
 		});
 
 		void this.systemQueue.add('checkExpiredMutings', {
 		}, {
 			repeat: { pattern: '*/5 * * * *' },
-			removeOnComplete: 10,
-			removeOnFail: 30,
+			removeOnComplete: true,
 		});
 
 		void this.systemQueue.add('checkMissingScheduledNote', {
@@ -127,16 +119,14 @@ export class QueueService {
 		void this.systemQueue.add('bakeBufferedReactions', {
 		}, {
 			repeat: { pattern: '0 0 * * *' },
-			removeOnComplete: 10,
-			removeOnFail: 30,
+			removeOnComplete: true,
 		});
 
 		void this.systemQueue.add('checkModeratorsActivity', {
 		}, {
 			// 毎時30分に起動
 			repeat: { pattern: '30 * * * *' },
-			removeOnComplete: 10,
-			removeOnFail: 30,
+			removeOnComplete: true,
 		});
 	}
 
@@ -158,21 +148,13 @@ export class QueueService {
 			isSharedInbox,
 		};
 
-		const label = to.replace('https://', '').replace('/inbox', '');
-
-		return this.deliverQueue.add(label, data, {
+		return this.deliverQueue.add(to, data, {
 			attempts: this.config.deliverJobMaxAttempts ?? 12,
 			backoff: {
 				type: 'custom',
 			},
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
@@ -193,18 +175,12 @@ export class QueueService {
 			backoff: {
 				type: 'custom',
 			},
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		};
 
 		await this.deliverQueue.addBulk(Array.from(inboxes.entries(), d => ({
-			name: d[0].replace('https://', '').replace('/inbox', ''),
+			name: d[0],
 			data: {
 				user,
 				content: contentBody,
@@ -226,21 +202,13 @@ export class QueueService {
 			signature,
 		};
 
-		const label = (activity.id ?? '').replace('https://', '').replace('/activity', '');
-
-		return this.inboxQueue.add(label, data, {
+		return this.inboxQueue.add('', data, {
 			attempts: this.config.inboxJobMaxAttempts ?? 8,
 			backoff: {
 				type: 'custom',
 			},
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
@@ -249,14 +217,8 @@ export class QueueService {
 		return this.dbQueue.add('deleteDriveFiles', {
 			user: { id: user.id },
 		}, {
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
@@ -265,14 +227,8 @@ export class QueueService {
 		return this.dbQueue.add('exportCustomEmojis', {
 			user: { id: user.id },
 		}, {
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
@@ -281,14 +237,8 @@ export class QueueService {
 		return this.dbQueue.add('exportNotes', {
 			user: { id: user.id },
 		}, {
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
@@ -297,14 +247,8 @@ export class QueueService {
 		return this.dbQueue.add('exportClips', {
 			user: { id: user.id },
 		}, {
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
@@ -313,14 +257,8 @@ export class QueueService {
 		return this.dbQueue.add('exportFavorites', {
 			user: { id: user.id },
 		}, {
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
@@ -331,14 +269,8 @@ export class QueueService {
 			excludeMuting,
 			excludeInactive,
 		}, {
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
@@ -347,14 +279,8 @@ export class QueueService {
 		return this.dbQueue.add('exportMuting', {
 			user: { id: user.id },
 		}, {
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
@@ -363,14 +289,8 @@ export class QueueService {
 		return this.dbQueue.add('exportBlocking', {
 			user: { id: user.id },
 		}, {
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
@@ -379,14 +299,8 @@ export class QueueService {
 		return this.dbQueue.add('exportUserLists', {
 			user: { id: user.id },
 		}, {
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
@@ -395,14 +309,8 @@ export class QueueService {
 		return this.dbQueue.add('exportAntennas', {
 			user: { id: user.id },
 		}, {
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
@@ -413,14 +321,8 @@ export class QueueService {
 			fileId: fileId,
 			withReplies,
 		}, {
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
@@ -436,14 +338,8 @@ export class QueueService {
 			user: { id: user.id },
 			fileId: fileId,
 		}, {
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
@@ -453,14 +349,8 @@ export class QueueService {
 			user: { id: user.id },
 			fileId: fileId,
 		}, {
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
@@ -480,14 +370,8 @@ export class QueueService {
 			name,
 			data,
 			opts: {
-				removeOnComplete: {
-					age: 3600 * 24 * 7, // keep up to 7 days
-					count: 30,
-				},
-				removeOnFail: {
-					age: 3600 * 24 * 7, // keep up to 7 days
-					count: 100,
-				},
+				removeOnComplete: true,
+				removeOnFail: true,
 			},
 		};
 	}
@@ -498,14 +382,8 @@ export class QueueService {
 			user: { id: user.id },
 			fileId: fileId,
 		}, {
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
@@ -515,14 +393,8 @@ export class QueueService {
 			user: { id: user.id },
 			fileId: fileId,
 		}, {
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
@@ -532,14 +404,8 @@ export class QueueService {
 			user: { id: user.id },
 			antenna,
 		}, {
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
@@ -561,14 +427,8 @@ export class QueueService {
 		return this.dbQueue.add('userSuspend', {
 			user: { id: user.id },
 		}, {
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
@@ -638,14 +498,8 @@ export class QueueService {
 				withReplies: data.withReplies,
 			},
 			opts: {
-				removeOnComplete: {
-					age: 3600 * 24 * 7, // keep up to 7 days
-					count: 30,
-				},
-				removeOnFail: {
-					age: 3600 * 24 * 7, // keep up to 7 days
-					count: 100,
-				},
+				removeOnComplete: true,
+				removeOnFail: true,
 				...opts,
 			},
 		};
@@ -656,28 +510,16 @@ export class QueueService {
 		return this.objectStorageQueue.add('deleteFile', {
 			key: key,
 		}, {
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
 	@bindThis
 	public createCleanRemoteFilesJob() {
 		return this.objectStorageQueue.add('cleanRemoteFiles', {}, {
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
@@ -708,14 +550,8 @@ export class QueueService {
 			backoff: {
 				type: 'custom',
 			},
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
@@ -745,19 +581,13 @@ export class QueueService {
 			backoff: {
 				type: 'custom',
 			},
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
+			removeOnComplete: true,
+			removeOnFail: true,
 		});
 	}
 
 	@bindThis
-	private getQueue(type: typeof QUEUE_TYPES[number]): Bull.Queue {
+	private getQueue(type: typeof QUEUE_TYPES[number]) {
 		switch (type) {
 			case 'system': return this.systemQueue;
 			case 'endedPollNotification': return this.endedPollNotificationQueue;
@@ -773,172 +603,18 @@ export class QueueService {
 	}
 
 	@bindThis
-	public async queueClear(queueType: typeof QUEUE_TYPES[number], state: '*' | 'completed' | 'wait' | 'active' | 'paused' | 'prioritized' | 'delayed' | 'failed') {
+	public clearQueue(queueType: typeof QUEUE_TYPES[number], state: '*' | 'completed' | 'wait' | 'active' | 'paused' | 'prioritized' | 'delayed' | 'failed') {
 		const queue = this.getQueue(queueType);
 		if (state === '*') {
-			await Promise.all([
-				queue.clean(0, 0, 'completed'),
-				queue.clean(0, 0, 'wait'),
-				queue.clean(0, 0, 'active'),
-				queue.clean(0, 0, 'paused'),
-				queue.clean(0, 0, 'prioritized'),
-				queue.clean(0, 0, 'delayed'),
-				queue.clean(0, 0, 'failed'),
-			]);
+			queue.clean(0, 0, 'completed');
+			queue.clean(0, 0, 'wait');
+			queue.clean(0, 0, 'active');
+			queue.clean(0, 0, 'paused');
+			queue.clean(0, 0, 'prioritized');
+			queue.clean(0, 0, 'delayed');
+			queue.clean(0, 0, 'failed');
 		} else {
-			await queue.clean(0, 0, state);
+			queue.clean(0, 0, state);
 		}
-	}
-
-	@bindThis
-	public async queuePromoteJobs(queueType: typeof QUEUE_TYPES[number]) {
-		const queue = this.getQueue(queueType);
-		await queue.promoteJobs();
-	}
-
-	@bindThis
-	public async queueRetryJob(queueType: typeof QUEUE_TYPES[number], jobId: string) {
-		const queue = this.getQueue(queueType);
-		const job: Bull.Job | null = await queue.getJob(jobId);
-		if (job) {
-			if (job.finishedOn != null) {
-				await job.retry();
-			} else {
-				await job.promote();
-			}
-		}
-	}
-
-	@bindThis
-	public async queueRemoveJob(queueType: typeof QUEUE_TYPES[number], jobId: string) {
-		const queue = this.getQueue(queueType);
-		const job: Bull.Job | null = await queue.getJob(jobId);
-		if (job) {
-			await job.remove();
-		}
-	}
-
-	@bindThis
-	private packJobData(job: Bull.Job) {
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		const stacktrace = job.stacktrace ? job.stacktrace.filter(Boolean) : [];
-		stacktrace.reverse();
-
-		return {
-			id: job.id,
-			name: job.name,
-			data: job.data,
-			opts: job.opts,
-			timestamp: job.timestamp,
-			processedOn: job.processedOn,
-			processedBy: job.processedBy,
-			finishedOn: job.finishedOn,
-			progress: job.progress,
-			attempts: job.attemptsMade,
-			delay: job.delay,
-			failedReason: job.failedReason,
-			stacktrace: stacktrace,
-			returnValue: job.returnvalue,
-			isFailed: !!job.failedReason || (Array.isArray(stacktrace) && stacktrace.length > 0),
-		};
-	}
-
-	@bindThis
-	public async queueGetJob(queueType: typeof QUEUE_TYPES[number], jobId: string) {
-		const queue = this.getQueue(queueType);
-		const job: Bull.Job | null = await queue.getJob(jobId);
-		if (job) {
-			return this.packJobData(job);
-		} else {
-			throw new Error(`Job not found: ${jobId}`);
-		}
-	}
-
-	@bindThis
-	public async queueGetJobs(queueType: typeof QUEUE_TYPES[number], jobTypes: JobType[], search?: string) {
-		const RETURN_LIMIT = 100;
-		const queue = this.getQueue(queueType);
-		let jobs: Bull.Job[];
-
-		if (search) {
-			jobs = await queue.getJobs(jobTypes, 0, 1000);
-
-			jobs = jobs.filter(job => {
-				const jobString = JSON.stringify(job).toLowerCase();
-				return search.toLowerCase().split(' ').every(term => {
-					return jobString.includes(term);
-				});
-			});
-
-			jobs = jobs.slice(0, RETURN_LIMIT);
-		} else {
-			jobs = await queue.getJobs(jobTypes, 0, RETURN_LIMIT);
-		}
-
-		return jobs.map(job => this.packJobData(job));
-	}
-
-	@bindThis
-	public async queueGetQueues() {
-		const fetchings = QUEUE_TYPES.map(async type => {
-			const queue = this.getQueue(type);
-
-			const counts = await queue.getJobCounts();
-			const isPaused = await queue.isPaused();
-			const metrics_completed = await queue.getMetrics('completed', 0, MetricsTime.ONE_WEEK);
-			const metrics_failed = await queue.getMetrics('failed', 0, MetricsTime.ONE_WEEK);
-
-			return {
-				name: type,
-				counts: counts,
-				isPaused,
-				metrics: {
-					completed: metrics_completed,
-					failed: metrics_failed,
-				},
-			};
-		});
-
-		return await Promise.all(fetchings);
-	}
-
-	@bindThis
-	public async queueGetQueue(queueType: typeof QUEUE_TYPES[number]) {
-		const queue = this.getQueue(queueType);
-		const counts = await queue.getJobCounts();
-		const isPaused = await queue.isPaused();
-		const metrics_completed = await queue.getMetrics('completed', 0, MetricsTime.ONE_WEEK);
-		const metrics_failed = await queue.getMetrics('failed', 0, MetricsTime.ONE_WEEK);
-		const db = parseRedisInfo(await (await queue.client).info());
-
-		return {
-			name: queueType,
-			qualifiedName: queue.qualifiedName,
-			counts: counts,
-			isPaused,
-			metrics: {
-				completed: metrics_completed,
-				failed: metrics_failed,
-			},
-			db: {
-				version: db.redis_version,
-				mode: db.redis_mode,
-				runId: db.run_id,
-				processId: db.process_id,
-				port: parseInt(db.tcp_port),
-				os: db.os,
-				uptime: parseInt(db.uptime_in_seconds),
-				memory: {
-					total: parseInt(db.total_system_memory) || parseInt(db.maxmemory),
-					used: parseInt(db.used_memory),
-					fragmentationRatio: parseInt(db.mem_fragmentation_ratio),
-					peak: parseInt(db.used_memory_peak),
-				},
-				clients: {
-					connected: parseInt(db.connected_clients),
-					blocked: parseInt(db.blocked_clients),
-				},
-			},
-		};
 	}
 }

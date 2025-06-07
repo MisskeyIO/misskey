@@ -612,68 +612,14 @@ export type paths = {
      */
     post: operations['admin___queue___inbox-delayed'];
   };
-  '/admin/queue/jobs': {
+  '/admin/queue/promote': {
     /**
-     * admin/queue/jobs
-     * @description No description provided.
-     *
-     * **Credential required**: *Yes* / **Permission**: *read:admin:queue*
-     */
-    post: operations['admin___queue___jobs'];
-  };
-  '/admin/queue/promote-jobs': {
-    /**
-     * admin/queue/promote-jobs
+     * admin/queue/promote
      * @description No description provided.
      *
      * **Credential required**: *Yes* / **Permission**: *write:admin:queue*
      */
-    post: operations['admin___queue___promote-jobs'];
-  };
-  '/admin/queue/queue-stats': {
-    /**
-     * admin/queue/queue-stats
-     * @description No description provided.
-     *
-     * **Credential required**: *Yes* / **Permission**: *read:admin:queue*
-     */
-    post: operations['admin___queue___queue-stats'];
-  };
-  '/admin/queue/queues': {
-    /**
-     * admin/queue/queues
-     * @description No description provided.
-     *
-     * **Credential required**: *Yes* / **Permission**: *read:admin:queue*
-     */
-    post: operations['admin___queue___queues'];
-  };
-  '/admin/queue/remove-job': {
-    /**
-     * admin/queue/remove-job
-     * @description No description provided.
-     *
-     * **Credential required**: *Yes* / **Permission**: *write:admin:queue*
-     */
-    post: operations['admin___queue___remove-job'];
-  };
-  '/admin/queue/retry-job': {
-    /**
-     * admin/queue/retry-job
-     * @description No description provided.
-     *
-     * **Credential required**: *Yes* / **Permission**: *write:admin:queue*
-     */
-    post: operations['admin___queue___retry-job'];
-  };
-  '/admin/queue/show-job': {
-    /**
-     * admin/queue/show-job
-     * @description No description provided.
-     *
-     * **Credential required**: *Yes* / **Permission**: *read:admin:queue*
-     */
-    post: operations['admin___queue___show-job'];
+    post: operations['admin___queue___promote'];
   };
   '/admin/queue/stats': {
     /**
@@ -9937,9 +9883,9 @@ export type operations = {
       content: {
         'application/json': {
           /** @enum {string} */
-          queue: 'system' | 'endedPollNotification' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
+          type: 'system' | 'endedPollNotification' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
           /** @enum {string} */
-          state: '*' | 'completed' | 'wait' | 'active' | 'paused' | 'prioritized' | 'delayed' | 'failed';
+          state: '*' | 'wait' | 'delayed';
         };
       };
     };
@@ -10073,326 +10019,17 @@ export type operations = {
     };
   };
   /**
-   * admin/queue/jobs
-   * @description No description provided.
-   *
-   * **Credential required**: *Yes* / **Permission**: *read:admin:queue*
-   */
-  admin___queue___jobs: {
-    requestBody: {
-      content: {
-        'application/json': {
-          /** @enum {string} */
-          queue: 'system' | 'endedPollNotification' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
-          state: ('active' | 'wait' | 'delayed' | 'completed' | 'failed')[];
-          search?: string;
-        };
-      };
-    };
-    responses: {
-      /** @description OK (without any results) */
-      204: {
-        content: never;
-      };
-      /** @description Client error */
-      400: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Authentication error */
-      401: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Forbidden error */
-      403: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description I'm Ai */
-      418: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Internal server error */
-      500: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-    };
-  };
-  /**
-   * admin/queue/promote-jobs
+   * admin/queue/promote
    * @description No description provided.
    *
    * **Credential required**: *Yes* / **Permission**: *write:admin:queue*
    */
-  'admin___queue___promote-jobs': {
+  admin___queue___promote: {
     requestBody: {
       content: {
         'application/json': {
           /** @enum {string} */
-          queue: 'system' | 'endedPollNotification' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
-        };
-      };
-    };
-    responses: {
-      /** @description OK (without any results) */
-      204: {
-        content: never;
-      };
-      /** @description Client error */
-      400: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Authentication error */
-      401: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Forbidden error */
-      403: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description I'm Ai */
-      418: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Internal server error */
-      500: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-    };
-  };
-  /**
-   * admin/queue/queue-stats
-   * @description No description provided.
-   *
-   * **Credential required**: *Yes* / **Permission**: *read:admin:queue*
-   */
-  'admin___queue___queue-stats': {
-    requestBody: {
-      content: {
-        'application/json': {
-          /** @enum {string} */
-          queue: 'system' | 'endedPollNotification' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
-        };
-      };
-    };
-    responses: {
-      /** @description OK (without any results) */
-      204: {
-        content: never;
-      };
-      /** @description Client error */
-      400: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Authentication error */
-      401: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Forbidden error */
-      403: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description I'm Ai */
-      418: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Internal server error */
-      500: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-    };
-  };
-  /**
-   * admin/queue/queues
-   * @description No description provided.
-   *
-   * **Credential required**: *Yes* / **Permission**: *read:admin:queue*
-   */
-  admin___queue___queues: {
-    responses: {
-      /** @description OK (without any results) */
-      204: {
-        content: never;
-      };
-      /** @description Client error */
-      400: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Authentication error */
-      401: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Forbidden error */
-      403: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description I'm Ai */
-      418: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Internal server error */
-      500: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-    };
-  };
-  /**
-   * admin/queue/remove-job
-   * @description No description provided.
-   *
-   * **Credential required**: *Yes* / **Permission**: *write:admin:queue*
-   */
-  'admin___queue___remove-job': {
-    requestBody: {
-      content: {
-        'application/json': {
-          /** @enum {string} */
-          queue: 'system' | 'endedPollNotification' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
-          jobId: string;
-        };
-      };
-    };
-    responses: {
-      /** @description OK (without any results) */
-      204: {
-        content: never;
-      };
-      /** @description Client error */
-      400: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Authentication error */
-      401: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Forbidden error */
-      403: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description I'm Ai */
-      418: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Internal server error */
-      500: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-    };
-  };
-  /**
-   * admin/queue/retry-job
-   * @description No description provided.
-   *
-   * **Credential required**: *Yes* / **Permission**: *write:admin:queue*
-   */
-  'admin___queue___retry-job': {
-    requestBody: {
-      content: {
-        'application/json': {
-          /** @enum {string} */
-          queue: 'system' | 'endedPollNotification' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
-          jobId: string;
-        };
-      };
-    };
-    responses: {
-      /** @description OK (without any results) */
-      204: {
-        content: never;
-      };
-      /** @description Client error */
-      400: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Authentication error */
-      401: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Forbidden error */
-      403: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description I'm Ai */
-      418: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Internal server error */
-      500: {
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-    };
-  };
-  /**
-   * admin/queue/show-job
-   * @description No description provided.
-   *
-   * **Credential required**: *Yes* / **Permission**: *read:admin:queue*
-   */
-  'admin___queue___show-job': {
-    requestBody: {
-      content: {
-        'application/json': {
-          /** @enum {string} */
-          queue: 'system' | 'endedPollNotification' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
-          jobId: string;
+          type: 'deliver' | 'inbox';
         };
       };
     };

@@ -48,7 +48,7 @@ import { CheckMissingScheduledNoteProcessorService } from './processors/CheckMis
 import { CleanProcessorService } from './processors/CleanProcessorService.js';
 import { AggregateRetentionProcessorService } from './processors/AggregateRetentionProcessorService.js';
 import { QueueLoggerService } from './QueueLoggerService.js';
-import { QUEUE, baseWorkerOptions, formatQueueName } from './const.js';
+import { QUEUE, baseQueueOptions } from './const.js';
 
 // ref. https://github.com/misskey-dev/misskey/pull/7635#issue-971097019
 function httpRelatedBackoff(attemptsMade: number) {
@@ -195,7 +195,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 					return processor(job);
 				}
 			}, {
-				...baseWorkerOptions(this.config.redisForSystemQueue, this.config.bullmqWorkerOptions, QUEUE.SYSTEM),
+				...baseQueueOptions(this.config.redisForSystemQueue, this.config.bullmqWorkerOptions, QUEUE.SYSTEM),
 				autorun: false,
 			});
 
@@ -263,7 +263,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 					return processor(job);
 				}
 			}, {
-				...baseWorkerOptions(this.config.redisForDbQueue, this.config.bullmqWorkerOptions, QUEUE.DB),
+				...baseQueueOptions(this.config.redisForDbQueue, this.config.bullmqWorkerOptions, QUEUE.DB),
 				autorun: false,
 			});
 
@@ -297,7 +297,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 						return this.deliverProcessorService.process(job);
 					}
 				}, {
-					...baseWorkerOptions(config, this.config.bullmqWorkerOptions, QUEUE.DELIVER),
+					...baseQueueOptions(config, this.config.bullmqWorkerOptions, QUEUE.DELIVER),
 					autorun: false,
 					concurrency: this.config.deliverJobConcurrency ?? 128,
 					limiter: {
@@ -341,7 +341,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 						return this.inboxProcessorService.process(job);
 					}
 				}, {
-					...baseWorkerOptions(config, this.config.bullmqWorkerOptions, QUEUE.INBOX),
+					...baseQueueOptions(config, this.config.bullmqWorkerOptions, QUEUE.INBOX),
 					autorun: false,
 					concurrency: this.config.inboxJobConcurrency ?? 16,
 					limiter: {
@@ -390,7 +390,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 					return this.userWebhookDeliverProcessorService.process(job);
 				}
 			}, {
-				...baseWorkerOptions(this.config.redisForWebhookDeliverQueue, this.config.bullmqWorkerOptions, QUEUE.USER_WEBHOOK_DELIVER),
+				...baseQueueOptions(this.config.redisForWebhookDeliverQueue, this.config.bullmqWorkerOptions, QUEUE.USER_WEBHOOK_DELIVER),
 				autorun: false,
 				concurrency: 64,
 				limiter: {
@@ -420,7 +420,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 					return this.systemWebhookDeliverProcessorService.process(job);
 				}
 			}, {
-				...baseWorkerOptions(this.config.redisForWebhookDeliverQueue, this.config.bullmqWorkerOptions, QUEUE.SYSTEM_WEBHOOK_DELIVER),
+				...baseQueueOptions(this.config.redisForWebhookDeliverQueue, this.config.bullmqWorkerOptions, QUEUE.SYSTEM_WEBHOOK_DELIVER),
 				autorun: false,
 				concurrency: 64,
 				limiter: {
@@ -462,7 +462,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 						return processor(job);
 					}
 				}, {
-					...baseWorkerOptions(config, this.config.bullmqWorkerOptions, QUEUE.RELATIONSHIP),
+					...baseQueueOptions(config, this.config.bullmqWorkerOptions, QUEUE.RELATIONSHIP),
 					autorun: false,
 					concurrency: this.config.relationshipJobConcurrency ?? 16,
 					limiter: {
@@ -501,7 +501,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 					return processor(job);
 				}
 			}, {
-				...baseWorkerOptions(this.config.redisForObjectStorageQueue, this.config.bullmqWorkerOptions, QUEUE.OBJECT_STORAGE),
+				...baseQueueOptions(this.config.redisForObjectStorageQueue, this.config.bullmqWorkerOptions, QUEUE.OBJECT_STORAGE),
 				autorun: false,
 				concurrency: 16,
 			});
@@ -534,7 +534,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 					return this.endedPollNotificationProcessorService.process(job);
 				}
 			}, {
-				...baseWorkerOptions(this.config.redisForEndedPollNotificationQueue, this.config.bullmqWorkerOptions, QUEUE.ENDED_POLL_NOTIFICATION),
+				...baseQueueOptions(this.config.redisForEndedPollNotificationQueue, this.config.bullmqWorkerOptions, QUEUE.ENDED_POLL_NOTIFICATION),
 				autorun: false,
 			});
 		}

@@ -217,21 +217,14 @@ defineExpose({
 
 	&.bgSame {
 		background: var(--MI_THEME-bg);
-
-		.inBodyHeader {
-			background: color(from var(--MI_THEME-bg) srgb r g b / 0.75);
-		}
 	}
 }
 
-.inBodyHeader {
-	background: color(from var(--MI_THEME-panel) srgb r g b / 0.75);
-	-webkit-backdrop-filter: var(--MI-blur, blur(15px));
-	backdrop-filter: var(--MI-blur, blur(15px));
-	border-bottom: solid 0.5px var(--MI_THEME-divider);
-}
-
-.inBodyFooter {
+.footer {
+	position: sticky !important;
+	z-index: 1;
+	bottom: var(--MI-stickyBottom, 0px);
+	left: 0;
 	padding: 12px;
 	background: color(from var(--MI_THEME-bg) srgb r g b / 0.5);
 	-webkit-backdrop-filter: var(--MI-blur, blur(15px));

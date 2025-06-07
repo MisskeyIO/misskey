@@ -44,7 +44,7 @@ jobs:
         fetch-depth: 0
         submodules: true
     - name: Setup pnpm
-      uses: pnpm/action-setup@v4.1.0
+      uses: pnpm/action-setup@v4
       with:
         run_install: false
     - uses: actions/setup-node@v4.4.0
@@ -109,7 +109,7 @@ jobs:
         fetch-depth: 0
         submodules: true
     - name: Setup pnpm
-      uses: pnpm/action-setup@v4.1.0
+      uses: pnpm/action-setup@v4
       with:
         run_install: false
     - uses: actions/setup-node@v4.4.0
@@ -118,7 +118,7 @@ jobs:
         cache: 'pnpm'
     - run: pnpm i --frozen-lockfile
     - run: pnpm -r run build:tsc
-      if: ${{ matrix.workspace == 'backend' || matrix.workspace == 'sw' }}
+      if: ${{ matrix.workspace == 'backend' }}
     - run: pnpm --filter misskey-js run build
       if: ${{ matrix.workspace == 'backend' }}
     - run: pnpm --filter ${{ matrix.workspace }} run typecheck

@@ -49,6 +49,7 @@ export class AbuseReportService {
 		reporterId: MiAbuseUserReport['reporterId'],
 		reporterHost: MiAbuseUserReport['reporterHost'],
 		comment: string,
+		category?: MiAbuseUserReport['category'],
 	}[]) {
 		const entities = params.map(param => {
 			return {
@@ -58,6 +59,7 @@ export class AbuseReportService {
 				reporterId: param.reporterId,
 				reporterHost: param.reporterHost,
 				comment: param.comment,
+				category: param.category ?? 'other',
 			};
 		});
 
@@ -87,7 +89,8 @@ export class AbuseReportService {
 	public async resolve(
 		params: {
 			reportId: string;
-			resolvedAs: MiAbuseUserReport['resolvedAs'];
+			resolvedAs?: MiAbuseUserReport['resolvedAs'];
+			forward: boolean;
 		}[],
 		moderator: MiUser,
 	) {
@@ -100,6 +103,9 @@ export class AbuseReportService {
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			const ps = paramsMap.get(report.id)!;
 
+			// forwardフラグが立ってて、報告先のユーザーがリモートなら通報を転送する。
+			if (ps.forward && report.targetUserHost !== null ) await this.forward(report.id, moderator);
+
 			await this.abuseUserReportsRepository.update(report.id, {
 				resolved: true,
 				assigneeId: moderator.id,
@@ -111,6 +117,7 @@ export class AbuseReportService {
 					reportId: report.id,
 					report: report,
 					resolvedAs: ps.resolvedAs,
+					forwarded: ps.forward && report.targetUserHost != null,
 				});
 		}
 

@@ -51,7 +51,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: /opt/hostedtoolcache/ffmpeg
-          key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ steps.setup-ffmpeg.outputs.ffmpeg-version }
+          key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ steps.setup-ffmpeg.outputs.ffmpeg-version }}
 
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4.3.0

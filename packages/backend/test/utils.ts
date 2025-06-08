@@ -357,7 +357,7 @@ export const uploadUrl = async (user: UserToken, url: string): Promise<misskey.e
 		'main',
 		(msg) => msg.type === 'urlUploadFinished' && msg.body.marker === marker,
 		(msg) => msg.body.file,
-		60 * 1000,
+		60 * 2000,
 	);
 
 	await api('drive/files/upload-from-url', {

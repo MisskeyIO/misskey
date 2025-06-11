@@ -1415,7 +1415,7 @@ goToDeck: "Return to Deck"
 federationJobs: "Federation Jobs"
 driveAboutTip: "In Drive, a list of files you've uploaded in the past will be displayed. <br>  \nYou can reuse these files when attaching them to notes, or you can upload files in advance to post later. <br>  \n<b>Be careful when deleting a file, as it will not be available in all places where it was used (such as notes, pages, avatars, banners, etc.).</b> <br>  \nYou can also create folders to organize your files."
 forwardReport: "Forward report to remote instance"
-forwardReportIsAnonymous: "Instead of your account, an anonymous system account will be displayed as reporter at the re…
+forwardReportIsAnonymous: "Instead of your account, an anonymous system account will be displayed as reporter at the remote instance."
 
 _chat:
   noMessagesYet: "No messages yet"

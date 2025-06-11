@@ -64,8 +64,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</MkAbuseReportResolver>
 				</MkFolder>
 				<MkPagination v-slot="{items}" ref="resolverPagingComponent" :pagination="resolverPagination">
-					<MkSpacer v-for="resolver in items" :key="resolver.id" :marginMin="14" :marginMax="22" :class="$style.resolverList">
-						<MkAbuseReportResolver v-model="editingResolver" :data="(resolver as any)" :editable="editableResolver === resolver.id">
+					<div v-for="resolver in items" :key="resolver.id" :class="$style.resolverList">
+						<MkAbuseReportResolver v-model="editingResolver" :data="(resolver as any)" :editable="editableResolver === resolver.id" class="_spacer" style=" --MI_SPACER-min: 14px; --MI_SPACER-max: 22px;">
 							<template #button>
 								<div v-if="editableResolver !== resolver.id">
 									<MkButton primary inline :class="$style.buttonMargin" @click="edit(resolver.id)"><i class="ti ti-pencil"></i> {{ i18n.ts.edit }}</MkButton>
@@ -76,7 +76,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</div>
 							</template>
 						</MkAbuseReportResolver>
-					</MkSpacer>
+					</div>
 				</MkPagination>
 			</div>
 		</div>
@@ -278,5 +278,11 @@ definePage(() => ({
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
+}
+
+.resolverList {
+	background: var(--MI_THEME-panel);
+	border-radius: 6px;
+	margin-bottom: 13px;
 }
 </style>

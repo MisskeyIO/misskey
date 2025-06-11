@@ -5700,6 +5700,14 @@ export interface Locale extends ILocale {
      * フォルダを作って整理することもできます。
      */
     "driveAboutTip": string;
+    /**
+     * リモートサーバーに通報を転送する
+     */
+    "forwardReport": string;
+    /**
+     * リモートサーバーからはあなたの情報は見れず、匿名のシステムアカウントとして表示されます。
+     */
+    "forwardReportIsAnonymous": string;
     "_chat": {
         /**
          * まだメッセージはありません

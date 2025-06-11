@@ -18,7 +18,7 @@
 
 	let forceError = localStorage.getItem('forceError');
 	if (forceError != null) {
-		renderError('FORCED_ERROR', 'This error is forced by having forceError in local storage.');
+		renderError('FORCED_ERROR');
 		return;
 	}
 

@@ -5840,6 +5840,7 @@ export type components = {
       assigneeId: string | null;
       assignee?: components['schemas']['UserDetailed'] | null;
       forwarded: boolean;
+      moderationNote: string;
     };
     ModerationLog: {
       /**
@@ -6567,6 +6568,10 @@ export type operations = {
               comment: string;
               /** @example false */
               resolved: boolean;
+              /** @example false */
+              forwarded: boolean;
+              /** @enum {string|null} */
+              resolvedAs: 'accept' | 'reject' | null;
               /** Format: id */
               reporterId: string;
               /** Format: id */
@@ -6577,6 +6582,7 @@ export type operations = {
               targetUser: components['schemas']['UserDetailed'];
               assignee?: components['schemas']['UserDetailed'] | null;
               category: string;
+              moderationNote: string | null;
             })[];
         };
       };
@@ -10411,6 +10417,8 @@ export type operations = {
         'application/json': {
           /** Format: misskey:id */
           reportId: string;
+          /** @enum {string|null} */
+          resolvedAs?: 'accept' | 'reject' | null;
           /** @default false */
           forward?: boolean;
         };

@@ -220,7 +220,7 @@ defineExpose({
 	}
 }
 
-.footer {
+.inBodyFooter {
 	position: sticky !important;
 	z-index: 1;
 	bottom: var(--MI-stickyBottom, 0px);

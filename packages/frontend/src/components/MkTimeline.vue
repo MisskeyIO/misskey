@@ -58,7 +58,7 @@ import { infoImageUrl } from '@/instance.js';
 import { generateClientTransactionId } from '@/utility/misskey-api.js';
 
 const props = withDefaults(defineProps<{
-	src: BasicTimelineType | 'media' | 'mentions' | 'directs' | 'list' | 'antenna' | 'channel' | 'role';
+	src: BasicTimelineType | 'mentions' | 'directs' | 'list' | 'antenna' | 'channel' | 'role';
 	list?: string;
 	antenna?: string;
 	channel?: string;

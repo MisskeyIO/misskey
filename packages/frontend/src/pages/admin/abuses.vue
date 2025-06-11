@@ -6,7 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <PageWithHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs">
 	<div class="_spacer" style="--MI_SPACER-w: 900px;">
-		<div :class="$style.root" class="_gaps">
+		<div v-if="tab === 'list'" :class="$style.root" class="_gaps">
 			<div :class="$style.subMenus" class="_gaps">
 				<MkButton link to="/admin/abuse-report-notification-recipient" primary>{{ i18n.ts.notificationSetting }}</MkButton>
 			</div>
@@ -15,20 +15,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 				{{ i18n.ts._abuseUserReport.resolveTutorial }}
 			</MkInfo>
 
-			<div :class="$style.inputs" class="_gaps" style="display: flex;">
-				<MkSelect v-model="state" :class="$style.targetUserOrigin">
+			<div :class="$style.inputs" class="_gaps">
+				<MkSelect v-model="state" style="margin: 0; flex: 1;">
 					<template #label>{{ i18n.ts.state }}</template>
 					<option value="all">{{ i18n.ts.all }}</option>
 					<option value="unresolved">{{ i18n.ts.unresolved }}</option>
 					<option value="resolved">{{ i18n.ts.resolved }}</option>
 				</MkSelect>
-				<MkSelect v-model="targetUserOrigin" :class="$style.targetUserOrigin">
+				<MkSelect v-model="targetUserOrigin" style="margin: 0; flex: 1;">
 					<template #label>{{ i18n.ts.reporteeOrigin }}</template>
 					<option value="combined">{{ i18n.ts.all }}</option>
 					<option value="local">{{ i18n.ts.local }}</option>
 					<option value="remote">{{ i18n.ts.remote }}</option>
 				</MkSelect>
-				<MkSelect v-model="reporterOrigin" :class="$style.targetUserOrigin">
+				<MkSelect v-model="reporterOrigin" style="margin: 0; flex: 1;">
 					<template #label>{{ i18n.ts.reporterOrigin }}</template>
 					<option value="combined">{{ i18n.ts.all }}</option>
 					<option value="local">{{ i18n.ts.local }}</option>
@@ -49,38 +49,37 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 			<MkPagination v-slot="{items}" ref="reports" :pagination="pagination">
 				<div class="_gaps">
-					<XAbuseReport v-for="report in items" :key="report.id" :report="report" @resolved="resolved"/>
+					<XAbuseReport v-for="report in (items)" :key="report.id" :report="report" @resolved="resolved"/>
 				</div>
 			</MkPagination>
 		</div>
-		<!--		TODO FIXME-->
-		<!--		<div v-else>-->
-		<!--			<div class="_gaps">-->
-		<!--				<MkFolder ref="folderComponent">-->
-		<!--					<template #label><i class="ti ti-plus" style="margin-right: 5px;"></i>{{ i18n.ts.createNew }}</template>-->
-		<!--					<MkAbuseReportResolver v-model="newResolver" :editable="true">-->
-		<!--						<template #button>-->
-		<!--							<MkButton primary :class="$style.margin" @click="create">{{ i18n.ts.create }}</MkButton>-->
-		<!--						</template>-->
-		<!--					</MkAbuseReportResolver>-->
-		<!--				</MkFolder>-->
-		<!--				<MkPagination v-slot="{items}" ref="resolverPagingComponent" :pagination="resolverPagination">-->
-		<!--					<MkSpacer v-for="resolver in items" :key="resolver.id" :marginMin="14" :marginMax="22" :class="$style.resolverList">-->
-		<!--						<MkAbuseReportResolver v-model="editingResolver" :data="(resolver as any)" :editable="editableResolver === resolver.id">-->
-		<!--							<template #button>-->
-		<!--								<div v-if="editableResolver !== resolver.id">-->
-		<!--									<MkButton primary inline :class="$style.buttonMargin" @click="edit(resolver.id)"><i class="ti ti-pencil"></i> {{ i18n.ts.edit }}</MkButton>-->
-		<!--									<MkButton danger inline @click="deleteResolver(resolver.id)"><i class="ti ti-trash"></i> {{ i18n.ts.remove }}</MkButton>-->
-		<!--								</div>-->
-		<!--								<div v-else>-->
-		<!--									<MkButton primary inline @click="save">{{ i18n.ts.save }}</MkButton>-->
-		<!--								</div>-->
-		<!--							</template>-->
-		<!--						</MkAbuseReportResolver>-->
-		<!--					</MkSpacer>-->
-		<!--				</MkPagination>-->
-		<!--			</div>-->
-		<!--		</div>-->
+		<div v-else>
+			<div class="_gaps">
+				<MkFolder ref="folderComponent">
+					<template #label><i class="ti ti-plus" style="margin-right: 5px;"></i>{{ i18n.ts.createNew }}</template>
+					<MkAbuseReportResolver v-model="newResolver" :editable="true">
+						<template #button>
+							<MkButton primary :class="$style.margin" @click="create">{{ i18n.ts.create }}</MkButton>
+						</template>
+					</MkAbuseReportResolver>
+				</MkFolder>
+				<MkPagination v-slot="{items}" ref="resolverPagingComponent" :pagination="resolverPagination">
+					<MkSpacer v-for="resolver in items" :key="resolver.id" :marginMin="14" :marginMax="22" :class="$style.resolverList">
+						<MkAbuseReportResolver v-model="editingResolver" :data="(resolver as any)" :editable="editableResolver === resolver.id">
+							<template #button>
+								<div v-if="editableResolver !== resolver.id">
+									<MkButton primary inline :class="$style.buttonMargin" @click="edit(resolver.id)"><i class="ti ti-pencil"></i> {{ i18n.ts.edit }}</MkButton>
+									<MkButton danger inline @click="deleteResolver(resolver.id)"><i class="ti ti-trash"></i> {{ i18n.ts.remove }}</MkButton>
+								</div>
+								<div v-else>
+									<MkButton primary inline @click="save">{{ i18n.ts.save }}</MkButton>
+								</div>
+							</template>
+						</MkAbuseReportResolver>
+					</MkSpacer>
+				</MkPagination>
+			</div>
+		</div>
 	</div>
 </PageWithHeader>
 </template>

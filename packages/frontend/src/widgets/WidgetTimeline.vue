@@ -35,13 +35,13 @@ import { ref } from 'vue';
 import { useWidgetPropsManager } from './widget.js';
 import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from './widget.js';
 import type { GetFormResultType } from '@/utility/form.js';
+import type { MenuItem } from '@/types/menu.js';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import MkContainer from '@/components/MkContainer.vue';
 import MkTimeline from '@/components/MkTimeline.vue';
 import { i18n } from '@/i18n.js';
 import { availableBasicTimelines, isAvailableBasicTimeline, isBasicTimeline, basicTimelineIconClass } from '@/timelines.js';
-import type { MenuItem } from '@/types/menu.js';
 
 const name = 'timeline';
 
@@ -115,10 +115,6 @@ const choose = async (ev) => {
 	const menuItems: MenuItem[] = [];
 
 	menuItems.push(...availableBasicTimelines().map(tl => ({
-		text: i18n.ts._timelines.media,
-		icon: 'ti ti-photo',
-		action: () => { setSrc('media'); },
-	}, {
 		text: i18n.ts._timelines[tl],
 		icon: basicTimelineIconClass(tl),
 		action: () => { setSrc(tl); },

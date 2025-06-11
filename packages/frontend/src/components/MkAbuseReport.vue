@@ -73,28 +73,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 			{{ i18n.ts.moderator }}:
 			<MkAcct :user="report.assignee"/>
 		</div>
-		<div v-if="report.category">{{ i18n.ts.category }}: {{ i18n.ts[`_abuseReportCategory.${report.category}`] }}</div>
+		<div v-if="report.category">{{ i18n.ts.category }}: {{ i18n.ts._abuseReportCategory[report.category] }}</div>
 		<div><MkTime :time="report.createdAt"/></div>
-		<div class="action">
-			<MkSwitch v-model="forward" :disabled="report.targetUser.host == null || report.resolved">
-				{{ i18n.ts.forwardReport }}
-				<template #caption>{{ i18n.ts.forwardReportIsAnonymous }}</template>
-			</MkSwitch>
-			<MkButton v-if="!report.resolved" primary @click="resolve">{{ i18n.ts.abuseMarkAsResolved }}</MkButton>
-		</div>
 	</div>
 </MkFolder>
 </template>
 
 <script lang="ts" setup>
-import { provide, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@/components/MkButton.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-import MkKeyValue from '@/components/MkKeyValue.vue';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
-import { dateString } from '@/filters/date.js';
 import MkFolder from '@/components/MkFolder.vue';
 import RouterView from '@/components/global/RouterView.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
@@ -137,7 +127,6 @@ function forward() {
 	os.apiWithDialog('admin/forward-abuse-user-report', {
 		reportId: props.report.id,
 	}).then(() => {
-
 	});
 }
 

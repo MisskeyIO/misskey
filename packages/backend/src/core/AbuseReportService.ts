@@ -7,6 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
+import { IdentifiableError } from '@/misc/identifiable-error.js';
 import type { AbuseUserReportsRepository, MiAbuseUserReport, MiUser, UsersRepository } from '@/models/_.js';
 import { AbuseReportNotificationService } from '@/core/AbuseReportNotificationService.js';
 import { QueueService } from '@/core/QueueService.js';
@@ -137,7 +138,7 @@ export class AbuseReportService {
 		}
 
 		if (report.forwarded) {
-			throw new Error('The report has already been forwarded.');
+			throw new IdentifiableError('2b9b1eba-6f68-4515-9381-4b6cf2c940cc', 'The report has already been forwarded.');
 		}
 
 		await this.abuseUserReportsRepository.update(report.id, {

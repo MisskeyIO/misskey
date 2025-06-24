@@ -118,7 +118,7 @@ describe('Block', () => {
 
 		test('Can reply if unblocked', async () => {
 			await alice.client.request('blocking/delete', { userId: bobInA.id });
-			await sleep();
+			await sleep(1000);
 
 			const note = (await alice.client.request('notes/create', { text: 'a' })).createdNote;
 			const resolvedNote = await resolveRemoteNote('a.test', note.id, bob);

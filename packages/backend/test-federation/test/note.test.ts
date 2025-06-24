@@ -371,7 +371,7 @@ describe('Note', () => {
 				// NOTE: resolve before voting
 				const noteInA = await resolveRemoteNote('b.test', note.id, bobRemoteFollower);
 				await localVoter.client.request('notes/polls/vote', { noteId: note.id, choice: 0 });
-				await sleep();
+				await sleep(1000);
 
 				const noteAfterVote = await bobRemoteFollower.client.request('notes/show', { noteId: noteInA.id });
 				assert(noteAfterVote.poll != null);

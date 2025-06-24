@@ -37,13 +37,10 @@ export class WorkerMultiDispatch<POST = unknown, RETURN = unknown> {
 		if (_DEV_) console.log('WorkerMultiDispatch: Posting message to worker', workerNumber, useWorkerNumber);
 		this.prevWorkerNumber = workerNumber;
 
-		// 不毛だがunionをoverloadに突っ込めない
-		// https://stackoverflow.com/questions/66507585/overload-signatures-union-types-and-no-overload-matches-this-call-error
-		// https://github.com/microsoft/TypeScript/issues/14107
-		if (Array.isArray(options)) {
-			this.workers[workerNumber].postMessage(message, options);
+		if (options === undefined) {
+			this.workers[workerNumber].postMessage(message);
 		} else {
-			this.workers[workerNumber].postMessage(message, options);
+			this.workers[workerNumber].postMessage(message, options as any);
 		}
 		return workerNumber;
 	}

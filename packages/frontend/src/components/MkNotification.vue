@@ -281,8 +281,6 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 
 	content-visibility: auto;
 	contain-intrinsic-size: none auto 100px;
-	content-visibility: auto;
-	contain-intrinsic-size: 0 100px;
 
 	--eventFollow: #36aed2;
 	--eventRenote: #36d298;

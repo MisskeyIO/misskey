@@ -77,8 +77,6 @@ describe('S3Service', () => {
 		});
 
 		test('upload a large file error', async () => {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-expect-error
 			s3Mock.on(UploadPartCommand).rejects();
 
 			await expect(s3Service.upload({} as MiMeta, {

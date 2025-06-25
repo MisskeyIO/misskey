@@ -120,7 +120,7 @@ export class CustomEmojiService implements OnApplicationShutdown {
 			isSensitive: data.isSensitive,
 			localOnly: data.localOnly,
 			requestedBy: data.requestedBy,
-			memo: data.memo,
+			memo: data.memo ?? '',
 			roleIdsThatCanBeUsedThisEmojiAsReaction: data.roleIdsThatCanBeUsedThisEmojiAsReaction,
 			roleIdsThatCanNotBeUsedThisEmojiAsReaction: data.roleIdsThatCanNotBeUsedThisEmojiAsReaction,
 		});
@@ -147,23 +147,23 @@ export class CustomEmojiService implements OnApplicationShutdown {
 	public async update(data: (
 		{ id: MiEmoji['id'], name?: string; } | { name: string; id?: MiEmoji['id'], }
 		) & {
-		originalUrl?: string;
-		publicUrl?: string;
-		fileType?: string;
-		category?: string | null;
-		aliases?: string[];
-		license?: string | null;
-		isSensitive?: boolean;
-		localOnly?: boolean;
-		requestedBy?: string | null;
-		memo?: string | null;
-		roleIdsThatCanBeUsedThisEmojiAsReaction?: MiRole['id'][];
-		roleIdsThatCanNotBeUsedThisEmojiAsReaction?: MiRole['id'][];
-	}, moderator?: MiUser): Promise<
+			originalUrl?: string;
+			publicUrl?: string;
+			fileType?: string;
+			category?: string | null;
+			aliases?: string[];
+			license?: string | null;
+			isSensitive?: boolean;
+			localOnly?: boolean;
+			requestedBy?: string | null;
+			memo?: string | null;
+			roleIdsThatCanBeUsedThisEmojiAsReaction?: MiRole['id'][];
+			roleIdsThatCanNotBeUsedThisEmojiAsReaction?: MiRole['id'][];
+		}, moderator?: MiUser): Promise<
 		null
 		| 'NO_SUCH_EMOJI'
 		| 'SAME_NAME_EMOJI_EXISTS'
-	> {
+		> {
 		const emoji = data.id
 			? await this.getEmojiById(data.id)
 			: await this.getEmojiByName(data.name!);

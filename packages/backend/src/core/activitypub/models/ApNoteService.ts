@@ -460,6 +460,11 @@ export class ApNoteService {
 				// _misskey_license が存在しなければ `null`
 				license: (tag._misskey_license?.freeText ?? null),
 				memo: '',
+				localOnly: false,
+				isSensitive: false,
+				requestedBy: null,
+				roleIdsThatCanBeUsedThisEmojiAsReaction: [],
+				roleIdsThatCanNotBeUsedThisEmojiAsReaction: [],
 			});
 		}));
 	}

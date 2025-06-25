@@ -84,7 +84,7 @@ export class MiEmoji {
 	@Column('varchar', {
 		length: 8192, default: '',
 	})
-	public memo: string | null;
+	public memo: string;
 
 	// TODO: 定期ジョブで存在しなくなったロールIDを除去するようにする
 	@Column('varchar', {

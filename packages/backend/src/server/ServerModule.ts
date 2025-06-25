@@ -8,7 +8,6 @@ import { EndpointsModule } from '@/server/api/EndpointsModule.js';
 import { CoreModule } from '@/core/CoreModule.js';
 import { ApiCallService } from './api/ApiCallService.js';
 import { FileServerService } from './FileServerService.js';
-import { HealthServerService } from './HealthServerService.js';
 import { NodeinfoServerService } from './NodeinfoServerService.js';
 import { ServerService } from './ServerService.js';
 import { WellKnownServerService } from './WellKnownServerService.js';
@@ -60,7 +59,6 @@ import { SigninWithPasskeyApiService } from './api/SigninWithPasskeyApiService.j
 		ClientServerService,
 		ClientLoggerService,
 		FeedService,
-		HealthServerService,
 		UrlPreviewService,
 		ActivityPubServerService,
 		FileServerService,

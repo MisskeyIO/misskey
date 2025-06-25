@@ -20,8 +20,6 @@ import { ServerService } from '@/server/ServerService.js';
 describe('/drive/files/create', () => {
 	let module: TestingModule;
 	let server: FastifyInstance;
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-expect-error
 	const s3Mock = mockClient(S3Client);
 	let roleService: RoleService;
 

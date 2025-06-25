@@ -76,7 +76,7 @@ const clientAssets = `${_dirname}/../../../../frontend/assets/`;
 const assets = `${_dirname}/../../../../../built/_frontend_dist_/`;
 const swAssets = `${_dirname}/../../../../../built/_sw_dist_/`;
 const frontendViteOut = `${_dirname}/../../../../../built/_frontend_vite_/`;
-const frontendEmbedViteOut = `${_dirname}/../../../../../built/_frontend_embed_vite_/`;
+// const frontendEmbedViteOut = `${_dirname}/../../../../../built/_frontend_embed_vite_/`;
 
 @Injectable()
 export class ClientServerService {

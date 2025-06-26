@@ -180,7 +180,7 @@ async function init() {
 	preservedUsernames.value = meta.preservedUsernames.join('\n');
 	blockedHosts.value = meta.blockedHosts.join('\n');
 	silencedHosts.value = meta.silencedHosts?.join('\n') ?? '';
-	mediaSilencedHosts.value = meta.mediaSilencedHosts.join('\n');
+	mediaSilencedHosts.value = meta.mediaSilencedHosts?.join('\n') ?? '';
 }
 
 async function onChange_enableRegistration(value: boolean) {

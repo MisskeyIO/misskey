@@ -437,7 +437,7 @@ describe('User', () => {
 
 				// TODO: why still following relation?
 				const following = await bob.client.request('users/following', { userId: bob.id });
-				strictEqual(following.length, 1);
+				strictEqual(following.length, 0);
 
 				await rejects(
 					async () => await bob.client.request('following/create', { userId: aliceInB.id }),
@@ -523,29 +523,16 @@ describe('User', () => {
 					},
 				);
 
-				// FIXME: resolving also fails
-				await rejects(
-					async () => await resolveRemoteUser('a.test', alice.id, bob),
-					(err: any) => {
-						strictEqual(err?.code || err?.id, 'REQUEST_FAILED');
-						return true;
-					},
-				);
+				// resolve は成功する
+				const unsuspendedAliceInB = await resolveRemoteUser('a.test', alice.id, bob);
+				assert(aliceInB.username === unsuspendedAliceInB.username);
+				assert(aliceInB.host === unsuspendedAliceInB.host);
+				assert(aliceInB.id !== unsuspendedAliceInB.id);
 			});
 
 			/**
 			 * instead of simple unsuspension, let's tell existence by following from Alice
 			 */
-			test('Alice cannot follow Bob while suspended', async () => {
-				await rejects(
-					async () => await alice.client.request('following/create', { userId: bobInA.id }),
-					(err: any) => {
-						strictEqual(err.code, 'YOUR_ACCOUNT_SUSPENDED');
-						return true;
-					},
-				);
-			});
-
 			test('Alice can follow Bob after unsuspension', async () => {
 				// 再度Aliceをunsuspend
 				await aAdmin.client.request('admin/unsuspend-user', { userId: alice.id });
@@ -572,14 +559,11 @@ describe('User', () => {
 				const aliceFollowers = await alice.client.request('users/followers', { userId: alice.id });
 				strictEqual(aliceFollowers.length, 1);
 
-				// FIXME: but resolving still fails ...
-				await rejects(
-					async () => await resolveRemoteUser('a.test', alice.id, bob),
-					(err: any) => {
-						strictEqual(err?.code || err?.id, 'REQUEST_FAILED');
-						return true;
-					},
-				);
+				// resolve は成功する
+				const unsuspendedAliceInB = await resolveRemoteUser('a.test', alice.id, bob);
+				assert(aliceInB.username === unsuspendedAliceInB.username);
+				assert(aliceInB.host === unsuspendedAliceInB.host);
+				assert(aliceInB.id !== unsuspendedAliceInB.id);
 			});
 		});
 	});

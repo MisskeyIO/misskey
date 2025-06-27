@@ -67,8 +67,8 @@ export class ApiCallService implements OnApplicationShutdown {
 
 	// HTTPヘッダーで無効な文字をサニタイズする関数
 	#sanitizeHeaderValue(value: string): string {
-		// 改行文字と制御文字を削除またはスペースに置換
-		return value.replace(/[\r\n\t\0-\x1f\x7f]/g, ' ').trim();
+		// 改行文字を削除またはスペースに置換（\x1fは除外）
+		return value.replace(/[\r\n\t\x7f]/g, ' ').trim();
 	}
 
 	#sendApiError(reply: FastifyReply, err: ApiError): void {

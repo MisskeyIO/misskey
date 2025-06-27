@@ -111,12 +111,6 @@ export class UtilityService {
 	}
 
 	@bindThis
-	public extractDbHost(uri: string): string {
-		const url = new URL(uri);
-		return this.toPuny(url.host);
-	}
-
-	@bindThis
 	public toPuny(host: string): string {
 		return domainToASCII(host.toLowerCase());
 	}
@@ -215,7 +209,7 @@ export class UtilityService {
 	}
 
 	@bindThis
-	public assertActivityRelatedToUrl(activity: IObject, url: string): void {
+	public assertActivityRelatedToUrl(activity: IObject, url: string ): void {
 		if (activity.id && this.isRelatedUris(activity.id, url)) return;
 
 		if (activity.url) {
@@ -242,7 +236,7 @@ export class UtilityService {
 
 	@bindThis
 	public isFederationAllowedUri(uri: string): boolean {
-		const host = this.extractDbHost(uri);
+		const host = this.extractHost(uri);
 		return this.isFederationAllowedHost(host);
 	}
 }

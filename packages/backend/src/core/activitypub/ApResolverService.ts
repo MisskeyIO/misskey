@@ -105,7 +105,6 @@ export class Resolver {
 			throw new Error('Instance is blocked');
 		}
 
-		// TODO なおす
 		if (!this.utilityService.isFederationAllowedHost(host)) {
 			throw new IdentifiableError('09d79f9e-64f1-4316-9cfa-e75c4d091574', 'Instance is blocked');
 		}
@@ -116,7 +115,7 @@ export class Resolver {
 
 		const object = (this.user
 			? await this.apRequestService.signedGet(value, this.user, allowSoftfail) as IObject
-			: await this.httpRequestService.getActivityJson(value, undefined, )) as IObject; // FIXME allowSoftfail
+			: await this.httpRequestService.getActivityJson(value, undefined )) as IObject; // FIXME allowSoftfail
 
 		if (
 			Array.isArray(object['@context']) ?

@@ -43,7 +43,7 @@ describe('Abuse report', () => {
 				async () => await aModerator.client.request('admin/forward-abuse-user-report', { reportId: report.id }),
 				(err: any) => {
 					strictEqual(err.code, 'INTERNAL_ERROR');
-					strictEqual(err.info.e.message, 'The report has already been forwarded.');
+					strictEqual(err.message, 'The report has already been forwarded.');
 					return true;
 				},
 			);

@@ -413,8 +413,7 @@ describe('User', () => {
 				]);
 			});
 
-			// おそらくもう修正されている問題
-			test.skip('Bob follows Alice, then Alice gets deleted in B server', async () => {
+			test('Bob follows Alice, then Alice gets deleted in B server', async () => {
 				await bob.client.request('following/create', { userId: aliceInB.id });
 				await sleep();
 
@@ -428,12 +427,18 @@ describe('User', () => {
 				 * FIXME: remote account is not deleted!
 				 *        @see https://github.com/misskey-dev/misskey/issues/14728
 				 */
-				const deletedAlice = await bob.client.request('users/show', { userId: aliceInB.id });
-				assert(deletedAlice.id, aliceInB.id);
+				await rejects(
+					async () => await bob.client.request('users/show', { userId: aliceInB.id }),
+					(err: any) => {
+						strictEqual(err.code, 'NO_SUCH_USER');
+						return true;
+					},
+				);
 
 				// TODO: why still following relation?
 				const following = await bob.client.request('users/following', { userId: bob.id });
 				strictEqual(following.length, 1);
+
 				await rejects(
 					async () => await bob.client.request('following/create', { userId: aliceInB.id }),
 					(err: any) => {
@@ -531,7 +536,21 @@ describe('User', () => {
 			/**
 			 * instead of simple unsuspension, let's tell existence by following from Alice
 			 */
-			test('Alice can follow Bob', async () => {
+			test('Alice cannot follow Bob while suspended', async () => {
+				await rejects(
+					async () => await alice.client.request('following/create', { userId: bobInA.id }),
+					(err: any) => {
+						strictEqual(err.code, 'YOUR_ACCOUNT_SUSPENDED');
+						return true;
+					},
+				);
+			});
+
+			test('Alice can follow Bob after unsuspension', async () => {
+				// 再度Aliceをunsuspend
+				await aAdmin.client.request('admin/unsuspend-user', { userId: alice.id });
+				await sleep();
+
 				await alice.client.request('following/create', { userId: bobInA.id });
 				await sleep();
 

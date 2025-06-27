@@ -196,10 +196,10 @@ describe('Note', () => {
 					const note = (await bob.client.request('notes/create', { text: 'I\'m Bob.' })).createdNote;
 					const noteInA = await resolveRemoteNote('b.test', note.id, alice);
 					await alice.client.request('notes/create', { text: 'Hello Bob!', replyId: noteInA.id });
-					await sleep();
+					await sleep(3000);
 
 					await bob.client.request('notes/delete', { noteId: note.id });
-					await sleep();
+					await sleep(3000);
 
 					await rejects(
 						async () => await alice.client.request('notes/show', { noteId: noteInA.id }),

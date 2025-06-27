@@ -43,7 +43,6 @@
 		"@testing-library/vue": "8.1.0",
 		"@types/estree": "1.0.7",
 		"@types/micromatch": "4.0.9",
-		"@types/node": "22.15.2",
 		"@types/punycode.js": "npm:@types/punycode@2.1.4",
 		"@types/tinycolor2": "1.4.6",
 		"@types/ws": "8.18.1",

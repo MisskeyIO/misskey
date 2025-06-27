@@ -367,7 +367,7 @@ describe('Note', () => {
 			});
 
 			test('A vote in Bob\'s server is delivered to Bob\'s remote followers', async () => {
-				const note = (await bob.client.request('notes/create', { poll: { choices: ['inu', 'neko'] } })).createdNote;
+				const note = (await bob.client.request('notes/create', { poll: { choices: ['takenoko', 'kinoko'] } })).createdNote;
 				// NOTE: resolve before voting
 				const noteInA = await resolveRemoteNote('b.test', note.id, bobRemoteFollower);
 				await localVoter.client.request('notes/polls/vote', { noteId: note.id, choice: 0 });

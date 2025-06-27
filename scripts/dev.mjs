@@ -76,19 +76,19 @@ execa('pnpm', ['--filter', 'sw', 'watch'], {
 	stderr: process.stderr,
 });
 
-execa('pnpm', ['--filter', 'misskey-js', 'watch', '--no-clean'], {
+execa('pnpm', ['--filter', 'misskey-js', 'watch'], {
 	cwd: _dirname + '/../',
 	stdout: process.stdout,
 	stderr: process.stderr,
 });
 
-execa('pnpm', ['--filter', 'misskey-reversi', 'watch', '--no-clean'], {
+execa('pnpm', ['--filter', 'misskey-reversi', 'watch'], {
 	cwd: _dirname + '/../',
 	stdout: process.stdout,
 	stderr: process.stderr,
 });
 
-execa('pnpm', ['--filter', 'misskey-bubble-game', 'watch', '--no-clean'], {
+execa('pnpm', ['--filter', 'misskey-bubble-game', 'watch'], {
 	cwd: _dirname + '/../',
 	stdout: process.stdout,
 	stderr: process.stderr,

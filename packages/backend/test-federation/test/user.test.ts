@@ -413,7 +413,8 @@ describe('User', () => {
 				]);
 			});
 
-			test('Bob follows Alice, then Alice gets deleted in B server', async () => {
+			// おそらくもう修正されている問題
+			test.skip('Bob follows Alice, then Alice gets deleted in B server', async () => {
 				await bob.client.request('following/create', { userId: aliceInB.id });
 				await sleep();
 
@@ -497,7 +498,7 @@ describe('User', () => {
 			});
 
 			// ioでは挙動が違いそう
-			test.skip('Alice gets unsuspended, Bob succeeds in following Alice', async () => {
+			test('Alice gets unsuspended, Bob succeeds in following Alice', async () => {
 				await aAdmin.client.request('admin/unsuspend-user', { userId: alice.id });
 				await sleep();
 

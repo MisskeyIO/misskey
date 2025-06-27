@@ -18,9 +18,9 @@ import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { bindThis } from '@/decorators.js';
-import { ApiError } from '../../error.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { FetchAllowSoftFailMask } from '@/core/activitypub/misc/check-against-url.js';
+import { ApiError } from '../../error.js';
 
 export const meta = {
 	tags: ['federation'],
@@ -203,10 +203,15 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 	@bindThis
 	private async mergePack(me: MiLocalUser | null | undefined, user: MiUser | null | undefined, note: MiNote | null | undefined): Promise<SchemaType<typeof meta.res> | null> {
 		if (user != null) {
-			return {
-				type: 'User',
-				object: await this.userEntityService.pack(user, me, { schema: 'UserDetailedNotMe' }),
-			};
+			try {
+				const object = await this.userEntityService.pack(user, me, { schema: 'UserDetailedNotMe' });
+				return {
+					type: 'User',
+					object: object,
+				};
+			} catch (e) {
+				return null;
+			}
 		} else if (note != null) {
 			try {
 				const object = await this.noteEntityService.pack(note, me, { detail: true });

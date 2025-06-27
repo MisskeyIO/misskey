@@ -320,11 +320,7 @@ export class ApInboxService {
 		}
 
 		// アナウンス先をブロックしてたら中断
-		const meta = await this.metaService.fetch();
-		if (this.utilityService.isItemListedIn(this.utilityService.extractHost(uri), meta.blockedHosts)) return 'skip: blocked host';
-		// アナウンス先が許可されているかチェック
 		if (!this.utilityService.isFederationAllowedUri(uri)) return 'skip: blocked host';
-		//TODO あとでなおす
 
 		const unlock = await acquireApObjectLock(this.redisForTimelines, uri);
 

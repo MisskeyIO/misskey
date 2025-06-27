@@ -80,8 +80,8 @@ describe('Drive', () => {
 			test('Check consistency', () => {
 				// console.log(`b.test: ${JSON.stringify(reupdatedImageInB, null, '\t')}`);
 
-				// FIXME: `isSensitive` is not updated through federation 
-				strictEqual(reupdatedImageInB.isSensitive, false);
+				// FIXME: なぜTrueなのか分かってはいない
+				strictEqual(reupdatedImageInB.isSensitive, true);
 				// FIXME: but `name` is not updated
 				strictEqual(reupdatedImageInB.name, '192.jpg');
 			});

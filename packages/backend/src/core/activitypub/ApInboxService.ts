@@ -132,7 +132,6 @@ export class ApInboxService {
 				result = results.map(([id, reason]) => `${id}: ${reason}`).join('\n');
 			}
 		} else {
-			//TODO なおして
 			result = await this.performOneActivity(actor, activity, resolver, additionalCc);
 		}
 

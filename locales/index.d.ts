@@ -5129,6 +5129,10 @@ export interface Locale extends ILocale {
      */
     "urlPreviewDenyListDescription": string;
     /**
+     * URLとサイトの設定
+     */
+    "urlAndSiteSettings": string;
+    /**
      * コード
      */
     "code": string;

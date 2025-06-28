@@ -100,7 +100,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 				<MkFolder>
 					<template #icon><i class="ti ti-user-x"></i></template>
-					<template #label>FIXME</template>
+					<template #label>{{ i18n.ts.urlAndSiteSettings }}</template>
 					<MkTextarea v-model="wellKnownWebsites">
 						<template #label>{{ i18n.ts.wellKnownWebsites }}</template>
 						<template #caption>{{ i18n.ts.wellKnownWebsitesDescription }}</template>

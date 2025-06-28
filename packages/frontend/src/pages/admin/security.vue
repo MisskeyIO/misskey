@@ -119,7 +119,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label>IndieAuth Clients</template>
 
 				<div class="_gaps">
-					<MkButton primary full @click="indieAuthAddNew"><i class="ti ti-plus"></i> New</MkButton>
+					<MkButton primary rounded @click="indieAuthAddNew"><i class="ti ti-plus"></i> New</MkButton>
 					<MkFolder v-for="(client, index) in indieAuthClients" :key="`${indieAuthTimestamp}-${index}-${client.createdAt ? client.id : 'new'}`" :defaultOpen="!client.createdAt">
 						<template #label>{{ client.name || client.id }}</template>
 						<template #icon>
@@ -139,7 +139,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<template #label>Redirect URIs</template>
 							</MkTextarea>
 							<div class="buttons _buttons">
-								<MkButton primary @click="indieAuthSave(client)"><i class="ti ti-device-floppy"></i> Save</MkButton>
+								<MkButton primary rounded @click="indieAuthSave(client)"><i class="ti ti-device-floppy"></i> Save</MkButton>
 								<MkButton v-if="client.createdAt" warn @click="indieAuthDelete(client)"><i class="ti ti-trash"></i> Delete</MkButton>
 							</div>
 						</div>
@@ -154,7 +154,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label>Single Sign-On Service Providers</template>
 
 				<div class="_gaps">
-					<MkButton primary full @click="ssoServiceAddNew"><i class="ti ti-plus"></i> New</MkButton>
+					<MkButton primary rounded @click="ssoServiceAddNew"><i class="ti ti-plus"></i> New</MkButton>
 					<MkFolder v-for="(service, index) in ssoServices" :key="`${ssoServiceTimestamp}-${index}-${service.createdAt ? service.id : 'new'}`" :defaultOpen="!service.createdAt">
 						<template #label>{{ service.name || service.id }}</template>
 						<template #icon>
@@ -212,7 +212,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<template #label>Regenerate Certificate</template>
 							</MkSwitch>
 							<div class="buttons _buttons">
-								<MkButton primary @click="ssoServiceSave(service)"><i class="ti ti-device-floppy"></i> Save</MkButton>
+								<MkButton primary rounded @click="ssoServiceSave(service)"><i class="ti ti-device-floppy"></i> Save</MkButton>
 								<MkButton v-if="service.createdAt" warn @click="ssoServiceDelete(service)"><i class="ti ti-trash"></i> Delete</MkButton>
 							</div>
 						</div>
@@ -243,6 +243,7 @@ import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import { useForm } from '@/use/use-form.js';
 import MkFormFooter from '@/components/MkFormFooter.vue';
+import MkButton from '@/components/MkButton.vue';
 
 const meta = await misskeyApi('admin/meta');
 

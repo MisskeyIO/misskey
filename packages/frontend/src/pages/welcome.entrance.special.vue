@@ -4,27 +4,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<div v-if="meta" class="rsqzvsbo">
-	<MkFeaturedPhotos class="bg"/>
-	<XTimeline class="tl"/>
-	<div class="shape1"></div>
-	<div class="shape2"></div>
-	<img class="extra-2" src="/client-assets/entrance-extra-2.png"/>
-	<img class="extra-1" src="/client-assets/entrance-extra-1.png"/>
-	<div class="logo-wrapper">
-		<img src="/client-assets/entrance-extra-3.png" class="misskey"/>
+<div v-if="meta" :class="$style.root">
+	<MkFeaturedPhotos :class="$style.bg"/>
+	<XTimeline :class="$style.tl"/>
+	<div :class="$style.shape1"></div>
+	<div :class="$style.shape2"></div>
+	<img :class="$style.extra1" src="/client-assets/entrance-extra-1.png"/>
+	<img :class="$style.extra2" src="/client-assets/entrance-extra-2.png"/>
+	<div :class="$style.logoWrapper">
+		<img src="/client-assets/entrance-extra-3.png" :class="$style.misskey"/>
 	</div>
-	<div class="emojis">
-		<MkEmoji :normal="true" :noStyle="true" emoji="👍"/>
-		<MkEmoji :normal="true" :noStyle="true" emoji="❤"/>
-		<MkEmoji :normal="true" :noStyle="true" emoji="😆"/>
-		<MkEmoji :normal="true" :noStyle="true" emoji="🎉"/>
-		<MkEmoji :normal="true" :noStyle="true" emoji="🍮"/>
-	</div>
-	<div class="contents">
+	<div :class="$style.contents">
 		<MkVisitorDashboard/>
 	</div>
-	<div v-if="instances && instances.length > 0" class="federation">
+	<div v-if="instances && instances.length > 0" :class="$style.federation">
 		<MarqueeText :duration="40">
 			<MkA v-for="instance in instances" :key="instance.id" :class="$style.federationInstance" :to="`/instance-info/${instance.host}`" behavior="window">
 				<!--<MkInstanceCardMini :instance="instance"/>-->
@@ -40,12 +33,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import XTimeline from './welcome.timeline.vue';
-import MarqueeText from '@/components/MkMarquee.vue';
 import MkFeaturedPhotos from '@/components/MkFeaturedPhotos.vue';
 import { misskeyApiGet } from '@/utility/misskey-api.js';
 import MkVisitorDashboard from '@/components/MkVisitorDashboard.vue';
 import { getProxiedImageUrl } from '@/utility/media-proxy.js';
 import { instance as meta } from '@/instance.js';
+import MarqueeText from '@/components/MkMarquee.vue';
 
 const instances = ref<Misskey.entities.FederationInstance[]>();
 
@@ -53,144 +46,74 @@ function getInstanceIcon(instance: Misskey.entities.FederationInstance): string 
 	if (!instance.iconUrl) {
 		return '';
 	}
+
 	return getProxiedImageUrl(instance.iconUrl, 'preview');
 }
 
 misskeyApiGet('federation/instances', {
 	sort: '+pubSub',
 	limit: 20,
+	blocked: false,
 }).then(_instances => {
 	instances.value = _instances;
 });
 </script>
 
-<style lang="scss" scoped>
-.rsqzvsbo {
-	> .bg {
-		position: fixed;
-		top: 0;
-		right: 0;
-		width: 80vw; // 100%からshapeの幅を引いている
-		height: 100vh;
-	}
+<style lang="scss" module>
+.root {
+	height: 100cqh;
+	overflow: auto;
+	overscroll-behavior: contain;
+}
 
-	> .tl {
-		position: fixed;
-		top: 0;
-		bottom: 0;
-		right: 64px;
-		margin: auto;
-		padding: 128px 0;
-		width: 500px;
-		height: calc(100% - 256px);
-		overflow: hidden;
-		-webkit-mask-image: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 128px, rgba(0,0,0,1) calc(100% - 128px), rgba(0,0,0,0) 100%);
-		mask-image: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 128px, rgba(0,0,0,1) calc(100% - 128px), rgba(0,0,0,0) 100%);
+.bg {
+	position: fixed;
+	top: 0;
+	right: 0;
+	width: 80vw; // 100%からshapeの幅を引いている
+	height: 100vh;
+}
 
-		@media (max-width: 1200px) {
-			display: none;
-		}
-	}
+.tl {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	right: 64px;
+	margin: auto;
+	padding: 128px 0;
+	width: 500px;
+	height: calc(100% - 256px);
+	overflow: hidden;
+	-webkit-mask-image: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 128px, rgba(0,0,0,1) calc(100% - 128px), rgba(0,0,0,0) 100%);
+	mask-image: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 128px, rgba(0,0,0,1) calc(100% - 128px), rgba(0,0,0,0) 100%);
 
-	> .shape1 {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100vw;
-		height: 100vh;
-		background: var(--MI_THEME-accent);
-		clip-path: polygon(0% 0%, 45% 0%, 20% 100%, 0% 100%);
-	}
-	> .shape2 {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100vw;
-		height: 100vh;
-		background: var(--MI_THEME-accent);
-		clip-path: polygon(0% 0%, 25% 0%, 35% 100%, 0% 100%);
-		opacity: 0.5;
-	}
-
-	> .logo-wrapper {
-		position: fixed;
-		top: 36px;
-		left: 36px;
-		flex: auto;
-		color: #fff;
-		user-select: none;
-		pointer-events: none;
-
-		> .powered-by {
-			margin-bottom: 2px;
-		}
-
-		> .misskey {
-			width: 240px;
-			@media (max-width: 450px) {
-				width: 130px;
-			}
-		}
-	}
-
-	> .emojis {
-		position: fixed;
-		bottom: 32px;
-		left: 35px;
-
-		> * {
-			margin-right: 8px;
-		}
-
-		@media (max-width: 1200px) {
-			display: none;
-		}
-	}
-
-	> .contents {
-		position: relative;
-		width: min(430px, calc(100% - 32px));
-		margin-left: 128px;
-		padding: 100px 0 100px 0;
-
-		@media (max-width: 1200px) {
-			margin: auto;
-		}
-	}
-
-	> .federation {
-		position: fixed;
-		bottom: 16px;
-		left: 0;
-		right: 0;
-		margin: auto;
-		background: var(--acrylicPanel);
-		-webkit-backdrop-filter: var(--MI-blur, blur(15px));
-		backdrop-filter: var(--MI-blur, blur(15px));
-		border-radius: 999px;
-		overflow: clip;
-		width: 800px;
-		padding: 8px 0;
-
-		@media (max-width: 900px) {
-			display: none;
-		}
+	@media (max-width: 1200px) {
+		display: none;
 	}
 }
 
-.extra-2 {
-	display: block;
+.shape1 {
 	position: fixed;
-	z-index: -1;
 	top: 0;
 	left: 0;
 	width: 100vw;
 	height: 100vh;
-	object-fit: cover;
-	pointer-events: none;
+	background: var(--MI_THEME-accent);
+	clip-path: polygon(0% 0%, 45% 0%, 20% 100%, 0% 100%);
 }
 
-.extra-1 {
+.shape2 {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background: var(--MI_THEME-accent);
+	clip-path: polygon(0% 0%, 25% 0%, 35% 100%, 0% 100%);
+	opacity: 0.5;
+}
+
+.extra1 {
 	display: block;
 	position: fixed;
 	bottom: 0;
@@ -207,9 +130,71 @@ misskeyApiGet('federation/instances', {
 		right: 0;
 	}
 }
-</style>
 
-<style lang="scss" module>
+.extra2 {
+	display: block;
+	position: fixed;
+	z-index: -1;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	object-fit: cover;
+	pointer-events: none;
+}
+
+.logoWrapper {
+	position: fixed;
+	top: 36px;
+	left: 36px;
+	flex: auto;
+	color: #fff;
+	user-select: none;
+	pointer-events: none;
+}
+
+.poweredBy {
+	margin-bottom: 2px;
+}
+
+.misskey {
+	width: 240px;
+
+	@media (max-width: 450px) {
+		width: 130px;
+	}
+}
+
+.contents {
+	position: relative;
+	width: min(430px, calc(100% - 32px));
+	margin-left: 128px;
+	padding: 100px 0 100px 0;
+
+	@media (max-width: 1200px) {
+		margin: auto;
+	}
+}
+
+.federation {
+	position: fixed;
+	bottom: 16px;
+	left: 0;
+	right: 0;
+	margin: auto;
+	background: color(from var(--MI_THEME-panel) srgb r g b / 0.5);
+	-webkit-backdrop-filter: var(--MI-blur, blur(15px));
+	backdrop-filter: var(--MI-blur, blur(15px));
+	border-radius: 999px;
+	overflow: clip;
+	width: 800px;
+	padding: 8px 0;
+
+	@media (max-width: 900px) {
+		display: none;
+	}
+}
+
 .federationInstance {
 	display: inline-flex;
 	align-items: center;
@@ -218,13 +203,13 @@ misskeyApiGet('federation/instances', {
 	margin: 0 10px 0 0;
 	background: var(--MI_THEME-panel);
 	border-radius: 999px;
+}
 
-	> :global(.icon) {
-		display: inline-block;
-		width: 20px;
-		height: 20px;
-		margin-right: 5px;
-		border-radius: 999px;
-	}
+.federationInstanceIcon {
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	margin-right: 5px;
+	border-radius: 999px;
 }
 </style>

@@ -16,8 +16,26 @@ export const basicTimelineTypes = [
 
 export type BasicTimelineType = typeof basicTimelineTypes[number];
 
+export const allTimelineTypes = [
+	...basicTimelineTypes,
+	'mentions',
+	'directs',
+	'list',
+	'antenna',
+	'channel',
+	'role',
+] as const;
+
+export type TimelinePageSrc = BasicTimelineType | `list:${string}`;
+
+export type AllTimelineType = typeof allTimelineTypes[number];
+
 export function isBasicTimeline(timeline: string): timeline is BasicTimelineType {
 	return basicTimelineTypes.includes(timeline as BasicTimelineType);
+}
+
+export function isDescriptionTimeline(timeline: string): boolean {
+	return timeline === 'home' || timeline === 'local' || timeline === 'social' || timeline === 'global';
 }
 
 export function basicTimelineIconClass(timeline: BasicTimelineType): string {

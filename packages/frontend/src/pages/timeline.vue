@@ -4,18 +4,29 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<PageWithHeader ref="pageComponent" v-model:tab="src" :actions="headerActions" :tabs="$i ? headerTabs : headerTabsWhenNotLogin" :swipable="true" :displayMyAvatar="true">
+<PageWithHeader
+	ref="pageComponent" v-model:tab="src" :actions="headerActions"
+	:tabs="$i ? headerTabs : headerTabsWhenNotLogin" :swipable="true" :displayMyAvatar="true"
+>
 	<div class="_spacer" style="--MI_SPACER-w: 800px;">
-		<MkInfo v-if="isBasicTimeline(src) && !store.r.timelineTutorials.value[src]" style="margin-bottom: var(--MI-margin);" closable @close="closeTutorial()">
+		<MkInfo
+			v-if="isBasicTimeline(src) && !store.r.timelineTutorials.value[src] && isDescriptionTimeline(src)"
+			style="margin-bottom: var(--MI-margin);" closable @close="closeTutorial()"
+		>
 			{{ i18n.ts._timelineDescription[src] }}
 		</MkInfo>
-		<MkPostForm v-if="prefer.r.showFixedPostForm.value" :class="$style.postForm" class="_panel" fixed style="margin-bottom: var(--MI-margin);"/>
-		<div v-if="queue > 0" :class="$style.new"><button class="_buttonPrimary" :class="$style.newButton" @click="top()">{{ i18n.ts.newNoteRecived }}</button></div>
+		<MkPostForm
+			v-if="prefer.r.showFixedPostForm.value" :class="$style.postForm" class="_panel" fixed
+			style="margin-bottom: var(--MI-margin);"
+		/>
+		<div v-if="queue > 0" :class="$style.new">
+			<button class="_buttonPrimary" :class="$style.newButton" @click="top()">{{ i18n.ts.newNoteRecived }}</button>
+		</div>
 		<MkTimeline
 			ref="tlComponent"
 			:key="src + withRenotes + withReplies + onlyFiles + withSensitive"
 			:class="$style.tl"
-			:src="src.split(':')[0]"
+			:src="src.split(':')[0] "
 			:list="src.split(':')[1]"
 			:withRenotes="withRenotes"
 			:withReplies="withReplies"
@@ -32,7 +43,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, watch, provide, useTemplateRef, ref, onMounted, onActivated } from 'vue';
 import type { Tab } from '@/components/global/MkPageHeader.tabs.vue';
 import type { MenuItem } from '@/types/menu.js';
-import type { BasicTimelineType } from '@/timelines.js';
+import type PageWithHeader from '@/components/global/PageWithHeader.vue';
+import type { AllTimelineType, TimelinePageSrc } from '@/timelines.js';
+import { isDescriptionTimeline } from '@/timelines.js';
 import MkTimeline from '@/components/MkTimeline.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import MkPostForm from '@/components/MkPostForm.vue';
@@ -45,15 +58,18 @@ import { antennasCache, userListsCache, favoritedChannelsCache } from '@/cache.j
 import { deviceKind } from '@/utility/device-kind.js';
 import { deepMerge } from '@/utility/merge.js';
 import { miLocalStorage } from '@/local-storage.js';
-import { availableBasicTimelines, hasWithReplies, isAvailableBasicTimeline, isBasicTimeline, basicTimelineIconClass } from '@/timelines.js';
+import {
+	availableBasicTimelines,
+	hasWithReplies,
+	isAvailableBasicTimeline,
+	isBasicTimeline,
+	basicTimelineIconClass,
+} from '@/timelines.js';
 import { prefer } from '@/preferences.js';
 
 provide('shouldOmitHeaderTitle', true);
-
-const tlComponent = useTemplateRef('tlComponent');
-const pageComponent = useTemplateRef('pageComponent');
-
-type TimelinePageSrc = BasicTimelineType | `list:${string}`;
+const tlComponent = useTemplateRef<InstanceType<typeof MkTimeline>>('tlComponent');
+const pageComponent = useTemplateRef<InstanceType<typeof PageWithHeader>>('pageComponent');
 
 const queue = ref(0);
 const srcWhenNotSignin = ref<'local' | 'global'>(isAvailableBasicTimeline('local') ? 'local' : 'global');
@@ -207,18 +223,16 @@ function saveTlFilter(key: keyof typeof store.s.tl.filter, newValue: boolean) {
 	}
 }
 
-async function timetravel(): Promise<void> {
-	const { canceled, result: date } = await os.inputDateTime({
-		title: i18n.ts.date,
-	});
-	if (canceled) return;
+// 使用されていない機能
 
-	tlComponent.value.timetravel(date);
-}
-
-function focus(): void {
-	tlComponent.value.focus();
-}
+// async function timetravel(): Promise<void> {
+// 	const { canceled, result: date } = await os.inputDateTime({
+// 		title: i18n.ts.date,
+// 	});
+// 	if (canceled) return;
+//
+// 	tlComponent.value.timetravel(date);
+// }
 
 function closeTutorial(): void {
 	if (!isBasicTimeline(src.value)) return;

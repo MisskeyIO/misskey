@@ -5,7 +5,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <MkPullToRefresh ref="prComponent" :refresher="() => reloadTimeline()">
-	<MkPagination v-if="paginationQuery" ref="pagingComponent" :pagination="paginationQuery" @queue="emit('queue', $event)" @status="prComponent?.setDisabled($event)">
+	<MkPagination
+		v-if="paginationQuery" ref="pagingComponent" :pagination="paginationQuery"
+		@queue="emit('queue', $event)" @status="prComponent?.setDisabled($event)"
+	>
 		<template #empty>
 			<div class="_fullinfo">
 				<img :src="infoImageUrl" draggable="false"/>
@@ -24,8 +27,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 				:moveClass=" $style.transition_x_move"
 				tag="div"
 			>
-				<template v-for="(note, i) in notes" :key="note.id">
-					<div v-if="note._shouldInsertAd_" :class="[$style.noteWithAd, { '_gaps': !noGap }]" :data-scroll-anchor="note.id">
+				<template v-for="(note, i) in (notes as Misskey.entities.Note[])" :key="note.id">
+					<div
+						v-if="note._shouldInsertAd_" :class="[$style.noteWithAd, { '_gaps': !noGap }]"
+						:data-scroll-anchor="note.id"
+					>
 						<MkNote :class="$style.note" :note="note" :withHardMute="true"/>
 						<div :class="$style.ad">
 							<MkAd :preferForms="['horizontal', 'horizontal-big']"/>
@@ -42,8 +48,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, watch, onUnmounted, provide, useTemplateRef, TransitionGroup, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
-import type { BasicTimelineType } from '@/timelines.js';
 import type { Paging } from '@/components/MkPagination.vue';
+import type { AllTimelineType, TimelinePageSrc } from '@/timelines.js';
+import { allTimelineTypes } from '@/timelines.js';
 import MkPullToRefresh from '@/components/MkPullToRefresh.vue';
 import { useStream } from '@/stream.js';
 import * as sound from '@/utility/sound.js';
@@ -58,7 +65,7 @@ import { infoImageUrl } from '@/instance.js';
 import { generateClientTransactionId } from '@/utility/misskey-api.js';
 
 const props = withDefaults(defineProps<{
-	src: BasicTimelineType | 'mentions' | 'directs' | 'list' | 'antenna' | 'channel' | 'role';
+	src: TimelinePageSrc | AllTimelineType;
 	list?: string;
 	antenna?: string;
 	channel?: string;
@@ -172,8 +179,8 @@ async function loadUnloadedNotes() {
 	}
 }
 
-let connection: Misskey.ChannelConnection | null = null;
-let connection2: Misskey.ChannelConnection | null = null;
+let connection: Misskey.IChannelConnection<any> | null = null;
+let connection2: Misskey.IChannelConnection<any> | null = null;
 let paginationQuery: Paging | null = null;
 const noGap = !prefer.s.showGapBetweenNotesInTimeline;
 
@@ -392,13 +399,15 @@ defineExpose({
 .transition_x_move,
 .transition_x_enterActive,
 .transition_x_leaveActive {
-	transition: opacity 0.3s cubic-bezier(0,.5,.5,1), transform 0.3s cubic-bezier(0,.5,.5,1) !important;
+	transition: opacity 0.3s cubic-bezier(0, .5, .5, 1), transform 0.3s cubic-bezier(0, .5, .5, 1) !important;
 }
+
 .transition_x_enterFrom,
 .transition_x_leaveTo {
 	opacity: 0;
 	transform: translateY(-50%);
 }
+
 .transition_x_leaveActive {
 	position: absolute;
 }

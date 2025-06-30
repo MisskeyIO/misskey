@@ -331,7 +331,12 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 							});
 							if (canceled3) return;
 
-							os.apiWithDialog('admin/roles/assign', { roleId: r.id, userId: user.id, memo: memo ?? undefined, expiresAt });
+							os.apiWithDialog('admin/roles/assign', {
+								roleId: r.id,
+								userId: user.id,
+								memo: memo ?? undefined,
+								expiresAt,
+							});
 						},
 					}));
 				},
@@ -372,14 +377,14 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 			},
 		});
 
-		if ($i.policies.chatAvailability === 'available' && user.canChat && user.host == null) {
-			menuItems.push({
-				type: 'link',
-				icon: 'ti ti-messages',
-				text: i18n.ts._chat.chatWithThisUser,
-				to: `/chat/user/${user.id}`,
-			});
-		}
+		// if ($i.policies.chatAvailability === 'available' && user.canChat && user.host == null) {
+		// 	menuItems.push({
+		// 		type: 'link',
+		// 		icon: 'ti ti-messages',
+		// 		text: i18n.ts._chat.chatWithThisUser,
+		// 		to: `/chat/user/${user.id}`,
+		// 	});
+		// }
 
 		menuItems.push({ type: 'divider' }, {
 			icon: user.isMuted ? 'ti ti-eye' : 'ti ti-eye-off',

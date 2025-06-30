@@ -113,13 +113,13 @@ export const navbarItemDef = reactive({
 		icon: 'ti ti-device-tv',
 		to: '/channels',
 	},
-	chat: {
-		title: i18n.ts.chat,
-		icon: 'ti ti-messages',
-		to: '/chat',
-		show: computed(() => $i != null && $i.policies.chatAvailability !== 'unavailable'),
-		indicated: computed(() => $i != null && $i.hasUnreadChatMessages),
-	},
+	// chat: {
+	// 	title: i18n.ts.chat,
+	// 	icon: 'ti ti-messages',
+	// 	to: '/chat',
+	// 	show: computed(() => $i != null && $i.policies.chatAvailability !== 'unavailable'),
+	// 	indicated: computed(() => $i != null && $i.hasUnreadChatMessages),
+	// },
 	achievements: {
 		title: i18n.ts.achievements,
 		icon: 'ti ti-medal',

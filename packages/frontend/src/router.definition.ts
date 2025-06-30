@@ -44,23 +44,25 @@ export const ROUTE_DEF = [{
 }, {
 	path: '/clips/:clipId',
 	component: page(() => import('@/pages/clip.vue')),
-}, {
-	path: '/chat',
-	component: chatPage(() => import('@/pages/chat/home.vue')),
-	loginRequired: true,
-}, {
-	path: '/chat/user/:userId',
-	component: chatPage(() => import('@/pages/chat/room.vue')),
-	loginRequired: true,
-}, {
-	path: '/chat/room/:roomId',
-	component: chatPage(() => import('@/pages/chat/room.vue')),
-	loginRequired: true,
-}, {
-	path: '/chat/messages/:messageId',
-	component: chatPage(() => import('@/pages/chat/message.vue')),
-	loginRequired: true,
-}, {
+}
+// 	{
+// 	path: '/chat',
+// 	component: chatPage(() => import('@/pages/chat/home.vue')),
+// 	loginRequired: true,
+// }, {
+// 	path: '/chat/user/:userId',
+// 	component: chatPage(() => import('@/pages/chat/room.vue')),
+// 	loginRequired: true,
+// }, {
+// 	path: '/chat/room/:roomId',
+// 	component: chatPage(() => import('@/pages/chat/room.vue')),
+// 	loginRequired: true,
+// }, {
+// 	path: '/chat/messages/:messageId',
+// 	component: chatPage(() => import('@/pages/chat/message.vue')),
+// 	loginRequired: true,
+// },
+, {
 	path: '/instance-info/:host',
 	component: page(() => import('@/pages/instance-info.vue')),
 }, {

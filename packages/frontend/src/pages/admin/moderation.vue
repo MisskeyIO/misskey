@@ -110,6 +110,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<template #label>{{ i18n.ts.urlPreviewDenyList }}</template>
 						<template #caption>{{ i18n.ts.urlPreviewDenyListDescription }}</template>
 					</MkTextarea>
+
+					<MkButton primary @click="save_hiddenTags">{{ i18n.ts.save}}</MkButton>
 				</MkFolder>
 
 				<MkFolder>
@@ -152,7 +154,7 @@ const prohibitedWordsForNameOfUser = ref<string>('');
 const hiddenTags = ref<string>('');
 const preservedUsernames = ref<string>('');
 const blockedHosts = ref<string>('');
-const silencedHosts = ref<string>('');\
+const silencedHosts = ref<string>('');
 const wellKnownWebsites = ref<string>('');
 const urlPreviewDenyList = ref<string>('');
 
@@ -249,15 +251,6 @@ function save_blockedHosts() {
 function save_silencedHosts() {
 	os.apiWithDialog('admin/update-meta', {
 		silencedHosts: silencedHosts.value.split('\n') || [],
-	}).then(() => {
-		fetchInstance(true);
-	});
-}
-
-function save_mediaSilencedHosts() {
-	os.apiWithDialog('admin/update-meta', {
-		wellKnownWebsites: wellKnownWebsites.value.split('\n'),
-		urlPreviewDenyList: urlPreviewDenyList.value.split('\n'),
 	}).then(() => {
 		fetchInstance(true);
 	});

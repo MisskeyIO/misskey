@@ -15,6 +15,10 @@ async function connectToPostgres() {
 }
 
 async function connectToRedis(redisOptions) {
+	if (!redisOptions) {
+		return;
+	}
+
 	return await new Promise(async (resolve, reject) => {
 		const redis = new Redis({
 			...redisOptions,

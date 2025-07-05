@@ -131,6 +131,7 @@ function getSaveOptions(): Misskey.entities.PagesCreateRequest {
 		content: content.value,
 		variables: [],
 		eyeCatchingImageId: eyeCatchingImageId.value,
+		visibility: visibility.value,
 	};
 }
 
@@ -273,6 +274,7 @@ async function init() {
 		alignCenter.value = page.value.alignCenter;
 		content.value = page.value.content;
 		eyeCatchingImageId.value = page.value.eyeCatchingImageId;
+		visibility.value = page.value.visibility;
 	} else {
 		const id = uuid();
 		content.value = [{
@@ -299,8 +301,8 @@ const headerTabs = computed(() => [{
 
 definePage(() => ({
 	title: props.initPageId ? i18n.ts._pages.editPage
-		: props.initPageName && props.initUser ? i18n.ts._pages.readPage
-		: i18n.ts._pages.newPage,
+	: props.initPageName && props.initUser ? i18n.ts._pages.readPage
+	: i18n.ts._pages.newPage,
 	icon: 'ti ti-pencil',
 }));
 </script>

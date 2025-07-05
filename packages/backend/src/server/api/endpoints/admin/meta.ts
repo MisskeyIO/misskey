@@ -541,14 +541,6 @@ export const meta = {
 					optional: false, nullable: false,
 				},
 			},
-			mediaSilencedHosts: {
-				type: 'array',
-				optional: true, nullable: false,
-				items: {
-					type: 'string',
-					optional: false, nullable: false,
-				},
-			}
 		},
 	},
 } as const;

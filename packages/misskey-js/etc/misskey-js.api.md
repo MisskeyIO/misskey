@@ -1094,12 +1094,6 @@ type ChartsUsersRequest = operations['charts___users']['requestBody']['content']
 type ChartsUsersResponse = operations['charts___users']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChatHistoryRequest = operations['chat___history']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatHistoryResponse = operations['chat___history']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
 type ChatMessage = components['schemas']['ChatMessage'];
 
 // @public (undocumented)
@@ -1112,51 +1106,6 @@ type ChatMessageLiteFor1on1 = components['schemas']['ChatMessageLiteFor1on1'];
 type ChatMessageLiteForRoom = components['schemas']['ChatMessageLiteForRoom'];
 
 // @public (undocumented)
-type ChatMessagesCreateToRoomRequest = operations['chat___messages___create-to-room']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatMessagesCreateToRoomResponse = operations['chat___messages___create-to-room']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type ChatMessagesCreateToUserRequest = operations['chat___messages___create-to-user']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatMessagesCreateToUserResponse = operations['chat___messages___create-to-user']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type ChatMessagesDeleteRequest = operations['chat___messages___delete']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatMessagesReactRequest = operations['chat___messages___react']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatMessagesRoomTimelineRequest = operations['chat___messages___room-timeline']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatMessagesRoomTimelineResponse = operations['chat___messages___room-timeline']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type ChatMessagesSearchRequest = operations['chat___messages___search']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatMessagesSearchResponse = operations['chat___messages___search']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type ChatMessagesShowRequest = operations['chat___messages___show']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatMessagesShowResponse = operations['chat___messages___show']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type ChatMessagesUnreactRequest = operations['chat___messages___unreact']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatMessagesUserTimelineRequest = operations['chat___messages___user-timeline']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatMessagesUserTimelineResponse = operations['chat___messages___user-timeline']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
 type ChatRoom = components['schemas']['ChatRoom'];
 
 // @public (undocumented)
@@ -1164,75 +1113,6 @@ type ChatRoomInvitation = components['schemas']['ChatRoomInvitation'];
 
 // @public (undocumented)
 type ChatRoomMembership = components['schemas']['ChatRoomMembership'];
-
-// @public (undocumented)
-type ChatRoomsCreateRequest = operations['chat___rooms___create']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsCreateResponse = operations['chat___rooms___create']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsDeleteRequest = operations['chat___rooms___delete']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsInvitationsCreateRequest = operations['chat___rooms___invitations___create']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsInvitationsCreateResponse = operations['chat___rooms___invitations___create']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsInvitationsIgnoreRequest = operations['chat___rooms___invitations___ignore']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsInvitationsInboxRequest = operations['chat___rooms___invitations___inbox']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsInvitationsInboxResponse = operations['chat___rooms___invitations___inbox']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsInvitationsOutboxRequest = operations['chat___rooms___invitations___outbox']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsInvitationsOutboxResponse = operations['chat___rooms___invitations___outbox']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsJoiningRequest = operations['chat___rooms___joining']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsJoiningResponse = operations['chat___rooms___joining']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsJoinRequest = operations['chat___rooms___join']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsLeaveRequest = operations['chat___rooms___leave']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsMembersRequest = operations['chat___rooms___members']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsMembersResponse = operations['chat___rooms___members']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsMuteRequest = operations['chat___rooms___mute']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsOwnedRequest = operations['chat___rooms___owned']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsOwnedResponse = operations['chat___rooms___owned']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsShowRequest = operations['chat___rooms___show']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsShowResponse = operations['chat___rooms___show']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsUpdateRequest = operations['chat___rooms___update']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type ChatRoomsUpdateResponse = operations['chat___rooms___update']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 type Clip = components['schemas']['Clip'];
@@ -1760,46 +1640,6 @@ declare namespace entities {
         ChartsUserReactionsResponse,
         ChartsUsersRequest,
         ChartsUsersResponse,
-        ChatHistoryRequest,
-        ChatHistoryResponse,
-        ChatMessagesCreateToRoomRequest,
-        ChatMessagesCreateToRoomResponse,
-        ChatMessagesCreateToUserRequest,
-        ChatMessagesCreateToUserResponse,
-        ChatMessagesDeleteRequest,
-        ChatMessagesReactRequest,
-        ChatMessagesRoomTimelineRequest,
-        ChatMessagesRoomTimelineResponse,
-        ChatMessagesSearchRequest,
-        ChatMessagesSearchResponse,
-        ChatMessagesShowRequest,
-        ChatMessagesShowResponse,
-        ChatMessagesUnreactRequest,
-        ChatMessagesUserTimelineRequest,
-        ChatMessagesUserTimelineResponse,
-        ChatRoomsCreateRequest,
-        ChatRoomsCreateResponse,
-        ChatRoomsDeleteRequest,
-        ChatRoomsInvitationsCreateRequest,
-        ChatRoomsInvitationsCreateResponse,
-        ChatRoomsInvitationsIgnoreRequest,
-        ChatRoomsInvitationsInboxRequest,
-        ChatRoomsInvitationsInboxResponse,
-        ChatRoomsInvitationsOutboxRequest,
-        ChatRoomsInvitationsOutboxResponse,
-        ChatRoomsJoinRequest,
-        ChatRoomsJoiningRequest,
-        ChatRoomsJoiningResponse,
-        ChatRoomsLeaveRequest,
-        ChatRoomsMembersRequest,
-        ChatRoomsMembersResponse,
-        ChatRoomsMuteRequest,
-        ChatRoomsOwnedRequest,
-        ChatRoomsOwnedResponse,
-        ChatRoomsShowRequest,
-        ChatRoomsShowResponse,
-        ChatRoomsUpdateRequest,
-        ChatRoomsUpdateResponse,
         ClipsAddNoteRequest,
         ClipsCreateRequest,
         ClipsCreateResponse,

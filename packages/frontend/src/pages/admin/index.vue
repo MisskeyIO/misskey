@@ -212,6 +212,11 @@ const menuDef = computed<SuperMenuDef[]>(() => [{
 		to: '/admin/relays',
 		active: currentPage.value?.route.name === 'relays',
 	}, {
+		icon: 'ti ti-ban',
+		text: i18n.ts.instanceBlocking,
+		to: '/admin/instance-block',
+		active: currentPage.value?.route.name === 'instance-block',
+	}, {
 		icon: 'ti ti-link',
 		text: i18n.ts.externalServices,
 		to: '/admin/external-services',

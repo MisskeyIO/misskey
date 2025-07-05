@@ -185,11 +185,6 @@ export const paramDef = {
 				type: 'string',
 			},
 		},
-		mediaSilencedHosts: {
-			type: 'array', nullable: true, items: {
-				type: 'string',
-			},
-		},
 	},
 	required: [],
 } as const;

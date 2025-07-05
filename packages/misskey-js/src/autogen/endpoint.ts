@@ -236,46 +236,6 @@ import type {
 	ChartsUserReactionsResponse,
 	ChartsUsersRequest,
 	ChartsUsersResponse,
-	ChatHistoryRequest,
-	ChatHistoryResponse,
-	ChatMessagesCreateToRoomRequest,
-	ChatMessagesCreateToRoomResponse,
-	ChatMessagesCreateToUserRequest,
-	ChatMessagesCreateToUserResponse,
-	ChatMessagesDeleteRequest,
-	ChatMessagesReactRequest,
-	ChatMessagesRoomTimelineRequest,
-	ChatMessagesRoomTimelineResponse,
-	ChatMessagesSearchRequest,
-	ChatMessagesSearchResponse,
-	ChatMessagesShowRequest,
-	ChatMessagesShowResponse,
-	ChatMessagesUnreactRequest,
-	ChatMessagesUserTimelineRequest,
-	ChatMessagesUserTimelineResponse,
-	ChatRoomsCreateRequest,
-	ChatRoomsCreateResponse,
-	ChatRoomsDeleteRequest,
-	ChatRoomsInvitationsCreateRequest,
-	ChatRoomsInvitationsCreateResponse,
-	ChatRoomsInvitationsIgnoreRequest,
-	ChatRoomsInvitationsInboxRequest,
-	ChatRoomsInvitationsInboxResponse,
-	ChatRoomsInvitationsOutboxRequest,
-	ChatRoomsInvitationsOutboxResponse,
-	ChatRoomsJoinRequest,
-	ChatRoomsJoiningRequest,
-	ChatRoomsJoiningResponse,
-	ChatRoomsLeaveRequest,
-	ChatRoomsMembersRequest,
-	ChatRoomsMembersResponse,
-	ChatRoomsMuteRequest,
-	ChatRoomsOwnedRequest,
-	ChatRoomsOwnedResponse,
-	ChatRoomsShowRequest,
-	ChatRoomsShowResponse,
-	ChatRoomsUpdateRequest,
-	ChatRoomsUpdateResponse,
 	ClipsAddNoteRequest,
 	ClipsCreateRequest,
 	ClipsCreateResponse,
@@ -825,30 +785,6 @@ export type Endpoints = {
 	'charts/user/pv': { req: ChartsUserPvRequest; res: ChartsUserPvResponse };
 	'charts/user/reactions': { req: ChartsUserReactionsRequest; res: ChartsUserReactionsResponse };
 	'charts/users': { req: ChartsUsersRequest; res: ChartsUsersResponse };
-	'chat/history': { req: ChatHistoryRequest; res: ChatHistoryResponse };
-	'chat/messages/create-to-room': { req: ChatMessagesCreateToRoomRequest; res: ChatMessagesCreateToRoomResponse };
-	'chat/messages/create-to-user': { req: ChatMessagesCreateToUserRequest; res: ChatMessagesCreateToUserResponse };
-	'chat/messages/delete': { req: ChatMessagesDeleteRequest; res: EmptyResponse };
-	'chat/messages/react': { req: ChatMessagesReactRequest; res: EmptyResponse };
-	'chat/messages/room-timeline': { req: ChatMessagesRoomTimelineRequest; res: ChatMessagesRoomTimelineResponse };
-	'chat/messages/search': { req: ChatMessagesSearchRequest; res: ChatMessagesSearchResponse };
-	'chat/messages/show': { req: ChatMessagesShowRequest; res: ChatMessagesShowResponse };
-	'chat/messages/unreact': { req: ChatMessagesUnreactRequest; res: EmptyResponse };
-	'chat/messages/user-timeline': { req: ChatMessagesUserTimelineRequest; res: ChatMessagesUserTimelineResponse };
-	'chat/rooms/create': { req: ChatRoomsCreateRequest; res: ChatRoomsCreateResponse };
-	'chat/rooms/delete': { req: ChatRoomsDeleteRequest; res: EmptyResponse };
-	'chat/rooms/invitations/create': { req: ChatRoomsInvitationsCreateRequest; res: ChatRoomsInvitationsCreateResponse };
-	'chat/rooms/invitations/ignore': { req: ChatRoomsInvitationsIgnoreRequest; res: EmptyResponse };
-	'chat/rooms/invitations/inbox': { req: ChatRoomsInvitationsInboxRequest; res: ChatRoomsInvitationsInboxResponse };
-	'chat/rooms/invitations/outbox': { req: ChatRoomsInvitationsOutboxRequest; res: ChatRoomsInvitationsOutboxResponse };
-	'chat/rooms/join': { req: ChatRoomsJoinRequest; res: EmptyResponse };
-	'chat/rooms/joining': { req: ChatRoomsJoiningRequest; res: ChatRoomsJoiningResponse };
-	'chat/rooms/leave': { req: ChatRoomsLeaveRequest; res: EmptyResponse };
-	'chat/rooms/members': { req: ChatRoomsMembersRequest; res: ChatRoomsMembersResponse };
-	'chat/rooms/mute': { req: ChatRoomsMuteRequest; res: EmptyResponse };
-	'chat/rooms/owned': { req: ChatRoomsOwnedRequest; res: ChatRoomsOwnedResponse };
-	'chat/rooms/show': { req: ChatRoomsShowRequest; res: ChatRoomsShowResponse };
-	'chat/rooms/update': { req: ChatRoomsUpdateRequest; res: ChatRoomsUpdateResponse };
 	'clips/add-note': { req: ClipsAddNoteRequest; res: EmptyResponse };
 	'clips/create': { req: ClipsCreateRequest; res: ClipsCreateResponse };
 	'clips/delete': { req: ClipsDeleteRequest; res: EmptyResponse };

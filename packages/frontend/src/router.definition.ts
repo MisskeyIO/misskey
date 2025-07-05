@@ -481,6 +481,10 @@ export const ROUTE_DEF = [{
 		name: 'relays',
 		component: page(() => import('@/pages/admin/relays.vue')),
 	}, {
+		path: '/instance-block',
+		name: 'instance-block',
+		component: page(() => import('@/pages/admin/instance-block.vue')),
+	}, {
 		path: '/external-services',
 		name: 'external-services',
 		component: page(() => import('@/pages/admin/external-services.vue')),

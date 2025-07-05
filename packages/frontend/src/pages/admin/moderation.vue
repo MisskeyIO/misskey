@@ -72,7 +72,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 				<MkFolder>
 					<template #icon><i class="ti ti-user-x"></i></template>
-					<template #label>{{ i18n.ts.prohibitedWordsForNameOfUser }}</template>
+					<template #label>{{ i18n.ts.hiddenTags }}</template>
 
 					<MkTextarea v-model="hiddenTags">
 						<template #label>{{ i18n.ts.hiddenTags }}</template>
@@ -110,18 +110,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<template #label>{{ i18n.ts.urlPreviewDenyList }}</template>
 						<template #caption>{{ i18n.ts.urlPreviewDenyListDescription }}</template>
 					</MkTextarea>
-				</MkFolder>
-
-				<MkFolder>
-					<template #icon><i class="ti ti-eye-off"></i></template>
-					<template #label>{{ i18n.ts.mediaSilencedInstances }}</template>
-
-					<div class="_gaps">
-						<MkTextarea v-model="mediaSilencedHosts">
-							<template #caption>{{ i18n.ts.mediaSilencedInstancesDescription }}</template>
-						</MkTextarea>
-						<MkButton primary @click="save_mediaSilencedHosts">{{ i18n.ts.save }}</MkButton>
-					</div>
 				</MkFolder>
 
 				<MkFolder>
@@ -164,8 +152,7 @@ const prohibitedWordsForNameOfUser = ref<string>('');
 const hiddenTags = ref<string>('');
 const preservedUsernames = ref<string>('');
 const blockedHosts = ref<string>('');
-const silencedHosts = ref<string>('');
-const mediaSilencedHosts = ref<string>('');
+const silencedHosts = ref<string>('');\
 const wellKnownWebsites = ref<string>('');
 const urlPreviewDenyList = ref<string>('');
 
@@ -179,8 +166,7 @@ async function init() {
 	hiddenTags.value = meta.hiddenTags.join('\n');
 	preservedUsernames.value = meta.preservedUsernames.join('\n');
 	blockedHosts.value = meta.blockedHosts.join('\n');
-	silencedHosts.value = meta.silencedHosts?.join('\n') ?? '';
-	mediaSilencedHosts.value = meta.mediaSilencedHosts?.join('\n') ?? '';
+	silencedHosts.value = meta.silencedHosts?.join('\n') ?? '';\
 }
 
 async function onChange_enableRegistration(value: boolean) {
@@ -270,7 +256,6 @@ function save_silencedHosts() {
 
 function save_mediaSilencedHosts() {
 	os.apiWithDialog('admin/update-meta', {
-		mediaSilencedHosts: mediaSilencedHosts.value.split('\n') || [],
 		wellKnownWebsites: wellKnownWebsites.value.split('\n'),
 		urlPreviewDenyList: urlPreviewDenyList.value.split('\n'),
 	}).then(() => {

@@ -87,18 +87,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</MkFolder>
 
 				<MkFolder>
-					<template #icon><i class="ti ti-eye-off"></i></template>
-					<template #label>{{ i18n.ts.silencedInstances }}</template>
-
-					<div class="_gaps">
-						<MkTextarea v-model="silencedHosts">
-							<template #caption>{{ i18n.ts.silencedInstancesDescription }}</template>
-						</MkTextarea>
-						<MkButton primary @click="save_silencedHosts">{{ i18n.ts.save }}</MkButton>
-					</div>
-				</MkFolder>
-
-				<MkFolder>
 					<template #icon><i class="ti ti-user-x"></i></template>
 					<template #label>{{ i18n.ts.urlAndSiteSettings }}</template>
 					<MkTextarea v-model="wellKnownWebsites">
@@ -111,19 +99,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<template #caption>{{ i18n.ts.urlPreviewDenyListDescription }}</template>
 					</MkTextarea>
 
-					<MkButton primary @click="save_hiddenTags">{{ i18n.ts.save}}</MkButton>
-				</MkFolder>
-
-				<MkFolder>
-					<template #icon><i class="ti ti-ban"></i></template>
-					<template #label>{{ i18n.ts.blockedInstances }}</template>
-
-					<div class="_gaps">
-						<MkTextarea v-model="blockedHosts">
-							<template #caption>{{ i18n.ts.blockedInstancesDescription }}</template>
-						</MkTextarea>
-						<MkButton primary @click="save_blockedHosts">{{ i18n.ts.save }}</MkButton>
-					</div>
+					<MkButton primary @click="save_hiddenTags">{{ i18n.ts.save }}</MkButton>
 				</MkFolder>
 			</div>
 		</FormSuspense>
@@ -153,8 +129,6 @@ const prohibitedWords = ref<string>('');
 const prohibitedWordsForNameOfUser = ref<string>('');
 const hiddenTags = ref<string>('');
 const preservedUsernames = ref<string>('');
-const blockedHosts = ref<string>('');
-const silencedHosts = ref<string>('');
 const wellKnownWebsites = ref<string>('');
 const urlPreviewDenyList = ref<string>('');
 
@@ -167,8 +141,6 @@ async function init() {
 	prohibitedWordsForNameOfUser.value = meta.prohibitedWordsForNameOfUser.join('\n');
 	hiddenTags.value = meta.hiddenTags.join('\n');
 	preservedUsernames.value = meta.preservedUsernames.join('\n');
-	blockedHosts.value = meta.blockedHosts.join('\n');
-	silencedHosts.value = meta.silencedHosts?.join('\n') ?? '';\
 }
 
 async function onChange_enableRegistration(value: boolean) {
@@ -235,22 +207,6 @@ function save_prohibitedWordsForNameOfUser() {
 function save_hiddenTags() {
 	os.apiWithDialog('admin/update-meta', {
 		hiddenTags: hiddenTags.value.split('\n'),
-	}).then(() => {
-		fetchInstance(true);
-	});
-}
-
-function save_blockedHosts() {
-	os.apiWithDialog('admin/update-meta', {
-		blockedHosts: blockedHosts.value.split('\n') || [],
-	}).then(() => {
-		fetchInstance(true);
-	});
-}
-
-function save_silencedHosts() {
-	os.apiWithDialog('admin/update-meta', {
-		silencedHosts: silencedHosts.value.split('\n') || [],
 	}).then(() => {
 		fetchInstance(true);
 	});

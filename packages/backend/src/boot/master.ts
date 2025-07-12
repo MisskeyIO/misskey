@@ -90,10 +90,6 @@ export async function masterMain() {
 		});
 	}
 
-	bootLogger.info(
-		`mode: [disableClustering: ${envOption.disableClustering}, onlyServer: ${envOption.onlyServer}, onlyQueue: ${envOption.onlyQueue}]`
-	);
-
 	if (envOption.disableClustering) {
 		if (envOption.onlyServer) {
 			await server();

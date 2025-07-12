@@ -97,6 +97,7 @@ export async function masterMain() {
 			await jobQueue();
 		} else {
 			await server();
+			await jobQueue();
 		}
 	} else {
 		if (envOption.onlyServer) {

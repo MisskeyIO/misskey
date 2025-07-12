@@ -8,7 +8,7 @@ export class OptimizeEmojiIndex1709126576000 {
 
 	async up(queryRunner) {
 		await queryRunner.query(`CREATE INDEX "IDX_EMOJI_ROLE_IDS" ON "emoji" using gin ("roleIdsThatCanBeUsedThisEmojiAsReaction")`)
-		await queryRunner.query(`CREATE INDEX "IDX_EMOJI_CATEGORY" ON "emoji" ("category")`)
+		await queryRunner.query(`CREATE INDEX IF NOT EXISTS  "IDX_EMOJI_CATEGORY" ON "emoji" USING gin ("category");`)
 	}
 
 	async down(queryRunner) {

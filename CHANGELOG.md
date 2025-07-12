@@ -279,7 +279,6 @@
 - Fix: ノートの閲覧にログイン必須にしてもFeedでノートが表示されてしまう問題を修正
 - Fix: 絵文字の連合でライセンス欄を相互にやり取りするように ( #10859, #14109 )
 - Fix: ロックダウンされた期間指定のノートがStreaming経由でLTLに出現するのを修正 ( #15200 )
-- Fix: disableClustering設定時の初期化ロジックを調整( #15223 )
 - Fix: URLとURIが異なるエンティティの照会に失敗する問題を修正( #15039 )
 - Fix: ActivityPubリクエストかどうかの判定が正しくない問題を修正  
   (Cherry-picked from https://github.com/MisskeyIO/misskey/pull/869)

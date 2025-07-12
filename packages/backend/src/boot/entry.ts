@@ -88,15 +88,15 @@ process.on('warning', warning => {
 
 //#endregion
 
-if (!envOption.disableClustering) {
+if (cluster.isPrimary || envOption.disableClustering) {
+	await masterMain();
+
 	if (cluster.isPrimary) {
-		coreLogger.info(`Start main process... pid: ${process.pid}`);
-		await masterMain();
 		ev.mount();
 	}
 }
 
-if (cluster.isWorker) {
+if (cluster.isWorker || envOption.disableClustering) {
 	await workerMain();
 }
 

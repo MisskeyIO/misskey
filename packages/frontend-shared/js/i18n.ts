@@ -149,7 +149,7 @@ export class I18n<T extends ILocale> {
 		}
 
 		function build(target: ILocale): Tsx<T> {
-			const result = {} as Tsx<T>;
+			const result = {} as TODO;
 
 			for (const k in target) {
 				if (!Object.hasOwn(target, k)) {
@@ -159,7 +159,7 @@ export class I18n<T extends ILocale> {
 				const value = target[k as keyof typeof target];
 
 				if (typeof value === 'object') {
-					(result as TODO)[k] = build(value as ILocale);
+					result[k] = build(value as ILocale);
 				} else if (typeof value === 'string') {
 					const quasis: string[] = [];
 					const expressions: string[] = [];
@@ -186,18 +186,86 @@ export class I18n<T extends ILocale> {
 						continue;
 					}
 
-					(result as TODO)[k] = (arg: TODO) => {
+					result[k] = (arg: TODO) => {
 						let str = quasis[0];
 
 						for (let i = 0; i < expressions.length; i++) {
-							str += arg[expressions[i]] + quasis[i + 1];
+							// Add null check for arg and provide fallback
+							const paramValue = arg?.[expressions[i]] ?? `{${expressions[i]}}`;
+							str += paramValue + quasis[i + 1];
 						}
 
 						return str;
 					};
 				}
 			}
-			return result;
+
+			// Add error handling with Proxy
+			return new Proxy(result, {
+				get(obj, prop) {
+					// If property exists, return it
+					if (prop in obj) {
+						return obj[prop];
+					}
+
+					// Handle missing properties by looking in the original target
+					const value = target[prop as keyof typeof target];
+
+					if (!value) {
+						// Return a function that returns the key for missing translations
+						return () => String(prop);
+					}
+
+					if (typeof value === 'object') {
+						return obj[prop] = build(value as ILocale);
+					} else if (typeof value === 'string') {
+						const quasis: string[] = [];
+						const expressions: string[] = [];
+						let cursor = 0;
+
+						while (~cursor) {
+							const start = value.indexOf('{', cursor);
+
+							if (!~start) {
+								quasis.push(value.slice(cursor));
+								break;
+							}
+
+							quasis.push(value.slice(cursor, start));
+
+							const end = value.indexOf('}', start);
+
+							expressions.push(value.slice(start + 1, end));
+
+							cursor = end + 1;
+						}
+
+						if (!expressions.length) {
+							// For non-parameterized strings, return the value directly
+							return value;
+						}
+
+						// Create and cache the function
+						const fn = (arg: TODO) => {
+							let str = quasis[0];
+
+							for (let i = 0; i < expressions.length; i++) {
+								// Add null check for arg and provide fallback
+								const paramValue = arg?.[expressions[i]] ?? `{${expressions[i]}}`;
+								str += paramValue + quasis[i + 1];
+							}
+
+							return str;
+						};
+
+						obj[prop] = fn;
+						return fn;
+					}
+
+					// Fallback
+					return () => String(prop);
+				}
+			}) as Tsx<T>;
 		}
 
 		return this.tsxCache = build(this.locale);

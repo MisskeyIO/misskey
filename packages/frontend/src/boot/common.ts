@@ -4,19 +4,19 @@
  */
 
 import { computed, watch, version as vueVersion } from 'vue';
+import type { App } from 'vue';
 import { compareVersions } from 'compare-versions';
 import { version, lang, updateLocale, locale, apiUrl } from '@@/js/config.js';
 import defaultLightTheme from '@@/themes/l-light.json5';
 import defaultDarkTheme from '@@/themes/d-green-lime.json5';
 import { createGtag, addGtag, consent as gtagConsent } from 'vue-gtag';// FIXME Google Analytics 周りの機能のチェック
-import type { App } from 'vue';
 import type { GtagConsentParams } from '@/types/gtag';
 import widgets from '@/widgets/index.js';
 import directives from '@/directives/index.js';
 import components from '@/components/index.js';
 import { applyTheme } from '@/theme.js';
 import { isDeviceDarkmode } from '@/utility/is-device-darkmode.js';
-import { updateI18n, i18n } from '@/i18n.js';
+import { i18n } from '@/i18n.js';
 import { refreshCurrentAccount, login } from '@/accounts.js';
 import { store } from '@/store.js';
 import { fetchInstance, instance } from '@/instance.js';
@@ -25,7 +25,6 @@ import { reloadChannel } from '@/utility/unison-reload.js';
 import { getUrlWithoutLoginId } from '@/utility/login-id.js';
 import { getAccountFromId } from '@/utility/get-account-from-id.js';
 import { deckStore } from '@/ui/deck/deck-store.js';
-import { analytics, initAnalytics } from '@/analytics.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { fetchCustomEmojis } from '@/custom-emojis.js';
 import { prefer } from '@/preferences.js';
@@ -252,19 +251,6 @@ export async function common(createVue: () => Promise<App<Element>>) {
 	try {
 		await fetchCustomEmojis();
 	} catch (err) { /* empty */ }
-
-	// analytics
-	fetchInstanceMetaPromise.then(async () => {
-		await initAnalytics(instance);
-
-		if ($i) {
-			analytics.identify($i.id);
-		}
-
-		analytics.page({
-			path: window.location.pathname,
-		});
-	});
 
 	const app = await createVue();
 

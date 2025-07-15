@@ -7,21 +7,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 <PageWithHeader :actions="headerActions" :tabs="headerTabs">
 	<div class="_spacer" style="--MI_SPACER-w: 700px; --MI_SPACER-min: 16px; --MI_SPACER-max: 32px;">
 		<FormSuspense :p="init">
-			<div class="_gaps_m">
-				<MkFolder>
-					<template #label>Google Analytics<span class="_beta">{{ i18n.ts.beta }}</span></template>
-
-					<div class="_gaps_m">
-						<MkInput v-model="googleAnalyticsMeasurementId">
-							<template #prefix><i class="ti ti-key"></i></template>
-							<template #label>Measurement ID</template>
-						</MkInput>
-						<MkButton primary @click="save_googleAnalytics">Save</MkButton>
-					</div>
-				</MkFolder>
-
-				<MkFolder>
-					<template #label>DeepL Translation</template>
+			<MkFolder>
+				<template #label>DeepL Translation</template>
 
 				<div class="_gaps_m">
 					<MkInput v-model="deeplAuthKey">
@@ -41,9 +28,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<template #prefix><i class="ti ti-report-analytics"></i></template>
 						<template #label>Google Analytics ID</template>
 					</MkInput>
-					</div>
-				</MkFolder>
-			</div>
+				</div>
+			</MkFolder>
 		</FormSuspense>
 	</div>
 	<template #footer>
@@ -73,15 +59,10 @@ const deeplAuthKey = ref<string>('');
 const deeplIsPro = ref<boolean>(false);
 const googleAnalyticsId = ref<string>('');
 
-const googleAnalyticsMeasurementId = ref<string>('');
-
-// FIXME atode naosu
-
 async function init() {
 	const meta = await misskeyApi('admin/meta');
-	deeplAuthKey.value = meta.deeplAuthKey ?? '';
+	deeplAuthKey.value = meta.deeplAuthKey;
 	deeplIsPro.value = meta.deeplIsPro;
-	googleAnalyticsMeasurementId.value = meta.googleAnalyticsMeasurementId ?? '';
 	googleAnalyticsId.value = meta.googleAnalyticsId;
 }
 
@@ -90,14 +71,6 @@ function save() {
 		deeplAuthKey: deeplAuthKey.value,
 		deeplIsPro: deeplIsPro.value,
 		googleAnalyticsId: googleAnalyticsId.value,
-	}).then(() => {
-		fetchInstance(true);
-	});
-}
-
-function save_googleAnalytics() {
-	os.apiWithDialog('admin/update-meta', {
-		googleAnalyticsMeasurementId: googleAnalyticsMeasurementId.value,
 	}).then(() => {
 		fetchInstance(true);
 	});

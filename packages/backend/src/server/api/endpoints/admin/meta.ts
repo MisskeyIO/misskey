@@ -75,10 +75,6 @@ export const meta = {
 				type: 'string',
 				optional: false, nullable: true,
 			},
-			googleAnalyticsMeasurementId: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
 			swPublickey: {
 				type: 'string',
 				optional: false, nullable: true,
@@ -592,7 +588,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				enableTurnstile: instance.enableTurnstile,
 				turnstileSiteKey: instance.turnstileSiteKey,
 				googleAnalyticsId: instance.googleAnalyticsId,
-				googleAnalyticsMeasurementId: instance.googleAnalyticsMeasurementId,
 				swPublickey: instance.swPublicKey,
 				themeColor: instance.themeColor,
 				mascotImageUrl: instance.mascotImageUrl,

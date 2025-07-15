@@ -98,7 +98,6 @@ export class MetaEntityService {
 			turnstileSiteKey: instance.turnstileSiteKey,
 			googleAnalyticsId: instance.googleAnalyticsId,
 			enableTestcaptcha: instance.enableTestcaptcha,
-			googleAnalyticsMeasurementId: instance.googleAnalyticsMeasurementId,
 			swPublickey: instance.swPublicKey,
 			themeColor: instance.themeColor,
 			mascotImageUrl: instance.mascotImageUrl ?? '/assets/ai.png',

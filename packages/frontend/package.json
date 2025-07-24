@@ -73,7 +73,7 @@
 		"uuid": "11.1.0",
 		"v-code-diff": "1.13.1",
 		"vite": "6.3.5",
-		"vue": "3.5.13",
+		"vue": "3.5.18",
 		"vue-gtag": "3.5.0",
 		"vuedraggable": "next",
 		"webgl-audiovisualizer": "managed"

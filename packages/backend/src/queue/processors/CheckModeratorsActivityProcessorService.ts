@@ -9,11 +9,11 @@ import type Logger from '@/logger.js';
 import { bindThis } from '@/decorators.js';
 import { MetaService } from '@/core/MetaService.js';
 import { RoleService } from '@/core/RoleService.js';
-import { EmailService } from '@/core/EmailService.js';
 import { MiUser, type UserProfilesRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { SystemWebhookService } from '@/core/SystemWebhookService.js';
 import { AnnouncementService } from '@/core/AnnouncementService.js';
+import { QueueService } from '@/core/QueueService.js';
 import { QueueLoggerService } from '../QueueLoggerService.js';
 
 // モデレーターが不在と判断する日付の閾値
@@ -104,9 +104,9 @@ export class CheckModeratorsActivityProcessorService {
 		private userProfilesRepository: UserProfilesRepository,
 		private metaService: MetaService,
 		private roleService: RoleService,
-		private emailService: EmailService,
 		private announcementService: AnnouncementService,
 		private systemWebhookService: SystemWebhookService,
+		private queueService: QueueService,
 		private queueLoggerService: QueueLoggerService,
 	) {
 		this.logger = this.queueLoggerService.logger.createSubLogger('check-moderators-activity');
@@ -225,7 +225,7 @@ export class CheckModeratorsActivityProcessorService {
 		for (const moderator of moderators) {
 			const profile = moderatorProfiles.get(moderator.id);
 			if (profile && profile.email && profile.emailVerified) {
-				this.emailService.sendEmail(profile.email, mail.subject, mail.html, mail.text);
+				this.queueService.createSendEmailJob(profile.email, mail.subject, mail.html, mail.text);
 			}
 		}
 
@@ -258,7 +258,7 @@ export class CheckModeratorsActivityProcessorService {
 
 			const profile = moderatorProfiles.get(moderator.id);
 			if (profile && profile.email && profile.emailVerified) {
-				this.emailService.sendEmail(profile.email, mail.subject, mail.html, mail.text);
+				this.queueService.createSendEmailJob(profile.email, mail.subject, mail.html, mail.text);
 			}
 		}
 

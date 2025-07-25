@@ -11,6 +11,7 @@ import { DI } from '@/di-symbols.js';
 import type Logger from '@/logger.js';
 import { bindThis } from '@/decorators.js';
 import { CheckModeratorsActivityProcessorService } from '@/queue/processors/CheckModeratorsActivityProcessorService.js';
+import { SendEmailProcessorService } from '@/queue/processors/SendEmailProcessor.js';
 import { UserWebhookDeliverProcessorService } from './processors/UserWebhookDeliverProcessorService.js';
 import { SystemWebhookDeliverProcessorService } from './processors/SystemWebhookDeliverProcessorService.js';
 import { EndedPollNotificationProcessorService } from './processors/EndedPollNotificationProcessorService.js';
@@ -130,6 +131,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		private checkModeratorsActivityProcessorService: CheckModeratorsActivityProcessorService,
 		private checkMissingScheduledNoteProcessorService: CheckMissingScheduledNoteProcessorService,
 		private cleanProcessorService: CleanProcessorService,
+		private sendEmailProcessorService: SendEmailProcessorService,
 	) {
 		this.logger = this.queueLoggerService.logger;
 
@@ -183,6 +185,8 @@ export class QueueProcessorService implements OnApplicationShutdown {
 						return this.checkModeratorsActivityProcessorService.process();
 					case 'clean':
 						return this.cleanProcessorService.process();
+					case 'sendEmail':
+						return this.sendEmailProcessorService.process(job);
 					default:
 						throw new Error(`unrecognized job type ${job.name} for system`);
 				}

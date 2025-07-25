@@ -441,6 +441,19 @@ export class QueueService {
 	}
 
 	@bindThis
+	public createSendEmailJob(to: string, subject: string, html: string, text: string) {
+		return this.systemQueue.add('sendEmail', {
+			to,
+			subject,
+			html,
+			text,
+		}, {
+			removeOnComplete: true,
+			removeOnFail: true,
+		});
+	}
+
+	@bindThis
 	public createScheduledNoteJob(draftId: MiScheduledNote['id'], scheduledAt: Date) {
 		return this.systemQueue.add('scheduledNote', {
 			draftId,

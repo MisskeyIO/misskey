@@ -8,7 +8,6 @@ import { page } from '@/router.definition.js';
 import { $i } from '@/i.js';
 import { Nirax } from '@/lib/nirax.js';
 import { ROUTE_DEF } from '@/router.definition.js';
-import { analytics } from '@/analytics.js';
 import { DI } from '@/di.js';
 
 export type Router = Nirax<typeof ROUTE_DEF>;
@@ -33,10 +32,6 @@ mainRouter.addListener('replace', ctx => {
 
 mainRouter.addListener('change', ctx => {
 	if (_DEV_) console.log('mainRouter: change', ctx.fullPath);
-	analytics.page({
-		path: ctx.fullPath,
-		title: ctx.fullPath,
-	});
 });
 
 mainRouter.init();

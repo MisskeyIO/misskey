@@ -22,9 +22,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</template>
 	</template>
 
-	<div :class="$style.root" class="_forceShrinkSpacer">
-		<StackingRouterView v-if="prefer.s['experimental.stackingRouterView']" :key="reloadCount" :router="windowRouter"/>
-		<RouterView v-else :key="reloadCount" :router="windowRouter"/>
+	<div :key="reloadCount" :class="$style.root" class="_forceShrinkSpacer">
+		<StackingRouterView v-if="prefer.s['experimental.stackingRouterView']" :router="windowRouter"/>
+		<RouterView v-else :router="windowRouter"/>
 	</div>
 </MkWindow>
 </template>
@@ -33,7 +33,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, nextTick, onMounted, onUnmounted, provide, ref, useTemplateRef } from 'vue';
 import { url } from '@@/js/config.js';
 import { pageview } from 'vue-gtag';
-import type { PageMetadata } from '@/scripts/page-metadata.js';
+import type { PageMetadata } from '@/page.js';
 import RouterView from '@/components/global/RouterView.vue';
 import MkWindow from '@/components/MkWindow.vue';
 import { popout as _popout } from '@/utility/popout.js';
@@ -42,11 +42,10 @@ import { i18n } from '@/i18n.js';
 import { provideMetadataReceiver, provideReactiveMetadata } from '@/page.js';
 import { openingWindowsCount } from '@/os.js';
 import { createRouter, mainRouter } from '@/router.js';
-import { analytics } from '@/analytics.js';
 import { DI } from '@/di.js';
 import { prefer } from '@/preferences.js';
 import { instance } from '@/instance.js';
-import { claimAchievement } from '@/scripts/achievements.js';
+import { claimAchievement } from '@/utility/achievements.js';
 
 const props = defineProps<{
 	initialPath: string;
@@ -63,11 +62,20 @@ const windowEl = useTemplateRef('windowEl');
 const history = ref<{ path: string; }[]>([{
 	path: windowRouter.getCurrentFullPath(),
 }]);
+
+type WindowButton = {
+	title: string;
+	icon: string;
+	onClick: () => void;
+	highlighted?: boolean;
+};
+
 const buttonsLeft = computed(() => {
-	const buttons: Record<string, unknown>[] = [];
+	const buttons: WindowButton[] = [];
 
 	if (history.value.length > 1) {
 		buttons.push({
+			title: i18n.ts.goBack,
 			icon: 'ti ti-arrow-left',
 			onClick: back,
 		});
@@ -76,7 +84,7 @@ const buttonsLeft = computed(() => {
 	return buttons;
 });
 const buttonsRight = computed(() => {
-	const buttons = [{
+	const buttons: WindowButton[] = [{
 		icon: 'ti ti-reload',
 		title: i18n.ts.reload,
 		onClick: reload,
@@ -110,10 +118,15 @@ windowRouter.addListener('replace', ctx => {
 windowRouter.addListener('change', ctx => {
 	if (_DEV_) console.log('windowRouter: change', ctx.fullPath);
 	searchMarkerId.value = getSearchMarker(ctx.fullPath);
-	analytics.page({
-		path: ctx.fullPath,
-		title: ctx.fullPath,
-	});
+
+	if (instance.googleAnalyticsId) {
+		nextTick(() =>
+			pageview({
+				page_title: pageMetadata.value?.title,
+				page_path: ctx.fullPath,
+			}),
+		);
+	}
 });
 
 windowRouter.init();
@@ -127,21 +140,6 @@ provideMetadataReceiver((metadataGetter) => {
 provideReactiveMetadata(pageMetadata);
 provide('shouldOmitHeaderTitle', true);
 provide('shouldHeaderThin', true);
-
-if (instance.googleAnalyticsId) {
-	pageview({
-		page_title: pageMetadata.value?.title,
-		page_path: windowRouter.getCurrentPath(),
-	});
-	windowRouter.afterEach(() =>
-		nextTick(() =>
-			pageview({
-				page_title: pageMetadata.value?.title,
-				page_path: windowRouter.getCurrentPath(),
-			}),
-		),
-	);
-}
 
 const contextmenu = computed(() => ([{
 	icon: 'ti ti-player-eject',

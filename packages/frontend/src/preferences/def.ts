@@ -194,10 +194,10 @@ export const PREF_DEF = {
 		default: 'auto' as 'auto' | 'popup' | 'drawer',
 	},
 	useBlurEffectForModal: {
-		default: DEFAULT_DEVICE_KIND === 'desktop',
+		default: false,
 	},
 	useBlurEffect: {
-		default: DEFAULT_DEVICE_KIND === 'desktop',
+		default: false,
 	},
 	useStickyIcons: {
 		default: true,

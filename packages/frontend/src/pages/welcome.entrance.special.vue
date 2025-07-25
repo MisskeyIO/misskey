@@ -21,8 +21,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<MarqueeText :duration="40">
 			<MkA v-for="instance in instances" :key="instance.id" :class="$style.federationInstance" :to="`/instance-info/${instance.host}`" behavior="window">
 				<!--<MkInstanceCardMini :instance="instance"/>-->
-				<img v-if="instance.iconUrl" class="icon" :src="getInstanceIcon(instance)" alt=""/>
-				<span class="name _monospace">{{ instance.host }}</span>
+				<img v-if="instance.iconUrl" :class="$style.icon" :src="getInstanceIcon(instance)" alt=""/>
+				<span :class="[$style.name, $style['_monospace']]">{{ instance.host }}</span>
 			</MkA>
 		</MarqueeText>
 	</div>
@@ -211,5 +211,17 @@ misskeyApiGet('federation/instances', {
 	height: 20px;
 	margin-right: 5px;
 	border-radius: 999px;
+}
+
+.icon {
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	margin-right: 5px;
+	border-radius: 999px;
+}
+
+.name {
+
 }
 </style>

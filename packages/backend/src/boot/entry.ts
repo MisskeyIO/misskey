@@ -12,7 +12,7 @@ import { EventEmitter } from 'node:events';
 import process from 'node:process';
 import chalk from 'chalk';
 import Xev from 'xev';
-import logger, { coreLogger } from '@/logger.js';
+import { coreLogger } from '@/logger.js';
 import { envOption } from '../env.js';
 import { masterMain } from './master.js';
 import { workerMain } from './worker.js';

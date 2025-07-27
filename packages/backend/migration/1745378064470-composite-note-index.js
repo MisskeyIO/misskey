@@ -5,6 +5,7 @@
 
 export class CompositeNoteIndex1745378064470 {
 	name = 'CompositeNoteIndex1745378064470';
+	transaction = false;
 
 	async up(queryRunner) {
 		await queryRunner.query(`CREATE INDEX CONCURRENTLY "IDX_724b311e6f883751f261ebe378" ON "note" ("userId", "id" DESC)`);

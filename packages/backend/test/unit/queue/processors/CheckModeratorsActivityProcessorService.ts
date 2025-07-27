@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { jest } from '@jest/globals';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, jest, test } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as lolex from '@sinonjs/fake-timers';
 import { addHours, addSeconds, subDays, subHours, subSeconds } from 'date-fns';
@@ -19,6 +19,7 @@ import { EmailService } from '@/core/EmailService.js';
 import { SystemWebhookService } from '@/core/SystemWebhookService.js';
 import { AnnouncementService } from '@/core/AnnouncementService.js';
 import { SystemWebhookEventType } from '@/models/SystemWebhook.js';
+import { QueueService } from '@/core/QueueService.js';
 
 const baseDate = new Date(Date.UTC(2000, 11, 15, 12, 0, 0));
 
@@ -36,6 +37,7 @@ describe('CheckModeratorsActivityProcessorService', () => {
 	let announcementService: jest.Mocked<AnnouncementService>;
 	let emailService: jest.Mocked<EmailService>;
 	let systemWebhookService: jest.Mocked<SystemWebhookService>;
+	let queueService: jest.Mocked<QueueService>;
 
 	let systemWebhook1: MiSystemWebhook;
 	let systemWebhook2: MiSystemWebhook;
@@ -122,6 +124,9 @@ describe('CheckModeratorsActivityProcessorService', () => {
 							}),
 						}),
 					},
+					{
+						provide: QueueService, useFactory: () => ({ createSendEmailJob: jest.fn() }),
+					},
 				],
 			})
 			.compile();
@@ -135,6 +140,7 @@ describe('CheckModeratorsActivityProcessorService', () => {
 		announcementService = app.get(AnnouncementService) as jest.Mocked<AnnouncementService>;
 		emailService = app.get(EmailService) as jest.Mocked<EmailService>;
 		systemWebhookService = app.get(SystemWebhookService) as jest.Mocked<SystemWebhookService>;
+		queueService = app.get(QueueService) as jest.Mocked<QueueService>;
 
 		app.enableShutdownHooks();
 	});
@@ -149,7 +155,7 @@ describe('CheckModeratorsActivityProcessorService', () => {
 		systemWebhook2 = crateSystemWebhook({ on: ['inactiveModeratorsWarning', 'inactiveModeratorsInvitationOnlyChanged'] });
 		systemWebhook3 = crateSystemWebhook({ on: ['abuseReport'] });
 
-		emailService.sendEmail.mockReturnValue(Promise.resolve());
+		queueService.createSendEmailJob.mockReturnValue(Promise.resolve({} as never));
 		announcementService.create.mockReturnValue(Promise.resolve({} as never));
 		systemWebhookService.fetchActiveSystemWebhooks.mockResolvedValue([systemWebhook1, systemWebhook2, systemWebhook3]);
 		systemWebhookService.enqueueSystemWebhook.mockReturnValue(Promise.resolve({} as never));
@@ -161,7 +167,7 @@ describe('CheckModeratorsActivityProcessorService', () => {
 		await userProfilesRepository.createQueryBuilder().delete().execute();
 		roleService.getModerators.mockReset();
 		announcementService.create.mockReset();
-		emailService.sendEmail.mockReset();
+		queueService.createSendEmailJob.mockReset();
 		systemWebhookService.enqueueSystemWebhook.mockReset();
 	});
 

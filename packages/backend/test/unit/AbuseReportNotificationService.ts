@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { describe, jest } from '@jest/globals';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, jest, test } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { randomString } from '../utils.js';
 import { AbuseReportNotificationService } from '@/core/AbuseReportNotificationService.js';
@@ -28,6 +28,7 @@ import { GlobalEventService } from '@/core/GlobalEventService.js';
 import { RecipientMethod } from '@/models/AbuseReportNotificationRecipient.js';
 import { SystemWebhookService } from '@/core/SystemWebhookService.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import { QueueService } from '@/core/QueueService.js';
 
 process.env.NODE_ENV = 'test';
 
@@ -45,6 +46,7 @@ describe('AbuseReportNotificationService', () => {
 	let roleService: jest.Mocked<RoleService>;
 	let emailService: jest.Mocked<EmailService>;
 	let webhookService: jest.Mocked<SystemWebhookService>;
+	let queueService: jest.Mocked<QueueService>;
 
 	// --------------------------------------------------------------------------------------
 
@@ -130,6 +132,9 @@ describe('AbuseReportNotificationService', () => {
 					{
 						provide: GlobalEventService, useFactory: () => ({ publishAdminStream: jest.fn() }),
 					},
+					{
+						provide: QueueService, useFactory: () => ({ createSendEmailJob: jest.fn() }),
+					},
 				],
 			})
 			.compile();
@@ -144,6 +149,7 @@ describe('AbuseReportNotificationService', () => {
 		roleService = app.get(RoleService) as jest.Mocked<RoleService>;
 		emailService = app.get<EmailService>(EmailService) as jest.Mocked<EmailService>;
 		webhookService = app.get<SystemWebhookService>(SystemWebhookService) as jest.Mocked<SystemWebhookService>;
+		queueService = app.get<QueueService>(QueueService) as jest.Mocked<QueueService>;
 
 		app.enableShutdownHooks();
 	});
@@ -159,7 +165,7 @@ describe('AbuseReportNotificationService', () => {
 	});
 
 	afterEach(async () => {
-		emailService.sendEmail.mockClear();
+		queueService.createSendEmailJob.mockClear();
 		webhookService.enqueueSystemWebhook.mockClear();
 
 		await usersRepository.createQueryBuilder().delete().execute();

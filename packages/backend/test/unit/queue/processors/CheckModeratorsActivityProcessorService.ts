@@ -328,8 +328,8 @@ describe('CheckModeratorsActivityProcessorService', () => {
 			mockModeratorRole([user1, user2, user3, root]);
 			await service.notifyInactiveModeratorsWarning({ time: 1, asDays: 0, asHours: 0 });
 
-			expect(emailService.sendEmail).toHaveBeenCalledTimes(2);
-			expect(emailService.sendEmail.mock.calls[0][0]).toBe('user1@example.com');
+			expect(queueService.createSendEmailJob).toHaveBeenCalledTimes(2);
+			expect(queueService.createSendEmailJob.mock.calls[0][0]).toBe('user1@example.com');
 			expect(emailService.sendEmail.mock.calls[1][0]).toBe('root@example.com');
 		});
 
@@ -367,9 +367,9 @@ describe('CheckModeratorsActivityProcessorService', () => {
 			expect(announcementService.create.mock.calls[2][0].userId).toBe(user3.id);
 			expect(announcementService.create.mock.calls[3][0].userId).toBe(root.id);
 
-			expect(emailService.sendEmail).toHaveBeenCalledTimes(2);
-			expect(emailService.sendEmail.mock.calls[0][0]).toBe('user1@example.com');
-			expect(emailService.sendEmail.mock.calls[1][0]).toBe('root@example.com');
+			expect(queueService.createSendEmailJob).toHaveBeenCalledTimes(2);
+			expect(queueService.createSendEmailJob.mock.calls[0][0]).toBe('user1@example.com');
+			expect(queueService.createSendEmailJob.mock.calls[1][0]).toBe('root@example.com');
 		});
 
 		test('[systemWebhook] "inactiveModeratorsInvitationOnlyChanged"が有効なSystemWebhookに対して送信される', async () => {

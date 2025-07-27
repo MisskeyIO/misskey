@@ -330,7 +330,7 @@ describe('CheckModeratorsActivityProcessorService', () => {
 
 			expect(queueService.createSendEmailJob).toHaveBeenCalledTimes(2);
 			expect(queueService.createSendEmailJob.mock.calls[0][0]).toBe('user1@example.com');
-			expect(emailService.sendEmail.mock.calls[1][0]).toBe('root@example.com');
+			expect(queueService.createSendEmailJob.mock.calls[1][0]).toBe('root@example.com');
 		});
 
 		test('[systemWebhook] "inactiveModeratorsWarning"が有効なSystemWebhookに対して送信される', async () => {

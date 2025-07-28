@@ -22,7 +22,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkA v-for="instance in instances" :key="instance.id" :class="$style.federationInstance" :to="`/instance-info/${instance.host}`" behavior="window">
 				<!--<MkInstanceCardMini :instance="instance"/>-->
 				<img v-if="instance.iconUrl" :class="$style.icon" :src="getInstanceIcon(instance)" alt=""/>
-				<span :class="[$style.name, $style['_monospace']]">{{ instance.host }}</span>
+				<span :class="[$style.name, '_monospace']">{{ instance.host }}</span>
 			</MkA>
 		</MarqueeText>
 	</div>

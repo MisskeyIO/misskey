@@ -10731,6 +10731,10 @@ export interface Locale extends ILocale {
              */
             "test": string;
             /**
+             * ファイルがセンシティブとして設定された
+             */
+            "sensitiveFlagAssigned": string;
+            /**
              * 連携アプリからの通知
              */
             "app": string;

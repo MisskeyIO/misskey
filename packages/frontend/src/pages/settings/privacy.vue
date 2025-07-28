@@ -193,27 +193,29 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<!--			</FormSection>-->
 		<!--		</SearchMarker>-->
 
-		<FormSection v-if="instance.googleAnalyticsId">
-			<MkFolder :defaultOpen="true">
-				<template #icon><i class="ti ti-lock-square"></i></template>
-				<template #label>{{ i18n.ts.gtagConsentCustomize }}</template>
-				<div class="_gaps_s">
-					<MkInfo>{{ i18n.tsx.gtagConsentCustomizeDescription({ host: instance.name ?? host }) }}</MkInfo>
-					<MkSwitch v-model="gtagConsentAnalytics">
-						{{ i18n.ts.gtagConsentAnalytics }}
-						<template #caption>{{ i18n.ts.gtagConsentAnalyticsDescription }}</template>
-					</MkSwitch>
-					<MkSwitch v-model="gtagConsentFunctionality">
-						{{ i18n.ts.gtagConsentFunctionality }}
-						<template #caption>{{ i18n.ts.gtagConsentFunctionalityDescription }}</template>
-					</MkSwitch>
-					<MkSwitch v-model="gtagConsentPersonalization">
-						{{ i18n.ts.gtagConsentPersonalization }}
-						<template #caption>{{ i18n.ts.gtagConsentPersonalizationDescription }}</template>
-					</MkSwitch>
-				</div>
-			</MkFolder>
-		</FormSection>
+		<SearchMarker :label="i18n.ts.gtagConsentCustomize" :keywords="['analytics', 'privacy']">
+			<FormSection v-if="instance.googleAnalyticsId">
+				<MkFolder :defaultOpen="true">
+					<template #icon><i class="ti ti-lock-square"></i></template>
+					<template #label>{{ i18n.ts.gtagConsentCustomize }}</template>
+					<div class="_gaps_s">
+						<MkInfo>{{ i18n.tsx.gtagConsentCustomizeDescription({ host: instance.name ?? host }) }}</MkInfo>
+						<MkSwitch v-model="gtagConsentAnalytics">
+							{{ i18n.ts.gtagConsentAnalytics }}
+							<template #caption>{{ i18n.ts.gtagConsentAnalyticsDescription }}</template>
+						</MkSwitch>
+						<MkSwitch v-model="gtagConsentFunctionality">
+							{{ i18n.ts.gtagConsentFunctionality }}
+							<template #caption>{{ i18n.ts.gtagConsentFunctionalityDescription }}</template>
+						</MkSwitch>
+						<MkSwitch v-model="gtagConsentPersonalization">
+							{{ i18n.ts.gtagConsentPersonalization }}
+							<template #caption>{{ i18n.ts.gtagConsentPersonalizationDescription }}</template>
+						</MkSwitch>
+					</div>
+				</MkFolder>
+			</FormSection>
+		</SearchMarker>
 	</div>
 </SearchMarker>
 </template>
@@ -232,9 +234,6 @@ import { i18n } from '@/i18n.js';
 import { instance } from '@/instance.js';
 import { ensureSignin } from '@/i.js';
 import { definePage } from '@/page.js';
-import FormSlot from '@/components/form/slot.vue';
-import { formatDateTimeString } from '@/utility/format-time-string.js';
-import MkInput from '@/components/MkInput.vue';
 import * as os from '@/os.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { unisonReload } from '@/utility/unison-reload.js';

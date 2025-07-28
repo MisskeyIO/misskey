@@ -9571,6 +9571,7 @@ export type operations = {
             federation: 'all' | 'specified' | 'none';
             federationHosts: string[];
             prohibitedWordsForNameOfUser: string[];
+            inquiryUrl: string | null;
           };
         };
       };

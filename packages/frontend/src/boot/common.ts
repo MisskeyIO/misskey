@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { computed, watch, version as vueVersion } from 'vue';
-import type { App } from 'vue';
+import { watch, version as vueVersion } from 'vue';
 import { compareVersions } from 'compare-versions';
-import { version, lang, updateLocale, locale, apiUrl } from '@@/js/config.js';
+import { version, lang, apiUrl } from '@@/js/config.js';
 import defaultLightTheme from '@@/themes/l-light.json5';
 import defaultDarkTheme from '@@/themes/d-green-lime.json5';
 import { createGtag, addGtag, consent as gtagConsent } from 'vue-gtag';// FIXME Google Analytics 周りの機能のチェック
+import type { App } from 'vue';
 import type { GtagConsentParams } from '@/types/gtag';
 import widgets from '@/widgets/index.js';
 import directives from '@/directives/index.js';
@@ -261,7 +261,6 @@ export async function common(createVue: () => Promise<App<Element>>) {
 	widgets(app);
 	directives(app);
 	components(app);
-
 	if (instance.googleAnalyticsId) {
 		app.use(createGtag( {
 			tagId: instance.googleAnalyticsId,

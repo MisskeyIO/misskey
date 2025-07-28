@@ -49,18 +49,18 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
+import { host } from '@@/js/config.js';
+import { addGtag, consent as gtagConsent, set as gtagSet } from 'vue-gtag';
+import type { GtagConsentParams } from '@/types/gtag.js';
 import MkButton from '@/components/MkButton.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import { miLocalStorage } from '@/local-storage.js';
 import { instance } from '@/instance.js';
-import { host } from '@@/js/config.js';
 import { i18n } from '@/i18n.js';
 import { $i } from '@/i.js';
 import * as os from '@/os.js';
-import { addGtag, consent as gtagConsent, set as gtagSet } from 'vue-gtag';
-import type { GtagConsentParams } from '@/types/gtag.js';
 
 const emit = defineEmits<(ev: 'closed') => void>();
 

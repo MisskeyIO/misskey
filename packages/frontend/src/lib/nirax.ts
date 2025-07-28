@@ -77,6 +77,8 @@ export type PathResolvedResult = {
 	};
 };
 
+export type AfterNavigationHook = (to: RouteDef, from: RouteDef) => any;
+
 function parsePath(path: string): ParsedPath {
 	const res = [] as ParsedPath;
 
@@ -111,6 +113,7 @@ export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvents> {
 	private isLoggedIn: boolean;
 	private notFoundPageComponent: Component;
 	private redirectCount = 0;
+	private afterHooks: Array<AfterNavigationHook | null> = [];
 
 	public navHook: ((fullPath: string, flag?: RouterFlag) => boolean) | null = null;
 
@@ -131,6 +134,22 @@ export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvents> {
 		this.emit('replace', {
 			fullPath: res._parsedRoute.fullPath,
 		});
+	}
+
+	public isReady() {
+		return Promise.resolve(true);
+	}
+
+	public afterEach(hook: AfterNavigationHook): AfterNavigationHook | undefined {
+		this.afterHooks.push(hook);
+		return () => {
+			const index = this.afterHooks.indexOf(hook);
+			if (index !== -1) {
+				return this.afterHooks.splice(index, 1);
+			} else {
+				return undefined;
+			}
+		};
 	}
 
 	public resolve(fullPath: string): PathResolvedResult | null {
@@ -258,6 +277,8 @@ export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvents> {
 
 	private navigate(fullPath: string, emitChange = true, _redirected = false): PathResolvedResult {
 		const beforeFullPath = this.currentFullPath;
+		const beforeRoute = this.currentRoute.value;
+
 		this.currentFullPath = fullPath;
 
 		const res = this.resolve(this.currentFullPath);
@@ -297,6 +318,12 @@ export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvents> {
 				fullPath,
 				resolved: res,
 			});
+		}
+
+		if (this.afterHooks.length > 0) {
+			for (const hook of this.afterHooks) {
+				if (hook) hook(res.route, beforeRoute);
+			}
 		}
 
 		this.redirectCount = 0;

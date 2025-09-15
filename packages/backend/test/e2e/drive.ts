@@ -43,8 +43,8 @@ describe('Drive', () => {
 		const file = await catcher;
 
 		assert.strictEqual(res.status, 204);
-		assert.strictEqual(file.name, '192.jpg');
-		assert.strictEqual(file.type, 'image/jpeg');
+		assert.strictEqual(file.name, '192.png');
+		assert.strictEqual(file.type, 'image/png');
 	});
 
 	test('ローカルからアップロードできる', async () => {

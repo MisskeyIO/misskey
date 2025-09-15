@@ -25,7 +25,7 @@ describe('Drive', () => {
 
 		const marker = Math.random().toString();
 
-		const url = 'https://raw.githubusercontent.com/mattyatea/misskey/merge-upstream/packages/backend/test/resources/192.jpg'; //FIXME 書き換えないといけない
+		const url = 'https://misskey.io/static-assets/icons/192.png';
 
 		const catcher = makeStreamCatcher(
 			alice,

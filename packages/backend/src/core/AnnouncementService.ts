@@ -80,12 +80,12 @@ export class AnnouncementService {
 
 	@bindThis
 	public async create(values: Partial<MiAnnouncement>, moderator?: MiUser): Promise<{ raw: MiAnnouncement; packed: Packed<'Announcement'> }> {
-		const announcement = await this.announcementsRepository.insert({
+		const announcement = await this.announcementsRepository.insertOne({
 			id: this.idService.gen(),
 			updatedAt: null,
 			title: values.title,
 			text: values.text,
-			imageUrl: values.imageUrl,
+			imageUrl: values.imageUrl || null,
 			icon: values.icon,
 			display: values.display,
 			forExistingUsers: values.forExistingUsers,
@@ -95,7 +95,7 @@ export class AnnouncementService {
 			closeDuration: values.closeDuration,
 			displayOrder: values.displayOrder,
 			userId: values.userId,
-		}).then(x => this.announcementsRepository.findOneByOrFail(x.identifiers[0]));
+		});
 
 		const packed = (await this.announcementEntityService.packMany([announcement], null))[0];
 
@@ -171,7 +171,7 @@ export class AnnouncementService {
 			id: In(announcements.map(a => a.userId).filter(id => id != null)),
 		});
 		const packedUsers = await this.userEntityService.packMany(users, moderator, {
-			schema: 'UserLite'
+			schema: 'UserLite',
 		});
 
 		return announcements.map(announcement => ({
@@ -377,6 +377,13 @@ export class AnnouncementService {
 			});
 		} catch (e) {
 			return;
+		}
+
+		const announcement = await this.announcementsRepository.findOneBy({ id: announcementId });
+		if (announcement != null && announcement.userId === user.id) {
+			await this.announcementsRepository.update(announcementId, {
+				isActive: false,
+			});
 		}
 
 		if ((await this.countUnreadAnnouncements(user)) === 0) {

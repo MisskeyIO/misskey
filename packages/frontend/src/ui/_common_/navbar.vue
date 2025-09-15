@@ -7,17 +7,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 <div :class="[$style.root, { [$style.iconOnly]: iconOnly }]">
 	<div :class="$style.body">
 		<div :class="$style.top">
-			<div :class="$style.banner" :style="{ backgroundImage: `url(${ instance.bannerUrl })` }"></div>
 			<button v-tooltip.noDelay.right="instance.name ?? i18n.ts.instance" class="_button" :class="$style.instance" @click="openInstanceMenu">
 				<img v-if="kawaiiMode" src="/client-assets/kawaii/misskey-io.png" alt="" :class="$style.instanceIconAlt"/>
-				<img v-else :src="instance.iconUrl || instance.faviconUrl || '/favicon.ico'" alt="" :class="$style.instanceIcon"/>
+				<img v-else :src="instance.iconUrl || instance.faviconUrl || '/favicon.ico'" alt="" :class="$style.instanceIcon" style="view-transition-name: navbar-serverIcon;"/>
 			</button>
 		</div>
 		<div :class="$style.middle">
 			<MkA v-tooltip.noDelay.right="i18n.ts.timeline" :class="$style.item" :activeClass="$style.active" to="/" exact>
-				<i :class="$style.itemIcon" class="ti ti-home ti-fw"></i><span :class="$style.itemText">{{ i18n.ts.timeline }}</span>
+				<i :class="$style.itemIcon" class="ti ti-home ti-fw" style="view-transition-name: navbar-homeIcon;"></i><span :class="$style.itemText">{{ i18n.ts.timeline }}</span>
 			</MkA>
-			<template v-for="item in menu">
+			<template v-for="item in prefer.r.menu.value">
 				<div v-if="item === '-'" :class="$style.divider"></div>
 				<component
 					:is="navbarItemDef[item].to ? 'MkA' : 'button'"
@@ -29,32 +28,64 @@ SPDX-License-Identifier: AGPL-3.0-only
 					:to="navbarItemDef[item].to"
 					v-on="navbarItemDef[item].action ? { click: navbarItemDef[item].action } : {}"
 				>
-					<i class="ti-fw" :class="[$style.itemIcon, navbarItemDef[item].icon]"></i><span :class="$style.itemText">{{ navbarItemDef[item].title }}</span>
-					<span v-if="navbarItemDef[item].indicated" :class="$style.itemIndicator">
+					<i class="ti-fw" :class="[$style.itemIcon, navbarItemDef[item].icon]" :style="{ viewTransitionName: 'navbar-item-' + item }"></i><span :class="$style.itemText">{{ navbarItemDef[item].title }}</span>
+					<span v-if="navbarItemDef[item].indicated" :class="$style.itemIndicator" class="_blink">
 						<span v-if="navbarItemDef[item].indicateValue" class="_indicateCounter" :class="$style.itemIndicateValueIcon">{{ navbarItemDef[item].indicateValue }}</span>
 						<i v-else class="_indicatorCircle"></i>
 					</span>
 				</component>
 			</template>
 			<div :class="$style.divider"></div>
-			<MkA v-if="$i.isAdmin || $i.isModerator" v-tooltip.noDelay.right="i18n.ts.controlPanel" :class="$style.item" :activeClass="$style.active" to="/admin">
-				<i :class="$style.itemIcon" class="ti ti-dashboard ti-fw"></i><span :class="$style.itemText">{{ i18n.ts.controlPanel }}</span>
+			<MkA v-if="$i != null && ($i.isAdmin || $i.isModerator)" v-tooltip.noDelay.right="i18n.ts.controlPanel" :class="$style.item" :activeClass="$style.active" to="/admin">
+				<i :class="$style.itemIcon" class="ti ti-dashboard ti-fw" style="view-transition-name: navbar-controlPanel;"></i><span :class="$style.itemText">{{ i18n.ts.controlPanel }}</span>
 			</MkA>
 			<button class="_button" :class="$style.item" @click="more">
-				<i :class="$style.itemIcon" class="ti ti-grid-dots ti-fw"></i><span :class="$style.itemText">{{ i18n.ts.more }}</span>
-				<span v-if="otherMenuItemIndicated" :class="$style.itemIndicator"><i class="_indicatorCircle"></i></span>
+				<i :class="$style.itemIcon" class="ti ti-grid-dots ti-fw" style="view-transition-name: navbar-more;"></i><span :class="$style.itemText">{{ i18n.ts.more }}</span>
+				<span v-if="otherMenuItemIndicated" :class="$style.itemIndicator" class="_blink"><i class="_indicatorCircle"></i></span>
 			</button>
 			<MkA v-tooltip.noDelay.right="i18n.ts.settings" :class="$style.item" :activeClass="$style.active" to="/settings">
-				<i :class="$style.itemIcon" class="ti ti-settings ti-fw"></i><span :class="$style.itemText">{{ i18n.ts.settings }}</span>
+				<i :class="$style.itemIcon" class="ti ti-settings ti-fw" style="view-transition-name: navbar-settings;"></i><span :class="$style.itemText">{{ i18n.ts.settings }}</span>
 			</MkA>
 		</div>
 		<div :class="$style.bottom">
-			<button v-tooltip.noDelay.right="i18n.ts.note" class="_button" :class="[$style.post]" data-cy-open-post-form @click="os.post">
+			<button v-if="showWidgetButton" class="_button" :class="[$style.widget]" @click="() => emit('widgetButtonClick')">
+				<i class="ti ti-apps ti-fw"></i>
+			</button>
+			<button v-tooltip.noDelay.right="i18n.ts.note" class="_button" :class="[$style.post]" data-cy-open-post-form @click="() => { os.post(); }">
 				<i class="ti ti-pencil ti-fw" :class="$style.postIcon"></i><span :class="$style.postText">{{ i18n.ts.note }}</span>
 			</button>
-			<button v-tooltip.noDelay.right="`${i18n.ts.account}: @${$i.username}`" class="_button" :class="[$style.account]" @click="openAccountMenu">
-				<MkAvatar :user="$i" :class="$style.avatar"/><MkAcct class="_nowrap" :class="$style.acct" :user="$i"/>
+			<button v-if="$i != null" v-tooltip.noDelay.right="`${i18n.ts.account}: @${$i.username}`" class="_button" :class="[$style.account]" @click="openAccountMenu">
+				<MkAvatar :user="$i" :class="$style.avatar" style="view-transition-name: navbar-avatar;"/><MkAcct class="_nowrap" :class="$style.acct" :user="$i"/>
 			</button>
+		</div>
+	</div>
+
+	<!--
+	<svg viewBox="0 0 16 48" :class="$style.subButtonShape">
+		<g transform="matrix(0.333333,0,0,0.222222,0.000895785,13.3333)">
+			<path d="M23.935,-24C37.223,-24 47.995,-7.842 47.995,12.09C47.995,34.077 47.995,62.07 47.995,84.034C47.995,93.573 45.469,102.721 40.972,109.466C36.475,116.211 30.377,120 24.018,120L23.997,120C10.743,120 -0.003,136.118 -0.003,156C-0.003,156 -0.003,156 -0.003,156L-0.003,-60L-0.003,-59.901C-0.003,-50.379 2.519,-41.248 7.007,-34.515C11.496,-27.782 17.584,-24 23.931,-24C23.932,-24 23.934,-24 23.935,-24Z" style="fill:var(--MI_THEME-navBg);"/>
+		</g>
+	</svg>
+	-->
+
+	<div v-if="!forceIconOnly && prefer.r.showNavbarSubButtons.value" :class="$style.subButtons">
+		<div :class="[$style.subButton, $style.menuEditButton]">
+			<svg viewBox="0 0 16 64" :class="$style.subButtonShape">
+				<g transform="matrix(0.333333,0,0,0.222222,0.000895785,21.3333)">
+					<path d="M47.488,7.995C47.79,10.11 47.943,12.266 47.943,14.429C47.997,26.989 47.997,84 47.997,84C47.997,84 44.018,118.246 23.997,133.5C-0.374,152.07 -0.003,192 -0.003,192L-0.003,-96C-0.003,-96 0.151,-56.216 23.997,-37.5C40.861,-24.265 46.043,-1.243 47.488,7.995Z" style="fill:var(--MI_THEME-navBg);"/>
+				</g>
+			</svg>
+			<button class="_button" :class="$style.subButtonClickable" @click="menuEdit"><i :class="$style.subButtonIcon" class="ti ti-settings-2"></i></button>
+		</div>
+		<div :class="$style.subButtonGapFill"></div>
+		<div :class="$style.subButtonGapFillDivider"></div>
+		<div :class="[$style.subButton, $style.toggleButton]">
+			<svg viewBox="0 0 16 64" :class="$style.subButtonShape">
+				<g transform="matrix(0.333333,0,0,0.222222,0.000895785,21.3333)">
+					<path d="M47.488,7.995C47.79,10.11 47.943,12.266 47.943,14.429C47.997,26.989 47.997,84 47.997,84C47.997,84 44.018,118.246 23.997,133.5C-0.374,152.07 -0.003,192 -0.003,192L-0.003,-96C-0.003,-96 0.151,-56.216 23.997,-37.5C40.861,-24.265 46.043,-1.243 47.488,7.995Z" style="fill:var(--MI_THEME-navBg);"/>
+				</g>
+			</svg>
+			<button class="_button" :class="$style.subButtonClickable" @click="toggleIconOnly"><i v-if="iconOnly" class="ti ti-chevron-right" :class="$style.subButtonIcon"></i><i v-else class="ti ti-chevron-left" :class="$style.subButtonIcon"></i></button>
 		</div>
 	</div>
 </div>
@@ -65,35 +96,59 @@ import { computed, defineAsyncComponent, ref, watch } from 'vue';
 import { openInstanceMenu } from './common.js';
 import * as os from '@/os.js';
 import { navbarItemDef } from '@/navbar.js';
-import { $i, openAccountMenu as openAccountMenu_ } from '@/account.js';
-import { defaultStore } from '@/store.js';
+import { store } from '@/store.js';
 import { i18n } from '@/i18n.js';
 import { instance } from '@/instance.js';
+import { getHTMLElementOrNull } from '@/utility/get-dom-node-or-null.js';
+import { useRouter } from '@/router.js';
+import { prefer } from '@/preferences.js';
+import { openAccountMenu as openAccountMenu_ } from '@/accounts.js';
+import { $i } from '@/i.js';
 import { miLocalStorage } from '@/local-storage.js';
 
-const iconOnly = ref(false);
+const router = useRouter();
+
+const props = defineProps<{
+	showWidgetButton?: boolean;
+}>();
 const kawaiiMode = miLocalStorage.getItem('kawaii') === 'true';
 
-const menu = computed(() => defaultStore.state.menu);
+const emit = defineEmits<{
+	(ev: 'widgetButtonClick'): void;
+}>();
+
+const forceIconOnly = ref(window.innerWidth <= 1279);
+const iconOnly = computed(() => {
+	return forceIconOnly.value || (store.r.menuDisplay.value === 'sideIcon');
+});
+
 const otherMenuItemIndicated = computed(() => {
 	for (const def in navbarItemDef) {
-		if (menu.value.includes(def)) continue;
+		if (prefer.r.menu.value.includes(def)) continue;
 		if (navbarItemDef[def].indicated) return true;
 	}
 	return false;
 });
 
-const calcViewState = () => {
-	iconOnly.value = (window.innerWidth <= 1279) || (defaultStore.state.menuDisplay === 'sideIcon');
-};
-
-calcViewState();
+function calcViewState() {
+	forceIconOnly.value = window.innerWidth <= 1279;
+}
 
 window.addEventListener('resize', calcViewState);
 
-watch(defaultStore.reactiveState.menuDisplay, () => {
+watch(store.r.menuDisplay, () => {
 	calcViewState();
 });
+
+function toggleIconOnly() {
+	if (window.document.startViewTransition && prefer.s.animation) {
+		window.document.startViewTransition(() => {
+			store.set('menuDisplay', iconOnly.value ? 'sideFull' : 'sideIcon');
+		});
+	} else {
+		store.set('menuDisplay', iconOnly.value ? 'sideFull' : 'sideIcon');
+	}
+}
 
 function openAccountMenu(ev: MouseEvent) {
 	openAccountMenu_({
@@ -102,10 +157,17 @@ function openAccountMenu(ev: MouseEvent) {
 }
 
 function more(ev: MouseEvent) {
-	os.popup(defineAsyncComponent(() => import('@/components/MkLaunchPad.vue')), {
-		src: ev.currentTarget ?? ev.target,
+	const target = getHTMLElementOrNull(ev.currentTarget ?? ev.target);
+	if (!target) return;
+	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkLaunchPad.vue')), {
+		src: target,
 	}, {
-	}, 'closed');
+		closed: () => dispose(),
+	});
+}
+
+function menuEdit() {
+	router.push('/settings/navbar');
 }
 </script>
 
@@ -113,6 +175,9 @@ function more(ev: MouseEvent) {
 .root {
 	--nav-width: 250px;
 	--nav-icon-only-width: 80px;
+	--nav-bg-transparent: color(from var(--MI_THEME-navBg) srgb r g b / 0.5);
+
+	--subButtonWidth: 20px;
 
 	flex: 0 0 var(--nav-width);
 	width: var(--nav-width);
@@ -120,20 +185,106 @@ function more(ev: MouseEvent) {
 }
 
 .body {
-	position: fixed;
-	top: 0;
-	left: 0;
-	z-index: 1001;
+	position: relative;
 	width: var(--nav-icon-only-width);
-	height: 100dvh;
+	height: 100%;
 	box-sizing: border-box;
 	overflow: auto;
 	overflow-x: clip;
 	overscroll-behavior: contain;
-	background: var(--navBg);
+	background: var(--MI_THEME-navBg);
 	contain: strict;
 	display: flex;
 	flex-direction: column;
+	direction: rtl; // スクロールバーを左に表示したいため
+}
+
+.top {
+	direction: ltr;
+}
+
+.middle {
+	direction: ltr;
+}
+
+.bottom {
+	direction: ltr;
+}
+
+.subButtons {
+	position: fixed;
+	left: var(--nav-width);
+	bottom: 80px;
+	z-index: 1001;
+	box-sizing: border-box;
+}
+
+.subButton {
+	display: block;
+	position: relative;
+	z-index: 1002;
+	width: var(--subButtonWidth);
+	height: 50px;
+	box-sizing: border-box;
+	align-content: center;
+}
+
+.subButtonShape {
+	position: absolute;
+	z-index: -1;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	margin: auto;
+	width: var(--subButtonWidth);
+	height: calc(var(--subButtonWidth) * 4);
+}
+
+.subButtonClickable {
+	position: absolute;
+	display: block;
+	max-width: unset;
+	width: 24px;
+	height: 42px;
+	top: 0;
+	bottom: 0;
+	left: -4px;
+	margin: auto;
+	font-size: 10px;
+
+	&:hover {
+		color: var(--MI_THEME-fgHighlighted);
+
+		.subButtonIcon {
+			opacity: 1;
+		}
+	}
+}
+
+.subButtonIcon {
+	margin-left: -4px;
+	opacity: 0.7;
+}
+
+.subButtonGapFill {
+	position: relative;
+	z-index: 1001;
+	width: var(--subButtonWidth);
+	height: 64px;
+	margin-top: -32px;
+	margin-bottom: -32px;
+	pointer-events: none;
+	background: var(--MI_THEME-navBg);
+}
+
+.subButtonGapFillDivider {
+	position: relative;
+	z-index: 1010;
+	margin-left: -2px;
+	width: 14px;
+	height: 1px;
+	background: var(--MI_THEME-divider);
+	pointer-events: none;
 }
 
 .root:not(.iconOnly) {
@@ -146,21 +297,9 @@ function more(ev: MouseEvent) {
 		top: 0;
 		z-index: 1;
 		padding: 20px 0;
-		background: var(--X14);
-		-webkit-backdrop-filter: var(--blur, blur(8px));
-		backdrop-filter: var(--blur, blur(8px));
-	}
-
-	.banner {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background-size: cover;
-		background-position: center center;
-		-webkit-mask-image: linear-gradient(0deg, rgba(0,0,0,0) 15%, rgba(0,0,0,0.75) 100%);
-		mask-image: linear-gradient(0deg, rgba(0,0,0,0) 15%, rgba(0,0,0,0.75) 100%);
+		background: var(--nav-bg-transparent);
+		-webkit-backdrop-filter: var(--MI-blur, blur(8px));
+		backdrop-filter: var(--MI-blur, blur(8px));
 	}
 
 	.instance {
@@ -168,12 +307,22 @@ function more(ev: MouseEvent) {
 		display: block;
 		text-align: center;
 		width: 100%;
+
+		&:focus-visible {
+			outline: none;
+
+			> .instanceIcon {
+				outline: 2px solid var(--MI_THEME-focus);
+				outline-offset: 2px;
+			}
+		}
 	}
 
 	.instanceIcon {
 		display: inline-block;
 		width: 38px;
 		aspect-ratio: 1;
+		border-radius: 8px;
 	}
 
 	.instanceIconAlt {
@@ -185,9 +334,9 @@ function more(ev: MouseEvent) {
 		position: sticky;
 		bottom: 0;
 		padding-top: 20px;
-		background: var(--X14);
-		-webkit-backdrop-filter: var(--blur, blur(8px));
-		backdrop-filter: var(--blur, blur(8px));
+		background: var(--nav-bg-transparent);
+		-webkit-backdrop-filter: var(--MI-blur, blur(8px));
+		backdrop-filter: var(--MI-blur, blur(8px));
 	}
 
 	.post {
@@ -195,11 +344,11 @@ function more(ev: MouseEvent) {
 		display: block;
 		width: 100%;
 		height: 40px;
-		color: var(--fgOnAccent);
+		color: var(--MI_THEME-fgOnAccent);
 		font-weight: bold;
 		text-align: left;
 
-		&:before {
+		&::before {
 			content: "";
 			display: block;
 			width: calc(100% - 38px);
@@ -211,12 +360,21 @@ function more(ev: MouseEvent) {
 			right: 0;
 			bottom: 0;
 			border-radius: 999px;
-			background: linear-gradient(90deg, var(--buttonGradateA), var(--buttonGradateB));
+			background: linear-gradient(90deg, var(--MI_THEME-buttonGradateA), var(--MI_THEME-buttonGradateB));
+		}
+
+		&:focus-visible {
+			outline: none;
+
+			&::before {
+				outline: 2px solid var(--MI_THEME-fgOnAccent);
+				outline-offset: -4px;
+			}
 		}
 
 		&:hover, &.active {
-			&:before {
-				background: var(--accentLighten);
+			&::before {
+				background: hsl(from var(--MI_THEME-accent) h s calc(l + 10));
 			}
 		}
 	}
@@ -241,6 +399,14 @@ function more(ev: MouseEvent) {
 		text-align: left;
 		box-sizing: border-box;
 		overflow: clip;
+
+		&:focus-visible {
+			outline: none;
+
+			> .avatar {
+				box-shadow: 0 0 0 4px var(--MI_THEME-focus);
+			}
+		}
 	}
 
 	.avatar {
@@ -264,7 +430,7 @@ function more(ev: MouseEvent) {
 
 	.divider {
 		margin: 16px 16px;
-		border-top: solid 0.5px var(--divider);
+		border-top: solid 0.5px var(--MI_THEME-divider);
 	}
 
 	.item {
@@ -278,21 +444,30 @@ function more(ev: MouseEvent) {
 		width: 100%;
 		text-align: left;
 		box-sizing: border-box;
-		color: var(--navFg);
+		color: var(--MI_THEME-navFg);
 
 		&:hover {
 			text-decoration: none;
-			color: var(--navHoverFg);
+			color: light-dark(hsl(from var(--MI_THEME-navFg) h s calc(l - 17)), hsl(from var(--MI_THEME-navFg) h s calc(l + 17)));
 		}
 
 		&.active {
-			color: var(--navActive);
+			color: var(--MI_THEME-navActive);
 		}
 
-		&:hover, &.active {
-			color: var(--accent);
+		&:focus-visible {
+			outline: none;
 
-			&:before {
+			&::before {
+				outline: 2px solid var(--MI_THEME-focus);
+				outline-offset: -2px;
+			}
+		}
+
+		&:hover, &.active, &:focus {
+			color: var(--MI_THEME-accent);
+
+			&::before {
 				content: "";
 				display: block;
 				width: calc(100% - 34px);
@@ -304,7 +479,7 @@ function more(ev: MouseEvent) {
 				right: 0;
 				bottom: 0;
 				border-radius: 999px;
-				background: var(--accentedBg);
+				background: var(--MI_THEME-accentedBg);
 			}
 		}
 	}
@@ -319,9 +494,8 @@ function more(ev: MouseEvent) {
 		position: absolute;
 		top: 0;
 		left: 20px;
-		color: var(--navIndicator);
+		color: var(--MI_THEME-navIndicator);
 		font-size: 8px;
-		animation: global-blink 1s infinite;
 
 		&:has(.itemIndicateValueIcon) {
 			animation: none;
@@ -334,6 +508,10 @@ function more(ev: MouseEvent) {
 	.itemText {
 		position: relative;
 		font-size: 0.9em;
+	}
+
+	.subButtons {
+		left: var(--nav-width);
 	}
 }
 
@@ -350,21 +528,31 @@ function more(ev: MouseEvent) {
 		top: 0;
 		z-index: 1;
 		padding: 20px 0;
-		background: var(--X14);
-		-webkit-backdrop-filter: var(--blur, blur(8px));
-		backdrop-filter: var(--blur, blur(8px));
+		background: var(--nav-bg-transparent);
+		-webkit-backdrop-filter: var(--MI-blur, blur(8px));
+		backdrop-filter: var(--MI-blur, blur(8px));
 	}
 
 	.instance {
 		display: block;
 		text-align: center;
 		width: 100%;
+
+		&:focus-visible {
+			outline: none;
+
+			> .instanceIcon {
+				outline: 2px solid var(--MI_THEME-focus);
+				outline-offset: 2px;
+			}
+		}
 	}
 
 	.instanceIcon {
 		display: inline-block;
 		width: 30px;
 		aspect-ratio: 1;
+		border-radius: 8px;
 	}
 
 	.instanceIconAlt {
@@ -376,9 +564,17 @@ function more(ev: MouseEvent) {
 		position: sticky;
 		bottom: 0;
 		padding-top: 20px;
-		background: var(--X14);
-		-webkit-backdrop-filter: var(--blur, blur(8px));
-		backdrop-filter: var(--blur, blur(8px));
+		background: var(--nav-bg-transparent);
+		-webkit-backdrop-filter: var(--MI-blur, blur(8px));
+		backdrop-filter: var(--MI-blur, blur(8px));
+	}
+
+	.widget {
+		display: block;
+		position: relative;
+		width: 100%;
+		height: 52px;
+		text-align: center;
 	}
 
 	.post {
@@ -388,7 +584,7 @@ function more(ev: MouseEvent) {
 		height: 52px;
 		text-align: center;
 
-		&:before {
+		&::before {
 			content: "";
 			display: block;
 			position: absolute;
@@ -400,19 +596,28 @@ function more(ev: MouseEvent) {
 			width: 52px;
 			aspect-ratio: 1/1;
 			border-radius: 100%;
-			background: linear-gradient(90deg, var(--buttonGradateA), var(--buttonGradateB));
+			background: linear-gradient(90deg, var(--MI_THEME-buttonGradateA), var(--MI_THEME-buttonGradateB));
+		}
+
+		&:focus-visible {
+			outline: none;
+
+			&::before {
+				outline: 2px solid var(--MI_THEME-fgOnAccent);
+				outline-offset: -4px;
+			}
 		}
 
 		&:hover, &.active {
-			&:before {
-				background: var(--accentLighten);
+			&::before {
+				background: hsl(from var(--MI_THEME-accent) h s calc(l + 10));
 			}
 		}
 	}
 
 	.postIcon {
 		position: relative;
-		color: var(--fgOnAccent);
+		color: var(--MI_THEME-fgOnAccent);
 	}
 
 	.postText {
@@ -425,6 +630,14 @@ function more(ev: MouseEvent) {
 		padding: 20px 0;
 		width: 100%;
 		overflow: clip;
+
+		&:focus-visible {
+			outline: none;
+
+			> .avatar {
+				box-shadow: 0 0 0 4px var(--MI_THEME-focus);
+			}
+		}
 	}
 
 	.avatar {
@@ -444,7 +657,7 @@ function more(ev: MouseEvent) {
 	.divider {
 		margin: 8px auto;
 		width: calc(100% - 32px);
-		border-top: solid 0.5px var(--divider);
+		border-top: solid 0.5px var(--MI_THEME-divider);
 	}
 
 	.item {
@@ -454,11 +667,20 @@ function more(ev: MouseEvent) {
 		width: 100%;
 		text-align: center;
 
-		&:hover, &.active {
-			text-decoration: none;
-			color: var(--accent);
+		&:focus-visible {
+			outline: none;
 
-			&:before {
+			&::before {
+				outline: 2px solid var(--MI_THEME-focus);
+				outline-offset: -2px;
+			}
+		}
+
+		&:hover, &.active, &:focus {
+			text-decoration: none;
+			color: var(--MI_THEME-accent);
+
+			&::before {
 				content: "";
 				display: block;
 				height: 100%;
@@ -470,7 +692,7 @@ function more(ev: MouseEvent) {
 				right: 0;
 				bottom: 0;
 				border-radius: 999px;
-				background: var(--accentedBg);
+				background: var(--MI_THEME-accentedBg);
 			}
 
 			> .icon,
@@ -494,9 +716,8 @@ function more(ev: MouseEvent) {
 		position: absolute;
 		top: 6px;
 		left: 24px;
-		color: var(--navIndicator);
+		color: var(--MI_THEME-navIndicator);
 		font-size: 8px;
-		animation: global-blink 1s infinite;
 
 		&:has(.itemIndicateValueIcon) {
 			animation: none;
@@ -505,6 +726,10 @@ function more(ev: MouseEvent) {
 			right: 4px;
 			font-size: 10px;
 		}
+	}
+
+	.subButtons {
+		left: var(--nav-icon-only-width);
 	}
 }
 </style>

@@ -4,12 +4,14 @@
  */
 
 import MkRippleEffect from '@/components/MkRippleEffect.vue';
+import { prefer } from '@/preferences.js';
 import { popup } from '@/os.js';
 
 export default {
 	mounted(el, binding, vn) {
 		// 明示的に false であればバインドしない
 		if (binding.value === false) return;
+		if (!prefer.s.animation) return;
 
 		el.addEventListener('click', () => {
 			const rect = el.getBoundingClientRect();
@@ -17,7 +19,9 @@ export default {
 			const x = rect.left + (el.offsetWidth / 2);
 			const y = rect.top + (el.offsetHeight / 2);
 
-			popup(MkRippleEffect, { x, y }, {}, 'end');
+			const { dispose } = popup(MkRippleEffect, { x, y }, {
+				end: () => dispose(),
+			});
 		});
 	},
 };

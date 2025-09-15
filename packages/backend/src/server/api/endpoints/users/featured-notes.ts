@@ -9,8 +9,9 @@ import { Endpoint } from '@/server/api/endpoint-base.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { FeaturedService } from '@/core/FeaturedService.js';
-import { QueryService } from '@/core/QueryService.js';
 import { CacheService } from '@/core/CacheService.js';
+import { isUserRelated } from '@/misc/is-user-related.js';
+import { QueryService } from '@/core/QueryService.js';
 
 export const meta = {
 	tags: ['notes'],
@@ -48,8 +49,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 		private noteEntityService: NoteEntityService,
 		private featuredService: FeaturedService,
-		private queryService: QueryService,
 		private cacheService: CacheService,
+		private queryService: QueryService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const userIdsWhoBlockingMe = me ? await this.cacheService.userBlockedCache.fetch(me.id) : new Set<string>();
@@ -71,6 +72,12 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				return [];
 			}
 
+			const [
+				userIdsWhoMeMuting,
+			] = me ? await Promise.all([
+				this.cacheService.userMutingsCache.fetch(me.id),
+			]) : [new Set<string>()];
+
 			const query = this.notesRepository.createQueryBuilder('note')
 				.where('note.id IN (:...noteIds)', { noteIds: noteIds })
 				.innerJoinAndSelect('note.user', 'user')
@@ -80,14 +87,21 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				.leftJoinAndSelect('renote.user', 'renoteUser')
 				.leftJoinAndSelect('note.channel', 'channel');
 
+			this.queryService.generateBlockedHostQueryForNote(query);
 			this.queryService.generateVisibilityQuery(query, me);
-			if (me) this.queryService.generateMutedUserQuery(query, me);
-			if (me) this.queryService.generateBlockedUserQuery(query, me);
 
 			const notes = await query.getMany();
-			notes.sort((a, b) => a.id > b.id ? -1 : 1);
 
-			return await this.noteEntityService.packMany(notes, me);
+			// Filter out blocked/muted users
+			const filteredNotes = notes.filter(note => {
+				if (me && isUserRelated(note, userIdsWhoBlockingMe, false)) return false;
+				if (me && isUserRelated(note, userIdsWhoMeMuting, true)) return false;
+				return true;
+			});
+
+			filteredNotes.sort((a, b) => a.id > b.id ? -1 : 1);
+
+			return await this.noteEntityService.packMany(filteredNotes, me);
 		});
 	}
 }

@@ -12,12 +12,12 @@ import { DI } from '@/di-symbols.js';
 import { RoleService } from '@/core/RoleService.js';
 import { DownloadService } from '@/core/DownloadService.js';
 import { ApiError } from '../../error.js';
+// TODO: requireRolePolicy: 'canImportAntennas',
 
 export const meta = {
 	secure: true,
 	requireCredential: true,
-	requireRolePolicy: 'canCreateContent',
-
+	requiredRolePolicy: 'canCreateContent',
 	prohibitMoved: true,
 
 	limit: {

@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</template>
 		</I18n>
 	</template>
-	<MkSpacer :marginMin="20" :marginMax="28">
+	<div class="_spacer" style="--MI_SPACER-min: 20px; --MI_SPACER-max: 28px;">
 		<div class="_gaps_m" :class="$style.root">
 			<MkSelect v-model="category" :required="true">
 				<template #label>{{ i18n.ts.abuseReportCategory }}</template>
@@ -38,7 +38,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkTextarea>
 			<MkButton primary full :disabled="comment.length === 0 || category.length === 0" @click="send">{{ i18n.ts.send }}</MkButton>
 		</div>
-	</MkSpacer>
+	</div>
 </MkWindow>
 
 <MkWindow v-if="page === 2" ref="uiWindow2" :initialWidth="450" :initialHeight="250" :canResize="true" @closed="emit('closed')">
@@ -46,7 +46,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<i class="ti ti-circle-check" style="margin-right: 0.5em;"></i>
 		<span><MkAcct :user="props.user"/> {{ i18n.ts.reportComplete }}</span>
 	</template>
-	<MkSpacer :marginMin="20" :marginMax="28">
+	<div class="_spacer" style="--MI_SPACER-min: 20px; --MI_SPACER-max: 28px;">
 		<div class="_gaps_m" :class="$style.root">
 			<div>
 				<p style="margin-bottom: 20px;">{{ i18n.ts.abuseReported }}</p>
@@ -55,12 +55,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<MkButton :disabled="fullUserInfo?.isMuted" @click="muteUser">{{ i18n.ts.muteThisUser }}</MkButton>
 			</div>
 		</div>
-	</MkSpacer>
+	</div>
 </MkWindow>
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, Ref } from 'vue';
+import { ref, useTemplateRef } from 'vue';
+import type { Ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkWindow from '@/components/MkWindow.vue';
 import MkSelect from '@/components/MkSelect.vue';
@@ -68,10 +69,10 @@ import MkTextarea from '@/components/MkTextarea.vue';
 import MkButton from '@/components/MkButton.vue';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 
 const props = defineProps<{
-	user: Misskey.entities.UserDetailed;
+	user: Misskey.entities.UserLite;
 	initialComment?: string;
 }>();
 
@@ -79,8 +80,10 @@ const emit = defineEmits<{
 	(ev: 'closed'): void;
 }>();
 
-const uiWindow = shallowRef<InstanceType<typeof MkWindow>>();
-const uiWindow2 = shallowRef<InstanceType<typeof MkWindow>>();
+// FIXME 確認
+
+const uiWindow = useTemplateRef<InstanceType<typeof MkWindow>>('uiWindow');
+const uiWindow2 = useTemplateRef<InstanceType<typeof MkWindow>>('uiWindow2');
 const comment = ref(props.initialComment ?? '');
 const category = ref('');
 const page = ref(1);

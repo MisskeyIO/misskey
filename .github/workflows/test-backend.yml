@@ -11,17 +11,22 @@ on:
       - packages/backend/**
       # for permissions
       - packages/misskey-js/**
+      - .github/workflows/test-backend.yml
+      - .github/misskey/test.yml
   pull_request:
     paths:
       - packages/backend/**
       # for permissions
       - packages/misskey-js/**
+      - .github/workflows/test-backend.yml
+      - .github/misskey/test.yml
 
 permissions:
   contents: read
 
 jobs:
   unit:
+    name: Unit tests (backend)
     runs-on: ubuntu-latest
 
     strategy:
@@ -46,12 +51,12 @@ jobs:
           - 56312:6379
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v4.2.2
       with:
         fetch-depth: 0
         submodules: true
     - name: Install pnpm
-      uses: pnpm/action-setup@v4
+      uses: pnpm/action-setup@v4.1.0
       with:
         run_install: false
     - name: Restore FFmpeg binary cache
@@ -93,6 +98,7 @@ jobs:
         files: ./packages/backend/coverage/coverage-final.json
 
   e2e:
+    name: E2E tests (backend)
     runs-on: ubuntu-latest
 
     strategy:
@@ -117,12 +123,12 @@ jobs:
           - 56312:6379
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
           submodules: true
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v4.1.0
         with:
           run_install: false
       - name: Use Node.js ${{ matrix.node-version }}

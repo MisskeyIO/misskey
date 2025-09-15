@@ -1,12 +1,16 @@
+<!--
+SPDX-FileCopyrightText: syuilo and misskey-project
+SPDX-License-Identifier: AGPL-3.0-only
+-->
+
 <template>
-<MkStickyContainer>
-	<template #header><MkPageHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs"/></template>
-	<MkSpacer :contentMax="800">
+<PageWithHeader :actions="headerActions" :tabs="headerTabs">
+	<div class="_spacer" style="--MI_SPACER-w: 800px;">
 		<Transition
-			:enterActiveClass="defaultStore.state.animation ? $style.fadeEnterActive : ''"
-			:leaveActiveClass="defaultStore.state.animation ? $style.fadeLeaveActive : ''"
-			:enterFromClass="defaultStore.state.animation ? $style.fadeEnterFrom : ''"
-			:leaveToClass="defaultStore.state.animation ? $style.fadeLeaveTo : ''"
+			:enterActiveClass="prefer.s.animation ? $style.fadeEnterActive : ''"
+			:leaveActiveClass="prefer.s.animation ? $style.fadeLeaveActive : ''"
+			:enterFromClass="prefer.s.animation ? $style.fadeEnterFrom : ''"
+			:leaveToClass="prefer.s.animation ? $style.fadeLeaveTo : ''"
 			mode="out-in"
 		>
 			<div v-if="announcement" :key="announcement.id" class="_panel" :class="$style.announcement">
@@ -15,14 +19,14 @@
 					<span v-if="$i && !announcement.silence && !announcement.isRead" style="margin-right: 0.5em;">🆕</span>
 					<span style="margin-right: 0.5em;">
 						<i v-if="announcement.icon === 'info'" class="ti ti-info-circle"></i>
-						<i v-else-if="announcement.icon === 'warning'" class="ti ti-alert-triangle" style="color: var(--warn);"></i>
-						<i v-else-if="announcement.icon === 'error'" class="ti ti-circle-x" style="color: var(--error);"></i>
-						<i v-else-if="announcement.icon === 'success'" class="ti ti-check" style="color: var(--success);"></i>
+						<i v-else-if="announcement.icon === 'warning'" class="ti ti-alert-triangle" style="color: var(--MI_THEME-warn);"></i>
+						<i v-else-if="announcement.icon === 'error'" class="ti ti-circle-x" style="color: var(--MI_THEME-error);"></i>
+						<i v-else-if="announcement.icon === 'success'" class="ti ti-check" style="color: var(--MI_THEME-success);"></i>
 					</span>
-					<Mfm :text="announcement.title"/>
+					<Mfm :text="announcement.title" class="_selectable"/>
 				</div>
 				<div :class="$style.content">
-					<Mfm :text="announcement.text"/>
+					<Mfm :text="announcement.text" class="_selectable"/>
 					<img v-if="announcement.imageUrl" :src="announcement.imageUrl"/>
 					<MkA :to="`/announcements/${announcement.id}`">
 						<div style="margin-top: 8px; opacity: 0.7; font-size: 85%;">
@@ -43,8 +47,8 @@
 			<MkError v-else-if="error" @retry="fetch()"/>
 			<MkLoading v-else/>
 		</Transition>
-	</MkSpacer>
-</MkStickyContainer>
+	</div>
+</PageWithHeader>
 </template>
 
 <script lang="ts" setup>
@@ -52,11 +56,12 @@ import { ref, computed, watch, defineAsyncComponent } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@/components/MkButton.vue';
 import * as os from '@/os.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
-import { $i, updateAccount } from '@/account.js';
-import { defaultStore } from '@/store.js';
+import { definePage } from '@/page.js';
+import { $i } from '@/i.js';
+import { prefer } from '@/preferences.js';
+import { updateCurrentAccountPartial } from '@/accounts.js';
 
 const props = defineProps<{
 	announcementId: string;
@@ -68,7 +73,7 @@ const path = computed(() => props.announcementId);
 
 function fetch() {
 	announcement.value = null;
-	misskeyApi('announcement', {
+	misskeyApi('announcements/show', {
 		announcementId: props.announcementId,
 	}).then(async _announcement => {
 		announcement.value = _announcement;
@@ -101,7 +106,7 @@ async function read(announcement): Promise<void> {
 	announcement.isRead = true;
 	await misskeyApi('i/read-announcement', { announcementId: announcement.id });
 	if ($i) {
-		updateAccount({
+		updateCurrentAccountPartial({
 			unreadAnnouncements: $i.unreadAnnouncements.filter((a: { id: string; }) => a.id !== announcement.id),
 		});
 	}
@@ -113,13 +118,22 @@ const headerActions = computed(() => []);
 
 const headerTabs = computed(() => []);
 
-definePageMetadata(() => ({
-	title: announcement.value ? `${i18n.ts.announcements}: ${announcement.value.title}` : i18n.ts.announcements,
+definePage(() => ({
+	title: announcement.value ? announcement.value.title : i18n.ts.announcements,
 	icon: 'ti ti-speakerphone',
 }));
 </script>
 
 <style lang="scss" module>
+.fadeEnterActive,
+.fadeLeaveActive {
+	transition: opacity 0.125s ease;
+}
+.fadeEnterFrom,
+.fadeLeaveTo {
+	opacity: 0;
+}
+
 .announcement {
 	padding: 16px;
 }

@@ -14,15 +14,16 @@ import {
 	UploadPartCommand,
 } from '@aws-sdk/client-s3';
 import { mockClient } from 'aws-sdk-client-mock';
+import type { TestingModule } from '@nestjs/testing';
 import { GlobalModule } from '@/GlobalModule.js';
 import { CoreModule } from '@/core/CoreModule.js';
 import { S3Service } from '@/core/S3Service.js';
 import { MiMeta } from '@/models/_.js';
-import type { TestingModule } from '@nestjs/testing';
 
 describe('S3Service', () => {
 	let app: TestingModule;
 	let s3Service: S3Service;
+	// aws-sdk-client-mockの型定義と@aws-sdk/client-s3の型定義が一致しないので、一時的な処置
 	const s3Mock = mockClient(S3Client);
 
 	beforeAll(async () => {

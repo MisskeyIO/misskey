@@ -1,4 +1,4 @@
-name: Test (backend)
+name: api.json validation
 
 on:
   push:
@@ -9,9 +9,11 @@ on:
       - host
     paths:
       - packages/backend/**
+      - .github/workflows/validate-api-json.yml
   pull_request:
     paths:
       - packages/backend/**
+      - .github/workflows/validate-api-json.yml
 
 permissions:
   contents: read
@@ -25,7 +27,7 @@ jobs:
         node-version: [22.x]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v4.2.2
       with:
         fetch-depth: 0
         submodules: true

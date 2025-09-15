@@ -5,16 +5,15 @@
 
 // https://github.com/typeorm/typeorm/issues/2400
 import pg from 'pg';
-pg.types.setTypeParser(20, Number);
 
-import { DataSource, Logger, QueryRunner } from 'typeorm';
+import { DataSource, Logger, type QueryRunner } from 'typeorm';
 import { QueryResultCache } from 'typeorm/cache/QueryResultCache.js';
 import { QueryResultCacheOptions } from 'typeorm/cache/QueryResultCacheOptions.js';
 import * as highlight from 'cli-highlight';
 import { entities as charts } from '@/core/chart/entities.js';
-
 import { MiAbuseReportResolver } from '@/models/AbuseReportResolver.js';
 import { MiAbuseUserReport } from '@/models/AbuseUserReport.js';
+import { MiAbuseReportNotificationRecipient } from '@/models/AbuseReportNotificationRecipient.js';
 import { MiAccessToken } from '@/models/AccessToken.js';
 import { MiAd } from '@/models/Ad.js';
 import { MiAnnouncement } from '@/models/Announcement.js';
@@ -48,7 +47,6 @@ import { MiScheduledNote } from '@/models/ScheduledNote.js';
 import { MiNoteFavorite } from '@/models/NoteFavorite.js';
 import { MiNoteReaction } from '@/models/NoteReaction.js';
 import { MiNoteThreadMuting } from '@/models/NoteThreadMuting.js';
-import { MiNoteUnread } from '@/models/NoteUnread.js';
 import { MiPage } from '@/models/Page.js';
 import { MiPageLike } from '@/models/PageLike.js';
 import { MiPasswordResetRequest } from '@/models/PasswordResetRequest.js';
@@ -76,6 +74,7 @@ import { MiUserPublickey } from '@/models/UserPublickey.js';
 import { MiUserSecurityKey } from '@/models/UserSecurityKey.js';
 import { MiUserAccountMoveLog } from '@/models/UserAccountMoveLog.js';
 import { MiWebhook } from '@/models/Webhook.js';
+import { MiSystemWebhook } from '@/models/SystemWebhook.js';
 import { MiChannel } from '@/models/Channel.js';
 import { MiRetentionAggregation } from '@/models/RetentionAggregation.js';
 import { MiRole } from '@/models/Role.js';
@@ -83,41 +82,96 @@ import { MiRoleAssignment } from '@/models/RoleAssignment.js';
 import { MiFlash } from '@/models/Flash.js';
 import { MiFlashLike } from '@/models/FlashLike.js';
 import { MiUserMemo } from '@/models/UserMemo.js';
+import { MiChatMessage } from '@/models/ChatMessage.js';
+import { MiChatRoom } from '@/models/ChatRoom.js';
+import { MiChatRoomMembership } from '@/models/ChatRoomMembership.js';
+import { MiChatRoomInvitation } from '@/models/ChatRoomInvitation.js';
 import { MiBubbleGameRecord } from '@/models/BubbleGameRecord.js';
 import { MiReversiGame } from '@/models/ReversiGame.js';
+import { MiChatApproval } from '@/models/ChatApproval.js';
+import { MiSystemAccount } from '@/models/SystemAccount.js';
 
 import { Config } from '@/config.js';
 import { bindThis } from '@/decorators.js';
 import MisskeyLogger from '@/logger.js';
 import { envOption } from './env.js';
 
+pg.types.setTypeParser(20, Number);
+
 export const dbLogger = new MisskeyLogger('db');
 
 const sqlLogger = dbLogger.createSubLogger('sql', 'gray', false);
 
+export type LoggerProps = {
+	disableQueryTruncation?: boolean;
+	enableQueryParamLogging?: boolean;
+	printReplicationMode?: boolean,
+};
+
+function highlightSql(sql: string) {
+	return highlight.highlight(sql, {
+		language: 'sql', ignoreIllegals: true,
+	});
+}
+
+function truncateSql(sql: string) {
+	return sql.length > 100 ? `${sql.substring(0, 100)}...` : sql;
+}
+
+function stringifyParameter(param: any) {
+	if (param instanceof Date) {
+		return param.toISOString();
+	} else {
+		return param;
+	}
+}
+
 class MyCustomLogger implements Logger {
+	constructor(private props: LoggerProps = {}) {
+	}
+
 	@bindThis
-	private highlight(sql: string) {
+	private transformQueryLog(sql: string, opts?: {
+		prefix?: string;
+	}) {
+		let modded = opts?.prefix ? opts.prefix + sql : sql;
+		if (!this.props.disableQueryTruncation) {
+			modded = truncateSql(modded);
+		}
+
 		if (envOption.logJson) return sql;
 
-		return highlight.highlight(sql, {
-			language: 'sql', ignoreIllegals: true,
-		});
+		return highlightSql(modded);
+	}
+
+	@bindThis
+	private transformParameters(parameters?: any[]) {
+		if (this.props.enableQueryParamLogging && parameters && parameters.length > 0) {
+			return parameters.map(stringifyParameter);
+		}
+
+		return undefined;
 	}
 
 	@bindThis
 	public logQuery(query: string, parameters?: any[]) {
-		sqlLogger.debug(this.highlight(query));
+		sqlLogger.debug(this.transformQueryLog(query));
 	}
 
 	@bindThis
-	public logQueryError(error: string, query: string, parameters?: any[]) {
-		sqlLogger.error(this.highlight(query));
+	public logQueryError(error: string, query: string, parameters?: any[], queryRunner?: QueryRunner) {
+		const prefix = (this.props.printReplicationMode && queryRunner)
+			? `[${queryRunner.getReplicationMode()}] `
+			: undefined;
+		sqlLogger.error(this.transformQueryLog(query, { prefix }), this.transformParameters(parameters));
 	}
 
 	@bindThis
-	public logQuerySlow(time: number, query: string, parameters?: any[]) {
-		sqlLogger.warn(this.highlight(query));
+	public logQuerySlow(time: number, query: string, parameters?: any[], queryRunner?: QueryRunner) {
+		const prefix = (this.props.printReplicationMode && queryRunner)
+			? `[${queryRunner.getReplicationMode()}] `
+			: undefined;
+		sqlLogger.warn(this.transformQueryLog(query, { prefix }), this.transformParameters(parameters));
 	}
 
 	@bindThis
@@ -167,7 +221,6 @@ export const entities = [
 	MiNoteFavorite,
 	MiNoteReaction,
 	MiNoteThreadMuting,
-	MiNoteUnread,
 	MiPage,
 	MiPageLike,
 	MiGalleryPost,
@@ -180,7 +233,9 @@ export const entities = [
 	MiHashtag,
 	MiIndieAuthClient,
 	MiSwSubscription,
+	MiSystemAccount,
 	MiAbuseUserReport,
+	MiAbuseReportNotificationRecipient,
 	MiRegistrationTicket,
 	MiSignin,
 	MiSingleSignOnServiceProvider,
@@ -200,6 +255,7 @@ export const entities = [
 	MiPasswordResetRequest,
 	MiUserPending,
 	MiWebhook,
+	MiSystemWebhook,
 	MiUserIp,
 	MiRetentionAggregation,
 	MiRole,
@@ -207,6 +263,11 @@ export const entities = [
 	MiFlash,
 	MiFlashLike,
 	MiUserMemo,
+	MiChatMessage,
+	MiChatRoom,
+	MiChatRoomMembership,
+	MiChatRoomInvitation,
+	MiChatApproval,
 	MiBubbleGameRecord,
 	MiReversiGame,
 	...charts,
@@ -345,7 +406,13 @@ export function createPostgresDataSource(config: Config) {
 			},
 		} : false,
 		logging: log,
-		logger: log ? new MyCustomLogger() : undefined,
+		logger: log
+			? new MyCustomLogger({
+				disableQueryTruncation: config.logging?.sql?.disableQueryTruncation,
+				enableQueryParamLogging: config.logging?.sql?.enableQueryParamLogging,
+				printReplicationMode: !!config.dbReplications,
+			})
+			: undefined,
 		maxQueryExecutionTime: 10000, // 10s
 		entities: entities,
 		migrations: ['../../migration/*.js'],

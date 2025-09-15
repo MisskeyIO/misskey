@@ -4,7 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<div :class="[hide ? $style.hidden : $style.visible, (image.isSensitive && defaultStore.state.highlightSensitiveMedia) && $style.sensitive]" :style="darkMode ? '--c: rgb(255 255 255 / 2%);' : '--c: rgb(0 0 0 / 2%);'" @click="showHiddenContent">
+<div :class="[hide ? $style.hidden : $style.visible, (image.isSensitive && prefer.s.highlightSensitiveMedia) && $style.sensitive]" @click="showHiddenContent">
 	<component
 		:is="(image.isSensitive && !$i) || disableImageLink ? 'div' : 'a'"
 		v-bind="(image.isSensitive && !$i) || disableImageLink ? {
@@ -19,7 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	>
 		<ImgWithBlurhash
 			:hash="image.blurhash"
-			:src="(image.isSensitive && !$i) || (defaultStore.state.dataSaver.media && hide) ? null : url"
+			:src="(image.isSensitive && !$i) || (prefer.s.dataSaver.media && hide) ? null : url"
 			:forceBlurhash="hide"
 			:cover="hide || cover"
 			:alt="image.comment || image.name"
@@ -32,8 +32,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template v-if="hide">
 		<div :class="$style.hiddenText">
 			<div :class="$style.hiddenTextWrapper">
-				<b v-if="image.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ i18n.ts.sensitive }}{{ defaultStore.state.dataSaver.media ? ` (${i18n.ts.image}${image.size ? ' ' + bytes(image.size) : ''})` : '' }}</b>
-				<b v-else style="display: block;"><i class="ti ti-photo"></i> {{ defaultStore.state.dataSaver.media && image.size ? bytes(image.size) : i18n.ts.image }}</b>
+				<b v-if="image.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ i18n.ts.sensitive }}{{ prefer.s.dataSaver.media ? ` (${i18n.ts.image}${image.size ? ' ' + bytes(image.size) : ''})` : '' }}</b>
+				<b v-else style="display: block;"><i class="ti ti-photo"></i> {{ prefer.s.dataSaver.media && image.size ? bytes(image.size) : i18n.ts.image }}</b>
 				<span v-if="controls" style="display: block;">{{ i18n.ts.clickToShow }}</span>
 			</div>
 		</div>
@@ -42,7 +42,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div :class="$style.indicators">
 			<div v-if="['image/gif', 'image/apng'].includes(image.type)" :class="$style.indicator">GIF</div>
 			<div v-if="image.comment" :class="$style.indicator">ALT</div>
-			<div v-if="image.isSensitive" :class="$style.indicator" style="color: var(--warn);" :title="i18n.ts.sensitive"><i class="ti ti-eye-exclamation"></i></div>
+			<div v-if="image.isSensitive" :class="$style.indicator" style="color: var(--MI_THEME-warn);" :title="i18n.ts.sensitive"><i class="ti ti-eye-exclamation"></i></div>
 		</div>
 		<button :class="$style.menu" class="_button" @click.prevent.stop="showMenu"><i class="ti ti-dots" style="vertical-align: middle;"></i></button>
 		<i class="ti ti-eye-off" :class="$style.hide" @click.prevent.stop="hide = true"></i>
@@ -54,15 +54,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { watch, ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { MenuItem } from '@/types/menu.js';
-import { getStaticImageUrl } from '@/scripts/media-proxy.js';
+import { copyToClipboard } from '@/utility/copy-to-clipboard';
+import { getStaticImageUrl } from '@/utility/media-proxy.js';
 import bytes from '@/filters/bytes.js';
 import ImgWithBlurhash from '@/components/MkImgWithBlurhash.vue';
-import { defaultStore } from '@/store.js';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
-import { pleaseLogin } from '@/scripts/please-login.js';
-import { $i, iAmModerator } from '@/account.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
+import { pleaseLogin } from '@/utility/please-login.js';
+import { $i, iAmModerator } from '@/i.js';
+import { prefer } from '@/preferences.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 
 const props = withDefaults(defineProps<{
 	image: Misskey.entities.DriveFile;
@@ -77,17 +78,18 @@ const props = withDefaults(defineProps<{
 });
 
 const hide = ref(true);
-const darkMode = ref<boolean>(defaultStore.state.darkMode);
 
-const url = computed(() => (props.raw || defaultStore.state.loadRawImages)
+const url = computed(() => (props.raw || prefer.s.loadRawImages)
 	? props.image.url
-	: defaultStore.state.disableShowingAnimatedImages
+	: prefer.s.disableShowingAnimatedImages
 		? getStaticImageUrl(props.image.url)
 		: props.image.thumbnailUrl,
 );
 
 function showMenu(ev: MouseEvent) {
-	const menu: MenuItem[] = [{
+	const menuItems: MenuItem[] = [];
+
+	menuItems.push({
 		text: i18n.ts.hide,
 		icon: 'ti ti-eye-off',
 		action: () => {
@@ -104,16 +106,16 @@ function showMenu(ev: MouseEvent) {
 				});
 			});
 		},
-	}];
+	});
 
 	if ($i?.id === props.image.userId || iAmModerator) {
-		menu.push({
+		menuItems.push({
 			type: 'divider',
 		});
 	}
 
 	if (iAmModerator) {
-		menu.push({
+		menuItems.push({
 			text: props.image.isSensitive ? i18n.ts.unmarkAsSensitive : i18n.ts.markAsSensitive,
 			icon: props.image.isSensitive ? 'ti ti-eye' : 'ti ti-eye-exclamation',
 			danger: true,
@@ -121,7 +123,7 @@ function showMenu(ev: MouseEvent) {
 		});
 
 		if ($i?.id !== props.image.userId) {
-			menu.push({
+			menuItems.push({
 				type: 'link' as const,
 				text: i18n.ts._fileViewer.title,
 				icon: 'ti ti-info-circle',
@@ -130,8 +132,9 @@ function showMenu(ev: MouseEvent) {
 		}
 	}
 
+	const details: MenuItem[] = [];
 	if ($i?.id === props.image.userId) {
-		menu.push({
+		details.push({
 			type: 'link' as const,
 			text: i18n.ts._fileViewer.title,
 			icon: 'ti ti-info-circle',
@@ -139,10 +142,33 @@ function showMenu(ev: MouseEvent) {
 		});
 	}
 
-	os.popupMenu(menu, ev.currentTarget ?? ev.target);
+	if (iAmModerator) {
+		details.push({
+			type: 'link',
+			text: i18n.ts.moderation,
+			icon: 'ti ti-photo-exclamation',
+			to: `/admin/file/${props.image.id}`,
+		});
+	}
+
+	if (details.length > 0) {
+		menuItems.push({ type: 'divider' }, ...details);
+	}
+
+	if (prefer.s.devMode) {
+		menuItems.push({ type: 'divider' }, {
+			icon: 'ti ti-hash',
+			text: i18n.ts.copyFileId,
+			action: () => {
+				copyToClipboard(props.image.id);
+			},
+		});
+	}
+
+	os.popupMenu(menuItems, ev.currentTarget ?? ev.target);
 }
 
-function showHiddenContent(ev: MouseEvent) {
+async function showHiddenContent(ev: MouseEvent) {
 	if (!props.controls) {
 		return;
 	}
@@ -155,8 +181,15 @@ function showHiddenContent(ev: MouseEvent) {
 	}
 
 	if (hide.value) {
-		ev.preventDefault();
 		ev.stopPropagation();
+		if (props.image.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
+			const { canceled } = await os.confirm({
+				type: 'question',
+				text: i18n.ts.sensitiveMediaRevealConfirm,
+			});
+			if (canceled) return;
+		}
+
 		hide.value = false;
 	}
 }
@@ -170,7 +203,7 @@ function toggleSensitive(file: Misskey.entities.DriveFile) {
 
 // Plugin:register_note_view_interruptor を使って書き換えられる可能性があるためwatchする
 watch(() => props.image, () => {
-	hide.value = (defaultStore.state.nsfw === 'force' || defaultStore.state.dataSaver.media) ? true : (props.image.isSensitive && defaultStore.state.nsfw !== 'ignore');
+	hide.value = (prefer.s.nsfw === 'force' || prefer.s.dataSaver.media) ? true : (props.image.isSensitive && prefer.s.nsfw !== 'ignore');
 }, {
 	deep: true,
 	immediate: true,
@@ -194,7 +227,7 @@ watch(() => props.image, () => {
 		height: 100%;
 		pointer-events: none;
 		border-radius: inherit;
-		box-shadow: inset 0 0 0 4px var(--warn);
+		box-shadow: inset 0 0 0 4px var(--MI_THEME-warn);
 	}
 }
 
@@ -215,8 +248,8 @@ watch(() => props.image, () => {
 	display: block;
 	position: absolute;
 	border-radius: 6px;
-	background-color: var(--fg);
-	color: var(--accentLighten);
+	background-color: var(--MI_THEME-fg);
+	color: hsl(from var(--MI_THEME-accent) h s calc(l + 10));
 	font-size: 12px;
 	opacity: .5;
 	padding: 5px 8px;
@@ -235,10 +268,19 @@ watch(() => props.image, () => {
 
 .visible {
 	position: relative;
-	//box-shadow: 0 0 0 1px var(--divider) inset;
-	background: var(--bg);
-	background-image: linear-gradient(45deg, var(--c) 16.67%, var(--bg) 16.67%, var(--bg) 50%, var(--c) 50%, var(--c) 66.67%, var(--bg) 66.67%, var(--bg) 100%);
+	//box-shadow: 0 0 0 1px var(--MI_THEME-divider) inset;
+	background: var(--MI_THEME-bg);
 	background-size: 16px 16px;
+}
+
+html[data-color-scheme=dark] .visible {
+	--c: rgb(255 255 255 / 2%);
+	background-image: linear-gradient(45deg, var(--c) 16.67%, var(--MI_THEME-bg) 16.67%, var(--MI_THEME-bg) 50%, var(--c) 50%, var(--c) 66.67%, var(--MI_THEME-bg) 66.67%, var(--MI_THEME-bg) 100%);
+}
+
+html[data-color-scheme=light] .visible {
+	--c: rgb(0 0 0 / 2%);
+	background-image: linear-gradient(45deg, var(--c) 16.67%, var(--MI_THEME-bg) 16.67%, var(--MI_THEME-bg) 50%, var(--c) 50%, var(--c) 66.67%, var(--MI_THEME-bg) 66.67%, var(--MI_THEME-bg) 100%);
 }
 
 .menu {
@@ -246,8 +288,8 @@ watch(() => props.image, () => {
 	position: absolute;
 	border-radius: 999px;
 	background-color: rgba(0, 0, 0, 0.3);
-	-webkit-backdrop-filter: var(--blur, blur(15px));
-	backdrop-filter: var(--blur, blur(15px));
+	-webkit-backdrop-filter: var(--MI-blur, blur(15px));
+	backdrop-filter: var(--MI-blur, blur(15px));
 	color: #fff;
 	font-size: 0.8em;
 	width: 28px;
@@ -278,10 +320,10 @@ watch(() => props.image, () => {
 }
 
 .indicator {
-	/* Hardcode to black because either --bg or --fg makes it hard to read in dark/light mode */
+	/* Hardcode to black because either --MI_THEME-bg or --MI_THEME-fg makes it hard to read in dark/light mode */
 	background-color: black;
 	border-radius: 6px;
-	color: var(--accentLighten);
+	color: hsl(from var(--MI_THEME-accent) h s calc(l + 10));
 	display: inline-block;
 	font-weight: bold;
 	font-size: 0.8em;

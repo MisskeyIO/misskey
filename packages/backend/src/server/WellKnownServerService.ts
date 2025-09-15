@@ -8,7 +8,7 @@ import { IsNull } from 'typeorm';
 import vary from 'vary';
 import fastifyAccepts from '@fastify/accepts';
 import { DI } from '@/di-symbols.js';
-import type { UsersRepository } from '@/models/_.js';
+import type { MiMeta, UsersRepository } from '@/models/_.js';
 import type { Config } from '@/config.js';
 import { escapeAttribute, escapeValue } from '@/misc/prelude/xml.js';
 import type { MiUser } from '@/models/User.js';
@@ -26,6 +26,9 @@ export class WellKnownServerService {
 		@Inject(DI.config)
 		private config: Config,
 
+		@Inject(DI.meta)
+		private meta: MiMeta,
+
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
 
@@ -33,7 +36,7 @@ export class WellKnownServerService {
 		private userEntityService: UserEntityService,
 		private oauth2ProviderService: OAuth2ProviderService,
 	) {
-		//this.createServer = this.createServer.bind(this);
+		// this.createServer = this.createServer.bind(this);
 	}
 
 	@bindThis
@@ -51,7 +54,7 @@ export class WellKnownServerService {
 		const jrd = 'application/jrd+json';
 		const xrd = 'application/xrd+xml';
 
-		fastify.register(fastifyAccepts);
+		fastify.register(fastifyAccepts, { decorateReply: true });
 
 		fastify.addHook('onRequest', (request, reply, done) => {
 			reply.header('Access-Control-Allow-Headers', 'Accept');
@@ -66,6 +69,11 @@ export class WellKnownServerService {
 		});
 
 		fastify.get('/.well-known/host-meta', async (request, reply) => {
+			if (this.meta.federation === 'none') {
+				reply.code(403);
+				return;
+			}
+
 			reply.header('Content-Type', xrd);
 			return XRD({ element: 'Link', attributes: {
 				rel: 'lrdd',
@@ -75,6 +83,11 @@ export class WellKnownServerService {
 		});
 
 		fastify.get('/.well-known/host-meta.json', async (request, reply) => {
+			if (this.meta.federation === 'none') {
+				reply.code(403);
+				return;
+			}
+
 			reply.header('Content-Type', 'application/json');
 			return {
 				links: [{
@@ -86,6 +99,11 @@ export class WellKnownServerService {
 		});
 
 		fastify.get('/.well-known/nodeinfo', async (request, reply) => {
+			if (this.meta.federation === 'none') {
+				reply.code(403);
+				return;
+			}
+
 			return { links: this.nodeinfoServerService.getLinks() };
 		});
 
@@ -99,6 +117,11 @@ fastify.get('/.well-known/change-password', async (request, reply) => {
 */
 
 		fastify.get<{ Querystring: { resource: string } }>(webFingerPath, async (request, reply) => {
+			if (this.meta.federation === 'none') {
+				reply.code(403);
+				return;
+			}
+
 			const fromId = (id: MiUser['id']): FindOptionsWhere<MiUser> => ({
 				id,
 				host: IsNull(),
@@ -115,7 +138,7 @@ fastify.get('/.well-known/change-password', async (request, reply) => {
 
 			const fromAcct = (acct: Acct.Acct): FindOptionsWhere<MiUser> | number =>
 				!acct.host || acct.host === this.config.host.toLowerCase() ? {
-					usernameLower: acct.username,
+					usernameLower: acct.username.toLowerCase(),
 					host: IsNull(),
 					isSuspended: false,
 				} : 422;

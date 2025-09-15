@@ -83,7 +83,6 @@ export const paramDef = {
 		sensitiveMediaDetectionSensitivity: { type: 'string', enum: ['medium', 'low', 'high', 'veryLow', 'veryHigh'] },
 		setSensitiveFlagAutomatically: { type: 'boolean' },
 		enableSensitiveMediaDetectionForVideos: { type: 'boolean' },
-		proxyAccountId: { type: 'string', format: 'misskey:id', nullable: true },
 		maintainerName: { type: 'string', nullable: true },
 		maintainerEmail: { type: 'string', nullable: true },
 		langs: {
@@ -111,7 +110,7 @@ export const paramDef = {
 		useObjectStorage: { type: 'boolean' },
 		objectStorageBaseUrl: { type: 'string', nullable: true },
 		objectStorageBucket: { type: 'string', nullable: true },
-		objectStoragePrefix: { type: 'string', nullable: true },
+		objectStoragePrefix: { type: 'string', pattern: /^[a-zA-Z0-9-._]*$/.source, nullable: true },
 		objectStorageEndpoint: { type: 'string', nullable: true },
 		objectStorageRegion: { type: 'string', nullable: true },
 		objectStoragePort: { type: 'integer', nullable: true },
@@ -180,6 +179,11 @@ export const paramDef = {
 		urlPreviewRequireContentLength: { type: 'boolean' },
 		urlPreviewUserAgent: { type: 'string', nullable: true },
 		urlPreviewSummaryProxyUrl: { type: 'string', nullable: true },
+		prohibitedWordsForNameOfUser: {
+			type: 'array', nullable: true, items: {
+				type: 'string',
+			},
+		},
 	},
 	required: [],
 } as const;
@@ -393,10 +397,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (ps.enableSensitiveMediaDetectionForVideos !== undefined) {
 				set.enableSensitiveMediaDetectionForVideos = ps.enableSensitiveMediaDetectionForVideos;
-			}
-
-			if (ps.proxyAccountId !== undefined) {
-				set.proxyAccountId = ps.proxyAccountId;
 			}
 
 			if (ps.maintainerName !== undefined) {
@@ -659,6 +659,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (ps.summalyProxy !== undefined || ps.urlPreviewSummaryProxyUrl !== undefined) {
 				const value = ((ps.urlPreviewSummaryProxyUrl ?? ps.summalyProxy) ?? '').trim();
 				set.urlPreviewSummaryProxyUrl = value === '' ? null : value;
+			}
+
+			if (Array.isArray(ps.prohibitedWordsForNameOfUser)) {
+				set.prohibitedWordsForNameOfUser = ps.prohibitedWordsForNameOfUser.filter(Boolean);
 			}
 
 			const before = await this.metaService.fetch(true);

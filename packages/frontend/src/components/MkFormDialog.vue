@@ -13,16 +13,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 	@click="cancel()"
 	@ok="ok()"
 	@close="cancel()"
-	@closed="$emit('closed')"
+	@closed="emit('closed')"
 >
 	<template #header>
 		{{ title }}
 	</template>
 
-	<MkSpacer :marginMin="20" :marginMax="32">
+	<div class="_spacer" style="--MI_SPACER-min: 20px; --MI_SPACER-max: 32px;">
 		<div v-if="Object.keys(form).filter(item => !form[item].hidden).length > 0" class="_gaps_m">
-			<template v-for="(v, k) in Object.fromEntries(Object.entries(form).filter(([_, v]) => !('hidden' in v) || 'hidden' in v && !v.hidden))">
-				<MkInput v-if="v.type === 'number'" v-model="values[k]" type="number" :step="v.step || 1">
+			<template v-for="(v, k) in Object.fromEntries(Object.entries(form))">
+				<template v-if="typeof v.hidden == 'function' ? v.hidden(values) : v.hidden"></template>
+				<MkInput v-else-if="v.type === 'number'" v-model="values[k]" type="number" :step="v.step || 1">
 					<template #label><span v-text="v.label || k"></span><span v-if="v.required === false"> ({{ i18n.ts.optional }})</span></template>
 					<template v-if="v.description" #caption>{{ v.description }}</template>
 				</MkInput>
@@ -53,18 +54,24 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<MkButton v-else-if="v.type === 'button'" @click="v.action($event, values)">
 					<span v-text="v.content || k"></span>
 				</MkButton>
+				<XFile
+					v-else-if="v.type === 'drive-file'"
+					:fileId="v.defaultFileId"
+					:validate="async f => !v.validate || await v.validate(f)"
+					@update="f => values[k] = f"
+				/>
 			</template>
 		</div>
 		<div v-else class="_fullinfo">
-			<img :src="infoImageUrl" class="_ghost"/>
+			<img :src="infoImageUrl" draggable="false"/>
 			<div>{{ i18n.ts.nothing }}</div>
 		</div>
-	</MkSpacer>
+	</div>
 </MkModalWindow>
 </template>
 
 <script lang="ts" setup>
-import { reactive, shallowRef } from 'vue';
+import { reactive, useTemplateRef } from 'vue';
 import MkInput from './MkInput.vue';
 import MkTextarea from './MkTextarea.vue';
 import MkSwitch from './MkSwitch.vue';
@@ -72,7 +79,8 @@ import MkSelect from './MkSelect.vue';
 import MkRange from './MkRange.vue';
 import MkButton from './MkButton.vue';
 import MkRadios from './MkRadios.vue';
-import type { Form } from '@/scripts/form.js';
+import XFile from './MkFormDialog.file.vue';
+import type { Form } from '@/utility/form.js';
 import MkModalWindow from '@/components/MkModalWindow.vue';
 import { i18n } from '@/i18n.js';
 import { infoImageUrl } from '@/instance.js';
@@ -91,7 +99,7 @@ const emit = defineEmits<{
 	(ev: 'closed'): void;
 }>();
 
-const dialog = shallowRef<InstanceType<typeof MkModalWindow>>();
+const dialog = useTemplateRef('dialog');
 const values = reactive({});
 
 for (const item in props.form) {

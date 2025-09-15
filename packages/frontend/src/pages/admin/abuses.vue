@@ -4,33 +4,39 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<MkStickyContainer>
-	<template #header><XHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs"/></template>
-	<MkSpacer :contentMax="900">
-		<div v-if="tab === 'list'">
-			<div class="reports">
-				<div class="">
-					<div class="inputs" style="display: flex;">
-						<MkSelect v-model="state" :class="$style.state">
-							<template #label>{{ i18n.ts.state }}</template>
-							<option value="all">{{ i18n.ts.all }}</option>
-							<option value="unresolved">{{ i18n.ts.unresolved }}</option>
-							<option value="resolved">{{ i18n.ts.resolved }}</option>
-						</MkSelect>
-						<MkSelect v-model="targetUserOrigin" :class="$style.targetUserOrigin">
-							<template #label>{{ i18n.ts.reporteeOrigin }}</template>
-							<option value="combined">{{ i18n.ts.all }}</option>
-							<option value="local">{{ i18n.ts.local }}</option>
-							<option value="remote">{{ i18n.ts.remote }}</option>
-						</MkSelect>
-						<MkSelect v-model="reporterOrigin" :class="$style.reporterOrigin">
-							<template #label>{{ i18n.ts.reporterOrigin }}</template>
-							<option value="combined">{{ i18n.ts.all }}</option>
-							<option value="local">{{ i18n.ts.local }}</option>
-							<option value="remote">{{ i18n.ts.remote }}</option>
-						</MkSelect>
-					</div>
-					<!-- TODO
+<PageWithHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs">
+	<div class="_spacer" style="--MI_SPACER-w: 900px;">
+		<div v-if="tab === 'list'" :class="$style.root" class="_gaps">
+			<div :class="$style.subMenus" class="_gaps">
+				<MkButton link to="/admin/abuse-report-notification-recipient" primary>{{ i18n.ts.notificationSetting }}</MkButton>
+			</div>
+
+			<MkInfo v-if="!store.r.abusesTutorial.value" closable @close="closeTutorial()">
+				{{ i18n.ts._abuseUserReport.resolveTutorial }}
+			</MkInfo>
+
+			<div :class="$style.inputs" class="_gaps">
+				<MkSelect v-model="state" style="margin: 0; flex: 1;">
+					<template #label>{{ i18n.ts.state }}</template>
+					<option value="all">{{ i18n.ts.all }}</option>
+					<option value="unresolved">{{ i18n.ts.unresolved }}</option>
+					<option value="resolved">{{ i18n.ts.resolved }}</option>
+				</MkSelect>
+				<MkSelect v-model="targetUserOrigin" style="margin: 0; flex: 1;">
+					<template #label>{{ i18n.ts.reporteeOrigin }}</template>
+					<option value="combined">{{ i18n.ts.all }}</option>
+					<option value="local">{{ i18n.ts.local }}</option>
+					<option value="remote">{{ i18n.ts.remote }}</option>
+				</MkSelect>
+				<MkSelect v-model="reporterOrigin" style="margin: 0; flex: 1;">
+					<template #label>{{ i18n.ts.reporterOrigin }}</template>
+					<option value="combined">{{ i18n.ts.all }}</option>
+					<option value="local">{{ i18n.ts.local }}</option>
+					<option value="remote">{{ i18n.ts.remote }}</option>
+				</MkSelect>
+			</div>
+
+			<!-- TODO
 			<div class="inputs" style="display: flex; padding-top: 1.2em;">
 				<MkInput v-model="searchUsername" style="margin: 0; flex: 1;" type="text" :spellcheck="false">
 					<span>{{ i18n.ts.username }}</span>
@@ -41,11 +47,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 			-->
 
-					<MkPagination v-slot="{items}" ref="reports" :pagination="pagination" style="margin-top: var(--margin);">
-						<XAbuseReport v-for="report in items" :key="report.id" :report="report" @resolved="resolved"/>
-					</MkPagination>
+			<MkPagination v-slot="{items}" ref="reports" :pagination="pagination">
+				<div class="_gaps">
+					<XAbuseReport v-for="report in (items)" :key="report.id" :report="report" @resolved="resolved"/>
 				</div>
-			</div>
+			</MkPagination>
 		</div>
 		<div v-else>
 			<div class="_gaps">
@@ -58,8 +64,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</MkAbuseReportResolver>
 				</MkFolder>
 				<MkPagination v-slot="{items}" ref="resolverPagingComponent" :pagination="resolverPagination">
-					<MkSpacer v-for="resolver in items" :key="resolver.id" :marginMin="14" :marginMax="22" :class="$style.resolverList">
-						<MkAbuseReportResolver v-model="editingResolver" :data="(resolver as any)" :editable="editableResolver === resolver.id">
+					<div v-for="resolver in items" :key="resolver.id" :class="$style.resolverList">
+						<MkAbuseReportResolver v-model="editingResolver" :data="(resolver as any)" :editable="editableResolver === resolver.id" class="_spacer" style=" --MI_SPACER-min: 14px; --MI_SPACER-max: 22px;">
 							<template #button>
 								<div v-if="editableResolver !== resolver.id">
 									<MkButton primary inline :class="$style.buttonMargin" @click="edit(resolver.id)"><i class="ti ti-pencil"></i> {{ i18n.ts.edit }}</MkButton>
@@ -70,29 +76,29 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</div>
 							</template>
 						</MkAbuseReportResolver>
-					</MkSpacer>
+					</div>
 				</MkPagination>
 			</div>
 		</div>
-	</MkSpacer>
-</MkStickyContainer>
+	</div>
+</PageWithHeader>
 </template>
 
 <script lang="ts" setup>
-import { computed, shallowRef, ref } from 'vue';
-
-import XHeader from './_header_.vue';
+import { computed, useTemplateRef, ref } from 'vue';
 import MkSelect from '@/components/MkSelect.vue';
-import MkButton from '@/components/MkButton.vue';
 import MkPagination from '@/components/MkPagination.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import MkAbuseReportResolver from '@/components/MkAbuseReportResolver.vue';
 import XAbuseReport from '@/components/MkAbuseReport.vue';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
+import { definePage } from '@/page.js';
+import MkButton from '@/components/MkButton.vue';
+import MkInfo from '@/components/MkInfo.vue';
+import { store } from '@/store.js';
 
-const reports = shallowRef<InstanceType<typeof MkPagination>>();
+const reports = useTemplateRef('reports');
 const resolverPagingComponent = ref<InstanceType<typeof MkPagination>>();
 const folderComponent = ref<InstanceType<typeof MkFolder>>();
 
@@ -199,6 +205,10 @@ function create(): void {
 	});
 }
 
+function closeTutorial() {
+	store.set('abusesTutorial', false);
+}
+
 const headerActions = computed(() => []);
 
 const headerTabs = computed(() => [{
@@ -209,7 +219,7 @@ const headerTabs = computed(() => [{
 	title: i18n.ts._abuse.resolver,
 }]);
 
-definePageMetadata(() => ({
+definePage(() => ({
 	title: i18n.ts.abuseReports,
 	icon: 'ti ti-exclamation-circle',
 }));
@@ -238,11 +248,40 @@ definePageMetadata(() => ({
 }
 
 .margin {
-	margin: 0 auto var(--margin) auto;
+	margin: 0 auto var(--MI-margin) auto;
 }
 
 .resolverList {
-	background: var(--panel);
+	background: var(--MI_THEME-panel);
+	border-radius: 6px;
+	margin-bottom: 13px;
+}
+</style>
+
+<style module lang="scss">
+.root {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: stretch;
+}
+
+.subMenus {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	align-items: center;
+}
+
+.inputs {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.resolverList {
+	background: var(--MI_THEME-panel);
 	border-radius: 6px;
 	margin-bottom: 13px;
 }

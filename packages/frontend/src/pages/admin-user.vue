@@ -4,9 +4,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<MkStickyContainer>
-	<template #header><MkPageHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs"/></template>
-	<MkSpacer :contentMax="600" :marginMin="16" :marginMax="32">
+<PageWithHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs">
+	<div class="_spacer" style="--MI_SPACER-w: 600px; --MI_SPACER-min: 16px; --MI_SPACER-max: 32px;">
 		<FormSuspense :p="init">
 			<div v-if="tab === 'overview'" class="_gaps_m">
 				<div class="aeakzknw">
@@ -25,7 +24,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</div>
 				</div>
 
-				<MkInfo v-if="user.username.includes('.')">{{ i18n.ts.isSystemAccount }}</MkInfo>
+				<MkInfo v-if="isSystem">{{ i18n.ts.isSystemAccount }}</MkInfo>
 
 				<FormLink v-if="user.host" :to="`/instance-info/${user.host}`">{{ i18n.ts.instanceInfo }}</FormLink>
 
@@ -38,25 +37,28 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<template #key>{{ i18n.ts.createdAt }}</template>
 						<template #value><span class="_monospace"><MkTime :time="user.createdAt" :mode="'detail'"/></span></template>
 					</MkKeyValue>
-					<MkKeyValue v-if="info" oneline>
-						<template #key>{{ i18n.ts.lastActiveDate }}</template>
-						<template #value><span class="_monospace"><MkTime :time="info.lastActiveDate" :mode="'detail'"/></span></template>
-					</MkKeyValue>
-					<MkKeyValue v-if="info" oneline>
-						<template #key>{{ i18n.ts.email }}</template>
-						<template #value><span class="_monospace">{{ info.email }}</span></template>
-					</MkKeyValue>
-					<MkKeyValue v-if="iAmAdmin && ips && ips.length > 0" :copy="ips[0].ip" oneline>
-						<template #key>IP (recent)</template>
-						<template #value><span class="_monospace">{{ ips[0].ip }}</span></template>
-					</MkKeyValue>
+					<template v-if="!isSystem">
+						<MkKeyValue v-if="info" oneline>
+							<template #key>{{ i18n.ts.lastActiveDate }}</template>
+							<template #value><span class="_monospace"><MkTime :time="info.lastActiveDate" :mode="'detail'"/></span></template>
+						</MkKeyValue>
+						<MkKeyValue v-if="info" oneline>
+							<template #key>{{ i18n.ts.email }}</template>
+							<template #value><span class="_monospace">{{ info.email }}</span></template>
+						</MkKeyValue>
+						<MkKeyValue v-if="iAmAdmin && ips && ips.length > 0" :copy="ips[0].ip" oneline>
+							<template #key>IP (recent)</template>
+							<template #value><span class="_monospace">{{ ips[0].ip }}</span></template>
+						</MkKeyValue>
+					</template>
 				</div>
 
-				<MkTextarea v-model="moderationNote" manualSave>
+				<MkTextarea v-if="!isSystem" v-model="moderationNote" manualSave>
 					<template #label>{{ i18n.ts.moderationNote }}</template>
+					<template #caption>{{ i18n.ts.moderationNoteDescription }}</template>
 				</MkTextarea>
 
-				<FormSection>
+				<FormSection v-if="!isSystem">
 					<div class="_gaps">
 						<MkFolder v-if="iAmModerator" defaultOpen>
 							<template #icon><i class="ti ti-shield"></i></template>
@@ -143,15 +145,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div v-else-if="tab === 'announcements'" class="_gaps">
 				<MkButton primary rounded @click="createAnnouncement"><i class="ti ti-plus"></i> {{ i18n.ts.new }}</MkButton>
 
+				<MkSelect v-model="announcementsStatus">
+					<template #label>{{ i18n.ts.filter }}</template>
+					<option value="active">{{ i18n.ts.active }}</option>
+					<option value="archived">{{ i18n.ts.archived }}</option>
+				</MkSelect>
+
 				<MkPagination ref="announcementsPaginationEl" :pagination="announcementsPagination">
 					<template #default="{ items }">
 						<div class="_gaps_s">
 							<div v-for="announcement in items" :key="announcement.id" v-panel :class="$style.announcementItem" @click="editAnnouncement(announcement)">
 								<span style="margin-right: 0.5em;">
 									<i v-if="announcement.icon === 'info'" class="ti ti-info-circle"></i>
-									<i v-else-if="announcement.icon === 'warning'" class="ti ti-alert-triangle" style="color: var(--warn);"></i>
-									<i v-else-if="announcement.icon === 'error'" class="ti ti-circle-x" style="color: var(--error);"></i>
-									<i v-else-if="announcement.icon === 'success'" class="ti ti-check" style="color: var(--success);"></i>
+									<i v-else-if="announcement.icon === 'warning'" class="ti ti-alert-triangle" style="color: var(--MI_THEME-warn);"></i>
+									<i v-else-if="announcement.icon === 'error'" class="ti ti-circle-x" style="color: var(--MI_THEME-error);"></i>
+									<i v-else-if="announcement.icon === 'success'" class="ti ti-check" style="color: var(--MI_THEME-success);"></i>
 								</span>
 								<span>{{ announcement.title }}</span>
 								<span v-if="announcement.reads > 0" style="margin-left: auto; opacity: 0.7;">{{ i18n.ts.messageRead }} <span v-if="announcement.lastReadAt">(<MkTime :time="announcement.lastReadAt" mode="absolute"/>)</span></span>
@@ -220,13 +228,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</MkObjectView>
 			</div>
 		</FormSuspense>
-	</MkSpacer>
-</MkStickyContainer>
+	</div>
+</PageWithHeader>
 </template>
 
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, watch, ref } from 'vue';
 import * as Misskey from 'misskey-js';
+import { url } from '@@/js/config.js';
 import MkChart from '@/components/MkChart.vue';
 import MkObjectView from '@/components/MkObjectView.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
@@ -241,12 +250,11 @@ import FormSuspense from '@/components/form/suspense.vue';
 import MkFileListForAdmin from '@/components/MkFileListForAdmin.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import * as os from '@/os.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
-import { url } from '@/config.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 import { acct } from '@/filters/user.js';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
+import { definePage } from '@/page.js';
 import { i18n } from '@/i18n.js';
-import { iAmAdmin, iAmModerator, $i } from '@/account.js';
+import { iAmAdmin, iAmModerator, $i } from '@/i.js';
 import MkRolePreview from '@/components/MkRolePreview.vue';
 import MkPagination from '@/components/MkPagination.vue';
 
@@ -269,6 +277,7 @@ const moderator = ref(false);
 const silenced = ref(false);
 const limited = ref(false);
 const suspended = ref(false);
+const isSystem = ref(false);
 const deleted = ref(false);
 const moderationNote = ref('');
 const filesPagination = {
@@ -279,12 +288,16 @@ const filesPagination = {
 	})),
 };
 const announcementsPaginationEl = ref<InstanceType<typeof MkPagination>>();
+
+const announcementsStatus = ref<'active' | 'archived'>('active');
+
 const announcementsPagination = {
 	endpoint: 'admin/announcements/list' as const,
 	offsetMode: true,
 	limit: 10,
 	params: computed(() => ({
 		userId: props.userId,
+		status: announcementsStatus.value,
 	})),
 };
 const expandedRoles = ref([]);
@@ -307,6 +320,7 @@ function createFetcher() {
 		suspended.value = info.value.isSuspended;
 		deleted.value = info.value.isDeleted;
 		moderationNote.value = info.value.moderationNote;
+		isSystem.value = user.value.host == null && user.value.username.includes('.');
 
 		watch(moderationNote, async () => {
 			await misskeyApi('admin/update-user-note', {
@@ -471,7 +485,7 @@ async function deleteAccount(soft: boolean) {
 }
 
 async function assignRole() {
-	const roles = await misskeyApi('admin/roles/list');
+	const roles = await misskeyApi('admin/roles/list').then(it => it.filter(r => r.target === 'manual'));
 
 	const { canceled, result: roleId } = await os.select({
 		title: i18n.ts._role.chooseRoleToAssign,
@@ -537,24 +551,20 @@ function toggleRoleItem(role) {
 }
 
 function createAnnouncement(): void {
-	os.popup(defineAsyncComponent(() => import('@/components/MkUserAnnouncementEditDialog.vue')), {
+	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkUserAnnouncementEditDialog.vue')), {
 		user: user.value,
 	}, {
-		done: async () => {
-			announcementsPaginationEl.value?.reload();
-		},
-	}, 'closed');
+		closed: () => dispose(),
+	});
 }
 
 function editAnnouncement(announcement): void {
-	os.popup(defineAsyncComponent(() => import('@/components/MkUserAnnouncementEditDialog.vue')), {
+	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkUserAnnouncementEditDialog.vue')), {
 		user: user.value,
 		announcement,
 	}, {
-		done: async () => {
-			announcementsPaginationEl.value?.reload();
-		},
-	}, 'closed');
+		closed: () => dispose(),
+	});
 }
 
 watch(() => props.userId, () => {
@@ -573,7 +583,15 @@ watch(user, () => {
 
 const headerActions = computed(() => []);
 
-const headerTabs = computed(() => [{
+const headerTabs = computed(() => isSystem.value ? [{
+	key: 'overview',
+	title: i18n.ts.overview,
+	icon: 'ti ti-info-circle',
+}, {
+	key: 'raw',
+	title: 'Raw',
+	icon: 'ti ti-code',
+}] : [{
 	key: 'overview',
 	title: i18n.ts.overview,
 	icon: 'ti ti-info-circle',
@@ -603,7 +621,7 @@ const headerTabs = computed(() => [{
 	icon: 'ti ti-code',
 }]);
 
-definePageMetadata(() => ({
+definePage(() => ({
 	title: user.value ? acct(user.value) : i18n.ts.userInfo,
 	icon: 'ti ti-user-exclamation',
 }));
@@ -667,33 +685,43 @@ definePageMetadata(() => ({
 			}
 
 			> .admin {
-				color: var(--success);
-				border-color: var(--success);
-			}
-
-			> .moderator {
-				color: var(--success);
-				border-color: var(--success);
-			}
-
-			> .silenced {
-				color: var(--warn);
-				border-color: var(--warn);
-			}
-
-			> .limited {
-				color: var(--error);
-				border-color: var(--error);
+				color: var(--MI_THEME-success);
+				border-color: var(--MI_THEME-success);
 			}
 
 			> .suspended {
-				color: var(--error);
-				border-color: var(--error);
+				color: var(--MI_THEME-error);
+				border-color: var(--MI_THEME-error);
+			}
+
+			> .silenced {
+				color: var(--MI_THEME-warn);
+				border-color: var(--MI_THEME-warn);
+			}
+
+			> .moderator {
+				color: var(--MI_THEME-success);
+				border-color: var(--MI_THEME-success);
+			}
+
+			> .silenced {
+				color: var(--MI_THEME-warn);
+				border-color: var(--MI_THEME-warn);
+			}
+
+			> .limited {
+				color: var(--MI_THEME-error);
+				border-color: var(--MI_THEME-error);
+			}
+
+			> .suspended {
+				color: var(--MI_THEME-error);
+				border-color: var(--MI_THEME-error);
 			}
 
 			> .deleted {
-				color: var(--error);
-				border-color: var(--error);
+				color: var(--MI_THEME-error);
+				border-color: var(--MI_THEME-error);
 			}
 		}
 	}
@@ -741,7 +769,7 @@ definePageMetadata(() => ({
 .roleItemSub {
 	padding: 6px 12px;
 	font-size: 85%;
-	color: var(--fgTransparentWeak);
+	color: color(from var(--MI_THEME-fg) srgb r g b / 0.75);
 }
 
 .roleUnassign {
@@ -764,7 +792,7 @@ definePageMetadata(() => ({
 }
 .fields {
 	padding: 24px;
-	border-bottom: solid 0.5px var(--divider);
+	border-bottom: solid 0.5px var(--MI_THEME-divider);
 	&:last-child {
 		border-bottom: none;
 	}

@@ -70,7 +70,7 @@ const expirationDate = ref<Date | null>(null);
 
 type NonNullType<T> = {
 	[P in keyof T]: NonNullable<T[P]>
-}
+};
 
 const emit = defineEmits(['update:modelValue']);
 

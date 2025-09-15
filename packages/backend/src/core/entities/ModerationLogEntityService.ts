@@ -8,7 +8,7 @@ import { DI } from '@/di-symbols.js';
 import type { ModerationLogsRepository } from '@/models/_.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { MiUser } from '@/models/User.js';
-import type { MiModerationLog } from '@/models/ModerationLog.js';
+import { MiModerationLog } from '@/models/ModerationLog.js';
 import { bindThis } from '@/decorators.js';
 import { Packed } from '@/misc/json-schema.js';
 import { IdService } from '@/core/IdService.js';
@@ -29,6 +29,9 @@ export class ModerationLogEntityService {
 	public async pack(
 		src: MiModerationLog['id'] | MiModerationLog,
 		me: { id: MiUser['id'] } | null | undefined,
+		hint?: {
+			packedUser?: Packed<'UserDetailedNotMe'>,
+		},
 	) : Promise<Packed<'ModerationLog'>> {
 		const log = typeof src === 'object' ? src : await this.moderationLogsRepository.findOneByOrFail({ id: src });
 
@@ -38,7 +41,7 @@ export class ModerationLogEntityService {
 			type: log.type,
 			info: log.info,
 			userId: log.userId,
-			user: this.userEntityService.pack(log.user ?? log.userId, me, {
+			user: hint?.packedUser ?? this.userEntityService.pack(log.user ?? log.userId, me, {
 				schema: 'UserDetailed',
 			}),
 		});

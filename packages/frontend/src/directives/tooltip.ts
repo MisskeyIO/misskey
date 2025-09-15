@@ -6,8 +6,9 @@
 // TODO: useTooltip関数使うようにしたい
 // ただディレクティブ内でonUnmountedなどのcomposition api使えるのか不明
 
-import { defineAsyncComponent, Directive, ref } from 'vue';
-import { isTouchUsing } from '@/scripts/touch.js';
+import { defineAsyncComponent, ref } from 'vue';
+import type { Directive } from 'vue';
+import { isTouchUsing } from '@/utility/touch.js';
 import { popup, alert } from '@/os.js';
 
 const start = isTouchUsing ? 'touchstart' : 'mouseenter';
@@ -46,18 +47,20 @@ export default {
 		}
 
 		self.show = () => {
-			if (!document.body.contains(el)) return;
+			if (!window.document.body.contains(el)) return;
 			if (self._close) return;
 			if (self.text == null) return;
 
 			const showing = ref(true);
-			popup(defineAsyncComponent(() => import('@/components/MkTooltip.vue')), {
+			const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkTooltip.vue')), {
 				showing,
 				text: self.text,
 				asMfm: binding.modifiers.mfm,
 				direction: binding.modifiers.left ? 'left' : binding.modifiers.right ? 'right' : binding.modifiers.top ? 'top' : binding.modifiers.bottom ? 'bottom' : 'top',
 				targetElement: el,
-			}, {}, 'closed');
+			}, {
+				closed: () => dispose(),
+			});
 
 			self._close = () => {
 				showing.value = false;

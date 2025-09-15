@@ -39,15 +39,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
 import * as Misskey from 'misskey-js';
-import { useWidgetPropsManager, WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from './widget.js';
+import { useWidgetPropsManager } from './widget.js';
+import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from './widget.js';
 import type { MisskeyEntity } from '@/types/date-separated-list.js';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
 import { userPage } from '@/filters/user.js';
 import { infoImageUrl } from '@/instance.js';
-import { GetFormResultType } from '@/scripts/form.js';
-import { useInterval } from '@/scripts/use-interval.js';
-import MkContainer from '@/components/MkContainer.vue';
+import type { GetFormResultType } from '@/utility/form.js';
+import { useInterval } from '@@/js/use-interval.js';
 import MkPagination from '@/components/MkPagination.vue';
 import MkDateSeparatedList from '@/components/MkDateSeparatedList.vue';
 import MkUserCardMini from '@/components/MkUserCardMini.vue';
@@ -165,6 +165,26 @@ defineExpose<WidgetComponentExpose>({
 </script>
 
 <style lang="scss" module>
+.bdayFRoot {
+	overflow: hidden;
+	min-height: calc(calc(calc(50px * 3) - 8px) + calc(var(--MI-margin) * 2));
+}
+.bdayFGrid {
+	display: grid;
+	grid-template-columns: repeat(6, 42px);
+	grid-template-rows: repeat(3, 42px);
+	place-content: center;
+	gap: 8px;
+	margin: var(--MI-margin) auto;
+}
+
+.bdayFFallback {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
 .empty {
 	display: flex;
 	flex-direction: column;
@@ -176,7 +196,7 @@ defineExpose<WidgetComponentExpose>({
 		width: auto;
 		max-width: 90%;
 		margin-bottom: 8px;
-		border-radius: var(--radius);
+		border-radius: var(--MI-radius);
 	}
 }
 
@@ -188,16 +208,16 @@ defineExpose<WidgetComponentExpose>({
 	margin: auto;
 	aspect-ratio: 1/1;
 	border-radius: 100%;
-	background: linear-gradient(90deg, var(--buttonGradateA), var(--buttonGradateB));
+	background: linear-gradient(90deg, var(--MI_THEME-buttonGradateA), var(--MI_THEME-buttonGradateB));
 
 	&:hover, &.active {
 		&:before {
-			background: var(--accentLighten);
+			background: hsl(from var(--MI_THEME-accent) h s calc(l + 10));
 		}
 	}
 }
 
 .postIcon {
-	color: var(--fgOnAccent);
+	color: var(--MI_THEME-fgOnAccent);
 }
 </style>

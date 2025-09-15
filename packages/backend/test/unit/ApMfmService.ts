@@ -23,7 +23,7 @@ describe('ApMfmService', () => {
 
 	describe('getNoteHtml', () => {
 		test('Do not provide _misskey_content for simple text', () => {
-			const note: MiNote = {
+			const note = {
 				text: 'テキスト #タグ @mention 🍊 :emoji: https://example.com',
 				mentionedRemoteUsers: '[]',
 			} as FIXME;
@@ -35,7 +35,7 @@ describe('ApMfmService', () => {
 		});
 
 		test('Provide _misskey_content for MFM', () => {
-			const note: MiNote = {
+			const note = {
 				text: '$[tada foo]',
 				mentionedRemoteUsers: '[]',
 			} as FIXME;

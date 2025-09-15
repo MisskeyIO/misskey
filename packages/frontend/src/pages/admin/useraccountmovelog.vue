@@ -1,8 +1,7 @@
 <template>
-<MkStickyContainer>
-	<template #header><XHeader :actions="headerActions" :tabs="headerTabs"/></template>
-	<MkSpacer :contentMax="900">
-		<div style="display: flex; flex-direction: column; gap: var(--margin); flex-wrap: wrap;">
+<PageWithHeader :actions="headerActions" :tabs="headerTabs">
+	<div class="_spacer" style="--MI_SPACER-w: 900px;">
+		<div style="display: flex; flex-direction: column; gap: var(--MI-margin); flex-wrap: wrap;">
 			<div :class="$style.inputs">
 				<MkSelect v-model="from" :class="$style.input">
 					<template #label>{{ i18n.ts._accountMigration.movedFromServer }}</template>
@@ -27,7 +26,7 @@
 			</div>
 		</div>
 
-		<MkPagination v-slot="{items}" ref="logs" :pagination="pagination" style="margin-top: var(--margin);">
+		<MkPagination v-slot="{items}" ref="logs" :pagination="pagination" style="margin-top: var(--MI-margin);">
 			<div class="_gaps_s">
 				<MkFolder v-for="item in items" :key="item.id">
 					<template #label>
@@ -51,20 +50,18 @@
 				</MkFolder>
 			</div>
 		</MkPagination>
-	</MkSpacer>
-</MkStickyContainer>
+	</div>
+</PageWithHeader>
 </template>
 
 <script lang="ts" setup>
 import { computed, shallowRef, ref } from 'vue';
-import XHeader from './_header_.vue';
 import MkInput from '@/components/MkInput.vue';
 import MkPagination from '@/components/MkPagination.vue';
 import { i18n } from '@/i18n.js';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
 import { userPage } from '@/filters/user.js';
 import MkFolder from '@/components/MkFolder.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
+import { definePage } from '@/page.js';
 import MkSelect from '@/components/MkSelect.vue';
 
 const logs = shallowRef<InstanceType<typeof MkPagination>>();
@@ -89,7 +86,7 @@ const headerActions = computed(() => []);
 
 const headerTabs = computed(() => []);
 
-definePageMetadata(() => ({
+definePage(() => ({
 	title: i18n.ts.userAccountMoveLogs,
 	icon: 'ti ti-list-search',
 }));
@@ -98,9 +95,9 @@ definePageMetadata(() => ({
 <style lang="scss" module>
 .card {
 	display: flex;
-	gap: var(--margin);
-	border-radius: var(--radius);
-	padding: var(--margin);
+	gap: var(--MI-margin);
+	border-radius: var(--MI-radius);
+	padding: var(--MI-margin);
 	align-items: center;
 	justify-content: center;
 	flex-wrap: wrap;
@@ -112,7 +109,7 @@ definePageMetadata(() => ({
 
 .cardContent{
 	display: flex;
-	gap: var(--margin);
+	gap: var(--MI-margin);
 	align-items: center;
 	flex-direction: column;
 }

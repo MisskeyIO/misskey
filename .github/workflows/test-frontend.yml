@@ -13,7 +13,8 @@ on:
       - packages/misskey-js/**
       # for e2e
       - packages/backend/**
-
+      - .github/workflows/test-frontend.yml
+      - .github/misskey/test.yml
   pull_request:
     paths:
       - packages/frontend/**
@@ -21,12 +22,15 @@ on:
       - packages/misskey-js/**
       # for e2e
       - packages/backend/**
+      - .github/workflows/test-frontend.yml
+      - .github/misskey/test.yml
 
 permissions:
   contents: read
 
 jobs:
   vitest:
+    name: Unit tests (frontend)
     runs-on: ubuntu-latest
 
     strategy:
@@ -34,12 +38,12 @@ jobs:
         node-version: [22.x]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v4.2.2
       with:
         fetch-depth: 0
         submodules: true
     - name: Install pnpm
-      uses: pnpm/action-setup@v4
+      uses: pnpm/action-setup@v4.1.0
       with:
         run_install: false
     - name: Use Node.js ${{ matrix.node-version }}

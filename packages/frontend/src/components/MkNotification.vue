@@ -77,20 +77,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<span v-if="notification.type === 'pollEnded'" :class="$style.headerName">{{ i18n.ts._notification.pollEnded }}</span>
 			<span v-else-if="notification.type === 'note'" :class="$style.headerName">{{ i18n.ts._notification.newNote }}: <MkUserName :user="notification.note.user"/></span>
 			<span v-else-if="notification.type === 'roleAssigned'" :class="$style.headerName">{{ i18n.ts._notification.roleAssigned }}</span>
+			<span v-else-if="notification.type === 'chatRoomInvitationReceived'" :class="$style.headerName">{{ i18n.ts._notification.chatRoomInvitationReceived }}</span>
 			<span v-else-if="notification.type === 'achievementEarned'" :class="$style.headerName">{{ i18n.ts._notification.achievementEarned }}</span>
 			<span v-else-if="notification.type === 'noteScheduled'" :class="$style.headerName">{{ i18n.ts._notification.noteScheduled }}</span>
 			<span v-else-if="notification.type === 'scheduledNotePosted'" :class="$style.headerName">{{ i18n.ts._notification.scheduledNotePosted }}</span>
 			<span v-else-if="notification.type === 'scheduledNoteError'" :class="$style.headerName">{{ i18n.ts._notification.scheduledNoteError }}</span>
+			<span v-else-if="notification.type === 'login'" :class="$style.headerName">{{ i18n.ts._notification.login }}</span>
+			<span v-else-if="notification.type === 'createToken'" :class="$style.headerName">{{ i18n.ts._notification.createToken }}</span>
 			<span v-else-if="notification.type === 'test'" :class="$style.headerName">{{ i18n.ts._notification.testNotification }}</span>
-			<span v-if="notification.type === 'pollEnded'">{{ i18n.ts._notification.pollEnded }}</span>
-			<span v-else-if="notification.type === 'note'">{{ i18n.ts._notification.newNote }}: <MkUserName :user="notification.note.user"/></span>
-			<span v-else-if="notification.type === 'roleAssigned'">{{ i18n.ts._notification.roleAssigned }}</span>
-			<span v-else-if="notification.type === 'chatRoomInvitationReceived'">{{ i18n.ts._notification.chatRoomInvitationReceived }}</span>
-			<span v-else-if="notification.type === 'achievementEarned'">{{ i18n.ts._notification.achievementEarned }}</span>
-			<span v-else-if="notification.type === 'login'">{{ i18n.ts._notification.login }}</span>
-			<span v-else-if="notification.type === 'createToken'">{{ i18n.ts._notification.createToken }}</span>
-			<span v-else-if="notification.type === 'test'">{{ i18n.ts._notification.testNotification }}</span>
-			<span v-else-if="notification.type === 'exportCompleted'">{{ i18n.tsx._notification.exportOfXCompleted({ x: exportEntityName[notification.exportedEntity] }) }}</span>
+			<span v-else-if="notification.type === 'exportCompleted'" :class="$style.headerName">{{ i18n.tsx._notification.exportOfXCompleted({ x: exportEntityName[notification.exportedEntity] }) }}</span>
 			<MkA v-else-if="notification.type === 'follow' || notification.type === 'mention' || notification.type === 'reply' || notification.type === 'renote' || notification.type === 'quote' || notification.type === 'reaction' || notification.type === 'receiveFollowRequest' || notification.type === 'followRequestAccepted'" v-user-preview="notification.user.id" :class="$style.headerName" :to="userPage(notification.user)"><MkUserName :user="notification.user"/></MkA>
 			<span v-else-if="notification.type === 'reaction:grouped' && notification.note.reactionAcceptance === 'likeOnly'" :class="$style.headerName">{{ i18n.tsx._notification.likedBySomeUsers({ n: getActualReactedUsersCount(notification) }) }}</span>
 			<span v-else-if="notification.type === 'reaction:grouped'" :class="$style.headerName">{{ i18n.tsx._notification.reactedBySomeUsers({ n: getActualReactedUsersCount(notification) }) }}</span>

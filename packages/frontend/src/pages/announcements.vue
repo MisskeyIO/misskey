@@ -81,7 +81,7 @@ const paginationEl = ref<InstanceType<typeof MkPagination>>();
 const tab = ref('current');
 
 async function read(target): Promise<void> {
-	if (target.value.needEnrollmentTutorialToRead) {
+	if (target.needEnrollmentTutorialToRead) {
 		const tutorialCompleted = await (new Promise<boolean>(resolve => {
 			os.popup(defineAsyncComponent(() => import('@/components/MkTutorialDialog.vue')), {}, {
 				done: () => {

@@ -194,10 +194,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 									</MkPreferenceContainer>
 								</SearchMarker>
 
-								<SearchMarker :keywords="['reaction', 'count', 'show']">
-									<MkPreferenceContainer k="showReactionsCount">
-										<MkSwitch v-model="showReactionsCount">
-											<template #label><SearchLabel>{{ i18n.ts.showReactionsCount }}</SearchLabel></template>
+								<SearchMarker :keywords="['replies', 'count', 'show']">
+									<MkPreferenceContainer k="showRepliesCount">
+										<MkSwitch v-model="showRepliesCount">
+											<template #label>
+												<SearchLabel>{{ i18n.ts.showRepliesCount }}</SearchLabel>
+											</template>
 										</MkSwitch>
 									</MkPreferenceContainer>
 								</SearchMarker>
@@ -210,12 +212,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 									</MkPreferenceContainer>
 								</SearchMarker>
 
-								<SearchMarker :keywords="['renote', 'count', 'show']">
-									<MkPreferenceContainer k="showRepliesCount">
-										<MkSwitch v-model="showRepliesCount">
-											<template #label>
-												<SearchLabel>{{ i18n.ts.showRepliesCount }}</SearchLabel>
-											</template>
+								<SearchMarker :keywords="['reaction', 'count', 'show']">
+									<MkPreferenceContainer k="showReactionsCount">
+										<MkSwitch v-model="showReactionsCount">
+											<template #label><SearchLabel>{{ i18n.ts.showReactionsCount }}</SearchLabel></template>
 										</MkSwitch>
 									</MkPreferenceContainer>
 								</SearchMarker>
@@ -775,9 +775,9 @@ const showNoteActionsOnlyHover = prefer.model('showNoteActionsOnlyHover');
 const showClipButtonInNoteFooter = prefer.model('showClipButtonInNoteFooter');
 const collapseRenotes = prefer.model('collapseRenotes');
 const advancedMfm = prefer.model('advancedMfm');
-const showReactionsCount = prefer.model('showReactionsCount');
-const showRenotesCount = prefer.model('showRenotesCount');
 const showRepliesCount = prefer.model('showRepliesCount');
+const showRenotesCount = prefer.model('showRenotesCount');
+const showReactionsCount = prefer.model('showReactionsCount');
 const enableQuickAddMfmFunction = prefer.model('enableQuickAddMfmFunction');
 const forceShowAds = prefer.model('forceShowAds');
 const loadRawImages = prefer.model('loadRawImages');

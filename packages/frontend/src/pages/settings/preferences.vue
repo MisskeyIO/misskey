@@ -194,6 +194,24 @@ SPDX-License-Identifier: AGPL-3.0-only
 									</MkPreferenceContainer>
 								</SearchMarker>
 
+								<SearchMarker :keywords="['replies', 'count', 'show']">
+									<MkPreferenceContainer k="showRepliesCount">
+										<MkSwitch v-model="showRepliesCount">
+											<template #label>
+												<SearchLabel>{{ i18n.ts.showRepliesCount }}</SearchLabel>
+											</template>
+										</MkSwitch>
+									</MkPreferenceContainer>
+								</SearchMarker>
+
+								<SearchMarker :keywords="['renote', 'count', 'show']">
+									<MkPreferenceContainer k="showRenotesCount">
+										<MkSwitch v-model="showRenotesCount">
+											<template #label><SearchLabel>{{ i18n.ts.showRenotesCount }}</SearchLabel></template>
+										</MkSwitch>
+									</MkPreferenceContainer>
+								</SearchMarker>
+
 								<SearchMarker :keywords="['reaction', 'count', 'show']">
 									<MkPreferenceContainer k="showReactionsCount">
 										<MkSwitch v-model="showReactionsCount">
@@ -725,7 +743,6 @@ import MkRadios from '@/components/MkRadios.vue';
 import MkRange from '@/components/MkRange.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import MkButton from '@/components/MkButton.vue';
-import FormSection from '@/components/form/section.vue';
 import FormLink from '@/components/form/link.vue';
 import MkLink from '@/components/MkLink.vue';
 import MkInfo from '@/components/MkInfo.vue';
@@ -758,6 +775,8 @@ const showNoteActionsOnlyHover = prefer.model('showNoteActionsOnlyHover');
 const showClipButtonInNoteFooter = prefer.model('showClipButtonInNoteFooter');
 const collapseRenotes = prefer.model('collapseRenotes');
 const advancedMfm = prefer.model('advancedMfm');
+const showRepliesCount = prefer.model('showRepliesCount');
+const showRenotesCount = prefer.model('showRenotesCount');
 const showReactionsCount = prefer.model('showReactionsCount');
 const enableQuickAddMfmFunction = prefer.model('enableQuickAddMfmFunction');
 const forceShowAds = prefer.model('forceShowAds');

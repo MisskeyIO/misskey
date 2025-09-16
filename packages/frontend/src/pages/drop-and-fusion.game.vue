@@ -907,13 +907,15 @@ function getGameImageDriveFile() {
 				formData.append('file', blob);
 				formData.append('name', `bubble-game-${Date.now()}.png`);
 				formData.append('isSensitive', 'false');
-				formData.append('i', $i.token);
 				if (prefer.s.uploadFolder) {
 					formData.append('folderId', prefer.s.uploadFolder);
 				}
 
 				window.fetch(apiUrl + '/drive/files/create', {
 					method: 'POST',
+					headers: {
+						'Authorization': `Bearer ${$i!.token}`,
+					},
 					body: formData,
 				})
 					.then(response => response.json())

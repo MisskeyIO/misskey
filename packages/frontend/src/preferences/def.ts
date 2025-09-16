@@ -175,6 +175,12 @@ export const PREF_DEF = {
 	showReactionsCount: {
 		default: false,
 	},
+	showRepliesCount: {
+		default: true,
+	},
+	showRenotesCount: {
+		default: true,
+	},
 	enableQuickAddMfmFunction: {
 		default: false,
 	},

@@ -78,7 +78,6 @@ const ok = async () => {
 			formData.append('name', `cropped_${props.file.name}`);
 			formData.append('isSensitive', props.file.isSensitive ? 'true' : 'false');
 			if (props.file.comment) { formData.append('comment', props.file.comment);}
-			formData.append('i', $i!.token);
 			if (props.uploadFolder) {
 				formData.append('folderId', props.uploadFolder);
 			} else if (props.uploadFolder !== null && prefer.s.uploadFolder) {
@@ -87,6 +86,9 @@ const ok = async () => {
 
 			window.fetch(apiUrl + '/drive/files/create', {
 				method: 'POST',
+				headers: {
+					'Authorization': `Bearer ${$i!.token}`,
+				},
 				body: formData,
 			})
 				.then(response => response.json())

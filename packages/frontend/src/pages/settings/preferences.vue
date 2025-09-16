@@ -202,6 +202,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 									</MkPreferenceContainer>
 								</SearchMarker>
 
+								<SearchMarker :keywords="['renote', 'count', 'show']">
+									<MkPreferenceContainer k="showRenotesCount">
+										<MkSwitch v-model="showRenotesCount">
+											<template #label><SearchLabel>{{ i18n.ts.showRenotesCount }}</SearchLabel></template>
+										</MkSwitch>
+									</MkPreferenceContainer>
+								</SearchMarker>
+
 								<SearchMarker :keywords="['reaction', 'confirm']">
 									<MkPreferenceContainer k="confirmOnReact">
 										<MkSwitch v-model="confirmOnReact">
@@ -759,6 +767,7 @@ const showClipButtonInNoteFooter = prefer.model('showClipButtonInNoteFooter');
 const collapseRenotes = prefer.model('collapseRenotes');
 const advancedMfm = prefer.model('advancedMfm');
 const showReactionsCount = prefer.model('showReactionsCount');
+const showRenotesCount = prefer.model('showRenotesCount');
 const enableQuickAddMfmFunction = prefer.model('enableQuickAddMfmFunction');
 const forceShowAds = prefer.model('forceShowAds');
 const loadRawImages = prefer.model('loadRawImages');

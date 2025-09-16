@@ -95,18 +95,22 @@ function showMenu(ev: MouseEvent) {
 		action: () => {
 			hide.value = true;
 		},
-	}, {
-		text: i18n.ts.saveThisFile,
-		icon: 'ti ti-cloud-upload',
-		action: () => {
-			os.selectDriveFolder(false).then(async folder => {
-				misskeyApi('drive/files/upload-from-url', {
-					url: props.image.url,
-					folderId: folder[0]?.id,
-				});
-			});
-		},
 	});
+
+	if ($i && $i.id !== props.image.userId) {
+		menuItems.push({
+			text: i18n.ts.saveThisFile,
+			icon: 'ti ti-cloud-upload',
+			action: () => {
+				os.selectDriveFolder(false).then(async folder => {
+					misskeyApi('drive/files/upload-from-url', {
+						url: props.image.url,
+						folderId: folder[0]?.id,
+					});
+				});
+			},
+		});
+	}
 
 	if ($i?.id === props.image.userId || iAmModerator) {
 		menuItems.push({

@@ -157,8 +157,7 @@ watch(v, newValue => {
 	min-width: 100%;
 	max-width: 100%;
 	overflow-x: auto;
-	overflow-y: auto;
-	max-height: 50vh;
+	overflow-y: hidden;
 	box-sizing: border-box;
 	margin: 0;
 	border-radius: 6px;

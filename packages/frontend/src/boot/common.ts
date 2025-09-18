@@ -236,6 +236,39 @@ export async function common(createVue: () => Promise<App<Element>>) {
 
 	if (prefer.s.makeEveryTextElementsSelectable) {
 		window.document.documentElement.classList.add('forceSelectableAll');
+	} else {
+		// When global selection is disabled, clear lingering selections if the user clicks outside selectable areas.
+		const clearSelectionOnPointerDown = (ev: PointerEvent) => {
+			if (ev.button !== 0 && ev.pointerType !== 'touch' && ev.pointerType !== 'pen') return;
+
+			const selection = window.getSelection();
+			if (!selection || selection.isCollapsed) return;
+
+			const path = typeof ev.composedPath === 'function' ? ev.composedPath() : [];
+			let targetElement: Element | null = null;
+
+			for (const item of path) {
+				if (item instanceof Element) {
+					targetElement = item;
+					break;
+				}
+			}
+
+			if (!targetElement) {
+				const target = ev.target;
+				if (target instanceof Element) {
+					targetElement = target;
+				} else if (target instanceof Node) {
+					targetElement = target.parentElement;
+				}
+			}
+
+			if (targetElement?.closest('textarea, input, [contenteditable="true"], ._selectable, ._selectableAtomic')) return;
+
+			selection.removeAllRanges();
+		};
+
+		window.addEventListener('pointerdown', clearSelectionOnPointerDown, { capture: true });
 	}
 
 	//#region Fetch user

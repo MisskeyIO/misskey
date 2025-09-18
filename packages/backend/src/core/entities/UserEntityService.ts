@@ -549,7 +549,7 @@ export class UserEntityService implements OnModuleInit {
 				followersVisibility: profile!.followersVisibility,
 				followingVisibility: profile!.followingVisibility,
 				chatScope: user.chatScope,
-				canChat: this.roleService.getUserPolicies(user.id).then(r => r.chatAvailability === 'available'),
+				canChat: false, // FIXME Chat機能が使えるようになった暁には修正する
 				roles: this.roleService.getUserRoles(user.id).then(roles => roles
 					.filter(role => role.isPublic || iAmModerator)
 					.sort((a, b) => b.displayOrder - a.displayOrder)

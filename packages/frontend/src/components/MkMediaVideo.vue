@@ -321,6 +321,7 @@ async function showHiddenContent(ev: MouseEvent) {
 		});
 		if (canceled) return;
 	}
+	hide.value = false;
 }
 
 async function toggleSensitive(file: Misskey.entities.DriveFile) {

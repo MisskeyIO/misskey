@@ -59,13 +59,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
-import {computed, ref} from 'vue';
-import {toUnicode} from 'punycode.js';
+import { computed, ref } from 'vue';
+import { toUnicode } from 'punycode.js';
 
-import {extractDomain, query} from '@@/js/url.js';
-import {host as configHost} from '@@/js/config.js';
-import type {OpenOnRemoteOptions} from '@/utility/please-login.js';
-import {i18n} from '@/i18n.js';
+import { extractDomain, query } from '@@/js/url.js';
+import { host as configHost } from '@@/js/config.js';
+import type { OpenOnRemoteOptions } from '@/utility/please-login.js';
+import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 
 import MkButton from '@/components/MkButton.vue';

@@ -27,7 +27,7 @@ const props = defineProps<{
 		url: string;
 		name: string;
 		roleIdsThatCanBeUsedThisDecoration: string[];
-	};
+	} | undefined;
 	angle?: number;
 	flipH?: boolean;
 	offsetX?: number;
@@ -38,7 +38,10 @@ const emit = defineEmits<{
 	(ev: 'click'): void;
 }>();
 
-const locked = computed(() => props.decoration.roleIdsThatCanBeUsedThisDecoration.length > 0 && !$i.roles.some(r => props.decoration.roleIdsThatCanBeUsedThisDecoration.includes(r.id)));
+const locked = computed(() => {
+	if (!props.decoration) return false;
+	return props.decoration.roleIdsThatCanBeUsedThisDecoration.length > 0 && !$i.roles.some(r => props.decoration.roleIdsThatCanBeUsedThisDecoration.includes(r.id));
+});
 </script>
 
 <style lang="scss" module>

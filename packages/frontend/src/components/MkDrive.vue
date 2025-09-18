@@ -543,7 +543,7 @@ async function fetch() {
 	const foldersMax = 30;
 	const filesMax = 30;
 
-	const foldersPromise = misskeyApi('drive/folders', {
+	const fetchedFolders = await misskeyApi('drive/folders', {
 		folderId: folder.value ? folder.value.id : null,
 		limit: foldersMax + 1,
 	}).then(fetchedFolders => {
@@ -554,23 +554,24 @@ async function fetch() {
 		return fetchedFolders;
 	});
 
-	const filesPromise = showFiles.value ? misskeyApi('drive/files', {
-		folderId: folder.value ? folder.value.id : null,
-		type: props.type,
-		limit: filesMax + 1,
-		sort: sortModeSelect.value,
-	}).then(fetchedFiles => {
-		if (fetchedFiles.length === filesMax + 1) {
-			moreFiles.value = true;
-			fetchedFiles.pop();
-		}
-		return fetchedFiles;
-	}) : Promise.resolve<Misskey.entities.DriveFile[]>([]);
-
-	const [fetchedFolders, fetchedFiles] = await Promise.all([foldersPromise, filesPromise]);
-
 	for (const x of fetchedFolders) appendFolder(x);
-	for (const x of fetchedFiles) appendFile(x);
+
+	if (showFiles.value) {
+		const fetchedFiles = await misskeyApi('drive/files', {
+			folderId: folder.value ? folder.value.id : null,
+			type: props.type,
+			limit: filesMax + 1,
+			sort: sortModeSelect.value,
+		}).then(fetchedFiles => {
+			if (fetchedFiles.length === filesMax + 1) {
+				moreFiles.value = true;
+				fetchedFiles.pop();
+			}
+			return fetchedFiles;
+		});
+
+		for (const x of fetchedFiles) appendFile(x);
+	}
 
 	fetching.value = false;
 }

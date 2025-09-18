@@ -5712,6 +5712,10 @@ export interface Locale extends ILocale {
      * リモートサーバーからはあなたの情報は見れず、匿名のシステムアカウントとして表示されます。
      */
     "forwardReportIsAnonymous": string;
+    /**
+     * 入力内容が正しくありません。
+     */
+    "incorrectInput": string;
     "_chat": {
         /**
          * まだメッセージはありません

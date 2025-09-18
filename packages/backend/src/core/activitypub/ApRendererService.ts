@@ -513,9 +513,11 @@ export class ApRendererService {
 		const id = this.userEntityService.genLocalUserUri(user.id);
 		const isSystem = user.username.includes('.');
 
+		// avatarUrl / bannerUrl が存在するなら、それを優先するべき。
+		// ないならDBに保存されているIDから取ってくる。
 		const [avatar, banner, profile] = await Promise.all([
-			user.avatarId ? this.driveFilesRepository.findOneBy({ id: user.avatarId }) : undefined,
-			user.bannerId ? this.driveFilesRepository.findOneBy({ id: user.bannerId }) : undefined,
+			user.avatarUrl ?? user.avatarId ? this.driveFilesRepository.findOneBy({ id: user.avatarId }) : undefined,
+			user.bannerUrl ?? user.bannerId ? this.driveFilesRepository.findOneBy({ id: user.bannerId }) : undefined,
 			this.userProfilesRepository.findOneByOrFail({ userId: user.id }),
 		]);
 

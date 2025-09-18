@@ -68,7 +68,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div v-for="(n, i) in 16" :key="i" :class="$style.padding"></div>
 				<MkButton v-if="moreFolders" ref="moreFolders" @click="fetchMoreFolders">{{ i18n.ts.loadMore }}</MkButton>
 			</div>
-			<div v-show="files.length > 0" ref="filesContainer" :class="$style.files">
+			<div v-if="showFiles && files.length > 0" ref="filesContainer" :class="$style.files">
 				<XFile
 					v-for="(file, i) in files"
 					:key="file.id"
@@ -100,7 +100,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onActivated, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, onActivated, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from './MkButton.vue';
 import MkInfo from './MkInfo.vue';
@@ -157,6 +157,7 @@ const draghover = ref(false);
 const isDragSource = ref(false);
 
 const fetching = ref(true);
+const showFiles = computed(() => props.select !== 'folder');
 
 const ilFilesObserver = new IntersectionObserver(
 	(entries) => entries.some((entry) => entry.isIntersecting) && !fetching.value && moreFiles.value && fetchMoreFiles(),
@@ -553,7 +554,7 @@ async function fetch() {
 		return fetchedFolders;
 	});
 
-	const filesPromise = misskeyApi('drive/files', {
+	const filesPromise = showFiles.value ? misskeyApi('drive/files', {
 		folderId: folder.value ? folder.value.id : null,
 		type: props.type,
 		limit: filesMax + 1,
@@ -564,7 +565,7 @@ async function fetch() {
 			fetchedFiles.pop();
 		}
 		return fetchedFiles;
-	});
+	}) : Promise.resolve<Misskey.entities.DriveFile[]>([]);
 
 	const [fetchedFolders, fetchedFiles] = await Promise.all([foldersPromise, filesPromise]);
 
@@ -597,6 +598,8 @@ function fetchMoreFolders() {
 }
 
 function fetchMoreFiles() {
+	if (!showFiles.value) return;
+
 	fetching.value = true;
 
 	const max = 30;
@@ -718,7 +721,7 @@ function closeTip() {
 }
 
 onMounted(() => {
-	if (prefer.s.enableInfiniteScroll && loadMoreFiles.value) {
+	if (showFiles.value && prefer.s.enableInfiniteScroll && loadMoreFiles.value) {
 		nextTick(() => {
 			ilFilesObserver.observe(loadMoreFiles.value?.$el);
 		});
@@ -739,7 +742,7 @@ onMounted(() => {
 });
 
 onActivated(() => {
-	if (prefer.s.enableInfiniteScroll) {
+	if (showFiles.value && prefer.s.enableInfiniteScroll) {
 		nextTick(() => {
 			ilFilesObserver.observe(loadMoreFiles.value?.$el);
 		});

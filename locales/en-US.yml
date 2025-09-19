@@ -188,7 +188,7 @@ flagShowTimelineRepliesDescription: "Shows replies of users to notes of other us
 autoAcceptFollowed: "Automatically approve follow requests from users you're following"
 addAccount: "Add account"
 reloadAccountsList: "Reload account list"
-loginFailed: "Failed to sign in"
+loginFailed: "We couldn't verify your credentials."
 showOnRemote: "View on remote instance"
 continueOnRemote: "Continue on a remote server"
 chooseServerOnMisskeyHub: "Choose a server from the Misskey Hub"

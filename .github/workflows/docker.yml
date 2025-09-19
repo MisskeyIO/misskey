@@ -17,6 +17,10 @@ permissions:
   contents: read
   packages: write
 
+concurrency:
+  group: docker-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   push_to_registry:
     name: Push Docker image to GitHub Container Registry

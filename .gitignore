@@ -57,6 +57,7 @@ temp
 /packages/frontend/src/**/*.stories.ts
 tsdoc-metadata.json
 misskey-assets
+.git-commit
 
 # Vite temporary files
 vite.config.js.timestamp-*

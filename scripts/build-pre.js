@@ -9,6 +9,8 @@ const { execSync } = require('child_process');
 
 const rootPackageJsonPath = path.resolve(__dirname, '../package.json');
 const misskeyJsPackageJsonPath = path.resolve(__dirname, '../packages/misskey-js/package.json');
+const gitDirectoryPath = path.resolve(__dirname, '../.git');
+const gitShortHashFilePath = path.resolve(__dirname, '../.git-commit');
 const isProductionBuild = process.env.NODE_ENV === 'production';
 
 function readJson(filePath) {
@@ -23,13 +25,51 @@ function removeGitHashSuffix(version) {
         return version.replace(/[-+][0-9a-f]{7,}$/i, '');
 }
 
-function getGitShortHash() {
+function readGitShortHashFromFile() {
         try {
-                return execSync('git rev-parse --short HEAD', { encoding: 'utf-8', cwd: __dirname }).trim();
+                const content = fs.readFileSync(gitShortHashFilePath, 'utf-8').trim();
+
+                if (content.length === 0) {
+                        return null;
+                }
+
+                if (!/^[0-9a-f]{7,}$/i.test(content)) {
+                        console.warn(`Invalid git commit hash found in ${path.basename(gitShortHashFilePath)}: ${content}`);
+                        return null;
+                }
+
+                return content;
         } catch (error) {
-                console.warn('Unable to determine git commit hash:', error);
+                if (error.code !== 'ENOENT') {
+                        console.warn('Unable to read git commit hash from file:', error);
+                }
+
                 return null;
         }
+}
+
+function getGitShortHash() {
+        const hasGitDirectory = fs.existsSync(gitDirectoryPath);
+
+        if (hasGitDirectory) {
+                try {
+                        return execSync('git rev-parse --short HEAD', { encoding: 'utf-8', cwd: __dirname }).trim();
+                } catch (error) {
+                        console.warn('Unable to determine git commit hash using git:', error);
+                }
+        }
+
+        const fallbackHash = readGitShortHashFromFile();
+
+        if (fallbackHash) {
+                return fallbackHash;
+        }
+
+        if (!hasGitDirectory) {
+                console.warn(`Unable to determine git commit hash: ${path.basename(gitShortHashFilePath)} is missing or invalid.`);
+        }
+
+        return null;
 }
 
 function ensureVersions() {

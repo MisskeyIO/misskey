@@ -263,7 +263,7 @@ export async function common(createVue: () => Promise<App<Element>>) {
 				}
 			}
 
-			if (targetElement?.closest('textarea, input, [contenteditable="true"], ._selectable, ._selectableAtomic')) return;
+			if (targetElement?.closest('textarea, input, [contenteditable]:not([contenteditable="false"]), ._selectable, ._selectableAtomic')) return;
 
 			selection.removeAllRanges();
 		};

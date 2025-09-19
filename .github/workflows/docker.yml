@@ -19,30 +19,9 @@ permissions:
 
 jobs:
   push_to_registry:
-    name: Push Docker image to GitHub Container Registry (${{ matrix.variant }})
-    runs-on: ubuntu-22.04
-    if: >-
-      ${{ github.repository == 'MisskeyIO/misskey' && ((github.ref_type == 'branch' && github.ref_name == matrix.branch)
-      || (github.ref_type == 'tag' && matrix.tag_contains != '' && contains(github.ref_name,
-      matrix.tag_contains))) }}
-    strategy:
-      matrix:
-        include:
-          - variant: main
-            branch: main
-            tag_contains: ''
-          - variant: next
-            branch: next
-            tag_contains: ''
-          - variant: beta
-            branch: beta
-            tag_contains: ''
-          - variant: host
-            branch: host
-            tag_contains: '-host.'
-          - variant: io
-            branch: io
-            tag_contains: '-io.'
+    name: Push Docker image to GitHub Container Registry
+    runs-on: ubuntu-latest
+    if: github.repository == 'MisskeyIO/misskey'
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
@@ -66,26 +45,37 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Prepare image metadata
-        id: prep
+        shell: bash
         run: |
-          format_ref_name() {
-            echo "$1" | sed -e 's/\//-/g'
-          }
-
-          FORMATTED_REF_NAME="$(format_ref_name "${GITHUB_REF_NAME}")"
-          FORMATTED_BRANCH_NAME="$(format_ref_name "${{ matrix.branch }}")"
-
-          echo "FORMATTED_BRANCH_NAME=${FORMATTED_REF_NAME}" >> "$GITHUB_ENV"
-          echo "CACHE_SCOPE=${FORMATTED_BRANCH_NAME}" >> "$GITHUB_ENV"
+          set -euo pipefail
+          
+          ref_type="${{ github.ref_type }}"
+          ref_name="$(echo ${{ github.ref_name }} | sed -e 's/\//-/g' )"
+          
+          case "${ref_type}" in
+            branch)
+              branch_name="${ref_name}"
+              ;;
+            tag)
+              if [[ "${ref_name}" == *-host.* ]]; then
+                branch_name="host"
+              elif [[ "${ref_name}" == *-io.* ]]; then
+                branch_name="io"
+              else
+                echo "Unsupported tag pattern: "${ref_name}"" >&2
+                exit 1
+              fi
+              ;;
+            *)
+              echo "Unsupported ref type: ${ref_type}" >&2
+              exit 1
+              ;;
+          esac
 
           {
-            echo 'tags<<EOF'
-            echo "ghcr.io/misskeyio/misskey:${FORMATTED_REF_NAME}"
-            if [ "${FORMATTED_REF_NAME}" != "${FORMATTED_BRANCH_NAME}" ]; then
-              echo "ghcr.io/misskeyio/misskey:${FORMATTED_BRANCH_NAME}"
-            fi
-            echo 'EOF'
-          } >> "$GITHUB_OUTPUT"
+            echo "BRANCH_NAME=${branch_name}"
+            echo "REF_NAME=${ref_name}"
+          } >> "${GITHUB_ENV}"
       - name: Build and Push to GitHub Container Registry
         uses: docker/build-push-action@v6
         with:
@@ -94,7 +84,9 @@ jobs:
           push: true
           platforms: ${{ steps.buildx.outputs.platforms }}
           provenance: false
-          labels: ${{ env.FORMATTED_BRANCH_NAME }}
-          cache-from: type=registry,ref=ghcr.io/misskeyio/misskey:buildcache-${{ env.CACHE_SCOPE }}
-          cache-to: type=registry,ref=ghcr.io/misskeyio/misskey:buildcache-${{ env.CACHE_SCOPE }},mode=max
-          tags: ${{ steps.prep.outputs.tags }}
+          labels: ${{ env.REF_NAME }}
+          cache-from: type=registry,ref=ghcr.io/misskeyio/misskey:buildcache-${{ env.BRANCH_NAME }}
+          cache-to: type=registry,ref=ghcr.io/misskeyio/misskey:buildcache-${{ env.BRANCH_NAME }},mode=max
+          tags: |
+            ghcr.io/misskeyio/misskey:${{ env.BRANCH_NAME }}
+            ghcr.io/misskeyio/misskey:${{ env.REF_NAME }}

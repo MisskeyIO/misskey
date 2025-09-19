@@ -5713,9 +5713,13 @@ export interface Locale extends ILocale {
      */
     "forwardReportIsAnonymous": string;
     /**
-     * 認証情報を確認できませんでした。
+     * 入力内容が正しくありません。
      */
     "incorrectInput": string;
+    /**
+     * 認証情報を確認できませんでした。
+     */
+    "credentialsVerificationFailed": string;
     "_chat": {
         /**
          * まだメッセージはありません

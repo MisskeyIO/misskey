@@ -12,13 +12,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 	}]"
 >
 	<ImgWithBlurhash
-		v-if="isThumbnailAvailable"
+		v-if="isThumbnailAvailable && !thumbnailLoadError"
 		:hash="file.blurhash"
 		:src="file.thumbnailUrl"
 		:alt="file.name"
 		:title="file.name"
 		:cover="fit !== 'contain'"
 		:forceBlurhash="forceBlurhash"
+		@error="onThumbnailError"
 	/>
 	<i v-else-if="is === 'image'" class="ti ti-photo" :class="$style.icon"></i>
 	<i v-else-if="is === 'video'" class="ti ti-video" :class="$style.icon"></i>
@@ -29,12 +30,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<i v-else-if="is === 'archive'" class="ti ti-file-zip" :class="$style.icon"></i>
 	<i v-else class="ti ti-file" :class="$style.icon"></i>
 
-	<i v-if="isThumbnailAvailable && is === 'video'" class="ti ti-video" :class="$style.iconSub"></i>
+	<i v-if="isThumbnailAvailable && !thumbnailLoadError && is === 'video'" class="ti ti-video" :class="$style.iconSub"></i>
 </div>
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import ImgWithBlurhash from '@/components/MkImgWithBlurhash.vue';
 
@@ -45,6 +46,17 @@ const props = defineProps<{
 	forceBlurhash?: boolean;
 	large?: boolean;
 }>();
+
+const thumbnailLoadError = ref(false);
+
+function onThumbnailError() {
+	thumbnailLoadError.value = true;
+}
+
+// Reset error state when file changes
+watch(() => props.file, () => {
+	thumbnailLoadError.value = false;
+}, { immediate: true });
 
 const is = computed(() => {
 	if (props.file.type.startsWith('image/')) return 'image';

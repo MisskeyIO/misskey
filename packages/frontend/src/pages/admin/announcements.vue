@@ -206,7 +206,7 @@ async function archive(announcement) {
 		...announcement,
 		isActive: false,
 	});
-	fetch(true);
+	refresh();
 }
 
 async function unarchive(announcement) {
@@ -223,7 +223,7 @@ async function save(announcement): Promise<void> {
 	} else {
 		await os.apiWithDialog('admin/announcements/update', announcement);
 	}
-	fetch(true);
+	refresh();
 }
 
 function fetch(resetOffset = false): void {
@@ -255,7 +255,6 @@ function refresh() {
 }
 
 watch(user, () => fetch(true));
-fetch(true);
 
 const headerActions = computed(() => [{
 	asFullButton: true,

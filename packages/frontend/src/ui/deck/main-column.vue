@@ -55,7 +55,7 @@ function onContextmenu(ev: MouseEvent) {
 	if (!ev.target) return;
 
 	if (isLink(ev.target as HTMLElement)) return;
-	if (['INPUT', 'TEXTAREA', 'IMG', 'VIDEO', 'CANVAS'].includes((ev.target as HTMLElement).tagName) || (ev.target as HTMLElement).attributes['contenteditable']) return;
+	if (['INPUT', 'TEXTAREA', 'IMG', 'VIDEO', 'CANVAS'].includes((ev.target as HTMLElement).tagName) || (ev.target as HTMLElement).isContentEditable) return;
 	if (window.getSelection()?.toString() !== '') return;
 	const path = mainRouter.currentRoute.value.path;
 	os.contextMenu([{

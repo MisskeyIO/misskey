@@ -40,7 +40,7 @@ jobs:
           images: ghcr.io/misskeyio/misskey
           tags: |
             type=ref,event=branch
-            type=ref,event=pr
+            type=ref,event=tag
             type=semver,pattern={{version}}
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -54,8 +54,7 @@ jobs:
           set -euo pipefail
           
           ref_type="${{ github.ref_type }}"
-          ref_name="${{ github.ref_name }}"
-          ref_name="${ref_name//\//-}"
+          ref_name="$(echo ${{ github.ref_name }} | sed -e 's/\//-/g' )"
 
           branch_name="main"
           case "${ref_type}" in

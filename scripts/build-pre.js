@@ -25,7 +25,7 @@ function removeGitHashSuffix(version) {
 
 function getGitShortHash() {
         try {
-                return execSync('git rev-parse --short HEAD', { encoding: 'utf-8' }).trim();
+                return execSync('git rev-parse --short HEAD', { encoding: 'utf-8', cwd: __dirname }).trim();
         } catch (error) {
                 console.warn('Unable to determine git commit hash:', error);
                 return null;

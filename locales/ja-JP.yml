@@ -189,6 +189,7 @@ autoAcceptFollowed: "フォロー中ユーザーからのフォロリクを自�
 addAccount: "アカウントを追加"
 reloadAccountsList: "アカウントリストの情報を更新"
 loginFailed: "ログインに失敗しました"
+credentialsVerificationFailed: "認証情報を確認できませんでした。"
 showOnRemote: "リモートで表示"
 continueOnRemote: "リモートで続行"
 chooseServerOnMisskeyHub: "Misskey Hubからサーバーを選択"

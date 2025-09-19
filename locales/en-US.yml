@@ -189,6 +189,7 @@ autoAcceptFollowed: "Automatically approve follow requests from users you're fol
 addAccount: "Add account"
 reloadAccountsList: "Reload account list"
 loginFailed: "Failed to sign in"
+credentialsVerificationFailed: "We couldn't verify your credentials."
 showOnRemote: "View on remote instance"
 continueOnRemote: "Continue on a remote server"
 chooseServerOnMisskeyHub: "Choose a server from the Misskey Hub"

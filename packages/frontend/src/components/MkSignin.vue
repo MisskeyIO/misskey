@@ -67,17 +67,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, ref, shallowRef, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
-import { supported as webAuthnSupported, parseRequestOptionsFromJSON } from '@github/webauthn-json/browser-ponyfill';
+import { parseRequestOptionsFromJSON, supported as webAuthnSupported } from '@github/webauthn-json/browser-ponyfill';
 import type { AuthenticationPublicKeyCredential } from '@github/webauthn-json/browser-ponyfill';
 import type { OpenOnRemoteOptions } from '@/utility/please-login.js';
 import type { PwResponse } from '@/components/MkSignin.password.vue';
+import XPassword from '@/components/MkSignin.password.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { showSuspendedDialog } from '@/utility/show-suspended-dialog.js';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 
 import XInput from '@/components/MkSignin.input.vue';
-import XPassword from '@/components/MkSignin.password.vue';
 import XTotp from '@/components/MkSignin.totp.vue';
 import XPasskey from '@/components/MkSignin.passkey.vue';
 import { login } from '@/accounts.js';
@@ -164,9 +164,11 @@ async function onUsernameSubmitted(_username: string) {
 
 	username = _username;
 
-	userInfo.value = await misskeyApi('users/show', {
-		username,
-	}).catch(() => null);
+	if (!username.includes('@')) {
+		userInfo.value = await misskeyApi('users/show', {
+			username,
+		}).catch(() => null);
+	}
 
 	await tryLogin({
 		username,
@@ -304,7 +306,7 @@ function onSigninApiError(err?: any): void {
 			os.alert({
 				type: 'error',
 				title: i18n.ts.loginFailed,
-				text: i18n.ts.incorrectPassword,
+				text: i18n.ts.credentialsVerificationFailed,
 			});
 			break;
 		}

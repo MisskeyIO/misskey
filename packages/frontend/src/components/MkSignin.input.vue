@@ -38,8 +38,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<span v-else>@</span>
 				</template>
 				<template v-if="!loginWithEmailAddress" #suffix>@{{ host }}</template>
+				<template #caption>
+					<button class="_textButton" type="button" tabindex="-1" @click="loginWithEmailAddress = !loginWithEmailAddress">{{ loginWithEmailAddress ? i18n.ts.usernameLogin : i18n.ts.emailAddressLogin }}</button>
+				</template>
 			</MkInput>
-			<MkButton type="submit" large primary rounded style="margin: 0 auto;" data-cy-signin-page-input-continue>{{ i18n.ts.continue }} <i class="ti ti-arrow-right"></i></MkButton>
+			<MkButton type="submit" :disabled="loginWithEmailAddress ? !isEmailAddress : false" large primary rounded style="margin: 0 auto;" data-cy-signin-page-input-continue>{{ i18n.ts.continue }} <i class="ti ti-arrow-right"></i></MkButton>
 		</form>
 
 		<div :class="$style.orHr">
@@ -50,21 +53,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkButton type="submit" style="margin: auto auto;" large rounded primary gradate @click="emit('passkeyClick', $event)">
 				<i class="ti ti-device-usb" style="font-size: medium;"></i>{{ i18n.tsx.signinWith({x: i18n.ts.securityKeyAndPasskey}) }}
 			</MkButton>
-
-			<!-- メールアドレスログイン -->
-			<MkButton type="submit" style="margin: auto auto;" large rounded primary gradate @click="loginWithEmailAddress = !loginWithEmailAddress">
-				<i :class="!loginWithEmailAddress ? 'ti ti-mail' : 'ti ti-user'" style="font-size: medium;"></i>{{ !loginWithEmailAddress ? i18n.tsx.signinWith({x: i18n.ts.emailAddress}) : i18n.tsx.signinWith({x: i18n.ts.username}) }}
-			</MkButton>
 		</div>
 	</div>
 </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { toUnicode } from 'punycode.js';
 
-import { query, extractDomain } from '@@/js/url.js';
+import { extractDomain, query } from '@@/js/url.js';
 import { host as configHost } from '@@/js/config.js';
 import type { OpenOnRemoteOptions } from '@/utility/please-login.js';
 import { i18n } from '@/i18n.js';
@@ -74,12 +72,17 @@ import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
 import MkInfo from '@/components/MkInfo.vue';
 
- withDefaults(defineProps<{
+withDefaults(defineProps<{
 	message?: string,
 	openOnRemote?: OpenOnRemoteOptions,
 }>(), {
 	message: '',
 	openOnRemote: undefined,
+});
+
+const isEmailAddress = computed(() => {
+	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	return emailRegex.test(username.value);
 });
 
 const emit = defineEmits<{

@@ -17,6 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div :class="$style.decorations">
 					<XDecoration
 						v-for="(avatarDecoration, i) in $i.avatarDecorations"
+						:key="avatarDecoration.id"
 						:decoration="avatarDecorations.find(d => d.id === avatarDecoration.id)"
 						:angle="avatarDecoration.angle"
 						:flipH="avatarDecoration.flipH"
@@ -47,7 +48,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, defineAsyncComponent, computed } from 'vue';
+import { computed, defineAsyncComponent, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import XDecoration from './avatar-decoration.decoration.vue';
 import MkButton from '@/components/MkButton.vue';
@@ -71,13 +72,14 @@ misskeyApi('get-avatar-decorations').then(_avatarDecorations => {
 function openDecoration(avatarDecoration, index?: number) {
 	const { dispose } = os.popup(defineAsyncComponent(() => import('./avatar-decoration.dialog.vue')), {
 		decoration: avatarDecoration,
-		usingIndex: index,
+		usingIndex: index ?? null,
 	}, {
 		'attach': async (payload) => {
 			const decoration = {
 				id: avatarDecoration.id,
 				angle: payload.angle,
 				flipH: payload.flipH,
+				url: avatarDecoration.url,
 				offsetX: payload.offsetX,
 				offsetY: payload.offsetY,
 			};
@@ -92,10 +94,13 @@ function openDecoration(avatarDecoration, index?: number) {
 				id: avatarDecoration.id,
 				angle: payload.angle,
 				flipH: payload.flipH,
+				url: avatarDecoration.url,
 				offsetX: payload.offsetX,
 				offsetY: payload.offsetY,
 			};
 			const update = [...$i.avatarDecorations];
+			if (index == null) return;
+
 			update[index] = decoration;
 			await os.apiWithDialog('i/update', {
 				avatarDecorations: update,
@@ -104,6 +109,8 @@ function openDecoration(avatarDecoration, index?: number) {
 		},
 		'detach': async () => {
 			const update = [...$i.avatarDecorations];
+			if (index == null) return;
+
 			update.splice(index, 1);
 			await os.apiWithDialog('i/update', {
 				avatarDecorations: update,

@@ -54,8 +54,8 @@ jobs:
           set -euo pipefail
           
           ref_type="${{ github.ref_type }}"
-          ref_name="$(echo ${{ github.ref_name }} | sed -e 's/\//-/g' )"
-          
+          ref_name="${{ github.ref_name }}"
+          ref_name="${ref_name//\//-}"
           case "${ref_type}" in
             branch)
               branch_name="${ref_name}"

@@ -159,18 +159,13 @@ function insertEmoji(ev: MouseEvent): void {
 	os.openEmojiPicker(
 		(ev.currentTarget ?? ev.target) as HTMLElement,
 		{ asReactionPicker: false },
-		announceTitleEl.value
+		announceTitleEl.value,
 	);
 }
 
-watch(announcementsStatus, (to) => {
+watch(announcementsStatus, () => {
 	loading.value = true;
-	misskeyApi('admin/announcements/list', {
-		status: to,
-	}).then(announcementResponse => {
-		announcements.value = announcementResponse;
-		loading.value = false;
-	});
+	fetch(true);
 }, { immediate: true });
 
 function add() {
@@ -230,28 +225,34 @@ function fetch(resetOffset = false): void {
 	if (resetOffset) {
 		announcements.value = [];
 		offset.value = 0;
+		hasMore.value = false;
 	}
 
-	misskeyApi('admin/announcements/list', {
+	const params: any = {
 		offsetMode: true,
 		offset: offset.value,
 		limit: 10,
-		userId: user.value?.id,
-	}).then(announcementResponse => {
-		announcements.value = announcements.value.concat(announcementResponse);
+		status: announcementsStatus.value,
+	};
+
+	if (user.value?.id) {
+		params.userId = user.value.id;
+	}
+
+	misskeyApi('admin/announcements/list', params).then(announcementResponse => {
+		if (resetOffset) {
+			announcements.value = announcementResponse;
+		} else {
+			announcements.value = announcements.value.concat(announcementResponse);
+		}
 		hasMore.value = announcementResponse?.length === 10;
 		offset.value += announcementResponse?.length ?? 0;
+		loading.value = false;
 	});
 }
 
 function refresh() {
-	loading.value = true;
-	misskeyApi('admin/announcements/list', {
-		status: announcementsStatus.value,
-	}).then(announcementResponse => {
-		announcements.value = announcementResponse;
-		loading.value = false;
-	});
+	fetch(true);
 }
 
 watch(user, () => fetch(true));

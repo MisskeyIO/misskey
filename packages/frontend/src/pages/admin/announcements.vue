@@ -105,8 +105,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</div>
 					</div>
 				</MkFolder>
-				<MkButton v-if="hasMore" :class="$style.more" :disabled="!hasMore" primary rounded @click="fetch()">
-					<i class="ti ti-reload"></i>{{ i18n.ts.more }}
+				<MkButton v-if="hasMore" :class="$style.more" :disabled="!hasMore || fetching" primary rounded @click="fetch()">
+					<i class="ti ti-reload"></i>{{ fetching ? 'Loading...' : i18n.ts.more }}
 				</MkButton>
 			</template>
 		</div>
@@ -139,6 +139,8 @@ import MkTextarea from '@/components/MkTextarea.vue';
 const announcementsStatus = ref<'active' | 'archived'>('active');
 
 const loading = ref(true);
+const fetching = ref(false);
+let fetchSequence = 0;
 
 const announcements = ref<any[]>([]);
 
@@ -163,9 +165,8 @@ function insertEmoji(ev: MouseEvent): void {
 	);
 }
 
-watch(announcementsStatus, () => {
-	loading.value = true;
-	fetch(true);
+watch(announcementsStatus, async () => {
+	await refresh();
 }, { immediate: true });
 
 function add() {
@@ -221,25 +222,37 @@ async function save(announcement): Promise<void> {
 	refresh();
 }
 
-function fetch(resetOffset = false): void {
-	if (resetOffset) {
-		announcements.value = [];
-		offset.value = 0;
-		hasMore.value = false;
-	}
+async function fetch(resetOffset = false): Promise<void> {
+	// Prevent duplicate requests
+	if (fetching.value) return;
 
-	const params: any = {
-		offsetMode: true,
-		offset: offset.value,
-		limit: 10,
-		status: announcementsStatus.value,
-	};
+	fetching.value = true;
+	const currentSequence = ++fetchSequence;
 
-	if (user.value?.id) {
-		params.userId = user.value.id;
-	}
+	try {
+		if (resetOffset) {
+			announcements.value = [];
+			offset.value = 0;
+			hasMore.value = false;
+			loading.value = true;
+		}
 
-	misskeyApi('admin/announcements/list', params).then(announcementResponse => {
+		const params: any = {
+			offsetMode: true,
+			offset: offset.value,
+			limit: 10,
+			status: announcementsStatus.value,
+		};
+
+		if (user.value?.id) {
+			params.userId = user.value.id;
+		}
+
+		const announcementResponse = await misskeyApi('admin/announcements/list', params);
+
+		// Check if this is still the latest request
+		if (currentSequence !== fetchSequence) return;
+
 		if (resetOffset) {
 			announcements.value = announcementResponse;
 		} else {
@@ -247,15 +260,28 @@ function fetch(resetOffset = false): void {
 		}
 		hasMore.value = announcementResponse?.length === 10;
 		offset.value += announcementResponse?.length ?? 0;
-		loading.value = false;
-	});
+	} catch (error) {
+		console.error('Failed to fetch announcements:', error);
+		if (currentSequence === fetchSequence) {
+			os.alert({
+				type: 'error',
+				title: 'エラー',
+				text: 'お知らせの取得に失敗しました。',
+			});
+		}
+	} finally {
+		if (currentSequence === fetchSequence) {
+			loading.value = false;
+			fetching.value = false;
+		}
+	}
 }
 
-function refresh() {
-	fetch(true);
+async function refresh(): Promise<void> {
+	await fetch(true);
 }
 
-watch(user, () => fetch(true));
+watch(user, () => refresh());
 
 const headerActions = computed(() => [{
 	asFullButton: true,

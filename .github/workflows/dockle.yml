@@ -22,6 +22,11 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
+      - name: Persist git metadata for Docker build
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s\n' "$(git rev-parse --short HEAD)" > .git-commit
       - name: Build an image from Dockerfile
         uses: docker/build-push-action@v6
         with:

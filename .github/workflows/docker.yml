@@ -32,6 +32,11 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
+      - name: Persist git metadata for Docker build
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s\n' "$(git rev-parse --short HEAD)" > .git-commit
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v3

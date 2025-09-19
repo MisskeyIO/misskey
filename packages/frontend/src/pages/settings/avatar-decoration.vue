@@ -79,7 +79,7 @@ function openDecoration(avatarDecoration, index?: number) {
 				id: avatarDecoration.id,
 				angle: payload.angle,
 				flipH: payload.flipH,
-				url: avatarDecoration.url,
+				url: avatarDecoration.url ?? avatarDecorations.value.find(d => d.id === avatarDecoration.id)?.url ?? '',
 				offsetX: payload.offsetX,
 				offsetY: payload.offsetY,
 			};
@@ -94,7 +94,7 @@ function openDecoration(avatarDecoration, index?: number) {
 				id: avatarDecoration.id,
 				angle: payload.angle,
 				flipH: payload.flipH,
-				url: avatarDecoration.url,
+				url: avatarDecoration.url ?? avatarDecorations.value.find(d => d.id === avatarDecoration.id)?.url ?? '',
 				offsetX: payload.offsetX,
 				offsetY: payload.offsetY,
 			};

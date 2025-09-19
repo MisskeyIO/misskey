@@ -16,7 +16,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div>
 		<div class="_spacer" style="--MI_SPACER-min: 20px; --MI_SPACER-max: 28px;">
 			<div style="text-align: center;">
-				<div :class="$style.name">{{ decoration.name }}</div>
+				<div :class="$style.name">{{ decoration?.name ?? '' }}</div>
 				<MkAvatar style="width: 64px; height: 64px; margin-bottom: 20px;" :user="$i" :decorations="decorationsForPreview" forceShowDecoration/>
 			</div>
 			<div class="_gaps_s">

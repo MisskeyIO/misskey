@@ -11,20 +11,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 			<MkAvatar :class="$style.avatar" :user="$i" forceShowDecoration/>
 
-			<div v-if="$i.avatarDecorations.length > 0" v-panel :class="$style.current" class="_gaps_s">
+			<div v-if="matchedDecorations.length > 0" v-panel :class="$style.current" class="_gaps_s">
 				<div>{{ i18n.ts.inUse }}</div>
 
 				<div :class="$style.decorations">
 					<XDecoration
-						v-for="(avatarDecoration, i) in $i.avatarDecorations"
-						:key="avatarDecoration.id"
-						:decoration="avatarDecorations.find(d => d.id === avatarDecoration.id)"
-						:angle="avatarDecoration.angle"
-						:flipH="avatarDecoration.flipH"
-						:offsetX="avatarDecoration.offsetX"
-						:offsetY="avatarDecoration.offsetY"
+						v-for="(decoration, i) in matchedDecorations"
+						:key="decoration.id"
+						:decoration="decoration"
+						:angle="decoration.angle"
+						:flipH="decoration.flipH"
+						:offsetX="decoration.offsetX"
+						:offsetY="decoration.offsetY"
 						:active="true"
-						@click="openDecoration(avatarDecoration, i)"
+						@click="openDecoration(decoration, i)"
 					/>
 				</div>
 
@@ -63,6 +63,16 @@ const $i = ensureSignin();
 
 const loading = ref(true);
 const avatarDecorations = ref<Misskey.entities.GetAvatarDecorationsResponse>([]);
+
+const matchedDecorations = computed(() => {
+	return $i.avatarDecorations.map(userDecoration => {
+		const decoration = avatarDecorations.value.find(d => d.id === userDecoration.id);
+		return {
+			...userDecoration,
+			...decoration,
+		};
+	}).filter(d => d.url); // URLが存在するもののみ
+});
 
 misskeyApi('get-avatar-decorations').then(_avatarDecorations => {
 	avatarDecorations.value = _avatarDecorations;

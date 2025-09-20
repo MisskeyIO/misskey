@@ -8,8 +8,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 	:class="[$style.root, { [$style.active]: active }]"
 	@click="emit('click')"
 >
-	<div :class="$style.name"><MkCondensedLine :minScale="0.5">{{ decoration?.name ?? '' }}</MkCondensedLine></div>
-	<MkAvatar v-if="decoration" style="width: 60px; height: 60px;" :user="$i" :decorations="[{ url: decoration.url, angle, flipH, offsetX, offsetY }]" forceShowDecoration/>
+	<div :class="$style.name"><MkCondensedLine :minScale="0.5">{{ decoration.name ?? '' }}</MkCondensedLine></div>
+	<MkAvatar style="width: 60px; height: 60px;" :user="$i" :decorations="[{ url: decoration.url, angle, flipH, offsetX, offsetY }]" forceShowDecoration/>
 	<i v-if="locked" :class="$style.lock" class="ti ti-lock"></i>
 </div>
 </template>
@@ -25,9 +25,9 @@ const props = defineProps<{
 	decoration: {
 		id: string;
 		url: string;
-		name: string;
-		roleIdsThatCanBeUsedThisDecoration: string[];
-	} | undefined;
+		name?: string;
+		roleIdsThatCanBeUsedThisDecoration?: string[];
+	};
 	angle?: number;
 	flipH?: boolean;
 	offsetX?: number;
@@ -40,7 +40,8 @@ const emit = defineEmits<{
 
 const locked = computed(() => {
 	if (!props.decoration) return false;
-	return props.decoration.roleIdsThatCanBeUsedThisDecoration.length > 0 && !$i.roles.some(r => props.decoration.roleIdsThatCanBeUsedThisDecoration.includes(r.id));
+	const roles = props.decoration.roleIdsThatCanBeUsedThisDecoration ?? [];
+	return roles.length > 0 && !$i.roles.some(r => roles.includes(r.id));
 });
 </script>
 

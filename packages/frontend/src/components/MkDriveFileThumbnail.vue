@@ -69,12 +69,6 @@ function onImageError() {
 	imageFailed.value = true;
 }
 
-// Reset error states when file changes
-watch(() => props.file, () => {
-	blurhashFailed.value = false;
-	imageFailed.value = false;
-}, { immediate: true });
-
 const is = computed(() => {
 	if (props.file.type.startsWith('image/')) return 'image';
 	if (props.file.type.startsWith('video/')) return 'video';

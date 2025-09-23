@@ -223,11 +223,11 @@ async function save(announcement): Promise<void> {
 }
 
 async function fetch(resetOffset = false): Promise<void> {
-	// Prevent duplicate requests
-	if (fetching.value) return;
+	// Allow "reset" to preempt; block only pagination duplicates
+	if (fetching.value && !resetOffset) return;
 
-	fetching.value = true;
 	const currentSequence = ++fetchSequence;
+	fetching.value = true;
 
 	try {
 		if (resetOffset) {

@@ -237,7 +237,7 @@ async function fetch(resetOffset = false): Promise<void> {
 			loading.value = true;
 		}
 
-		const params: any = {
+		const params = {
 			offsetMode: true,
 			offset: offset.value,
 			limit: 10,

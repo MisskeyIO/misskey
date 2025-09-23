@@ -179,7 +179,7 @@
 		"tmp": "0.2.3",
 		"tsc-alias": "1.8.16",
 		"tsconfig-paths": "4.2.0",
-		"typeorm": "0.3.23",
+		"typeorm": "0.3.27",
 		"typescript": "5.8.3",
 		"ulid": "3.0.0",
 		"vary": "1.1.2",

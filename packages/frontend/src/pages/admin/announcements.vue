@@ -202,7 +202,7 @@ async function archive(announcement) {
 		...announcement,
 		isActive: false,
 	});
-	refresh();
+	await refresh();
 }
 
 async function unarchive(announcement) {
@@ -210,7 +210,7 @@ async function unarchive(announcement) {
 		...announcement,
 		isActive: true,
 	});
-	refresh();
+	await refresh();
 }
 
 async function save(announcement): Promise<void> {
@@ -219,7 +219,7 @@ async function save(announcement): Promise<void> {
 	} else {
 		await os.apiWithDialog('admin/announcements/update', announcement);
 	}
-	refresh();
+	await refresh();
 }
 
 async function fetch(resetOffset = false): Promise<void> {

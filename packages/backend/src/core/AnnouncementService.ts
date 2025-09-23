@@ -139,6 +139,7 @@ export class AnnouncementService {
 		limit: number,
 		offset: number,
 		moderator: MiUser,
+		status: 'active' | 'archived' | null = null,
 	): Promise<(MiAnnouncement & { userInfo: Packed<'UserLite'> | null, reads: number, lastReadAt: Date | null })[]> {
 		const query = this.announcementsRepository.createQueryBuilder('announcement');
 
@@ -146,6 +147,12 @@ export class AnnouncementService {
 			query.andWhere('announcement."userId" = :userId', { userId: userId });
 		} else {
 			query.andWhere('announcement."userId" IS NULL');
+		}
+
+		if (status === 'active') {
+			query.andWhere('announcement."isActive" = true');
+		} else if (status === 'archived') {
+			query.andWhere('announcement."isActive" = false');
 		}
 
 		query.orderBy({

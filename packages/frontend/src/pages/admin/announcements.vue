@@ -117,6 +117,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref, computed, watch, useTemplateRef } from 'vue';
 import * as misskey from 'misskey-js';
+import type { entities } from 'misskey-js';
 import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
 import MkSelect from '@/components/MkSelect.vue';
@@ -237,18 +238,13 @@ async function fetch(resetOffset = false): Promise<void> {
 			loading.value = true;
 		}
 
-		const params = {
+		const announcementResponse = await misskeyApi('admin/announcements/list', {
 			offsetMode: true,
 			offset: offset.value,
 			limit: 10,
 			status: announcementsStatus.value,
-		};
-
-		if (user.value?.id) {
-			params.userId = user.value.id;
-		}
-
-		const announcementResponse = await misskeyApi('admin/announcements/list', params);
+			...(user.value?.id ? { userId: user.value.id } : {}),
+		});
 
 		// Check if this is still the latest request
 		if (currentSequence !== fetchSequence) return;

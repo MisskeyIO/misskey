@@ -62,9 +62,6 @@ COPY --link ["packages/misskey-bubble-game/package.json", "./packages/misskey-bu
 RUN pnpm i --frozen-lockfile --aggregate-output --prefer-offline \
 	&& pnpm rebuild -r
 
-# NOTE: for Instana monitoring
-RUN pnpm add @instana/collector
-
 FROM --platform=$TARGETPLATFORM node:22-slim AS runner
 
 ARG UID="991"

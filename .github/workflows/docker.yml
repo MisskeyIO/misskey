@@ -99,7 +99,9 @@ jobs:
           push: true
           platforms: ${{ steps.buildx.outputs.platforms }}
           provenance: false
-          tags: "with-instana"
+          tags: |
+            ghcr.io/misskeyio/misskey:with-instana
+            ghcr.io/misskeyio/misskey:${{ env.BRANCH_NAME }}-with-instana
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=ghcr.io/misskeyio/misskey:buildcache-${{ env.BRANCH_NAME }}-with-instana
           cache-to: type=registry,ref=ghcr.io/misskeyio/misskey:buildcache-${{ env.BRANCH_NAME }}-with-instana,mode=max

@@ -61,7 +61,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          
+
           ref_type="${{ github.ref_type }}"
           ref_name="$(echo ${{ github.ref_name }} | sed -e 's/\//-/g')"
 
@@ -90,3 +90,20 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=ghcr.io/misskeyio/misskey:buildcache-${{ env.BRANCH_NAME }}
           cache-to: type=registry,ref=ghcr.io/misskeyio/misskey:buildcache-${{ env.BRANCH_NAME }},mode=max
+      - name: Build and Push to GitHub Container Registry (with instana collector)
+        uses: docker/build-push-action@v6
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          context: .
+          file: dockerfile/with-instana.Dockerfile
+          build-args: |
+            BASE_IMAGE=ghcr.io/misskeyio/misskey:${{ env.BRANCH_NAME }}
+          push: true
+          platforms: ${{ steps.buildx.outputs.platforms }}
+          provenance: false
+          tags: |
+            ghcr.io/misskeyio/misskey:with-instana
+            ghcr.io/misskeyio/misskey:${{ env.BRANCH_NAME }}-with-instana
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=ghcr.io/misskeyio/misskey:buildcache-${{ env.BRANCH_NAME }}-with-instana
+          cache-to: type=registry,ref=ghcr.io/misskeyio/misskey:buildcache-${{ env.BRANCH_NAME }}-with-instana,mode=max

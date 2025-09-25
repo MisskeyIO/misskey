@@ -96,6 +96,8 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
           file: dockerfile/with-instana.Dockerfile
+          build-args: |
+            BASE_IMAGE=ghcr.io/misskeyio/misskey:${{ env.BRANCH_NAME }}
           push: true
           platforms: ${{ steps.buildx.outputs.platforms }}
           provenance: false

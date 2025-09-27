@@ -7,6 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <MkModal
 	ref="modal"
 	:preferType="'dialog'"
+	:hasInteractionWithOtherFocusTrappedEls="true"
 	@click="modal?.close()"
 	@closed="onModalClosed()"
 	@esc="modal?.close()"

@@ -11,6 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	:canResize="true"
 	:mini="true"
 	:front="true"
+	allowFocusTrapInteraction
 	@closed="emit('closed')"
 >
 	<MkEmojiPicker

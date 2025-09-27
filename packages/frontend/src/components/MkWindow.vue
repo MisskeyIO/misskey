@@ -16,7 +16,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		v-if="showing"
 		ref="rootEl"
 		:class="[$style.root, { [$style.maximized]: maximized }]"
-		:data-focus-trap-interactable="props.allowFocusTrapInteraction ? 'true' : null"
+ 		:data-focus-trap-interactable="allowFocusTrapInteraction ? '' : null"
 	>
 		<div :class="$style.body" class="_shadow" @mousedown="onBodyMousedown" @keydown="onKeydown">
 			<div :class="[$style.header, { [$style.mini]: mini }]" @contextmenu.prevent.stop="onContextmenu">
@@ -101,6 +101,9 @@ const props = withDefaults(defineProps<{
 	contextmenu?: MenuItem[] | null;
 	buttonsLeft?: WindowButton[];
 	buttonsRight?: WindowButton[];
+	/**
+	 * Allow this window to remain interactive alongside other focus-trapped elements.
+	 */
 	allowFocusTrapInteraction?: boolean;
 }>(), {
 	initialWidth: 400,

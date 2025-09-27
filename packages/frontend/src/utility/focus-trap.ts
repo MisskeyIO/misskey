@@ -108,7 +108,7 @@ export function focusTrap(el: HTMLElement, hasInteractionWithOtherFocusTrappedEl
 		el.parentElement.childNodes.forEach((siblingNode) => {
 			const siblingEl = getHTMLElementOrNull(siblingNode);
 			if (!siblingEl) return;
-			const isInteractableSibling = hasInteractionWithOtherFocusTrappedEls && siblingEl.dataset.focusTrapInteractable != null;
+			const isInteractableSibling = hasInteractionWithOtherFocusTrappedEls && siblingEl.hasAttribute('data-focus-trap-interactable');
 			if (
 				siblingEl !== el &&
 				isInteractableSibling

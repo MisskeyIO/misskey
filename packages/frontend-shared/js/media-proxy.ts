@@ -4,7 +4,7 @@
  */
 
 import * as Misskey from 'misskey-js';
-import { query } from './url.js';
+import {appendQuery, omitHttps, query} from './url.js';
 
 export class MediaProxy {
 	private serverMetadata: Misskey.entities.MetaDetailed;
@@ -20,19 +20,26 @@ export class MediaProxy {
 		let _imageUrl = imageUrl;
 
 		if (imageUrl.startsWith(this.serverMetadata.mediaProxy + '/') || imageUrl.startsWith('/proxy/') || imageUrl.startsWith(localProxy + '/')) {
-			// もう既にproxyっぽそうだったらurlを取り出す
-			_imageUrl = (new URL(imageUrl)).searchParams.get('url') ?? imageUrl;
+			const url = (new URL(imageUrl)).searchParams.get('url');
+			if (url) {
+				_imageUrl = url;
+			} else if (imageUrl.startsWith(this.serverMetadata.mediaProxy + '/')) {
+				_imageUrl = imageUrl.slice(this.serverMetadata.mediaProxy.length + 1);
+			} else if (imageUrl.startsWith('/proxy/')) {
+				_imageUrl = imageUrl.slice('/proxy/'.length);
+			} else if (imageUrl.startsWith(localProxy + '/')) {
+				_imageUrl = imageUrl.slice(localProxy.length + 1);
+			}
 		}
 
-		return `${mustOrigin ? localProxy : this.serverMetadata.mediaProxy}/${
-			type === 'preview' ? 'preview.webp'
-			: 'image.webp'
-		}?${query({
-			url: _imageUrl,
-			...(!noFallback ? { 'fallback': '1' } : {}),
-			...(type ? { [type]: '1' } : {}),
-			...(mustOrigin ? { origin: '1' } : {}),
-		})}`;
+		return appendQuery(
+			`${mustOrigin ? localProxy : this.serverMetadata.mediaProxy}/${type === 'preview' ? 'preview' : 'image'}/${encodeURIComponent(omitHttps(_imageUrl))}`,
+			query({
+				...(!noFallback ? { 'fallback': '1' } : {}),
+				...(type ? { [type]: '1' } : {}),
+				...(mustOrigin ? { origin: '1' } : {}),
+			}),
+		);
 	}
 
 	public getProxiedImageUrlNullable(imageUrl: string | null | undefined, type?: 'preview'): string | null {
@@ -55,9 +62,9 @@ export class MediaProxy {
 			return u.href;
 		}
 
-		return `${this.serverMetadata.mediaProxy}/static.webp?${query({
-			url: u.href,
-			static: '1',
-		})}`;
+		return appendQuery(
+			`${this.serverMetadata.mediaProxy}/static/${encodeURIComponent(omitHttps(u.href))}`,
+			query({ static: '1' }),
+		);
 	}
 }

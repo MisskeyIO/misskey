@@ -4,7 +4,7 @@
  */
 
 import * as Misskey from 'misskey-js';
-import {appendQuery, omitHttps, query} from './url.js';
+import { appendQuery, omitHttps, query } from './url.js';
 
 export class MediaProxy {
 	private serverMetadata: Misskey.entities.MetaDetailed;

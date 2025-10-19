@@ -81,6 +81,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				reporterId: me.id,
 				reporterHost: null,
 				comment: ps.comment,
+				category: ps.category,
 			}]);
 		});
 	}

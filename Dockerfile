@@ -2,7 +2,7 @@
 
 # build assets & compile TypeScript
 
-FROM --platform=$BUILDPLATFORM node:22 AS native-builder
+FROM --platform=$BUILDPLATFORM node:25 AS native-builder
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 	--mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -37,7 +37,7 @@ RUN NODE_ENV=production pnpm build
 
 # build native dependencies for target platform
 
-FROM --platform=$TARGETPLATFORM node:22 AS target-builder
+FROM --platform=$TARGETPLATFORM node:25 AS target-builder
 
 RUN apt-get update \
 	&& apt-get install -yqq --no-install-recommends \
@@ -60,7 +60,7 @@ COPY --link ["packages/misskey-bubble-game/package.json", "./packages/misskey-bu
 RUN pnpm i --frozen-lockfile --aggregate-output --prefer-offline \
 	&& pnpm rebuild -r
 
-FROM --platform=$TARGETPLATFORM node:22-slim AS runner
+FROM --platform=$TARGETPLATFORM node:25-slim AS runner
 
 ARG UID="991"
 ARG GID="991"

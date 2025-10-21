@@ -70,11 +70,13 @@ async function toggleReaction() {
 
 	const oldReaction = props.note.myReaction;
 	if (oldReaction) {
-		const confirm = await os.confirm({
-			type: 'warning',
-			text: oldReaction !== props.reaction ? i18n.ts.changeReactionConfirm : i18n.ts.cancelReactionConfirm,
-		});
-		if (confirm.canceled) return;
+		if (prefer.s.confirmOnReact) {
+			const confirm = await os.confirm({
+				type: 'warning',
+				text: oldReaction !== props.reaction ? i18n.ts.changeReactionConfirm : i18n.ts.cancelReactionConfirm,
+			});
+			if (confirm.canceled) return;
+		}
 
 		if (oldReaction !== props.reaction) {
 			sound.playMisskeySfx('reaction');

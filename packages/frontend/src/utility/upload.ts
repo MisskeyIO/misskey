@@ -88,10 +88,13 @@ export function uploadFile(
 				}
 			}
 
+			const fileName = ctx.name.trim() || 'untitled';
 			const formData = new FormData();
 			formData.append('force', 'true');
-			formData.append('file', resizedImage ?? file);
-			formData.append('name', ctx.name);
+			ctx.name = fileName;
+			// 第3引数に明示的なファイル名を渡してあげる必要がある
+			formData.append('file', resizedImage ?? file, fileName);
+			formData.append('name', fileName);
 			if (_folder) formData.append('folderId', _folder);
 
 			const xhr = new XMLHttpRequest();

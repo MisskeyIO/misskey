@@ -111,7 +111,7 @@ const updateWidget = (id, data) => {
 function onContextmenu(widget: Widget, ev: MouseEvent) {
 	const element = ev.target as HTMLElement | null;
 	if (element && isLink(element)) return;
-	if (element && (['INPUT', 'TEXTAREA', 'IMG', 'VIDEO', 'CANVAS'].includes(element.tagName) || element.attributes['contenteditable'])) return;
+	if (element && (['INPUT', 'TEXTAREA', 'IMG', 'VIDEO', 'CANVAS'].includes(element.tagName) || element.isContentEditable)) return;
 	if (window.getSelection()?.toString() !== '') return;
 
 	os.contextMenu([{

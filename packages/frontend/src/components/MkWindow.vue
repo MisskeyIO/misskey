@@ -12,7 +12,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 	appear
 	@afterLeave="emit('closed')"
 >
-	<div v-if="showing" ref="rootEl" :class="[$style.root, { [$style.maximized]: maximized }]">
+	<div
+		v-if="showing"
+		ref="rootEl"
+		:class="[$style.root, { [$style.maximized]: maximized }]"
+ 		:data-focus-trap-interactable="allowFocusTrapInteraction ? '' : null"
+	>
 		<div :class="$style.body" class="_shadow" @mousedown="onBodyMousedown" @keydown="onKeydown">
 			<div :class="[$style.header, { [$style.mini]: mini }]" @contextmenu.prevent.stop="onContextmenu">
 				<span :class="$style.headerLeft">
@@ -96,6 +101,10 @@ const props = withDefaults(defineProps<{
 	contextmenu?: MenuItem[] | null;
 	buttonsLeft?: WindowButton[];
 	buttonsRight?: WindowButton[];
+	/**
+	 * Allow this window to remain interactive alongside other focus-trapped elements.
+	 */
+	allowFocusTrapInteraction?: boolean;
 }>(), {
 	initialWidth: 400,
 	initialHeight: null,
@@ -106,6 +115,7 @@ const props = withDefaults(defineProps<{
 	contextmenu: null,
 	buttonsLeft: () => [],
 	buttonsRight: () => [],
+	allowFocusTrapInteraction: false,
 });
 
 const emit = defineEmits<{

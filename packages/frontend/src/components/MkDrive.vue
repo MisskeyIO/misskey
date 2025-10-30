@@ -551,7 +551,7 @@ async function fetch() {
 	const foldersMax = 30;
 	const filesMax = 30;
 
-	const fetchedFolders = await misskeyApi('drive/folders', {
+	const foldersPromise = misskeyApi('drive/folders', {
 		folderId: folder.value ? folder.value.id : null,
 		limit: foldersMax + 1,
 	}).then(fetchedFolders => {
@@ -562,10 +562,9 @@ async function fetch() {
 		return fetchedFolders;
 	});
 
-	for (const x of fetchedFolders) appendFolder(x);
-
+	let filesPromise: Promise<Misskey.entities.DriveFile[]> | undefined;
 	if (showFiles.value) {
-		const fetchedFiles = await misskeyApi('drive/files', {
+		filesPromise = misskeyApi('drive/files', {
 			folderId: folder.value ? folder.value.id : null,
 			type: props.type,
 			limit: filesMax + 1,
@@ -577,7 +576,13 @@ async function fetch() {
 			}
 			return fetchedFiles;
 		});
+	}
 
+	const fetchedFolders = await foldersPromise;
+	for (const x of fetchedFolders) appendFolder(x);
+
+	if (filesPromise) {
+		const fetchedFiles = await filesPromise;
 		for (const x of fetchedFiles) appendFile(x);
 	}
 

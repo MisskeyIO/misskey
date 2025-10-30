@@ -148,6 +148,7 @@ const selectedFiles = ref<Misskey.entities.DriveFile[]>([]);
 const selectedFolders = ref<Misskey.entities.DriveFolder[]>([]);
 const uploadings = uploads;
 const connection = useStream().useChannel('drive');
+const fileInput = useTemplateRef('fileInput');
 
 // ドロップされようとしているか
 const draghover = ref(false);
@@ -383,6 +384,13 @@ function deleteFolder(folderToDelete: Misskey.entities.DriveFolder) {
 				});
 		}
 	});
+}
+
+function onChangeFileInput() {
+	if (!fileInput.value?.files) return;
+	for (const file of Array.from(fileInput.value.files)) {
+		upload(file, folder.value);
+	}
 }
 
 function upload(file: File, folderToUpload?: Misskey.entities.DriveFolder | null, keepOriginal?: boolean) {

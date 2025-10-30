@@ -775,6 +775,10 @@ export interface Locale extends ILocale {
      */
     "loginFailed": string;
     /**
+     * 認証情報を確認できませんでした。
+     */
+    "credentialsVerificationFailed": string;
+    /**
      * リモートで表示
      */
     "showOnRemote": string;
@@ -5712,10 +5716,6 @@ export interface Locale extends ILocale {
      * リモートサーバーからはあなたの情報は見れず、匿名のシステムアカウントとして表示されます。
      */
     "forwardReportIsAnonymous": string;
-    /**
-     * 認証情報を確認できませんでした。
-     */
-    "credentialsVerificationFailed": string;
     "_chat": {
         /**
          * まだメッセージはありません

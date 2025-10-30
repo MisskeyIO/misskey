@@ -65,6 +65,8 @@ const loading = ref(true);
 const avatarDecorations = ref<Misskey.entities.GetAvatarDecorationsResponse>([]);
 
 const matchedDecorations = computed(() => {
+	if (loading.value) return [];
+
 	return $i.avatarDecorations.map(userDecoration => {
 		const decoration = avatarDecorations.value.find(d => d.id === userDecoration.id);
 		return {

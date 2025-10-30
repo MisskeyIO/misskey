@@ -105,8 +105,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</div>
 					</div>
 				</MkFolder>
-				<MkButton v-if="hasMore" :class="$style.more" :disabled="!hasMore" primary rounded @click="fetch()">
-					<i class="ti ti-reload"></i>{{ i18n.ts.more }}
+				<MkButton v-if="hasMore" :class="$style.more" :disabled="!hasMore || fetching" primary rounded @click="fetch()">
+					<i class="ti ti-reload"></i>{{ fetching ? 'Loading...' : i18n.ts.more }}
 				</MkButton>
 			</template>
 		</div>
@@ -139,6 +139,8 @@ import MkTextarea from '@/components/MkTextarea.vue';
 const announcementsStatus = ref<'active' | 'archived'>('active');
 
 const loading = ref(true);
+const fetching = ref(false);
+let fetchSequence = 0;
 
 const announcements = ref<any[]>([]);
 
@@ -159,18 +161,12 @@ function insertEmoji(ev: MouseEvent): void {
 	os.openEmojiPicker(
 		(ev.currentTarget ?? ev.target) as HTMLElement,
 		{ asReactionPicker: false },
-		announceTitleEl.value
+		announceTitleEl.value,
 	);
 }
 
-watch(announcementsStatus, (to) => {
-	loading.value = true;
-	misskeyApi('admin/announcements/list', {
-		status: to,
-	}).then(announcementResponse => {
-		announcements.value = announcementResponse;
-		loading.value = false;
-	});
+watch(announcementsStatus, async () => {
+	await refresh();
 }, { immediate: true });
 
 function add() {
@@ -206,7 +202,7 @@ async function archive(announcement) {
 		...announcement,
 		isActive: false,
 	});
-	fetch(true);
+	await refresh();
 }
 
 async function unarchive(announcement) {
@@ -214,7 +210,7 @@ async function unarchive(announcement) {
 		...announcement,
 		isActive: true,
 	});
-	refresh();
+	await refresh();
 }
 
 async function save(announcement): Promise<void> {
@@ -223,39 +219,64 @@ async function save(announcement): Promise<void> {
 	} else {
 		await os.apiWithDialog('admin/announcements/update', announcement);
 	}
-	fetch(true);
+	await refresh();
 }
 
-function fetch(resetOffset = false): void {
-	if (resetOffset) {
-		announcements.value = [];
-		offset.value = 0;
-	}
+async function fetch(resetOffset = false): Promise<void> {
+	// Allow "reset" to preempt; block only pagination duplicates
+	if (fetching.value && !resetOffset) return;
 
-	misskeyApi('admin/announcements/list', {
-		offsetMode: true,
-		offset: offset.value,
-		limit: 10,
-		userId: user.value?.id,
-	}).then(announcementResponse => {
-		announcements.value = announcements.value.concat(announcementResponse);
+	const currentSequence = ++fetchSequence;
+	fetching.value = true;
+
+	try {
+		if (resetOffset) {
+			announcements.value = [];
+			offset.value = 0;
+			hasMore.value = false;
+			loading.value = true;
+		}
+
+		const announcementResponse = await misskeyApi('admin/announcements/list', {
+			offsetMode: true,
+			offset: offset.value,
+			limit: 10,
+			status: announcementsStatus.value,
+			...(user.value?.id ? { userId: user.value.id } : {}),
+		});
+
+		// Check if this is still the latest request
+		if (currentSequence !== fetchSequence) return;
+
+		if (resetOffset) {
+			announcements.value = announcementResponse;
+		} else {
+			announcements.value = announcements.value.concat(announcementResponse);
+		}
 		hasMore.value = announcementResponse?.length === 10;
 		offset.value += announcementResponse?.length ?? 0;
-	});
+	} catch (error) {
+		console.error('Failed to fetch announcements:', error);
+		if (currentSequence === fetchSequence) {
+			os.alert({
+				type: 'error',
+				title: 'エラー',
+				text: 'お知らせの取得に失敗しました。',
+			});
+		}
+	} finally {
+		if (currentSequence === fetchSequence) {
+			loading.value = false;
+			fetching.value = false;
+		}
+	}
 }
 
-function refresh() {
-	loading.value = true;
-	misskeyApi('admin/announcements/list', {
-		status: announcementsStatus.value,
-	}).then(announcementResponse => {
-		announcements.value = announcementResponse;
-		loading.value = false;
-	});
+async function refresh(): Promise<void> {
+	await fetch(true);
 }
 
-watch(user, () => fetch(true));
-fetch(true);
+watch(user, () => refresh());
 
 const headerActions = computed(() => [{
 	asFullButton: true,

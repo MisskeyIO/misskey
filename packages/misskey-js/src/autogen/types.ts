@@ -7101,6 +7101,8 @@ export type operations = {
           offset?: number;
           /** Format: misskey:id */
           userId?: string | null;
+          /** @enum {string|null} */
+          status?: 'active' | 'archived';
         };
       };
     };

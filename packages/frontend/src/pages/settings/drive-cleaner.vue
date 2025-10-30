@@ -78,8 +78,6 @@ const usage = ref<number>(0);
 const fetching = ref(true);
 const sortModeSelect = ref('sizeDesc');
 
-fetchDriveInfo();
-
 watch(sortModeSelect, () => {
 	switch (sortModeSelect.value) {
 		case 'sizeDesc':
@@ -92,7 +90,7 @@ watch(sortModeSelect, () => {
 			fetchDriveInfo();
 			break;
 	}
-});
+}, { immediate: true });
 
 function fetchDriveInfo(): void {
 	fetching.value = true;

@@ -9,10 +9,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template #header>{{ i18n.ts.files }}</template>
 	<div :class="$style.root">
 		<MkLoading v-if="fetching"/>
-		<div v-if="!fetching && medias.length > 0" :class="$style.stream">
-			<MkNoteMediaGrid v-for="media in medias" :key="media.note.id + media.file.id" :note="media.note"/>
+		<div v-if="!fetching && notes.length > 0" :class="$style.stream">
+			<MkNoteMediaGrid v-for="note in notes" :key="note.id" :note="note"/>
 		</div>
-		<p v-if="!fetching && medias.length == 0" :class="$style.empty">{{ i18n.ts.nothing }}</p>
+		<p v-if="!fetching && notes.length == 0" :class="$style.empty">{{ i18n.ts.nothing }}</p>
 	</div>
 </MkContainer>
 </template>
@@ -36,25 +36,15 @@ const emit = defineEmits<{
 }>();
 
 const fetching = ref(true);
-const medias = ref<{
-	note: Misskey.entities.Note;
-	file: Misskey.entities.DriveFile;
-}[]>([]);
+const notes = ref<Misskey.entities.Note[]>([]);
 
 onMounted(() => {
 	misskeyApi('users/notes', {
 		userId: props.user.id,
 		withFiles: true,
 		limit: 15,
-	}).then(notes => {
-		for (const note of notes) {
-			for (const file of note.files) {
-				medias.value.push({
-					note,
-					file,
-				});
-			}
-		}
+	}).then(fetchedNotes => {
+		notes.value = fetchedNotes;
 		fetching.value = false;
 	});
 });

@@ -4,7 +4,6 @@
  */
 
 import * as nodemailer from 'nodemailer';
-import juice from 'juice';
 import { Inject, Injectable } from '@nestjs/common';
 import { validate as validateEmail } from 'deep-email-validator';
 import Redis from 'ioredis';
@@ -20,7 +19,9 @@ import type { Config } from '@/config.js';
 
 @Injectable()
 export class EmailService {
-	private logger: Logger;
+        private logger: Logger;
+        private inlineCssRenderer: ((html: string) => string) | null = null;
+        private juiceLoadLogged = false;
 
 	private verifymailResponseCache: RedisKVCache<{
 		valid: boolean,
@@ -159,11 +160,11 @@ export class EmailService {
 	</body>
 </html>`;
 
-		const inlinedHtml = juice(htmlContent);
+                const inlinedHtml = await this.inlineEmailHtml(htmlContent);
 
-		try {
-			// TODO: htmlサニタイズ
-			const info = await transporter.sendMail({
+                try {
+                        // TODO: htmlサニタイズ
+                        const info = await transporter.sendMail({
 				from: this.meta.email!,
 				to: to,
 				subject: subject,
@@ -176,11 +177,37 @@ export class EmailService {
 			this.logger.error('Failed to send email', { error: err });
 			throw err;
 		}
-	}
+        }
 
-	@bindThis
-	public async validateEmailForAccount(emailAddress: string): Promise<{
-		available: boolean;
+        private async inlineEmailHtml(html: string): Promise<string> {
+                const renderer = await this.ensureJuiceRenderer();
+                return renderer(html);
+        }
+
+        private async ensureJuiceRenderer(): Promise<(html: string) => string> {
+                if (this.inlineCssRenderer) return this.inlineCssRenderer;
+
+                try {
+                        const mod: any = await import('juice');
+                        const candidate = typeof mod?.default === 'function' ? mod.default : mod;
+                        if (typeof candidate === 'function') {
+                                this.inlineCssRenderer = (html) => candidate(html);
+                                return this.inlineCssRenderer;
+                        }
+                        throw new Error('juice module did not export a callable default');
+                } catch (error) {
+                        if (!this.juiceLoadLogged) {
+                                this.logger.warn('Falling back to non-inlined emails because the juice module could not be loaded.', { error });
+                                this.juiceLoadLogged = true;
+                        }
+                        this.inlineCssRenderer = (html) => html;
+                        return this.inlineCssRenderer;
+                }
+        }
+
+        @bindThis
+        public async validateEmailForAccount(emailAddress: string): Promise<{
+                available: boolean;
 		reason: null | 'used' | 'format' | 'disposable' | 'mx' | 'smtp' | 'banned' | 'network' | 'blacklist';
 	}> {
 		if (!this.utilityService.validateEmailFormat(emailAddress)) {

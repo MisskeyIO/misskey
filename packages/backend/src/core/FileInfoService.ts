@@ -326,7 +326,7 @@ export class FileInfoService {
 	 * （ない場合：m4a, webmなど）
 	 *
 	 * @param path ファイルパス
-	 * @returns ビデオトラックがあるかどうか（エラー発生時は常に`true`を返す）
+         * @returns ビデオトラックがあるかどうか（エラー発生時は常に`false`を返す）
 	 */
 	@bindThis
 	private hasVideoTrackOnVideoFile(path: string): Promise<boolean> {
@@ -334,20 +334,20 @@ export class FileInfoService {
 		sublogger.info(`Checking the video file. File path: ${path}`);
 		return new Promise((resolve) => {
 			try {
-				FFmpeg.ffprobe(path, (err, metadata) => {
-					if (err) {
-						sublogger.warn(`Could not check the video file. Returns true. File path: ${path}`, err);
-						resolve(true);
-						return;
-					}
-					resolve(metadata.streams.some((stream) => stream.codec_type === 'video'));
-				});
-			} catch (err) {
-				sublogger.warn(`Could not check the video file. Returns true. File path: ${path}`, err as Error);
-				resolve(true);
-			}
-		});
-	}
+                                FFmpeg.ffprobe(path, (err, metadata) => {
+                                        if (err) {
+                                                sublogger.warn(`Could not check the video file. Treating as audio-only. File path: ${path}`, err);
+                                                resolve(false);
+                                                return;
+                                        }
+                                        resolve(metadata?.streams?.some((stream) => stream.codec_type === 'video') ?? false);
+                                });
+                        } catch (err) {
+                                sublogger.warn(`Could not check the video file. Treating as audio-only. File path: ${path}`, err as Error);
+                                resolve(false);
+                        }
+                });
+        }
 
 	/**
 	 * Detect MIME Type and extension

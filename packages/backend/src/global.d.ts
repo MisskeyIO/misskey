@@ -4,3 +4,8 @@
  */
 
 type FIXME = any;
+
+declare module 'juice' {
+        const juice: (html: string, options?: unknown) => string;
+        export default juice;
+}

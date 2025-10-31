@@ -6,7 +6,7 @@
 import * as http from 'node:http';
 import * as https from 'node:https';
 import * as net from 'node:net';
-import type { Duplex } from 'node:stream';
+import * as tls from 'node:tls';
 import ipaddr from 'ipaddr.js';
 import CacheableLookup from 'cacheable-lookup';
 import fetch from 'node-fetch';
@@ -28,6 +28,12 @@ export type HttpRequestSendOptions = {
 	validators?: ((res: Response) => void)[];
 };
 
+const httpAgentCreateConnection = Reflect.get(http.Agent.prototype, 'createConnection') as (
+        this: http.Agent,
+        options: http.ClientRequestArgs,
+        callback?: (err: Error | null, socket: net.Socket) => void,
+) => net.Socket;
+
 class HttpRequestServiceAgent extends http.Agent {
 	constructor(
 		private config: Config,
@@ -37,23 +43,25 @@ class HttpRequestServiceAgent extends http.Agent {
 	}
 
 	@bindThis
-	public override createConnection(
-		options: http.ClientRequestArgs,
-		callback?: (err: Error | null, stream: Duplex) => void,
-	): Duplex | null | undefined {
-		const guardedCallback = callback
-			? (err: Error | null, stream: Duplex) => {
-				this.guardDuplex(stream);
-				callback(err, stream);
-			}
-			: undefined;
+        public createConnection(
+                options: http.ClientRequestArgs,
+                callback?: (err: Error | null, socket: net.Socket) => void,
+        ): net.Socket {
+                const guardedCallback = callback
+                        ? (err: Error | null, socket: net.Socket) => {
+                                this.guardSocket(socket);
+                                callback(err, socket);
+                        }
+                        : undefined;
 
-		return this.guardDuplex(super.createConnection(options, guardedCallback));
-	}
+                const socket = httpAgentCreateConnection.call(this, options, guardedCallback);
+                this.guardSocket(socket);
+                return socket;
+        }
 
-	@bindThis
-	private guardSocket(socket: net.Socket): void {
-		socket.on('connect', () => {
+        @bindThis
+        private guardSocket(socket: net.Socket): void {
+                socket.on('connect', () => {
 			const address = socket.remoteAddress;
 			if (process.env.NODE_ENV === 'production' && address && ipaddr.isValid(address)) {
 				if (this.isPrivateIp(address)) {
@@ -63,17 +71,8 @@ class HttpRequestServiceAgent extends http.Agent {
 		});
 	}
 
-	@bindThis
-	private guardDuplex<T extends Duplex | null | undefined>(socket: T): T {
-		if (socket instanceof net.Socket) {
-			this.guardSocket(socket);
-		}
-
-		return socket;
-	}
-
-	@bindThis
-	private isPrivateIp(ip: string): boolean {
+        @bindThis
+        private isPrivateIp(ip: string): boolean {
 		const parsedIp = ipaddr.parse(ip);
 
 		for (const net of this.config.allowedPrivateNetworks ?? []) {
@@ -87,6 +86,12 @@ class HttpRequestServiceAgent extends http.Agent {
 	}
 }
 
+const httpsAgentCreateConnection = Reflect.get(https.Agent.prototype, 'createConnection') as (
+        this: https.Agent,
+        options: https.RequestOptions,
+        callback?: (err: Error | null, socket: tls.TLSSocket) => void,
+) => tls.TLSSocket;
+
 class HttpsRequestServiceAgent extends https.Agent {
 	constructor(
 		private config: Config,
@@ -96,23 +101,25 @@ class HttpsRequestServiceAgent extends https.Agent {
 	}
 
 	@bindThis
-	public override createConnection(
-		options: https.RequestOptions,
-		callback?: (err: Error | null, stream: Duplex) => void,
-	): Duplex | null | undefined {
-		const guardedCallback = callback
-			? (err: Error | null, stream: Duplex) => {
-				this.guardDuplex(stream);
-				callback(err, stream);
-			}
-			: undefined;
+        public createConnection(
+                options: https.RequestOptions,
+                callback?: (err: Error | null, socket: tls.TLSSocket) => void,
+        ): tls.TLSSocket {
+                const guardedCallback = callback
+                        ? (err: Error | null, socket: tls.TLSSocket) => {
+                                this.guardSocket(socket);
+                                callback(err, socket);
+                        }
+                        : undefined;
 
-		return this.guardDuplex(super.createConnection(options, guardedCallback));
-	}
+                const socket = httpsAgentCreateConnection.call(this, options, guardedCallback);
+                this.guardSocket(socket);
+                return socket;
+        }
 
-	@bindThis
-	private guardSocket(socket: net.Socket): void {
-		socket.on('connect', () => {
+        @bindThis
+        private guardSocket(socket: net.Socket | tls.TLSSocket): void {
+                socket.on('connect', () => {
 			const address = socket.remoteAddress;
 			if (process.env.NODE_ENV === 'production' && address && ipaddr.isValid(address)) {
 				if (this.isPrivateIp(address)) {
@@ -122,17 +129,8 @@ class HttpsRequestServiceAgent extends https.Agent {
 		});
 	}
 
-	@bindThis
-	private guardDuplex<T extends Duplex | null | undefined>(socket: T): T {
-		if (socket instanceof net.Socket) {
-			this.guardSocket(socket);
-		}
-
-		return socket;
-	}
-
-	@bindThis
-	private isPrivateIp(ip: string): boolean {
+        @bindThis
+        private isPrivateIp(ip: string): boolean {
 		const parsedIp = ipaddr.parse(ip);
 
 		for (const net of this.config.allowedPrivateNetworks ?? []) {

@@ -4,7 +4,7 @@
  */
 
 import cluster from 'node:cluster';
-import pino, { type Logger as PinoLogger } from 'pino';
+import { pino, type Logger as PinoLogger } from 'pino';
 import pinoPretty from 'pino-pretty';
 import { bindThis } from '@/decorators.js';
 import { envOption } from './env.js';
@@ -34,7 +34,7 @@ export default class Logger {
 			this.domain = domain;
 		}
 
-		this.logger = pino({
+                this.logger = pino({
 			name: this.domain,
 			serializers: {
 				...pino.stdSerializers,
@@ -48,9 +48,9 @@ export default class Logger {
 			timestamp: envOption.withLogTime || envOption.logJson ? pino.stdTimeFunctions.isoTime : false,
 			messageKey: 'message',
 			errorKey: 'error',
-			formatters: {
-				level: (label, number) => ({ severity: label, level: number }),
-			},
+                        formatters: {
+                                level: (label: string, numericLevel: number) => ({ severity: label, level: numericLevel }),
+                        },
 			mixin: () => this.mixin(),
 		}, !envOption.logJson ? pinoPrettyStream : undefined);
 	}

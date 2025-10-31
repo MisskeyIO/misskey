@@ -183,6 +183,13 @@ export interface ReversiEventTypes {
 	};
 }
 
+type ReversiSerializedLogEntry = {
+        time: number;
+        player: boolean;
+        operation: 'put';
+        pos: number;
+};
+
 export interface ReversiGameEventTypes {
 	changeReadyStates: {
 		user1: boolean;
@@ -193,7 +200,7 @@ export interface ReversiGameEventTypes {
 		key: string;
 		value: any;
 	};
-	log: Reversi.Serializer.Log & { id: string | null };
+        log: ReversiSerializedLogEntry & { id: string | null };
 	started: {
 		game: Packed<'ReversiGameDetailed'>;
 	};

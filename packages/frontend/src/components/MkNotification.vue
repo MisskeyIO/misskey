@@ -12,8 +12,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			v-else-if="notification.type === 'sensitiveFlagAssigned'"
 			:class="$style.iconFrame"
 		>
-			<div :class="[$style.iconInner]">
-				<img :class="$style.iconImg" src="/fluent-emoji/1f6a9.png">
+                        <div :class="[$style.iconInner]">
+                                <img :class="$style.iconImg" :src="sensitiveFlagIconUrl">
 			</div>
 		</div>
 		<div v-else-if="notification.type === 'reaction:grouped' && notification.note.reactionAcceptance === 'likeOnly'" :class="[$style.icon, $style.icon_reactionGroupHeart]"><i class="ti ti-heart" style="line-height: 1;"></i></div>
@@ -218,19 +218,22 @@ import { i18n } from '@/i18n.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { ensureSignin } from '@/i.js';
 import { infoImageUrl } from '@/instance.js';
+import { char2fluentEmojiFilePath } from '@@/js/emoji-base.js';
 
 const $i = ensureSignin();
 
 const props = withDefaults(defineProps<{
-	notification: Misskey.entities.Notification;
-	withTime?: boolean;
-	full?: boolean;
+        notification: Misskey.entities.Notification;
+        withTime?: boolean;
+        full?: boolean;
 }>(), {
-	withTime: false,
-	full: false,
+        withTime: false,
+        full: false,
 });
 
 type ExportCompletedNotification = Misskey.entities.Notification & { type: 'exportCompleted' };
+
+const sensitiveFlagIconUrl = char2fluentEmojiFilePath('🚩');
 
 const exportEntityName = {
 	antenna: i18n.ts.antennas,

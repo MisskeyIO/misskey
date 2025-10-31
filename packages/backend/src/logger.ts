@@ -4,7 +4,7 @@
  */
 
 import cluster from 'node:cluster';
-import { pino } from 'pino';
+import pino, { type Logger as PinoLogger } from 'pino';
 import pinoPretty from 'pino-pretty';
 import { bindThis } from '@/decorators.js';
 import { envOption } from './env.js';
@@ -23,7 +23,7 @@ const pinoPrettyStream = pinoPretty({
 // eslint-disable-next-line import/no-default-export
 export default class Logger {
 	private readonly domain: string | undefined;
-	private readonly logger: pino.Logger;
+        private readonly logger: PinoLogger;
 	private context: Record<string, any> = {};
 
 	constructor(domain: string | undefined, _color?: KEYWORD, _store = true, parentLogger?: Logger) {

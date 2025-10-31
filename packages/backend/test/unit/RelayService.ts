@@ -9,7 +9,6 @@ import { jest } from '@jest/globals';
 import { Test } from '@nestjs/testing';
 import { ModuleMocker } from 'jest-mock';
 import type { TestingModule } from '@nestjs/testing';
-import type { MockFunctionMetadata } from 'jest-mock';
 import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { IdService } from '@/core/IdService.js';
@@ -44,12 +43,14 @@ describe('RelayService', () => {
 				if (token === QueueService) {
 					return { deliver: jest.fn() };
 				}
-				if (typeof token === 'function') {
-					const mockMetadata = moduleMocker.getMetadata(token) as MockFunctionMetadata<any, any>;
-					const Mock = moduleMocker.generateFromMetadata(mockMetadata);
-					return new Mock();
-				}
-			})
+                                if (typeof token === 'function') {
+                                        const mockMetadata = moduleMocker.getMetadata(token);
+                                        if (!mockMetadata) return undefined;
+                                        const Mock = moduleMocker.generateFromMetadata(mockMetadata) as { new (): unknown };
+                                        return new Mock();
+                                }
+                                return undefined;
+                        })
 			.compile();
 
 		app.enableShutdownHooks();

@@ -6,7 +6,7 @@
 import { URL, domainToASCII } from 'node:url';
 import { isIP } from 'node:net';
 import punycode from 'punycode.js';
-import psl from 'psl';
+import * as psl from 'psl';
 import RE2 from 're2';
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
@@ -153,13 +153,19 @@ export class UtilityService {
 		// -----------------------------
 		// 2. ホストの場合の処理
 		// -----------------------------
-		const parsedA = psl.parse(hostA);
-		const parsedB = psl.parse(hostB);
+                const parsedA = psl.parse(hostA);
+                if ('error' in parsedA || parsedA.domain == null) {
+                        return false;
+                }
 
-		// どちらか一方でもパース失敗 or eTLD+1が異なる場合は false
-		if (parsedA.error || parsedB.error || parsedA.domain !== parsedB.domain) {
-			return false;
-		}
+                const parsedB = psl.parse(hostB);
+                if ('error' in parsedB || parsedB.domain == null) {
+                        return false;
+                }
+
+                if (parsedA.domain !== parsedB.domain) {
+                        return false;
+                }
 
 		// -----------------------------
 		// 3. サブドメインの比較
@@ -172,9 +178,9 @@ export class UtilityService {
 		//  subA = "alice.users", subB = "bob.users" => true  (1階層差)
 		//  subA = "alice.users", subB = ""          => false (2階層差)
 
-		const labelsA = parsedA.subdomain?.split('.') ?? [];
-		const levelsA = labelsA.length;
-		const labelsB = parsedB.subdomain?.split('.') ?? [];
+                const labelsA = parsedA.subdomain?.split('.') ?? [];
+                const levelsA = labelsA.length;
+                const labelsB = parsedB.subdomain?.split('.') ?? [];
 		const levelsB = labelsB.length;
 
 		// 後ろ(右)から一致している部分をカウント

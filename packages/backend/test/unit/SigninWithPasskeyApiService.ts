@@ -9,7 +9,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { AuthenticationResponseJSON } from '@simplewebauthn/types';
 import { HttpHeader } from 'fastify/types/utils.js';
-import { MockFunctionMetadata, ModuleMocker } from 'jest-mock';
+import { ModuleMocker } from 'jest-mock';
 import { MiUser } from '@/models/User.js';
 import { MiUserProfile, UserProfilesRepository, UsersRepository } from '@/models/_.js';
 import { IdService } from '@/core/IdService.js';
@@ -93,13 +93,15 @@ describe('SigninWithPasskeyApiService', () => {
 				{ provide: RateLimiterService, useClass: FakeLimiter },
 				{ provide: SigninService, useClass: FakeSigninService },
 			],
-		}).useMocker((token) => {
-			if (typeof token === 'function') {
-				const mockMetadata = moduleMocker.getMetadata(token) as MockFunctionMetadata<any, any>;
-				const Mock = moduleMocker.generateFromMetadata(mockMetadata);
-				return new Mock();
-			}
-		}).compile();
+                }).useMocker((token) => {
+                        if (typeof token === 'function') {
+                                const mockMetadata = moduleMocker.getMetadata(token);
+                                if (!mockMetadata) return undefined;
+                                const Mock = moduleMocker.generateFromMetadata(mockMetadata) as { new (): unknown };
+                                return new Mock();
+                        }
+                        return undefined;
+                }).compile();
 		passkeyApiService = app.get<SigninWithPasskeyApiService>(SigninWithPasskeyApiService);
 		usersRepository = app.get<UsersRepository>(DI.usersRepository);
 		userProfilesRepository = app.get<UserProfilesRepository>(DI.userProfilesRepository);

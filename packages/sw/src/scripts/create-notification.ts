@@ -39,7 +39,18 @@ export async function createNotification<K extends keyof PushNotificationDataMap
 	}
 }
 
-async function composeNotification(data: PushNotificationDataMap[keyof PushNotificationDataMap]): Promise<[string, NotificationOptions & { actions?: Record<string, string>[], renotify?: boolean }] | null> {
+type NotificationActionLike = {
+        action: string;
+        title: string;
+        icon?: string;
+};
+
+type NotificationOptionsWithActions = NotificationOptions & {
+        actions?: NotificationActionLike[];
+        renotify?: boolean;
+};
+
+async function composeNotification(data: PushNotificationDataMap[keyof PushNotificationDataMap]): Promise<[string, NotificationOptionsWithActions] | null> {
 	const i18n = await (swLang.i18n ?? swLang.fetchLocale());
 	const { t } = i18n;
 	switch (data.type) {
@@ -58,16 +69,16 @@ async function composeNotification(data: PushNotificationDataMap[keyof PushNotif
 					const account = await getAccountFromId(data.userId);
 					if (!account) return null;
 					const userDetail = await cli.request('users/show', { userId: data.body.userId }, account.token);
-					return [i18n.ts._notification.youWereFollowed, {
-						body: getUserName(data.body.user),
-						icon: data.body.user.avatarUrl ?? undefined,
-						badge: iconUrl('user-plus'),
-						data,
-						actions: userDetail.isFollowing ? [] : [
-							{
-								action: 'follow',
-								title: i18n.ts._notification._actions.followBack,
-							},
+                                        return [i18n.ts._notification.youWereFollowed, {
+                                                body: getUserName(data.body.user),
+                                                icon: data.body.user.avatarUrl ?? undefined,
+                                                badge: iconUrl('user-plus'),
+                                                data,
+                                                actions: userDetail.isFollowing ? [] : [
+                                                        {
+                                                                action: 'follow',
+                                                                title: i18n.ts._notification._actions.followBack,
+                                                        },
 						],
 					}];
 				}
@@ -325,26 +336,28 @@ export async function createEmptyNotification(): Promise<void> {
 	return new Promise<void>(async res => {
 		const i18n = await (swLang.i18n ?? swLang.fetchLocale());
 
-		await globalThis.registration.showNotification(
-			(new URL(origin)).host,
-			{
-				body: `Misskey v${_VERSION_}`,
-				silent: true,
-				badge: iconUrl('null'),
-				tag: 'read_notification',
-				actions: [
-					{
-						action: 'markAllAsRead',
-						title: i18n.ts.markAllAsRead,
-					},
-					{
-						action: 'settings',
-						title: i18n.ts.notificationSettings,
-					},
-				],
-				data: {},
-			},
-		);
+                const options: NotificationOptionsWithActions = {
+                        body: `Misskey v${_VERSION_}`,
+                        silent: true,
+                        badge: iconUrl('null'),
+                        tag: 'read_notification',
+                        actions: [
+                                {
+                                        action: 'markAllAsRead',
+                                        title: i18n.ts.markAllAsRead,
+                                },
+                                {
+                                        action: 'settings',
+                                        title: i18n.ts.notificationSettings,
+                                },
+                        ],
+                        data: {},
+                };
+
+                await globalThis.registration.showNotification(
+                        (new URL(origin)).host,
+                        options,
+                );
 
 		setTimeout(async () => {
 			try {

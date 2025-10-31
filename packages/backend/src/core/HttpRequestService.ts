@@ -6,6 +6,7 @@
 import * as http from 'node:http';
 import * as https from 'node:https';
 import * as net from 'node:net';
+import type { Duplex } from 'node:stream';
 import ipaddr from 'ipaddr.js';
 import CacheableLookup from 'cacheable-lookup';
 import fetch from 'node-fetch';
@@ -27,39 +28,52 @@ export type HttpRequestSendOptions = {
 	validators?: ((res: Response) => void)[];
 };
 
-declare module 'node:http' {
-	interface Agent {
-		createConnection(options: net.NetConnectOpts, callback?: (err: unknown, stream: net.Socket) => void): net.Socket;
-	}
-}
-
 class HttpRequestServiceAgent extends http.Agent {
-	constructor(
-		private config: Config,
-		options?: http.AgentOptions,
-	) {
-		super(options);
-	}
+        constructor(
+                private config: Config,
+                options?: http.AgentOptions,
+        ) {
+                super(options);
+        }
 
-	@bindThis
-	public createConnection(options: net.NetConnectOpts, callback?: (err: unknown, stream: net.Socket) => void): net.Socket {
-		const socket = super.createConnection(options, callback)
-			.on('connect', () => {
-				const address = socket.remoteAddress;
-				if (process.env.NODE_ENV === 'production') {
-					if (address && ipaddr.isValid(address)) {
-						if (this.isPrivateIp(address)) {
-							socket.destroy(new Error(`Blocked address: ${address}`));
-						}
-					}
-				}
-			});
-		return socket;
-	}
+        @bindThis
+        private guardSocket(socket: net.Socket): void {
+                socket.on('connect', () => {
+                        const address = socket.remoteAddress;
+                        if (process.env.NODE_ENV === 'production' && address && ipaddr.isValid(address)) {
+                                if (this.isPrivateIp(address)) {
+                                        socket.destroy(new Error(`Blocked address: ${address}`));
+                                }
+                        }
+                });
+        }
 
-	@bindThis
-	private isPrivateIp(ip: string): boolean {
-		const parsedIp = ipaddr.parse(ip);
+        @bindThis
+        private guardDuplex<T extends Duplex | null | undefined>(socket: T): T {
+                if (socket instanceof net.Socket) {
+                        this.guardSocket(socket);
+                }
+
+                return socket;
+        }
+
+        public override createConnection(
+                options: http.ClientRequestArgs,
+                callback?: (err: Error | null, stream: Duplex) => void,
+        ): Duplex | null | undefined {
+                const guardedCallback = callback
+                        ? (err: Error | null, stream: Duplex) => {
+                                this.guardDuplex(stream);
+                                callback(err, stream);
+                        }
+                        : undefined;
+
+                return this.guardDuplex(super.createConnection(options, guardedCallback));
+        }
+
+        @bindThis
+        private isPrivateIp(ip: string): boolean {
+                const parsedIp = ipaddr.parse(ip);
 
 		for (const net of this.config.allowedPrivateNetworks ?? []) {
 			const cidr = ipaddr.parseCIDR(net);
@@ -73,32 +87,51 @@ class HttpRequestServiceAgent extends http.Agent {
 }
 
 class HttpsRequestServiceAgent extends https.Agent {
-	constructor(
-		private config: Config,
-		options?: https.AgentOptions,
-	) {
-		super(options);
-	}
+        constructor(
+                private config: Config,
+                options?: https.AgentOptions,
+        ) {
+                super(options);
+        }
 
-	@bindThis
-	public createConnection(options: net.NetConnectOpts, callback?: (err: unknown, stream: net.Socket) => void): net.Socket {
-		const socket = super.createConnection(options, callback)
-			.on('connect', () => {
-				const address = socket.remoteAddress;
-				if (process.env.NODE_ENV === 'production') {
-					if (address && ipaddr.isValid(address)) {
-						if (this.isPrivateIp(address)) {
-							socket.destroy(new Error(`Blocked address: ${address}`));
-						}
-					}
-				}
-			});
-		return socket;
-	}
+        @bindThis
+        private guardSocket(socket: net.Socket): void {
+                socket.on('connect', () => {
+                        const address = socket.remoteAddress;
+                        if (process.env.NODE_ENV === 'production' && address && ipaddr.isValid(address)) {
+                                if (this.isPrivateIp(address)) {
+                                        socket.destroy(new Error(`Blocked address: ${address}`));
+                                }
+                        }
+                });
+        }
 
-	@bindThis
-	private isPrivateIp(ip: string): boolean {
-		const parsedIp = ipaddr.parse(ip);
+        @bindThis
+        private guardDuplex<T extends Duplex | null | undefined>(socket: T): T {
+                if (socket instanceof net.Socket) {
+                        this.guardSocket(socket);
+                }
+
+                return socket;
+        }
+
+        public override createConnection(
+                options: https.RequestOptions,
+                callback?: (err: Error | null, stream: Duplex) => void,
+        ): Duplex | null | undefined {
+                const guardedCallback = callback
+                        ? (err: Error | null, stream: Duplex) => {
+                                this.guardDuplex(stream);
+                                callback(err, stream);
+                        }
+                        : undefined;
+
+                return this.guardDuplex(super.createConnection(options, guardedCallback));
+        }
+
+        @bindThis
+        private isPrivateIp(ip: string): boolean {
+                const parsedIp = ipaddr.parse(ip);
 
 		for (const net of this.config.allowedPrivateNetworks ?? []) {
 			const cidr = ipaddr.parseCIDR(net);

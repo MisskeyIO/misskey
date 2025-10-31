@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div style="overflow: clip;">
 		<div class="_spacer" style="--MI_SPACER-w: 600px; --MI_SPACER-min: 20px;">
 			<div class="_gaps_m znqjceqz">
-				<div v-panel class="about">
+                                <div v-panel class="about">
 					<div ref="containerEl" class="container" :class="{ playing: easterEggEngine != null }">
 						<img v-if="kawaiiMode" src="/client-assets/kawaii/about-icon.png" alt="" class="iconAlt" draggable="false" @load="iconLoaded" @click="gravity"/>
 						<img v-else src="/client-assets/about-icon.png" alt="" class="icon" draggable="false" @load="iconLoaded" @click="gravity"/>
@@ -20,7 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<MkEmoji v-else class="emoji" :emoji="emoji.emoji" :normal="true" :noStyle="true"/>
 						</span>
 					</div>
-					<button v-if="thereIsTreasure" class="_button treasure" @click="getTreasure"><img src="/fluent-emoji/1f3c6.png" class="treasureImg"></button>
+                                        <button v-if="thereIsTreasure" class="_button treasure" @click="getTreasure"><img :src="treasureEmojiUrl" class="treasureImg"></button>
 				</div>
 				<div style="text-align: center;">
 					{{ i18n.ts._aboutMisskey.about }}<br><a href="https://misskey-hub.net/docs/about-misskey/" rel="nofollow noopener" target="_blank" class="_link">{{ i18n.ts.learnMore }}</a>
@@ -145,8 +145,11 @@ import { definePage } from '@/page.js';
 import { claimAchievement, claimedAchievements } from '@/utility/achievements.js';
 import { $i } from '@/i.js';
 import { prefer } from '@/preferences.js';
+import { char2fluentEmojiFilePath } from '@@/js/emoji-base.js';
 
 const kawaiiMode = miLocalStorage.getItem('kawaii') === 'true';
+
+const treasureEmojiUrl = char2fluentEmojiFilePath('🏆');
 
 const patronsWithIcon = [{
 	name: 'カイヤン',

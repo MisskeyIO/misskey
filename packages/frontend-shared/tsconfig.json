@@ -16,12 +16,13 @@
 		"experimentalDecorators": true,
 		"noImplicitReturns": true,
 		"esModuleInterop": true,
-		"verbatimModuleSyntax": true,
 		"baseUrl": ".",
-		"paths": {
-			"@/*": ["./*"],
-			"@@/*": ["./*"]
-		},
+                "paths": {
+                        "@/*": ["./*"],
+                        "@@/*": ["./*"],
+                        "misskey-js": ["../misskey-js/src/index.ts"],
+                        "misskey-js/*": ["../misskey-js/src/*"]
+                },
 		"typeRoots": [
 			"./@types",
 			"./node_modules/@types"

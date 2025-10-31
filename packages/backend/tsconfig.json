@@ -25,9 +25,9 @@
 		"isolatedModules": true,
 		"rootDir": "./src",
 		"baseUrl": "./",
-		"paths": {
-			"@/*": ["./src/*"]
-		},
+                "paths": {
+                        "@/*": ["./src/*"]
+                },
 		"outDir": "./built",
 		"types": [
 			"node"

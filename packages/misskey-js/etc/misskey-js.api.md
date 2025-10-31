@@ -8,7 +8,7 @@ import type { AuthenticationResponseJSON } from '@simplewebauthn/types';
 import { EventEmitter } from 'eventemitter3';
 import { Options } from 'reconnecting-websocket';
 import type { PublicKeyCredentialRequestOptionsJSON as PublicKeyCredentialRequestOptionsJSON_2 } from '@simplewebauthn/types';
-import _ReconnectingWebSocket from 'reconnecting-websocket';
+import { reconnectingWebsocket } from 'reconnecting-websocket';
 
 // Warning: (ae-forgotten-export) The symbol "components" needs to be exported by the entry point index.d.ts
 //
@@ -3434,7 +3434,7 @@ export class Stream extends EventEmitter<StreamEvents> implements IStream {
         token: string;
     } | null, options?: {
         WebSocket?: Options['WebSocket'];
-        binaryType?: ReconnectingWebSocket['binaryType'];
+        binaryType?: ReconnectingWebSocketInstance['binaryType'];
     });
     // (undocumented)
     close(): void;
@@ -3733,7 +3733,7 @@ type V2AdminEmojiListResponse = operations['v2___admin___emoji___list']['respons
 // Warnings were encountered during analysis:
 //
 // src/entities.ts:50:2 - (ae-forgotten-export) The symbol "ModerationLogPayloads" needs to be exported by the entry point index.d.ts
-// src/streaming.ts:57:3 - (ae-forgotten-export) The symbol "ReconnectingWebSocket" needs to be exported by the entry point index.d.ts
+// src/streaming.ts:57:3 - (ae-forgotten-export) The symbol "ReconnectingWebSocketInstance" needs to be exported by the entry point index.d.ts
 // src/streaming.types.ts:226:4 - (ae-forgotten-export) The symbol "ReversiUpdateKey" needs to be exported by the entry point index.d.ts
 // src/streaming.types.ts:236:4 - (ae-forgotten-export) The symbol "ReversiUpdateSettings" needs to be exported by the entry point index.d.ts
 

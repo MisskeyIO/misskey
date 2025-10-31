@@ -18,7 +18,7 @@ import vary from 'vary';
 import htmlSafeJsonStringify from 'htmlescape';
 import { FastifyAdapter as BullBoardFastifyAdapter } from '@bull-board/fastify';
 import fastifyCookie from '@fastify/cookie';
-import { BullMQAdapter } from '@bull-board/api/bullMQAdapter.js';
+import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { createBullBoard } from '@bull-board/api';
 import type { Config } from '@/config.js';
 import { getNoteSummary } from '@/misc/get-note-summary.js';

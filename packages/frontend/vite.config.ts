@@ -194,9 +194,11 @@ export function getConfig(): UserConfig {
 			format: 'es',
 		},
 
-		test: {
-			environment: 'happy-dom',
-			deps: {
+                test: {
+                        environment: 'happy-dom',
+                        clearMocks: true,
+                        restoreMocks: true,
+                        deps: {
 				optimizer: {
 					web: {
 						include: [

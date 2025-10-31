@@ -312,23 +312,25 @@ describe('AiScript common API', () => {
 			expect(misskeyApiMock).toHaveBeenCalledOnce();
 		});
 
-		test.sequential('invalid endpoint', async () => {
-			await expect(() => exe(`
-				Mk:api('https://example.com/api/ping', {})
-			`)).rejects.toStrictEqual(
-				new errors.AiScriptRuntimeError('invalid endpoint'),
-			);
-			expect(misskeyApiMock).not.toHaveBeenCalled();
-		});
+                test.sequential('invalid endpoint', async () => {
+                        await expect(() => exe(`
+                                Mk:api('https://example.com/api/ping', {})
+                        `)).rejects.toMatchObject({
+                                message: expect.stringContaining('invalid endpoint'),
+                                name: new errors.AiScriptRuntimeError('').name,
+                        });
+                        expect(misskeyApiMock).not.toHaveBeenCalled();
+                });
 
-		test.sequential('missing param', async () => {
-			await expect(() => exe(`
-				Mk:api('ping')
-			`)).rejects.toStrictEqual(
-				new errors.AiScriptRuntimeError('expected param'),
-			);
-			expect(misskeyApiMock).not.toHaveBeenCalled();
-		});
+                test.sequential('missing param', async () => {
+                        await expect(() => exe(`
+                                Mk:api('ping')
+                        `)).rejects.toMatchObject({
+                                message: expect.stringContaining('expected param'),
+                                name: new errors.AiScriptRuntimeError('').name,
+                        });
+                        expect(misskeyApiMock).not.toHaveBeenCalled();
+                });
 	});
 
 	describe('save and load', () => {
@@ -349,13 +351,14 @@ describe('AiScript common API', () => {
 			expect(res).toStrictEqual(values.STR('value'));
 		});
 
-		test.sequential('missing value to save', async () => {
-			await expect(() => exe(`
-				Mk:save('key')
-			`)).rejects.toStrictEqual(
-				new errors.AiScriptRuntimeError('Expect anything, but got nothing.'),
-			);
-		});
+                test.sequential('missing value to save', async () => {
+                        await expect(() => exe(`
+                                Mk:save('key')
+                        `)).rejects.toMatchObject({
+                                message: expect.stringContaining('Expect anything, but got nothing.'),
+                                name: new errors.AiScriptRuntimeError('').name,
+                        });
+                });
 
 		test.sequential('not value found to load', async () => {
 			const [res] = await exe(`

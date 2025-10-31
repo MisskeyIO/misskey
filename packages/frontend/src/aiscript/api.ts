@@ -45,10 +45,10 @@ export function createAiScriptEnv(opts: { storageKey: string, token?: string }) 
 		'Mk:dialog': values.FN_NATIVE(async ([title, text, type]) => {
 			utils.assertString(title);
 			utils.assertString(text);
-			if (type != null) {
-				assertStringAndIsIn(type, DIALOG_TYPES);
-			}
-			await os.alert({
+                        if (type != null) {
+                                assertStringAndIsIn(type, DIALOG_TYPES);
+                        }
+                        await os.alert({
 				type: type ? type.value : 'info',
 				title: title.value,
 				text: text.value,
@@ -58,10 +58,10 @@ export function createAiScriptEnv(opts: { storageKey: string, token?: string }) 
 		'Mk:confirm': values.FN_NATIVE(async ([title, text, type]) => {
 			utils.assertString(title);
 			utils.assertString(text);
-			if (type != null) {
-				assertStringAndIsIn(type, DIALOG_TYPES);
-			}
-			const confirm = await os.confirm({
+                        if (type != null) {
+                                assertStringAndIsIn(type, DIALOG_TYPES);
+                        }
+                        const confirm = await os.confirm({
 				type: type ? type.value : 'question',
 				title: title.value,
 				text: text.value,

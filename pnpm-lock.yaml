@@ -1363,8 +1363,8 @@ importers:
         specifier: 'catalog:'
         version: 9.4.1
       parse5:
-        specifier: 'catalog:'
-        version: 7.3.0
+        specifier: 8.0.0
+        version: 8.0.0
       pg:
         specifier: 'catalog:'
         version: 8.16.3

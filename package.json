@@ -64,6 +64,7 @@
     "esbuild": "0.25.11",
     "jpeg-js": "0.4.4",
     "lodash": "4.17.21",
+    "parse5": "8.0.0",
     "sharp": "0.34.4",
     "storybook-addon-misskey-theme": "github:misskey-dev/storybook-addon-misskey-theme",
     "tough-cookie": "6.0.0",

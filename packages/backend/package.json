@@ -154,7 +154,7 @@
     "oauth2orize-pkce": "catalog:",
     "os-utils": "catalog:",
     "otpauth": "catalog:",
-    "parse5": "catalog:",
+    "parse5": "8.0.0",
     "pg": "catalog:",
     "pino": "catalog:",
     "pino-pretty": "catalog:",

@@ -47,39 +47,15 @@
     "clean-all": "node ./scripts/clean-all.js",
     "cleanall": "pnpm clean-all"
   },
-  "resolutions": {
-    "@aiscript-dev/aiscript-languageserver": "github:aiscript-dev/aiscript-languageserver#0.1.6",
-    "@misskey-dev/summaly": "github:MisskeyIO/summaly#5.2.1-io.1",
-    "@tensorflow/tfjs": "4.22.0",
-    "@tensorflow/tfjs-core": "4.22.0",
-    "@tensorflow/tfjs-node": "4.22.0",
-    "@types/punycode": "2.1.4",
-    "@types/punycode.js": "npm:@types/punycode@2.1.4",
-    "aiscript-vscode": "github:aiscript-dev/aiscript-vscode#v0.1.16",
-    "axios": "1.13.1",
-    "chokidar": "4.0.3",
-    "cookie": "1.0.2",
-    "cookie-signature": "1.2.2",
-    "debug": "4.4.3",
-    "esbuild": "0.25.11",
-    "jpeg-js": "0.4.4",
-    "lodash": "4.17.21",
-    "parse5": "8.0.0",
-    "sharp": "0.34.4",
-    "storybook-addon-misskey-theme": "github:misskey-dev/storybook-addon-misskey-theme",
-    "tough-cookie": "6.0.0",
-    "webgl-audiovisualizer": "github:MisskeyIO/webgl-audiovisualizer",
-    "web-streams-polyfill": "4.2.0"
-  },
   "dependencies": {
     "cssnano": "catalog:",
     "esbuild": "catalog:",
     "execa": "catalog:",
     "fast-glob": "catalog:",
+    "glob": "catalog:",
     "ignore-walk": "catalog:",
     "js-yaml": "catalog:",
     "postcss": "catalog:",
-    "glob": "catalog:",
     "terser": "catalog:",
     "typescript": "catalog:"
   },
@@ -97,6 +73,6 @@
     "start-server-and-test": "catalog:"
   },
   "optionalDependencies": {
-    "@tensorflow/tfjs-core": "catalog:"
+    "@tensorflow/tfjs-core": "4.22.0"
   }
 }

@@ -38,12 +38,12 @@
     "vue": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "catalog:",
-    "@misskey-dev/summaly": "catalog:",
+    "@misskey-dev/summaly": "github:MisskeyIO/summaly#5.2.1-io.1",
     "@testing-library/vue": "catalog:",
     "@types/estree": "catalog:",
     "@types/micromatch": "catalog:",
-    "@types/punycode.js": "catalog:",
+    "@types/node": "catalog:",
+    "@types/punycode.js": "npm:@types/punycode@2.1.4",
     "@types/tinycolor2": "catalog:",
     "@types/ws": "catalog:",
     "@typescript-eslint/eslint-plugin": "catalog:",

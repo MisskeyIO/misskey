@@ -44,7 +44,9 @@
     "@types/node": "catalog:",
     "@typescript-eslint/eslint-plugin": "catalog:",
     "@typescript-eslint/parser": "catalog:",
+    "esbuild": "catalog:",
     "eslint": "catalog:",
+    "glob": "catalog:",
     "jest": "catalog:",
     "jest-fetch-mock": "catalog:",
     "jest-websocket-mock": "catalog:",
@@ -52,8 +54,6 @@
     "ncp": "catalog:",
     "nodemon": "catalog:",
     "tsd": "catalog:",
-    "esbuild": "catalog:",
-    "glob": "catalog:",
     "typescript": "catalog:"
   },
   "files": [

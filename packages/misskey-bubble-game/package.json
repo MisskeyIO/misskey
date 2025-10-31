@@ -29,10 +29,10 @@
     "@types/seedrandom": "catalog:",
     "@typescript-eslint/eslint-plugin": "catalog:",
     "@typescript-eslint/parser": "catalog:",
-    "execa": "catalog:",
-    "eslint": "catalog:",
-    "nodemon": "catalog:",
     "esbuild": "catalog:",
+    "eslint": "catalog:",
+    "execa": "catalog:",
+    "nodemon": "catalog:",
     "typescript": "catalog:"
   },
   "files": [

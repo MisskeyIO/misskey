@@ -93,15 +93,15 @@ describe('SigninWithPasskeyApiService', () => {
 				{ provide: RateLimiterService, useClass: FakeLimiter },
 				{ provide: SigninService, useClass: FakeSigninService },
 			],
-                }).useMocker((token) => {
-                        if (typeof token === 'function') {
-                                const mockMetadata = moduleMocker.getMetadata(token);
-                                if (!mockMetadata) return undefined;
-                                const Mock = moduleMocker.generateFromMetadata(mockMetadata) as { new (): unknown };
-                                return new Mock();
-                        }
-                        return undefined;
-                }).compile();
+		}).useMocker((token) => {
+			if (typeof token === 'function') {
+				const mockMetadata = moduleMocker.getMetadata(token);
+				if (!mockMetadata) return undefined;
+				const Mock = moduleMocker.generateFromMetadata(mockMetadata) as { new (): unknown };
+				return new Mock();
+			}
+			return undefined;
+		}).compile();
 		passkeyApiService = app.get<SigninWithPasskeyApiService>(SigninWithPasskeyApiService);
 		usersRepository = app.get<UsersRepository>(DI.usersRepository);
 		userProfilesRepository = app.get<UserProfilesRepository>(DI.userProfilesRepository);

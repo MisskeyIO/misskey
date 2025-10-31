@@ -6,7 +6,7 @@
 import { URL, domainToASCII } from 'node:url';
 import { isIP } from 'node:net';
 import punycode from 'punycode.js';
-import * as psl from 'psl';
+import { parse as parseDomain } from 'psl';
 import RE2 from 're2';
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
@@ -14,6 +14,10 @@ import type { Config } from '@/config.js';
 import { bindThis } from '@/decorators.js';
 import { MiMeta } from '@/models/Meta.js';
 import type { IObject } from '@/core/activitypub/type.js';
+
+type PslParseResult = ReturnType<typeof parseDomain>;
+type PslErrorResult = Extract<PslParseResult, { error: unknown }>;
+const isPslError = (result: PslParseResult): result is PslErrorResult => 'error' in result;
 
 @Injectable()
 export class UtilityService {
@@ -153,19 +157,17 @@ export class UtilityService {
 		// -----------------------------
 		// 2. ホストの場合の処理
 		// -----------------------------
-                const parsedA = psl.parse(hostA);
-                if ('error' in parsedA || parsedA.domain == null) {
-                        return false;
-                }
+		const parsedA = parseDomain(hostA);
+		const parsedB = parseDomain(hostB);
 
-                const parsedB = psl.parse(hostB);
-                if ('error' in parsedB || parsedB.domain == null) {
-                        return false;
-                }
+		if (isPslError(parsedA) || isPslError(parsedB)) {
+			return false;
+		}
 
-                if (parsedA.domain !== parsedB.domain) {
-                        return false;
-                }
+                // どちらか一方でもパース失敗 or eTLD+1が異なる場合は false
+		if (parsedA.domain !== parsedB.domain) {
+			return false;
+		}
 
 		// -----------------------------
 		// 3. サブドメインの比較
@@ -178,9 +180,9 @@ export class UtilityService {
 		//  subA = "alice.users", subB = "bob.users" => true  (1階層差)
 		//  subA = "alice.users", subB = ""          => false (2階層差)
 
-                const labelsA = parsedA.subdomain?.split('.') ?? [];
-                const levelsA = labelsA.length;
-                const labelsB = parsedB.subdomain?.split('.') ?? [];
+		const labelsA = parsedA.subdomain?.split('.') ?? [];
+		const levelsA = labelsA.length;
+		const labelsB = parsedB.subdomain?.split('.') ?? [];
 		const levelsB = labelsB.length;
 
 		// 後ろ(右)から一致している部分をカウント

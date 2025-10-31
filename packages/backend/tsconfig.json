@@ -26,7 +26,8 @@
 		"rootDir": "./src",
 		"baseUrl": "./",
                 "paths": {
-                        "@/*": ["./src/*"]
+                        "@/*": ["./src/*"],
+                        "psl": ["./node_modules/psl/types/index.d.ts"]
                 },
 		"outDir": "./built",
 		"types": [

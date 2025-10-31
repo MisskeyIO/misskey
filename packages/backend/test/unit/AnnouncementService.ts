@@ -83,14 +83,14 @@ describe('AnnouncementService', () => {
 					return {
 						log: jest.fn(),
 					};
-                                } else if (typeof token === 'function') {
-                                        const mockMetadata = moduleMocker.getMetadata(token);
-                                        if (!mockMetadata) return undefined;
-                                        const Mock = moduleMocker.generateFromMetadata(mockMetadata) as { new (): unknown };
-                                        return new Mock();
-                                }
-                                return undefined;
-                        })
+				} else if (typeof token === 'function') {
+					const mockMetadata = moduleMocker.getMetadata(token);
+					if (!mockMetadata) return undefined;
+					const Mock = moduleMocker.generateFromMetadata(mockMetadata) as { new (): unknown };
+					return new Mock();
+				}
+				return undefined;
+			})
 			.compile();
 
 		app.enableShutdownHooks();

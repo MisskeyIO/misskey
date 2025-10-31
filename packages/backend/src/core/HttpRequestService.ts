@@ -29,51 +29,52 @@ export type HttpRequestSendOptions = {
 };
 
 class HttpRequestServiceAgent extends http.Agent {
-        constructor(
-                private config: Config,
-                options?: http.AgentOptions,
-        ) {
-                super(options);
-        }
+	constructor(
+		private config: Config,
+		options?: http.AgentOptions,
+	) {
+		super(options);
+	}
 
-        @bindThis
-        private guardSocket(socket: net.Socket): void {
-                socket.on('connect', () => {
-                        const address = socket.remoteAddress;
-                        if (process.env.NODE_ENV === 'production' && address && ipaddr.isValid(address)) {
-                                if (this.isPrivateIp(address)) {
-                                        socket.destroy(new Error(`Blocked address: ${address}`));
-                                }
-                        }
-                });
-        }
+	@bindThis
+	public override createConnection(
+		options: http.ClientRequestArgs,
+		callback?: (err: Error | null, stream: Duplex) => void,
+	): Duplex | null | undefined {
+		const guardedCallback = callback
+			? (err: Error | null, stream: Duplex) => {
+				this.guardDuplex(stream);
+				callback(err, stream);
+			}
+			: undefined;
 
-        @bindThis
-        private guardDuplex<T extends Duplex | null | undefined>(socket: T): T {
-                if (socket instanceof net.Socket) {
-                        this.guardSocket(socket);
-                }
+		return this.guardDuplex(super.createConnection(options, guardedCallback));
+	}
 
-                return socket;
-        }
+	@bindThis
+	private guardSocket(socket: net.Socket): void {
+		socket.on('connect', () => {
+			const address = socket.remoteAddress;
+			if (process.env.NODE_ENV === 'production' && address && ipaddr.isValid(address)) {
+				if (this.isPrivateIp(address)) {
+					socket.destroy(new Error(`Blocked address: ${address}`));
+				}
+			}
+		});
+	}
 
-        public override createConnection(
-                options: http.ClientRequestArgs,
-                callback?: (err: Error | null, stream: Duplex) => void,
-        ): Duplex | null | undefined {
-                const guardedCallback = callback
-                        ? (err: Error | null, stream: Duplex) => {
-                                this.guardDuplex(stream);
-                                callback(err, stream);
-                        }
-                        : undefined;
+	@bindThis
+	private guardDuplex<T extends Duplex | null | undefined>(socket: T): T {
+		if (socket instanceof net.Socket) {
+			this.guardSocket(socket);
+		}
 
-                return this.guardDuplex(super.createConnection(options, guardedCallback));
-        }
+		return socket;
+	}
 
-        @bindThis
-        private isPrivateIp(ip: string): boolean {
-                const parsedIp = ipaddr.parse(ip);
+	@bindThis
+	private isPrivateIp(ip: string): boolean {
+		const parsedIp = ipaddr.parse(ip);
 
 		for (const net of this.config.allowedPrivateNetworks ?? []) {
 			const cidr = ipaddr.parseCIDR(net);
@@ -87,51 +88,52 @@ class HttpRequestServiceAgent extends http.Agent {
 }
 
 class HttpsRequestServiceAgent extends https.Agent {
-        constructor(
-                private config: Config,
-                options?: https.AgentOptions,
-        ) {
-                super(options);
-        }
+	constructor(
+		private config: Config,
+		options?: https.AgentOptions,
+	) {
+		super(options);
+	}
 
-        @bindThis
-        private guardSocket(socket: net.Socket): void {
-                socket.on('connect', () => {
-                        const address = socket.remoteAddress;
-                        if (process.env.NODE_ENV === 'production' && address && ipaddr.isValid(address)) {
-                                if (this.isPrivateIp(address)) {
-                                        socket.destroy(new Error(`Blocked address: ${address}`));
-                                }
-                        }
-                });
-        }
+	@bindThis
+	public override createConnection(
+		options: https.RequestOptions,
+		callback?: (err: Error | null, stream: Duplex) => void,
+	): Duplex | null | undefined {
+		const guardedCallback = callback
+			? (err: Error | null, stream: Duplex) => {
+				this.guardDuplex(stream);
+				callback(err, stream);
+			}
+			: undefined;
 
-        @bindThis
-        private guardDuplex<T extends Duplex | null | undefined>(socket: T): T {
-                if (socket instanceof net.Socket) {
-                        this.guardSocket(socket);
-                }
+		return this.guardDuplex(super.createConnection(options, guardedCallback));
+	}
 
-                return socket;
-        }
+	@bindThis
+	private guardSocket(socket: net.Socket): void {
+		socket.on('connect', () => {
+			const address = socket.remoteAddress;
+			if (process.env.NODE_ENV === 'production' && address && ipaddr.isValid(address)) {
+				if (this.isPrivateIp(address)) {
+					socket.destroy(new Error(`Blocked address: ${address}`));
+				}
+			}
+		});
+	}
 
-        public override createConnection(
-                options: https.RequestOptions,
-                callback?: (err: Error | null, stream: Duplex) => void,
-        ): Duplex | null | undefined {
-                const guardedCallback = callback
-                        ? (err: Error | null, stream: Duplex) => {
-                                this.guardDuplex(stream);
-                                callback(err, stream);
-                        }
-                        : undefined;
+	@bindThis
+	private guardDuplex<T extends Duplex | null | undefined>(socket: T): T {
+		if (socket instanceof net.Socket) {
+			this.guardSocket(socket);
+		}
 
-                return this.guardDuplex(super.createConnection(options, guardedCallback));
-        }
+		return socket;
+	}
 
-        @bindThis
-        private isPrivateIp(ip: string): boolean {
-                const parsedIp = ipaddr.parse(ip);
+	@bindThis
+	private isPrivateIp(ip: string): boolean {
+		const parsedIp = ipaddr.parse(ip);
 
 		for (const net of this.config.allowedPrivateNetworks ?? []) {
 			const cidr = ipaddr.parseCIDR(net);

@@ -17,7 +17,7 @@
     "watch": "node ./scripts/watch.mjs",
     "restart": "pnpm build && pnpm start",
     "dev": "nodemon -w src -e ts,js,mjs,cjs,json --exec \"cross-env NODE_ENV=development pnpm run restart\"",
-        "typecheck": "pnpm --filter misskey-js build && pnpm --filter misskey-reversi build:tsc && tsc --noEmit && tsc -p test --noEmit && tsc -p test-federation --noEmit",
+    "typecheck": "tsc --noEmit && tsc -p test --noEmit && tsc -p test-federation --noEmit",
     "eslint": "eslint --quiet \"{src,test-federation}/**/*.ts\"",
     "lint": "pnpm typecheck && pnpm eslint",
     "jest": "cross-env NODE_ENV=test node --experimental-vm-modules --experimental-import-meta-resolve node_modules/jest/bin/jest.js --forceExit --config jest.config.unit.cjs",

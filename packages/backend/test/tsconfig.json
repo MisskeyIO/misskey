@@ -25,7 +25,8 @@
 		"isolatedModules": true,
 		"baseUrl": "./",
                 "paths": {
-                        "@/*": ["../src/*"]
+                        "@/*": ["../src/*"],
+                        "psl": ["../node_modules/psl/types/index.d.ts"]
                 },
 		"typeRoots": [
 			"../src/@types",

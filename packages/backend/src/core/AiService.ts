@@ -6,7 +6,7 @@
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 import { Injectable } from '@nestjs/common';
-import * as nsfw from 'nsfwjs';
+import type * as nsfw from 'nsfwjs';
 import si from 'systeminformation';
 import { Mutex } from 'async-mutex';
 import { sharpBmp } from '@misskey-dev/sharp-read-bmp';
@@ -14,6 +14,8 @@ import fetch from 'node-fetch';
 import { bindThis } from '@/decorators.js';
 import type Logger from '@/logger.js';
 import { LoggerService } from '@/core/LoggerService.js';
+
+type NsfwModule = typeof import('nsfwjs');
 
 const _filename = fileURLToPath(import.meta.url);
 const _dirname = dirname(_filename);
@@ -24,8 +26,9 @@ let isSupportedCpu: undefined | boolean = undefined;
 @Injectable()
 export class AiService {
 	private logger: Logger;
-	private model: nsfw.NSFWJS;
-	private modelLoadMutex: Mutex = new Mutex();
+	private model: nsfw.NSFWJS | null = null;
+	private readonly modelLoadMutex: Mutex = new Mutex();
+	private nsfwModule: Promise<NsfwModule> | null = null;
 
 	constructor(
 		private loggerService: LoggerService,
@@ -51,6 +54,7 @@ export class AiService {
 			if (this.model == null) {
 				await this.modelLoadMutex.runExclusive(async () => {
 					if (this.model == null) {
+						const nsfw = await this.loadNsfwModule();
 						this.model = await nsfw.load(`file://${_dirname}/../../nsfw-model/`, { size: 299 });
 					}
 				});
@@ -64,8 +68,13 @@ export class AiService {
 				.toBuffer({ resolveWithObject: true });
 
 			const image = tf.tensor3d(data, [info.height, info.width, info.channels], 'bool');
+			const model = this.model;
+			if (model == null) {
+				image.dispose();
+				return null;
+			}
 			try {
-				return await this.model.classify(image);
+				return await model.classify(image);
 			} finally {
 				image.dispose();
 			}
@@ -95,5 +104,14 @@ export class AiService {
 	private async getCpuFlags(): Promise<string[]> {
 		const str = await si.cpuFlags();
 		return str.split(/\s+/);
+	}
+
+	@bindThis
+	private loadNsfwModule(): Promise<NsfwModule> {
+		if (this.nsfwModule == null) {
+			this.nsfwModule = import('nsfwjs');
+		}
+
+		return this.nsfwModule;
 	}
 }

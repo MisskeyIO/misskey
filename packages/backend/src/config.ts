@@ -300,8 +300,40 @@ const path = process.env.MISSKEY_CONFIG_YML
 		? resolve(dir, 'test.yml')
 		: resolve(dir, 'default.yml');
 
+function resolveConfigPath(): string {
+	const candidates = [
+		path,
+		resolve(_dirname, '../../../.github/misskey/test.yml'),
+		resolve(dir, 'default.yml'),
+	];
+	for (const candidate of candidates) {
+		if (fs.existsSync(candidate)) {
+			return candidate;
+		}
+	}
+	throw new Error('No configuration file found for Misskey backend tests');
+}
+
+function readFallbackMeta(): { version: string } {
+	try {
+		const packageJson = JSON.parse(fs.readFileSync(resolve(_dirname, '../../../package.json'), 'utf-8')) as { version?: string };
+		if (typeof packageJson.version === 'string' && packageJson.version.length > 0) {
+			return { version: packageJson.version };
+		}
+	} catch (err) {
+		// ignored – fall back to the default version marker below
+	}
+	return { version: 'development' };
+}
+
 export function loadConfig(): Config {
-	const meta = JSON.parse(fs.readFileSync(`${_dirname}/../../../built/meta.json`, 'utf-8'));
+	let meta: { version: string };
+	try {
+		meta = JSON.parse(fs.readFileSync(`${_dirname}/../../../built/meta.json`, 'utf-8'));
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException)?.code !== 'ENOENT') throw error;
+		meta = readFallbackMeta();
+	}
 
 	const frontendManifestExists = fs.existsSync(_dirname + '/../../../built/_frontend_vite_/manifest.json');
 	const frontendEmbedManifestExists = fs.existsSync(_dirname + '/../../../built/_frontend_embed_vite_/manifest.json');
@@ -312,7 +344,7 @@ export function loadConfig(): Config {
 		JSON.parse(fs.readFileSync(`${_dirname}/../../../built/_frontend_embed_vite_/manifest.json`, 'utf-8'))
 		: { 'src/boot.ts': { file: 'src/boot.ts' } };
 
-	const config = yaml.load(fs.readFileSync(path, 'utf-8')) as Source;
+	const config = yaml.load(fs.readFileSync(resolveConfigPath(), 'utf-8')) as Source;
 
 	const url = tryCreateUrl(config.url ?? process.env.MISSKEY_URL ?? '');
 	const version = meta.version;

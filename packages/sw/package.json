@@ -1,25 +1,25 @@
 {
-	"name": "sw",
-	"private": true,
-	"scripts": {
-		"watch": "nodemon -w ../../package.json -e json --exec \"node build.js watch\"",
-		"build": "node build.js",
-		"typecheck": "tsc --noEmit",
-		"eslint": "eslint --quiet src/**/*.ts",
-		"lint": "pnpm typecheck && pnpm eslint"
-	},
-	"dependencies": {
-		"esbuild": "managed",
-		"idb-keyval": "6.2.2",
-		"misskey-js": "workspace:*"
-	},
-	"devDependencies": {
-		"@typescript/lib-webworker": "npm:@types/serviceworker@0.0.74",
-		"@typescript-eslint/parser": "8.33.1",
-		"eslint": "9.27.0",
-		"eslint-plugin-import": "2.31.0",
-		"nodemon": "3.1.10",
-		"typescript": "5.8.3"
-	},
-	"type": "module"
+  "name": "sw",
+  "private": true,
+  "scripts": {
+    "watch": "nodemon -w ../../package.json -e json --exec \"node build.js watch\"",
+    "build": "node build.js",
+    "typecheck": "tsc --noEmit",
+    "eslint": "eslint --quiet src/**/*.ts",
+    "lint": "pnpm typecheck && pnpm eslint"
+  },
+  "dependencies": {
+    "esbuild": "catalog:",
+    "idb-keyval": "catalog:",
+    "misskey-js": "workspace:*"
+  },
+  "devDependencies": {
+    "@typescript/lib-webworker": "catalog:",
+    "@typescript-eslint/parser": "catalog:",
+    "eslint": "catalog:",
+    "eslint-plugin-import": "catalog:",
+    "nodemon": "catalog:",
+    "typescript": "catalog:"
+  },
+  "type": "module"
 }

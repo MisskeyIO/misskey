@@ -3,6 +3,9 @@ name: Check Misskey JS version
 on:
   push:
     branches:
+      - main
+      - next
+      - beta
       - io
       - host
     paths:
@@ -25,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           submodules: true

@@ -131,13 +131,11 @@ async function menu(ev) {
 		text: i18n.ts.info,
 		icon: 'ti ti-info-circle',
 		action: async () => {
-			const { dispose } = os.popup(MkCustomEmojiDetailedDialog, {
+			await os.popup(MkCustomEmojiDetailedDialog, {
 				emoji: await misskeyApiGet('emoji', {
 					name: props.reaction.replace(/:/g, '').replace(/@\./, ''),
 				}),
-			}, {
-				closed: () => dispose(),
-			});
+			}, {}, 'closed');
 		},
 	}], ev.currentTarget ?? ev.target);
 }
@@ -148,9 +146,7 @@ function anime() {
 	const rect = buttonEl.value.getBoundingClientRect();
 	const x = rect.left + 16;
 	const y = rect.top + (buttonEl.value.offsetHeight / 2);
-	const { dispose } = os.popup(MkReactionEffect, { reaction: props.reaction, x, y }, {
-		end: () => dispose(),
-	});
+	os.popup(MkReactionEffect, { reaction: props.reaction, x, y }, {}, 'end');
 }
 
 watch(() => props.count, (newCount, oldCount) => {
@@ -172,15 +168,13 @@ if (!mock) {
 
 		const users = reactions.map(x => x.user);
 
-		const { dispose } = os.popup(XDetails, {
+		await os.popup(XDetails, {
 			showing,
 			reaction: props.reaction,
 			users,
 			count: props.count,
 			targetElement: buttonEl.value,
-		}, {
-			closed: () => dispose(),
-		});
+		}, {}, 'closed');
 	}, 100);
 }
 </script>

@@ -87,7 +87,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { defineAsyncComponent, computed } from 'vue';
-import { supported as webAuthnSupported, create as webAuthnCreate, parseCreationOptionsFromJSON } from '@github/webauthn-json/browser-ponyfill';
+import { browserSupportsWebAuthn as webAuthnSupported, startRegistration } from '@simplewebauthn/browser';
 import MkButton from '@/components/MkButton.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
@@ -119,11 +119,9 @@ async function registerTOTP(): Promise<void> {
 		token: auth.result.token,
 	});
 
-	const { dispose } = os.popup(defineAsyncComponent(() => import('./2fa.qrdialog.vue')), {
+	os.popup(defineAsyncComponent(() => import('./2fa.qrdialog.vue')), {
 		twoFactorData,
-	}, {
-		closed: () => dispose(),
-	});
+	}, {}, 'closed');
 }
 
 async function unregisterTOTP(): Promise<void> {
@@ -201,11 +199,9 @@ async function addSecurityKey() {
 	const auth = await os.authenticateDialog();
 	if (auth.canceled) return;
 
-	const registrationOptions = parseCreationOptionsFromJSON({
-		publicKey: await os.apiWithDialog('i/2fa/register-key', {
-			password: auth.result.password,
-			token: auth.result.token,
-		}),
+	const registrationOptions = await os.apiWithDialog('i/2fa/register-key', {
+		password: auth.result.password,
+		token: auth.result.token,
 	});
 
 	const name = await os.inputText({
@@ -218,7 +214,7 @@ async function addSecurityKey() {
 	if (name.canceled) return;
 
 	const credential = await os.promiseDialog(
-		webAuthnCreate(registrationOptions),
+		startRegistration({ optionsJSON: registrationOptions }),
 		null,
 		() => {}, // ユーザーのキャンセルはrejectなのでエラーダイアログを出さない
 		i18n.ts._2fa.tapSecurityKey,
@@ -232,7 +228,7 @@ async function addSecurityKey() {
 		password: auth.result.password,
 		token: auth.result.token,
 		name: name.result,
-		credential: credential.toJSON(),
+		credential,
 	});
 }
 

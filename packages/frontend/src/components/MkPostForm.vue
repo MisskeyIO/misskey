@@ -521,14 +521,14 @@ function upload(file: File, name?: string): void {
 	});
 }
 
-function setVisibility() {
+async function setVisibility() {
 	if (channel.value) {
 		visibility.value = 'public';
 		localOnly.value = true; // TODO: チャンネルが連合するようになった折には消す
 		return;
 	}
 
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkVisibilityPicker.vue')), {
+	await os.popup(defineAsyncComponent(() => import('@/components/MkVisibilityPicker.vue')), {
 		currentVisibility: visibility.value,
 		isSilenced: $i.isSilenced,
 		localOnly: localOnly.value,
@@ -541,8 +541,7 @@ function setVisibility() {
 				store.set('visibility', visibility.value);
 			}
 		},
-		closed: () => dispose(),
-	});
+	}, 'closed');
 }
 
 async function toggleLocalOnly() {
@@ -890,8 +889,8 @@ function isAnnoying(text: string): boolean {
 }
 
 async function openDrafts() {
-	const { canceled, selected } = await new Promise<{ canceled: boolean, selected: string | undefined }>(resolve => {
-		os.popup(MkDraftsDialog, {}, {
+	const { canceled, selected } = await new Promise<{ canceled: boolean, selected: string | undefined }>(async (resolve) => {
+		await os.popup(MkDraftsDialog, {}, {
 			done: result => {
 				resolve(typeof result.selected === 'string' ? result : { canceled: true, selected: undefined });
 			},
@@ -961,9 +960,7 @@ async function post(ev?: MouseEvent) {
 			const rect = el.getBoundingClientRect();
 			const x = rect.left + (el.offsetWidth / 2);
 			const y = rect.top + (el.offsetHeight / 2);
-			const { dispose } = os.popup(MkRippleEffect, { x, y }, {
-				end: () => dispose(),
-			});
+			os.popup(MkRippleEffect, { x, y }, {}, 'end');
 		}
 	}
 

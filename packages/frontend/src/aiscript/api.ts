@@ -4,7 +4,7 @@
  */
 
 import { errors, utils, values } from '@syuilo/aiscript';
-import * as Misskey from 'misskey-js';
+import { nyaize } from 'misskey-js';
 import { url, lang } from '@@/js/config.js';
 import { assertStringAndIsIn } from './common.js';
 import * as os from '@/os.js';
@@ -111,7 +111,7 @@ export function createAiScriptEnv(opts: { storageKey: string, token?: string }) 
 		}),
 		'Mk:nyaize': values.FN_NATIVE(([text]) => {
 			utils.assertString(text);
-			return values.STR(Misskey.nyaize(text.value));
+			return values.STR(nyaize(text.value));
 		}),
 	};
 }

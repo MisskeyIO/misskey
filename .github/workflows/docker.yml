@@ -6,11 +6,11 @@ on:
       - main
       - next
       - beta
-      - host
       - io
+      - host
     tags:
-      - '**-host.*'
       - '**-io.*'
+      - '**-host.*'
   workflow_dispatch:
 
 permissions:
@@ -28,7 +28,7 @@ jobs:
     if: github.repository == 'MisskeyIO/misskey'
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           submodules: true

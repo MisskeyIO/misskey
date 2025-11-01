@@ -60,7 +60,7 @@ const windowRouter = createRouter(props.initialPath);
 const pageMetadata = ref<null | PageMetadata>(null);
 const windowEl = useTemplateRef('windowEl');
 const history = ref<{ path: string; }[]>([{
-	path: windowRouter.getCurrentFullPath(),
+	path: windowRouter.getCurrentPath(),
 }]);
 
 type WindowButton = {
@@ -107,23 +107,23 @@ function getSearchMarker(path: string) {
 const searchMarkerId = ref<string | null>(getSearchMarker(props.initialPath));
 
 windowRouter.addListener('push', ctx => {
-	history.value.push({ path: ctx.fullPath });
+	history.value.push({ path: ctx.path });
 });
 
 windowRouter.addListener('replace', ctx => {
 	history.value.pop();
-	history.value.push({ path: ctx.fullPath });
+	history.value.push({ path: ctx.path });
 });
 
 windowRouter.addListener('change', ctx => {
-	if (_DEV_) console.log('windowRouter: change', ctx.fullPath);
-	searchMarkerId.value = getSearchMarker(ctx.fullPath);
+	if (_DEV_) console.log('windowRouter: change', ctx.path);
+	searchMarkerId.value = getSearchMarker(ctx.path);
 
 	if (instance.googleAnalyticsId) {
 		nextTick(() =>
 			pageview({
 				page_title: pageMetadata.value?.title,
-				page_path: ctx.fullPath,
+				page_path: ctx.path,
 			}),
 		);
 	}
@@ -153,14 +153,14 @@ const contextmenu = computed(() => ([{
 	icon: 'ti ti-external-link',
 	text: i18n.ts.openInNewTab,
 	action: () => {
-		window.open(url + windowRouter.getCurrentFullPath(), '_blank', 'noopener');
+		window.open(url + windowRouter.getCurrentPath(), '_blank', 'noopener');
 		windowEl.value?.close();
 	},
 }, {
 	icon: 'ti ti-link',
 	text: i18n.ts.copyLink,
 	action: () => {
-		copyToClipboard(url + windowRouter.getCurrentFullPath());
+		copyToClipboard(url + windowRouter.getCurrentPath());
 	},
 }]));
 
@@ -178,12 +178,12 @@ function close() {
 }
 
 function expand() {
-	mainRouter.push(windowRouter.getCurrentFullPath(), 'forcePage');
+	mainRouter.push(windowRouter.getCurrentPath(), 'forcePage');
 	windowEl.value?.close();
 }
 
 function popout() {
-	_popout(windowRouter.getCurrentFullPath(), windowEl.value?.$el);
+	_popout(windowRouter.getCurrentPath(), windowEl.value?.$el);
 	windowEl.value?.close();
 }
 

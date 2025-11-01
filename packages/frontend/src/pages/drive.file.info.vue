@@ -115,7 +115,7 @@ const folderHierarchy = computed(() => {
 });
 const isImage = computed(() => file.value?.type.startsWith('image/'));
 
-async function fetch() {
+async function fetchInfo() {
 	fetching.value = true;
 
 	file.value = await misskeyApi('drive/files/show', {
@@ -153,7 +153,7 @@ function move() {
 			fileId: file.value.id,
 			folderId: folder[0] ? folder[0].id : null,
 		}).then(async () => {
-			await fetch();
+			await fetchInfo();
 		});
 	});
 }
@@ -165,7 +165,7 @@ function toggleSensitive() {
 		fileId: file.value.id,
 		isSensitive: !file.value.isSensitive,
 	}).then(async () => {
-		await fetch();
+		await fetchInfo();
 	}).catch(err => {
 		os.alert({
 			type: 'error',
@@ -188,7 +188,7 @@ function rename() {
 			fileId: file.value.id,
 			name: name,
 		}).then(async () => {
-			await fetch();
+			await fetchInfo();
 		});
 	});
 }
@@ -196,7 +196,7 @@ function rename() {
 function describe() {
 	if (!file.value) return;
 
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkFileCaptionEditWindow.vue')), {
+	os.popup(defineAsyncComponent(() => import('@/components/MkFileCaptionEditWindow.vue')), {
 		default: file.value.comment ?? '',
 		file: file.value,
 	}, {
@@ -205,11 +205,10 @@ function describe() {
 				fileId: file.value.id,
 				comment: caption.length === 0 ? null : caption,
 			}).then(async () => {
-				await fetch();
+				await fetchInfo();
 			});
 		},
-		closed: () => dispose(),
-	});
+	}, 'closed');
 }
 
 async function deleteFile() {
@@ -229,7 +228,7 @@ async function deleteFile() {
 }
 
 onMounted(async () => {
-	await fetch();
+	await fetchInfo();
 });
 </script>
 

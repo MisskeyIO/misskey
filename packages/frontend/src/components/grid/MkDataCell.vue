@@ -297,15 +297,11 @@ useTooltip(rootEl, (showing) => {
 	}
 
 	const content = cell.value.violation.violations.filter(it => !it.valid).map(it => it.result.message).join('\n');
-	const result = os.popup(defineAsyncComponent(() => import('@/components/grid/MkCellTooltip.vue')), {
+	os.popup(defineAsyncComponent(() => import('@/components/grid/MkCellTooltip.vue')), {
 		showing,
 		content,
 		targetElement: rootEl.value!,
-	}, {
-		closed: () => {
-			result.dispose();
-		},
-	});
+	}, {}, 'closed');
 });
 
 onMounted(() => {

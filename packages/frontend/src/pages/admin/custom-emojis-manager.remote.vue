@@ -215,7 +215,7 @@ function setupGrid(): GridSetting {
 						icon: 'ti ti-info-circle',
 						action: async () => {
 							const target = customEmojis.value[row.index];
-							const { dispose } = os.popup(MkRemoteEmojiEditDialog, {
+							await os.popup(MkRemoteEmojiEditDialog, {
 								emoji: {
 									id: target.id,
 									name: target.name,
@@ -223,14 +223,7 @@ function setupGrid(): GridSetting {
 									license: target.license,
 									url: target.publicUrl,
 								},
-							}, {
-								done: () => {
-									dispose();
-								},
-								closed: () => {
-									dispose();
-								},
-							});
+							}, {}, 'closed');
 						},
 					},
 					{

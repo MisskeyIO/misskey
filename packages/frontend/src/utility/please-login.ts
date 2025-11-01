@@ -45,7 +45,7 @@ export type OpenOnRemoteOptions = {
 	params: Record<string, string>;
 };
 
-export function pleaseLogin(opts: {
+export async function pleaseLogin(opts: {
 	path?: string;
 	message?: string;
 	openOnRemote?: OpenOnRemoteOptions;
@@ -59,7 +59,7 @@ export function pleaseLogin(opts: {
 		_openOnRemote = opts.openOnRemote;
 	}
 
-	const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkSigninDialog.vue')), {
+	await popup(defineAsyncComponent(() => import('@/components/MkSigninDialog.vue')), {
 		autoSet: true,
 		message: opts.message ?? (_openOnRemote ? i18n.ts.signinOrContinueOnRemote : i18n.ts.signinRequired),
 		openOnRemote: _openOnRemote,
@@ -69,8 +69,7 @@ export function pleaseLogin(opts: {
 				window.location.href = opts.path;
 			}
 		},
-		closed: () => dispose(),
-	});
+	}, 'closed');
 
 	throw new Error('signin required');
 }

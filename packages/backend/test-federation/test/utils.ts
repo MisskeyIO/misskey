@@ -81,7 +81,7 @@ async function createAdmin(host: Host): Promise<Misskey.entities.SignupResponse 
 		}, res.token);
 		return res;
 	}).catch(err => {
-		if (err.info.e.message === 'access denied') return undefined;
+		if (err.info && err.info.error === 'access denied') return undefined;
 		throw err;
 	});
 }

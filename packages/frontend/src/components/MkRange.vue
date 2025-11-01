@@ -116,40 +116,36 @@ const steps = computed(() => {
 const tooltipForDragShowing = ref(false);
 const tooltipForHoverShowing = ref(false);
 
-function onMouseenter() {
+async function onMouseenter() {
 	if (isTouchUsing) return;
 
 	tooltipForHoverShowing.value = true;
 
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkTooltip.vue')), {
+	await os.popup(defineAsyncComponent(() => import('@/components/MkTooltip.vue')), {
 		showing: computed(() => tooltipForHoverShowing.value && !tooltipForDragShowing.value),
 		text: computed(() => {
 			return props.textConverter(finalValue.value);
 		}),
 		targetElement: thumbEl,
-	}, {
-		closed: () => dispose(),
-	});
+	}, {}, 'closed');
 
 	thumbEl.value!.addEventListener('mouseleave', () => {
 		tooltipForHoverShowing.value = false;
 	}, { once: true, passive: true });
 }
 
-function onMousedown(ev: MouseEvent | TouchEvent) {
+async function onMousedown(ev: MouseEvent | TouchEvent) {
 	ev.preventDefault();
 
 	tooltipForDragShowing.value = true;
 
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkTooltip.vue')), {
+	await os.popup(defineAsyncComponent(() => import('@/components/MkTooltip.vue')), {
 		showing: tooltipForDragShowing,
 		text: computed(() => {
 			return props.textConverter(finalValue.value);
 		}),
 		targetElement: thumbEl,
-	}, {
-		closed: () => dispose(),
-	});
+	}, {}, 'closed');
 
 	const style = window.document.createElement('style');
 	style.appendChild(window.document.createTextNode('* { cursor: grabbing !important; } body * { pointer-events: none !important; }'));

@@ -47,7 +47,7 @@ const current = router.current!;
 const currentPageComponent = shallowRef('component' in current.route ? current.route.component : MkLoadingPage);
 const currentPageProps = ref(current.props);
 let currentRoutePath = current.route.path;
-const key = ref(router.getCurrentFullPath());
+const key = ref(router.getCurrentPath());
 
 router.useListener('change', ({ resolved }) => {
 	if (resolved == null || 'redirect' in resolved.route) return;
@@ -56,7 +56,7 @@ router.useListener('change', ({ resolved }) => {
 	function _() {
 		currentPageComponent.value = resolved.route.component;
 		currentPageProps.value = resolved.props;
-		key.value = router.getCurrentFullPath();
+		key.value = router.getCurrentPath();
 		currentRoutePath = resolved.route.path;
 	}
 
@@ -99,5 +99,12 @@ onBeforeUnmount(() => {
 .root {
 	height: 100%;
 	background-color: var(--MI_THEME-bg);
+
+	/**
+	 * FIXME: Safari 26 で contain: layout を指定するとバグるので、hotfixとして _pageContainer の content: strict を上書き
+	 * https://github.com/misskey-dev/misskey/issues/16204#issuecomment-3265404776
+	 * https://bugs.webkit.org/show_bug.cgi?id=297186
+	 */
+	contain: size style paint !important;
 }
 </style>

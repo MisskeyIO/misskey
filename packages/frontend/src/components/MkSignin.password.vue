@@ -97,9 +97,7 @@ const captchaFailed = computed((): boolean => {
 });
 
 function resetPassword(): void {
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkForgotPassword.vue')), {}, {
-		closed: () => dispose(),
-	});
+	os.popup(defineAsyncComponent(() => import('@/components/MkForgotPassword.vue')), {}, {}, 'closed');
 }
 
 function onSubmit() {

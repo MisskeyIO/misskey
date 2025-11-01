@@ -100,7 +100,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onActivated, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from './MkButton.vue';
 import MkInfo from './MkInfo.vue';
@@ -752,14 +752,6 @@ onMounted(() => {
 		move(props.initialFolder);
 	} else {
 		fetch();
-	}
-});
-
-onActivated(() => {
-	if (showFiles.value && prefer.s.enableInfiniteScroll) {
-		nextTick(() => {
-			ilFilesObserver.observe(loadMoreFiles.value?.$el);
-		});
 	}
 });
 

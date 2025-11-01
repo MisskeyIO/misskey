@@ -82,8 +82,8 @@ const tab = ref('current');
 
 async function read(target): Promise<void> {
 	if (target.needEnrollmentTutorialToRead) {
-		const tutorialCompleted = await (new Promise<boolean>(resolve => {
-			os.popup(defineAsyncComponent(() => import('@/components/MkTutorialDialog.vue')), {}, {
+		const tutorialCompleted = await (new Promise<boolean>(async (resolve) => {
+			await os.popup(defineAsyncComponent(() => import('@/components/MkTutorialDialog.vue')), {}, {
 				done: () => {
 					resolve(true);
 				},

@@ -44,7 +44,7 @@ async function show(ev: MouseEvent) {
 	if (props.media.isSensitive && !$i && prefer.s.confirmWhenRevealingSensitiveMedia) {
 		ev.preventDefault();
 		ev.stopPropagation();
-		pleaseLogin();
+		await pleaseLogin();
 		return;
 	}
 

@@ -27,7 +27,7 @@ describe('ReversiGame', () => {
 		assert.strictEqual(response2.status, 200);
 		assert.notStrictEqual(response2.body, null);
 		const body = response2.body as ReversiMatchResponse;
-		assert.strictEqual(body.user1.id, alice.id);
+		assert.strictEqual(body?.user1.id, alice.id);
 		assert.strictEqual(body.user2.id, bob.id);
 	});
 });

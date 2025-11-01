@@ -180,7 +180,7 @@ async function showHiddenContent(ev: MouseEvent) {
 	if (props.image.isSensitive && !$i) {
 		ev.preventDefault();
 		ev.stopPropagation();
-		pleaseLogin();
+		await pleaseLogin();
 		return;
 	}
 

@@ -17,7 +17,7 @@ import type {
 	PublicKeyCredentialCreationOptionsJSON,
 	PublicKeyCredentialRequestOptionsJSON,
 	RegistrationResponseJSON,
-} from '@simplewebauthn/types';
+} from '@simplewebauthn/server';
 import type * as misskey from 'misskey-js';
 import { loadConfig } from '@/config.js';
 

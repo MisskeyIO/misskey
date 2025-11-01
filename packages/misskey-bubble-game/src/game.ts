@@ -187,7 +187,7 @@ export class DropAndFusionGame extends EventEmitter<{
 	}
 
 	private createBody(mono: Mono, x: number, y: number) {
-		const options: Matter.IBodyDefinition = {
+		const options: Matter.IChamferableBodyDefinition = {
 			label: mono.id,
 			density: this.gameMode === 'space' ? 0.01 : ((mono.sizeX * mono.sizeY) / 10000),
 			restitution: this.gameMode === 'space' ? 0.5 : 0.2,

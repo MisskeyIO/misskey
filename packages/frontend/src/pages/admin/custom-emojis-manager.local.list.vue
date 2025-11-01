@@ -525,10 +525,10 @@ const headerPageMetadata = computed(() => ({
 const headerActions = computed(() => [{
 	icon: 'ti ti-search',
 	text: i18n.ts.search,
-	handler: () => {
+	handler: async () => {
 		if (searchWindowOpening) return;
 		searchWindowOpening = true;
-		const { dispose } = os.popup(defineAsyncComponent(() => import('./custom-emojis-manager.local.list.search.vue')), {
+		const { dispose } = await os.popup(defineAsyncComponent(() => import('./custom-emojis-manager.local.list.search.vue')), {
 			query: searchQuery.value,
 		}, {
 			queryUpdated: (query: EmojiSearchQuery) => {
@@ -584,14 +584,10 @@ const headerActions = computed(() => [{
 }, {
 	icon: 'ti ti-notes',
 	text: i18n.ts._customEmojisManager._gridCommon.registrationLogs,
-	handler: () => {
-		const { dispose } = os.popup(defineAsyncComponent(() => import('./custom-emojis-manager.local.list.logs.vue')), {
+	handler: async () => {
+		await os.popup(defineAsyncComponent(() => import('./custom-emojis-manager.local.list.logs.vue')), {
 			logs: requestLogs.value,
-		}, {
-			closed: () => {
-				dispose();
-			},
-		});
+		}, {}, 'closed');
 	},
 }]);
 </script>

@@ -72,12 +72,10 @@ const otherNavItemIndicated = computed<boolean>(() => {
 });
 
 function more(ev: MouseEvent) {
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkLaunchPad.vue')), {
+	os.popup(defineAsyncComponent(() => import('@/components/MkLaunchPad.vue')), {
 		src: ev.currentTarget ?? ev.target,
 		anchor: { x: 'center', y: 'bottom' },
-	}, {
-		closed: () => dispose(),
-	});
+	}, {}, 'closed');
 }
 
 function openAccountMenu(ev: MouseEvent) {

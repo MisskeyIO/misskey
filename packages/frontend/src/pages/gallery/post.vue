@@ -158,12 +158,10 @@ function reportAbuse() {
 
 	const pageUrl = `${url}/gallery/${post.value.id}`;
 
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkAbuseReportWindow.vue')), {
+	os.popup(defineAsyncComponent(() => import('@/components/MkAbuseReportWindow.vue')), {
 		user: post.value.user,
 		initialComment: `Post: ${pageUrl}\n-----\n`,
-	}, {
-		closed: () => dispose(),
-	});
+	}, {}, 'closed');
 }
 
 function showMenu(ev: MouseEvent) {

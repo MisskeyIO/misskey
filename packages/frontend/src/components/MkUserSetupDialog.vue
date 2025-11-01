@@ -175,11 +175,9 @@ function setupComplete() {
 function launchTutorial() {
 	setupComplete();
 	nextTick(() => {
-		const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkTutorialDialog.vue')), {
+		os.popup(defineAsyncComponent(() => import('@/components/MkTutorialDialog.vue')), {
 			initialPage: 1,
-		}, {
-			closed: () => dispose(),
-		});
+		}, {}, 'closed');
 	});
 }
 

@@ -163,12 +163,10 @@ export async function refreshCurrentAccount() {
 
 export async function login(token: AccountWithToken['token'], redirect?: string) {
 	const showing = ref(true);
-	const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkWaitingDialog.vue')), {
+	await popup(defineAsyncComponent(() => import('@/components/MkWaitingDialog.vue')), {
 		success: false,
 		showing: showing,
-	}, {
-		closed: () => dispose(),
-	});
+	}, {}, 'closed');
 
 	const me = await fetchAccount(token, undefined, true).catch(reason => {
 		showing.value = false;
@@ -200,15 +198,12 @@ export async function switchAccount(host: string, id: string) {
 	if (token) {
 		login(token);
 	} else {
-		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkSigninDialog.vue')), {}, {
+		await popup(defineAsyncComponent(() => import('@/components/MkSigninDialog.vue')), {}, {
 			done: async (res: Misskey.entities.SigninFlowResponse & { finished: true }) => {
 				store.set('accountTokens', { ...store.s.accountTokens, [host + '/' + res.id]: res.i });
 				login(res.i);
 			},
-			closed: () => {
-				dispose();
-			},
-		});
+		}, 'closed');
 	}
 }
 
@@ -316,8 +311,8 @@ export async function openAccountMenu(opts: {
 }
 
 export function getAccountWithSigninDialog(): Promise<{ id: string, token: string } | null> {
-	return new Promise((resolve) => {
-		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkSigninDialog.vue')), {}, {
+	return new Promise(async (resolve) => {
+		await popup(defineAsyncComponent(() => import('@/components/MkSigninDialog.vue')), {}, {
 			done: async (res: Misskey.entities.SigninFlowResponse & { finished: true }) => {
 				const user = await fetchAccount(res.i, res.id, true);
 				await addAccount(host, user, res.i);
@@ -326,16 +321,13 @@ export function getAccountWithSigninDialog(): Promise<{ id: string, token: strin
 			cancelled: () => {
 				resolve(null);
 			},
-			closed: () => {
-				dispose();
-			},
-		});
+		}, 'closed');
 	});
 }
 
 export function getAccountWithSignupDialog(): Promise<{ id: string, token: string } | null> {
-	return new Promise((resolve) => {
-		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkSignupDialog.vue')), {}, {
+	return new Promise(async (resolve) => {
+		await popup(defineAsyncComponent(() => import('@/components/MkSignupDialog.vue')), {}, {
 			done: async (res: Misskey.entities.SignupResponse) => {
 				const user = JSON.parse(JSON.stringify(res));
 				delete user.token;
@@ -345,9 +337,6 @@ export function getAccountWithSignupDialog(): Promise<{ id: string, token: strin
 			cancelled: () => {
 				resolve(null);
 			},
-			closed: () => {
-				dispose();
-			},
-		});
+		}, 'closed');
 	});
 }

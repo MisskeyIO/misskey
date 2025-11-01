@@ -95,8 +95,8 @@ export async function authorizePlugin(plugin: Plugin) {
 	if (plugin.permissions == null || plugin.permissions.length === 0) return;
 	if (Object.hasOwn(store.s.pluginTokens, plugin.installId)) return;
 
-	const token = await new Promise<string>((res, rej) => {
-		const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkTokenGenerateWindow.vue')), {
+	const token = await new Promise<string>(async (res, rej) => {
+		await os.popup(defineAsyncComponent(() => import('@/components/MkTokenGenerateWindow.vue')), {
 			title: i18n.ts.tokenRequested,
 			information: i18n.ts.pluginTokenRequestedDescription,
 			initialName: plugin.name,
@@ -111,8 +111,7 @@ export async function authorizePlugin(plugin: Plugin) {
 				});
 				res(token);
 			},
-			closed: () => dispose(),
-		});
+		}, 'closed');
 	});
 
 	store.set('pluginTokens', {

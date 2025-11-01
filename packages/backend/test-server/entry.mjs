@@ -1,11 +1,10 @@
+import process from 'node:process';
 import { portToPid } from 'pid-port';
 import fkill from 'fkill';
 import Fastify from 'fastify';
-import { NestFactory } from '@nestjs/core';
-import { MainModule } from '../built/MainModule.js';
-import { ServerService } from '../built/server/ServerService.js';
+import { server } from '../built/boot/common.js';
 import { loadConfig } from '../built/config.js';
-import { NestLogger } from '../built/NestLogger.js';
+import { coreLogger } from '../built/logger.js';
 
 const config = loadConfig();
 const originEnv = JSON.stringify(process.env);
@@ -13,21 +12,20 @@ const originEnv = JSON.stringify(process.env);
 process.env.NODE_ENV = 'test';
 
 let app;
-let serverService;
 
 /**
  * テスト用のサーバインスタンスを起動する
  */
 async function launch() {
+	process.on('unhandledRejection', console.dir);
+	process.on('uncaughtException', err => {
+		coreLogger.error(`Uncaught exception: ${err.message}`, { error: err });
+	});
+
 	await killTestServer();
 
 	console.log('starting application...');
-
-	app = await NestFactory.createApplicationContext(MainModule, {
-		logger: new NestLogger(),
-	});
-	serverService = app.get(ServerService);
-	await serverService.launch();
+	app = await server();
 
 	await startControllerEndpoints();
 
@@ -75,18 +73,12 @@ async function startControllerEndpoints(port = config.port + 1000) {
 	fastify.post('/env-reset', async (req, res) => {
 		process.env = JSON.parse(originEnv);
 
-		await serverService.dispose();
 		await app.close();
 
 		await killTestServer();
 
 		console.log('starting application...');
-
-		app = await NestFactory.createApplicationContext(MainModule, {
-			logger: new NestLogger(),
-		});
-		serverService = app.get(ServerService);
-		await serverService.launch();
+		app = await server();
 
 		res.code(200).send({ success: true });
 	});

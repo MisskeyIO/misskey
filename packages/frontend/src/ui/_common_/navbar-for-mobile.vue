@@ -77,9 +77,7 @@ function openAccountMenu(ev: MouseEvent) {
 }
 
 function more() {
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkLaunchPad.vue')), {}, {
-		closed: () => dispose(),
-	});
+	os.popup(defineAsyncComponent(() => import('@/components/MkLaunchPad.vue')), {}, {}, 'closed');
 }
 </script>
 

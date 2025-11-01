@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - next
       - beta
       - io
       - host
@@ -39,7 +40,7 @@ jobs:
   pnpm_install:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4.2.2
+    - uses: actions/checkout@v5
       with:
         fetch-depth: 0
         submodules: true
@@ -47,7 +48,7 @@ jobs:
       uses: pnpm/action-setup@v4
       with:
         run_install: false
-    - uses: actions/setup-node@v4.4.0
+    - uses: actions/setup-node@v6
       with:
         node-version-file: '.node-version'
         cache: 'pnpm'
@@ -72,21 +73,21 @@ jobs:
       eslint-cache-version: v1
       eslint-cache-path: ${{ github.workspace }}/node_modules/.cache/eslint-${{ matrix.workspace }}
     steps:
-    - uses: actions/checkout@v4.2.2
+    - uses: actions/checkout@v5
       with:
         fetch-depth: 0
         submodules: true
     - name: Setup pnpm
-      uses: pnpm/action-setup@v4.1.0
+      uses: pnpm/action-setup@v4
       with:
         run_install: false
-    - uses: actions/setup-node@v4.4.0
+    - uses: actions/setup-node@v6
       with:
         node-version-file: '.node-version'
         cache: 'pnpm'
     - run: pnpm i --frozen-lockfile
     - name: Restore eslint cache
-      uses: actions/cache@v4.2.3
+      uses: actions/cache@v4
       with:
         path: ${{ env.eslint-cache-path }}
         key: eslint-${{ env.eslint-cache-version }}-${{ matrix.workspace }}-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ github.ref_name }}-${{ github.sha }}
@@ -104,7 +105,7 @@ jobs:
         - sw
         - misskey-js
     steps:
-    - uses: actions/checkout@v4.2.2
+    - uses: actions/checkout@v5
       with:
         fetch-depth: 0
         submodules: true
@@ -112,7 +113,7 @@ jobs:
       uses: pnpm/action-setup@v4
       with:
         run_install: false
-    - uses: actions/setup-node@v4.4.0
+    - uses: actions/setup-node@v6
       with:
         node-version-file: '.node-version'
         cache: 'pnpm'

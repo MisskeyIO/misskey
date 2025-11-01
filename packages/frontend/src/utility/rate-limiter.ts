@@ -7,8 +7,8 @@
  * Adapted from https://github.com/isaacs/ttlcache/blob/b6002f971e122e3b35e23d00ac6a8365d505c14d/examples/rate-limiter-window.ts
  */
 
-import TTLCache from '@isaacs/ttlcache';
-import type { Options as TTLCacheOptions } from '@isaacs/ttlcache';
+import { TTLCache } from '@isaacs/ttlcache';
+import type { TTLCacheOptions } from '@isaacs/ttlcache';
 
 export interface Options {
 	duration: number;

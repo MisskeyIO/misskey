@@ -33,6 +33,17 @@ async function exe(script: string): Promise<values.Value[]> {
 	return outputs;
 }
 
+const expectRuntimeError = async (
+	script: string,
+	expected: { message: string; pos: { line: number; column: number } },
+) => {
+	await expect(exe(script)).rejects.toMatchObject({
+		message: expect.stringContaining(expected.message),
+		name: 'Runtime',
+		pos: expect.objectContaining(expected.pos),
+	});
+};
+
 let $iMock = vi.hoisted<Partial<typeof import('@/i.js').$i> | null >(
 	() => null
 );
@@ -70,6 +81,7 @@ describe('AiScript common API', () => {
 
 	describe('readline', () => {
 		afterEach(() => {
+			vi.clearAllMocks();
 			vi.restoreAllMocks();
 		});
 
@@ -166,6 +178,7 @@ describe('AiScript common API', () => {
 
 	describe('dialog', () => {
 		afterEach(() => {
+			vi.clearAllMocks();
 			vi.restoreAllMocks();
 		});
 
@@ -205,6 +218,7 @@ describe('AiScript common API', () => {
 
 	describe('confirm', () => {
 		afterEach(() => {
+			vi.clearAllMocks();
 			vi.restoreAllMocks();
 		});
 
@@ -262,7 +276,9 @@ describe('AiScript common API', () => {
 
 	describe('api', () => {
 		afterEach(() => {
+			vi.clearAllMocks();
 			vi.restoreAllMocks();
+			misskeyApiMock.mockReset();
 		});
 
 		test.sequential('successful', async () => {
@@ -313,20 +329,22 @@ describe('AiScript common API', () => {
 		});
 
 		test.sequential('invalid endpoint', async () => {
-			await expect(() => exe(`
+			await expectRuntimeError(`
 				Mk:api('https://example.com/api/ping', {})
-			`)).rejects.toStrictEqual(
-				new errors.AiScriptRuntimeError('invalid endpoint'),
-			);
+			`, {
+				message: 'invalid endpoint',
+				pos: { line: 2, column: 11 },
+			});
 			expect(misskeyApiMock).not.toHaveBeenCalled();
 		});
 
 		test.sequential('missing param', async () => {
-			await expect(() => exe(`
+			await expectRuntimeError(`
 				Mk:api('ping')
-			`)).rejects.toStrictEqual(
-				new errors.AiScriptRuntimeError('expected param'),
-			);
+			`, {
+				message: 'expected param',
+				pos: { line: 2, column: 11 },
+			});
 			expect(misskeyApiMock).not.toHaveBeenCalled();
 		});
 	});
@@ -350,11 +368,12 @@ describe('AiScript common API', () => {
 		});
 
 		test.sequential('missing value to save', async () => {
-			await expect(() => exe(`
+			await expectRuntimeError(`
 				Mk:save('key')
-			`)).rejects.toStrictEqual(
-				new errors.AiScriptRuntimeError('Expect anything, but got nothing.'),
-			);
+			`, {
+				message: 'Expect anything, but got nothing.',
+				pos: { line: 2, column: 12 },
+			});
 		});
 
 		test.sequential('not value found to load', async () => {

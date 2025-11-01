@@ -194,7 +194,7 @@ async function matchHeatbeat() {
 }
 
 async function matchUser() {
-	pleaseLogin();
+	await pleaseLogin();
 
 	const user = await os.selectUser({ includeSelf: false, localOnly: true });
 	if (user == null) return;
@@ -204,8 +204,8 @@ async function matchUser() {
 	matchHeatbeat();
 }
 
-function matchAny(ev: MouseEvent) {
-	pleaseLogin();
+async function matchAny(ev: MouseEvent) {
+	await pleaseLogin();
 
 	os.popupMenu([{
 		text: i18n.ts._reversi.allowIrregularRules,

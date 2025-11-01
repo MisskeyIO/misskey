@@ -48,13 +48,13 @@ function resolveNested(current: PathResolvedResult, d = 0): PathResolvedResult |
 const current = resolveNested(router.current)!;
 const currentPageComponent = shallowRef('component' in current.route ? current.route.component : MkLoadingPage);
 const currentPageProps = ref(current.props);
-const key = ref(router.getCurrentFullPath());
+const key = ref(router.getCurrentPath());
 
 router.useListener('change', ({ resolved }) => {
 	const current = resolveNested(resolved);
 	if (current == null || 'redirect' in current.route) return;
 	currentPageComponent.value = current.route.component;
 	currentPageProps.value = current.props;
-	key.value = router.getCurrentFullPath();
+	key.value = router.getCurrentPath();
 });
 </script>

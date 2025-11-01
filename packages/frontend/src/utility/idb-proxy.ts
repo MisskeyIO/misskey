@@ -12,9 +12,8 @@ import {
 	clear as iclear,
 	keys as ikeys,
 } from 'idb-keyval';
-import { miLocalStorage } from '@/local-storage.js';
 
-const PREFIX = 'idbfallback::';
+const fallbackName = (key: string) => `idbfallback::${key}`;
 
 let idbAvailable = typeof window !== 'undefined' ? !!(window.indexedDB && typeof window.indexedDB.open === 'function') : true;
 
@@ -41,17 +40,17 @@ if (idbAvailable) {
 
 export async function get(key: string) {
 	if (idbAvailable) return iget(key);
-	return miLocalStorage.getItemAsJson(`${PREFIX}${key}`);
+	return JSON.parse(window.localStorage.getItem(fallbackName(key)));
 }
 
 export async function set(key: string, val: any) {
 	if (idbAvailable) return iset(key, val);
-	return miLocalStorage.setItemAsJson(`${PREFIX}${key}`, val);
+	return window.localStorage.setItem(fallbackName(key), JSON.stringify(val));
 }
 
 export async function del(key: string) {
 	if (idbAvailable) return idel(key);
-	return miLocalStorage.removeItem(`${PREFIX}${key}`);
+	return window.localStorage.removeItem(fallbackName(key));
 }
 
 export async function exist(key: string) {

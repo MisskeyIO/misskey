@@ -39,7 +39,7 @@ if (props.role.behavior === 'skeb') {
 
 		if (userSkebStatus.value === null) return;
 
-		os.popup(defineAsyncComponent(() => import('@/components/MkSkebStatusPopup.vue')), {
+		await os.popup(defineAsyncComponent(() => import('@/components/MkSkebStatusPopup.vue')), {
 			showing,
 			skebStatus: userSkebStatus.value,
 			source: el.value instanceof HTMLElement ? el.value : el.value?.$el,

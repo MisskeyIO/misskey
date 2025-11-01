@@ -1011,17 +1011,8 @@ function attachGameEvents() {
 		const domY = rect.top + (y * viewScale);
 		const scoreUnit = getScoreUnit(props.gameMode);
 
-		{
-			const { dispose } = os.popup(MkRippleEffect, { x: domX, y: domY }, {
-				end: () => dispose(),
-			});
-		}
-
-		{
-			const { dispose } = os.popup(MkPlusOneEffect, { x: domX, y: domY, value: scoreDelta + (scoreUnit === 'pt' ? '' : scoreUnit) }, {
-				end: () => dispose(),
-			});
-		}
+		os.popup(MkRippleEffect, { x: domX, y: domY }, {}, 'end');
+		os.popup(MkPlusOneEffect, { x: domX, y: domY, value: scoreDelta + (scoreUnit === 'pt' ? '' : scoreUnit) }, {}, 'end');
 
 		if (nextMono) {
 			const def = monoDefinitions.value.find(x => x.id === nextMono.id)!;

@@ -17,7 +17,7 @@ export function useChartTooltip(opts: { position: 'top' | 'middle' } = { positio
 		borderColor: string;
 		text: string;
 	}[] | null>(null);
-	const { dispose: disposeTooltipComponent } = os.popup(MkChartTooltip, {
+	const tooltipComponent = os.popup(MkChartTooltip, {
 		showing: tooltipShowing,
 		x: tooltipX,
 		y: tooltipY,
@@ -25,8 +25,8 @@ export function useChartTooltip(opts: { position: 'top' | 'middle' } = { positio
 		series: tooltipSeries,
 	}, {});
 
-	onUnmounted(() => {
-		disposeTooltipComponent();
+	onUnmounted(async () => {
+		(await tooltipComponent).dispose();
 	});
 
 	onDeactivated(() => {

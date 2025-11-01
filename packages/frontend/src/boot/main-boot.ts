@@ -82,9 +82,7 @@ export async function mainBoot() {
 	emojiPicker.init();
 
 	if (isClientUpdated && $i) {
-		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkUpdated.vue')), {}, {
-			closed: () => dispose(),
-		});
+		await popup(defineAsyncComponent(() => import('@/components/MkUpdated.vue')), {}, {}, 'closed');
 
 		// prefereces migration
 		// TODO: そのうち消す
@@ -160,29 +158,23 @@ export async function mainBoot() {
 	if ($i) {
 		store.loaded.then(async () => {
 			if (store.s.accountSetupWizard !== -1) {
-				const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkUserSetupDialog.vue')), {}, {
-					closed: () => dispose(),
-				});
+				await popup(defineAsyncComponent(() => import('@/components/MkUserSetupDialog.vue')), {}, {}, 'closed');
 			}
 		});
 
 		for (const announcement of ($i.unreadAnnouncements ?? []).filter(x => x.display === 'dialog')) {
-			const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkAnnouncementDialog.vue')), {
+			await popup(defineAsyncComponent(() => import('@/components/MkAnnouncementDialog.vue')), {
 				announcement,
-			}, {
-				closed: () => dispose(),
-			});
+			}, {}, 'closed');
 		}
 
-		function onAnnouncementCreated(ev: { announcement: Misskey.entities.Announcement }) {
+		async function onAnnouncementCreated(ev: { announcement: Misskey.entities.Announcement }) {
 			const announcement = ev.announcement;
 
 			if (announcement.display === 'dialog') {
-				const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkAnnouncementDialog.vue')), {
+				await popup(defineAsyncComponent(() => import('@/components/MkAnnouncementDialog.vue')), {
 					announcement,
-				}, {
-					closed: () => dispose(),
-				});
+				}, {}, 'closed');
 			}
 		}
 
@@ -344,21 +336,17 @@ export async function mainBoot() {
 			const neverShowDonationInfo = miLocalStorage.getItem('neverShowDonationInfo');
 			if (neverShowDonationInfo !== 'true' && (createdAt.getTime() < (Date.now() - (1000 * 60 * 60 * 24 * 3)))) {
 				if (latestDonationInfoShownAt == null || (new Date(latestDonationInfoShownAt).getTime() < (Date.now() - (1000 * 60 * 60 * 24 * 30)))) {
-					const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkDonation.vue')), {}, {
-						closed: () => dispose(),
-					});
+					await popup(defineAsyncComponent(() => import('@/components/MkDonation.vue')), {}, {}, 'closed');
 				}
 			}
 
 			// const modifiedVersionMustProminentlyOfferInAgplV3Section13Read = miLocalStorage.getItem('modifiedVersionMustProminentlyOfferInAgplV3Section13Read');
 			// if (modifiedVersionMustProminentlyOfferInAgplV3Section13Read !== 'true' && instance.repositoryUrl !== 'https://github.com/misskey-dev/misskey') {
-			// 	popup(defineAsyncComponent(() => import('@/components/MkSourceCodeAvailablePopup.vue')), {}, {}, 'closed');
+			// 	await popup(defineAsyncComponent(() => import('@/components/MkSourceCodeAvailablePopup.vue')), {}, {}, 'closed');
 			// }
 
 			if (instance.googleAnalyticsId && miLocalStorage.getItem('gaConsent') === null) {
-				const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkTrackingConsent.vue')), {}, {
-					closed: () => dispose(),
-				});
+				await popup(defineAsyncComponent(() => import('@/components/MkTrackingConsent.vue')), {}, {}, 'closed');
 			}
 		}
 

@@ -155,9 +155,9 @@ function fetchNote() {
 				clips.value = _clips;
 			});
 		}
-	}).catch(err => {
+	}).catch(async (err) => {
 		if (err.id === '8e75455b-738c-471d-9f80-62693f33372e') {
-			pleaseLogin({
+			await pleaseLogin({
 				path: '/',
 				message: i18n.ts.thisContentsAreMarkedAsSigninRequiredByAuthor,
 				openOnRemote: {

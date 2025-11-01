@@ -24,7 +24,7 @@ const props = defineProps<{
 }>();
 
 if (props.showLoginPopup) {
-	pleaseLogin({ path: '/' });
+	await pleaseLogin({ path: '/' });
 }
 
 const headerActions = computed(() => []);

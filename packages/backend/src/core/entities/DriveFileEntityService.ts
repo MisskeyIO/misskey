@@ -264,7 +264,7 @@ export class DriveFileEntityService {
 				detail: true,
 			}) : null,
 			userId: file.userId,
-			user: (opts.withUser && file.userId) ? hint?.packedUser ?? this.userEntityService.pack(file.userId, me) : null,
+			user: (opts.withUser && file.userId) ? hint?.packedUser ?? await this.userEntityService.pack(file.userId, me) : null,
 		});
 	}
 

@@ -1,4 +1,4 @@
-import {
+import type {
 	Antenna,
 	ChatMessage,
 	ChatMessageLite,
@@ -12,7 +12,7 @@ import {
 	UserDetailedNotMe,
 	UserLite,
 } from './autogen/models.js';
-import {
+import type {
 	AnnouncementCreated,
 	EmojiAdded, EmojiDeleted,
 	EmojiUpdated,
@@ -23,7 +23,7 @@ import {
 	ServerStatsLog,
 	ReversiGameDetailed,
 } from './entities.js';
-import {
+import type {
 	ReversiUpdateKey,
 } from './consts.js';
 

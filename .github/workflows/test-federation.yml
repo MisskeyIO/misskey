@@ -3,8 +3,11 @@ name: Test (federation)
 on:
   push:
     branches:
-      - master
-      - develop
+      - main
+      - next
+      - beta
+      - io
+      - host
     paths:
       - packages/backend/**
       - packages/misskey-js/**
@@ -15,16 +18,19 @@ on:
       - packages/misskey-js/**
       - .github/workflows/test-federation.yml
 
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Federation test
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [24.x]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           submodules: true
@@ -54,7 +60,7 @@ jobs:
           key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ steps.setup-ffmpeg.outputs.ffmpeg-version }}
 
       - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4.3.0
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'

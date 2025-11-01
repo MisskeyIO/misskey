@@ -30,13 +30,13 @@ export class UserPreview {
 		this.attach();
 	}
 
-	private show() {
+	private async show() {
 		if (!window.document.body.contains(this.el)) return;
 		if (this.promise) return;
 
 		const showing = ref(true);
 
-		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkUserPopup.vue')), {
+		await popup(defineAsyncComponent(() => import('@/components/MkUserPopup.vue')), {
 			showing,
 			q: this.user,
 			source: this.el,
@@ -48,8 +48,7 @@ export class UserPreview {
 				window.clearTimeout(this.showTimer);
 				this.hideTimer = window.setTimeout(this.close, 500);
 			},
-			closed: () => dispose(),
-		});
+		}, 'closed');
 
 		this.promise = {
 			cancel: () => {

@@ -270,11 +270,11 @@ function showMenu(ev: MouseEvent) {
 	});
 }
 
-function showHiddenContent(ev: MouseEvent) {
+async function showHiddenContent(ev: MouseEvent) {
 	if (props.audio.isSensitive && !$i) {
 		ev.preventDefault();
 		ev.stopPropagation();
-		pleaseLogin();
+		await pleaseLogin();
 		return;
 	}
 

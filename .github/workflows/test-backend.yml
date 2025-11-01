@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - next
       - beta
       - io
       - host
@@ -31,7 +32,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [24.x]
 
     services:
       postgres:
@@ -51,12 +52,12 @@ jobs:
           - 56312:6379
 
     steps:
-    - uses: actions/checkout@v4.2.2
+    - uses: actions/checkout@v5
       with:
         fetch-depth: 0
         submodules: true
     - name: Install pnpm
-      uses: pnpm/action-setup@v4.1.0
+      uses: pnpm/action-setup@v4
       with:
         run_install: false
     - name: Restore FFmpeg binary cache
@@ -78,7 +79,7 @@ jobs:
         path: /opt/hostedtoolcache/ffmpeg
         key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ steps.setup-ffmpeg.outputs.ffmpeg-version }}
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4.4.0
+      uses: actions/setup-node@v6
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'pnpm'
@@ -103,7 +104,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [24.x]
 
     services:
       postgres:
@@ -123,16 +124,16 @@ jobs:
           - 56312:6379
 
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           submodules: true
       - name: Install pnpm
-        uses: pnpm/action-setup@v4.1.0
+        uses: pnpm/action-setup@v4
         with:
           run_install: false
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4.4.0
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'

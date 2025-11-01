@@ -46,21 +46,19 @@ export default {
 			});
 		}
 
-		self.show = () => {
+		self.show = async () => {
 			if (!window.document.body.contains(el)) return;
 			if (self._close) return;
 			if (self.text == null) return;
 
 			const showing = ref(true);
-			const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkTooltip.vue')), {
+			await popup(defineAsyncComponent(() => import('@/components/MkTooltip.vue')), {
 				showing,
 				text: self.text,
 				asMfm: binding.modifiers.mfm,
 				direction: binding.modifiers.left ? 'left' : binding.modifiers.right ? 'right' : binding.modifiers.top ? 'top' : binding.modifiers.bottom ? 'bottom' : 'top',
 				targetElement: el,
-			}, {
-				closed: () => dispose(),
-			});
+			}, {}, 'closed');
 
 			self._close = () => {
 				showing.value = false;

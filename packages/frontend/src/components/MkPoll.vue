@@ -87,7 +87,7 @@ if (props.poll.expiresAt) {
 const vote = async (id) => {
 	if (props.readOnly || closed.value || isVoted.value) return;
 
-	pleaseLogin({ openOnRemote: pleaseLoginContext.value });
+	await pleaseLogin({ openOnRemote: pleaseLoginContext.value });
 
 	const { canceled } = await os.confirm({
 		type: 'question',

@@ -52,8 +52,8 @@ const sec = ref(props.announcement.closeDuration);
 async function gotIt(): Promise<void> {
 	if (props.announcement.needEnrollmentTutorialToRead) {
 		modal.value?.close();
-		const tutorialCompleted = await (new Promise<boolean>(resolve => {
-			os.popup(defineAsyncComponent(() => import('@/components/MkTutorialDialog.vue')), {}, {
+		const tutorialCompleted = await (new Promise<boolean>(async (resolve) => {
+			await os.popup(defineAsyncComponent(() => import('@/components/MkTutorialDialog.vue')), {}, {
 				done: () => {
 					resolve(true);
 				},

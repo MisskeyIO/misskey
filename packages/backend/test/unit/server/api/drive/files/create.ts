@@ -17,6 +17,9 @@ import { MiUser } from '@/models/User.js';
 import { ServerModule } from '@/server/ServerModule.js';
 import { ServerService } from '@/server/ServerService.js';
 
+// Skip Redis-based idempotency logic during unit tests to avoid hanging on a missing Redis instance.
+process.env.FORCE_IGNORE_IDEMPOTENCY_FOR_TESTING = 'true';
+
 describe('/drive/files/create', () => {
 	let module: TestingModule;
 	let server: FastifyInstance;
@@ -103,6 +106,6 @@ describe('/drive/files/create', () => {
 			.set('Authorization', `Bearer ${root.token}`)
 			.attach('file', Buffer.from('a'.repeat(11)));
 		expect(result.statusCode).toBe(413);
-		expect(result.body.error.code).toBe('FILE_SIZE_TOO_LARGE');
+		expect(result.body.error.code).toBe('MAX_FILE_SIZE_EXCEEDED');
 	});
 });

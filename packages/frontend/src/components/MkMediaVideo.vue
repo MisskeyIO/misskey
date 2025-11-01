@@ -310,7 +310,7 @@ async function showHiddenContent(ev: MouseEvent) {
 	if (props.video.isSensitive && !$i) {
 		ev.preventDefault();
 		ev.stopPropagation();
-		pleaseLogin();
+		await pleaseLogin();
 		return;
 	}
 

@@ -19,7 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #default="{ items: notes }">
 			<component
 				:is="prefer.s.animation ? TransitionGroup : 'div'"
-				:class="[$style.root, { [$style.noGap]: noGap, '_gaps': !noGap, [$style.reverse]: paginationQuery.reversed }]"
+				:class="[$style.root, { [$style.noGap]: noGap, '_gaps': !noGap, [$style.reverse]: paginationQuery.prepend }]"
 				:enterActiveClass="$style.transition_x_enterActive"
 				:leaveActiveClass="$style.transition_x_leaveActive"
 				:enterFromClass="$style.transition_x_enterFrom"

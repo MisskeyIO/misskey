@@ -114,13 +114,11 @@ function onClick(ev: MouseEvent) {
 			text: i18n.ts.info,
 			icon: 'ti ti-info-circle',
 			action: async () => {
-				const { dispose } = os.popup(MkCustomEmojiDetailedDialog, {
+				os.popup(MkCustomEmojiDetailedDialog, {
 					emoji: await misskeyApiGet('emoji', {
 						name: customEmojiName.value,
 					}),
-				}, {
-					closed: () => dispose(),
-				});
+				}, {}, 'closed');
 			},
 		});
 
@@ -142,11 +140,9 @@ async function edit(name: string) {
 	const emoji = await misskeyApi('emoji', {
 		name: name,
 	});
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@/pages/emoji-edit-dialog.vue')), {
+	os.popup(defineAsyncComponent(() => import('@/pages/emoji-edit-dialog.vue')), {
 		emoji: emoji,
-	}, {
-		closed: () => dispose(),
-	});
+	}, {	}, 'closed');
 }
 
 </script>

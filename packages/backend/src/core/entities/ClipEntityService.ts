@@ -46,7 +46,7 @@ export class ClipEntityService {
 			createdAt: this.idService.parse(clip.id).date.toISOString(),
 			lastClippedAt: clip.lastClippedAt ? clip.lastClippedAt.toISOString() : null,
 			userId: clip.userId,
-			user: hint?.packedUser ?? this.userEntityService.pack(clip.user ?? clip.userId, me),
+			user: hint?.packedUser ?? await this.userEntityService.pack(clip.user ?? clip.userId, me),
 			name: clip.name,
 			description: clip.description,
 			isPublic: clip.isPublic,

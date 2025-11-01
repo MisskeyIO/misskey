@@ -29,7 +29,7 @@ globalThis.addEventListener('activate', ev => {
 });
 
 async function offlineContentHTML() {
-	const i18n = await (swLang.i18n ?? swLang.fetchLocale()) as Partial<I18n<Locale>>;
+	const i18n = await (swLang.i18n ?? await swLang.fetchLocale()) as Partial<I18n<Locale>>;
 	const messages = {
 		title: i18n.ts?._offlineScreen.title ?? 'Offline - Could not connect to server',
 		header: i18n.ts?._offlineScreen.header ?? 'Could not connect to server',

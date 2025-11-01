@@ -10,7 +10,7 @@ import * as Misskey from 'misskey-js';
 import { components } from '@/components/index.js';
 import { directives } from '@/directives/index.js';
 import MkMediaImage from '@/components/MkMediaImage.vue';
-import {DriveFile} from "misskey-js/autogen/models.js";
+import type { DriveFile } from 'misskey-js/autogen/models.js';
 
 describe('MkMediaImage', () => {
 	const renderMediaImage = (image: Partial<Misskey.entities.DriveFile>): RenderResult => {

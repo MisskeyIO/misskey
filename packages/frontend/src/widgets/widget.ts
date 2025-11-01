@@ -28,22 +28,26 @@ export type WidgetComponentExpose = {
 	configure: () => void;
 };
 
-export const useWidgetPropsManager = <F extends Form & Record<string, { default: any; }>>(
+export const useWidgetPropsManager = <
+	F extends Form & Record<string, { default: any; }>,
+	R extends GetFormResultType<F> = GetFormResultType<F>,
+>(
 	name: string,
 	propsDef: F,
-	props: Readonly<WidgetComponentProps<GetFormResultType<F>>>,
-	emit: WidgetComponentEmits<GetFormResultType<F>>,
+	props: Readonly<WidgetComponentProps<R>>,
+	emit: WidgetComponentEmits<R>,
 ): {
-	widgetProps: GetFormResultType<F>;
+	widgetProps: R;
 	save: () => void;
 	configure: () => void;
 } => {
-	const widgetProps = reactive(props.widget ? deepClone(props.widget.data) : {});
+	const initialData = (props.widget ? deepClone(props.widget.data) : {}) as Partial<R>;
+	const widgetProps = reactive(initialData) as R;
 
 	const mergeProps = () => {
-		for (const prop of Object.keys(propsDef)) {
+		for (const prop of Object.keys(propsDef) as (keyof R & keyof F)[]) {
 			if (typeof widgetProps[prop] === 'undefined') {
-				widgetProps[prop] = propsDef[prop].default;
+				widgetProps[prop] = propsDef[prop].default as R[typeof prop];
 			}
 		}
 	};
@@ -63,8 +67,8 @@ export const useWidgetPropsManager = <F extends Form & Record<string, { default:
 		const { canceled, result } = await os.form(name, form);
 		if (canceled) return;
 
-		for (const key of Object.keys(result)) {
-			widgetProps[key] = result[key];
+		for (const key of Object.keys(result) as (keyof R)[]) {
+			widgetProps[key] = result[key] as R[typeof key];
 		}
 
 		save();

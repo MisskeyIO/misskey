@@ -40,7 +40,7 @@ export async function createNotification<K extends keyof PushNotificationDataMap
 }
 
 async function composeNotification(data: PushNotificationDataMap[keyof PushNotificationDataMap]): Promise<[string, NotificationOptions & { actions?: Record<string, string>[], renotify?: boolean }] | null> {
-	const i18n = await (swLang.i18n ?? swLang.fetchLocale());
+	const i18n = await (swLang.i18n ?? await swLang.fetchLocale());
 	const { t } = i18n;
 	switch (data.type) {
 		/*
@@ -323,11 +323,11 @@ async function composeNotification(data: PushNotificationDataMap[keyof PushNotif
 
 export async function createEmptyNotification(): Promise<void> {
 	return new Promise<void>(async res => {
-		const i18n = await (swLang.i18n ?? swLang.fetchLocale());
+		const i18n = await (swLang.i18n ?? await swLang.fetchLocale());
 
 		await globalThis.registration.showNotification(
 			(new URL(origin)).host,
-			{
+			<NotificationOptions & { actions?: { action?: string; title?: string; icon?: string }[] }>{
 				body: `Misskey v${_VERSION_}`,
 				silent: true,
 				badge: iconUrl('null'),

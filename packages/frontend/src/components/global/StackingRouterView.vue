@@ -62,7 +62,7 @@ const currentDepth = inject(DI.routerCurrentDepth, 0);
 provide(DI.routerCurrentDepth, currentDepth + 1);
 
 const tabs = shallowRef([{
-	fullPath: router.getCurrentFullPath(),
+	fullPath: router.getCurrentPath(),
 	routePath: router.current.route.path,
 	component: 'component' in router.current.route ? router.current.route.component : MkLoadingPage,
 	props: router.current.props,
@@ -84,7 +84,7 @@ router.useListener('change', ({ resolved }) => {
 	const routePath = resolved.route.path;
 	if (resolved == null || 'redirect' in resolved.route) return;
 	if (resolved.route.path === currentTab.routePath && deepEqual(resolved.props, currentTab.props)) return;
-	const fullPath = router.getCurrentFullPath();
+	const fullPath = router.getCurrentPath();
 
 	if (tabs.value.some(tab => tab.routePath === routePath && deepEqual(resolved.props, tab.props))) {
 		const newTabs = [];

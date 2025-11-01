@@ -39,8 +39,10 @@ export class WorkerMultiDispatch<POST = unknown, RETURN = unknown> {
 
 		if (options === undefined) {
 			this.workers[workerNumber].postMessage(message);
+		} else if (Array.isArray(options)) {
+			this.workers[workerNumber].postMessage(message, options);
 		} else {
-			this.workers[workerNumber].postMessage(message, options as any);
+			this.workers[workerNumber].postMessage(message, options);
 		}
 		return workerNumber;
 	}

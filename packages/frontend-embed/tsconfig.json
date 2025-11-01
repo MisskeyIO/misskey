@@ -11,7 +11,7 @@
 		"sourceMap": false,
 		"target": "ES2022",
 		"module": "ES2022",
-		"moduleResolution": "Bundler",
+		"moduleResolution": "bundler",
 		"removeComments": false,
 		"noLib": false,
 		"strict": true,
@@ -30,8 +30,7 @@
 		"typeRoots": [
 			"./@types",
 			"./node_modules/@types",
-			"./node_modules/@vue-macros",
-			"./node_modules"
+			"./node_modules/@vue-macros"
 		],
 		"types": [
 			"vite/client"

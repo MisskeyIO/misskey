@@ -5,7 +5,7 @@
 
 // NIRAX --- A lightweight router
 
-import { onBeforeUnmount, onMounted, shallowRef } from 'vue';
+import { onBeforeUnmount, shallowRef } from 'vue';
 import { EventEmitter } from 'eventemitter3';
 import type { Component, ShallowRef } from 'vue';
 
@@ -23,6 +23,7 @@ interface RouteDefBase {
 	loginRequired?: boolean;
 	name?: string;
 	hash?: string;
+	globalCacheKey?: string;
 	children?: RouteDef[];
 }
 
@@ -36,8 +37,6 @@ interface RouteDefWithRedirect extends RouteDefBase {
 
 export type RouteDef = RouteDefWithComponent | RouteDefWithRedirect;
 
-export type RouterFlag = 'forcePage';
-
 type ParsedPath = (string | {
 	name: string;
 	startsWith?: string;
@@ -45,28 +44,31 @@ type ParsedPath = (string | {
 	optional?: boolean;
 })[];
 
-export type RouterEvents = {
+export type RouterEvent = {
 	change: (ctx: {
-		beforeFullPath: string;
-		fullPath: string;
-		resolved: PathResolvedResult;
+		beforePath: string;
+		path: string;
+		resolved: Resolved;
+		key: string;
 	}) => void;
 	replace: (ctx: {
-		fullPath: string;
+		path: string;
+		key: string;
 	}) => void;
 	push: (ctx: {
-		beforeFullPath: string;
-		fullPath: string;
+		beforePath: string;
+		path: string;
 		route: RouteDef | null;
 		props: Map<string, string> | null;
+		key: string;
 	}) => void;
 	same: () => void;
 };
 
-export type PathResolvedResult = {
+export type Resolved = {
 	route: RouteDef;
 	props: Map<string, string | boolean>;
-	child?: PathResolvedResult;
+	child?: Resolved;
 	redirected?: boolean;
 
 	/** @internal */
@@ -104,56 +106,129 @@ function parsePath(path: string): ParsedPath {
 	return res;
 }
 
-export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvents> {
-	private routes: DEF;
-	public current: PathResolvedResult;
-	public currentRef: ShallowRef<PathResolvedResult>;
+export interface IRouter extends EventEmitter<RouterEvent> {
+	current: Resolved;
+	currentRef: ShallowRef<Resolved>;
+	currentRoute: ShallowRef<RouteDef>;
+	navHook: ((path: string, flag?: any) => boolean) | null;
+	afterHooks: Array<AfterNavigationHook | null>;
+
+	/**
+	 * ルートの初期化（eventListenerの定義後に必ず呼び出すこと）
+	 */
+	init(): void;
+
+	resolve(path: string): Resolved | null;
+
+	isReady(): Promise<boolean>;
+
+	getCurrentPath(): any;
+
+	getCurrentKey(): string;
+
+	afterEach(hook: AfterNavigationHook): AfterNavigationHook | undefined;
+
+	push(path: string, flag?: any): void;
+
+	replace(path: string, key?: string | null): void;
+
+	/** @see EventEmitter */
+	eventNames(): Array<EventEmitter.EventNames<RouterEvent>>;
+
+	/** @see EventEmitter */
+	listeners<T extends EventEmitter.EventNames<RouterEvent>>(
+		event: T
+	): Array<EventEmitter.EventListener<RouterEvent, T>>;
+
+	/** @see EventEmitter */
+	listenerCount(
+		event: EventEmitter.EventNames<RouterEvent>
+	): number;
+
+	/** @see EventEmitter */
+	emit<T extends EventEmitter.EventNames<RouterEvent>>(
+		event: T,
+		...args: EventEmitter.EventArgs<RouterEvent, T>
+	): boolean;
+
+	/** @see EventEmitter */
+	on<T extends EventEmitter.EventNames<RouterEvent>>(
+		event: T,
+		fn: EventEmitter.EventListener<RouterEvent, T>,
+		context?: any
+	): this;
+
+	/** @see EventEmitter */
+	addListener<T extends EventEmitter.EventNames<RouterEvent>>(
+		event: T,
+		fn: EventEmitter.EventListener<RouterEvent, T>,
+		context?: any
+	): this;
+
+	/** @see EventEmitter */
+	once<T extends EventEmitter.EventNames<RouterEvent>>(
+		event: T,
+		fn: EventEmitter.EventListener<RouterEvent, T>,
+		context?: any
+	): this;
+
+	/** @see EventEmitter */
+	removeListener<T extends EventEmitter.EventNames<RouterEvent>>(
+		event: T,
+		fn?: EventEmitter.EventListener<RouterEvent, T>,
+		context?: any,
+		once?: boolean | undefined
+	): this;
+
+	/** @see EventEmitter */
+	off<T extends EventEmitter.EventNames<RouterEvent>>(
+		event: T,
+		fn?: EventEmitter.EventListener<RouterEvent, T>,
+		context?: any,
+		once?: boolean | undefined
+	): this;
+
+	/** @see EventEmitter */
+	removeAllListeners(
+		event?: EventEmitter.EventNames<RouterEvent>
+	): this;
+}
+
+export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvent> implements IRouter {
+	public current: Resolved;
+	public currentRef: ShallowRef<Resolved>;
 	public currentRoute: ShallowRef<RouteDef>;
-	private currentFullPath: string; // /foo/bar?baz=qux#hash
+	public navHook: ((path: string, flag?: any) => boolean) | null = null;
+	public afterHooks: Array<AfterNavigationHook | null> = [];
+	private routes: DEF;
+	private currentPath: string;
 	private isLoggedIn: boolean;
 	private notFoundPageComponent: Component;
+	private currentKey = Date.now().toString();
 	private redirectCount = 0;
-	private afterHooks: Array<AfterNavigationHook | null> = [];
 
-	public navHook: ((fullPath: string, flag?: RouterFlag) => boolean) | null = null;
-
-	constructor(routes: DEF, currentFullPath: Nirax<DEF>['currentFullPath'], isLoggedIn: boolean, notFoundPageComponent: Component) {
+	constructor(routes: Nirax<DEF>['routes'], currentPath: Nirax<DEF>['currentPath'], isLoggedIn: boolean, notFoundPageComponent: Component) {
 		super();
 
 		this.routes = routes;
-		this.current = this.resolve(currentFullPath)!;
+		this.current = this.resolve(currentPath)!;
 		this.currentRef = shallowRef(this.current);
 		this.currentRoute = shallowRef(this.current.route);
-		this.currentFullPath = currentFullPath;
+		this.currentPath = currentPath;
 		this.isLoggedIn = isLoggedIn;
 		this.notFoundPageComponent = notFoundPageComponent;
 	}
 
 	public init() {
-		const res = this.navigate(this.currentFullPath, false);
+		const res = this.navigate(this.currentPath, null, false);
 		this.emit('replace', {
-			fullPath: res._parsedRoute.fullPath,
+			path: res._parsedRoute.fullPath,
+			key: this.currentKey,
 		});
 	}
 
-	public isReady() {
-		return Promise.resolve(true);
-	}
-
-	public afterEach(hook: AfterNavigationHook): AfterNavigationHook | undefined {
-		this.afterHooks.push(hook);
-		return () => {
-			const index = this.afterHooks.indexOf(hook);
-			if (index !== -1) {
-				return this.afterHooks.splice(index, 1);
-			} else {
-				return undefined;
-			}
-		};
-	}
-
-	public resolve(fullPath: string): PathResolvedResult | null {
-		let path = fullPath;
+	public resolve(path: string): Resolved | null {
+		const fullPath = path;
 		let queryString: string | null = null;
 		let hash: string | null = null;
 		if (path[0] === '/') path = path.substring(1);
@@ -172,7 +247,9 @@ export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvents> {
 			hash,
 		};
 
-		function check(routes: RouteDef[], _parts: string[]): PathResolvedResult | null {
+		if (_DEV_) console.log('Routing: ', path, queryString);
+
+		function check(routes: RouteDef[], _parts: string[]): Resolved | null {
 			forEachRouteLoop:
 			for (const route of routes) {
 				let parts = [..._parts];
@@ -275,19 +352,82 @@ export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvents> {
 		return check(this.routes, _parts);
 	}
 
-	private navigate(fullPath: string, emitChange = true, _redirected = false): PathResolvedResult {
-		const beforeFullPath = this.currentFullPath;
+	public isReady() {
+		return Promise.resolve(true);
+	}
+
+	public getCurrentPath() {
+		return this.currentPath;
+	}
+
+	public getCurrentKey() {
+		return this.currentKey;
+	}
+
+	public afterEach(hook: AfterNavigationHook): AfterNavigationHook | undefined {
+		this.afterHooks.push(hook);
+		return () => {
+			const index = this.afterHooks.indexOf(hook);
+			if (index !== -1) {
+				return this.afterHooks.splice(index, 1);
+			} else {
+				return undefined;
+			}
+		};
+	}
+
+	public push(path: string, flag?: any) {
+		const beforePath = this.currentPath;
+		if (path === beforePath) {
+			this.emit('same');
+			return;
+		}
+		if (this.navHook) {
+			const cancel = this.navHook(path, flag);
+			if (cancel) return;
+		}
+		const res = this.navigate(path, null);
+		if (res.route.path === '/:(*)') {
+			window.location.href = path;
+		} else {
+			this.emit('push', {
+				beforePath,
+				path: res._parsedRoute.fullPath,
+				route: res.route,
+				props: res.props,
+				key: this.currentKey,
+			});
+		}
+	}
+
+	public replace(path: string, key?: string | null) {
+		const res = this.navigate(path, key);
+		this.emit('replace', {
+			path: res._parsedRoute.fullPath,
+			key: this.currentKey,
+		});
+	}
+
+	public useListener<E extends keyof RouterEvent>(event: E, listener: (...args: EventEmitter.ArgumentMap<RouterEvent>[Extract<E, keyof RouterEvent>]) => void, context?: any) {
+		this.addListener(event, listener, context);
+
+		onBeforeUnmount(() => {
+			this.removeListener(event, listener, context);
+		});
+	}
+
+	private navigate(path: string, key: string | null | undefined, emitChange = true, _redirected = false): Resolved {
+		const beforePath = this.currentPath;
 		const beforeRoute = this.currentRoute.value;
+		this.currentPath = path;
 
-		this.currentFullPath = fullPath;
-
-		const res = this.resolve(this.currentFullPath);
+		const res = this.resolve(this.currentPath);
 
 		if (res == null) {
-			throw new Error('no route found for: ' + fullPath);
+			throw new Error('no route found for: ' + path);
 		}
 
-		for (let current: PathResolvedResult | undefined = res; current; current = current.child) {
+		for (let current: Resolved | undefined = res; current; current = current.child) {
 			if ('redirect' in current.route) {
 				let redirectPath: string;
 				if (typeof current.route.redirect === 'function') {
@@ -299,24 +439,28 @@ export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvents> {
 				if (_redirected && this.redirectCount++ > 10) {
 					throw new Error('redirect loop detected');
 				}
-				return this.navigate(redirectPath, emitChange, true);
+				return this.navigate(redirectPath, null, emitChange, true);
 			}
 		}
 
 		if (res.route.loginRequired && !this.isLoggedIn) {
-			res.route.component = this.notFoundPageComponent;
+			res.route['component'] = this.notFoundPageComponent;
 			res.props.set('showLoginPopup', true);
 		}
 
+		const isSamePath = beforePath === path;
+		if (isSamePath && key == null) key = this.currentKey;
 		this.current = res;
 		this.currentRef.value = res;
 		this.currentRoute.value = res.route;
+		this.currentKey = res.route.globalCacheKey ?? key ?? path;
 
 		if (emitChange && res.route.path !== '/:(*)') {
 			this.emit('change', {
-				beforeFullPath,
-				fullPath,
+				beforePath,
+				path,
 				resolved: res,
+				key: this.currentKey,
 			});
 		}
 
@@ -332,46 +476,5 @@ export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvents> {
 			redirected: _redirected,
 		};
 	}
-
-	public getCurrentFullPath() {
-		return this.currentFullPath;
-	}
-
-	public push(fullPath: string, flag?: RouterFlag) {
-		const beforeFullPath = this.currentFullPath;
-		if (fullPath === beforeFullPath) {
-			this.emit('same');
-			return;
-		}
-		if (this.navHook) {
-			const cancel = this.navHook(fullPath, flag);
-			if (cancel) return;
-		}
-		const res = this.navigate(fullPath);
-		if (res.route.path === '/:(*)') {
-			window.location.href = fullPath;
-		} else {
-			this.emit('push', {
-				beforeFullPath,
-				fullPath: res._parsedRoute.fullPath,
-				route: res.route,
-				props: res.props,
-			});
-		}
-	}
-
-	public replace(fullPath: string) {
-		const res = this.navigate(fullPath);
-		this.emit('replace', {
-			fullPath: res._parsedRoute.fullPath,
-		});
-	}
-
-	public useListener<E extends keyof RouterEvents, L = RouterEvents[E]>(event: E, listener: L) {
-		this.addListener(event, listener);
-
-		onBeforeUnmount(() => {
-			this.removeListener(event, listener);
-		});
-	}
 }
+

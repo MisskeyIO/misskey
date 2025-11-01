@@ -1,5 +1,5 @@
 /* eslint @typescript-eslint/naming-convention: 0 */
-import { operations } from './types.js';
+import type { operations } from './types.js';
 
 export type EmptyRequest = Record<string, unknown> | undefined;
 export type EmptyResponse = Record<string, unknown> | undefined;

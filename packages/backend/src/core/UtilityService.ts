@@ -157,7 +157,7 @@ export class UtilityService {
 		const parsedB = psl.parse(hostB);
 
 		// どちらか一方でもパース失敗 or eTLD+1が異なる場合は false
-		if (parsedA.error || parsedB.error || parsedA.domain !== parsedB.domain) {
+		if (psl.isPslError(parsedA) || psl.isPslError(parsedB) || parsedA.domain !== parsedB.domain) {
 			return false;
 		}
 

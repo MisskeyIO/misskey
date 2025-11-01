@@ -79,7 +79,7 @@ const toggleView = () => {
 	save();
 };
 
-const connection = useStream().useChannel('serverStats');
+const connection: Misskey.IChannelConnection<Misskey.Channels['serverStats']> = useStream().useChannel('serverStats');
 onUnmounted(() => {
 	connection.dispose();
 });

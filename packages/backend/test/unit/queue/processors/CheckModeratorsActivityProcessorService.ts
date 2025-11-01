@@ -148,6 +148,7 @@ describe('CheckModeratorsActivityProcessorService', () => {
 	beforeEach(async () => {
 		clock = lolex.install({
 			now: new Date(baseDate),
+			toFake: ['Date'],
 			shouldClearNativeTimers: true,
 		});
 

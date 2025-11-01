@@ -3,7 +3,7 @@ import { mkdir, readFile, writeFile } from 'fs/promises';
 import { OpenAPIV3_1 } from 'openapi-types';
 import { toPascal } from 'ts-case-convert';
 import { parse as OpenAPIParser } from '@readme/openapi-parser';
-import openapiTS, { OpenAPI3, OperationObject, PathItemObject } from 'openapi-typescript';
+import openapiTS, { astToString, OpenAPI3, OperationObject, PathItemObject } from 'openapi-typescript';
 
 async function generateBaseTypes(
 	openApiDocs: OpenAPIV3_1.Document,
@@ -29,11 +29,7 @@ async function generateBaseTypes(
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		openApi.paths![key] = {
 			...('get' in item ? {
-				get: {
-					...item.get,
-					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-					operationId: ((item as PathItemObject).get as OperationObject).operationId!.replaceAll('get___', ''),
-				},
+				get: item.get,
 			} : {}),
 			post: {
 				...item.post,
@@ -51,7 +47,7 @@ async function generateBaseTypes(
 			}
 		},
 	});
-	lines.push(generatedTypes);
+	lines.push(astToString(generatedTypes));
 	lines.push('');
 
 	await writeFile(typeFileName, lines.join('\n'));
@@ -70,7 +66,7 @@ async function generateSchemaEntities(
 	const schemaNames = Object.keys(schemas);
 	const typeAliasLines: string[] = [];
 
-	typeAliasLines.push(`import { components } from '${toImportPath(typeFileName)}';`);
+	typeAliasLines.push(`import type { components } from '${toImportPath(typeFileName)}';`);
 	typeAliasLines.push(
 		...schemaNames.map(it => `export type ${it} = components['schemas']['${it}'];`),
 	);
@@ -145,7 +141,7 @@ async function generateEndpoints(
 
 	entitiesOutputLine.push('/* eslint @typescript-eslint/naming-convention: 0 */');
 
-	entitiesOutputLine.push(`import { operations } from '${toImportPath(typeFileName)}';`);
+	entitiesOutputLine.push(`import type { operations } from '${toImportPath(typeFileName)}';`);
 	entitiesOutputLine.push('');
 
 	entitiesOutputLine.push(new EmptyTypeAlias(OperationsAliasType.REQUEST).toLine());

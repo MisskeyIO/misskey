@@ -46,7 +46,7 @@ export class GalleryPostEntityService {
 			createdAt: this.idService.parse(post.id).date.toISOString(),
 			updatedAt: post.updatedAt.toISOString(),
 			userId: post.userId,
-			user: hint?.packedUser ?? this.userEntityService.pack(post.user ?? post.userId, me),
+			user: hint?.packedUser ?? await this.userEntityService.pack(post.user ?? post.userId, me),
 			title: post.title,
 			description: post.description,
 			fileIds: post.fileIds,

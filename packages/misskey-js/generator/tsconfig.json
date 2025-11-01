@@ -2,8 +2,8 @@
 	"$schema": "https://json.schemastore.org/tsconfig",
 	"compilerOptions": {
 		"target": "ESNext",
-		"module": "ESNext",
-		"moduleResolution": "node16",
+		"module": "NodeNext",
+		"moduleResolution": "nodenext",
 		"strict": true,
 		"strictFunctionTypes": true,
 		"strictNullChecks": true,

@@ -41,7 +41,7 @@ export class ModerationLogEntityService {
 			type: log.type,
 			info: log.info,
 			userId: log.userId,
-			user: hint?.packedUser ?? this.userEntityService.pack(log.user ?? log.userId, me, {
+			user: hint?.packedUser ?? await this.userEntityService.pack(log.user ?? log.userId, me, {
 				schema: 'UserDetailed',
 			}),
 		});

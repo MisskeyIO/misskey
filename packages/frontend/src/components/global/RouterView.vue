@@ -47,7 +47,7 @@ const current = router.current!;
 const currentPageComponent = shallowRef('component' in current.route ? current.route.component : MkLoadingPage);
 const currentPageProps = ref(current.props);
 let currentRoutePath = current.route.path;
-const key = ref(router.getCurrentFullPath());
+const key = ref(router.getCurrentPath());
 
 router.useListener('change', ({ resolved }) => {
 	if (resolved == null || 'redirect' in resolved.route) return;
@@ -56,7 +56,7 @@ router.useListener('change', ({ resolved }) => {
 	function _() {
 		currentPageComponent.value = resolved.route.component;
 		currentPageProps.value = resolved.props;
-		key.value = router.getCurrentFullPath();
+		key.value = router.getCurrentPath();
 		currentRoutePath = resolved.route.path;
 	}
 

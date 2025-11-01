@@ -80,8 +80,10 @@ export class ServerService implements OnApplicationShutdown {
 	public async launch() {
 		const fastify = Fastify({
 			logger: false,
-			maxParamLength: 1024,
 			trustProxy: true,
+			routerOptions: {
+				maxParamLength: 1024,
+			},
 		});
 		this.#fastify = fastify;
 

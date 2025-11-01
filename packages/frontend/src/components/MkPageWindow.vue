@@ -60,7 +60,7 @@ const windowRouter = createRouter(props.initialPath);
 const pageMetadata = ref<null | PageMetadata>(null);
 const windowEl = useTemplateRef('windowEl');
 const history = ref<{ path: string; }[]>([{
-	path: windowRouter.getCurrentFullPath(),
+	path: windowrouter.getCurrentPath(),
 }]);
 
 type WindowButton = {
@@ -153,14 +153,14 @@ const contextmenu = computed(() => ([{
 	icon: 'ti ti-external-link',
 	text: i18n.ts.openInNewTab,
 	action: () => {
-		window.open(url + windowRouter.getCurrentFullPath(), '_blank', 'noopener');
+		window.open(url + windowrouter.getCurrentPath(), '_blank', 'noopener');
 		windowEl.value?.close();
 	},
 }, {
 	icon: 'ti ti-link',
 	text: i18n.ts.copyLink,
 	action: () => {
-		copyToClipboard(url + windowRouter.getCurrentFullPath());
+		copyToClipboard(url + windowrouter.getCurrentPath());
 	},
 }]));
 
@@ -178,12 +178,12 @@ function close() {
 }
 
 function expand() {
-	mainRouter.push(windowRouter.getCurrentFullPath(), 'forcePage');
+	mainRouter.push(windowrouter.getCurrentPath(), 'forcePage');
 	windowEl.value?.close();
 }
 
 function popout() {
-	_popout(windowRouter.getCurrentFullPath(), windowEl.value?.$el);
+	_popout(windowrouter.getCurrentPath(), windowEl.value?.$el);
 	windowEl.value?.close();
 }
 

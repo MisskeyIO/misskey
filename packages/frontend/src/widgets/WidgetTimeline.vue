@@ -12,7 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</template>
 	<template #header>
 		<button class="_button" @click="choose">
-			<span>{{ widgetProps.src === 'list' ? widgetProps.list.name : widgetProps.src === 'antenna' ? widgetProps.antenna.name : i18n.ts._timelines[widgetProps.src] }}</span>
+			<span>{{ selectedTimelineLabel }}</span>
 			<i :class="menuOpened ? 'ti ti-chevron-up' : 'ti ti-chevron-down'" style="margin-left: 8px;"></i>
 		</button>
 	</template>
@@ -25,17 +25,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<p :class="$style.disabledDescription">{{ i18n.ts._disabledTimeline.description }}</p>
 	</div>
 	<div v-else>
-		<MkTimeline :key="widgetProps.src === 'list' ? `list:${widgetProps.list.id}` : widgetProps.src === 'antenna' ? `antenna:${widgetProps.antenna.id}` : widgetProps.src" :src="widgetProps.src" :list="widgetProps.list ? widgetProps.list.id : null" :antenna="widgetProps.antenna ? widgetProps.antenna.id : null"/>
+		<MkTimeline :key="timelineKey" :src="widgetProps.src" :list="listId" :antenna="antennaId"/>
 	</div>
 </MkContainer>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import * as Misskey from 'misskey-js';
 import { useWidgetPropsManager } from './widget.js';
 import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from './widget.js';
-import type { GetFormResultType } from '@/utility/form.js';
+import type { Form, GetFormResultType } from '@/utility/form.js';
 import type { MenuItem } from '@/types/menu.js';
+import type { AllTimelineType, BasicTimelineType } from '@/timelines.js';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import MkContainer from '@/components/MkContainer.vue';
@@ -69,37 +71,71 @@ const widgetPropsDef = {
 		default: null,
 		hidden: true,
 	},
+} satisfies Form;
+
+type WidgetPropsFormResult = GetFormResultType<typeof widgetPropsDef>;
+type KnownAntenna = Misskey.entities.Antenna & Record<string, unknown>;
+type KnownUserList = Misskey.entities.UserList & Record<string, unknown>;
+type WidgetProps = Omit<WidgetPropsFormResult, 'antenna' | 'list' | 'src'> & {
+	src: AllTimelineType;
+	antenna: KnownAntenna | null;
+	list: KnownUserList | null;
 };
 
-type WidgetProps = GetFormResultType<typeof widgetPropsDef>;
+const props = defineProps<WidgetComponentProps<WidgetPropsFormResult>>();
+const emit = defineEmits<WidgetComponentEmits<WidgetPropsFormResult>>();
 
-const props = defineProps<WidgetComponentProps<WidgetProps>>();
-const emit = defineEmits<WidgetComponentEmits<WidgetProps>>();
-
-const { widgetProps, configure, save } = useWidgetPropsManager(name,
+const manager = useWidgetPropsManager(
+	name,
 	widgetPropsDef,
 	props,
 	emit,
 );
 
+const widgetProps = manager.widgetProps as WidgetProps;
+const { configure, save } = manager;
+
 const menuOpened = ref(false);
 
-const setSrc = (src) => {
+const timelineKey = computed(() => {
+	if (widgetProps.src === 'list') {
+		return widgetProps.list ? `list:${widgetProps.list.id}` : 'list';
+	}
+	if (widgetProps.src === 'antenna') {
+		return widgetProps.antenna ? `antenna:${widgetProps.antenna.id}` : 'antenna';
+	}
+	return widgetProps.src;
+});
+
+const listId = computed(() => widgetProps.list?.id ?? undefined);
+const antennaId = computed(() => widgetProps.antenna?.id ?? undefined);
+
+const selectedTimelineLabel = computed(() => {
+	if (widgetProps.src === 'list') {
+		return widgetProps.list?.name ?? i18n.ts.lists;
+	}
+	if (widgetProps.src === 'antenna') {
+		return widgetProps.antenna?.name ?? i18n.ts.antennas;
+	}
+	return i18n.ts._timelines[widgetProps.src as BasicTimelineType];
+});
+
+const setSrc = (src: AllTimelineType) => {
 	widgetProps.src = src;
 	save();
 };
 
-const choose = async (ev) => {
+const choose = async (ev: MouseEvent) => {
 	menuOpened.value = true;
 	const [antennas, lists] = await Promise.all([
-		misskeyApi('antennas/list'),
-		misskeyApi('users/lists/list'),
+		misskeyApi<Misskey.entities.Antenna[]>('antennas/list'),
+		misskeyApi<Misskey.entities.UserList[]>('users/lists/list'),
 	]);
 	const antennaItems = antennas.map(antenna => ({
 		text: antenna.name,
 		icon: 'ti ti-antenna',
 		action: () => {
-			widgetProps.antenna = antenna;
+			widgetProps.antenna = antenna as KnownAntenna;
 			setSrc('antenna');
 		},
 	}));
@@ -107,7 +143,7 @@ const choose = async (ev) => {
 		text: list.name,
 		icon: 'ti ti-list',
 		action: () => {
-			widgetProps.list = list;
+			widgetProps.list = list as KnownUserList;
 			setSrc('list');
 		},
 	}));

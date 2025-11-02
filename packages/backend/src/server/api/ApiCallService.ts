@@ -7,7 +7,7 @@ import { randomUUID } from 'node:crypto';
 import * as fs from 'node:fs';
 import * as stream from 'node:stream/promises';
 import { Transform } from 'node:stream';
-import { type MultipartFile } from '@fastify/multipart';
+import { type MultipartFile, type Multipart } from '@fastify/multipart';
 import { Inject, Injectable } from '@nestjs/common';
 import * as Sentry from '@sentry/node';
 import { AttachmentFile } from '@/server/api/endpoint-base.js';
@@ -227,10 +227,10 @@ export class ApiCallService implements OnApplicationShutdown {
 		request: FastifyRequest<{ Body: Record<string, unknown>, Querystring: Record<string, unknown> }>,
 		reply: FastifyReply,
 	): Promise<void> {
-		const multipartData = await request.file().catch(() => {
-			/* Fastify throws if the remote didn't send multipart data. Return 400 below. */
-		});
-		if (multipartData == null) {
+		let parts: AsyncIterableIterator<Multipart>;
+		try {
+			parts = request.parts();
+		} catch {
 			reply.code(400);
 			reply.raw.statusMessage = 'multipart payload not received';
 			reply.send();
@@ -238,8 +238,37 @@ export class ApiCallService implements OnApplicationShutdown {
 		}
 
 		const fields = {} as Record<string, unknown>;
-		for (const [k, v] of Object.entries(multipartData.fields)) {
-			fields[k] = typeof v === 'object' && 'value' in v ? v.value : undefined;
+		let multipartFile: MultipartFile | null = null;
+
+		try {
+			for await (const part of parts) {
+				if (part.type === 'field') {
+					fields[part.fieldname] = part.value;
+					continue;
+				}
+
+				multipartFile = part;
+				break;
+			}
+		} catch {
+			reply.code(400);
+			reply.raw.statusMessage = 'multipart payload not received';
+			reply.send();
+			return;
+		}
+
+		if (multipartFile == null) {
+			reply.code(400);
+			reply.raw.statusMessage = 'multipart payload not received';
+			reply.send();
+			return;
+		}
+
+		for (const [name, value] of Object.entries(multipartFile.fields)) {
+			const extracted = this.extractMultipartValue(value);
+			if (extracted !== undefined || !(name in fields)) {
+				fields[name] = extracted;
+			}
 		}
 
 		// https://datatracker.ietf.org/doc/html/rfc6750.html#section-2.1 (case sensitive)
@@ -251,7 +280,7 @@ export class ApiCallService implements OnApplicationShutdown {
 			return;
 		}
 		this.authenticateService.authenticate(token).then(([user, app]) => {
-			this.call(endpoint, user, app, fields, multipartData, request).then((res) => {
+			this.call(endpoint, user, app, fields, multipartFile, request).then((res) => {
 				this.send(reply, res);
 			}).catch((err: ApiError) => {
 				this.#sendApiError(reply, err);
@@ -263,6 +292,25 @@ export class ApiCallService implements OnApplicationShutdown {
 		}).catch(err => {
 			this.#sendAuthenticationError(reply, err);
 		});
+	}
+
+	@bindThis
+	private extractMultipartValue(value: Multipart | Multipart[] | undefined): unknown {
+		if (Array.isArray(value)) {
+			for (const entry of value) {
+				const resolved = this.extractMultipartValue(entry);
+				if (resolved !== undefined) {
+					return resolved;
+				}
+			}
+			return undefined;
+		}
+
+		if (value?.type === 'field') {
+			return value.value;
+		}
+
+		return undefined;
 	}
 
 	@bindThis

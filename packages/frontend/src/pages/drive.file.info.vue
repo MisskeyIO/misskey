@@ -196,7 +196,7 @@ function rename() {
 function describe() {
 	if (!file.value) return;
 
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkFileCaptionEditWindow.vue')), {
+	os.popup(defineAsyncComponent(() => import('@/components/MkFileCaptionEditWindow.vue')), {
 		default: file.value.comment ?? '',
 		file: file.value,
 	}, {
@@ -208,8 +208,7 @@ function describe() {
 				await fetch();
 			});
 		},
-		closed: () => dispose(),
-	});
+	}, 'closed');
 }
 
 async function deleteFile() {

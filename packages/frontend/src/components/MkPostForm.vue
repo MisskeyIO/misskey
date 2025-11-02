@@ -528,7 +528,7 @@ function setVisibility() {
 		return;
 	}
 
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkVisibilityPicker.vue')), {
+	os.popup(defineAsyncComponent(() => import('@/components/MkVisibilityPicker.vue')), {
 		currentVisibility: visibility.value,
 		isSilenced: $i.isSilenced,
 		localOnly: localOnly.value,
@@ -541,8 +541,7 @@ function setVisibility() {
 				store.set('visibility', visibility.value);
 			}
 		},
-		closed: () => dispose(),
-	});
+	}, 'closed');
 }
 
 async function toggleLocalOnly() {
@@ -961,9 +960,7 @@ async function post(ev?: MouseEvent) {
 			const rect = el.getBoundingClientRect();
 			const x = rect.left + (el.offsetWidth / 2);
 			const y = rect.top + (el.offsetHeight / 2);
-			const { dispose } = os.popup(MkRippleEffect, { x, y }, {
-				end: () => dispose(),
-			});
+			os.popup(MkRippleEffect, { x, y }, {}, 'end');
 		}
 	}
 

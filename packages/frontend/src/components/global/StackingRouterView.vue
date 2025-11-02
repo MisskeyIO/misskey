@@ -115,9 +115,9 @@ router.useListener('change', ({ resolved }) => {
 	}];
 });
 
-router.useListener('replace', ({ fullPath }) => {
+router.useListener('replace', ({ path }) => {
 	const currentTab = tabs.value[tabs.value.length - 1];
-	currentTab.fullPath = fullPath;
+	currentTab.fullPath = path;
 	tabs.value = [...tabs.value.slice(0, tabs.value.length - 1), currentTab];
 });
 </script>

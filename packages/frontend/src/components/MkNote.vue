@@ -399,14 +399,12 @@ if (!props.mock) {
 
 		if (users.length < 1) return;
 
-		const { dispose } = os.popup(MkUsersTooltip, {
+		os.popup(MkUsersTooltip, {
 			showing,
 			users,
 			count: appearNote.value.renoteCount,
 			targetElement: renoteButton.value,
-		}, {
-			closed: () => dispose(),
-		});
+		}, {}, 'closed');
 	});
 
 	if (appearNote.value.reactionAcceptance === 'likeOnly') {
@@ -421,15 +419,13 @@ if (!props.mock) {
 
 			if (users.length < 1) return;
 
-			const { dispose } = os.popup(MkReactionsViewerDetails, {
+			os.popup(MkReactionsViewerDetails, {
 				showing,
 				reaction: '❤️',
 				users,
 				count: appearNote.value.reactionCount,
 				targetElement: reactButton.value!,
-			}, {
-				closed: () => dispose(),
-			});
+			}, {}, 'closed');
 		});
 	}
 }
@@ -476,9 +472,7 @@ function react(): void {
 			const rect = el.getBoundingClientRect();
 			const x = rect.left + (el.offsetWidth / 2);
 			const y = rect.top + (el.offsetHeight / 2);
-			const { dispose } = os.popup(MkRippleEffect, { x, y }, {
-				end: () => dispose(),
-			});
+			os.popup(MkRippleEffect, { x, y }, {}, 'end');
 		}
 	} else {
 		blur();

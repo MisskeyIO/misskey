@@ -335,6 +335,7 @@ export const uploadFile = async (user?: UserToken, { path, name, blob }: UploadO
 		formData.append('i', user.token);
 	}
 
+	console.dir(formData);
 	const res = await relativeFetch('api/drive/files/create', {
 		method: 'POST',
 		body: formData,

@@ -24,13 +24,11 @@ const elRef = useTemplateRef('elRef');
 
 if (props.withTooltip) {
 	useTooltip(elRef, (showing) => {
-		const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkReactionTooltip.vue')), {
+		os.popup(defineAsyncComponent(() => import('@/components/MkReactionTooltip.vue')), {
 			showing,
 			reaction: props.reaction.replace(/^:(\w+):$/, ':$1@.:'),
 			targetElement: elRef.value.$el,
-		}, {
-			closed: () => dispose(),
-		});
+		}, {}, 'closed');
 	});
 }
 </script>

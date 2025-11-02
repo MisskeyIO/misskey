@@ -201,7 +201,6 @@
 		"@swc/jest": "catalog:",
 		"@types/accepts": "catalog:",
 		"@types/archiver": "catalog:",
-		"@types/bcryptjs": "catalog:",
 		"@types/body-parser": "catalog:",
 		"@types/color-convert": "catalog:",
 		"@types/content-disposition": "catalog:",

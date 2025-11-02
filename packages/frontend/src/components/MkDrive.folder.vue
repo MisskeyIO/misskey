@@ -275,11 +275,10 @@ function onContextmenu(ev: MouseEvent) {
 		text: i18n.ts.openInWindow,
 		icon: 'ti ti-app-window',
 		action: () => {
-			const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkDriveWindow.vue')), {
+			os.popup(defineAsyncComponent(() => import('@/components/MkDriveWindow.vue')), {
 				initialFolder: props.folder,
 			}, {
-				closed: () => dispose(),
-			});
+			}, 'closed');
 		},
 	}, { type: 'divider' }, {
 		text: i18n.ts.rename,

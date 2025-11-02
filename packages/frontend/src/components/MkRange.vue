@@ -121,15 +121,13 @@ function onMouseenter() {
 
 	tooltipForHoverShowing.value = true;
 
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkTooltip.vue')), {
+	os.popup(defineAsyncComponent(() => import('@/components/MkTooltip.vue')), {
 		showing: computed(() => tooltipForHoverShowing.value && !tooltipForDragShowing.value),
 		text: computed(() => {
 			return props.textConverter(finalValue.value);
 		}),
 		targetElement: thumbEl,
-	}, {
-		closed: () => dispose(),
-	});
+	}, {}, 'closed');
 
 	thumbEl.value!.addEventListener('mouseleave', () => {
 		tooltipForHoverShowing.value = false;
@@ -141,15 +139,13 @@ function onMousedown(ev: MouseEvent | TouchEvent) {
 
 	tooltipForDragShowing.value = true;
 
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkTooltip.vue')), {
+	os.popup(defineAsyncComponent(() => import('@/components/MkTooltip.vue')), {
 		showing: tooltipForDragShowing,
 		text: computed(() => {
 			return props.textConverter(finalValue.value);
 		}),
 		targetElement: thumbEl,
-	}, {
-		closed: () => dispose(),
-	});
+	}, {}, 'closed');
 
 	const style = window.document.createElement('style');
 	style.appendChild(window.document.createTextNode('* { cursor: grabbing !important; } body * { pointer-events: none !important; }'));

@@ -119,11 +119,9 @@ async function registerTOTP(): Promise<void> {
 		token: auth.result.token,
 	});
 
-	const { dispose } = os.popup(defineAsyncComponent(() => import('./2fa.qrdialog.vue')), {
+	os.popup(defineAsyncComponent(() => import('./2fa.qrdialog.vue')), {
 		twoFactorData,
-	}, {
-		closed: () => dispose(),
-	});
+	}, {}, 'closed');
 }
 
 async function unregisterTOTP(): Promise<void> {

@@ -46,19 +46,18 @@ function load() {
 load();
 
 async function add(ev: MouseEvent) {
-	const { dispose } = os.popup(defineAsyncComponent(() => import('./avatar-decoration-edit-dialog.vue')), {
+	os.popup(defineAsyncComponent(() => import('./avatar-decoration-edit-dialog.vue')), {
 	}, {
 		done: result => {
 			if (result.created) {
 				avatarDecorations.value.unshift(result.created);
 			}
 		},
-		closed: () => dispose(),
-	});
+	}, 'closed');
 }
 
 function edit(avatarDecoration) {
-	const { dispose } = os.popup(defineAsyncComponent(() => import('./avatar-decoration-edit-dialog.vue')), {
+	os.popup(defineAsyncComponent(() => import('./avatar-decoration-edit-dialog.vue')), {
 		avatarDecoration: avatarDecoration,
 	}, {
 		done: result => {
@@ -72,8 +71,7 @@ function edit(avatarDecoration) {
 				avatarDecorations.value = avatarDecorations.value.filter(x => x.id !== avatarDecoration.id);
 			}
 		},
-		closed: () => dispose(),
-	});
+	}, 'closed');
 }
 
 const headerActions = computed(() => [{

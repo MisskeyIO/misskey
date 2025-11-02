@@ -159,11 +159,9 @@ function openAccountMenu(ev: MouseEvent) {
 function more(ev: MouseEvent) {
 	const target = getHTMLElementOrNull(ev.currentTarget ?? ev.target);
 	if (!target) return;
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkLaunchPad.vue')), {
+	os.popup(defineAsyncComponent(() => import('@/components/MkLaunchPad.vue')), {
 		src: target,
-	}, {
-		closed: () => dispose(),
-	});
+	}, {}, 'closed');
 }
 
 function menuEdit() {

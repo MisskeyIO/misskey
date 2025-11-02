@@ -94,11 +94,9 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 	}
 
 	function reportAbuse() {
-		const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkAbuseReportWindow.vue')), {
+		os.popup(defineAsyncComponent(() => import('@/components/MkAbuseReportWindow.vue')), {
 			user: user,
-		}, {
-			closed: () => dispose(),
-		});
+		}, {}, 'closed');
 	}
 
 	async function getConfirmed(text: string): Promise<boolean> {

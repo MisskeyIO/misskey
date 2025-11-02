@@ -28,7 +28,7 @@ const props = defineProps<{
 const notificationsComponent = useTemplateRef('notificationsComponent');
 
 function func() {
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkNotificationSelectWindow.vue')), {
+	os.popup(defineAsyncComponent(() => import('@/components/MkNotificationSelectWindow.vue')), {
 		excludeTypes: props.column.excludeTypes,
 	}, {
 		done: async (res) => {
@@ -37,8 +37,7 @@ function func() {
 				excludeTypes: excludeTypes,
 			});
 		},
-		closed: () => dispose(),
-	});
+	}, 'closed');
 }
 
 const menu = [{

@@ -243,12 +243,10 @@ function reportAbuse() {
 
 	const pageUrl = `${url}/play/${flash.value.id}`;
 
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkAbuseReportWindow.vue')), {
+	os.popup(defineAsyncComponent(() => import('@/components/MkAbuseReportWindow.vue')), {
 		user: flash.value.user,
 		initialComment: `Play: ${pageUrl}\n-----\n`,
-	}, {
-		closed: () => dispose(),
-	});
+	}, {}, 'closed');
 }
 
 function showMenu(ev: MouseEvent) {

@@ -43,13 +43,11 @@ function menu(ev) {
 		text: i18n.ts.info,
 		icon: 'ti ti-info-circle',
 		action: async () => {
-			const { dispose } = os.popup(MkCustomEmojiDetailedDialog, {
+			os.popup(MkCustomEmojiDetailedDialog, {
 				emoji: await misskeyApiGet('emoji', {
 					name: props.emoji.name,
 				}),
-			}, {
-				closed: () => dispose(),
-			});
+			}, {}, 'closed');
 		},
 	});
 
@@ -67,11 +65,9 @@ function menu(ev) {
 }
 
 const edit = async (emoji) => {
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@/pages/emoji-edit-dialog.vue')), {
+	os.popup(defineAsyncComponent(() => import('@/pages/emoji-edit-dialog.vue')), {
 		emoji: emoji,
-	}, {
-		closed: () => dispose(),
-	});
+	}, {}, 'closed');
 };
 </script>
 

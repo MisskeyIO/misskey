@@ -55,7 +55,7 @@ const { widgetProps, configure, save } = useWidgetPropsManager(name,
 );
 
 const configureNotification = () => {
-	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkNotificationSelectWindow.vue')), {
+	os.popup(defineAsyncComponent(() => import('@/components/MkNotificationSelectWindow.vue')), {
 		excludeTypes: widgetProps.excludeTypes,
 	}, {
 		done: async (res) => {
@@ -63,8 +63,7 @@ const configureNotification = () => {
 			widgetProps.excludeTypes = excludeTypes;
 			save();
 		},
-		closed: () => dispose(),
-	});
+	}, 'closed');
 };
 
 defineExpose<WidgetComponentExpose>({

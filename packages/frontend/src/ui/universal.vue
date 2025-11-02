@@ -111,7 +111,7 @@ const onContextmenu = (ev) => {
 	if (isLink(ev.target)) return;
 	if (['INPUT', 'TEXTAREA', 'IMG', 'VIDEO', 'CANVAS'].includes(ev.target.tagName) || (ev.target.isContentEditable)) return;
 	if (window.getSelection()?.toString() !== '') return;
-	const path = mainrouter.getCurrentPath();
+	const path = mainRouter.getCurrentPath();
 	os.contextMenu([{
 		type: 'label',
 		text: path,

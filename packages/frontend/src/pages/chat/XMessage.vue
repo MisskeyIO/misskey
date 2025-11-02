@@ -183,12 +183,10 @@ function showMenu(ev: MouseEvent, contextmenu = false) {
 			icon: 'ti ti-exclamation-circle',
 			action: () => {
 				const localUrl = `${url}/chat/messages/${props.message.id}`;
-				const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkAbuseReportWindow.vue')), {
+				os.popup(defineAsyncComponent(() => import('@/components/MkAbuseReportWindow.vue')), {
 					user: props.message.fromUser!,
 					initialComment: `${localUrl}\n-----\n`,
-				}, {
-					closed: () => dispose(),
-				});
+				}, {}, 'closed');
 			},
 		});
 	}

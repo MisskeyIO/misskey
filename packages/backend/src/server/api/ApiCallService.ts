@@ -7,7 +7,7 @@ import { randomUUID } from 'node:crypto';
 import * as fs from 'node:fs';
 import * as stream from 'node:stream/promises';
 import { Transform } from 'node:stream';
-import { type MultipartFile } from '@fastify/multipart';
+import { type Multipart, type MultipartFile } from '@fastify/multipart';
 import { Inject, Injectable } from '@nestjs/common';
 import * as Sentry from '@sentry/node';
 import { AttachmentFile } from '@/server/api/endpoint-base.js';
@@ -36,16 +36,27 @@ const accessDenied = {
         id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e',
 };
 
-function coerceMultipartField(value: unknown): unknown {
-        if (typeof value !== 'string') return value;
+function normalizeMultipartValue(value: Multipart | Multipart[] | undefined): unknown {
+        if (value == null) return undefined;
 
-        const lower = value.toLowerCase();
-        if (lower === 'true') return true;
-        if (lower === 'false') return false;
-        if (lower === 'null') return null;
-        if (lower === 'undefined') return undefined;
+        if (Array.isArray(value)) {
+                const normalized = value
+                        .map(item => normalizeMultipartValue(item))
+                        .filter(item => item !== undefined);
 
-        return value;
+                if (normalized.length === 0) return undefined;
+                return normalized.length === 1 ? normalized[0] : normalized;
+        }
+
+        if (typeof value === 'object' && value !== null && 'value' in value) {
+                return value.value;
+        }
+
+        return undefined;
+}
+
+function hasFilepath(file: MultipartFile): file is MultipartFile & { filepath: string } {
+        return typeof (file as { filepath?: unknown }).filepath === 'string';
 }
 
 @Injectable()
@@ -239,43 +250,58 @@ export class ApiCallService implements OnApplicationShutdown {
 		request: FastifyRequest<{ Body: Record<string, unknown>, Querystring: Record<string, unknown> }>,
 		reply: FastifyReply,
 	): Promise<void> {
-		const multipartData = await request.file().catch(() => {
-			/* Fastify throws if the remote didn't send multipart data. Return 400 below. */
-		});
-		if (multipartData == null) {
-			reply.code(400);
-			reply.send();
-			return;
-		}
+                const savedFiles = await request.saveRequestFiles().catch(err => {
+                        this.logger.warn('Failed to parse multipart form data.', err);
+                });
+                const multipartData = savedFiles?.[0];
+
+                const cleanupTempFiles = async () => {
+                        try {
+                                await request.cleanRequestFiles();
+                        } catch (err) {
+                                this.logger.warn('Failed to clean temporary upload files.', err);
+                        }
+                };
+
+                if (multipartData == null) {
+                        await cleanupTempFiles();
+                        reply.code(400);
+                        reply.send();
+                        return;
+                }
 
                 const fields = {} as Record<string, unknown>;
                 for (const [k, v] of Object.entries(multipartData.fields)) {
-                        const rawValue = typeof v === 'object' && 'value' in v ? v.value : undefined;
-                        fields[k] = coerceMultipartField(rawValue);
+                        const value = normalizeMultipartValue(v);
+                        if (value !== undefined) {
+                                fields[k] = value;
+                        }
                 }
 
-		// https://datatracker.ietf.org/doc/html/rfc6750.html#section-2.1 (case sensitive)
-		const token = request.headers.authorization?.startsWith('Bearer ')
-			? request.headers.authorization.slice(7)
-			: fields['i'];
-		if (token != null && typeof token !== 'string') {
-			reply.code(400);
-			return;
-		}
-		this.authenticateService.authenticate(token).then(([user, app]) => {
-			this.call(endpoint, user, app, fields, multipartData, request).then((res) => {
-				this.send(reply, res);
-			}).catch((err: ApiError) => {
-				this.#sendApiError(reply, err);
-			});
+                // https://datatracker.ietf.org/doc/html/rfc6750.html#section-2.1 (case sensitive)
+                const token = request.headers.authorization?.startsWith('Bearer ')
+                        ? request.headers.authorization.slice(7)
+                        : fields['i'];
+                if (token != null && typeof token !== 'string') {
+                        await cleanupTempFiles();
+                        reply.code(400);
+                        return;
+                }
+                this.authenticateService.authenticate(token).then(([user, app]) => {
+                        this.call(endpoint, user, app, fields, multipartData, request).then((res) => {
+                                this.send(reply, res);
+                        }).catch((err: ApiError) => {
+                                this.#sendApiError(reply, err);
+                        }).finally(() => cleanupTempFiles());
 
-			if (user) {
-				this.logIp(request, user);
-			}
-		}).catch(err => {
-			this.#sendAuthenticationError(reply, err);
-		});
-	}
+                        if (user) {
+                                this.logIp(request, user);
+                        }
+                }).catch(async err => {
+                        await cleanupTempFiles();
+                        this.#sendAuthenticationError(reply, err);
+                });
+        }
 
 	@bindThis
 	private send(reply: FastifyReply, x?: any, y?: ApiError) {
@@ -467,17 +493,36 @@ export class ApiCallService implements OnApplicationShutdown {
 			}
 		}
 
-		let attachmentFile: AttachmentFile | null = null;
-		let cleanup = () => {};
-		if (ep.meta.requireFile && request.method === 'POST' && multipartFile) {
-			const policies = await this.roleService.getUserPolicies(user!.id);
-			const result = await this.handleAttachmentFile(
-				Math.min((policies.maxFileSizeMb * 1024 * 1024), this.config.maxFileSize),
-				multipartFile,
-			);
-			attachmentFile = result.attachmentFile;
-			cleanup = result.cleanup;
-		}
+                let attachmentFile: AttachmentFile | null = null;
+                let cleanup: () => Promise<void> | void = () => {};
+                if (ep.meta.requireFile && request.method === 'POST' && multipartFile) {
+                        const policies = await this.roleService.getUserPolicies(user!.id);
+                        const fileSizeLimit = Math.min((policies.maxFileSizeMb * 1024 * 1024), this.config.maxFileSize);
+
+                        if (hasFilepath(multipartFile)) {
+                                if (multipartFile.file.truncated) {
+                                        throw this.#createFileTooLargeError();
+                                }
+
+                                const stats = await fs.promises.stat(multipartFile.filepath);
+                                if (stats.size > fileSizeLimit) {
+                                        throw this.#createFileTooLargeError();
+                                }
+
+                                attachmentFile = {
+                                        name: multipartFile.filename ?? null,
+                                        path: multipartFile.filepath,
+                                };
+                                cleanup = async () => {};
+                        } else {
+                                const result = await this.handleAttachmentFile(
+                                        fileSizeLimit,
+                                        multipartFile,
+                                );
+                                attachmentFile = result.attachmentFile;
+                                cleanup = result.cleanup;
+                        }
+                }
 
 		// API invoking
 		if (this.config.sentryForBackend) {
@@ -500,48 +545,40 @@ export class ApiCallService implements OnApplicationShutdown {
 		fileSizeLimit: number,
 		multipartFile: MultipartFile,
 	) {
-		function createTooLongError() {
-			return new ApiError({
-				httpStatusCode: 413,
-				kind: 'client',
-				message: 'File size is too large.',
-				code: 'FILE_SIZE_TOO_LARGE',
-				id: 'ff827ce8-9b4b-4808-8511-422222a3362f',
-			});
-		}
+                const createTooLongError = () => this.#createFileTooLargeError();
 
-		function createLimitStream(limit: number) {
-			let total = 0;
+                const createLimitStream = (limit: number) => {
+                        let total = 0;
 
-			return new Transform({
-				transform(chunk, _, callback) {
-					total += chunk.length;
-					if (total > limit) {
-						callback(createTooLongError());
-					} else {
-						callback(null, chunk);
-					}
-				},
-			});
-		}
+                        return new Transform({
+                                transform(chunk, _, callback) {
+                                        total += chunk.length;
+                                        if (total > limit) {
+                                                callback(createTooLongError());
+                                        } else {
+                                                callback(null, chunk);
+                                        }
+                                },
+                        });
+                };
 
-		const [path, cleanup] = await createTemp();
-		try {
-			await stream.pipeline(
-				multipartFile.file,
-				createLimitStream(fileSizeLimit),
-				fs.createWriteStream(path),
-			);
+                const [path, cleanup] = await createTemp();
+                try {
+                        await stream.pipeline(
+                                multipartFile.file,
+                                createLimitStream(fileSizeLimit),
+                                fs.createWriteStream(path),
+                        );
 
-			// ファイルサイズが制限を超えていた場合
-			// なお truncated はストリームを読み切ってからでないと機能しないため、stream.pipeline より後にある必要がある
-			if (multipartFile.file.truncated) {
-				throw createTooLongError();
-			}
-		} catch (err) {
-			cleanup();
-			throw err;
-		}
+                        // ファイルサイズが制限を超えていた場合
+                        // なお truncated はストリームを読み切ってからでないと機能しないため、stream.pipeline より後にある必要がある
+                        if (multipartFile.file.truncated) {
+                                throw createTooLongError();
+                        }
+                } catch (err) {
+                        cleanup();
+                        throw err;
+                }
 
 		return {
 			attachmentFile: {
@@ -552,10 +589,20 @@ export class ApiCallService implements OnApplicationShutdown {
 		};
 	}
 
-	@bindThis
-	public dispose(): void {
-		clearInterval(this.userIpHistoriesClearIntervalId);
-	}
+        @bindThis
+        public dispose(): void {
+                clearInterval(this.userIpHistoriesClearIntervalId);
+        }
+
+        #createFileTooLargeError(): ApiError {
+                return new ApiError({
+                        httpStatusCode: 413,
+                        kind: 'client',
+                        message: 'File size is too large.',
+                        code: 'FILE_SIZE_TOO_LARGE',
+                        id: 'ff827ce8-9b4b-4808-8511-422222a3362f',
+                });
+        }
 
 	@bindThis
 	public onApplicationShutdown(signal?: string | undefined): void {

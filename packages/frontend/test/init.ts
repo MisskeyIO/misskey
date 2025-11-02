@@ -77,5 +77,3 @@ const MockedResizeObserver = class MockedResizeObserver {
 };
 
 vi.stubGlobal('ResizeObserver', MockedResizeObserver);
-
-(window as typeof globalThis & { ResizeObserver: typeof MockedResizeObserver }).ResizeObserver = MockedResizeObserver;

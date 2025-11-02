@@ -231,12 +231,11 @@ export class ApiCallService implements OnApplicationShutdown {
 			/* Fastify throws if the remote didn't send multipart data. Return 400 below. */
 		});
 		if (multipartData == null) {
-                        reply.code(400);
-                        reply.send({
-                                error: 'multipart payload not received',
-                        });
-                        return;
-                }
+			reply.code(400);
+			reply.raw.statusMessage = 'multipart payload not received';
+			reply.send();
+			return;
+		}
 
 		const fields = {} as Record<string, unknown>;
 		for (const [k, v] of Object.entries(multipartData.fields)) {

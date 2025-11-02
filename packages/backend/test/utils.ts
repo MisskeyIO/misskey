@@ -341,6 +341,7 @@ export const uploadFile = async (user?: UserToken, { path, name, blob }: UploadO
 		headers,
 	});
 
+	console.dir(res);
 	const body = res.status !== 204 ? await res.json() as misskey.Endpoints['drive/files/create']['res'] : null;
 	return {
 		status: res.status,

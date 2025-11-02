@@ -70,15 +70,16 @@ Object.defineProperty(window, 'matchMedia', {
 	})),
 });
 
-const resizeObserverMock = vi.fn().mockImplementation(() => ({
-	observe: vi.fn(),
-	unobserve: vi.fn(),
-	disconnect: vi.fn(),
+const ResizeObserverMock = vi.fn(() => ({
+        observe: vi.fn(),
+        unobserve: vi.fn(),
+        disconnect: vi.fn(),
 }));
 
-Object.defineProperty(window, 'ResizeObserver', {
-	writable: true,
-	value: resizeObserverMock,
-});
+vi.stubGlobal('ResizeObserver', ResizeObserverMock);
 
-vi.stubGlobal('ResizeObserver', window.ResizeObserver);
+Object.defineProperty(window, 'ResizeObserver', {
+        configurable: true,
+        writable: true,
+        value: ResizeObserverMock,
+});

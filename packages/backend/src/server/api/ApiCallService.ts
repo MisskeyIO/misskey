@@ -6,26 +6,26 @@
 import { randomUUID } from 'node:crypto';
 import * as fs from 'node:fs';
 import * as stream from 'node:stream/promises';
-import { Transform } from 'node:stream';
-import { type Multipart, type MultipartFile } from '@fastify/multipart';
 import { Inject, Injectable } from '@nestjs/common';
-import * as Sentry from '@sentry/node';
-import { AttachmentFile } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
 import { getIpHash } from '@/misc/get-ip-hash.js';
 import type { MiLocalUser, MiUser } from '@/models/User.js';
 import type { MiAccessToken } from '@/models/AccessToken.js';
 import type Logger from '@/logger.js';
-import type { MiMeta, UserIpsRepository } from '@/models/_.js';
+import type { UserIpsRepository } from '@/models/_.js';
+import { MetaService } from '@/core/MetaService.js';
 import { createTemp } from '@/misc/create-temp.js';
 import { bindThis } from '@/decorators.js';
-import { type RolePolicies, RoleService } from '@/core/RoleService.js';
+import { RoleService } from '@/core/RoleService.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import type { Config } from '@/config.js';
 import { ApiError } from './error.js';
 import { RateLimiterService } from './RateLimiterService.js';
 import { ApiLoggerService } from './ApiLoggerService.js';
-import { AuthenticateService, AuthenticationError } from './AuthenticateService.js';
+import {
+	AuthenticateService,
+	AuthenticationError,
+} from './AuthenticateService.js';
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import type { OnApplicationShutdown } from '@nestjs/common';
 import type { IEndpointMeta, IEndpoint } from './endpoints.js';
@@ -43,15 +43,12 @@ export class ApiCallService implements OnApplicationShutdown {
 	private userIpHistoriesClearIntervalId: NodeJS.Timeout;
 
 	constructor(
-		@Inject(DI.meta)
-		private meta: MiMeta,
-
 		@Inject(DI.config)
 		private config: Config,
-
 		@Inject(DI.userIpsRepository)
 		private userIpsRepository: UserIpsRepository,
 
+		private metaService: MetaService,
 		private authenticateService: AuthenticateService,
 		private rateLimiterService: RateLimiterService,
 		private roleService: RoleService,
@@ -60,38 +57,31 @@ export class ApiCallService implements OnApplicationShutdown {
 		this.logger = this.apiLoggerService.logger;
 		this.userIpHistories = new Map<MiUser['id'], Set<string>>();
 
-		this.userIpHistoriesClearIntervalId = setInterval(() => {
-			this.userIpHistories.clear();
-		}, 1000 * 60 * 60);
-	}
-
-	// HTTPヘッダーで無効な文字をサニタイズする関数
-	#sanitizeHeaderValue(value: string): string {
-		// 改行文字を削除またはスペースに置換（\x1fは除外）
-		return value.replace(/[\r\n\t\x7f]/g, ' ').trim();
+		this.userIpHistoriesClearIntervalId = setInterval(
+			() => {
+				this.userIpHistories.clear();
+			},
+			1000 * 60 * 60,
+		);
 	}
 
 	#sendApiError(reply: FastifyReply, err: ApiError): void {
 		let statusCode = err.httpStatusCode;
 		if (err.httpStatusCode === 401) {
 			reply.header('WWW-Authenticate', 'Bearer realm="Misskey"');
-		} else if (err.code === 'RATE_LIMIT_EXCEEDED') {
-			const info: unknown = err.info;
-			const unixEpochInSeconds = Date.now();
-			if (typeof(info) === 'object' && info && 'resetMs' in info && typeof(info.resetMs) === 'number') {
-				const cooldownInSeconds = Math.ceil((info.resetMs - unixEpochInSeconds) / 1000);
-				// もしかするとマイナスになる可能性がなくはないのでマイナスだったら0にしておく
-				reply.header('Retry-After', Math.max(cooldownInSeconds, 0).toString(10));
-			} else {
-				this.logger.warn(`rate limit information has unexpected type ${typeof(err.info?.reset)}`);
-			}
 		} else if (err.kind === 'client') {
-			reply.header('WWW-Authenticate', `Bearer realm="Misskey", error="invalid_request", error_description="${this.#sanitizeHeaderValue(err.message)}"`);
+			reply.header(
+				'WWW-Authenticate',
+				`Bearer realm="Misskey", error="invalid_request", error_description="${err.message}"`,
+			);
 			statusCode = statusCode ?? 400;
 		} else if (err.kind === 'permission') {
 			// (ROLE_PERMISSION_DENIEDは関係ない)
 			if (err.code === 'PERMISSION_DENIED') {
-				reply.header('WWW-Authenticate', `Bearer realm="Misskey", error="insufficient_scope", error_description="${this.#sanitizeHeaderValue(err.message)}"`);
+				reply.header(
+					'WWW-Authenticate',
+					`Bearer realm="Misskey", error="insufficient_scope", error_description="${err.message}"`,
+				);
 			}
 			statusCode = statusCode ?? 403;
 		} else if (!statusCode) {
@@ -102,98 +92,46 @@ export class ApiCallService implements OnApplicationShutdown {
 
 	#sendAuthenticationError(reply: FastifyReply, err: unknown): void {
 		if (err instanceof AuthenticationError) {
-			const message = 'Authentication failed. Please ensure your token is correct.';
-			reply.header('WWW-Authenticate', `Bearer realm="Misskey", error="invalid_token", error_description="${this.#sanitizeHeaderValue(message)}"`);
-			this.send(reply, 401, new ApiError({
-				message: 'Authentication failed. Please ensure your token is correct.',
-				code: 'AUTHENTICATION_FAILED',
-				id: 'b0a7f5f8-dc2f-4171-b91f-de88ad238e14',
-			}));
-		} else {
-			this.#sendApiError(reply, new ApiError({
-				message: 'Internal error occurred. Please contact us if the error persists.',
-				code: 'INTERNAL_ERROR',
-				id: '5d37dbcb-891e-41ca-a3d6-e690c97775ac',
-				kind: 'server',
-			}));
-		}
-	}
-
-	#onExecError(ep: IEndpoint, data: any, err: Error, userId?: MiUser['id']): void {
-		if (err instanceof ApiError || err instanceof AuthenticationError) {
-			throw err;
-		} else if (err instanceof IdentifiableError) {
-			this.logger.error(`Internal error occurred in ${ep.name}: ${err.message}`, {
-				ep: ep.name,
-				ps: data,
-				id: err.id,
-				error: {
-					message: err.message,
-					code: 'INTERNAL_ERROR',
-					stack: err.stack,
-				},
-			});
-			throw new ApiError(
-				{
-					message: err.message,
-					code: 'INTERNAL_ERROR',
-					id: err.id,
-				},
-				{
-					message: err.message,
-					code: err.name,
-					id: err.id,
-				},
+			const message =
+				'Authentication failed. Please ensure your token is correct.';
+			reply.header(
+				'WWW-Authenticate',
+				`Bearer realm="Misskey", error="invalid_token", error_description="${message}"`,
+			);
+			this.send(
+				reply,
+				401,
+				new ApiError({
+					message:
+						'Authentication failed. Please ensure your token is correct.',
+					code: 'AUTHENTICATION_FAILED',
+					id: 'b0a7f5f8-dc2f-4171-b91f-de88ad238e14',
+				}),
 			);
 		} else {
-			const errId = randomUUID();
-			this.logger.error(`Internal error occurred in ${ep.name}: ${err.message}`, {
-				ep: ep.name,
-				ps: data,
-				id: errId,
-				error: {
-					message: err.message,
-					code: err.name,
-					stack: err.stack,
-				},
-			});
-
-			if (this.config.sentryForBackend) {
-				Sentry.captureMessage(`Internal error occurred in ${ep.name}: ${err.message}`, {
-					level: 'error',
-					user: {
-						id: userId,
-					},
-					extra: {
-						ep: ep.name,
-						ps: data,
-						e: {
-							message: err.message,
-							code: err.name,
-							stack: err.stack,
-							id: errId,
-						},
-					},
-				});
-			}
-
-			throw new ApiError({
-				message: err.message,
-				code: err.name,
-				id: errId,
-			});
+			this.#sendApiError(
+				reply,
+				new ApiError({
+					message:
+						'Internal error occurred. Please contact us if the error persists.',
+					code: 'INTERNAL_ERROR',
+					id: '5d37dbcb-891e-41ca-a3d6-e690c97775ac',
+					kind: 'server',
+				}),
+			);
 		}
 	}
 
 	@bindThis
 	public handleRequest(
 		endpoint: IEndpoint & { exec: any },
-		request: FastifyRequest<{ Body: Record<string, unknown> | undefined, Querystring: Record<string, unknown> }>,
+		request: FastifyRequest<{
+			Body: Record<string, unknown> | undefined;
+			Querystring: Record<string, unknown>;
+		}>,
 		reply: FastifyReply,
 	): void {
-		const body = request.method === 'GET'
-			? request.query
-			: request.body;
+		const body = request.method === 'GET' ? request.query : request.body;
 
 		// https://datatracker.ietf.org/doc/html/rfc6750.html#section-2.1 (case sensitive)
 		const token = request.headers.authorization?.startsWith('Bearer ')
@@ -203,112 +141,100 @@ export class ApiCallService implements OnApplicationShutdown {
 			reply.code(400);
 			return;
 		}
-		this.authenticateService.authenticate(token).then(([user, app]) => {
-			this.call(endpoint, user, app, body, null, request).then((res) => {
-				if (request.method === 'GET' && endpoint.meta.cacheSec && !token && !user) {
-					reply.header('Cache-Control', `public, max-age=${endpoint.meta.cacheSec}`);
-				}
-				this.send(reply, res);
-			}).catch((err: ApiError) => {
-				this.#sendApiError(reply, err);
-			});
+		this.authenticateService
+			.authenticate(token)
+			.then(([user, app]) => {
+				this.call(endpoint, user, app, body, null, request)
+					.then((res) => {
+						if (
+							request.method === 'GET' &&
+							endpoint.meta.cacheSec &&
+							!token &&
+							!user
+						) {
+							reply.header(
+								'Cache-Control',
+								`public, max-age=${endpoint.meta.cacheSec}`,
+							);
+						}
+						this.send(reply, res);
+					})
+					.catch((err: ApiError) => {
+						this.#sendApiError(reply, err);
+					});
 
-			if (user) {
-				this.logIp(request, user);
-			}
-		}).catch(err => {
-			this.#sendAuthenticationError(reply, err);
-		});
+				if (user) {
+					this.logIp(request, user);
+				}
+			})
+			.catch((err) => {
+				this.#sendAuthenticationError(reply, err);
+			});
 	}
 
 	@bindThis
-        public async handleMultipartRequest(
-                endpoint: IEndpoint & { exec: any },
-                request: FastifyRequest<{ Body: Record<string, unknown>, Querystring: Record<string, unknown> }>,
-                reply: FastifyReply,
-        ): Promise<void> {
-                let parts: AsyncIterableIterator<Multipart>;
-                try {
-                        parts = request.parts();
-                } catch {
-                        reply.code(400);
-                        reply.send();
-                        return;
-                }
+	public async handleMultipartRequest(
+		endpoint: IEndpoint & { exec: any },
+		request: FastifyRequest<{
+			Body: Record<string, unknown>;
+			Querystring: Record<string, unknown>;
+		}>,
+		reply: FastifyReply,
+	): Promise<void> {
+		const multipartData = await request.file().catch(() => {
+			/* Fastify throws if the remote didn't send multipart data. Return 400 below. */
+		});
+		if (multipartData == null) {
+			reply.code(400);
+			reply.send();
+			return;
+		}
 
-                const fields: Record<string, unknown> = {};
-                let multipartFile: MultipartFile | null = null;
+		const [path] = await createTemp();
+		await stream.pipeline(multipartData.file, fs.createWriteStream(path));
 
-                try {
-                        for await (const part of parts) {
-                                if (part.type === 'field') {
-                                        fields[part.fieldname] = part.value;
-                                        continue;
-                                }
+		const fields = {} as Record<string, unknown>;
+		for (const [k, v] of Object.entries(multipartData.fields)) {
+			fields[k] = typeof v === 'object' && 'value' in v ? v.value : undefined;
+		}
 
-                                multipartFile = part;
-                                break;
-                        }
-                } catch {
-                        reply.code(400);
-                        reply.send();
-                        return;
-                }
+		// https://datatracker.ietf.org/doc/html/rfc6750.html#section-2.1 (case sensitive)
+		const token = request.headers.authorization?.startsWith('Bearer ')
+			? request.headers.authorization.slice(7)
+			: fields['i'];
+		if (token != null && typeof token !== 'string') {
+			reply.code(400);
+			return;
+		}
+		this.authenticateService
+			.authenticate(token)
+			.then(([user, app]) => {
+				this.call(
+					endpoint,
+					user,
+					app,
+					fields,
+					{
+						name: multipartData.filename,
+						path: path,
+					},
+					request,
+				)
+					.then((res) => {
+						this.send(reply, res);
+					})
+					.catch((err: ApiError) => {
+						this.#sendApiError(reply, err);
+					});
 
-                if (multipartFile == null) {
-                        reply.code(400);
-                        reply.send();
-                        return;
-                }
-
-                for (const [name, value] of Object.entries(multipartFile.fields)) {
-                        const resolved = this.extractMultipartValue(value);
-                        if (resolved !== undefined || !(name in fields)) {
-                                fields[name] = resolved;
-                        }
-                }
-
-                // https://datatracker.ietf.org/doc/html/rfc6750.html#section-2.1 (case sensitive)
-                const token = request.headers.authorization?.startsWith('Bearer ')
-                        ? request.headers.authorization.slice(7)
-                        : fields['i'];
-                if (token != null && typeof token !== 'string') {
-                        reply.code(400);
-                        return;
-                }
-                this.authenticateService.authenticate(token).then(([user, app]) => {
-                        this.call(endpoint, user, app, fields, multipartFile, request).then((res) => {
-                                this.send(reply, res);
-                        }).catch((err: ApiError) => {
-                                this.#sendApiError(reply, err);
-                        });
-
-                        if (user) {
-                                this.logIp(request, user);
-                        }
-                }).catch(err => {
-                        this.#sendAuthenticationError(reply, err);
-                });
-        }
-
-        @bindThis
-        private extractMultipartValue(value: Multipart | Multipart[] | undefined): unknown {
-                if (Array.isArray(value)) {
-                        for (const entry of value) {
-                                const resolved = this.extractMultipartValue(entry);
-                                if (resolved !== undefined) {
-                                        return resolved;
-                                }
-                        }
-                        return undefined;
-                }
-
-                if (value?.type === 'field') {
-                        return value.value;
-                }
-
-                return undefined;
-        }
+				if (user) {
+					this.logIp(request, user);
+				}
+			})
+			.catch((err) => {
+				this.#sendAuthenticationError(reply, err);
+			});
+	}
 
 	@bindThis
 	private send(reply: FastifyReply, x?: any, y?: ApiError) {
@@ -333,8 +259,9 @@ export class ApiCallService implements OnApplicationShutdown {
 	}
 
 	@bindThis
-	private logIp(request: FastifyRequest, user: MiLocalUser) {
-		if (!this.meta.enableIpLogging) return;
+	private async logIp(request: FastifyRequest, user: MiLocalUser) {
+		const meta = await this.metaService.fetch();
+		if (!meta.enableIpLogging) return;
 		const ip = request.ip;
 		const ips = this.userIpHistories.get(user.id);
 		if (ips == null || !ips.has(ip)) {
@@ -345,13 +272,17 @@ export class ApiCallService implements OnApplicationShutdown {
 			}
 
 			try {
-				this.userIpsRepository.createQueryBuilder().insert().values({
-					createdAt: new Date(),
-					userId: user.id,
-					ip: ip,
-				}).orIgnore(true).execute();
-			} catch {
-			}
+				this.userIpsRepository
+					.createQueryBuilder()
+					.insert()
+					.values({
+						createdAt: new Date(),
+						userId: user.id,
+						ip: ip,
+					})
+					.orIgnore(true)
+					.execute();
+			} catch {}
 		}
 	}
 
@@ -361,8 +292,14 @@ export class ApiCallService implements OnApplicationShutdown {
 		user: MiLocalUser | null | undefined,
 		token: MiAccessToken | null | undefined,
 		data: any,
-		multipartFile: MultipartFile | null,
-		request: FastifyRequest<{ Body: Record<string, unknown> | undefined, Querystring: Record<string, unknown> }>,
+		file: {
+			name: string;
+			path: string;
+		} | null,
+		request: FastifyRequest<{
+			Body: Record<string, unknown> | undefined;
+			Querystring: Record<string, unknown>;
+		}>,
 	) {
 		const isSecure = user != null && token == null;
 
@@ -370,7 +307,10 @@ export class ApiCallService implements OnApplicationShutdown {
 			throw new ApiError(accessDenied);
 		}
 
-		const bypassRateLimit = this.config.bypassRateLimit?.some(({ header, value }) => request.headers[header] === value) ?? false;
+		const bypassRateLimit =
+			this.config.bypassRateLimit?.some(
+				({ header, value }) => request.headers[header] === value,
+			) ?? false;
 		if (ep.meta.limit && !bypassRateLimit) {
 			// koa will automatically load the `X-Forwarded-For` header if `proxy: true` is configured in the app.
 			let limitActor: string;
@@ -387,27 +327,34 @@ export class ApiCallService implements OnApplicationShutdown {
 			}
 
 			// TODO: 毎リクエスト計算するのもあれだしキャッシュしたい
-			const factor = user ? (await this.roleService.getUserPolicies(user.id)).rateLimitFactor : 1;
+			const factor = user
+				? (await this.roleService.getUserPolicies(user.id)).rateLimitFactor
+				: 1;
 
 			if (factor > 0) {
 				// Rate limit
-				await this.rateLimiterService.limit(limit as IEndpointMeta['limit'] & { key: NonNullable<string> }, limitActor, factor).catch(err => {
-					if ('info' in err) {
-						// errはLimiter.LimiterInfoであることが期待される
+				await this.rateLimiterService
+					.limit(
+						limit as IEndpointMeta['limit'] & { key: NonNullable<string> },
+						limitActor,
+						factor,
+					)
+					.catch((err) => {
 						throw new ApiError({
 							message: 'Rate limit exceeded. Please try again later.',
 							code: 'RATE_LIMIT_EXCEEDED',
 							id: 'd5826d14-3982-4d2e-8011-b9e9f02499ef',
 							httpStatusCode: 429,
-						}, err.info);
-					} else {
-						throw new TypeError('information must be a rate-limiter information.');
-					}
-				});
+						});
+					});
 			}
 		}
 
-		if (ep.meta.requireCredential || ep.meta.requireModerator || ep.meta.requireAdmin) {
+		if (
+			ep.meta.requireCredential ||
+			ep.meta.requireModerator ||
+			ep.meta.requireAdmin
+		) {
 			if (user == null) {
 				throw new ApiError({
 					message: 'Credential required.',
@@ -436,40 +383,12 @@ export class ApiCallService implements OnApplicationShutdown {
 			}
 		}
 
-		// Cast non JSON input
-		if ((ep.meta.requireFile || request.method === 'GET') && ep.params.properties) {
-			for (const k of Object.keys(ep.params.properties)) {
-				const param = ep.params.properties![k];
-				if (['boolean', 'number', 'integer'].includes(param.type ?? '') && typeof data[k] === 'string') {
-					try {
-						data[k] = JSON.parse(data[k]);
-					} catch (e) {
-						throw new ApiError({
-							message: 'Invalid param.',
-							code: 'INVALID_PARAM',
-							id: '0b5f1631-7c1a-41a6-b399-cce335f34d85',
-						}, {
-							param: k,
-							reason: `cannot cast to ${param.type}`,
-						});
-					}
-				}
-			}
-		}
-
-		if (token && ((ep.meta.kind && !token.permission.some(p => p === ep.meta.kind))
-			|| (!ep.meta.kind && (ep.meta.requireCredential || ep.meta.requireModerator || ep.meta.requireAdmin)))) {
-			throw new ApiError({
-				message: 'Your app does not have the necessary permissions to use this endpoint.',
-				code: 'PERMISSION_DENIED',
-				kind: 'permission',
-				id: '1370e5b7-d4eb-4566-bb1d-7748ee6a1838',
-			});
-		}
-
-		if ((ep.meta.requireModerator || ep.meta.requireAdmin) && (this.meta.rootUserId !== user!.id)) {
+		if ((ep.meta.requireModerator || ep.meta.requireAdmin) && !user!.isRoot) {
 			const myRoles = await this.roleService.getUserRoles(user!.id);
-			if (ep.meta.requireModerator && !myRoles.some(r => r.isModerator || r.isAdministrator)) {
+			if (
+				ep.meta.requireModerator &&
+				!myRoles.some((r) => r.isModerator || r.isAdministrator)
+			) {
 				throw new ApiError({
 					message: 'You are not assigned to a moderator role.',
 					code: 'ROLE_PERMISSION_DENIED',
@@ -477,7 +396,7 @@ export class ApiCallService implements OnApplicationShutdown {
 					id: 'd33d5333-db36-423d-a8f9-1a2b9549da41',
 				});
 			}
-			if (ep.meta.requireAdmin && !myRoles.some(r => r.isAdministrator)) {
+			if (ep.meta.requireAdmin && !myRoles.some((r) => r.isAdministrator)) {
 				throw new ApiError({
 					message: 'You are not assigned to an administrator role.',
 					code: 'ROLE_PERMISSION_DENIED',
@@ -487,10 +406,13 @@ export class ApiCallService implements OnApplicationShutdown {
 			}
 		}
 
-		if (ep.meta.requiredRolePolicy != null && (this.meta.rootUserId !== user!.id)) {
+		if (ep.meta.requireRolePolicy != null && !user!.isRoot) {
 			const myRoles = await this.roleService.getUserRoles(user!.id);
 			const policies = await this.roleService.getUserPolicies(user!.id);
-			if (!policies[ep.meta.requiredRolePolicy] && !myRoles.some(r => r.isAdministrator)) {
+			if (
+				!policies[ep.meta.requireRolePolicy] &&
+				!myRoles.some((r) => r.isAdministrator)
+			) {
 				throw new ApiError({
 					message: 'You are not assigned to a required role.',
 					code: 'ROLE_PERMISSION_DENIED',
@@ -500,89 +422,116 @@ export class ApiCallService implements OnApplicationShutdown {
 			}
 		}
 
-		let attachmentFile: AttachmentFile | null = null;
-		let cleanup = () => {};
-		if (ep.meta.requireFile && request.method === 'POST' && multipartFile) {
-			const policies = await this.roleService.getUserPolicies(user!.id);
-			const result = await this.handleAttachmentFile(
-				Math.min((policies.maxFileSizeMb * 1024 * 1024), this.config.maxFileSize),
-				multipartFile,
-			);
-			attachmentFile = result.attachmentFile;
-			cleanup = result.cleanup;
+		if (
+			token &&
+			((ep.meta.kind && !token.permission.some((p) => p === ep.meta.kind)) ||
+				(!ep.meta.kind &&
+					(ep.meta.requireCredential ||
+						ep.meta.requireModerator ||
+						ep.meta.requireAdmin)))
+		) {
+			throw new ApiError({
+				message:
+					'Your app does not have the necessary permissions to use this endpoint.',
+				code: 'PERMISSION_DENIED',
+				kind: 'permission',
+				id: '1370e5b7-d4eb-4566-bb1d-7748ee6a1838',
+			});
+		}
+
+		// Cast non JSON input
+		if (
+			(ep.meta.requireFile || request.method === 'GET') &&
+			ep.params.properties
+		) {
+			for (const k of Object.keys(ep.params.properties)) {
+				const param = ep.params.properties![k];
+				if (
+					['boolean', 'number', 'integer'].includes(param.type ?? '') &&
+					typeof data[k] === 'string'
+				) {
+					try {
+						data[k] = JSON.parse(data[k]);
+					} catch (e) {
+						throw new ApiError(
+							{
+								message: 'Invalid param.',
+								code: 'INVALID_PARAM',
+								id: '0b5f1631-7c1a-41a6-b399-cce335f34d85',
+							},
+							{
+								param: k,
+								reason: `cannot cast to ${param.type}`,
+							},
+						);
+					}
+				}
+			}
 		}
 
 		// API invoking
-		if (this.config.sentryForBackend) {
-			return await Sentry.startSpan({
-				name: 'API: ' + ep.name,
-			}, () => {
-				return ep.exec(data, user, token, attachmentFile, request.ip, request.headers)
-					.catch((err: Error) => this.#onExecError(ep, data, err, user?.id))
-					.finally(() => cleanup());
+		return await ep
+			.exec(data, user, token, file, request.ip, request.headers)
+			.catch((err: Error) => {
+				if (err instanceof ApiError || err instanceof AuthenticationError) {
+					throw err;
+				} else if (err instanceof IdentifiableError) {
+					this.logger.error(
+						`Internal error occurred in ${ep.name}: ${err.message}`,
+						{
+							ep: ep.name,
+							ps: data,
+							id: err.id,
+							error: {
+								message: err.message,
+								code: 'INTERNAL_ERROR',
+								stack: err.stack,
+							},
+						},
+					);
+					throw new ApiError(
+						{
+							message: err.message,
+							code: 'INTERNAL_ERROR',
+							id: err.id,
+						},
+						{
+							message: err.message,
+							code: err.name,
+							id: err.id,
+						},
+					);
+				} else {
+					const errId = randomUUID();
+					this.logger.error(
+						`Internal error occurred in ${ep.name}: ${err.message}`,
+						{
+							ep: ep.name,
+							ps: data,
+							id: errId,
+							error: {
+								message: err.message,
+								code: err.name,
+								stack: err.stack,
+							},
+						},
+					);
+					throw new ApiError(
+						{
+							message:
+								'Internal error occurred. Please contact us if the error persists.',
+							code: 'INTERNAL_ERROR',
+							id: '5d37dbcb-891e-41ca-a3d6-e690c97775ac',
+							kind: 'server',
+						},
+						{
+							message: err.message,
+							code: err.name,
+							id: errId,
+						},
+					);
+				}
 			});
-		} else {
-			return await ep.exec(data, user, token, attachmentFile, request.ip, request.headers)
-				.catch((err: Error) => this.#onExecError(ep, data, err, user?.id))
-				.finally(() => cleanup());
-		}
-	}
-
-	@bindThis
-	private async handleAttachmentFile(
-		fileSizeLimit: number,
-		multipartFile: MultipartFile,
-	) {
-		function createTooLongError() {
-			return new ApiError({
-				httpStatusCode: 413,
-				kind: 'client',
-				message: 'File size is too large.',
-				code: 'FILE_SIZE_TOO_LARGE',
-				id: 'ff827ce8-9b4b-4808-8511-422222a3362f',
-			});
-		}
-
-		function createLimitStream(limit: number) {
-			let total = 0;
-
-			return new Transform({
-				transform(chunk, _, callback) {
-					total += chunk.length;
-					if (total > limit) {
-						callback(createTooLongError());
-					} else {
-						callback(null, chunk);
-					}
-				},
-			});
-		}
-
-		const [path, cleanup] = await createTemp();
-		try {
-			await stream.pipeline(
-				multipartFile.file,
-				createLimitStream(fileSizeLimit),
-				fs.createWriteStream(path),
-			);
-
-			// ファイルサイズが制限を超えていた場合
-			// なお truncated はストリームを読み切ってからでないと機能しないため、stream.pipeline より後にある必要がある
-			if (multipartFile.file.truncated) {
-				throw createTooLongError();
-			}
-		} catch (err) {
-			cleanup();
-			throw err;
-		}
-
-		return {
-			attachmentFile: {
-				name: multipartFile.filename,
-				path,
-			},
-			cleanup,
-		};
 	}
 
 	@bindThis

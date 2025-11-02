@@ -227,12 +227,12 @@ export class ApiCallService implements OnApplicationShutdown {
 		request: FastifyRequest<{ Body: Record<string, unknown>, Querystring: Record<string, unknown> }>,
 		reply: FastifyReply,
 	): Promise<void> {
-                const multipartData = await request.file().catch(() => {
-                        /* Fastify throws if the remote didn't send multipart data. Return 400 below. */
-                });
-                if (multipartData == null) {
-                        reply.code(400);
-                        reply.send();
+		const multipartData = await request.file().catch(() => {
+			/* Fastify throws if the remote didn't send multipart data. Return 400 below. */
+		});
+		if (multipartData == null) {
+			reply.code(400);
+			reply.send();
 			return;
 		}
 
@@ -242,13 +242,13 @@ export class ApiCallService implements OnApplicationShutdown {
 		}
 
 		// https://datatracker.ietf.org/doc/html/rfc6750.html#section-2.1 (case sensitive)
-                const token = request.headers.authorization?.startsWith('Bearer ')
-                        ? request.headers.authorization.slice(7)
-                        : fields['i'];
-                if (token != null && typeof token !== 'string') {
-                        this.#sendAuthenticationError(reply, new AuthenticationError('token must be string'));
-                        return;
-                }
+		const token = request.headers.authorization?.startsWith('Bearer ')
+			? request.headers.authorization.slice(7)
+			: fields['i'];
+		if (token != null && typeof token !== 'string') {
+			this.#sendAuthenticationError(reply, new AuthenticationError('token is not provided'));
+			return;
+		}
 		this.authenticateService.authenticate(token).then(([user, app]) => {
 			this.call(endpoint, user, app, fields, multipartData, request).then((res) => {
 				this.send(reply, res);

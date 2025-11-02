@@ -9,7 +9,7 @@ import { basename, isAbsolute } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { inspect } from 'node:util';
 import WebSocket, { ClientOptions } from 'ws';
-import fetch, { File, RequestInit, type Headers } from 'node-fetch';
+import fetch, { File, Headers, RequestInit } from 'node-fetch';
 import { DataSource } from 'typeorm';
 import { JSDOM } from 'jsdom';
 import * as Redis from 'ioredis';
@@ -326,13 +326,18 @@ export const uploadFile = async (user?: UserToken, { path, name, blob }: UploadO
 		formData.append('name', name);
 	}
 
-	const headers: Record<string, string> = {};
+	const headers = new Headers();
 	if (user != null) {
 		if (user.bearer ?? true) {
-			headers.Authorization = `Bearer ${user.token}`;
+			headers.set('Authorization', `Bearer ${user.token}`);
 		} else {
 			formData.append('i', user.token);
 		}
+	}
+
+	const boundary = (formData as unknown as { getBoundary?: () => string }).getBoundary?.();
+	if (boundary) {
+		headers.set('Content-Type', `multipart/form-data; boundary=${boundary}`);
 	}
 
 	formData.append('file', blob ??

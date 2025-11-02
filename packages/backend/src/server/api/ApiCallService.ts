@@ -31,10 +31,22 @@ import type { OnApplicationShutdown } from '@nestjs/common';
 import type { IEndpointMeta, IEndpoint } from './endpoints.js';
 
 const accessDenied = {
-	message: 'Access denied.',
-	code: 'ACCESS_DENIED',
-	id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e',
+        message: 'Access denied.',
+        code: 'ACCESS_DENIED',
+        id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e',
 };
+
+function coerceMultipartField(value: unknown): unknown {
+        if (typeof value !== 'string') return value;
+
+        const lower = value.toLowerCase();
+        if (lower === 'true') return true;
+        if (lower === 'false') return false;
+        if (lower === 'null') return null;
+        if (lower === 'undefined') return undefined;
+
+        return value;
+}
 
 @Injectable()
 export class ApiCallService implements OnApplicationShutdown {
@@ -236,10 +248,11 @@ export class ApiCallService implements OnApplicationShutdown {
 			return;
 		}
 
-		const fields = {} as Record<string, unknown>;
-		for (const [k, v] of Object.entries(multipartData.fields)) {
-			fields[k] = typeof v === 'object' && 'value' in v ? v.value : undefined;
-		}
+                const fields = {} as Record<string, unknown>;
+                for (const [k, v] of Object.entries(multipartData.fields)) {
+                        const rawValue = typeof v === 'object' && 'value' in v ? v.value : undefined;
+                        fields[k] = coerceMultipartField(rawValue);
+                }
 
 		// https://datatracker.ietf.org/doc/html/rfc6750.html#section-2.1 (case sensitive)
 		const token = request.headers.authorization?.startsWith('Bearer ')

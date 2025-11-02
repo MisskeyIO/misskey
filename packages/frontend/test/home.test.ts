@@ -12,7 +12,15 @@ import { components } from '@/components/index.js';
 import XHome from '@/pages/user/home.vue';
 
 vi.mock('@/utility/misskey-api.js', () => ({
-	misskeyApi: vi.fn().mockResolvedValue({})
+        misskeyApi: vi.fn().mockResolvedValue({}),
+        misskeyApiGet: vi.fn().mockResolvedValue({}),
+}));
+
+vi.mock('@/components/MkChart.vue', () => ({
+        default: {
+                name: 'MkChart',
+                template: '<div />',
+        },
 }));
 
 describe('XHome', () => {

@@ -9,7 +9,7 @@ import { basename, isAbsolute } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { inspect } from 'node:util';
 import WebSocket, { ClientOptions } from 'ws';
-import fetch, { File, Headers, RequestInit } from 'node-fetch';
+import fetch, { File, RequestInit, type Headers } from 'node-fetch';
 import { DataSource } from 'typeorm';
 import { JSDOM } from 'jsdom';
 import * as Redis from 'ioredis';
@@ -321,33 +321,27 @@ export const uploadFile = async (user?: UserToken, { path, name, blob }: UploadO
 			: new URL(path, new URL('resources/', import.meta.url));
 
 	const formData = new FormData();
-	formData.append('force', true as any);
+	formData.append('file', blob ??
+		new File([await readFile(absPath)], basename(absPath.toString())));
+	formData.append('force', 'true');
 	if (name) {
 		formData.append('name', name);
 	}
 
-	const headers = new Headers();
-	if (user != null) {
-		if (user.bearer ?? true) {
-			headers.set('Authorization', `Bearer ${user.token}`);
-		} else {
-			formData.append('i', user.token);
-		}
+	const headers: Record<string, string> = {};
+	if (user?.bearer) {
+		headers.Authorization = `Bearer ${user.token}`;
+	} else if (user) {
+		formData.append('i', user.token);
 	}
 
-	const boundary = (formData as unknown as { getBoundary?: () => string }).getBoundary?.();
-	if (boundary) {
-		headers.set('Content-Type', `multipart/form-data; boundary=${boundary}`);
-	}
-
-	formData.append('file', blob ??
-		new File([await readFile(absPath)], basename(absPath.toString())));
 	console.dir(formData);
 	const res = await relativeFetch('api/drive/files/create', {
 		method: 'POST',
 		body: formData,
 		headers,
 	});
+
 	console.dir(res);
 	const body = res.status !== 204 ? await res.json() as misskey.Endpoints['drive/files/create']['res'] : null;
 	return {

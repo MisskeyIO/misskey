@@ -71,15 +71,11 @@ Object.defineProperty(window, 'matchMedia', {
 });
 
 const ResizeObserverMock = vi.fn(() => ({
-        observe: vi.fn(),
-        unobserve: vi.fn(),
-        disconnect: vi.fn(),
+	observe: vi.fn(),
+	unobserve: vi.fn(),
+	disconnect: vi.fn(),
 }));
 
 vi.stubGlobal('ResizeObserver', ResizeObserverMock);
 
-Object.defineProperty(window, 'ResizeObserver', {
-        configurable: true,
-        writable: true,
-        value: ResizeObserverMock,
-});
+(window as typeof globalThis & { ResizeObserver: typeof ResizeObserverMock }).ResizeObserver = ResizeObserverMock;

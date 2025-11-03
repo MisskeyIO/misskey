@@ -71,18 +71,18 @@ Object.defineProperty(window, 'matchMedia', {
 });
 
 const MockedResizeObserver = class MockedResizeObserver {
-        observe = vi.fn();
-        unobserve = vi.fn();
-        disconnect = vi.fn();
+	observe = vi.fn();
+	unobserve = vi.fn();
+	disconnect = vi.fn();
 };
 
 vi.stubGlobal('ResizeObserver', MockedResizeObserver);
 
 const MockedIntersectionObserver = class MockedIntersectionObserver {
-        observe = vi.fn();
-        unobserve = vi.fn();
-        disconnect = vi.fn();
-        takeRecords = vi.fn(() => []);
+	observe = vi.fn();
+	unobserve = vi.fn();
+	disconnect = vi.fn();
+	takeRecords = vi.fn(() => []);
 };
 
 vi.stubGlobal('IntersectionObserver', MockedIntersectionObserver);

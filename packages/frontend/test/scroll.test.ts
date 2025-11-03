@@ -3,57 +3,55 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { describe, test, assert } from 'vitest';
+import { assert, describe, test } from 'vitest';
 import { onScrollBottom, onScrollTop } from '@@/js/scroll.js';
 
 describe('Scroll', () => {
 	describe('onScrollTop', () => {
-                /* Disabled: depends on browser scroll observers.
-                test('Initial onScrollTop callback for connected elements', () => {
-                        const div = document.createElement('div');
-                        assert.strictEqual(div.scrollTop, 0);
+		// XXX: 環境依存のためskip
+		test.skip('Initial onScrollTop callback for connected elements', () => {
+			const div = document.createElement('div');
+			assert.strictEqual(div.scrollTop, 0);
 
-                        document.body.append(div);
+			document.body.append(div);
 
-                        let called = false;
-                        onScrollTop(div as any as HTMLElement, () => called = true);
+			let called = false;
+			onScrollTop(div as any as HTMLElement, () => called = true);
 
 			assert.ok(called);
 		});
-		*/
 
-                test('No onScrollTop callback for disconnected elements', () => {
-                        const div = document.createElement('div');
-                        assert.strictEqual(div.scrollTop, 0);
+		test('No onScrollTop callback for disconnected elements', () => {
+			const div = document.createElement('div');
+			assert.strictEqual(div.scrollTop, 0);
 
-                        let called = false;
-                        onScrollTop(div as any as HTMLElement, () => called = true);
+			let called = false;
+			onScrollTop(div as any as HTMLElement, () => called = true);
 
-                        assert.ok(!called);
-                });
-        });
+			assert.ok(!called);
+		});
+	});
 
 	describe('onScrollBottom', () => {
-                /* Disabled: depends on browser scroll observers.
-                test('Initial onScrollBottom callback for connected elements', () => {
-                        const div = document.createElement('div');
-                        assert.strictEqual(div.scrollTop, 0);
+		// XXX: 環境依存のためskip
+		test.skip('Initial onScrollBottom callback for connected elements', () => {
+			const div = document.createElement('div');
+			assert.strictEqual(div.scrollTop, 0);
 
-                        document.body.append(div);
+			document.body.append(div);
 
-                        let called = false;
-                        onScrollBottom(div as any as HTMLElement, () => called = true);
+			let called = false;
+			onScrollBottom(div as any as HTMLElement, () => called = true);
 
 			assert.ok(called);
 		});
-		*/
 
-                test('No onScrollBottom callback for disconnected elements', () => {
-                        const div = document.createElement('div');
-                        assert.strictEqual(div.scrollTop, 0);
+		test('No onScrollBottom callback for disconnected elements', () => {
+			const div = document.createElement('div');
+			assert.strictEqual(div.scrollTop, 0);
 
-                        let called = false;
-                        onScrollBottom(div as any as HTMLElement, () => called = true);
+			let called = false;
+			onScrollBottom(div as any as HTMLElement, () => called = true);
 
 			assert.ok(!called);
 		});

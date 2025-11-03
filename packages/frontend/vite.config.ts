@@ -194,8 +194,8 @@ export function getConfig(): UserConfig {
 			format: 'es',
 		},
 
-                test: {
-                        environment: 'jsdom',
+		test: {
+			environment: 'jsdom',
 			deps: {
 				optimizer: {
 					web: {

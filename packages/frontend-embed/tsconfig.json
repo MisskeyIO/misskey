@@ -30,7 +30,8 @@
 		"typeRoots": [
 			"./@types",
 			"./node_modules/@types",
-			"./node_modules/@vue-macros"
+			"./node_modules/@vue-macros",
+			"./node_modules"
 		],
 		"types": [
 			"vite/client"

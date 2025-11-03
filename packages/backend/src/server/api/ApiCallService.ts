@@ -29,10 +29,12 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { IEndpoint, IEndpointMeta } from './endpoints.js';
 import type { OnApplicationShutdown } from '@nestjs/common';
 
-const accessDenied = {
+const accessDenied = <ConstructorParameters<typeof ApiError>[0]>{
 	message: 'Access denied.',
 	code: 'ACCESS_DENIED',
 	id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e',
+	httpStatusCode: 403,
+	kind: 'client',
 };
 
 @Injectable()
@@ -229,6 +231,7 @@ export class ApiCallService implements OnApplicationShutdown {
 				message: 'Current request is not a multipart request',
 				code: 'INVALID_PARAM',
 				id: '217bc614-dd72-42dc-806e-22ac93f8266e',
+				httpStatusCode: 415,
 				kind: 'client',
 			}));
 			return;
@@ -248,6 +251,7 @@ export class ApiCallService implements OnApplicationShutdown {
 							message: 'Only a single file may be uploaded at a time',
 							code: 'INVALID_PARAM',
 							id: '5c95c8b6-25bf-40e1-8c7d-d6d727d3503b',
+							httpStatusCode: 406,
 							kind: 'client',
 						}));
 						return;
@@ -269,6 +273,7 @@ export class ApiCallService implements OnApplicationShutdown {
 				message: 'No files found in multipart request',
 				code: 'INVALID_PARAM',
 				id: '2e973d41-8e9c-48b8-a68f-16f712a4bc89',
+				httpStatusCode: 422,
 				kind: 'client',
 			}));
 			return;

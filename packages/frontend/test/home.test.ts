@@ -15,6 +15,13 @@ vi.mock('@/utility/misskey-api.js', () => ({
 	misskeyApi: vi.fn().mockResolvedValue({})
 }));
 
+vi.mock('@/components/MkImgWithBlurhash.vue', () => ({
+	default: {
+		name: 'MkImgWithBlurhash',
+		template: '<div></div>'
+	}
+}));
+
 describe('XHome', () => {
 	const renderHome = (user: Misskey.entities.UserDetailed): RenderResult => {
 		return render(XHome, {
@@ -74,7 +81,7 @@ describe('XHome', () => {
 	});
 
 	// XXX: 変なところでエラーを起こすのでskip
-	test.skip('Should render the remote caution when user.host exists', async () => {
+	test('Should render the remote caution when user.host exists', async () => {
 		const home = renderHome(userObject);
 
 		const anchor = home.container.querySelector<HTMLAnchorElement>('a[href^="https://example.com/"]');
@@ -83,7 +90,7 @@ describe('XHome', () => {
 	});
 
 	// XXX: 変なところでエラーを起こすのでskip
-	test.skip('The remote caution should fall back to uri if url is null', async () => {
+	test('The remote caution should fall back to uri if url is null', async () => {
 		const home = renderHome({ ...userObject, url: null });
 
 		const anchor = home.container.querySelector<HTMLAnchorElement>('a[href^="https://example.com/"]');

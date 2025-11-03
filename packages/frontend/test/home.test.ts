@@ -15,6 +15,13 @@ vi.mock('@/utility/misskey-api.js', () => ({
 	misskeyApi: vi.fn().mockResolvedValue({})
 }));
 
+vi.mock('@/components/MkChart.vue', () => ({
+	default: {
+		name: 'MkChart',
+		template: '<div></div>'
+	}
+}));
+
 vi.mock('@/components/MkImgWithBlurhash.vue', () => ({
 	default: {
 		name: 'MkImgWithBlurhash',

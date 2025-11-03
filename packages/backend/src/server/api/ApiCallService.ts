@@ -6,6 +6,7 @@
 import { randomUUID } from 'node:crypto';
 import * as fs from 'node:fs';
 import * as stream from 'node:stream/promises';
+import { Transform } from 'node:stream';
 import { Inject, Injectable } from '@nestjs/common';
 import * as Sentry from '@sentry/node';
 import fastifyMultipart from '@fastify/multipart';
@@ -16,6 +17,7 @@ import type { MiAccessToken } from '@/models/AccessToken.js';
 import type Logger from '@/logger.js';
 import type { UserIpsRepository } from '@/models/_.js';
 import { createTemp } from '@/misc/create-temp.js';
+import { AttachmentFile } from '@/server/api/endpoint-base.js';
 import { bindThis } from '@/decorators.js';
 import { RoleService } from '@/core/RoleService.js';
 import type { Config } from '@/config.js';
@@ -34,6 +36,14 @@ const accessDenied = <ConstructorParameters<typeof ApiError>[0]>{
 	code: 'ACCESS_DENIED',
 	id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e',
 	httpStatusCode: 403,
+	kind: 'client',
+};
+
+const uploadFileSizeExceeded = <ConstructorParameters<typeof ApiError>[0]>{
+	message: 'Maximum upload size exceeded',
+	code: 'MAX_FILE_SIZE_EXCEEDED',
+	id: '39591dd6-b5e8-4399-bb03-13b0a8a62a21',
+	httpStatusCode: 413,
 	kind: 'client',
 };
 
@@ -237,7 +247,6 @@ export class ApiCallService implements OnApplicationShutdown {
 			return;
 		}
 
-		const [path, cleanup] = await createTemp();
 		let multipartFile: fastifyMultipart.MultipartFile | undefined = undefined;
 		const fields = {} as Record<string, unknown>;
 
@@ -246,7 +255,6 @@ export class ApiCallService implements OnApplicationShutdown {
 			switch (part.type) {
 				case 'file':
 					if (multipartFile !== undefined) {
-						cleanup();
 						this.#sendApiError(reply, new ApiError({
 							message: 'Only a single file may be uploaded at a time',
 							code: 'INVALID_PARAM',
@@ -257,7 +265,6 @@ export class ApiCallService implements OnApplicationShutdown {
 						return;
 					}
 					multipartFile = part;
-					await stream.pipeline(part.file, fs.createWriteStream(path));
 					break;
 				case 'field':
 					for (const [k, v] of Object.entries(part.fields)) {
@@ -268,26 +275,11 @@ export class ApiCallService implements OnApplicationShutdown {
 		}
 
 		if (multipartFile === undefined) {
-			cleanup();
 			this.#sendApiError(reply, new ApiError({
 				message: 'No files found in multipart request',
 				code: 'INVALID_PARAM',
 				id: '2e973d41-8e9c-48b8-a68f-16f712a4bc89',
 				httpStatusCode: 422,
-				kind: 'client',
-			}));
-			return;
-		}
-
-		// ファイルサイズが制限を超えていた場合
-		// なお truncated はストリームを読み切ってからでないと機能しないため、stream.pipeline より後にある必要がある
-		if (multipartFile.file.truncated) {
-			cleanup();
-			this.#sendApiError(reply, new ApiError({
-				message: 'Maximum upload size exceeded',
-				code: 'INVALID_PARAM',
-				id: '39591dd6-b5e8-4399-bb03-13b0a8a62a21',
-				httpStatusCode: 413,
 				kind: 'client',
 			}));
 			return;
@@ -309,10 +301,7 @@ export class ApiCallService implements OnApplicationShutdown {
 		}
 
 		this.authenticateService.authenticate(token).then(([user, app]) => {
-			this.call(endpoint, user, app, fields, {
-				name: multipartFile.filename,
-				path: path,
-			}, request).then((res) => {
+			this.call(endpoint, user, app, fields, multipartFile, request).then((res) => {
 				this.send(reply, res);
 			}).catch((err: ApiError) => {
 				this.#sendApiError(reply, err);
@@ -378,10 +367,7 @@ export class ApiCallService implements OnApplicationShutdown {
 		user: MiLocalUser | null | undefined,
 		token: MiAccessToken | null | undefined,
 		data: any,
-		file: {
-			name: string;
-			path: string;
-		} | null,
+		multipartFile: fastifyMultipart.MultipartFile | null | undefined,
 		request: FastifyRequest<{ Body: Record<string, unknown> | undefined, Querystring: Record<string, unknown> }>,
 	) {
 		const meta = await this.metaService.fetch();
@@ -521,15 +507,65 @@ export class ApiCallService implements OnApplicationShutdown {
 			}
 		}
 
+		let attachmentFile: AttachmentFile | null = null;
+		let onExecCleanup: (() => void) | undefined = undefined;
+		if (ep.meta.requireFile && multipartFile) {
+			const policies = await this.roleService.getUserPolicies(user!.id);
+			const maxFileSize = Math.min((policies.maxFileSizeMb * 1024 * 1024), this.config.maxFileSize);
+
+			function sizeLimitStream(limit: number) {
+				let total = 0;
+
+				return new Transform({
+					transform(chunk, _, callback) {
+						total += chunk.length;
+						if (total > limit) {
+							callback(new ApiError(uploadFileSizeExceeded));
+						} else {
+							callback(null, chunk);
+						}
+					},
+				});
+			}
+
+			const [path, cleanup] = await createTemp();
+			try {
+				await stream.pipeline(
+					multipartFile.file,
+					sizeLimitStream(maxFileSize),
+					fs.createWriteStream(path),
+				);
+			} catch (err) {
+				cleanup();
+				throw err;
+			}
+
+			// ファイルサイズが制限を超えていた場合
+			// なお truncated はストリームを読み切ってからでないと機能しないため、stream.pipeline より後にある必要がある
+			if (multipartFile.file.truncated) {
+				cleanup();
+				throw new ApiError(uploadFileSizeExceeded);
+			}
+
+			attachmentFile = {
+				name: multipartFile.filename,
+				path,
+			};
+
+			onExecCleanup = () => cleanup();
+		}
+
 		// API invoking
 		if (this.config.sentryForBackend) {
 			return await Sentry.startSpan({
 				name: 'API: ' + ep.name,
-			}, () => ep.exec(data, user, token, file, request.ip, request.headers)
-				.catch((err: Error) => this.#onExecError(ep, data, err, user?.id)));
+			}, () => ep.exec(data, user, token, attachmentFile, request.ip, request.headers)
+				.catch((err: Error) => this.#onExecError(ep, data, err, user?.id))
+				.finally(() => onExecCleanup?.()));
 		} else {
-			return await ep.exec(data, user, token, file, request.ip, request.headers)
-				.catch((err: Error) => this.#onExecError(ep, data, err, user?.id));
+			return await ep.exec(data, user, token, attachmentFile, request.ip, request.headers)
+				.catch((err: Error) => this.#onExecError(ep, data, err, user?.id))
+				.finally(() => onExecCleanup?.());
 		}
 	}
 

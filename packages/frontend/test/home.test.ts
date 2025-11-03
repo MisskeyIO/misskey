@@ -22,6 +22,13 @@ vi.mock('@/components/MkChart.vue', () => ({
 	}
 }));
 
+vi.mock('@/components/MkNoteMediaGrid.vue', () => ({
+	default: {
+		name: 'MkNoteMediaGrid',
+		template: '<div></div>'
+	}
+}));
+
 vi.mock('@/components/MkImgWithBlurhash.vue', () => ({
 	default: {
 		name: 'MkImgWithBlurhash',

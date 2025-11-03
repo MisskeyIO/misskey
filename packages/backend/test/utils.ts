@@ -323,26 +323,18 @@ export const uploadFile = async (user?: UserToken, { path, name, blob }: UploadO
 	const formData = new FormData();
 	formData.append('file', blob ??
 		new File([await readFile(absPath)], basename(absPath.toString())));
+	if (name) formData.append('name', name);
 	formData.append('force', 'true');
-	if (name) {
-		formData.append('name', name);
-	}
 
-	const headers: Record<string, string> = {};
-	if (user?.bearer) {
-		headers.Authorization = `Bearer ${user.token}`;
-	} else if (user) {
-		formData.append('i', user.token);
-	}
-
-	console.dir(formData);
 	const res = await relativeFetch('api/drive/files/create', {
 		method: 'POST',
+		headers: {
+			'Authorization': `Bearer ${user!.token}`,
+			'Content-Type': 'multipart/form-data',
+		},
 		body: formData,
-		headers,
 	});
 
-	console.dir(res);
 	const body = res.status !== 204 ? await res.json() as misskey.Endpoints['drive/files/create']['res'] : null;
 	return {
 		status: res.status,

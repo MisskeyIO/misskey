@@ -328,10 +328,11 @@ export const uploadFile = async (user?: UserToken, { path, name, blob }: UploadO
 
 	const res = await relativeFetch('api/drive/files/create', {
 		method: 'POST',
-		headers: {
-			'Authorization': `Bearer ${user!.token}`,
-			'Content-Type': 'multipart/form-data',
-		},
+		...(user && {
+			headers: {
+				'Authorization': `Bearer ${user.token}`,
+			},
+		}),
 		body: formData,
 	});
 

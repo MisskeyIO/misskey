@@ -4,18 +4,18 @@
  */
 
 import * as assert from 'node:assert';
-import { readFile } from 'node:fs/promises';
-import { File as UndiciFile } from 'undici';
+import { createReadStream } from 'node:fs';
 import { basename, isAbsolute } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { inspect } from 'node:util';
 import WebSocket, { ClientOptions } from 'ws';
-import fetch, { File, RequestInit, type Headers } from 'node-fetch';
+import fetch, { Headers, RequestInit } from 'node-fetch';
 import { DataSource } from 'typeorm';
 import { JSDOM } from 'jsdom';
 import * as Redis from 'ioredis';
 import { type Response } from 'node-fetch';
 import Fastify from 'fastify';
+import request from 'supertest';
 import type * as misskey from 'misskey-js';
 import { entities } from '@/postgres.js';
 import { loadConfig } from '@/config.js';
@@ -306,6 +306,29 @@ interface UploadOptions {
 	blob?: Blob;
 }
 
+type NamedBlob = Blob & { name: string };
+
+const hasBlobName = (blob?: Blob): blob is NamedBlob => {
+	if (blob == null) return false;
+	const candidate = blob as Blob & { name?: unknown };
+	return typeof candidate.name === 'string' && candidate.name.length > 0;
+};
+
+const buildHeadersFromResponse = (rawHeaders: Record<string, string | string[] | undefined>): Headers => {
+	const result = new Headers();
+	for (const [key, value] of Object.entries(rawHeaders)) {
+		if (value == null) continue;
+		if (Array.isArray(value)) {
+			for (const entry of value) {
+				result.append(key, entry);
+			}
+			continue;
+		}
+		result.append(key, value);
+	}
+	return result;
+};
+
 /**
  * Upload file
  * @param user User
@@ -321,48 +344,37 @@ export const uploadFile = async (user?: UserToken, { path, name, blob }: UploadO
 			? new URL(path)
 			: new URL(path, new URL('resources/', import.meta.url));
 
-	const boundary = `----misskey${randomUUID()}`;
-	const buffers: Buffer[] = [];
-	const fileBuffer = blob ? Buffer.from(await blob.arrayBuffer()) : await readFile(absPath);
-	const uploadFilename = blob instanceof UndiciFile ? blob.name : basename(absPath.toString());
+	const uploadFilename = hasBlobName(blob) ? blob.name! : basename(absPath.toString());
+	const baseUrl = `http://127.0.0.1:${port}`;
 
-	const appendField = (field: string, value: string) => {
-		buffers.push(Buffer.from(`--${boundary}\r\n`));
-		buffers.push(Buffer.from(`Content-Disposition: form-data; name="${field}"\r\n\r\n`));
-		buffers.push(Buffer.from(`${value}\r\n`));
-	};
+	const req = request(baseUrl)
+		.post('/api/drive/files/create')
+		.set('Accept', 'application/json');
 
-	const appendFile = (field: string, filename: string, content: Buffer) => {
-		buffers.push(Buffer.from(`--${boundary}\r\n`));
-		buffers.push(Buffer.from(`Content-Disposition: form-data; name="${field}"; filename="${filename}"\r\n`));
-		buffers.push(Buffer.from('Content-Type: application/octet-stream\r\n\r\n'));
-		buffers.push(content);
-		buffers.push(Buffer.from('\r\n'));
-	};
+	if (user) req.set('Authorization', `Bearer ${user.token}`);
 
-	appendFile('file', uploadFilename, fileBuffer);
-	if (name) appendField('name', name);
-	appendField('force', 'true');
-	buffers.push(Buffer.from(`--${boundary}--\r\n`));
+	if (blob) {
+		const blobBuffer = Buffer.from(await blob.arrayBuffer());
+		req.attach('file', blobBuffer, {
+			filename: uploadFilename,
+			contentType: blob.type || 'application/octet-stream',
+		});
+	} else {
+		req.attach('file', createReadStream(absPath), uploadFilename);
+	}
 
-	const multipartBody = Buffer.concat(buffers);
+	req.field('force', 'true');
+	if (name) req.field('name', name);
 
-	const headers: Record<string, string> = {
-		'Content-Type': `multipart/form-data; boundary=${boundary}`,
-	};
-	if (user) headers['Authorization'] = `Bearer ${user.token}`;
+	const res = await req;
+	const responseBody = res.status !== 204
+		? res.body as misskey.Endpoints['drive/files/create']['res']
+		: null;
 
-	const res = await relativeFetch('api/drive/files/create', {
-		method: 'POST',
-		headers,
-		body: multipartBody,
-	});
-
-	const body = res.status !== 204 ? await res.json() as misskey.Endpoints['drive/files/create']['res'] : null;
 	return {
 		status: res.status,
-		headers: res.headers,
-		body,
+		headers: buildHeadersFromResponse(res.headers as Record<string, string | string[] | undefined>),
+		body: responseBody,
 	};
 };
 

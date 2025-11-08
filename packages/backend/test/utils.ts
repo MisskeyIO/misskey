@@ -5,6 +5,7 @@
 
 import * as assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
+import { File as UndiciFile } from 'undici';
 import { basename, isAbsolute } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { inspect } from 'node:util';
@@ -320,20 +321,41 @@ export const uploadFile = async (user?: UserToken, { path, name, blob }: UploadO
 			? new URL(path)
 			: new URL(path, new URL('resources/', import.meta.url));
 
-	const formData = new FormData();
-	formData.append('file', blob ??
-		new File([await readFile(absPath)], basename(absPath.toString())));
-	if (name) formData.append('name', name);
-	formData.append('force', 'true');
+	const boundary = `----misskey${randomUUID()}`;
+	const buffers: Buffer[] = [];
+	const fileBuffer = blob ? Buffer.from(await blob.arrayBuffer()) : await readFile(absPath);
+	const uploadFilename = blob instanceof UndiciFile ? blob.name : basename(absPath.toString());
+
+	const appendField = (field: string, value: string) => {
+		buffers.push(Buffer.from(`--${boundary}\r\n`));
+		buffers.push(Buffer.from(`Content-Disposition: form-data; name="${field}"\r\n\r\n`));
+		buffers.push(Buffer.from(`${value}\r\n`));
+	};
+
+	const appendFile = (field: string, filename: string, content: Buffer) => {
+		buffers.push(Buffer.from(`--${boundary}\r\n`));
+		buffers.push(Buffer.from(`Content-Disposition: form-data; name="${field}"; filename="${filename}"\r\n`));
+		buffers.push(Buffer.from('Content-Type: application/octet-stream\r\n\r\n'));
+		buffers.push(content);
+		buffers.push(Buffer.from('\r\n'));
+	};
+
+	appendFile('file', uploadFilename, fileBuffer);
+	if (name) appendField('name', name);
+	appendField('force', 'true');
+	buffers.push(Buffer.from(`--${boundary}--\r\n`));
+
+	const multipartBody = Buffer.concat(buffers);
+
+	const headers: Record<string, string> = {
+		'Content-Type': `multipart/form-data; boundary=${boundary}`,
+	};
+	if (user) headers['Authorization'] = `Bearer ${user.token}`;
 
 	const res = await relativeFetch('api/drive/files/create', {
 		method: 'POST',
-		...(user && {
-			headers: {
-				'Authorization': `Bearer ${user.token}`,
-			},
-		}),
-		body: formData,
+		headers,
+		body: multipartBody,
 	});
 
 	const body = res.status !== 204 ? await res.json() as misskey.Endpoints['drive/files/create']['res'] : null;

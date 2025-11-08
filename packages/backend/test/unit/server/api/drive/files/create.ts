@@ -17,6 +17,9 @@ import { MiUser } from '@/models/User.js';
 import { ServerModule } from '@/server/ServerModule.js';
 import { ServerService } from '@/server/ServerService.js';
 
+// Skip Redis-based idempotency logic during unit tests to avoid hanging on a missing Redis instance.
+process.env.FORCE_IGNORE_IDEMPOTENCY_FOR_TESTING = 'true';
+
 describe('/drive/files/create', () => {
 	let module: TestingModule;
 	let server: FastifyInstance;

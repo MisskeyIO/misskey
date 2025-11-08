@@ -9,7 +9,6 @@ import * as stream from 'node:stream/promises';
 import { Transform } from 'node:stream';
 import { Inject, Injectable } from '@nestjs/common';
 import * as Sentry from '@sentry/node';
-import fastifyMultipart from '@fastify/multipart';
 import { DI } from '@/di-symbols.js';
 import { getIpHash } from '@/misc/get-ip-hash.js';
 import type { MiLocalUser, MiUser } from '@/models/User.js';
@@ -47,6 +46,12 @@ const uploadFileSizeExceeded = <ConstructorParameters<typeof ApiError>[0]>{
 	kind: 'client',
 };
 
+type PreparedFile = {
+	file: AttachmentFile;
+	size: number;
+	cleanup: () => void;
+};
+
 @Injectable()
 export class ApiCallService implements OnApplicationShutdown {
 	private logger: Logger;
@@ -75,7 +80,9 @@ export class ApiCallService implements OnApplicationShutdown {
 	#sendApiError(reply: FastifyReply, err: ApiError): void {
 		let statusCode = err.httpStatusCode;
 		if (err.httpStatusCode === 401) {
-			reply.header('WWW-Authenticate', 'Bearer realm="Misskey"');
+			if (!reply.getHeader('WWW-Authenticate')) {
+				reply.header('WWW-Authenticate', 'Bearer realm="Misskey"');
+			}
 		} else if (err.code === 'RATE_LIMIT_EXCEEDED') {
 			const info: unknown = err.info;
 			const unixEpochInSeconds = Date.now();
@@ -87,7 +94,9 @@ export class ApiCallService implements OnApplicationShutdown {
 				this.logger.warn(`rate limit information has unexpected type ${typeof (err.info?.reset)}`);
 			}
 		} else if (err.kind === 'client') {
-			reply.header('WWW-Authenticate', `Bearer realm="Misskey", error="invalid_request", error_description="${err.message}"`);
+			if (!reply.getHeader('WWW-Authenticate')) {
+				reply.header('WWW-Authenticate', `Bearer realm="Misskey", error="invalid_request", error_description="${err.message}"`);
+			}
 			statusCode = statusCode ?? 400;
 		} else if (err.kind === 'permission') {
 			// (ROLE_PERMISSION_DENIEDは関係ない)
@@ -241,40 +250,78 @@ export class ApiCallService implements OnApplicationShutdown {
 				message: 'Current request is not a multipart request',
 				code: 'INVALID_PARAM',
 				id: '217bc614-dd72-42dc-806e-22ac93f8266e',
-				httpStatusCode: 415,
+				httpStatusCode: 400,
 				kind: 'client',
 			}));
 			return;
 		}
 
-		let multipartFile: fastifyMultipart.MultipartFile | undefined = undefined;
+		let preparedFile: PreparedFile | undefined;
 		const fields = {} as Record<string, unknown>;
 
 		const parts = request.parts();
+
+		const globalSizeLimitStream = (limit: number) => {
+			let total = 0;
+			return new Transform({
+				transform: (chunk, _enc, callback) => {
+					total += chunk.length;
+					if (total > limit) {
+						callback(new ApiError(uploadFileSizeExceeded));
+					} else {
+						callback(null, chunk);
+					}
+				},
+			});
+		};
+
 		for await (const part of parts) {
-			switch (part.type) {
-				case 'file':
-					if (multipartFile !== undefined) {
-						this.#sendApiError(reply, new ApiError({
-							message: 'Only a single file may be uploaded at a time',
-							code: 'INVALID_PARAM',
-							id: '5c95c8b6-25bf-40e1-8c7d-d6d727d3503b',
-							httpStatusCode: 406,
-							kind: 'client',
-						}));
+			if (part.type === 'file') {
+				this.logger.debug('received multipart file', { endpoint: endpoint.name, filename: part.filename });
+				if (preparedFile) {
+					this.#sendApiError(reply, new ApiError({
+						message: 'Only a single file may be uploaded at a time',
+						code: 'INVALID_PARAM',
+						id: '5c95c8b6-25bf-40e1-8c7d-d6d727d3503b',
+						httpStatusCode: 406,
+						kind: 'client',
+					}));
+					return;
+				}
+
+				const [path, cleanup] = await createTemp();
+				try {
+					await stream.pipeline(part.file, globalSizeLimitStream(this.config.maxFileSize), fs.createWriteStream(path));
+				} catch (err) {
+					cleanup();
+					if ((err as { code?: string; })?.code === 'FST_REQ_FILE_TOO_LARGE' || err instanceof ApiError) {
+						this.#sendApiError(reply, err instanceof ApiError ? err : new ApiError(uploadFileSizeExceeded));
 						return;
 					}
-					multipartFile = part;
-					break;
-				case 'field':
-					for (const [k, v] of Object.entries(part.fields)) {
-						fields[k] = typeof v === 'object' && 'value' in v ? v.value : undefined;
-					}
-					break;
+					throw err;
+				}
+
+				if (part.file.truncated) {
+					cleanup();
+					this.#sendApiError(reply, new ApiError(uploadFileSizeExceeded));
+					return;
+				}
+
+				const stats = await fs.promises.stat(path);
+				preparedFile = {
+					file: {
+						name: part.filename ?? null,
+						path,
+					},
+					size: stats.size,
+					cleanup,
+				};
+			} else if (part.type === 'field') {
+				fields[part.fieldname] = part.value;
 			}
 		}
 
-		if (multipartFile === undefined) {
+		if (!preparedFile) {
 			this.#sendApiError(reply, new ApiError({
 				message: 'No files found in multipart request',
 				code: 'INVALID_PARAM',
@@ -301,7 +348,7 @@ export class ApiCallService implements OnApplicationShutdown {
 		}
 
 		this.authenticateService.authenticate(token).then(([user, app]) => {
-			this.call(endpoint, user, app, fields, multipartFile, request).then((res) => {
+			this.call(endpoint, user, app, fields, preparedFile, request).then((res) => {
 				this.send(reply, res);
 			}).catch((err: ApiError) => {
 				this.#sendApiError(reply, err);
@@ -311,6 +358,7 @@ export class ApiCallService implements OnApplicationShutdown {
 				this.logIp(request, user);
 			}
 		}).catch(err => {
+			preparedFile.cleanup();
 			this.#sendAuthenticationError(reply, err);
 		});
 	}
@@ -367,7 +415,7 @@ export class ApiCallService implements OnApplicationShutdown {
 		user: MiLocalUser | null | undefined,
 		token: MiAccessToken | null | undefined,
 		data: any,
-		multipartFile: fastifyMultipart.MultipartFile | null | undefined,
+		preparedFile: PreparedFile | null | undefined,
 		request: FastifyRequest<{ Body: Record<string, unknown> | undefined, Querystring: Record<string, unknown> }>,
 	) {
 		const meta = await this.metaService.fetch();
@@ -443,6 +491,16 @@ export class ApiCallService implements OnApplicationShutdown {
 			}
 		}
 
+		if (token && ((ep.meta.kind && !token.permission.some(p => p === ep.meta.kind))
+			|| (!ep.meta.kind && (ep.meta.requireCredential || ep.meta.requireModerator || ep.meta.requireAdmin)))) {
+			throw new ApiError({
+				message: 'Your app does not have the necessary permissions to use this endpoint.',
+				code: 'PERMISSION_DENIED',
+				kind: 'permission',
+				id: '1370e5b7-d4eb-4566-bb1d-7748ee6a1838',
+			});
+		}
+
 		if ((ep.meta.requireModerator || ep.meta.requireAdmin) && (meta.rootUserId !== user!.id)) {
 			const myRoles = await this.roleService.getUserRoles(user!.id);
 			if (ep.meta.requireModerator && !myRoles.some(r => r.isModerator || r.isAdministrator)) {
@@ -476,16 +534,6 @@ export class ApiCallService implements OnApplicationShutdown {
 			}
 		}
 
-		if (token && ((ep.meta.kind && !token.permission.some(p => p === ep.meta.kind))
-			|| (!ep.meta.kind && (ep.meta.requireCredential || ep.meta.requireModerator || ep.meta.requireAdmin)))) {
-			throw new ApiError({
-				message: 'Your app does not have the necessary permissions to use this endpoint.',
-				code: 'PERMISSION_DENIED',
-				kind: 'permission',
-				id: '1370e5b7-d4eb-4566-bb1d-7748ee6a1838',
-			});
-		}
-
 		// Cast non JSON input
 		if ((ep.meta.requireFile || request.method === 'GET') && ep.params.properties) {
 			for (const k of Object.keys(ep.params.properties)) {
@@ -509,50 +557,17 @@ export class ApiCallService implements OnApplicationShutdown {
 
 		let attachmentFile: AttachmentFile | null = null;
 		let onExecCleanup: (() => void) | undefined = undefined;
-		if (ep.meta.requireFile && multipartFile) {
+		if (ep.meta.requireFile && preparedFile) {
 			const policies = await this.roleService.getUserPolicies(user!.id);
-			const maxFileSize = Math.min((policies.maxFileSizeMb * 1024 * 1024), this.config.maxFileSize);
+			const userMaxFileSize = policies.maxFileSizeMb * 1024 * 1024;
 
-			function sizeLimitStream(limit: number) {
-				let total = 0;
-
-				return new Transform({
-					transform(chunk, _, callback) {
-						total += chunk.length;
-						if (total > limit) {
-							callback(new ApiError(uploadFileSizeExceeded));
-						} else {
-							callback(null, chunk);
-						}
-					},
-				});
-			}
-
-			const [path, cleanup] = await createTemp();
-			try {
-				await stream.pipeline(
-					multipartFile.file,
-					sizeLimitStream(maxFileSize),
-					fs.createWriteStream(path),
-				);
-			} catch (err) {
-				cleanup();
-				throw err;
-			}
-
-			// ファイルサイズが制限を超えていた場合
-			// なお truncated はストリームを読み切ってからでないと機能しないため、stream.pipeline より後にある必要がある
-			if (multipartFile.file.truncated) {
-				cleanup();
+			if (preparedFile.size > userMaxFileSize) {
+				preparedFile.cleanup();
 				throw new ApiError(uploadFileSizeExceeded);
 			}
 
-			attachmentFile = {
-				name: multipartFile.filename,
-				path,
-			};
-
-			onExecCleanup = () => cleanup();
+			attachmentFile = preparedFile.file;
+			onExecCleanup = () => preparedFile.cleanup();
 		}
 
 		// API invoking

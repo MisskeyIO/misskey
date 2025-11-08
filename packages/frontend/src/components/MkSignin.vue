@@ -254,9 +254,7 @@ async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>): Promi
 				}
 				case 'passkey': {
 					if (webAuthnSupported()) {
-						credentialRequest.value = parseRequestOptionsFromJSON({
-							publicKey: res.authRequest,
-						});
+						credentialRequest.value = res.authRequest;
 						page.value = 'passkey';
 					} else {
 						page.value = 'totp';

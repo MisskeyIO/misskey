@@ -69,7 +69,7 @@ Thanks for your cooperation 🤗
 
 If PR includes changes to ActivityPub payload, please reflect it in [misskey-hub's document](https://github.com/misskey-dev/misskey-hub-next/blob/master/content/ns.md) by sending PR.
 
-The name of purporsed extension property (referred as "extended property" in later) to ActivityPub shall be prefixed by `_misskey_`. (i.e. `_misskey_quote`)
+The name of proposed extension property (referred as "extended property" later) to ActivityPub shall be prefixed by `_misskey_`. (i.e. `_misskey_quote`)
 
 The extended property in `packages/backend/src/core/activitypub/type.ts` **must** be declared as optional because ActivityPub payloads that comes from older Misskey or other implementation may not contain it.
 

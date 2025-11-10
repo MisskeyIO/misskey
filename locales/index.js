@@ -64,7 +64,7 @@ export function build() {
 		for (const [k, v] of Object.entries(obj)) {
 			if (v === '') {
 				delete obj[k];
-			} else if (typeof v === 'object') {
+			} else if (typeof v === 'object' && v) {
 				removeEmpty(v);
 			}
 		}

@@ -1448,7 +1448,6 @@ _accountSettings:
   makeNotesFollowersOnlyBefore: "Macht frühere Notizen nur für Follower sichtbar"
   makeNotesFollowersOnlyBeforeDescription: "Solange diese Funktion aktiviert ist, sind Notizen, die nach dem eingestellten Datum und der eingestellten Zeit liegen oder die eingestellte Zeit abgelaufen ist, nur für Follower sichtbar. Bei Deaktivierung wird auch der öffentliche Status der Notiz wiederhergestellt."
   makeNotesHiddenBefore: "Frühere Notizen privat machen"
-  makeNotesHiddenBeforeDescription: ""
   mayNotEffectForFederatedNotes: "Dies hat möglicherweise keine Auswirkungen auf Notizen, die an andere Server föderiert werden."
   mayNotEffectSomeSituations: "Diese Einschränkungen sind vereinfacht. Sie gelten möglicherweise nicht in allen Situationen, z. B. bei der Anzeige auf einem fremden Server oder während der Moderation."
   notesHavePassedSpecifiedPeriod: "Notizen die nach der folgenden Zeit veröffentlicht worden"

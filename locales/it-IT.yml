@@ -1216,7 +1216,6 @@ confirmShowRepliesAll: "Questa è una attività irreversibile. Vuoi davvero incl
 confirmHideRepliesAll: "Questa è una attività irreversibile. Vuoi davvero escludere tutte le risposte dei following in TL?"
 externalServices: "Servizi esterni"
 sourceCode: "Codice sorgente"
-sourceCodeIsNotYetProvided: ""
 repositoryUrl: "URL della repository"
 repositoryUrlDescription: "Se esiste un repository il cui il codice sorgente è disponibile pubblicamente, inserisci il suo URL. Se stai utilizzando Misskey così com'è (senza alcuna modifica al codice sorgente), inserisci https://github.com/misskey-dev/misskey."
 repositoryUrlOrTarballRequired: "Se non disponi di un repository pubblico, dovrai fornire un file tarball (tar). Vedere .config/example.yml per i dettagli."

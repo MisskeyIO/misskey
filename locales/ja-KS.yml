@@ -11,7 +11,7 @@ username: "ユーザー名"
 password: "パスワード"
 initialPasswordForSetup: "初期設定開始用パスワード"
 initialPasswordIsIncorrect: "初期設定開始用のパスワードがちゃうで。"
-initialPasswordForSetupDescription: "Miskkeyを自分でインストールしたんやったら、設定ファイルに入れたパスワードを使ってや。\nホスティングサービスを使っとるんやったら、サービスから言われたやつを使うんやで。\n別に何も設定しとらんのやったら、何も入れずに空けといてな。"
+initialPasswordForSetupDescription: "Misskeyを自分でインストールしたんやったら、設定ファイルに入れたパスワードを使ってや。\nホスティングサービスを使っとるんやったら、サービスから言われたやつを使うんやで。\n別に何も設定しとらんのやったら、何も入れずに空けといてな。"
 forgotPassword: "パスワード忘れたん？"
 fetchingAsApObject: "今ちと連合に照会しとるで"
 ok: "ええで"
@@ -1927,7 +1927,6 @@ _aboutMisskey:
   donate: "Misskeyに寄付"
   morePatrons: "他にもぎょうさんの人からサポートしてもろてんねん。ほんまおおきに🥰"
   patrons: "支援者"
-  projectMembers: ""
 _displayOfSensitiveMedia:
   respect: "きわどいのは見とうない"
   ignore: "きわどいのも見たい"
@@ -2614,20 +2613,11 @@ _externalResourceInstaller:
   _theme:
     title: "このテーマインストールする？"
   _meta:
-    base: ""
   _vendorInfo:
-    title: ""
-    endpoint: ""
-    hashVerify: ""
   _errors:
     _invalidParams:
-      title: ""
-      description: ""
     _resourceTypeNotSupported:
-      title: ""
-      description: ""
     _failedToFetch:
-      title: ""
       fetchErrorDescription: "他のサイトに繋がらんかったわ。もっかいやってもダメやったら、サイトの管理してる人に言っといて。"
       parseErrorDescription: "他のサイトから持ってきたデータ、よう分からんかったわ。サイトの管理してる人に言っといて。"
     _hashUnmatched:

@@ -124,6 +124,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { host, version } from '@@/js/config.js';
 import { i18n } from '@/i18n.js';
 import { instance } from '@/instance.js';
+import { miLocalStorage } from '@/local-storage.js';
 import number from '@/filters/number.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import FormLink from '@/components/form/link.vue';
@@ -134,6 +135,7 @@ import MkFolder from '@/components/MkFolder.vue';
 import MkKeyValue from '@/components/MkKeyValue.vue';
 import MkLink from '@/components/MkLink.vue';
 
+const kawaiiMode = miLocalStorage.getItem('kawaii') === 'true';
 const initStats = () => misskeyApi('stats', {});
 </script>
 
@@ -166,6 +168,13 @@ const initStats = () => misskeyApi('stats', {});
 	color: #fff;
 	text-shadow: 0 0 8px #000;
 	background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+}
+
+.iconCredit {
+	margin: 0 auto;
+	width: max-content;
+	position: relative;
+	z-index: 1;
 }
 
 .rules {

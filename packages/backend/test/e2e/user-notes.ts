@@ -17,8 +17,8 @@ describe('users/notes', () => {
 
 	beforeAll(async () => {
 		alice = await signup({ username: 'alice' });
-		const jpg = await uploadUrl(alice, 'https://raw.githubusercontent.com/MisskeyIO/misskey/main/packages/backend/test/resources/Lenna.jpg');
-		const png = await uploadUrl(alice, 'https://raw.githubusercontent.com/MisskeyIO/misskey/main/packages/backend/test/resources/Lenna.png');
+		const jpg = await uploadUrl(alice, 'https://media.misskeyusercontent.jp/misskey/65b25d3c-2ae4-474f-b1c0-050c8c8962e1.jpg');
+		const png = await uploadUrl(alice, 'https://misskey.io/static-assets/icons/192.png');
 		jpgNote = await post(alice, {
 			fileIds: [jpg.id],
 		});
@@ -28,7 +28,7 @@ describe('users/notes', () => {
 		jpgPngNote = await post(alice, {
 			fileIds: [jpg.id, png.id],
 		});
-	}, 1000 * 60 * 2);
+	}, 1000 * 60 * 5);
 
 	test('withFiles', async () => {
 		const res = await api('users/notes', {

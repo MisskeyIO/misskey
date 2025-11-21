@@ -12,7 +12,7 @@ import type { Packed } from '@/misc/json-schema.js';
 import type { MiNote } from '@/models/Note.js';
 import { IdService } from '@/core/IdService.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
-import type { NoteUnreadsRepository, MutingsRepository, NoteThreadMutingsRepository } from '@/models/_.js';
+import type { MutingsRepository, NoteThreadMutingsRepository } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { trackPromise } from '@/misc/promise-tracker.js';
 
@@ -21,9 +21,6 @@ export class NoteReadService implements OnApplicationShutdown {
 	#shutdownController = new AbortController();
 
 	constructor(
-		@Inject(DI.noteUnreadsRepository)
-		private noteUnreadsRepository: NoteUnreadsRepository,
-
 		@Inject(DI.mutingsRepository)
 		private mutingsRepository: MutingsRepository,
 
@@ -57,28 +54,13 @@ export class NoteReadService implements OnApplicationShutdown {
 		});
 		if (isThreadMuted) return;
 
-		const unread = {
-			id: this.idService.gen(),
-			noteId: note.id,
-			userId: userId,
-			isSpecified: params.isSpecified,
-			isMentioned: params.isMentioned,
-			noteUserId: note.userId,
-		};
-
-		await this.noteUnreadsRepository.insert(unread);
-
 		// 2秒経っても既読にならなかったら「未読の投稿がありますよ」イベントを発行する
 		setTimeout(2000, 'unread note', { signal: this.#shutdownController.signal }).then(async () => {
-			const exist = await this.noteUnreadsRepository.exists({ where: { id: unread.id } });
-
-			if (!exist) return;
-
 			if (params.isMentioned) {
-				this.globalEventService.publishMainStream(userId, 'unreadMention', note.id);
+				this.globalEventService.publishMainStream(userId, 'notification', note.id);
 			}
 			if (params.isSpecified) {
-				this.globalEventService.publishMainStream(userId, 'unreadSpecifiedNote', note.id);
+				this.globalEventService.publishMainStream(userId, 'notification', note.id);
 			}
 		}, () => { /* aborted, ignore it */ });
 	}
@@ -92,37 +74,24 @@ export class NoteReadService implements OnApplicationShutdown {
 
 		const noteIds = new Set<MiNote['id']>(
 			notes.filter(note =>
-				(note.mentions?.includes(userId) ?? false) || (note.visibleUserIds?.includes(userId) ?? false)
+				(note.mentions?.includes(userId) ?? false) || (note.visibleUserIds?.includes(userId) ?? false),
 			).map(note => note.id),
 		);
 
 		if (noteIds.size === 0) return;
 
-		// Remove the record
-		await this.noteUnreadsRepository.delete({
-			userId: userId,
-			noteId: In(Array.from(noteIds)),
-		});
-
 		// TODO: ↓まとめてクエリしたい
-
-		trackPromise(this.noteUnreadsRepository.countBy({
-			userId: userId,
-			isMentioned: true,
-		}).then(mentionsCount => {
+		trackPromise(Promise.resolve(0).then((mentionsCount: number) => {
 			if (mentionsCount === 0) {
 				// 全て既読になったイベントを発行
-				this.globalEventService.publishMainStream(userId, 'readAllUnreadMentions');
+				this.globalEventService.publishMainStream(userId, 'notification');
 			}
 		}));
 
-		trackPromise(this.noteUnreadsRepository.countBy({
-			userId: userId,
-			isSpecified: true,
-		}).then(specifiedCount => {
+		trackPromise(Promise.resolve(0).then((specifiedCount: number) => {
 			if (specifiedCount === 0) {
 				// 全て既読になったイベントを発行
-				this.globalEventService.publishMainStream(userId, 'readAllUnreadSpecifiedNotes');
+				this.globalEventService.publishMainStream(userId, 'notification');
 			}
 		}));
 	}

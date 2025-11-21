@@ -1,0 +1,18 @@
+services:
+  dragonflytest:
+    image: docker.dragonflydb.io/dragonflydb/dragonfly
+    ulimits:
+      memlock: -1
+    environment:
+      DFLY_version_check: false
+      DFLY_default_lua_flags: allow-undeclared-keys
+    ports:
+      - "127.0.0.1:56312:6379"
+
+  dbtest:
+    image: postgres:17
+    ports:
+      - "127.0.0.1:54312:5432"
+    environment:
+      POSTGRES_DB: "test-misskey"
+      POSTGRES_HOST_AUTH_METHOD: trust

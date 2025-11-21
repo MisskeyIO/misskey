@@ -451,7 +451,7 @@ export class FileInfoService {
 	}
 
 	/**
-	 * Calculate average color of image
+	 * Calculate blurhash string of image
 	 */
 	@bindThis
 	private async getBlurhash(path: string, type: string): Promise<string> {

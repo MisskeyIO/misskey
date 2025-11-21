@@ -4,28 +4,32 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<MkStickyContainer>
-	<template #header><XHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs"/></template>
-	<MkSpacer :contentMax="800">
+<PageWithHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs">
+	<div class="_spacer" style="--MI_SPACER-w: 800px;">
 		<XQueue v-if="tab === 'deliver'" domain="deliver"/>
 		<XQueue v-else-if="tab === 'inbox'" domain="inbox"/>
 		<br>
-		<MkButton @click="promoteAllQueues"><i class="ti ti-reload"></i> {{ i18n.ts.retryAllQueuesNow }}</MkButton>
-	</MkSpacer>
-</MkStickyContainer>
+		<div class="_buttons">
+			<MkButton @click="promoteAllQueues"><i class="ti ti-reload"></i> {{ i18n.ts.retryAllQueuesNow }}</MkButton>
+			<MkButton danger @click="clear"><i class="ti ti-trash"></i> {{ i18n.ts.clearQueue }}</MkButton>
+		</div>
+	</div>
+</PageWithHeader>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
 import XQueue from './queue.chart.vue';
-import XHeader from './_header_.vue';
+import type { Ref } from 'vue';
 import * as os from '@/os.js';
-import * as config from '@/config.js';
 import { i18n } from '@/i18n.js';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
+import { definePage } from '@/page.js';
 import MkButton from '@/components/MkButton.vue';
+import * as config from '@@/js/config.js';
 
-const tab = ref('deliver');
+export type ApQueueDomain = 'deliver' | 'inbox';
+
+const tab: Ref<ApQueueDomain> = ref('deliver');
 
 function clear() {
 	os.confirm({
@@ -35,7 +39,7 @@ function clear() {
 	}).then(({ canceled }) => {
 		if (canceled) return;
 
-		os.apiWithDialog('admin/queue/clear');
+		os.apiWithDialog('admin/queue/clear', { type: tab.value, state: '*' });
 	});
 }
 
@@ -68,7 +72,7 @@ const headerTabs = computed(() => [{
 	title: 'Inbox',
 }]);
 
-definePageMetadata(() => ({
+definePage(() => ({
 	title: i18n.ts.jobQueue,
 	icon: 'ti ti-clock-play',
 }));

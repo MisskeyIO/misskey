@@ -10,7 +10,6 @@ import * as Redis from 'ioredis';
 import ms from 'ms';
 import { Inject, Injectable } from '@nestjs/common';
 import type { DriveFilesRepository } from '@/models/_.js';
-import { DI } from '@/di-symbols.js';
 import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
 import { DriveService } from '@/core/DriveService.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
@@ -18,7 +17,9 @@ import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { DB_MAX_IMAGE_COMMENT_LENGTH } from '@/const.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import { MetaService } from '@/core/MetaService.js';
-import { ApiError } from '@/server/api/error.js';
+import { MiMeta } from '@/models/_.js';
+import { DI } from '@/di-symbols.js';
+import { ApiError } from '../../../error.js';
 
 export const meta = {
 	tags: ['drive'],
@@ -75,6 +76,13 @@ export const meta = {
 			code: 'NO_FREE_SPACE',
 			id: 'd08dbc37-a6a9-463a-8c47-96c32ab5f064',
 		},
+
+		maxFileSizeExceeded: {
+			message: 'Cannot upload the file because it exceeds the maximum file size.',
+			code: 'MAX_FILE_SIZE_EXCEEDED',
+			id: 'b9d8c348-33f0-4673-b9a9-5d4da058977a',
+			httpStatusCode: 413,
+		},
 	},
 } as const;
 
@@ -98,6 +106,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
+
+		@Inject(DI.meta)
+		private serverSettings: MiMeta,
 
 		private driveFileEntityService: DriveFileEntityService,
 		private metaService: MetaService,
@@ -151,8 +162,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				}
 			}
 
-			const instance = await this.metaService.fetch();
-
 			try {
 				// Create file
 				const driveFile = await this.driveService.addFile({
@@ -163,8 +172,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					folderId: ps.folderId,
 					force: ps.force,
 					sensitive: ps.isSensitive,
-					requestIp: instance.enableIpLogging ? ip : null,
-					requestHeaders: instance.enableIpLogging ? headers : null,
+					requestIp: this.serverSettings.enableIpLogging ? ip : null,
+					requestHeaders: this.serverSettings.enableIpLogging ? headers : null,
 				});
 
 				// 1分間、リクエストの処理結果を記録
@@ -181,6 +190,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				if (e instanceof IdentifiableError) {
 					if (e.id === '282f77bf-5816-4f72-9264-aa14d8261a21') throw new ApiError(meta.errors.inappropriate);
 					if (e.id === 'c6244ed2-a39a-4e1c-bf93-f0fbd7764fa6') throw new ApiError(meta.errors.noFreeSpace);
+					if (e.id === 'f9e4e5f3-4df4-40b5-b400-f236945f7073') throw new ApiError(meta.errors.maxFileSizeExceeded);
 				}
 
 				const err = e as Error;
@@ -193,7 +203,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					{
 						message: err.message,
 						code: err.name,
-					},
+				},
 				);
 			} finally {
 				if (cleanup) cleanup();

@@ -9,8 +9,8 @@ import type { NotesRepository, DriveFilesRepository } from '@/models/_.js';
 import { QueryService } from '@/core/QueryService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { DI } from '@/di-symbols.js';
-import { ApiError } from '../../../error.js';
 import { RoleService } from '@/core/RoleService.js';
+import { ApiError } from '../../../error.js';
 
 export const meta = {
 	tags: ['drive', 'notes'],

@@ -97,9 +97,6 @@ export class MiAntenna {
 	})
 	public expression: string | null;
 
-	@Column('boolean')
-	public notify: boolean;
-
 	@Index()
 	@Column('boolean', {
 		default: true,
@@ -110,4 +107,9 @@ export class MiAntenna {
 		default: false,
 	})
 	public localOnly: boolean;
+
+	@Column('boolean', {
+		default: false,
+	})
+	public excludeNotesInSensitiveChannel: boolean;
 }

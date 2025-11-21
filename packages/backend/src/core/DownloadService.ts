@@ -41,7 +41,7 @@ export class DownloadService {
 
 		const timeout = 30 * 1000;
 		const operationTimeout = 60 * 1000;
-		const maxSize = this.config.maxFileSize ?? 262144000;
+		const maxSize = this.config.maxFileSize;
 
 		const urlObj = new URL(url);
 		let filename = urlObj.pathname.split('/').pop() ?? 'untitled';
@@ -60,8 +60,8 @@ export class DownloadService {
 				request: operationTimeout,	// whole operation timeout
 			},
 			agent: {
-				http: this.httpRequestService.httpAgent,
-				https: this.httpRequestService.httpsAgent,
+				http: this.httpRequestService.getAgentForHttp(urlObj, true),
+				https: this.httpRequestService.getAgentForHttps(urlObj, true),
 			},
 			http2: false,	// default
 			retry: {

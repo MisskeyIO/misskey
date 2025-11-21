@@ -1,3 +1,4 @@
+
 /*
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
@@ -9,6 +10,7 @@ import { MetaService } from '@/core/MetaService.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { DEFAULT_POLICIES } from '@/core/RoleService.js';
+import { SystemAccountService } from '@/core/SystemAccountService.js';
 
 export const meta = {
 	tags: ['meta'],
@@ -226,7 +228,7 @@ export const meta = {
 			},
 			proxyAccountId: {
 				type: 'string',
-				optional: false, nullable: true,
+				optional: false, nullable: false,
 				format: 'id',
 			},
 			email: {
@@ -514,6 +516,31 @@ export const meta = {
 				type: 'string',
 				optional: false, nullable: true,
 			},
+			federation: {
+				type: 'string',
+				enum: ['all', 'specified', 'none'],
+				optional: false, nullable: false,
+			},
+			federationHosts: {
+				type: 'array',
+				optional: false, nullable: false,
+				items: {
+					type: 'string',
+					optional: false, nullable: false,
+				},
+			},
+			prohibitedWordsForNameOfUser: {
+				type: 'array',
+				optional: false, nullable: false,
+				items: {
+					type: 'string',
+					optional: false, nullable: false,
+				},
+			},
+			inquiryUrl: {
+				type: 'string',
+				optional: false, nullable: true,
+			},
 		},
 	},
 } as const;
@@ -532,9 +559,12 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private config: Config,
 
 		private metaService: MetaService,
+		private systemAccountService: SystemAccountService,
 	) {
 		super(meta, paramDef, async () => {
 			const instance = await this.metaService.fetch(true);
+
+			const proxy = await this.systemAccountService.fetch('proxy');
 
 			return {
 				maintainerName: instance.maintainerName,
@@ -597,7 +627,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				sensitiveMediaDetectionSensitivity: instance.sensitiveMediaDetectionSensitivity,
 				setSensitiveFlagAutomatically: instance.setSensitiveFlagAutomatically,
 				enableSensitiveMediaDetectionForVideos: instance.enableSensitiveMediaDetectionForVideos,
-				proxyAccountId: instance.proxyAccountId,
+				proxyAccountId: proxy.id,
+				inquiryUrl: instance.inquiryUrl,
 				email: instance.email,
 				smtpSecure: instance.smtpSecure,
 				smtpHost: instance.smtpHost,
@@ -651,6 +682,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				urlPreviewRequireContentLength: instance.urlPreviewRequireContentLength,
 				urlPreviewUserAgent: instance.urlPreviewUserAgent,
 				urlPreviewSummaryProxyUrl: instance.urlPreviewSummaryProxyUrl,
+				federation: instance.federation,
+				federationHosts: instance.federationHosts,
+				prohibitedWordsForNameOfUser: instance.prohibitedWordsForNameOfUser,
 			};
 		});
 	}

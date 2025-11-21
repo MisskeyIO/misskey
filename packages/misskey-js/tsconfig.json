@@ -1,9 +1,9 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
 	"compilerOptions": {
-		"target": "es2022",
-		"module": "nodenext",
-		"moduleResolution": "nodenext",
+		"target": "ES2022",
+		"module": "ES2022",
+		"moduleResolution": "bundler",
 		"declaration": true,
 		"declarationMap": true,
 		"sourceMap": true,
@@ -15,6 +15,7 @@
 		"experimentalDecorators": true,
 		"noImplicitReturns": true,
 		"esModuleInterop": true,
+		"exactOptionalPropertyTypes": true,
 		"typeRoots": [
 			"./node_modules/@types"
 		],

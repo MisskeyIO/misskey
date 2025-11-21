@@ -4,62 +4,77 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<div>
-	<div v-if="!loading" class="_gaps">
-		<MkInfo>{{ i18n.tsx._profile.avatarDecorationMax({ max: $i.policies.avatarDecorationLimit }) }} ({{ i18n.tsx.remainingN({ n: $i.policies.avatarDecorationLimit - $i.avatarDecorations.length }) }})</MkInfo>
+<SearchMarker path="/settings/avatar-decoration" :label="i18n.ts.avatarDecorations" :keywords="['avatar', 'icon', 'decoration']" icon="ti ti-sparkles">
+	<div>
+		<div v-if="!loading" class="_gaps">
+			<MkInfo>{{ i18n.tsx._profile.avatarDecorationMax({ max: $i.policies.avatarDecorationLimit }) }} ({{ i18n.tsx.remainingN({ n: $i.policies.avatarDecorationLimit - $i.avatarDecorations.length }) }})</MkInfo>
 
-		<MkAvatar :class="$style.avatar" :user="$i" forceShowDecoration/>
+			<MkAvatar :class="$style.avatar" :user="$i" forceShowDecoration/>
 
-		<div v-if="$i.avatarDecorations.length > 0" v-panel :class="$style.current" class="_gaps_s">
-			<div>{{ i18n.ts.inUse }}</div>
+			<div v-if="matchedDecorations.length > 0" v-panel :class="$style.current" class="_gaps_s">
+				<div>{{ i18n.ts.inUse }}</div>
+
+				<div :class="$style.decorations">
+					<XDecoration
+						v-for="(decoration, i) in matchedDecorations"
+						:key="decoration.id"
+						:decoration="decoration"
+						:angle="decoration.angle"
+						:flipH="decoration.flipH"
+						:offsetX="decoration.offsetX"
+						:offsetY="decoration.offsetY"
+						:active="true"
+						@click="openDecoration(decoration, i)"
+					/>
+				</div>
+
+				<MkButton danger @click="detachAllDecorations">{{ i18n.ts.detachAll }}</MkButton>
+			</div>
 
 			<div :class="$style.decorations">
 				<XDecoration
-					v-for="(avatarDecoration, i) in $i.avatarDecorations"
-					:decoration="avatarDecorations.find(d => d.id === avatarDecoration.id)"
-					:angle="avatarDecoration.angle"
-					:flipH="avatarDecoration.flipH"
-					:offsetX="avatarDecoration.offsetX"
-					:offsetY="avatarDecoration.offsetY"
-					:active="true"
-					@click="openDecoration(avatarDecoration, i)"
+					v-for="avatarDecoration in avatarDecorations"
+					:key="avatarDecoration.id"
+					:decoration="avatarDecoration"
+					@click="openDecoration(avatarDecoration)"
 				/>
 			</div>
-
-			<MkButton danger @click="detachAllDecorations">{{ i18n.ts.detachAll }}</MkButton>
 		</div>
-
-		<div :class="$style.decorations">
-			<XDecoration
-				v-for="avatarDecoration in avatarDecorations"
-				:key="avatarDecoration.id"
-				:decoration="avatarDecoration"
-				@click="openDecoration(avatarDecoration)"
-			/>
+		<div v-else>
+			<MkLoading/>
 		</div>
 	</div>
-	<div v-else>
-		<MkLoading/>
-	</div>
-</div>
+</SearchMarker>
 </template>
 
 <script lang="ts" setup>
-import { ref, defineAsyncComponent, computed } from 'vue';
+import { computed, defineAsyncComponent, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import XDecoration from './avatar-decoration.decoration.vue';
 import MkButton from '@/components/MkButton.vue';
 import * as os from '@/os.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
-import { signinRequired } from '@/account.js';
+import { ensureSignin } from '@/i.js';
 import MkInfo from '@/components/MkInfo.vue';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
+import { definePage } from '@/page.js';
 
-const $i = signinRequired();
+const $i = ensureSignin();
 
 const loading = ref(true);
 const avatarDecorations = ref<Misskey.entities.GetAvatarDecorationsResponse>([]);
+
+const matchedDecorations = computed(() => {
+	if (loading.value) return [];
+
+	return $i.avatarDecorations.map(userDecoration => {
+		const decoration = avatarDecorations.value.find(d => d.id === userDecoration.id);
+		return {
+			...userDecoration,
+			...decoration,
+		};
+	}).filter(d => d.url); // URLが存在するもののみ
+});
 
 misskeyApi('get-avatar-decorations').then(_avatarDecorations => {
 	avatarDecorations.value = _avatarDecorations;
@@ -69,13 +84,14 @@ misskeyApi('get-avatar-decorations').then(_avatarDecorations => {
 function openDecoration(avatarDecoration, index?: number) {
 	os.popup(defineAsyncComponent(() => import('./avatar-decoration.dialog.vue')), {
 		decoration: avatarDecoration,
-		usingIndex: index,
+		usingIndex: index ?? null,
 	}, {
 		'attach': async (payload) => {
 			const decoration = {
 				id: avatarDecoration.id,
 				angle: payload.angle,
 				flipH: payload.flipH,
+				url: avatarDecoration.url ?? avatarDecorations.value.find(d => d.id === avatarDecoration.id)?.url ?? '',
 				offsetX: payload.offsetX,
 				offsetY: payload.offsetY,
 			};
@@ -90,10 +106,13 @@ function openDecoration(avatarDecoration, index?: number) {
 				id: avatarDecoration.id,
 				angle: payload.angle,
 				flipH: payload.flipH,
+				url: avatarDecoration.url ?? avatarDecorations.value.find(d => d.id === avatarDecoration.id)?.url ?? '',
 				offsetX: payload.offsetX,
 				offsetY: payload.offsetY,
 			};
 			const update = [...$i.avatarDecorations];
+			if (index == null) return;
+
 			update[index] = decoration;
 			await os.apiWithDialog('i/update', {
 				avatarDecorations: update,
@@ -102,6 +121,8 @@ function openDecoration(avatarDecoration, index?: number) {
 		},
 		'detach': async () => {
 			const update = [...$i.avatarDecorations];
+			if (index == null) return;
+
 			update.splice(index, 1);
 			await os.apiWithDialog('i/update', {
 				avatarDecorations: update,
@@ -128,7 +149,7 @@ const headerActions = computed(() => []);
 
 const headerTabs = computed(() => []);
 
-definePageMetadata(() => ({
+definePage(() => ({
 	title: i18n.ts.avatarDecorations,
 	icon: 'ti ti-sparkles',
 }));
@@ -144,7 +165,7 @@ definePageMetadata(() => ({
 
 .current {
 	padding: 16px;
-	border-radius: var(--radius);
+	border-radius: var(--MI-radius);
 }
 
 .decorations {

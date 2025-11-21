@@ -14,15 +14,16 @@ import {
 	UploadPartCommand,
 } from '@aws-sdk/client-s3';
 import { mockClient } from 'aws-sdk-client-mock';
+import type { TestingModule } from '@nestjs/testing';
 import { GlobalModule } from '@/GlobalModule.js';
 import { CoreModule } from '@/core/CoreModule.js';
 import { S3Service } from '@/core/S3Service.js';
 import { MiMeta } from '@/models/_.js';
-import type { TestingModule } from '@nestjs/testing';
 
 describe('S3Service', () => {
 	let app: TestingModule;
 	let s3Service: S3Service;
+	// aws-sdk-client-mockの型定義と@aws-sdk/client-s3の型定義が一致しないので、一時的な処置
 	const s3Mock = mockClient(S3Client);
 
 	beforeAll(async () => {
@@ -72,7 +73,7 @@ describe('S3Service', () => {
 				Bucket: 'fake',
 				Key: 'fake',
 				Body: 'x',
-			})).rejects.toThrowError(Error);
+			})).rejects.toThrow(Error);
 		});
 
 		test('upload a large file error', async () => {
@@ -82,7 +83,7 @@ describe('S3Service', () => {
 				Bucket: 'fake',
 				Key: 'fake',
 				Body: 'x'.repeat(8 * 1024 * 1024 + 1), // デフォルトpartSizeにしている 8 * 1024 * 1024 を越えるサイズ
-			})).rejects.toThrowError(Error);
+			})).rejects.toThrow(Error);
 		});
 	});
 });

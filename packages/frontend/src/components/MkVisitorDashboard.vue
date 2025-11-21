@@ -6,7 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <div v-if="instance" :class="$style.root">
 	<div :class="[$style.main, $style.panel]">
-		<img v-if="kawaiiMode" src="/client-assets/kawaii/misskey-io.png" alt="Logo by @sawaratsuki@misskey.io" :class="$style.mainIconAlt"/>
+		<img v-if="kawaiiMode" src="/client-assets/kawaii/misskey.png" alt="Logo by @sawaratsuki@misskey.io" :class="$style.mainIconAlt"/>
 		<img v-else :src="instance.iconUrl || '/favicon.ico'" alt="" :class="$style.mainIcon"/>
 		<button class="_button _acrylic" :class="$style.mainMenu" @click="showMenu"><i class="ti ti-dots"></i></button>
 		<div :class="$style.mainFg">

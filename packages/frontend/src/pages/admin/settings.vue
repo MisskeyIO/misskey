@@ -61,22 +61,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<template #prefix><i class="ti ti-link"></i></template>
 					</MkInput>
 
-					<MkInfo v-if="!instance.providesTarball && !infoForm.state.repositoryUrl" warn>
-						{{ i18n.ts.repositoryUrlOrTarballRequired }}
-					</MkInfo>
+					<MkInput v-model="infoForm.state.impressumUrl" type="url">
+						<template #label>{{ i18n.ts.impressumUrl }}<span v-if="infoForm.modifiedStates.impressumUrl" class="_modified">{{ i18n.ts.modified }}</span></template>
+						<template #caption>{{ i18n.ts.impressumDescription }}</template>
+						<template #prefix><i class="ti ti-link"></i></template>
+					</MkInput>
 
-						<MkInput v-model="infoForm.state.impressumUrl" type="url">
-							<template #label>{{ i18n.ts.impressumUrl }}<span v-if="infoForm.modifiedStates.impressumUrl" class="_modified">{{ i18n.ts.modified }}</span></template>
-							<template #caption>{{ i18n.ts.impressumDescription }}</template>
-							<template #prefix><i class="ti ti-link"></i></template>
-						</MkInput>
-
-						<MkTextarea v-model="infoForm.state.featuredGameChannels">
-							<template #label>{{ i18n.ts.featuredGameChannels }}</template>
-							<template #caption>{{ i18n.ts.featuredGameChannelsDescription }}</template>
-						</MkTextarea>
-					</div>
-				</MkFolder>
+					<MkTextarea v-model="infoForm.state.featuredGameChannels">
+						<template #label>{{ i18n.ts.featuredGameChannels }}</template>
+						<template #caption>{{ i18n.ts.featuredGameChannelsDescription }}</template>
+					</MkTextarea>
+				</div>
+			</MkFolder>
 
 			<MkFolder>
 				<template #icon><i class="ti ti-user-star"></i></template>
@@ -293,6 +289,7 @@ const infoForm = useForm({
 	inquiryUrl: meta.inquiryUrl ?? '',
 	repositoryUrl: meta.repositoryUrl ?? '',
 	impressumUrl: meta.impressumUrl ?? '',
+	featuredGameChannels: meta.featuredGameChannels.join('\n'),
 }, async (state) => {
 	await os.apiWithDialog('admin/update-meta', {
 		name: state.name,
@@ -305,6 +302,7 @@ const infoForm = useForm({
 		inquiryUrl: state.inquiryUrl,
 		repositoryUrl: state.repositoryUrl,
 		impressumUrl: state.impressumUrl,
+		featuredGameChannels: state.featuredGameChannels.split('\n'),
 	});
 	fetchInstance(true);
 });

@@ -5558,7 +5558,7 @@ export interface Locale extends ILocale {
      */
     "confirmOnReact": string;
     /**
-     * " {emoji} " をリアクションしますか？
+     * 「{emoji}」をリアクションしますか？
      */
     "reactAreYouSure": ParameterizedString<"emoji">;
     /**

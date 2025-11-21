@@ -4,9 +4,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<MkStickyContainer>
-	<template #header><XHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs"/></template>
-	<MkSpacer :contentMax="700" :marginMin="16" :marginMax="32">
+<PageWithHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs">
+	<div class="_spacer" style="--MI_SPACER-w: 600px; --MI_SPACER-min: 16px; --MI_SPACER-max: 32px;">
 		<FormSuspense :p="init">
 			<MkTextarea v-if="tab === 'block'" v-model="blockedHosts">
 				<span>{{ i18n.ts.blockedInstances }}</span>
@@ -22,21 +21,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkTextarea>
 			<MkButton primary @click="save"><i class="ti ti-device-floppy"></i> {{ i18n.ts.save }}</MkButton>
 		</FormSuspense>
-	</MkSpacer>
-</MkStickyContainer>
+	</div>
+</PageWithHeader>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
-import XHeader from './_header_.vue';
+import { definePage } from '@/page.js';
 import MkButton from '@/components/MkButton.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
 import FormSuspense from '@/components/form/suspense.vue';
 import * as os from '@/os.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 import { fetchInstance } from '@/instance.js';
 import { i18n } from '@/i18n.js';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
 
 const blockedHosts = ref<string>('');
 const silencedHosts = ref<string>('');
@@ -77,7 +75,7 @@ const headerTabs = computed(() => [{
 	icon: 'ti ti-photo-exclamation',
 }]);
 
-definePageMetadata(() => ({
+definePage(() => ({
 	title: i18n.ts.instanceBlocking,
 	icon: 'ti ti-ban',
 }));

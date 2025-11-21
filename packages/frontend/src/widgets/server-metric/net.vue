@@ -54,7 +54,7 @@ import * as Misskey from 'misskey-js';
 import bytes from '@/filters/bytes.js';
 
 const props = defineProps<{
-	connection: Misskey.ChannelConnection<Misskey.Channels['serverStats']>,
+	connection: Misskey.IChannelConnection<Misskey.Channels['serverStats']>,
 	meta: Misskey.entities.ServerInfoResponse
 }>();
 
@@ -111,7 +111,7 @@ function onStats(connStats: Misskey.entities.ServerStats) {
 }
 
 function onStatsLog(statsLog: Misskey.entities.ServerStatsLog) {
-	for (const revStats of statsLog.reverse()) {
+	for (const revStats of statsLog.toReversed()) {
 		onStats(revStats);
 	}
 }

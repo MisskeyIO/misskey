@@ -1,0 +1,114 @@
+name: Test (federation)
+
+on:
+  push:
+    branches:
+      - main
+      - next
+      - beta
+      - io
+      - host
+    paths:
+      - packages/backend/**
+      - packages/misskey-js/**
+      - .github/workflows/test-federation.yml
+  pull_request:
+    paths:
+      - packages/backend/**
+      - packages/misskey-js/**
+      - .github/workflows/test-federation.yml
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Federation test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [24.x]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          submodules: true
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Restore FFmpeg binary cache
+        uses: actions/cache/restore@v4
+        with:
+          path: /opt/hostedtoolcache/ffmpeg
+          key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-latest
+          restore-keys: |
+            ffmpeg-${{ runner.os }}-${{ runner.arch }}-
+      - name: Install FFmpeg
+        uses: FedericoCarboni/setup-ffmpeg@v3
+        id: setup-ffmpeg
+        with:
+          ffmpeg-version: 7.0.2
+      - name: Save FFmpeg binary cache
+        if: steps.setup-ffmpeg.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /opt/hostedtoolcache/ffmpeg
+          key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ steps.setup-ffmpeg.outputs.ffmpeg-version }}
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+
+      - name: Check pnpm-lock.yaml
+        run: git diff --exit-code pnpm-lock.yaml
+
+      - name: Build Misskey
+        run: |
+          pnpm i --frozen-lockfile
+          pnpm build
+
+      - name: Setup
+        run: |
+          cd packages/backend/test-federation
+          bash ./setup.sh
+          sudo chmod 644 ./certificates/*.test.key
+
+      - name: Start servers
+        id: start_servers
+        continue-on-error: true
+        # https://github.com/docker/compose/issues/1294#issuecomment-374847206
+        run: |
+          cd packages/backend/test-federation
+          docker compose up -d --scale tester=0
+
+      - name: Print start_servers error
+        if: ${{ steps.start_servers.outcome == 'failure' }}
+        run: |
+          cd packages/backend/test-federation
+          docker compose logs | tail -n 300
+          exit 1
+      - name: Test
+        run: |
+          cd packages/backend/test-federation
+          docker compose run --no-deps tester
+
+      - name: Log
+        if: always()
+        run: |
+          cd packages/backend/test-federation
+          docker compose logs
+
+      - name: Stop servers
+        if: always()
+        run: |
+          cd packages/backend/test-federation
+          docker compose down

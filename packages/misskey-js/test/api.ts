@@ -5,13 +5,19 @@ enableFetchMocks();
 
 function getFetchCall(call: any[]) {
 	const { body, method } = call[1];
-	if (body != null && typeof body != 'string') {
+	const contentType = call[1].headers['Content-Type'];
+	if (
+		body == null ||
+		(contentType === 'application/json' && typeof body !== 'string') ||
+		(contentType === 'multipart/form-data' && !(body instanceof FormData))
+	) {
 		throw new Error('invalid body');
 	}
 	return {
 		url: call[0],
 		method: method,
-		body: JSON.parse(body as any)
+		contentType: contentType,
+		body: body instanceof FormData ? Object.fromEntries(body.entries()) : JSON.parse(body),
 	};
 }
 
@@ -45,6 +51,7 @@ describe('API', () => {
 		expect(getFetchCall(fetchMock.mock.calls[0])).toEqual({
 			url: 'https://misskey.test/api/i',
 			method: 'POST',
+			contentType: 'application/json',
 			body: { i: 'TOKEN' }
 		});
 	});
@@ -78,7 +85,49 @@ describe('API', () => {
 		expect(getFetchCall(fetchMock.mock.calls[0])).toEqual({
 			url: 'https://misskey.test/api/notes/show',
 			method: 'POST',
+			contentType: 'application/json',
 			body: { i: 'TOKEN', noteId: 'aaaaa' }
+		});
+	});
+
+	test('multipart/form-data', async () => {
+		fetchMock.resetMocks();
+		fetchMock.mockResponse(async (req) => {
+			if (req.method == 'POST' && req.url == 'https://misskey.test/api/drive/files/create') {
+				if (req.headers.get('Content-Type')?.includes('multipart/form-data')) {
+					return JSON.stringify({ id: 'foo' });
+				} else {
+					return { status: 400 };
+				}
+			} else {
+				return { status: 404 };
+			}
+		});
+
+		const cli = new APIClient({
+			origin: 'https://misskey.test',
+			credential: 'TOKEN',
+		});
+
+		const testFile = new File([], 'foo.txt');
+
+		const res = await cli.request('drive/files/create', {
+			file: testFile,
+			name: null, // nullのパラメータは消える
+		});
+
+		expect(res).toEqual({
+			id: 'foo'
+		});
+
+		expect(getFetchCall(fetchMock.mock.calls[0])).toEqual({
+			url: 'https://misskey.test/api/drive/files/create',
+			method: 'POST',
+			contentType: 'multipart/form-data',
+			body: {
+				i: 'TOKEN',
+				file: testFile,
+			}
 		});
 	});
 
@@ -104,6 +153,7 @@ describe('API', () => {
 		expect(getFetchCall(fetchMock.mock.calls[0])).toEqual({
 			url: 'https://misskey.test/api/reset-password',
 			method: 'POST',
+			contentType: 'application/json',
 			body: { i: 'TOKEN', token: 'aaa', password: 'aaa' }
 		});
 	});
@@ -139,7 +189,7 @@ describe('API', () => {
 			});
 
 			await cli.request('i', {}, null);
-		} catch (e) {
+		} catch (e: Error) {
 			expect(isAPIError(e)).toEqual(true);
 		}
 	});
@@ -167,7 +217,7 @@ describe('API', () => {
 			});
 
 			await cli.request('i');
-		} catch (e: any) {
+		} catch (e: Error) {
 			expect(isAPIError(e)).toEqual(true);
 			expect(e.id).toEqual('5d37dbcb-891e-41ca-a3d6-e690c97775ac');
 		}
@@ -184,7 +234,7 @@ describe('API', () => {
 			});
 
 			await cli.request('i');
-		} catch (e) {
+		} catch (e: Error) {
 			expect(isAPIError(e)).toEqual(false);
 		}
 	});
@@ -205,8 +255,46 @@ describe('API', () => {
 			});
 
 			await cli.request('i');
-		} catch (e) {
+		} catch (e: Error) {
 			expect(isAPIError(e)).toEqual(false);
 		}
 	});
+
+	test('admin/roles/create の型が合う', async() => {
+		fetchMock.resetMocks();
+		fetchMock.mockResponse(async () => {
+			return {
+				// 本来返すべき値は`Role`型だが、テストなのでお茶を濁す
+				status: 200,
+				body: '{}'
+			};
+		});
+
+		const cli = new APIClient({
+			origin: 'https://misskey.test',
+			credential: 'TOKEN',
+		});
+		await cli.request('admin/roles/create', {
+			name: 'aaa',
+			asBadge: false,
+			canEditMembersByModerator: false,
+			color: '#123456',
+			condFormula: {},
+			description: '',
+			displayOrder: 0,
+			iconUrl: '',
+			isAdministrator: false,
+			isExplorable: false,
+			isModerator: false,
+			isPublic: false,
+			policies: {
+				ltlAvailable: {
+					value: true,
+					priority: 0,
+					useDefault: false,
+				},
+			},
+			target: 'manual',
+		});
+	})
 });

@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { defineAsyncComponent, Directive, ref } from 'vue';
+import { defineAsyncComponent, ref } from 'vue';
+import type { Directive } from 'vue';
 import { popup } from '@/os.js';
 
 export class UserPreview {
@@ -29,13 +30,13 @@ export class UserPreview {
 		this.attach();
 	}
 
-	private show() {
-		if (!document.body.contains(this.el)) return;
+	private async show() {
+		if (!window.document.body.contains(this.el)) return;
 		if (this.promise) return;
 
 		const showing = ref(true);
 
-		popup(defineAsyncComponent(() => import('@/components/MkUserPopup.vue')), {
+		await popup(defineAsyncComponent(() => import('@/components/MkUserPopup.vue')), {
 			showing,
 			q: this.user,
 			source: this.el,
@@ -56,7 +57,7 @@ export class UserPreview {
 		};
 
 		this.checkTimer = window.setInterval(() => {
-			if (!document.body.contains(this.el)) {
+			if (!window.document.body.contains(this.el)) {
 				window.clearTimeout(this.showTimer);
 				window.clearTimeout(this.hideTimer);
 				this.close();

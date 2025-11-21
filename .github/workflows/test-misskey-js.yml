@@ -7,31 +7,35 @@ on:
   push:
     branches:
       - main
+      - next
       - beta
       - io
       - host
     paths:
       - packages/misskey-js/**
+      - .github/workflows/test-misskey-js.yml
   pull_request:
     paths:
       - packages/misskey-js/**
+      - .github/workflows/test-misskey-js.yml
 
 permissions:
   contents: read
 
 jobs:
   test:
+    name: Unit tests (misskey.js)
 
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [24.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           submodules: true
@@ -42,7 +46,7 @@ jobs:
           run_install: false
 
       - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4.4.0
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'

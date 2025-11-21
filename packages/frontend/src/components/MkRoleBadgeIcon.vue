@@ -7,8 +7,8 @@ import { computed, defineAsyncComponent, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import * as os from '@/os.js';
 import { instance } from '@/instance.js';
-import { misskeyApiGet } from '@/scripts/misskey-api.js';
-import { useTooltip } from '@/scripts/use-tooltip.js';
+import { misskeyApiGet } from '@/utility/misskey-api.js';
+import { useTooltip } from '@/use/use-tooltip.js';
 
 const props = defineProps<{
 	userId: string,
@@ -39,7 +39,7 @@ if (props.role.behavior === 'skeb') {
 
 		if (userSkebStatus.value === null) return;
 
-		os.popup(defineAsyncComponent(() => import('@/components/MkSkebStatusPopup.vue')), {
+		await os.popup(defineAsyncComponent(() => import('@/components/MkSkebStatusPopup.vue')), {
 			showing,
 			skebStatus: userSkebStatus.value,
 			source: el.value instanceof HTMLElement ? el.value : el.value?.$el,

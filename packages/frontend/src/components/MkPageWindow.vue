@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	:buttonsLeft="buttonsLeft"
 	:buttonsRight="buttonsRight"
 	:contextmenu="contextmenu"
-	@closed="$emit('closed')"
+	@closed="emit('closed')"
 >
 	<template #header>
 		<template v-if="pageMetadata">
@@ -22,53 +22,60 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</template>
 	</template>
 
-	<div ref="contents" :class="$style.root" style="container-type: inline-size;">
-		<RouterView :key="reloadCount" :router="windowRouter"/>
+	<div :key="reloadCount" :class="$style.root" class="_forceShrinkSpacer">
+		<StackingRouterView v-if="prefer.s['experimental.stackingRouterView']" :router="windowRouter"/>
+		<RouterView v-else :router="windowRouter"/>
 	</div>
 </MkWindow>
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, onUnmounted, provide, ref, shallowRef } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, provide, ref, useTemplateRef } from 'vue';
+import { url } from '@@/js/config.js';
+import { pageview } from 'vue-gtag';
+import type { PageMetadata } from '@/page.js';
 import RouterView from '@/components/global/RouterView.vue';
 import MkWindow from '@/components/MkWindow.vue';
-import { popout as _popout } from '@/scripts/popout.js';
-import copyToClipboard from '@/scripts/copy-to-clipboard.js';
-import { url } from '@/config.js';
-import { useScrollPositionManager } from '@/nirax.js';
+import { popout as _popout } from '@/utility/popout.js';
+import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
 import { i18n } from '@/i18n.js';
-import { PageMetadata, provideMetadataReceiver, provideReactiveMetadata } from '@/scripts/page-metadata.js';
+import { provideMetadataReceiver, provideReactiveMetadata } from '@/page.js';
 import { openingWindowsCount } from '@/os.js';
-import { claimAchievement } from '@/scripts/achievements.js';
-import { getScrollContainer } from '@/scripts/scroll.js';
-import { useRouterFactory } from '@/router/supplier.js';
-import { mainRouter } from '@/router/main.js';
+import { createRouter, mainRouter } from '@/router.js';
+import { DI } from '@/di.js';
+import { prefer } from '@/preferences.js';
 import { instance } from '@/instance.js';
-import { pageview } from 'vue-gtag';
+import { claimAchievement } from '@/utility/achievements.js';
 
 const props = defineProps<{
 	initialPath: string;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
 	(ev: 'closed'): void;
 }>();
 
-const routerFactory = useRouterFactory();
-const windowRouter = routerFactory(props.initialPath);
+const windowRouter = createRouter(props.initialPath);
 
-const contents = shallowRef<HTMLElement | null>(null);
 const pageMetadata = ref<null | PageMetadata>(null);
-const windowEl = shallowRef<InstanceType<typeof MkWindow>>();
-const history = ref<{ path: string; key: any; }[]>([{
+const windowEl = useTemplateRef('windowEl');
+const history = ref<{ path: string; }[]>([{
 	path: windowRouter.getCurrentPath(),
-	key: windowRouter.getCurrentKey(),
 }]);
+
+type WindowButton = {
+	title: string;
+	icon: string;
+	onClick: () => void;
+	highlighted?: boolean;
+};
+
 const buttonsLeft = computed(() => {
-	const buttons: Record<string, unknown>[] = [];
+	const buttons: WindowButton[] = [];
 
 	if (history.value.length > 1) {
 		buttons.push({
+			title: i18n.ts.goBack,
 			icon: 'ti ti-arrow-left',
 			onClick: back,
 		});
@@ -77,7 +84,7 @@ const buttonsLeft = computed(() => {
 	return buttons;
 });
 const buttonsRight = computed(() => {
-	const buttons = [{
+	const buttons: WindowButton[] = [{
 		icon: 'ti ti-reload',
 		title: i18n.ts.reload,
 		onClick: reload,
@@ -91,18 +98,41 @@ const buttonsRight = computed(() => {
 });
 const reloadCount = ref(0);
 
+function getSearchMarker(path: string) {
+	const hash = path.split('#')[1];
+	if (hash == null) return null;
+	return hash;
+}
+
+const searchMarkerId = ref<string | null>(getSearchMarker(props.initialPath));
+
 windowRouter.addListener('push', ctx => {
-	history.value.push({ path: ctx.path, key: ctx.key });
+	history.value.push({ path: ctx.path });
 });
 
 windowRouter.addListener('replace', ctx => {
 	history.value.pop();
-	history.value.push({ path: ctx.path, key: ctx.key });
+	history.value.push({ path: ctx.path });
+});
+
+windowRouter.addListener('change', ctx => {
+	if (_DEV_) console.log('windowRouter: change', ctx.path);
+	searchMarkerId.value = getSearchMarker(ctx.path);
+
+	if (instance.googleAnalyticsId) {
+		nextTick(() =>
+			pageview({
+				page_title: pageMetadata.value?.title,
+				page_path: ctx.path,
+			}),
+		);
+	}
 });
 
 windowRouter.init();
 
-provide('router', windowRouter);
+provide(DI.router, windowRouter);
+provide(DI.inAppSearchMarkerId, searchMarkerId);
 provideMetadataReceiver((metadataGetter) => {
 	const info = metadataGetter();
 	pageMetadata.value = info;
@@ -110,22 +140,6 @@ provideMetadataReceiver((metadataGetter) => {
 provideReactiveMetadata(pageMetadata);
 provide('shouldOmitHeaderTitle', true);
 provide('shouldHeaderThin', true);
-provide('forceSpacerMin', true);
-
-if (instance.googleAnalyticsId) {
-	pageview({
-		page_title: pageMetadata.value?.title,
-		page_path: windowRouter.getCurrentPath(),
-	});
-	windowRouter.afterEach(() =>
-		nextTick(() =>
-			pageview({
-				page_title: pageMetadata.value?.title,
-				page_path: windowRouter.getCurrentPath(),
-			}),
-		),
-	);
-}
 
 const contextmenu = computed(() => ([{
 	icon: 'ti ti-player-eject',
@@ -152,7 +166,7 @@ const contextmenu = computed(() => ([{
 
 function back() {
 	history.value.pop();
-	windowRouter.replace(history.value.at(-1)!.path, history.value.at(-1)!.key);
+	windowRouter.replace(history.value.at(-1)!.path);
 }
 
 function reload() {
@@ -173,8 +187,6 @@ function popout() {
 	windowEl.value?.close();
 }
 
-useScrollPositionManager(() => getScrollContainer(contents.value), windowRouter);
-
 onMounted(() => {
 	openingWindowsCount.value++;
 	if (openingWindowsCount.value >= 3) {
@@ -193,11 +205,9 @@ defineExpose({
 
 <style lang="scss" module>
 .root {
-	overscroll-behavior: contain;
+	height: 100%;
+	background: var(--MI_THEME-bg);
 
-	min-height: 100%;
-	background: var(--bg);
-
-	--margin: var(--marginHalf);
+	--MI-margin: var(--MI-marginHalf);
 }
 </style>

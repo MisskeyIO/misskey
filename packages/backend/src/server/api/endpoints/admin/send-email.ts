@@ -5,7 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
-import { EmailService } from '@/core/EmailService.js';
+import { QueueService } from '@/core/QueueService.js';
 
 export const meta = {
 	tags: ['admin'],
@@ -28,10 +28,10 @@ export const paramDef = {
 @Injectable()
 export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
 	constructor(
-		private emailService: EmailService,
+		private queueService: QueueService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
-			await this.emailService.sendEmail(ps.to, ps.subject, ps.text, ps.text);
+			await this.queueService.createSendEmailJob(ps.to, ps.subject, ps.text, ps.text);
 		});
 	}
 }

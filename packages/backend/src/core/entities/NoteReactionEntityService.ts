@@ -10,9 +10,9 @@ import type { NoteReactionsRepository } from '@/models/_.js';
 import type { Packed } from '@/misc/json-schema.js';
 import { bindThis } from '@/decorators.js';
 import { IdService } from '@/core/IdService.js';
-import type { OnModuleInit } from '@nestjs/common';
 import type { MiUser } from '@/models/User.js';
 import type { MiNoteReaction } from '@/models/NoteReaction.js';
+import type { OnModuleInit } from '@nestjs/common';
 import type { ReactionService } from '../ReactionService.js';
 import type { UserEntityService } from './UserEntityService.js';
 import type { NoteEntityService } from './NoteEntityService.js';
@@ -51,6 +51,9 @@ export class NoteReactionEntityService implements OnModuleInit {
 		options?: {
 			withNote: boolean;
 		},
+		hints?: {
+			packedUser?: Packed<'UserLite'>
+		},
 	): Promise<Packed<'NoteReaction'>> {
 		const opts = Object.assign({
 			withNote: false,
@@ -61,7 +64,7 @@ export class NoteReactionEntityService implements OnModuleInit {
 		return {
 			id: reaction.id,
 			createdAt: this.idService.parse(reaction.id).date.toISOString(),
-			user: await this.userEntityService.pack(reaction.user ?? reaction.userId, me),
+			user: hints?.packedUser ?? await this.userEntityService.pack(reaction.user ?? reaction.userId, me),
 			type: this.reactionService.convertLegacyReaction(reaction.reaction),
 			...(opts.withNote ? {
 				note: await this.noteEntityService.pack(reaction.note ?? reaction.noteId, me),

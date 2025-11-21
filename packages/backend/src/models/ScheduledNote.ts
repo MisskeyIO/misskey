@@ -19,7 +19,7 @@ export class MiScheduledNote {
 	@Index()
 	@Column('timestamp with time zone', {
 		comment: 'The scheduled date of the Note.',
-		nullable: true
+		nullable: true,
 	})
 	public scheduledAt: Date | null;
 

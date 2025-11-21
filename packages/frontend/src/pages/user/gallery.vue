@@ -4,13 +4,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<MkSpacer :contentMax="700">
+<div class="_spacer" style="--MI_SPACER-w: 700px;">
 	<MkPagination v-slot="{items}" :pagination="pagination">
 		<div :class="$style.root">
 			<MkGalleryPostPreview v-for="post in items" :key="post.id" :post="post" class="post"/>
 		</div>
 	</MkPagination>
-</MkSpacer>
+</div>
 </template>
 
 <script lang="ts" setup>
@@ -38,6 +38,6 @@ const pagination = {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
 	grid-gap: 12px;
-	margin: var(--margin);
+	margin: var(--MI-margin);
 }
 </style>

@@ -17,9 +17,12 @@ import { UtilityService } from '@/core/UtilityService.js';
 import { StatusError } from '@/misc/status-error.js';
 import { bindThis } from '@/decorators.js';
 import { validateContentTypeSetAsActivityPub } from '@/core/activitypub/misc/validator.js';
+import { assertActivityMatchesUrl, FetchAllowSoftFailMask } from '@/core/activitypub/misc/check-against-url.js';
 import type { IObject } from '@/core/activitypub/type.js';
 import type { Response } from 'node-fetch';
 import type { URL } from 'node:url';
+import stream, { Duplex } from "node:stream";
+import { RequestOptions } from "https";
 
 export type HttpRequestSendOptions = {
 	throwErrorWhenResponseNotOk: boolean;
@@ -41,8 +44,8 @@ class HttpRequestServiceAgent extends http.Agent {
 	}
 
 	@bindThis
-	public createConnection(options: net.NetConnectOpts, callback?: (err: unknown, stream: net.Socket) => void): net.Socket {
-		const socket = super.createConnection(options, callback)
+	public createConnection(options: net.NetConnectOpts, callback?: (err: Error | null, stream: net.Socket) => void): net.Socket {
+		const socket = super.createConnection(options, <(err: unknown, stream: net.Socket) => void> callback)
 			.on('connect', () => {
 				const address = socket.remoteAddress;
 				if (process.env.NODE_ENV === 'production') {
@@ -80,18 +83,17 @@ class HttpsRequestServiceAgent extends https.Agent {
 	}
 
 	@bindThis
-	public createConnection(options: net.NetConnectOpts, callback?: (err: unknown, stream: net.Socket) => void): net.Socket {
-		const socket = super.createConnection(options, callback)
-			.on('connect', () => {
-				const address = socket.remoteAddress;
-				if (process.env.NODE_ENV === 'production') {
-					if (address && ipaddr.isValid(address)) {
-						if (this.isPrivateIp(address)) {
-							socket.destroy(new Error(`Blocked address: ${address}`));
-						}
+	public createConnection(options: https.RequestOptions, callback?: (err: Error | null, stream: stream.Duplex) => void): stream.Duplex | null | undefined {
+		const socket = super.createConnection(options, callback)?.on('connect', () => {
+			const address = (socket as net.Socket).remoteAddress;
+			if (process.env.NODE_ENV === 'production') {
+				if (address && ipaddr.isValid(address)) {
+					if (this.isPrivateIp(address)) {
+						socket?.destroy(new Error(`Blocked address: ${address}`));
 					}
 				}
-			});
+			}
+		});
 		return socket;
 	}
 
@@ -115,32 +117,32 @@ export class HttpRequestService {
 	/**
 	 * Get http non-proxy agent (without local address filtering)
 	 */
-	private httpNative: http.Agent;
+	private readonly httpNative: http.Agent;
 
 	/**
 	 * Get https non-proxy agent (without local address filtering)
 	 */
-	private httpsNative: https.Agent;
+	private readonly httpsNative: https.Agent;
 
 	/**
 	 * Get http non-proxy agent
 	 */
-	private http: http.Agent;
+	private readonly http: http.Agent;
 
 	/**
 	 * Get https non-proxy agent
 	 */
-	private https: https.Agent;
+	private readonly https: https.Agent;
 
 	/**
 	 * Get http proxy or non-proxy agent
 	 */
-	public httpAgent: http.Agent;
+	public readonly httpAgent: http.Agent;
 
 	/**
 	 * Get https proxy or non-proxy agent
 	 */
-	public httpsAgent: https.Agent;
+	public readonly httpsAgent: https.Agent;
 
 	constructor(
 		@Inject(DI.config)
@@ -199,7 +201,8 @@ export class HttpRequestService {
 	/**
 	 * Get agent by URL
 	 * @param url URL
-	 * @param bypassProxy Allways bypass proxy
+	 * @param bypassProxy Always bypass proxy
+	 * @param isLocalAddressAllowed
 	 */
 	@bindThis
 	public getAgentByUrl(url: URL, bypassProxy = false, isLocalAddressAllowed = false): http.Agent | https.Agent {
@@ -213,6 +216,38 @@ export class HttpRequestService {
 				return url.protocol === 'http:' ? this.httpNative : this.httpsNative;
 			}
 			return url.protocol === 'http:' ? this.httpAgent : this.httpsAgent;
+		}
+	}
+
+	/**
+	 * Get agent for http by URL
+	 * @param url URL
+	 * @param isLocalAddressAllowed
+	 */
+	@bindThis
+	public getAgentForHttp(url: URL, isLocalAddressAllowed = false): http.Agent {
+		if ((this.config.proxyBypassHosts ?? []).includes(url.hostname)) {
+			return isLocalAddressAllowed
+				? this.httpNative
+				: this.http;
+		} else {
+			return this.httpAgent;
+		}
+	}
+
+	/**
+	 * Get agent for https by URL
+	 * @param url URL
+	 * @param isLocalAddressAllowed
+	 */
+	@bindThis
+	public getAgentForHttps(url: URL, isLocalAddressAllowed = false): https.Agent {
+		if ((this.config.proxyBypassHosts ?? []).includes(url.hostname)) {
+			return isLocalAddressAllowed
+				? this.httpsNative
+				: this.https;
+		} else {
+			return this.httpsAgent;
 		}
 	}
 
@@ -303,6 +338,7 @@ export class HttpRequestService {
 			},
 			body: args.body,
 			size: args.size ?? 10 * 1024 * 1024,
+			// @ts-expect-error typedef of fetch does not considered for https agent
 			agent: (url) => this.getAgentByUrl(url, false, isLocalAddressAllowed),
 			signal: controller.signal,
 		});

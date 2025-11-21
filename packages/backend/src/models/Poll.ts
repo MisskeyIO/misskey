@@ -5,10 +5,10 @@
 
 import { PrimaryColumn, Entity, Index, JoinColumn, Column, OneToOne } from 'typeorm';
 import { noteVisibilities } from '@/types.js';
+import type { MiChannel } from '@/models/Channel.js';
 import { id } from './util/id.js';
 import { MiNote } from './Note.js';
 import type { MiUser } from './User.js';
-import type { MiChannel } from '@/models/Channel.js';
 
 @Entity('poll')
 export class MiPoll {

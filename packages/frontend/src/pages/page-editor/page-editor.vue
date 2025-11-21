@@ -4,11 +4,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<MkStickyContainer>
-	<template #header><MkPageHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs"/></template>
-	<MkSpacer :contentMax="700">
+<PageWithHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs">
+	<div class="_spacer" style="--MI_SPACER-w: 700px;">
 		<div class="jqqmcavi">
-			<MkButton v-if="pageId" class="button" inline link :to="`/@${ author.username }/pages/${ currentName }`"><i class="ti ti-external-link"></i> {{ i18n.ts._pages.viewPage }}</MkButton>
+			<MkButton v-if="pageId" class="button" inline link :to="`/@${ author?.username }/pages/${ currentName }`"><i class="ti ti-external-link"></i> {{ i18n.ts._pages.viewPage }}</MkButton>
 			<MkButton v-if="!readonly" inline primary class="button" @click="save"><i class="ti ti-device-floppy"></i> {{ i18n.ts.save }}</MkButton>
 			<MkButton v-if="pageId" inline class="button" @click="duplicate"><i class="ti ti-copy"></i> {{ i18n.ts.duplicate }}</MkButton>
 			<MkButton v-if="pageId && !readonly" inline class="button" danger @click="del"><i class="ti ti-trash"></i> {{ i18n.ts.delete }}</MkButton>
@@ -25,7 +24,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</MkInput>
 
 				<MkInput v-model="name" type="text" pattern="^[a-zA-Z0-9_-]+$" autocapitalize="off">
-					<template #prefix>{{ url }}/@{{ author.username }}/pages/</template>
+					<template #prefix>{{ url }}/@{{ author?.username }}/pages/</template>
 					<template #label>{{ i18n.ts._pages.url }}</template>
 				</MkInput>
 
@@ -62,27 +61,28 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<MkButton v-if="!readonly" rounded class="add" @click="add()"><i class="ti ti-plus"></i></MkButton>
 			</div>
 		</div>
-	</MkSpacer>
-</MkStickyContainer>
+	</div>
+</PageWithHeader>
 </template>
 
 <script lang="ts" setup>
 import { computed, provide, watch, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { v4 as uuid } from 'uuid';
+import { url } from '@@/js/config.js';
 import XBlocks from './page-editor.blocks.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkSelect from '@/components/MkSelect.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import MkInput from '@/components/MkInput.vue';
-import { url } from '@/config.js';
 import * as os from '@/os.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
-import { selectFile } from '@/scripts/select-file.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
+import { selectFile } from '@/utility/select-file.js';
 import { i18n } from '@/i18n.js';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
-import { $i } from '@/account.js';
-import { mainRouter } from '@/router/main.js';
+import { definePage } from '@/page.js';
+import { $i } from '@/i.js';
+import { mainRouter } from '@/router.js';
+import { getPageBlockList } from '@/pages/page-editor/common.js';
 
 const props = defineProps<{
 	initPageId?: string;
@@ -101,14 +101,13 @@ const summary = ref<string | null>(null);
 const name = ref(Date.now().toString());
 const eyeCatchingImage = ref<Misskey.entities.DriveFile | null>(null);
 const eyeCatchingImageId = ref<string | null>(null);
-const font = ref('sans-serif');
-const visibility = ref('public');
+const font = ref<'sans-serif' | 'serif'>('sans-serif');
+const visibility = ref<'public' | 'private'>('public');
 const content = ref<Misskey.entities.Page['content']>([]);
 const alignCenter = ref(false);
 const hideTitleWhenPinned = ref(false);
 
 provide('readonly', readonly.value);
-provide('getPageBlockList', getPageBlockList);
 
 watch(eyeCatchingImageId, async () => {
 	if (eyeCatchingImageId.value == null) {
@@ -120,120 +119,127 @@ watch(eyeCatchingImageId, async () => {
 	}
 });
 
-function getSaveOptions() {
+function getSaveOptions(): Misskey.entities.PagesCreateRequest {
 	return {
 		title: title.value.trim(),
 		name: name.value.trim(),
 		summary: summary.value,
 		font: font.value,
-		visibility: visibility.value,
 		script: '',
 		hideTitleWhenPinned: hideTitleWhenPinned.value,
 		alignCenter: alignCenter.value,
 		content: content.value,
 		variables: [],
 		eyeCatchingImageId: eyeCatchingImageId.value,
+		visibility: visibility.value,
 	};
 }
 
-function save() {
+function onError(error: any) {
+	console.error('Error occurred:', error);
+	os.alert({
+		type: 'error',
+		text: i18n.ts.somethingHappened,
+	});
+}
+
+async function save() {
 	const options = getSaveOptions();
 
-	const onError = err => {
-		if (err.id === '3d81ceae-475f-4600-b2a8-2bc116157532') {
-			if (err.info.param === 'name') {
-				os.alert({
-					type: 'error',
-					title: i18n.ts._pages.invalidNameTitle,
-					text: i18n.ts._pages.invalidNameText,
-				});
-			}
-		} else if (err.code === 'NAME_ALREADY_EXISTS') {
-			os.alert({
-				type: 'error',
-				text: i18n.ts._pages.nameAlreadyExists,
-			});
-		}
-	};
-
 	if (pageId.value) {
-		options.pageId = pageId.value;
-		os.apiWithDialog('pages/update', options)
-			.then(page => {
-				currentName.value = name.value.trim();
-				os.alert({
-					type: 'success',
-					text: i18n.ts._pages.updated,
+		const updateOptions: Misskey.entities.PagesUpdateRequest = {
+			pageId: pageId.value,
+			...options,
+		};
+
+		try {
+			await os.apiWithDialog('pages/update', updateOptions);
+
+			currentName.value = name.value.trim();
+			await os.alert({
+				type: 'success',
+				text: i18n.ts.saved,
+			});
+		} catch (error) {
+			if (error && typeof error === 'object' && 'code' in error && error.code === '2298a392-d4a1-44c5-9ebb-ac1aeaa5a9ab') {
+				await os.alert({
+					type: 'error',
+					title: i18n.ts.somethingHappened,
+					text: i18n.ts._pages.nameAlreadyExists,
 				});
-			}).catch(onError);
+			} else {
+				onError(error);
+			}
+		}
 	} else {
-		os.apiWithDialog('pages/create', options)
-			.then(created => {
-				pageId.value = created.id;
-				currentName.value = name.value.trim();
-				os.alert({
-					type: 'success',
-					text: i18n.ts._pages.created,
-				});
-				mainRouter.push(`/pages/edit/${pageId.value}`);
-			}).catch(onError);
+		try {
+			const created = await os.apiWithDialog('pages/create', options);
+			pageId.value = created.id;
+			currentName.value = name.value.trim();
+			await os.alert({
+				type: 'success',
+				text: 'Page created successfully',
+			});
+			mainRouter.push(`/pages/edit/${pageId.value}`);
+		} catch (error) {
+			onError(error);
+		}
 	}
 }
 
-function del() {
-	os.confirm({
+async function del() {
+	if (!pageId.value) return;
+
+	const { canceled } = await os.confirm({
 		type: 'warning',
 		text: i18n.tsx.removeAreYouSure({ x: title.value.trim() }),
-	}).then(({ canceled }) => {
-		if (canceled) return;
-		misskeyApi('pages/delete', {
-			pageId: pageId.value,
-		}).then(() => {
-			os.alert({
-				type: 'success',
-				text: i18n.ts._pages.deleted,
-			});
-			mainRouter.push('/pages');
-		});
 	});
+
+	if (canceled) return;
+
+	await os.apiWithDialog('pages/delete', {
+		pageId: pageId.value,
+	});
+
+	mainRouter.replace('/pages');
 }
 
-function duplicate() {
-	title.value = title.value + ' - copy';
-	name.value = name.value + '-copy';
-	misskeyApi('pages/create', getSaveOptions()).then(created => {
+async function duplicate() {
+	try {
+		title.value = title.value + ' - copy';
+		name.value = name.value + '-copy';
+
+		const created = await os.apiWithDialog('pages/create', getSaveOptions());
+
 		pageId.value = created.id;
 		currentName.value = name.value.trim();
-		os.alert({
-			type: 'success',
-			text: i18n.ts._pages.created,
-		});
+
 		mainRouter.push(`/pages/edit/${pageId.value}`);
-	});
+	} catch (error) {
+		if (error && typeof error === 'object' && 'code' in error && error.code === '4650348e-301c-499a-83c9-6aa988c66bc1') {
+			await os.alert({
+				type: 'error',
+				title: i18n.ts.somethingHappened,
+				text: i18n.ts._pages.nameAlreadyExists,
+			});
+		} else {
+			onError(error);
+		}
+	}
 }
 
 async function add() {
 	const { canceled, result: type } = await os.select({
-		type: null,
 		title: i18n.ts._pages.chooseBlock,
 		items: getPageBlockList(),
 	});
 	if (canceled) return;
 
 	const id = uuid();
-	content.value.push({ id, type });
+	content.value.push({ id, type } as any);
 }
 
-function getPageBlockList() {
-	return [
-		{ value: 'section', text: i18n.ts._pages.blocks.section },
-		{ value: 'text', text: i18n.ts._pages.blocks.text },
-		{ value: 'image', text: i18n.ts._pages.blocks.image },
-		{ value: 'note', text: i18n.ts._pages.blocks.note },
-	];
-}
-
-function setEyeCatchingImage(img) {
+function setEyeCatchingImage(img: Event) {
 	selectFile(img.currentTarget ?? img.target, null).then(file => {
 		eyeCatchingImageId.value = file.id;
 	});
@@ -257,18 +263,18 @@ async function init() {
 	}
 
 	if (page.value) {
-		author.value = page.value.user;
+		author.value = page.value.user as any;
 		pageId.value = page.value.id;
 		title.value = page.value.title;
 		name.value = page.value.name;
 		currentName.value = page.value.name;
 		summary.value = page.value.summary;
-		font.value = page.value.font;
-		visibility.value = page.value.visibility;
+		font.value = page.value.font as 'serif' | 'sans-serif';
 		hideTitleWhenPinned.value = page.value.hideTitleWhenPinned;
 		alignCenter.value = page.value.alignCenter;
 		content.value = page.value.content;
 		eyeCatchingImageId.value = page.value.eyeCatchingImageId;
+		visibility.value = page.value.visibility;
 	} else {
 		const id = uuid();
 		content.value = [{
@@ -279,7 +285,7 @@ async function init() {
 	}
 }
 
-init();
+await init();
 
 const headerActions = computed(() => []);
 
@@ -293,7 +299,7 @@ const headerTabs = computed(() => [{
 	icon: 'ti ti-note',
 }]);
 
-definePageMetadata(() => ({
+definePage(() => ({
 	title: props.initPageId ? i18n.ts._pages.editPage
 	: props.initPageName && props.initUser ? i18n.ts._pages.readPage
 	: i18n.ts._pages.newPage,

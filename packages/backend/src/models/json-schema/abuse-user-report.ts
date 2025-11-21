@@ -63,5 +63,9 @@ export const packedAbuseUserReportSchema = {
 			type: 'boolean',
 			optional: false, nullable: false,
 		},
+		moderationNote: {
+			type: 'string',
+			optional: false, nullable: false,
+		},
 	},
 } as const;

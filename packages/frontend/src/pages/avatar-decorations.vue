@@ -4,9 +4,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<MkStickyContainer>
-	<template #header><MkPageHeader :actions="headerActions" :tabs="headerTabs"/></template>
-	<MkSpacer :contentMax="900">
+<PageWithHeader :actions="headerActions" :tabs="headerTabs">
+	<div class="_spacer" style="--MI_SPACER-w: 900px;">
 		<div class="_gaps">
 			<div :class="$style.decorations">
 				<div
@@ -21,20 +20,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 			</div>
 		</div>
-	</MkSpacer>
-</MkStickyContainer>
+	</div>
+</PageWithHeader>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed, defineAsyncComponent } from 'vue';
 import * as Misskey from 'misskey-js';
-import { signinRequired } from '@/account.js';
+import { ensureSignin } from '@/i.js';
 import * as os from '@/os.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
+import { definePage } from '@/page.js';
 
-const $i = signinRequired();
+const $i = ensureSignin();
 
 const avatarDecorations = ref<Misskey.entities.AdminAvatarDecorationsListResponse>([]);
 
@@ -47,19 +46,18 @@ function load() {
 load();
 
 async function add(ev: MouseEvent) {
-	const { dispose } = os.popup(defineAsyncComponent(() => import('./avatar-decoration-edit-dialog.vue')), {
+	os.popup(defineAsyncComponent(() => import('./avatar-decoration-edit-dialog.vue')), {
 	}, {
 		done: result => {
 			if (result.created) {
 				avatarDecorations.value.unshift(result.created);
 			}
 		},
-		closed: () => dispose(),
-	});
+	}, 'closed');
 }
 
 function edit(avatarDecoration) {
-	const { dispose } = os.popup(defineAsyncComponent(() => import('./avatar-decoration-edit-dialog.vue')), {
+	os.popup(defineAsyncComponent(() => import('./avatar-decoration-edit-dialog.vue')), {
 		avatarDecoration: avatarDecoration,
 	}, {
 		done: result => {
@@ -73,8 +71,7 @@ function edit(avatarDecoration) {
 				avatarDecorations.value = avatarDecorations.value.filter(x => x.id !== avatarDecoration.id);
 			}
 		},
-		closed: () => dispose(),
-	});
+	}, 'closed');
 }
 
 const headerActions = computed(() => [{
@@ -86,7 +83,7 @@ const headerActions = computed(() => [{
 
 const headerTabs = computed(() => []);
 
-definePageMetadata(() => ({
+definePage(() => ({
 	title: i18n.ts.avatarDecorations,
 	icon: 'ti ti-sparkles',
 }));

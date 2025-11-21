@@ -1,29 +1,28 @@
 {
 	"type": "module",
 	"name": "misskey-js",
-	"version": "0.0.0",
+	"version": "2025.4.1-io.1",
 	"description": "Misskey SDK for JavaScript",
-	"types": "./built/dts/index.d.ts",
+	"license": "MIT",
+	"types": "./built/index.d.ts",
 	"exports": {
 		".": {
-			"import": "./built/esm/index.js",
-			"types": "./built/dts/index.d.ts"
+			"import": "./built/index.js",
+			"types": "./built/index.d.ts"
 		},
 		"./*": {
-			"import": "./built/esm/*",
-			"types": "./built/dts/*"
+			"import": "./built/*",
+			"types": "./built/*"
 		}
 	},
 	"scripts": {
 		"build": "pnpm run build:tsc",
-		"build:tsc": "pnpm tsc-esm && pnpm tsc-dts",
-		"tsc-esm": "tsc --outDir built/esm",
-		"tsc-dts": "tsc --outDir built/dts --declaration true --emitDeclarationOnly true --declarationMap true",
+		"build:tsc": "tsc --outDir built --declaration true --declarationMap true",
 		"watch": "nodemon -w src -e ts,js,cjs,mjs,json --exec \"pnpm run build\"",
 		"tsd": "tsd",
 		"api": "pnpm api-extractor run --local --verbose",
 		"api-prod": "pnpm api-extractor run --verbose",
-		"eslint": "eslint . --ext .js,.jsx,.ts,.tsx",
+		"eslint": "eslint './**/*.{js,jsx,ts,tsx}'",
 		"typecheck": "tsc --noEmit",
 		"lint": "pnpm typecheck && pnpm eslint",
 		"jest": "jest --coverage --detectOpenHandles",
@@ -32,35 +31,36 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/misskey-dev/misskey.js.git"
+		"url": "https://github.com/misskey-dev/misskey.git",
+		"directory": "packages/misskey-js"
 	},
 	"devDependencies": {
-		"@microsoft/api-extractor": "7.52.8",
-		"@misskey-dev/eslint-plugin": "1.0.0",
-		"@swc/jest": "0.2.38",
-		"@types/jest": "29.5.14",
-		"@types/node": "22.15.17",
-		"@typescript-eslint/eslint-plugin": "7.10.0",
-		"@typescript-eslint/parser": "7.10.0",
-		"eslint": "8.57.1",
-		"jest": "29.7.0",
-		"jest-fetch-mock": "3.0.3",
-		"jest-websocket-mock": "2.5.0",
-		"mock-socket": "9.3.1",
-		"ncp": "2.0.0",
-		"nodemon": "3.1.10",
-		"tsd": "0.32.0",
-		"typescript": "5.8.3"
+		"@microsoft/api-extractor": "catalog:",
+		"@misskey-dev/eslint-plugin": "catalog:",
+		"@swc/jest": "catalog:",
+		"@types/jest": "catalog:",
+		"@types/node": "catalog:",
+		"@typescript-eslint/eslint-plugin": "catalog:",
+		"@typescript-eslint/parser": "catalog:",
+		"esbuild": "catalog:",
+		"eslint": "catalog:",
+		"glob": "catalog:",
+		"jest": "catalog:",
+		"jest-fetch-mock": "catalog:",
+		"jest-websocket-mock": "catalog:",
+		"mock-socket": "catalog:",
+		"ncp": "catalog:",
+		"nodemon": "catalog:",
+		"tsd": "catalog:",
+		"typescript": "catalog:"
 	},
 	"files": [
-		"built",
-		"built/esm",
-		"built/dts"
+		"built"
 	],
 	"dependencies": {
-		"@swc/cli": "0.7.7",
-		"@swc/core": "1.11.24",
-		"eventemitter3": "5.0.1",
-		"reconnecting-websocket": "4.4.0"
+		"@simplewebauthn/browser": "catalog:",
+		"@swc/cli": "catalog:",
+		"@swc/core": "catalog:",
+		"eventemitter3": "catalog:"
 	}
 }

@@ -47,7 +47,6 @@ await fs.readFile(
 				)
 			)
 			.map((path) => path.replace(/(?:(?<=\.stories)\.(?:impl|meta)|\.msw)(?=\.ts$)/g, ''))
-			.map((path) => (path.startsWith('.') ? path : `./${path}`))
 	);
 	if (
 		micromatch(Array.from(modules), [
@@ -56,7 +55,7 @@ await fs.readFile(
 			'../../locales/ja-JP.yml',
 			'assets/**',
 			'public/**',
-			'../../pnpm-lock.yaml',
+			'package.json',
 		]).length
 	) {
 		return;

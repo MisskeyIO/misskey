@@ -58,7 +58,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			const games = await query.take(ps.limit).getMany();
 
-			return await this.reversiGameEntityService.packLiteMany(games, me);
+			return await this.reversiGameEntityService.packLiteMany(games);
 		});
 	}
 }

@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - next
       - beta
       - io
       - host
@@ -13,7 +14,8 @@ on:
       - packages/misskey-js/**
       # for e2e
       - packages/backend/**
-
+      - .github/workflows/test-frontend.yml
+      - .github/misskey/test.yml
   pull_request:
     paths:
       - packages/frontend/**
@@ -21,20 +23,23 @@ on:
       - packages/misskey-js/**
       # for e2e
       - packages/backend/**
+      - .github/workflows/test-frontend.yml
+      - .github/misskey/test.yml
 
 permissions:
   contents: read
 
 jobs:
   vitest:
+    name: Unit tests (frontend)
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [24.x]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         fetch-depth: 0
         submodules: true
@@ -43,7 +48,7 @@ jobs:
       with:
         run_install: false
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4.4.0
+      uses: actions/setup-node@v6
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'pnpm'

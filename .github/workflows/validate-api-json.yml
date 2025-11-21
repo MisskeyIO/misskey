@@ -1,17 +1,20 @@
-name: Test (backend)
+name: api.json validation
 
 on:
   push:
     branches:
       - main
+      - next
       - beta
       - io
       - host
     paths:
       - packages/backend/**
+      - .github/workflows/validate-api-json.yml
   pull_request:
     paths:
       - packages/backend/**
+      - .github/workflows/validate-api-json.yml
 
 permissions:
   contents: read
@@ -22,10 +25,10 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [24.x]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         fetch-depth: 0
         submodules: true
@@ -34,7 +37,7 @@ jobs:
       with:
         run_install: false
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4.4.0
+      uses: actions/setup-node@v6
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'pnpm'

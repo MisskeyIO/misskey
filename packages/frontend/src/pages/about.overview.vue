@@ -131,6 +131,7 @@ import FormLink from '@/components/form/link.vue';
 import FormSection from '@/components/form/section.vue';
 import FormSplit from '@/components/form/split.vue';
 import FormSuspense from '@/components/form/suspense.vue';
+import Mfm from '@/components/global/MkMfm.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import MkKeyValue from '@/components/MkKeyValue.vue';
 import MkLink from '@/components/MkLink.vue';

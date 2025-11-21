@@ -38,12 +38,12 @@
 		"vue": "catalog:"
 	},
 	"devDependencies": {
-		"@misskey-dev/summaly": "catalog:",
+		"@misskey-dev/summaly": "github:MisskeyIO/summaly#5.2.1-io.1",
 		"@testing-library/vue": "catalog:",
 		"@types/estree": "catalog:",
 		"@types/micromatch": "catalog:",
 		"@types/node": "catalog:",
-		"@types/punycode.js": "catalog:",
+		"@types/punycode.js": "npm:@types/punycode@2.1.4",
 		"@types/tinycolor2": "catalog:",
 		"@types/ws": "catalog:",
 		"@typescript-eslint/eslint-plugin": "catalog:",
@@ -55,7 +55,7 @@
 		"eslint-plugin-import": "catalog:",
 		"eslint-plugin-vue": "catalog:",
 		"fast-glob": "catalog:",
-		"jsdom": "catalog:",
+		"jsdom": "26.1.0",
 		"micromatch": "catalog:",
 		"msw": "catalog:",
 		"nodemon": "catalog:",

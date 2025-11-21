@@ -1,66 +1,66 @@
 {
-	"type": "module",
-	"name": "misskey-js",
-	"version": "2025.4.1-io.1",
-	"description": "Misskey SDK for JavaScript",
-	"license": "MIT",
-	"types": "./built/index.d.ts",
-	"exports": {
-		".": {
-			"import": "./built/index.js",
-			"types": "./built/index.d.ts"
-		},
-		"./*": {
-			"import": "./built/*",
-			"types": "./built/*"
-		}
-	},
-	"scripts": {
-		"build": "pnpm run build:tsc",
-		"build:tsc": "tsc --outDir built --declaration true --declarationMap true",
-		"watch": "nodemon -w src -e ts,js,cjs,mjs,json --exec \"pnpm run build\"",
-		"tsd": "tsd",
-		"api": "pnpm api-extractor run --local --verbose",
-		"api-prod": "pnpm api-extractor run --verbose",
-		"eslint": "eslint './**/*.{js,jsx,ts,tsx}'",
-		"typecheck": "tsc --noEmit",
-		"lint": "pnpm typecheck && pnpm eslint",
-		"jest": "jest --coverage --detectOpenHandles",
-		"test": "pnpm jest && pnpm tsd",
-		"update-autogen-code": "pnpm --filter misskey-js-type-generator generate && ncp generator/built/autogen src/autogen"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/misskey-dev/misskey.git",
-		"directory": "packages/misskey-js"
-	},
-	"devDependencies": {
-		"@microsoft/api-extractor": "catalog:",
-		"@misskey-dev/eslint-plugin": "catalog:",
-		"@swc/jest": "catalog:",
-		"@types/jest": "catalog:",
-		"@types/node": "catalog:",
-		"@typescript-eslint/eslint-plugin": "catalog:",
-		"@typescript-eslint/parser": "catalog:",
-		"esbuild": "catalog:",
-		"eslint": "catalog:",
-		"glob": "catalog:",
-		"jest": "catalog:",
-		"jest-fetch-mock": "catalog:",
-		"jest-websocket-mock": "catalog:",
-		"mock-socket": "catalog:",
-		"ncp": "catalog:",
-		"nodemon": "catalog:",
-		"tsd": "catalog:",
-		"typescript": "catalog:"
-	},
-	"files": [
-		"built"
-	],
-	"dependencies": {
-		"@simplewebauthn/browser": "catalog:",
-		"@swc/cli": "catalog:",
-		"@swc/core": "catalog:",
-		"eventemitter3": "catalog:"
-	}
+  "type": "module",
+  "name": "misskey-js",
+  "version": "2025.4.1-io.1",
+  "description": "Misskey SDK for JavaScript",
+  "license": "MIT",
+  "types": "./built/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./built/index.js",
+      "types": "./built/index.d.ts"
+    },
+    "./*": {
+      "import": "./built/*",
+      "types": "./built/*"
+    }
+  },
+  "scripts": {
+    "build": "pnpm run build:tsc",
+    "build:tsc": "tsc --outDir built --declaration true --declarationMap true",
+    "watch": "nodemon -w src -e ts,js,cjs,mjs,json --exec \"pnpm run build\"",
+    "tsd": "tsd",
+    "api": "pnpm api-extractor run --local --verbose",
+    "api-prod": "pnpm api-extractor run --verbose",
+    "eslint": "eslint './**/*.{js,jsx,ts,tsx}'",
+    "typecheck": "tsc --noEmit",
+    "lint": "pnpm typecheck && pnpm eslint",
+    "jest": "jest --coverage --detectOpenHandles",
+    "test": "pnpm jest && pnpm tsd",
+    "update-autogen-code": "pnpm --filter misskey-js-type-generator generate && ncp generator/built/autogen src/autogen"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/misskey-dev/misskey.git",
+    "directory": "packages/misskey-js"
+  },
+  "devDependencies": {
+    "@microsoft/api-extractor": "catalog:",
+    "@misskey-dev/eslint-plugin": "catalog:",
+    "@swc/jest": "catalog:",
+    "@types/jest": "catalog:",
+    "@types/node": "catalog:",
+    "@typescript-eslint/eslint-plugin": "catalog:",
+    "@typescript-eslint/parser": "catalog:",
+    "esbuild": "catalog:",
+    "eslint": "catalog:",
+    "glob": "catalog:",
+    "jest": "catalog:",
+    "jest-fetch-mock": "catalog:",
+    "jest-websocket-mock": "catalog:",
+    "mock-socket": "catalog:",
+    "ncp": "catalog:",
+    "nodemon": "catalog:",
+    "tsd": "catalog:",
+    "typescript": "catalog:"
+  },
+  "files": [
+    "built"
+  ],
+  "dependencies": {
+    "@simplewebauthn/browser": "catalog:",
+    "@swc/cli": "catalog:",
+    "@swc/core": "catalog:",
+    "eventemitter3": "catalog:"
+  }
 }

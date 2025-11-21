@@ -1,40 +1,40 @@
 {
-	"name": "frontend-shared",
-	"type": "module",
-	"main": "./js-built/index.js",
-	"types": "./js-built/index.d.ts",
-	"exports": {
-		".": {
-			"import": "./js-built/index.js",
-			"types": "./js-built/index.d.ts"
-		},
-		"./*": {
-			"import": "./js-built/*",
-			"types": "./js-built/*"
-		}
-	},
-	"scripts": {
-		"build": "node ./build.js",
-		"watch": "nodemon -w package.json -e json --exec \"node ./build.js --watch\"",
-		"eslint": "eslint './**/*.{js,jsx,ts,tsx}'",
-		"typecheck": "tsc --noEmit",
-		"lint": "pnpm typecheck && pnpm eslint"
-	},
-	"devDependencies": {
-		"@types/node": "catalog:",
-		"@typescript-eslint/eslint-plugin": "catalog:",
-		"@typescript-eslint/parser": "catalog:",
-		"esbuild": "catalog:",
-		"eslint-plugin-vue": "catalog:",
-		"nodemon": "catalog:",
-		"typescript": "catalog:",
-		"vue-eslint-parser": "catalog:"
-	},
-	"files": [
-		"js-built"
-	],
-	"dependencies": {
-		"misskey-js": "workspace:*",
-		"vue": "catalog:"
-	}
+  "name": "frontend-shared",
+  "type": "module",
+  "main": "./js-built/index.js",
+  "types": "./js-built/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./js-built/index.js",
+      "types": "./js-built/index.d.ts"
+    },
+    "./*": {
+      "import": "./js-built/*",
+      "types": "./js-built/*"
+    }
+  },
+  "scripts": {
+    "build": "node ./build.js",
+    "watch": "nodemon -w package.json -e json --exec \"node ./build.js --watch\"",
+    "eslint": "eslint './**/*.{js,jsx,ts,tsx}'",
+    "typecheck": "tsc --noEmit",
+    "lint": "pnpm typecheck && pnpm eslint"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@typescript-eslint/eslint-plugin": "catalog:",
+    "@typescript-eslint/parser": "catalog:",
+    "esbuild": "catalog:",
+    "eslint-plugin-vue": "catalog:",
+    "nodemon": "catalog:",
+    "typescript": "catalog:",
+    "vue-eslint-parser": "catalog:"
+  },
+  "files": [
+    "js-built"
+  ],
+  "dependencies": {
+    "misskey-js": "workspace:*",
+    "vue": "catalog:"
+  }
 }

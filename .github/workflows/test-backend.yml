@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - next
       - beta
       - io
       - host
@@ -11,22 +12,27 @@ on:
       - packages/backend/**
       # for permissions
       - packages/misskey-js/**
+      - .github/workflows/test-backend.yml
+      - .github/misskey/test.yml
   pull_request:
     paths:
       - packages/backend/**
       # for permissions
       - packages/misskey-js/**
+      - .github/workflows/test-backend.yml
+      - .github/misskey/test.yml
 
 permissions:
   contents: read
 
 jobs:
   unit:
+    name: Unit tests (backend)
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [24.x]
 
     services:
       postgres:
@@ -46,7 +52,7 @@ jobs:
           - 56312:6379
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
         submodules: true
@@ -73,7 +79,7 @@ jobs:
         path: /opt/hostedtoolcache/ffmpeg
         key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ steps.setup-ffmpeg.outputs.ffmpeg-version }}
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4.4.0
+      uses: actions/setup-node@v6
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'pnpm'
@@ -93,11 +99,12 @@ jobs:
         files: ./packages/backend/coverage/coverage-final.json
 
   e2e:
+    name: E2E tests (backend)
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [24.x]
 
     services:
       postgres:
@@ -117,7 +124,7 @@ jobs:
           - 56312:6379
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           submodules: true
@@ -126,7 +133,7 @@ jobs:
         with:
           run_install: false
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4.4.0
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'

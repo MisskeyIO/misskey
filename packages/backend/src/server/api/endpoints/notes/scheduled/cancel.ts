@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
+import ms from 'ms';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
 import type { ScheduledNotesRepository } from '@/models/_.js';
 import { QueueService } from '@/core/QueueService.js';
 import { ApiError } from '@/server/api/error.js';
-import ms from 'ms';
 
 export const meta = {
 	tags: ['notes'],
@@ -26,7 +26,7 @@ export const meta = {
 			message: 'No such draft',
 			code: 'NO_SUCH_DRAFT',
 			id: '91c2ad21-fb45-4f2a-ba4c-ea749b262947',
-		}
+		},
 	},
 } as const;
 

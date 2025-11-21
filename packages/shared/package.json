@@ -1,0 +1,8 @@
+{
+	"name": "@misskey/shared-config",
+	"private": true,
+	"type": "module",
+	"dependencies": {
+		"@misskey-dev/eslint-plugin": "catalog:"
+	}
+}

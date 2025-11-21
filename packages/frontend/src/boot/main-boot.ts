@@ -4,47 +4,102 @@
  */
 
 import { createApp, defineAsyncComponent, markRaw } from 'vue';
+import { lang, locale, ui, updateLocale, version } from '@@/js/config.js';
+import * as Misskey from 'misskey-js';
+import { compareVersions } from 'compare-versions';
 import { common } from './common.js';
-import { ui } from '@/config.js';
-import { i18n } from '@/i18n.js';
-import { alert, confirm, popup, post, toast } from '@/os.js';
+import type { Component } from 'vue';
+import type { Keymap } from '@/utility/hotkey.js';
+import { i18n, updateI18n } from '@/i18n.js';
+import { alert, confirm, popup, post } from '@/os.js';
 import { useStream } from '@/stream.js';
-import * as sound from '@/scripts/sound.js';
-import { $i, signout, updateAccount } from '@/account.js';
-import { ColdDeviceStorage, defaultStore } from '@/store.js';
-import { makeHotkey } from '@/scripts/hotkey.js';
-import { reactionPicker } from '@/scripts/reaction-picker.js';
-import { miLocalStorage } from '@/local-storage.js';
-import { claimAchievement, claimedAchievements } from '@/scripts/achievements.js';
-import { initializeSw } from '@/scripts/initialize-sw.js';
-import { deckStore } from '@/ui/deck/deck-store.js';
-import { emojiPicker } from '@/scripts/emoji-picker.js';
-import { mainRouter } from '@/router/main.js';
+import * as sound from '@/utility/sound.js';
+import { $i } from '@/i.js';
 import { instance } from '@/instance.js';
+import { store } from '@/store.js';
+import { reactionPicker } from '@/utility/reaction-picker.js';
+import { miLocalStorage } from '@/local-storage.js';
+import { claimAchievement, claimedAchievements } from '@/utility/achievements.js';
+import { initializeSw } from '@/utility/initialize-sw.js';
+import { emojiPicker } from '@/utility/emoji-picker.js';
+import { mainRouter } from '@/router.js';
+import { makeHotkey } from '@/utility/hotkey.js';
+import { addCustomEmoji, removeCustomEmojis, updateCustomEmojis } from '@/custom-emojis.js';
+import { prefer } from '@/preferences.js';
+import { launchPlugins } from '@/plugin.js';
+import { updateCurrentAccountPartial } from '@/accounts.js';
+import { signout } from '@/signout.js';
+import { migrateOldSettings } from '@/pref-migrate.js';
 
 export async function mainBoot() {
-	const { isClientUpdated } = await common(() => createApp(
-		new URLSearchParams(window.location.search).has('zen') || (ui === 'deck' && deckStore.state.useSimpleUiForNonRootPages && location.pathname !== '/') ? defineAsyncComponent(() => import('@/ui/zen.vue')) :
-		!$i ? defineAsyncComponent(() => import('@/ui/visitor.vue')) :
-		ui === 'deck' ? defineAsyncComponent(() => import('@/ui/deck.vue')) :
-		ui === 'classic' ? defineAsyncComponent(() => import('@/ui/classic.vue')) :
-		defineAsyncComponent(() => import('@/ui/universal.vue')),
-	));
+	//#region Detect language & fetch translations
+	const localeVersion = miLocalStorage.getItem('localeVersion');
+	const localeOutdated = (localeVersion == null || localeVersion !== version || locale == null);
+	if (localeOutdated) {
+		const res = await window.fetch(`/assets/locales/${lang}.${version}.json`);
+		if (res.status === 200) {
+			const newLocale = await res.text();
+			const parsedNewLocale = JSON.parse(newLocale);
+			miLocalStorage.setItem('locale', newLocale);
+			miLocalStorage.setItem('localeVersion', version);
+			updateLocale(parsedNewLocale);
+			updateI18n(parsedNewLocale);
+		}
+	}
+	//#endregion
+
+	const { isClientUpdated, lastVersion } = await common(async () => {
+		let uiStyle = ui;
+		const searchParams = new URLSearchParams(window.location.search);
+
+		if (!$i) uiStyle = 'visitor';
+
+		if (searchParams.has('zen')) uiStyle = 'zen';
+		if (uiStyle === 'deck' && prefer.s['deck.useSimpleUiForNonRootPages'] && window.location.pathname !== '/') uiStyle = 'zen';
+
+		if (searchParams.has('ui')) uiStyle = searchParams.get('ui');
+
+		let rootComponent: Component;
+		switch (uiStyle) {
+			case 'zen':
+				rootComponent = await import('@/ui/zen.vue').then(x => x.default);
+				break;
+			case 'deck':
+				rootComponent = await import('@/ui/deck.vue').then(x => x.default);
+				break;
+			case 'visitor':
+				rootComponent = await import('@/ui/visitor.vue').then(x => x.default);
+				break;
+			default:
+				rootComponent = await import('@/ui/universal.vue').then(x => x.default);
+				break;
+		}
+
+		return createApp(rootComponent);
+	});
 
 	reactionPicker.init();
 	emojiPicker.init();
 
 	if (isClientUpdated && $i) {
-		popup(defineAsyncComponent(() => import('@/components/MkUpdated.vue')), {}, {}, 'closed');
+		await popup(defineAsyncComponent(() => import('@/components/MkUpdated.vue')), {}, {}, 'closed');
+
+		// prefereces migration
+		// TODO: そのうち消す
+		if (lastVersion && (compareVersions('2025.3.2-alpha.0', lastVersion) === 1)) {
+			console.log('Preferences migration');
+
+			migrateOldSettings();
+		}
 	}
 
 	const stream = useStream();
 
 	let reloadDialogShowing = false;
 	stream.on('_disconnected_', async () => {
-		if (defaultStore.state.serverDisconnectedBehavior === 'reload') {
-			location.reload();
-		} else if (defaultStore.state.serverDisconnectedBehavior === 'dialog') {
+		if (prefer.s.serverDisconnectedBehavior === 'reload') {
+			window.location.reload();
+		} else if (prefer.s.serverDisconnectedBehavior === 'dialog') {
 			if (reloadDialogShowing) return;
 			reloadDialogShowing = true;
 			const { canceled } = await confirm({
@@ -54,44 +109,41 @@ export async function mainBoot() {
 			});
 			reloadDialogShowing = false;
 			if (!canceled) {
-				location.reload();
+				window.location.reload();
 			}
 		}
 	});
 
-	for (const plugin of ColdDeviceStorage.get('plugins').filter(p => p.active)) {
-		import('@/plugin.js').then(async ({ install }) => {
-			// Workaround for https://bugs.webkit.org/show_bug.cgi?id=242740
-			await new Promise(r => setTimeout(r, 0));
-			install(plugin);
-		});
-	}
+	stream.on('emojiAdded', emojiData => {
+		addCustomEmoji(emojiData.emoji);
+	});
 
-	const hotkeys = {
-		'd': (): void => {
-			defaultStore.set('darkMode', !defaultStore.state.darkMode);
-		},
-		's': (): void => {
-			mainRouter.push('/search');
-		},
-	};
+	stream.on('emojiUpdated', emojiData => {
+		updateCustomEmojis(emojiData.emojis);
+	});
+
+	stream.on('emojiDeleted', emojiData => {
+		removeCustomEmojis(emojiData.emojis);
+	});
+
+	launchPlugins();
 
 	try {
-		if (defaultStore.state.enableSeasonalScreenEffect) {
+		if (prefer.s.enableSeasonalScreenEffect) {
 			const month = new Date().getMonth() + 1;
-			if (defaultStore.state.hemisphere === 'S') {
+			if (prefer.s.hemisphere === 'S') {
 				// ▼南半球
 				if (month === 7 || month === 8) {
-					const SnowfallEffect = (await import('@/scripts/snowfall-effect.js')).SnowfallEffect;
+					const SnowfallEffect = (await import('@/utility/snowfall-effect.js')).SnowfallEffect;
 					new SnowfallEffect({}).render();
 				}
 			} else {
 				// ▼北半球
 				if (month === 12 || month === 1) {
-					const SnowfallEffect = (await import('@/scripts/snowfall-effect.js')).SnowfallEffect;
+					const SnowfallEffect = (await import('@/utility/snowfall-effect.js')).SnowfallEffect;
 					new SnowfallEffect({}).render();
 				} else if (month === 3 || month === 4) {
-					const SakuraEffect = (await import('@/scripts/snowfall-effect.js')).SnowfallEffect;
+					const SakuraEffect = (await import('@/utility/snowfall-effect.js')).SnowfallEffect;
 					new SakuraEffect({
 						sakura: true,
 					}).render();
@@ -104,19 +156,26 @@ export async function mainBoot() {
 	}
 
 	if ($i) {
-		// only add post shortcuts if logged in
-		hotkeys['p|n'] = post;
-
-		defaultStore.loaded.then(() => {
-			if (defaultStore.state.accountSetupWizard !== -1) {
-				popup(defineAsyncComponent(() => import('@/components/MkUserSetupDialog.vue')), {}, {}, 'closed');
+		store.loaded.then(async () => {
+			if (store.s.accountSetupWizard !== -1) {
+				await popup(defineAsyncComponent(() => import('@/components/MkUserSetupDialog.vue')), {}, {}, 'closed');
 			}
 		});
 
 		for (const announcement of ($i.unreadAnnouncements ?? []).filter(x => x.display === 'dialog')) {
-			popup(defineAsyncComponent(() => import('@/components/MkAnnouncementDialog.vue')), {
+			await popup(defineAsyncComponent(() => import('@/components/MkAnnouncementDialog.vue')), {
 				announcement,
 			}, {}, 'closed');
+		}
+
+		async function onAnnouncementCreated(ev: { announcement: Misskey.entities.Announcement }) {
+			const announcement = ev.announcement;
+
+			if (announcement.display === 'dialog') {
+				await popup(defineAsyncComponent(() => import('@/components/MkAnnouncementDialog.vue')), {
+					announcement,
+				}, {}, 'closed');
+			}
 		}
 
 		if ($i.isDeleted) {
@@ -209,48 +268,85 @@ export async function mainBoot() {
 			claimAchievement('collectAchievements30');
 		}
 
-		window.setInterval(() => {
-			if (Math.floor(Math.random() * 20000) === 0) {
-				claimAchievement('justPlainLucky');
+		if (!claimedAchievements.includes('justPlainLucky')) {
+			let justPlainLuckyTimer: number | null = null;
+			let lastVisibilityChangedAt = Date.now();
+
+			function claimPlainLucky() {
+				if (window.document.visibilityState !== 'visible') {
+					if (justPlainLuckyTimer != null) window.clearTimeout(justPlainLuckyTimer);
+					return;
+				}
+
+				if (Math.floor(Math.random() * 20000) === 0) {
+					claimAchievement('justPlainLucky');
+				} else {
+					justPlainLuckyTimer = window.setTimeout(claimPlainLucky, 1000 * 10);
+				}
 			}
-		}, 1000 * 10);
 
-		window.setTimeout(() => {
-			claimAchievement('client30min');
-		}, 1000 * 60 * 30);
+			window.addEventListener('visibilitychange', () => {
+				const now = Date.now();
 
-		window.setTimeout(() => {
-			claimAchievement('client60min');
-		}, 1000 * 60 * 60);
+				if (window.document.visibilityState === 'visible') {
+					// タブを高速で切り替えたら取得処理が何度も走るのを防ぐ
+					if ((now - lastVisibilityChangedAt) < 1000 * 10) {
+						justPlainLuckyTimer = window.setTimeout(claimPlainLucky, 1000 * 10);
+					} else {
+						claimPlainLucky();
+					}
+				} else if (justPlainLuckyTimer != null) {
+					window.clearTimeout(justPlainLuckyTimer);
+					justPlainLuckyTimer = null;
+				}
 
-		const lastUsed = miLocalStorage.getItem('lastUsed');
-		if (lastUsed) {
-			const lastUsedDate = parseInt(lastUsed, 10);
-			// 二時間以上前なら
-			if (Date.now() - lastUsedDate > 1000 * 60 * 60 * 2) {
-				toast(i18n.tsx.welcomeBackWithName({
-					name: $i.name || $i.username,
-				}));
-			}
+				lastVisibilityChangedAt = now;
+			}, { passive: true });
+
+			claimPlainLucky();
 		}
-		miLocalStorage.setItem('lastUsed', Date.now().toString());
 
-		if (!location.pathname.startsWith('/miauth') && !location.pathname.startsWith('/sso') && !location.pathname.startsWith('/oauth')) {
+		if (!claimedAchievements.includes('client30min')) {
+			window.setTimeout(() => {
+				claimAchievement('client30min');
+			}, 1000 * 60 * 30);
+		}
+
+		if (!claimedAchievements.includes('client60min')) {
+			window.setTimeout(() => {
+				claimAchievement('client60min');
+			}, 1000 * 60 * 60);
+		}
+
+		// 邪魔
+		//const lastUsed = miLocalStorage.getItem('lastUsed');
+		//if (lastUsed) {
+		//	const lastUsedDate = parseInt(lastUsed, 10);
+		//	// 二時間以上前なら
+		//	if (Date.now() - lastUsedDate > 1000 * 60 * 60 * 2) {
+		//		toast(i18n.tsx.welcomeBackWithName({
+		//			name: $i.name || $i.username,
+		//		}));
+		//	}
+		//}
+		//miLocalStorage.setItem('lastUsed', Date.now().toString());
+
+		if (!window.location.pathname.startsWith('/miauth') && !window.location.pathname.startsWith('/sso') && !window.location.pathname.startsWith('/oauth')) {
 			const latestDonationInfoShownAt = miLocalStorage.getItem('latestDonationInfoShownAt');
 			const neverShowDonationInfo = miLocalStorage.getItem('neverShowDonationInfo');
 			if (neverShowDonationInfo !== 'true' && (createdAt.getTime() < (Date.now() - (1000 * 60 * 60 * 24 * 3)))) {
 				if (latestDonationInfoShownAt == null || (new Date(latestDonationInfoShownAt).getTime() < (Date.now() - (1000 * 60 * 60 * 24 * 30)))) {
-					popup(defineAsyncComponent(() => import('@/components/MkDonation.vue')), {}, {}, 'closed');
+					await popup(defineAsyncComponent(() => import('@/components/MkDonation.vue')), {}, {}, 'closed');
 				}
 			}
 
 			// const modifiedVersionMustProminentlyOfferInAgplV3Section13Read = miLocalStorage.getItem('modifiedVersionMustProminentlyOfferInAgplV3Section13Read');
 			// if (modifiedVersionMustProminentlyOfferInAgplV3Section13Read !== 'true' && instance.repositoryUrl !== 'https://github.com/misskey-dev/misskey') {
-			// 	popup(defineAsyncComponent(() => import('@/components/MkSourceCodeAvailablePopup.vue')), {}, {}, 'closed');
+			// 	await popup(defineAsyncComponent(() => import('@/components/MkSourceCodeAvailablePopup.vue')), {}, {}, 'closed');
 			// }
 
 			if (instance.googleAnalyticsId && miLocalStorage.getItem('gaConsent') === null) {
-				popup(defineAsyncComponent(() => import('@/components/MkTrackingConsent.vue')), {}, {}, 'closed');
+				await popup(defineAsyncComponent(() => import('@/components/MkTrackingConsent.vue')), {}, {}, 'closed');
 			}
 		}
 
@@ -265,25 +361,13 @@ export async function mainBoot() {
 
 		// 自分の情報が更新されたとき
 		main.on('meUpdated', i => {
-			updateAccount(i);
+			updateCurrentAccountPartial(i);
 		});
 
-		main.on('announcementCreated', (ev) => {
-			const announcement = ev.announcement;
-			updateAccount({
-				hasUnreadAnnouncement: true,
-				unreadAnnouncements: [...($i?.unreadAnnouncements ?? []), announcement],
-			});
-
-			if (announcement.display === 'dialog') {
-				popup(defineAsyncComponent(() => import('@/components/MkAnnouncementDialog.vue')), {
-					announcement,
-				}, {}, 'closed');
-			}
-		});
+		main.on('announcementCreated', onAnnouncementCreated);
 
 		main.on('readAllNotifications', () => {
-			updateAccount({
+			updateCurrentAccountPartial({
 				hasUnreadNotification: false,
 				unreadNotificationsCount: 0,
 			});
@@ -291,57 +375,31 @@ export async function mainBoot() {
 
 		main.on('unreadNotification', () => {
 			const unreadNotificationsCount = ($i?.unreadNotificationsCount ?? 0) + 1;
-			updateAccount({
+			updateCurrentAccountPartial({
 				hasUnreadNotification: true,
 				unreadNotificationsCount,
 			});
 		});
 
-		main.on('unreadMention', () => {
-			updateAccount({ hasUnreadMentions: true });
-		});
-
-		main.on('readAllUnreadMentions', () => {
-			updateAccount({ hasUnreadMentions: false });
-		});
-
-		main.on('unreadSpecifiedNote', () => {
-			updateAccount({ hasUnreadSpecifiedNotes: true });
-		});
-
-		main.on('readAllUnreadSpecifiedNotes', () => {
-			updateAccount({ hasUnreadSpecifiedNotes: false });
-		});
-
-		main.on('readAllAntennas', () => {
-			updateAccount({ hasUnreadAntenna: false });
-		});
-
 		main.on('unreadAntenna', () => {
-			updateAccount({ hasUnreadAntenna: true });
+			updateCurrentAccountPartial({ hasUnreadAntenna: true });
 			sound.playMisskeySfx('antenna');
 		});
 
-		stream.on('announcementCreated', (ev) => {
-			const announcement = ev.announcement;
-			updateAccount({
-				hasUnreadAnnouncement: true,
-				unreadAnnouncements: [...($i?.unreadAnnouncements ?? []), announcement],
-			});
-
-			if (announcement.display === 'dialog') {
-				popup(defineAsyncComponent(() => import('@/components/MkAnnouncementDialog.vue')), {
-					announcement,
-				}, {}, 'closed');
-			}
+		main.on('newChatMessage', () => {
+			updateCurrentAccountPartial({ hasUnreadChatMessages: true });
+			sound.playMisskeySfx('chatMessage');
 		});
 
 		main.on('readAllAnnouncements', () => {
-			updateAccount({
+			updateCurrentAccountPartial({
 				hasUnreadAnnouncement: false,
 				unreadAnnouncements: [],
 			});
 		});
+
+		// 個人宛てお知らせが発行されたとき
+		main.on('announcementCreated', onAnnouncementCreated);
 
 		// トークンが再生成されたとき
 		// このままではMisskeyが利用できないので強制的にサインアウトさせる
@@ -351,7 +409,19 @@ export async function mainBoot() {
 	}
 
 	// shortcut
-	document.addEventListener('keydown', makeHotkey(hotkeys));
+	const keymap = {
+		'p|n': () => {
+			if ($i == null) return;
+			post();
+		},
+		'd': () => {
+			store.set('darkMode', !store.s.darkMode);
+		},
+		's': () => {
+			mainRouter.push('/search');
+		},
+	} as const satisfies Keymap;
+	window.document.addEventListener('keydown', makeHotkey(keymap), { passive: false });
 
 	initializeSw();
 }

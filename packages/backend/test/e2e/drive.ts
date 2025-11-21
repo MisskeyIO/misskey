@@ -25,7 +25,7 @@ describe('Drive', () => {
 
 		const marker = Math.random().toString();
 
-		const url = 'https://raw.githubusercontent.com/MisskeyIO/misskey/main/packages/backend/test/resources/Lenna.jpg';
+		const url = 'https://misskey.io/static-assets/icons/192.png';
 
 		const catcher = makeStreamCatcher(
 			alice,
@@ -43,14 +43,14 @@ describe('Drive', () => {
 		const file = await catcher;
 
 		assert.strictEqual(res.status, 204);
-		assert.strictEqual(file.name, 'Lenna.jpg');
-		assert.strictEqual(file.type, 'image/jpeg');
+		assert.strictEqual(file.name, '192.png');
+		assert.strictEqual(file.type, 'image/png');
 	});
 
 	test('ローカルからアップロードできる', async () => {
 		// APIレスポンスを直接使用するので utils.js uploadFile が通過することで成功とする
 
-		const res = await uploadFile(alice, { path: 'Lenna.jpg', name: 'テスト画像' });
+		const res = await uploadFile(alice, { path: '192.jpg', name: 'テスト画像' });
 
 		assert.strictEqual(res.body?.name, 'テスト画像.jpg');
 		assert.strictEqual(res.body.type, 'image/jpeg');

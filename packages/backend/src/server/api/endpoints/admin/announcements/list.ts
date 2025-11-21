@@ -117,6 +117,7 @@ export const paramDef = {
 		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
 		offset: { type: 'integer', default: 0 },
 		userId: { type: 'string', format: 'misskey:id', nullable: true },
+		status: { type: 'string', enum: ['active', 'archived'], nullable: true },
 	},
 	required: [],
 } as const;
@@ -129,7 +130,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private idService: IdService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
-			const announcements = await this.announcementService.list(ps.userId ?? null, ps.limit, ps.offset, me);
+			const announcements = await this.announcementService.list(ps.userId ?? null, ps.limit, ps.offset, me, ps.status ?? null);
 
 			return announcements.map(announcement => ({
 				id: announcement.id,

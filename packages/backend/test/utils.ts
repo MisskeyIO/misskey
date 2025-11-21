@@ -4,20 +4,24 @@
  */
 
 import * as assert from 'node:assert';
-import { readFile } from 'node:fs/promises';
+import { createReadStream } from 'node:fs';
 import { basename, isAbsolute } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { inspect } from 'node:util';
 import WebSocket, { ClientOptions } from 'ws';
-import fetch, { File, RequestInit, type Headers } from 'node-fetch';
+import fetch, { Headers, RequestInit } from 'node-fetch';
 import { DataSource } from 'typeorm';
 import { JSDOM } from 'jsdom';
 import * as Redis from 'ioredis';
-import { DEFAULT_POLICIES } from '@/core/RoleService.js';
-import { validateContentTypeSetAsActivityPub } from '@/core/activitypub/misc/validator.js';
+import { type Response } from 'node-fetch';
+import Fastify from 'fastify';
+import request from 'supertest';
+import type * as misskey from 'misskey-js';
 import { entities } from '@/postgres.js';
 import { loadConfig } from '@/config.js';
-import type * as misskey from 'misskey-js';
+import { DEFAULT_POLICIES } from '@/core/RoleService.js';
+import { validateContentTypeSetAsActivityPub } from '@/core/activitypub/misc/validator.js';
+import { ApiError } from '@/server/api/error.js';
 
 export { server as startServer, jobQueue as startJobQueue } from '@/boot/common.js';
 
@@ -26,14 +30,22 @@ export interface UserToken {
 	bearer?: boolean;
 }
 
+export type SystemWebhookPayload = {
+	server: string;
+	hookId: string;
+	eventId: string;
+	createdAt: string;
+	type: string;
+	body: any;
+};
+
 const config = loadConfig();
 export const port = config.port;
 export const origin = config.url;
 export const host = new URL(config.url).host;
 
-export const cookie = (me: UserToken): string => {
-	return `token=${me.token};`;
-};
+export const WEBHOOK_HOST = 'http://127.0.0.1:15080';
+export const WEBHOOK_PORT = 15080;
 
 export type ApiRequest<E extends keyof misskey.Endpoints, P extends misskey.Endpoints[E]['req'] = misskey.Endpoints[E]['req']> = {
 	endpoint: E,
@@ -48,27 +60,28 @@ export const successfulApiCall = async <E extends keyof misskey.Endpoints, P ext
 	const res = await api(endpoint, parameters, user);
 	const status = assertion.status ?? (res.body == null ? 204 : 200);
 	assert.strictEqual(res.status, status, inspect(res.body, { depth: 5, colors: true }));
-	return res.body;
+
+	return res.body as misskey.api.SwitchCaseResponseType<E, P>;
 };
 
-export const failedApiCall = async <T, E extends keyof misskey.Endpoints, P extends misskey.Endpoints[E]['req']>(request: ApiRequest<E, P>, assertion: {
+export const failedApiCall = async <E extends keyof misskey.Endpoints, P extends misskey.Endpoints[E]['req']>(request: ApiRequest<E, P>, assertion: {
 	status: number,
 	code: string,
 	id: string
-}): Promise<T> => {
+}): Promise<void> => {
 	const { endpoint, parameters, user } = request;
 	const { status, code, id } = assertion;
 	const res = await api(endpoint, parameters, user);
 	assert.strictEqual(res.status, status, inspect(res.body));
-	assert.strictEqual(res.body.error.code, code, inspect(res.body));
-	assert.strictEqual(res.body.error.id, id, inspect(res.body));
-	return res.body;
+	assert.ok(res.body);
+	assert.strictEqual(castAsError(res.body as any).error.code, code, inspect(res.body));
+	assert.strictEqual(castAsError(res.body as any).error.id, id, inspect(res.body));
 };
 
-export const api = async <E extends keyof misskey.Endpoints>(path: E, params: misskey.Endpoints[E]['req'], me?: UserToken): Promise<{
+export const api = async <E extends keyof misskey.Endpoints, P extends misskey.Endpoints[E]['req']>(path: E, params: P, me?: UserToken): Promise<{
 	status: number,
 	headers: Headers,
-	body: any
+	body: misskey.api.SwitchCaseResponseType<E, P>
 }> => {
 	const bodyAuth: Record<string, string> = {};
 	const headers: Record<string, string> = {
@@ -89,13 +102,14 @@ export const api = async <E extends keyof misskey.Endpoints>(path: E, params: mi
 	});
 
 	const body = res.headers.get('content-type') === 'application/json; charset=utf-8'
-		? await res.json()
+		? await res.json() as misskey.api.SwitchCaseResponseType<E, P>
 		: null;
 
 	return {
 		status: res.status,
 		headers: res.headers,
-		body,
+		// FIXME: removing this non-null assertion: requires better typing around empty response.
+		body: body!,
 	};
 };
 
@@ -292,6 +306,29 @@ interface UploadOptions {
 	blob?: Blob;
 }
 
+type NamedBlob = Blob & { name: string };
+
+const hasBlobName = (blob?: Blob): blob is NamedBlob => {
+	if (blob == null) return false;
+	const candidate = blob as Blob & { name?: unknown };
+	return typeof candidate.name === 'string' && candidate.name.length > 0;
+};
+
+const buildHeadersFromResponse = (rawHeaders: Record<string, string | string[] | undefined>): Headers => {
+	const result = new Headers();
+	for (const [key, value] of Object.entries(rawHeaders)) {
+		if (value == null) continue;
+		if (Array.isArray(value)) {
+			for (const entry of value) {
+				result.append(key, entry);
+			}
+			continue;
+		}
+		result.append(key, value);
+	}
+	return result;
+};
+
 /**
  * Upload file
  * @param user User
@@ -302,37 +339,42 @@ export const uploadFile = async (user?: UserToken, { path, name, blob }: UploadO
 	body: misskey.entities.DriveFile | null
 }> => {
 	const absPath = path == null
-		? new URL('resources/Lenna.jpg', import.meta.url)
+		? new URL('resources/192.jpg', import.meta.url)
 		: isAbsolute(path.toString())
 			? new URL(path)
 			: new URL(path, new URL('resources/', import.meta.url));
 
-	const formData = new FormData();
-	formData.append('file', blob ??
-		new File([await readFile(absPath)], basename(absPath.toString())));
-	formData.append('force', 'true');
-	if (name) {
-		formData.append('name', name);
+	const uploadFilename = hasBlobName(blob) ? blob.name! : basename(absPath.toString());
+	const baseUrl = `http://127.0.0.1:${port}`;
+
+	const req = request(baseUrl)
+		.post('/api/drive/files/create')
+		.set('Accept', 'application/json');
+
+	if (user) req.set('Authorization', `Bearer ${user.token}`);
+
+	if (blob) {
+		const blobBuffer = Buffer.from(await blob.arrayBuffer());
+		req.attach('file', blobBuffer, {
+			filename: uploadFilename,
+			contentType: blob.type || 'application/octet-stream',
+		});
+	} else {
+		req.attach('file', createReadStream(absPath), uploadFilename);
 	}
 
-	const headers: Record<string, string> = {};
-	if (user?.bearer) {
-		headers.Authorization = `Bearer ${user.token}`;
-	} else if (user) {
-		formData.append('i', user.token);
-	}
+	req.field('force', 'true');
+	if (name) req.field('name', name);
 
-	const res = await relativeFetch('api/drive/files/create', {
-		method: 'POST',
-		body: formData,
-		headers,
-	});
+	const res = await req;
+	const responseBody = res.status !== 204
+		? res.body as misskey.Endpoints['drive/files/create']['res']
+		: null;
 
-	const body = res.status !== 204 ? await res.json() as misskey.Endpoints['drive/files/create']['res'] : null;
 	return {
 		status: res.status,
-		headers: res.headers,
-		body,
+		headers: buildHeadersFromResponse(res.headers as Record<string, string | string[] | undefined>),
+		body: responseBody,
 	};
 };
 
@@ -344,7 +386,7 @@ export const uploadUrl = async (user: UserToken, url: string): Promise<misskey.e
 		'main',
 		(msg) => msg.type === 'urlUploadFinished' && msg.body.marker === marker,
 		(msg) => msg.body.file,
-		60 * 1000,
+		60 * 2000,
 	);
 
 	await api('drive/files/upload-from-url', {
@@ -460,7 +502,7 @@ export type SimpleGetResponse = {
 	type: string | null,
 	location: string | null
 };
-export const simpleGet = async (path: string, accept = '*/*', cookie: any = undefined): Promise<SimpleGetResponse> => {
+export const simpleGet = async (path: string, accept = '*/*', cookie: any = undefined, bodyExtractor: (res: Response) => Promise<string | null> = _ => Promise.resolve(null)): Promise<SimpleGetResponse> => {
 	const res = await relativeFetch(path, {
 		headers: {
 			Accept: accept,
@@ -488,7 +530,7 @@ export const simpleGet = async (path: string, accept = '*/*', cookie: any = unde
 	const body =
 		jsonTypes.includes(res.headers.get('content-type') ?? '') ? await res.json() :
 		htmlTypes.includes(res.headers.get('content-type') ?? '') ? new JSDOM(await res.text()) :
-		null;
+		await bodyExtractor(res);
 
 	return {
 		status: res.status,
@@ -613,14 +655,6 @@ export async function initTestDb(justBorrow = false, initEntities?: any[]) {
 	return db;
 }
 
-export function sleep(msec: number) {
-	return new Promise<void>(res => {
-		setTimeout(() => {
-			res();
-		}, msec);
-	});
-}
-
 export async function sendEnvUpdateRequest(params: { key: string, value?: string }) {
 	const res = await fetch(
 		`http://localhost:${port + 1000}/env`,
@@ -650,4 +684,44 @@ export async function sendEnvResetRequest() {
 	if (res.status !== 200) {
 		throw new Error('server env update failed.');
 	}
+}
+
+// 与えられた値を強制的にエラーとみなす。この関数は型安全性を破壊するため、異常系のアサーション以外で用いられるべきではない。
+// FIXME(misskey-js): misskey-jsがエラー情報を公開するようになったらこの関数を廃止する
+export function castAsError(obj: Record<string, unknown>): { error: ApiError } {
+	return obj as { error: ApiError };
+}
+
+export async function captureWebhook<T = SystemWebhookPayload>(postAction: () => Promise<void>, port = WEBHOOK_PORT): Promise<T> {
+	const fastify = Fastify();
+
+	let timeoutHandle: NodeJS.Timeout | null = null;
+	const result = await new Promise<string>(async (resolve, reject) => {
+		fastify.all('/', async (req, res) => {
+			timeoutHandle && clearTimeout(timeoutHandle);
+
+			const body = JSON.stringify(req.body);
+			res.status(200).send('ok');
+			await fastify.close();
+			resolve(body);
+		});
+
+		await fastify.listen({ port });
+
+		timeoutHandle = setTimeout(async () => {
+			await fastify.close();
+			reject(new Error('timeout'));
+		}, 3000);
+
+		try {
+			await postAction();
+		} catch (e) {
+			await fastify.close();
+			reject(e);
+		}
+	});
+
+	await fastify.close();
+
+	return JSON.parse(result) as T;
 }

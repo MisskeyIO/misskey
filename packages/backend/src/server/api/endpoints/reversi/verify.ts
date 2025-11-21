@@ -7,7 +7,6 @@ import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { ReversiService } from '@/core/ReversiService.js';
 import { ReversiGameEntityService } from '@/core/entities/ReversiGameEntityService.js';
-import { ApiError } from '../../error.js';
 
 export const meta = {
 	errors: {
@@ -52,7 +51,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (game) {
 				return {
 					desynced: true,
-					game: await this.reversiGameEntityService.packDetail(game, me),
+					game: await this.reversiGameEntityService.packDetail(game),
 				};
 			} else {
 				return {

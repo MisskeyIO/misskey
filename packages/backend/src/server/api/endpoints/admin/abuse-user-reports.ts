@@ -44,6 +44,12 @@ export const meta = {
 					nullable: false, optional: false,
 					example: false,
 				},
+				forwarded: {
+					type: 'boolean',
+					nullable: false, optional: false,
+					example: false,
+				},
+				resolvedAs: { type: 'string', enum: ['accept', 'reject', null], nullable: true },
 				reporterId: {
 					type: 'string',
 					nullable: false, optional: false,
@@ -77,6 +83,10 @@ export const meta = {
 				category: {
 					type: 'string',
 					nullable: false, optional: false,
+				},
+				moderationNote: {
+					type: 'string',
+					nullable: true, optional: false,
 				},
 			},
 		},

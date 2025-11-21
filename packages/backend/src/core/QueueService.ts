@@ -9,16 +9,49 @@ import type { IActivity } from '@/core/activitypub/type.js';
 import type { MiDriveFile } from '@/models/DriveFile.js';
 import type { MiScheduledNote } from '@/models/ScheduledNote.js';
 import type { MiAbuseUserReport } from '@/models/AbuseUserReport.js';
-import type { MiWebhook, webhookEventTypes } from '@/models/Webhook.js';
+import type { MiWebhook, WebhookEventTypes } from '@/models/Webhook.js';
+import type { MiSystemWebhook, SystemWebhookEventType } from '@/models/SystemWebhook.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import type { Antenna } from '@/server/api/endpoints/i/import-antennas.js';
 import { ApRequestCreator } from '@/core/activitypub/ApRequestService.js';
-import type { DbQueue, DeliverQueue, EndedPollNotificationQueue, InboxQueue, ObjectStorageQueue, RelationshipQueue, SystemQueue, WebhookDeliverQueue } from './QueueModule.js';
-import type { DbJobData, DeliverJobData, RelationshipJobData, ThinUser } from '../queue/types.js';
+import { type SystemWebhookPayload } from '@/core/SystemWebhookService.js';
+import { Queues } from '@/misc/queues.js';
+import { type UserWebhookPayload } from './UserWebhookService.js';
+import type {
+	DbJobData,
+	DeliverJobData,
+	RelationshipJobData,
+	SystemWebhookDeliverJobData,
+	ThinUser,
+	UserWebhookDeliverJobData,
+} from '../queue/types.js';
+import type {
+	DbQueue,
+	DeliverQueue,
+	EndedPollNotificationQueue,
+	InboxQueue,
+	ObjectStorageQueue,
+	RelationshipQueue,
+	SystemQueue,
+	SystemWebhookDeliverQueue,
+	UserWebhookDeliverQueue,
+} from './QueueModule.js';
 import type httpSignature from '@peertube/http-signature';
 import type * as Bull from 'bullmq';
+
+export const QUEUE_TYPES = [
+	'system',
+	'endedPollNotification',
+	'deliver',
+	'inbox',
+	'db',
+	'relationship',
+	'objectStorage',
+	'userWebhookDeliver',
+	'systemWebhookDeliver',
+] as const;
 
 @Injectable()
 export class QueueService {
@@ -33,52 +66,66 @@ export class QueueService {
 		@Inject('queue:db') public dbQueue: DbQueue,
 		@Inject('queue:relationship') public relationshipQueue: RelationshipQueue,
 		@Inject('queue:objectStorage') public objectStorageQueue: ObjectStorageQueue,
-		@Inject('queue:webhookDeliver') public webhookDeliverQueue: WebhookDeliverQueue,
+		@Inject('queue:userWebhookDeliver') public userWebhookDeliverQueue: UserWebhookDeliverQueue,
+		@Inject('queue:systemWebhookDeliver') public systemWebhookDeliverQueue: SystemWebhookDeliverQueue,
 	) {
 		this.ensureRepeatJobs();
 	}
 
 	@bindThis
 	private ensureRepeatJobs() {
-		this.systemQueue.add('tickCharts', {
+		void this.systemQueue.add('tickCharts', {
 		}, {
 			repeat: { pattern: '55 * * * *' },
 			removeOnComplete: true,
 		});
 
-		this.systemQueue.add('resyncCharts', {
+		void this.systemQueue.add('resyncCharts', {
 		}, {
 			repeat: { pattern: '0 0 * * *' },
 			removeOnComplete: true,
 		});
 
-		this.systemQueue.add('cleanCharts', {
+		void this.systemQueue.add('cleanCharts', {
 		}, {
 			repeat: { pattern: '0 0 * * *' },
 			removeOnComplete: true,
 		});
 
-		this.systemQueue.add('aggregateRetention', {
+		void this.systemQueue.add('aggregateRetention', {
 		}, {
 			repeat: { pattern: '0 0 * * *' },
 			removeOnComplete: true,
 		});
 
-		this.systemQueue.add('clean', {
+		void this.systemQueue.add('clean', {
 		}, {
 			repeat: { pattern: '0 0 * * *' },
 			removeOnComplete: true,
 		});
 
-		this.systemQueue.add('checkExpiredMutings', {
+		void this.systemQueue.add('checkExpiredMutings', {
 		}, {
 			repeat: { pattern: '*/5 * * * *' },
 			removeOnComplete: true,
 		});
 
-		this.systemQueue.add('checkMissingScheduledNote', {
+		void this.systemQueue.add('checkMissingScheduledNote', {
 		}, {
 			repeat: { pattern: '*/5 * * * *' },
+			removeOnComplete: true,
+		});
+
+		void this.systemQueue.add('bakeBufferedReactions', {
+		}, {
+			repeat: { pattern: '0 0 * * *' },
+			removeOnComplete: true,
+		});
+
+		void this.systemQueue.add('checkModeratorsActivity', {
+		}, {
+			// 毎時30分に起動
+			repeat: { pattern: '30 * * * *' },
 			removeOnComplete: true,
 		});
 	}
@@ -123,7 +170,6 @@ export class QueueService {
 		if (content == null) return null;
 		const contentBody = JSON.stringify(content);
 		const digest = ApRequestCreator.createDigest(contentBody);
-
 		const opts = {
 			attempts: this.config.deliverJobMaxAttempts ?? 12,
 			backoff: {
@@ -395,6 +441,19 @@ export class QueueService {
 	}
 
 	@bindThis
+	public createSendEmailJob(to: string, subject: string, html: string, text: string) {
+		return this.systemQueue.add('sendEmail', {
+			to,
+			subject,
+			html,
+			text,
+		}, {
+			removeOnComplete: true,
+			removeOnFail: true,
+		});
+	}
+
+	@bindThis
 	public createScheduledNoteJob(draftId: MiScheduledNote['id'], scheduledAt: Date) {
 		return this.systemQueue.add('scheduledNote', {
 			draftId,
@@ -477,9 +536,18 @@ export class QueueService {
 		});
 	}
 
+	/**
+	 * @see UserWebhookDeliverJobData
+	 * @see UserWebhookDeliverProcessorService
+	 */
 	@bindThis
-	public webhookDeliver(webhook: MiWebhook, type: typeof webhookEventTypes[number], content: unknown) {
-		const data = {
+	public userWebhookDeliver<T extends WebhookEventTypes>(
+		webhook: MiWebhook,
+		type: T,
+		content: UserWebhookPayload<T>,
+		opts?: { attempts?: number },
+	) {
+		const data: UserWebhookDeliverJobData = {
 			type,
 			content,
 			webhookId: webhook.id,
@@ -490,8 +558,39 @@ export class QueueService {
 			eventId: randomUUID(),
 		};
 
-		return this.webhookDeliverQueue.add(webhook.id, data, {
-			attempts: 4,
+		return this.userWebhookDeliverQueue.add(webhook.id, data, {
+			attempts: opts?.attempts ?? 4,
+			backoff: {
+				type: 'custom',
+			},
+			removeOnComplete: true,
+			removeOnFail: true,
+		});
+	}
+
+	/**
+	 * @see SystemWebhookDeliverJobData
+	 * @see SystemWebhookDeliverProcessorService
+	 */
+	@bindThis
+	public systemWebhookDeliver<T extends SystemWebhookEventType>(
+		webhook: MiSystemWebhook,
+		type: T,
+		content: SystemWebhookPayload<T>,
+		opts?: { attempts?: number },
+	) {
+		const data: SystemWebhookDeliverJobData = {
+			type,
+			content,
+			webhookId: webhook.id,
+			to: webhook.url,
+			secret: webhook.secret,
+			createdAt: Date.now(),
+			eventId: randomUUID(),
+		};
+
+		return this.systemWebhookDeliverQueue.add(webhook.id, data, {
+			attempts: opts?.attempts ?? 4,
 			backoff: {
 				type: 'custom',
 			},
@@ -501,15 +600,34 @@ export class QueueService {
 	}
 
 	@bindThis
-	public destroy() {
-		this.deliverQueue.once('cleaned', (jobs, status) => {
-			//deliverLogger.succ(`Cleaned ${jobs.length} ${status} jobs`);
-		});
-		this.deliverQueue.clean(0, 0, 'delayed');
+	private getQueue(type: typeof QUEUE_TYPES[number]) {
+		switch (type) {
+			case 'system': return this.systemQueue;
+			case 'endedPollNotification': return this.endedPollNotificationQueue;
+			case 'deliver': return this.deliverQueue;
+			case 'inbox': return this.inboxQueue;
+			case 'db': return this.dbQueue;
+			case 'relationship': return this.relationshipQueue;
+			case 'objectStorage': return this.objectStorageQueue;
+			case 'userWebhookDeliver': return this.userWebhookDeliverQueue;
+			case 'systemWebhookDeliver': return this.systemWebhookDeliverQueue;
+			default: throw new Error(`Unrecognized queue type: ${type}`);
+		}
+	}
 
-		this.inboxQueue.once('cleaned', (jobs, status) => {
-			//inboxLogger.succ(`Cleaned ${jobs.length} ${status} jobs`);
-		});
-		this.inboxQueue.clean(0, 0, 'delayed');
+	@bindThis
+	public clearQueue(queueType: typeof QUEUE_TYPES[number], state: '*' | 'completed' | 'wait' | 'active' | 'paused' | 'prioritized' | 'delayed' | 'failed') {
+		const queue = this.getQueue(queueType);
+		if (state === '*') {
+			queue.clean(0, 0, 'completed');
+			queue.clean(0, 0, 'wait');
+			queue.clean(0, 0, 'active');
+			queue.clean(0, 0, 'paused');
+			queue.clean(0, 0, 'prioritized');
+			queue.clean(0, 0, 'delayed');
+			queue.clean(0, 0, 'failed');
+		} else {
+			queue.clean(0, 0, state);
+		}
 	}
 }

@@ -9,8 +9,8 @@
 		"noFallthroughCasesInSwitch": true,
 		"declaration": false,
 		"sourceMap": true,
-		"target": "es2022",
-		"module": "nodenext",
+		"target": "ESNext",
+		"module": "NodeNext",
 		"moduleResolution": "nodenext",
 		"allowSyntheticDefaultImports": true,
 		"removeComments": false,
@@ -29,8 +29,7 @@
 		},
 		"typeRoots": [
 			"../src/@types",
-			"../node_modules/@types",
-			"../node_modules"
+			"../node_modules/@types"
 		],
 		"lib": [
 			"esnext"

@@ -273,7 +273,7 @@ export class SAMLIdentifyProviderService {
 				});
 			} catch (err) {
 				this.#logger.error('Failed to parse SAML request', { error: err });
-				const traceableError = err as Error & {code?: string};
+				const traceableError = err as Error & { code?: string };
 
 				if (traceableError.code) {
 					reply.status(500).send({

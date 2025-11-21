@@ -16,35 +16,23 @@ await execa('pnpm', ['clean'], {
 	stderr: process.stderr,
 });
 
-await execa('pnpm', ['build-pre'], {
-	cwd: _dirname + '/../',
-	stdout: process.stdout,
-	stderr: process.stderr,
-});
-
-await execa('pnpm', ['build-assets'], {
-	cwd: _dirname + '/../',
-	stdout: process.stdout,
-	stderr: process.stderr,
-});
-
-await execa('pnpm', ['--filter', 'misskey-js', 'build'], {
-	cwd: _dirname + '/../',
-	stdout: process.stdout,
-	stderr: process.stderr,
-});
-
-await execa('pnpm', ['--filter', 'misskey-reversi', 'build:tsc'], {
-	cwd: _dirname + '/../',
-	stdout: process.stdout,
-	stderr: process.stderr,
-});
-
-await execa('pnpm', ['--filter', 'misskey-bubble-game', 'build:tsc'], {
-	cwd: _dirname + '/../',
-	stdout: process.stdout,
-	stderr: process.stderr,
-});
+await Promise.all([
+	execa('pnpm', ['build-pre'], {
+		cwd: _dirname + '/../',
+		stdout: process.stdout,
+		stderr: process.stderr,
+	}),
+	execa('pnpm', ['build-assets'], {
+		cwd: _dirname + '/../',
+		stdout: process.stdout,
+		stderr: process.stderr,
+	}),
+	execa('pnpm', ['--filter', 'backend...', 'build'], {
+		cwd: _dirname + '/../',
+		stdout: process.stdout,
+		stderr: process.stderr,
+	}),
+]);
 
 execa('pnpm', ['build-pre', '--watch'], {
 	cwd: _dirname + '/../',
@@ -64,7 +52,19 @@ execa('pnpm', ['--filter', 'backend', 'dev'], {
 	stderr: process.stderr,
 });
 
+execa('pnpm', ['--filter', 'frontend-shared', 'watch', '--no-clean'], {
+	cwd: _dirname + '/../',
+	stdout: process.stdout,
+	stderr: process.stderr,
+});
+
 execa('pnpm', ['--filter', 'frontend', 'watch'], {
+	cwd: _dirname + '/../',
+	stdout: process.stdout,
+	stderr: process.stderr,
+});
+
+execa('pnpm', ['--filter', 'frontend-embed', 'watch'], {
 	cwd: _dirname + '/../',
 	stdout: process.stdout,
 	stderr: process.stderr,

@@ -74,7 +74,7 @@ export class RemoteUserResolveService {
 		if (user == null) {
 			const self = await this.resolveSelf(acctLower);
 
-			if (new URL(self.href).origin === this.config.url) {
+			if (this.utilityService.isSelfHost(host)) {
 				const local = this.apDbResolverService.parseUri(self.href);
 				if (local.local && local.type === 'users') {
 					// the LR points to local

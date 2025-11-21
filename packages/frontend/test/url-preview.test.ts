@@ -14,7 +14,7 @@ import MkUrlPreview from '@/components/MkUrlPreview.vue';
 type SummalyResult = Awaited<ReturnType<typeof summaly>>;
 
 describe('MkUrlPreview', () => {
-	const renderPreviewBy = async (summary: Partial<SummalyResult>): Promise<RenderResult> => {
+	const renderPreviewBy = async (summary: Partial<SummalyResult> & { url: string }): Promise<RenderResult> => {
 		if (!summary.player) {
 			summary.player = {
 				url: null,
@@ -24,7 +24,10 @@ describe('MkUrlPreview', () => {
 			};
 		}
 
-		fetchMock.mockOnceIf(/^\/url?/, () => {
+		fetchMock.mockOnceIf((req) => {
+			const url = new URL(req.url);
+			return url.pathname === '/url';
+		}, () => {
 			return {
 				status: 200,
 				body: JSON.stringify(summary),
@@ -47,7 +50,7 @@ describe('MkUrlPreview', () => {
 		return result;
 	};
 
-	const renderAndOpenPreview = async (summary: Partial<SummalyResult>): Promise<HTMLIFrameElement | null> => {
+	const renderAndOpenPreview = async (summary: Partial<SummalyResult> & { url: string }): Promise<HTMLIFrameElement | null> => {
 		const mkUrlPreview = await renderPreviewBy(summary);
 		const buttons = mkUrlPreview.getAllByRole('button');
 		buttons[0].click();
@@ -97,8 +100,8 @@ describe('MkUrlPreview', () => {
 		assert.exists(iframe, 'iframe should exist');
 		assert.strictEqual(iframe?.src, 'https://example.local/player?autoplay=1&auto_play=1');
 		assert.strictEqual(
-			iframe?.sandbox.toString(),
-			'allow-popups allow-scripts allow-storage-access-by-user-activation allow-same-origin',
+			iframe?.getAttribute('sandbox'),
+			'allow-popups allow-popups-to-escape-sandbox allow-scripts allow-storage-access-by-user-activation allow-same-origin',
 		);
 	});
 
@@ -113,7 +116,7 @@ describe('MkUrlPreview', () => {
 			},
 		});
 		assert.exists(iframe, 'iframe should exist');
-		assert.strictEqual(iframe?.allow, 'fullscreen;web-share');
+		assert.strictEqual(iframe?.getAttribute('allow'), 'fullscreen;web-share');
 	});
 
 	test('A Summaly proxy response without allow falls back to the default', async () => {
@@ -127,7 +130,7 @@ describe('MkUrlPreview', () => {
 			},
 		});
 		assert.exists(iframe, 'iframe should exist');
-		assert.strictEqual(iframe?.allow, 'autoplay;encrypted-media;fullscreen');
+		assert.strictEqual(iframe?.getAttribute('allow'), 'autoplay;encrypted-media;fullscreen');
 	});
 
 	test('Filtering the allow list from the Summaly proxy', async () => {
@@ -141,7 +144,7 @@ describe('MkUrlPreview', () => {
 			},
 		});
 		assert.exists(iframe, 'iframe should exist');
-		assert.strictEqual(iframe?.allow, 'autoplay;fullscreen');
+		assert.strictEqual(iframe?.getAttribute('allow'), 'autoplay;fullscreen');
 	});
 
 	test('Having a player width should keep the fixed aspect ratio', async () => {

@@ -10,6 +10,7 @@ import type { PagesRepository, DriveFilesRepository } from '@/models/_.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '../../error.js';
+import { pageNameSchema } from '@/models/Page.js';
 
 export const meta = {
 	tags: ['pages'],
@@ -32,13 +33,11 @@ export const meta = {
 			code: 'NO_SUCH_PAGE',
 			id: '21149b9e-3616-4778-9592-c4ce89f5a864',
 		},
-
 		accessDenied: {
 			message: 'Access denied.',
 			code: 'ACCESS_DENIED',
 			id: '3c15cd52-3b4b-4274-967d-6456fc4f792b',
 		},
-
 		noSuchFile: {
 			message: 'No such file.',
 			code: 'NO_SUCH_FILE',
@@ -57,7 +56,7 @@ export const paramDef = {
 	properties: {
 		pageId: { type: 'string', format: 'misskey:id' },
 		title: { type: 'string' },
-		name: { type: 'string', minLength: 1, pattern: /^[a-zA-Z0-9_-]+$/.toString().slice(1, -1) },
+		name: { ...pageNameSchema, minLength: 1, pattern: /^[a-zA-Z0-9_-]+$/.toString().slice(1, -1) },
 		summary: { type: 'string', nullable: true },
 		content: { type: 'array', items: {
 			type: 'object', additionalProperties: true,
@@ -72,7 +71,7 @@ export const paramDef = {
 		hideTitleWhenPinned: { type: 'boolean' },
 		visibility: { type: 'string', enum: ['public', 'private'] },
 	},
-	required: ['pageId', 'title', 'name', 'content', 'variables', 'script'],
+	required: ['pageId'],
 } as const;
 
 @Injectable()
@@ -93,9 +92,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw new ApiError(meta.errors.accessDenied);
 			}
 
-			let eyeCatchingImage = null;
 			if (ps.eyeCatchingImageId != null) {
-				eyeCatchingImage = await this.driveFilesRepository.findOneBy({
+				const eyeCatchingImage = await this.driveFilesRepository.findOneBy({
 					id: ps.eyeCatchingImageId,
 					userId: me.id,
 				});
@@ -105,38 +103,32 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				}
 			}
 
-			await this.pagesRepository.findBy({
-				id: Not(ps.pageId),
-				userId: me.id,
-				name: ps.name,
-			}).then(result => {
-				if (result.length > 0) {
-					throw new ApiError(meta.errors.nameAlreadyExists);
-				}
-			});
+			if (ps.name != null) {
+				await this.pagesRepository.findBy({
+					id: Not(ps.pageId),
+					userId: me.id,
+					name: ps.name,
+				}).then(result => {
+					if (result.length > 0) {
+						throw new ApiError(meta.errors.nameAlreadyExists);
+					}
+				});
+			}
 
 			await this.pagesRepository.update(page.id, {
 				updatedAt: new Date(),
 				title: ps.title,
-				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-				name: ps.name === undefined ? page.name : ps.name,
+				name: ps.name,
 				summary: ps.summary === undefined ? page.summary : ps.summary,
 				content: ps.content,
 				variables: ps.variables,
 				script: ps.script,
-				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-				alignCenter: ps.alignCenter === undefined ? page.alignCenter : ps.alignCenter,
-				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-				hideTitleWhenPinned: ps.hideTitleWhenPinned === undefined ? page.hideTitleWhenPinned : ps.hideTitleWhenPinned,
-				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-				font: ps.font === undefined ? page.font : ps.font,
+				alignCenter: ps.alignCenter,
+				hideTitleWhenPinned: ps.hideTitleWhenPinned,
+				font: ps.font,
 				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 				visibility: ps.visibility === undefined ? page.visibility : ps.visibility,
-				eyeCatchingImageId: ps.eyeCatchingImageId === null
-					? null
-					: ps.eyeCatchingImageId === undefined
-						? page.eyeCatchingImageId
-						: eyeCatchingImage!.id,
+				eyeCatchingImageId: ps.eyeCatchingImageId,
 			});
 		});
 	}

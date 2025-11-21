@@ -10,9 +10,9 @@ import type Logger from '@/logger.js';
 import type { DriveFilesRepository, NotesRepository, UserProfilesRepository, UsersRepository } from '@/models/_.js';
 import type { MiUser } from '@/models/User.js';
 import { DriveService } from '@/core/DriveService.js';
-import { EmailService } from '@/core/EmailService.js';
 import { SearchService } from '@/core/SearchService.js';
 import { RoleService } from '@/core/RoleService.js';
+import { QueueService } from '@/core/QueueService.js';
 import { QueueLoggerService } from '../QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 import type { DbUserDeleteJobData } from '../types.js';
@@ -35,9 +35,9 @@ export class DeleteAccountProcessorService {
 		private driveFilesRepository: DriveFilesRepository,
 
 		private driveService: DriveService,
-		private emailService: EmailService,
 		private searchService: SearchService,
 		private roleService: RoleService,
+		private queueService: QueueService,
 		private queueLoggerService: QueueLoggerService,
 	) {
 		this.logger = this.queueLoggerService.logger.createSubLogger('account:delete');
@@ -117,9 +117,12 @@ export class DeleteAccountProcessorService {
 		if (user.token) { // Send email notification
 			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
 			if (profile.email && profile.emailVerified) {
-				await this.emailService.sendEmail(profile.email, 'Account deleted',
+				await this.queueService.createSendEmailJob(
+					profile.email,
+					'Account deleted',
 					'Your account has been deleted.',
-					'Your account has been deleted.');
+					'Your account has been deleted.'
+				);
 			}
 		}
 

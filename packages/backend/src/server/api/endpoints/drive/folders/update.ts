@@ -94,26 +94,30 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 						throw new ApiError(meta.errors.noSuchParentFolder);
 					}
 
-					// Check if the circular reference will occur
-					const checkCircle = async (folderId: string): Promise<boolean> => {
-						// Fetch folder
-						const folder2 = await this.driveFoldersRepository.findOneBy({
-							id: folderId,
+					const isDescendant = async (ancestorId: string, targetId: string): Promise<boolean> => {
+						if (ancestorId === targetId) {
+							return true;
+						}
+
+						const children = await this.driveFoldersRepository.find({
+							select: ['id'],
+							where: {
+								parentId: ancestorId,
+								userId: me.id,
+							},
 						});
 
-						if (folder2!.id === folder!.id) {
-							return true;
-						} else if (folder2!.parentId) {
-							return await checkCircle(folder2!.parentId);
-						} else {
-							return false;
+						for (const child of children) {
+							if (await isDescendant(child.id, targetId)) {
+								return true;
+							}
 						}
+
+						return false;
 					};
 
-					if (parent.parentId !== null) {
-						if (await checkCircle(parent.parentId)) {
-							throw new ApiError(meta.errors.recursiveNesting);
-						}
+					if (await isDescendant(folder.id, parent.id)) {
+						throw new ApiError(meta.errors.recursiveNesting);
 					}
 
 					folder.parentId = parent.id;

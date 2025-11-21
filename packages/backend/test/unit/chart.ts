@@ -25,7 +25,7 @@ describe('Chart', () => {
 	const config = loadConfig();
 
 	let db: DataSource | undefined;
-	let redisForTimelines = {
+	const redisForTimelines = {
 		set: () => Promise.resolve('OK'),
 		get: () => Promise.resolve(null),
 	} as unknown as jest.Mocked<Redis.Redis>;
@@ -72,6 +72,7 @@ describe('Chart', () => {
 
 		clock = lolex.install({
 			now: new Date(Date.UTC(2000, 0, 1, 0, 0, 0)),
+			toFake: ['Date'],
 			shouldClearNativeTimers: true,
 		});
 	});

@@ -1,46 +1,46 @@
 {
-	"type": "module",
-	"name": "misskey-bubble-game",
-	"version": "0.0.1",
-	"types": "./built/index.d.ts",
-	"exports": {
-		".": {
-			"import": "./built/index.js",
-			"types": "./built/index.d.ts"
-		},
-		"./*": {
-			"import": "./built/*",
-			"types": "./built/*"
-		}
-	},
-	"scripts": {
-		"build": "pnpm run build:tsc",
-		"build:tsc": "tsc --outDir built --declaration true --declarationMap true",
-		"watch": "nodemon -w src -e ts,js,cjs,mjs,json --exec \"pnpm run build:tsc\"",
-		"eslint": "eslint './**/*.{js,jsx,ts,tsx}'",
-		"typecheck": "tsc --noEmit",
-		"lint": "pnpm typecheck && pnpm eslint"
-	},
-	"devDependencies": {
-		"@types/matter-js": "catalog:",
-		"@types/node": "catalog:",
-		"@types/seedrandom": "catalog:",
-		"@typescript-eslint/eslint-plugin": "catalog:",
-		"@typescript-eslint/parser": "catalog:",
-		"esbuild": "catalog:",
-		"eslint": "catalog:",
-		"execa": "catalog:",
-		"nodemon": "catalog:",
-		"typescript": "catalog:"
-	},
-	"files": [
-		"built"
-	],
-	"dependencies": {
-		"esbuild": "catalog:",
-		"eventemitter3": "catalog:",
-		"glob": "catalog:",
-		"matter-js": "catalog:",
-		"seedrandom": "catalog:"
-	}
+  "type": "module",
+  "name": "misskey-bubble-game",
+  "version": "0.0.1",
+  "types": "./built/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./built/index.js",
+      "types": "./built/index.d.ts"
+    },
+    "./*": {
+      "import": "./built/*",
+      "types": "./built/*"
+    }
+  },
+  "scripts": {
+    "build": "pnpm run build:tsc",
+    "build:tsc": "tsc --outDir built --declaration true --declarationMap true",
+    "watch": "nodemon -w src -e ts,js,cjs,mjs,json --exec \"pnpm run build:tsc\"",
+    "eslint": "eslint './**/*.{js,jsx,ts,tsx}'",
+    "typecheck": "tsc --noEmit",
+    "lint": "pnpm typecheck && pnpm eslint"
+  },
+  "devDependencies": {
+    "@types/matter-js": "catalog:",
+    "@types/node": "catalog:",
+    "@types/seedrandom": "catalog:",
+    "@typescript-eslint/eslint-plugin": "catalog:",
+    "@typescript-eslint/parser": "catalog:",
+    "esbuild": "catalog:",
+    "eslint": "catalog:",
+    "execa": "catalog:",
+    "nodemon": "catalog:",
+    "typescript": "catalog:"
+  },
+  "files": [
+    "built"
+  ],
+  "dependencies": {
+    "esbuild": "catalog:",
+    "eventemitter3": "catalog:",
+    "glob": "catalog:",
+    "matter-js": "catalog:",
+    "seedrandom": "catalog:"
+  }
 }

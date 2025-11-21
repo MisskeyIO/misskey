@@ -10,7 +10,7 @@
 	<template #header>
 		{{ i18n.ts.drafts }}
 	</template>
-	<MkTab v-if="$i!.policies.canScheduleNote" v-model="tab" style="margin-bottom: var(--margin);">
+	<MkTab v-if="$i!.policies.canScheduleNote" v-model="tab" style="margin-bottom: var(--MI-margin);">
 		<option value="unsent">{{ i18n.ts.unsent }}</option>
 		<option value="scheduled">{{ i18n.ts.scheduled }}</option>
 	</MkTab>
@@ -29,10 +29,10 @@
 							<i class="ti ti-device-tv"></i> {{ draft.channel.name }}
 						</span>
 						<span v-if="draft.renote">
-							<i class="ti ti-quote"></i> <MkAcct :user="draft.renote.user" /> <span>{{ draft.renote.text }}</span>
+							<i class="ti ti-quote"></i> <MkAcct :user="draft.renote.user"/> <span>{{ draft.renote.text }}</span>
 						</span>
 						<span v-else-if="draft.reply">
-							<i class="ti ti-arrow-back-up"></i> <MkAcct :user="draft.reply.user" /> <span>{{ draft.reply.text }}</span>
+							<i class="ti ti-arrow-back-up"></i> <MkAcct :user="draft.reply.user"/> <span>{{ draft.reply.text }}</span>
 						</span>
 						<span v-else>
 							<i class="ti ti-pencil"></i>
@@ -44,7 +44,7 @@
 								<span><i class="ti ti-calendar-clock" style="margin-right: 4px;"/></span>
 								<MkTime :time="draft.scheduledAt"/>
 							</div>
-							<MkTime :time="draft.createdAt" colored />
+							<MkTime :time="draft.createdAt" colored/>
 						</div>
 						<span v-if="draft.visibility !== 'public'" :title="i18n.ts._visibility[draft.visibility]">
 							<i v-if="draft.visibility === 'home'" class="ti ti-home"></i>
@@ -61,9 +61,9 @@
 				</div>
 				<div>
 					<p v-if="!!draft.cw" :class="$style.draftNoteCw">
-						<Mfm :text="draft.cw" />
+						<Mfm :text="draft.cw"/>
 					</p>
-					<MkSubNoteContent :class="$style.draftNoteText" :note="draft" />
+					<MkSubNoteContent :class="$style.draftNoteText" :note="draft"/>
 				</div>
 			</div>
 			<button v-tooltip="i18n.ts.delete" :class="$style.button" class="_button" @click="removeDraft(draft.id)">
@@ -83,18 +83,18 @@
 				<div :class="$style.draftNote">
 					<div :class="$style.draftNoteHeader">
 						<div :class="$style.draftNoteDestination">
-						<span v-if="draft.channel" style="opacity: 0.7; padding-right: 0.5em">
-							<i class="ti ti-device-tv"></i> {{ draft.channel.name }}
-						</span>
+							<span v-if="draft.channel" style="opacity: 0.7; padding-right: 0.5em">
+								<i class="ti ti-device-tv"></i> {{ draft.channel.name }}
+							</span>
 							<span v-if="draft.renote">
-							<i class="ti ti-quote"></i> <MkAcct :user="draft.renote.user" /> <span>{{ draft.renote.text }}</span>
-						</span>
+								<i class="ti ti-quote"></i> <MkAcct :user="draft.renote.user"/> <span>{{ draft.renote.text }}</span>
+							</span>
 							<span v-else-if="draft.reply">
-							<i class="ti ti-arrow-back-up"></i> <MkAcct :user="draft.reply.user" /> <span>{{ draft.reply.text }}</span>
-						</span>
+								<i class="ti ti-arrow-back-up"></i> <MkAcct :user="draft.reply.user"/> <span>{{ draft.reply.text }}</span>
+							</span>
 							<span v-else>
-							<i class="ti ti-pencil"></i>
-						</span>
+								<i class="ti ti-pencil"></i>
+							</span>
 						</div>
 						<div :class="$style.draftNoteInfo">
 							<div style="display: flex; gap: 4px">
@@ -105,7 +105,7 @@
 								<div v-else style="display: flex; opacity: 0.6">
 									<span><i class="ti ti-exclamation-circle"/></span>
 								</div>
-								<MkTime :time="draft.createdAt" colored />
+								<MkTime :time="draft.createdAt" colored/>
 							</div>
 							<span v-if="draft.visibility !== 'public'" :title="i18n.ts._visibility[draft.visibility]">
 								<i v-if="draft.visibility === 'home'" class="ti ti-home"></i>
@@ -122,9 +122,9 @@
 					</div>
 					<div>
 						<p v-if="!!draft.cw" :class="$style.draftNoteCw">
-							<Mfm :text="draft.cw" />
+							<Mfm :text="draft.cw"/>
 						</p>
-						<MkSubNoteContent :class="$style.draftNoteText" :note="draft" />
+						<MkSubNoteContent :class="$style.draftNoteText" :note="draft"/>
 						<div v-if="draft.reason" style="opacity: 0.6; margin-top: 4px">
 							{{ i18n.ts.error }}: {{ draft.reason }}
 						</div>
@@ -149,7 +149,7 @@ import * as os from '@/os.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { infoImageUrl } from '@/instance.js';
 import { i18n } from '@/i18n.js';
-import { $i } from '@/account.js';
+import { $i } from '@/i.js';
 import MkSubNoteContent from '@/components/MkSubNoteContent.vue';
 import MkModalWindow from '@/components/MkModalWindow.vue';
 import MkPagination from '@/components/MkPagination.vue';
@@ -253,13 +253,13 @@ const scheduledPagination = {
 .draftItem {
 	display: flex;
 	padding: 8px 0 8px 0;
-	border-bottom: 1px solid var(--divider);
+	border-bottom: 1px solid var(--MI_THEME-divider);
 }
 
 .draftItemHover {
 	&:hover {
-		color: var(--accent);
-		background: var(--accentedBg);
+		color: var(--MI_THEME-accent);
+		background: var(--MI_THEME-accentedBg);
 	}
 }
 

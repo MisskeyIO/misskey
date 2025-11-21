@@ -4,186 +4,233 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<div class="_gaps_m">
-	<div class="_panel">
-		<div :class="$style.banner" :style="{ backgroundImage: $i.bannerUrl ? `url(${ $i.bannerUrl })` : null }">
-			<MkButton primary rounded :class="$style.bannerEdit" @click="changeBanner">{{ i18n.ts._profile.changeBanner }}</MkButton>
-		</div>
-		<div :class="$style.avatarContainer">
-			<MkAvatar :class="$style.avatar" :user="$i" forceShowDecoration @click="changeAvatar"/>
-			<div class="_buttonsCenter">
-				<MkButton primary rounded @click="changeAvatar">{{ i18n.ts._profile.changeAvatar }}</MkButton>
-				<MkButton primary rounded link to="/settings/avatar-decoration">{{ i18n.ts.decorate }} <i class="ti ti-sparkles"></i></MkButton>
+<SearchMarker path="/settings/profile" :label="i18n.ts.profile" :keywords="['profile']" icon="ti ti-user">
+	<div class="_gaps_m">
+		<div class="_panel">
+			<div :class="$style.banner" :style="{ backgroundImage: $i.bannerUrl ? `url(${ $i.bannerUrl })` : null }">
+				<div :class="$style.bannerEdit">
+					<SearchMarker :keywords="['banner', 'change']">
+						<MkButton primary rounded @click="changeBanner"><SearchLabel>{{ i18n.ts._profile.changeBanner }}</SearchLabel></MkButton>
+					</SearchMarker>
+				</div>
+			</div>
+			<div :class="$style.avatarContainer">
+				<MkAvatar :class="$style.avatar" :user="$i" forceShowDecoration @click="changeAvatar"/>
+				<div class="_buttonsCenter">
+					<SearchMarker :keywords="['avatar', 'icon', 'change']">
+						<MkButton primary rounded @click="changeAvatar"><SearchLabel>{{ i18n.ts._profile.changeAvatar }}</SearchLabel></MkButton>
+					</SearchMarker>
+					<MkButton primary rounded link to="/settings/avatar-decoration">{{ i18n.ts.decorate }} <i class="ti ti-sparkles"></i></MkButton>
+				</div>
 			</div>
 		</div>
-	</div>
 
-	<MkInput v-model="profile.name" :max="30" manualSave :mfmAutocomplete="['emoji']">
-		<template #label>{{ i18n.ts._profile.name }}</template>
-	</MkInput>
+		<SearchMarker :keywords="['name']">
+			<MkInput v-model="profile.name" :max="30" manualSave :mfmAutocomplete="['emoji']">
+				<template #label><SearchLabel>{{ i18n.ts._profile.name }}</SearchLabel></template>
+			</MkInput>
+		</SearchMarker>
 
-	<MkTextarea v-model="profile.description" :max="500" tall manualSave mfmAutocomplete :mfmPreview="true">
-		<template #label>{{ i18n.ts._profile.description }}</template>
-		<template #caption>{{ i18n.ts._profile.youCanIncludeHashtags }}</template>
-	</MkTextarea>
+		<SearchMarker :keywords="['description', 'bio']">
+			<MkTextarea v-model="profile.description" :max="500" tall manualSave mfmAutocomplete :mfmPreview="true">
+				<template #label><SearchLabel>{{ i18n.ts._profile.description }}</SearchLabel></template>
+				<template #caption>{{ i18n.ts._profile.youCanIncludeHashtags }}</template>
+			</MkTextarea>
+		</SearchMarker>
 
-	<MkInput v-model="profile.location" manualSave>
-		<template #label>{{ i18n.ts.location }}</template>
-		<template #prefix><i class="ti ti-map-pin"></i></template>
-	</MkInput>
+		<SearchMarker :keywords="['location', 'locale']">
+			<MkInput v-model="profile.location" manualSave>
+				<template #label><SearchLabel>{{ i18n.ts.location }}</SearchLabel></template>
+				<template #prefix><i class="ti ti-map-pin"></i></template>
+			</MkInput>
+		</SearchMarker>
 
-	<MkInput v-model="profile.birthday" type="date" manualSave>
-		<template #label>{{ i18n.ts.birthday }}</template>
-		<template #prefix><i class="ti ti-cake"></i></template>
-	</MkInput>
+		<SearchMarker :keywords="['birthday', 'birthdate', 'age']">
+			<MkInput v-model="profile.birthday" type="date" manualSave>
+				<template #label><SearchLabel>{{ i18n.ts.birthday }}</SearchLabel></template>
+				<template #prefix><i class="ti ti-cake"></i></template>
+			</MkInput>
+		</SearchMarker>
 
-	<MkSelect v-model="profile.lang">
-		<template #label>{{ i18n.ts.language }}</template>
-		<option v-for="x in Object.keys(langmap)" :key="x" :value="x">{{ langmap[x].nativeName }}</option>
-	</MkSelect>
+		<SearchMarker :keywords="['language', 'locale']">
+			<MkSelect v-model="profile.lang">
+				<template #label><SearchLabel>{{ i18n.ts.language }}</SearchLabel></template>
+				<option v-for="x in Object.keys(langmap)" :key="x" :value="x">{{ langmap[x].nativeName }}</option>
+			</MkSelect>
+		</SearchMarker>
 
-	<FormSlot>
-		<MkFolder>
-			<template #icon><i class="ti ti-list"></i></template>
-			<template #label>{{ i18n.ts._profile.metadataEdit }}</template>
-
-			<div :class="$style.metadataRoot">
-				<div :class="$style.metadataMargin">
-					<MkButton :disabled="fields.length >= 16" inline style="margin-right: 8px;" @click="addField"><i class="ti ti-plus"></i> {{ i18n.ts.add }}</MkButton>
-					<MkButton v-if="!fieldEditMode" :disabled="fields.length <= 1" inline danger style="margin-right: 8px;" @click="fieldEditMode = !fieldEditMode"><i class="ti ti-trash"></i> {{ i18n.ts.delete }}</MkButton>
-					<MkButton v-else inline style="margin-right: 8px;" @click="fieldEditMode = !fieldEditMode"><i class="ti ti-arrows-sort"></i> {{ i18n.ts.rearrange }}</MkButton>
-					<MkButton inline primary @click="saveFields"><i class="ti ti-check"></i> {{ i18n.ts.save }}</MkButton>
-				</div>
-
-				<Sortable
-					v-model="fields"
-					class="_gaps_s"
-					itemKey="id"
-					:animation="150"
-					:handle="'.' + $style.dragItemHandle"
-					@start="e => e.item.classList.add('active')"
-					@end="e => e.item.classList.remove('active')"
-				>
-					<template #item="{element, index}">
-						<div :class="$style.fieldDragItem">
-							<button v-if="!fieldEditMode" class="_button" :class="$style.dragItemHandle" tabindex="-1"><i class="ti ti-menu"></i></button>
-							<button v-if="fieldEditMode" :disabled="fields.length <= 1" class="_button" :class="$style.dragItemRemove" @click="deleteField(index)"><i class="ti ti-x"></i></button>
-							<div :class="$style.dragItemForm">
-								<FormSplit :minWidth="200">
-									<MkInput v-model="element.name" small>
-										<template #label>{{ i18n.ts._profile.metadataLabel }}</template>
-									</MkInput>
-									<MkInput v-model="element.value" small>
-										<template #label>{{ i18n.ts._profile.metadataContent }}</template>
-									</MkInput>
-								</FormSplit>
-							</div>
+		<SearchMarker :keywords="['metadata']">
+			<FormSlot>
+				<MkFolder>
+					<template #icon><i class="ti ti-list"></i></template>
+					<template #label><SearchLabel>{{ i18n.ts._profile.metadataEdit }}</SearchLabel></template>
+					<template #footer>
+						<div class="_buttons">
+							<MkButton primary @click="saveFields"><i class="ti ti-check"></i> {{ i18n.ts.save }}</MkButton>
+							<MkButton :disabled="fields.length >= 16" @click="addField"><i class="ti ti-plus"></i> {{ i18n.ts.add }}</MkButton>
+							<MkButton v-if="!fieldEditMode" :disabled="fields.length <= 1" danger @click="fieldEditMode = !fieldEditMode"><i class="ti ti-trash"></i> {{ i18n.ts.delete }}</MkButton>
+							<MkButton v-else @click="fieldEditMode = !fieldEditMode"><i class="ti ti-arrows-sort"></i> {{ i18n.ts.rearrange }}</MkButton>
 						</div>
 					</template>
-				</Sortable>
 
-				<MkInfo>{{ i18n.ts._profile.verifiedLinkDescription }}</MkInfo>
-			</div>
-		</MkFolder>
-		<template #caption>{{ i18n.ts._profile.metadataDescription }}</template>
-	</FormSlot>
-	<FormSlot>
-		<MkFolder>
-			<template #icon><i class="ti ti-link"></i></template>
-			<template #label>{{ i18n.ts._profile.mutualLinksEdit }}</template>
+					<div :class="$style.metadataRoot" class="_gaps_s">
+						<MkInfo>{{ i18n.ts._profile.verifiedLinkDescription }}</MkInfo>
 
-			<div :class="$style.metadataRoot">
-				<div :class="$style.metadataMargin">
-					<MkButton inline style="margin-right: 8px;" @click="addMutualLinkSections"><i class="ti ti-plus"></i> {{ i18n.ts._profile.addMutualLinkSection }}</MkButton>
-					<MkButton v-if="!mutualLinkSectionEditMode" inline danger style="margin-right: 8px;" @click="mutualLinkSectionEditMode = !mutualLinkSectionEditMode"><i class="ti ti-trash"></i> {{ i18n.ts.delete }}</MkButton>
-					<MkButton v-else inline style="margin-right: 8px;" @click="mutualLinkSectionEditMode = !mutualLinkSectionEditMode"><i class="ti ti-arrows-sort"></i> {{ i18n.ts.rearrange }}</MkButton>
-					<MkButton inline primary @click="saveMutualLinks"><i class="ti ti-check"></i> {{ i18n.ts.save }}</MkButton>
-				</div>
-
-				<Sortable
-					v-model="mutualLinkSections"
-					class="_gaps_s"
-					itemKey="id"
-					:animation="150"
-					:handle="'.' + $style.dragItemHandle"
-					@start="e => e.item.classList.add('active')"
-					@end="e => e.item.classList.remove('active')"
-				>
-					<template #item="{ element: sectionElement, index: sectionIndex }">
-						<div :class="$style.mutualLinkSectionRoot">
-							<button v-if="!mutualLinkSectionEditMode" class="_button" :class="$style.dragItemHandle" tabindex="-1"><i class="ti ti-menu"></i></button>
-
-							{{sectionElement.length }}
-							<button v-if="mutualLinkSectionEditMode" :disabled="sectionElement.length <= 1" class="_button" :class="$style.dragItemRemove" @click="deleteMutualLinkSection(sectionIndex)"><i class="ti ti-x"></i></button>
-							<FormSlot :style="{flexGrow: 1}">
-								<MkFolder>
-									<template #label>{{ sectionElement.name || i18n.ts._profile.sectionNameNone }}</template>
-
-									<div class="_gaps_s" :class="$style.metadataMargin">
-										<MkInfo v-if="sectionIndex >= $i.policies.mutualLinkSectionLimit" warn><Mfm :text="i18n.tsx._profile.policyDisplayLimitExceeded({ max: $i.policies.mutualLinkSectionLimit })"/></MkInfo>
-										<MkInput v-if="sectionElement.name !== null" v-model="sectionElement.name" :placeholder="i18n.ts._profile.sectionName" :max="32"></MkInput>
-										<MkSwitch v-model="sectionElement.none" @update:modelValue="()=>{ sectionElement.none ? sectionElement.name = null : sectionElement.name = 'New Section' }">{{ i18n.ts._profile.sectionNameNoneDescription }}</MkSwitch>
-										<MkButton inline style="margin-right: 8px;" @click="addMutualLinks(sectionIndex)"><i class="ti ti-plus"></i> {{ i18n.ts._profile.addMutualLink }}</MkButton>
+						<Sortable
+							v-model="fields"
+							class="_gaps_s"
+							itemKey="id"
+							:animation="150"
+							:handle="'.' + $style.dragItemHandle"
+							@start="e => e.item.classList.add('active')"
+							@end="e => e.item.classList.remove('active')"
+						>
+							<template #item="{element, index}">
+								<div v-panel :class="$style.fieldDragItem">
+									<button v-if="!fieldEditMode" class="_button" :class="$style.dragItemHandle" tabindex="-1"><i class="ti ti-menu"></i></button>
+									<button v-if="fieldEditMode" :disabled="fields.length <= 1" class="_button" :class="$style.dragItemRemove" @click="deleteField(index)"><i class="ti ti-x"></i></button>
+									<div :class="$style.dragItemForm">
+										<FormSplit :minWidth="200">
+											<MkInput v-model="element.name" small :placeholder="i18n.ts._profile.metadataLabel">
+											</MkInput>
+											<MkInput v-model="element.value" small :placeholder="i18n.ts._profile.metadataContent">
+											</MkInput>
+										</FormSplit>
 									</div>
+								</div>
+							</template>
+						</Sortable>
+					</div>
+				</MkFolder>
+				<template #caption>{{ i18n.ts._profile.metadataDescription }}</template>
+			</FormSlot>
+		</SearchMarker>
 
-									<Sortable
-										v-model="sectionElement.mutualLinks"
-										class="_gaps_s"
-										itemKey="id"
-										:animation="150"
-										:handle="'.' + $style.dragItemHandle"
-										@start="e => e.item.classList.add('active')"
-										@end="e => e.item.classList.remove('active')"
-									>
-										<template #item="{ element: linkElement, index: linkIndex }">
-											<div :class="$style.mutualLinkRoot">
-												<button v-if="!mutualLinkSectionEditMode" class="_button" :class="$style.dragItemHandle" tabindex="-1"><i class="ti ti-menu"></i></button>
-												<button v-if="mutualLinkSectionEditMode" class="_button" :class="$style.dragItemRemove" @click="deleteMutualLink(sectionIndex,linkIndex)"><i class="ti ti-x"></i></button>
+		<SearchMarker :label="i18n.ts._profile.mutualLinksEdit" :keywords="['mutual', 'link', 'links','metadata']">
+			<FormSlot>
+				<MkFolder>
+					<template #icon><i class="ti ti-link"></i></template>
+					<template #label>{{ i18n.ts._profile.mutualLinksEdit }}</template>
 
-												<div class="_gaps_s" :style="{flex: 1}">
-													<MkInfo v-if="linkIndex >= $i.policies.mutualLinkLimit" warn><Mfm :text="i18n.tsx._profile.policyDisplayLimitExceeded({ max: $i.policies.mutualLinkLimit })"/></MkInfo>
-													<MkInput v-model="linkElement.url" small>
-														<template #label>{{ i18n.ts._profile.mutualLinksUrl }}</template>
-													</MkInput>
-													<MkInput v-model="linkElement.description" small>
-														<template #label>{{ i18n.ts._profile.mutualLinksDescriptionEdit }}</template>
-													</MkInput>
-													<span>{{ i18n.ts._profile.mutualLinksBanner }}</span>
-													<img :class="$style.mutualLinkImg" :src="linkElement.imgSrc">
-													<MkButton class="_button" @click="ev => changeMutualLinkFile(ev, sectionIndex, linkIndex)">{{ i18n.ts.selectFile }}</MkButton>
-												</div>
-											</div>
-										</template>
-									</Sortable>
-								</MkFolder>
-							</FormSlot>
+					<div :class="$style.metadataRoot">
+						<div :class="$style.metadataMargin">
+							<MkButton inline style="margin-right: 8px;" @click="addMutualLinkSections"><i class="ti ti-plus"></i> {{ i18n.ts._profile.addMutualLinkSection }}</MkButton>
+							<MkButton v-if="!mutualLinkSectionEditMode" inline danger style="margin-right: 8px;" @click="mutualLinkSectionEditMode = !mutualLinkSectionEditMode"><i class="ti ti-trash"></i> {{ i18n.ts.delete }}</MkButton>
+							<MkButton v-else inline style="margin-right: 8px;" @click="mutualLinkSectionEditMode = !mutualLinkSectionEditMode"><i class="ti ti-arrows-sort"></i> {{ i18n.ts.rearrange }}</MkButton>
+							<MkButton inline primary @click="saveMutualLinks"><i class="ti ti-check"></i> {{ i18n.ts.save }}</MkButton>
 						</div>
-					</template>
-				</Sortable>
-			</div>
-		</MkFolder>
 
-		<template #caption>{{ i18n.ts._profile.mutualLinksDescription }}</template>
-	</FormSlot>
+						<Sortable
+							v-model="mutualLinkSections"
+							class="_gaps_s"
+							itemKey="id"
+							:animation="150"
+							:handle="'.' + $style.dragItemHandle"
+							@start="e => e.item.classList.add('active')"
+							@end="e => e.item.classList.remove('active')"
+						>
+							<template #item="{ element: sectionElement, index: sectionIndex }">
+								<div :class="$style.mutualLinkSectionRoot">
+									<button v-if="!mutualLinkSectionEditMode" class="_button" :class="$style.dragItemHandle" tabindex="-1"><i class="ti ti-menu"></i></button>
 
-	<MkFolder>
-		<template #label>{{ i18n.ts.advancedSettings }}</template>
+									{{ sectionElement.length }}
+									<button v-if="mutualLinkSectionEditMode" :disabled="sectionElement.length <= 1" class="_button" :class="$style.dragItemRemove" @click="deleteMutualLinkSection(sectionIndex)"><i class="ti ti-x"></i></button>
+									<FormSlot :style="{flexGrow: 1}">
+										<MkFolder>
+											<template #label>{{ sectionElement.name || i18n.ts._profile.sectionNameNone }}</template>
 
-		<div class="_gaps_m">
-			<MkSwitch v-model="profile.isCat">{{ i18n.ts.flagAsCat }}<template #caption>{{ i18n.ts.flagAsCatDescription }}</template></MkSwitch>
-			<MkSwitch v-model="profile.isBot">{{ i18n.ts.flagAsBot }}<template #caption>{{ i18n.ts.flagAsBotDescription }}</template></MkSwitch>
-		</div>
-	</MkFolder>
+											<div class="_gaps_s" :class="$style.metadataMargin">
+												<MkInfo v-if="sectionIndex >= $i.policies.mutualLinkSectionLimit" warn><Mfm :text="i18n.tsx._profile.policyDisplayLimitExceeded({ max: $i.policies.mutualLinkSectionLimit })"/></MkInfo>
+												<MkInput v-if="sectionElement.name !== null" v-model="sectionElement.name" :placeholder="i18n.ts._profile.sectionName" :max="32"></MkInput>
+												<MkSwitch v-model="sectionElement.none" @update:modelValue="()=>{ sectionElement.none ? sectionElement.name = null : sectionElement.name = 'New Section' }">{{ i18n.ts._profile.sectionNameNoneDescription }}</MkSwitch>
+												<MkButton inline style="margin-right: 8px;" @click="addMutualLinks(sectionIndex)"><i class="ti ti-plus"></i> {{ i18n.ts._profile.addMutualLink }}</MkButton>
+											</div>
 
-	<MkSelect v-model="reactionAcceptance">
-		<template #label>{{ i18n.ts.reactionAcceptance }}</template>
-		<option :value="null">{{ i18n.ts.all }}</option>
-		<option value="likeOnlyForRemote">{{ i18n.ts.likeOnlyForRemote }}</option>
-		<option value="nonSensitiveOnly">{{ i18n.ts.nonSensitiveOnly }}</option>
-		<option value="nonSensitiveOnlyForLocalLikeOnlyForRemote">{{ i18n.ts.nonSensitiveOnlyForLocalLikeOnlyForRemote }}</option>
-		<option value="likeOnly">{{ i18n.ts.likeOnly }}</option>
-	</MkSelect>
-</div>
+											<Sortable
+												v-model="sectionElement.mutualLinks"
+												class="_gaps_s"
+												itemKey="id"
+												:animation="150"
+												:handle="'.' + $style.dragItemHandle"
+												@start="e => e.item.classList.add('active')"
+												@end="e => e.item.classList.remove('active')"
+											>
+												<template #item="{ element: linkElement, index: linkIndex }">
+													<div :class="$style.mutualLinkRoot">
+														<button v-if="!mutualLinkSectionEditMode" class="_button" :class="$style.dragItemHandle" tabindex="-1"><i class="ti ti-menu"></i></button>
+														<button v-if="mutualLinkSectionEditMode" class="_button" :class="$style.dragItemRemove" @click="deleteMutualLink(sectionIndex,linkIndex)"><i class="ti ti-x"></i></button>
+
+														<div class="_gaps_s" :style="{flex: 1}">
+															<MkInfo v-if="linkIndex >= $i.policies.mutualLinkLimit" warn><Mfm :text="i18n.tsx._profile.policyDisplayLimitExceeded({ max: $i.policies.mutualLinkLimit })"/></MkInfo>
+															<MkInput v-model="linkElement.url" small>
+																<template #label>{{ i18n.ts._profile.mutualLinksUrl }}</template>
+															</MkInput>
+															<MkInput v-model="linkElement.description" small>
+																<template #label>{{ i18n.ts._profile.mutualLinksDescriptionEdit }}</template>
+															</MkInput>
+															<span>{{ i18n.ts._profile.mutualLinksBanner }}</span>
+															<img :class="$style.mutualLinkImg" :src="linkElement.imgSrc">
+															<MkButton class="_button" @click="ev => changeMutualLinkFile(ev, sectionIndex, linkIndex)">{{ i18n.ts.selectFile }}</MkButton>
+														</div>
+													</div>
+												</template>
+											</Sortable>
+										</MkFolder>
+									</FormSlot>
+								</div>
+							</template>
+						</Sortable>
+					</div>
+				</MkFolder>
+
+				<template #caption>{{ i18n.ts._profile.mutualLinksDescription }}</template>
+			</FormSlot>
+		</SearchMarker>
+
+		<SearchMarker :keywords="['follow', 'message']">
+			<MkInput v-model="profile.followedMessage" :max="200" manualSave :mfmPreview="false">
+				<template #label><SearchLabel>{{ i18n.ts._profile.followedMessage }}</SearchLabel><span class="_beta">{{ i18n.ts.beta }}</span></template>
+				<template #caption>
+					<div><SearchKeyword>{{ i18n.ts._profile.followedMessageDescription }}</SearchKeyword></div>
+					<div>{{ i18n.ts._profile.followedMessageDescriptionForLockedAccount }}</div>
+				</template>
+			</MkInput>
+		</SearchMarker>
+
+		<SearchMarker :keywords="['reaction']">
+			<MkSelect v-model="reactionAcceptance">
+				<template #label><SearchLabel>{{ i18n.ts.reactionAcceptance }}</SearchLabel></template>
+				<option :value="null">{{ i18n.ts.all }}</option>
+				<option value="likeOnlyForRemote">{{ i18n.ts.likeOnlyForRemote }}</option>
+				<option value="nonSensitiveOnly">{{ i18n.ts.nonSensitiveOnly }}</option>
+				<option value="nonSensitiveOnlyForLocalLikeOnlyForRemote">{{ i18n.ts.nonSensitiveOnlyForLocalLikeOnlyForRemote }}</option>
+				<option value="likeOnly">{{ i18n.ts.likeOnly }}</option>
+			</MkSelect>
+		</SearchMarker>
+
+		<SearchMarker>
+			<MkFolder>
+				<template #label><SearchLabel>{{ i18n.ts.advancedSettings }}</SearchLabel></template>
+
+				<div class="_gaps_m">
+					<SearchMarker :keywords="['cat']">
+						<MkSwitch v-model="profile.isCat">
+							<template #label><SearchLabel>{{ i18n.ts.flagAsCat }}</SearchLabel></template>
+							<template #caption>{{ i18n.ts.flagAsCatDescription }}</template>
+						</MkSwitch>
+					</SearchMarker>
+
+					<SearchMarker :keywords="['bot']">
+						<MkSwitch v-model="profile.isBot">
+							<template #label><SearchLabel>{{ i18n.ts.flagAsBot }}</SearchLabel></template>
+							<template #caption>{{ i18n.ts.flagAsBotDescription }}</template>
+						</MkSwitch>
+					</SearchMarker>
+				</div>
+			</MkFolder>
+		</SearchMarker>
+	</div>
+</SearchMarker>
 </template>
 
 <script lang="ts" setup>
@@ -195,29 +242,33 @@ import MkSelect from '@/components/MkSelect.vue';
 import FormSplit from '@/components/form/split.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import FormSlot from '@/components/form/slot.vue';
-import { selectFile } from '@/scripts/select-file.js';
+import { selectFile } from '@/utility/select-file.js';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
-import { signinRequired } from '@/account.js';
-import { langmap } from '@/scripts/langmap.js';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
-import { claimAchievement } from '@/scripts/achievements.js';
-import { defaultStore } from '@/store.js';
-import { globalEvents } from '@/events.js';
+import { ensureSignin } from '@/i.js';
+import { langmap } from '@/utility/langmap.js';
+import { definePage } from '@/page.js';
+import { claimAchievement } from '@/utility/achievements.js';
+import { store } from '@/store.js';
 import MkInfo from '@/components/MkInfo.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
 
-const $i = signinRequired();
+const $i = ensureSignin();
 
 const Sortable = defineAsyncComponent(() => import('vuedraggable').then(x => x.default));
-const reactionAcceptance = computed(defaultStore.makeGetterSetter('reactionAcceptance'));
+const reactionAcceptance = computed(store.makeGetterSetter('reactionAcceptance'));
+
+function assertVaildLang(lang: string | null): lang is keyof typeof langmap {
+	return lang != null && lang in langmap;
+}
 
 const profile = reactive({
 	name: $i.name,
 	description: $i.description,
+	followedMessage: $i.followedMessage,
 	location: $i.location,
 	birthday: $i.birthday,
-	lang: $i.lang,
+	lang: assertVaildLang($i.lang) ? $i.lang : null,
 	isBot: $i.isBot ?? false,
 	isCat: $i.isCat ?? false,
 });
@@ -280,7 +331,6 @@ function saveFields() {
 	os.apiWithDialog('i/update', {
 		fields: fields.value.filter(field => field.name !== '' && field.value !== '').map(field => ({ name: field.name, value: field.value })),
 	});
-	globalEvents.emit('requestClearPageCache');
 }
 
 function saveMutualLinks() {
@@ -297,6 +347,8 @@ function save() {
 		// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 		description: profile.description || null,
 		// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+		followedMessage: profile.followedMessage || null,
+		// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 		location: profile.location || null,
 		// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 		birthday: profile.birthday || null,
@@ -304,8 +356,12 @@ function save() {
 		lang: profile.lang || null,
 		isBot: !!profile.isBot,
 		isCat: !!profile.isCat,
+	}, undefined, {
+		'0b3f9f6a-2f4d-4b1f-9fb4-49d3a2fd7191': {
+			title: i18n.ts.yourNameContainsProhibitedWords,
+			text: i18n.ts.yourNameContainsProhibitedWordsDescription,
+		},
 	});
-	globalEvents.emit('requestClearPageCache');
 	claimAchievement('profileFilled');
 	if (profile.name === 'syuilo' || profile.name === 'しゅいろ') {
 		claimAchievement('setNameToSyuilo');
@@ -344,7 +400,6 @@ function changeAvatar(ev) {
 		});
 		$i.avatarId = i.avatarId;
 		$i.avatarUrl = i.avatarUrl;
-		globalEvents.emit('requestClearPageCache');
 		claimAchievement('profileFilled');
 	});
 }
@@ -371,7 +426,6 @@ function changeBanner(ev) {
 		});
 		$i.bannerId = i.bannerId;
 		$i.bannerUrl = i.bannerUrl;
-		globalEvents.emit('requestClearPageCache');
 	});
 }
 
@@ -379,7 +433,7 @@ const headerActions = computed(() => []);
 
 const headerTabs = computed(() => []);
 
-definePageMetadata(() => ({
+definePage(() => ({
 	title: i18n.ts.profile,
 	icon: 'ti ti-user',
 }));
@@ -391,7 +445,7 @@ definePageMetadata(() => ({
 	height: 130px;
 	background-size: cover;
 	background-position: center;
-	border-bottom: solid 1px var(--divider);
+	border-bottom: solid 1px var(--MI_THEME-divider);
 	overflow: clip;
 }
 
@@ -424,7 +478,7 @@ definePageMetadata(() => ({
 	flex-direction: row;
 	gap: 8px;
 	padding-bottom: .75em;
-	border-bottom: solid 0.5px var(--divider);
+	border-bottom: solid 0.5px var(--MI_THEME-divider);
 	flex: 1;
 	&:last-child {
 		border-bottom: 0;
@@ -435,7 +489,7 @@ definePageMetadata(() => ({
 	display: flex;
 	padding-bottom: .75em;
 	align-items: center;
-	border-bottom: solid 0.5px var(--divider);
+	border-bottom: solid 0.5px var(--MI_THEME-divider);
 	overflow: clip;
 	&:last-child {
 		border-bottom: 0;
@@ -454,13 +508,9 @@ definePageMetadata(() => ({
 
 .fieldDragItem {
 	display: flex;
-	padding-bottom: .75em;
+	padding: 10px;
 	align-items: flex-end;
-	border-bottom: solid 0.5px var(--divider);
-
-	&:last-child {
-		border-bottom: 0;
-	}
+	border-radius: 6px;
 
 	/* (drag button) 32px + (drag button margin) 8px + (input width) 200px * 2 + (input gap) 12px = 452px */
 	@container (max-width: 452px) {
@@ -491,6 +541,7 @@ definePageMetadata(() => ({
 	&:hover, &:focus {
 		opacity: .7;
 	}
+
 	&:active {
 		cursor: pointer;
 	}

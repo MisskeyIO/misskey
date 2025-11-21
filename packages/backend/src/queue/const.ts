@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { Config, RedisOptionsSource } from '@/config.js';
 import type * as Bull from 'bullmq';
 import type { RedisOptions } from 'ioredis';
-import type { RedisOptionsSource } from '@/config.js';
 
 export const QUEUE = {
 	DELIVER: 'deliver',
@@ -15,7 +15,8 @@ export const QUEUE = {
 	DB: 'db',
 	RELATIONSHIP: 'relationship',
 	OBJECT_STORAGE: 'objectStorage',
-	WEBHOOK_DELIVER: 'webhookDeliver',
+	USER_WEBHOOK_DELIVER: 'userWebhookDeliver',
+	SYSTEM_WEBHOOK_DELIVER: 'systemWebhookDeliver',
 };
 
 export function formatQueueName(config: RedisOptionsSource, queueName: typeof QUEUE[keyof typeof QUEUE]): string {
@@ -26,26 +27,6 @@ export function baseQueueOptions(config: RedisOptions & RedisOptionsSource, queu
 	const name = formatQueueName(config, queueName);
 	return {
 		...queueOptions,
-		connection: {
-			...config,
-			maxRetriesPerRequest: null,
-			keyPrefix: undefined,
-			reconnectOnError: (err: Error) => {
-				if ( err.message.includes('READONLY')
-					|| err.message.includes('ETIMEDOUT')
-					|| err.message.includes('Command timed out')
-				) return 2;
-				return 1;
-			},
-		},
-		prefix: config.prefix ? `{${config.prefix}:queue:${name}}` : `{queue:${name}}`,
-	};
-}
-
-export function baseWorkerOptions(config: RedisOptions & RedisOptionsSource, workerOptions: Partial<Bull.WorkerOptions>, queueName: typeof QUEUE[keyof typeof QUEUE]): Bull.WorkerOptions {
-	const name = formatQueueName(config, queueName);
-	return {
-		...workerOptions,
 		connection: {
 			...config,
 			maxRetriesPerRequest: null,

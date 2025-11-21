@@ -18,6 +18,7 @@ import { bindThis } from '@/decorators.js';
 import type Logger from '@/logger.js';
 import { validateContentTypeSetAsActivityPub } from '@/core/activitypub/misc/validator.js';
 import type { IObject } from './type.js';
+import { FetchAllowSoftFailMask } from "@/core/activitypub/misc/check-against-url.js";
 
 type Request = {
 	url: string;
@@ -181,10 +182,11 @@ export class ApRequestService {
 	 * Get AP object with http-signature
 	 * @param user http-signature user
 	 * @param url URL to fetch
+	 * @param allowSoftfail
 	 * @param followAlternate If true, follow alternate link tag in HTML
 	 */
 	@bindThis
-	public async signedGet(url: string, user: { id: MiUser['id'] }, followAlternate?: boolean): Promise<unknown> {
+	public async signedGet(url: string, user: { id: MiUser['id'] }, allowSoftfail: FetchAllowSoftFailMask = FetchAllowSoftFailMask.Strict, followAlternate?: boolean): Promise<unknown> {
 		const _followAlternate = followAlternate ?? true;
 		const keypair = await this.userKeypairService.getUserKeypair(user.id);
 
@@ -221,7 +223,7 @@ export class ApRequestService {
 				if (alternate) {
 					const href = alternate.getAttribute('href');
 					if (href && this.utilityService.isRelatedUris(url, href)) {
-						return await this.signedGet(href, user, false);
+						return await this.signedGet(href, user, allowSoftfail, false);
 					}
 				}
 			} catch (e) {
@@ -235,7 +237,7 @@ export class ApRequestService {
 		const activity = await res.json() as IObject;
 
 		this.utilityService.assertActivityRelatedToUrl(activity, finalUrl);
-
+		// assertActivityMatchesUrl(url, activity, finalUrl, allowSoftfail);
 		return activity;
 	}
 }

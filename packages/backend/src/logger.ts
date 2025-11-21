@@ -4,7 +4,7 @@
  */
 
 import cluster from 'node:cluster';
-import { pino } from 'pino';
+import pino from 'pino';
 import pinoPretty from 'pino-pretty';
 import { bindThis } from '@/decorators.js';
 import { envOption } from './env.js';
@@ -116,7 +116,7 @@ export default class Logger {
 	public succ(message: string, context?: Record<string, any> | null, important = false): void { // 何かに成功した状況で使う
 		if (context === null) context = undefined;
 
-		this.logger.trace({ context, important }, message);
+		this.logger.info({ context, important }, message);
 	}
 
 	@bindThis

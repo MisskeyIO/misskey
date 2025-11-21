@@ -13,8 +13,8 @@ import { DI } from '@/di-symbols.js';
 import { GetterService } from '@/server/api/GetterService.js';
 import { CacheService } from '@/core/CacheService.js';
 import { isUserRelated } from '@/misc/is-user-related.js';
-import { ApiError } from '../../error.js';
 import { Packed } from '@/misc/json-schema.js';
+import { ApiError } from '../../error.js';
 
 export const meta = {
 	tags: ['users'],
@@ -129,12 +129,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const repliedUsersSorted = Object.keys(repliedUsers).sort((a, b) => repliedUsers[b] - repliedUsers[a]);
 
 			// Extract top replied users
-			const topRepliedUsers = repliedUsersSorted.slice(0, ps.limit);
+			const topRepliedUserIds = repliedUsersSorted.slice(0, ps.limit);
 
 			// Make replies object (includes weights)
-			const repliesObj = (await Promise.allSettled(topRepliedUsers.map(async (user) => ({
-				user: await this.userEntityService.pack(user, me, { schema: 'UserDetailed' }),
-				weight: repliedUsers[user] / peak,
+			const _userMap = await this.userEntityService.packMany(topRepliedUserIds, me, { schema: 'UserDetailed' })
+				.then(users => new Map(users.map(u => [u.id, u])));
+			const repliesObj = (await Promise.allSettled(topRepliedUserIds.map(async (userId) => ({
+				user: _userMap.get(userId) ?? await this.userEntityService.pack(userId, me, { schema: 'UserDetailed' }),
+				weight: repliedUsers[userId] / peak,
 			}))))
 				.filter((result): result is PromiseFulfilledResult<{ user: Packed<'UserDetailed'>; weight: number }> => result.status === 'fulfilled')
 				.map(result => result.value);

@@ -27,12 +27,12 @@ export class CheckMissingScheduledNoteProcessorService {
 
 	@bindThis
 	public async process(): Promise<void> {
-		this.logger.info(`checking missing scheduled note tasks`);
+		this.logger.info('checking missing scheduled note tasks');
 
 		try {
-			await acquireDistributedLock(this.redisForTimelines, `note:scheduled:check`, 3 * 60 * 1000, 1, 1000);
+			await acquireDistributedLock(this.redisForTimelines, 'note:scheduled:check', 3 * 60 * 1000, 1, 1000);
 		} catch (e) {
-			this.logger.warn(`check is already being processed`);
+			this.logger.warn('check is already being processed');
 			return;
 		}
 

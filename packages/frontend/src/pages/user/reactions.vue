@@ -4,7 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<MkSpacer :contentMax="700">
+<div class="_spacer" style="--MI_SPACER-w: 700px;">
 	<MkPagination v-slot="{items}" ref="list" :pagination="pagination">
 		<div v-for="item in items" :key="item.id" :to="`/clips/${item.id}`" class="_panel _margin">
 			<div :class="$style.header">
@@ -15,7 +15,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkNote :key="item.id" :note="item.note"/>
 		</div>
 	</MkPagination>
-</MkSpacer>
+</div>
 </template>
 
 <script lang="ts" setup>
@@ -44,7 +44,7 @@ const pagination = {
 	align-items: center;
 	padding: 8px 16px;
 	margin-bottom: 8px;
-	border-bottom: solid 2px var(--divider);
+	border-bottom: solid 2px var(--MI_THEME-divider);
 }
 
 .avatar {

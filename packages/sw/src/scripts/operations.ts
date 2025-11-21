@@ -12,17 +12,28 @@ import type { SwMessage, SwMessageOrderType } from '@/types.js';
 import { getAccountFromId } from '@/scripts/get-account-from-id.js';
 import { getUrlWithLoginId } from '@/scripts/login-id.js';
 
-export const cli = new Misskey.api.APIClient({ origin, fetch: (...args): Promise<Response> => fetch(...args) });
+const fetchWithTuple = (
+	...args: Parameters<typeof fetch>
+): ReturnType<typeof fetch> => fetch(...args);
 
-export async function api<E extends keyof Misskey.Endpoints, O extends Misskey.Endpoints[E]['req']>(endpoint: E, userId?: string, options?: O): Promise<void | ReturnType<typeof cli.request<E, O>>> {
-	let account: { token: string; id: string } | void = undefined;
+export const cli = new Misskey.api.APIClient({ origin, fetch: fetchWithTuple });
+
+export async function api<
+	E extends keyof Misskey.Endpoints,
+	P extends Misskey.Endpoints[E]['req'],
+>(endpoint: E, userId?: string, params?: P): Promise<Misskey.api.SwitchCaseResponseType<E, P> | undefined> {
+	let account: Pick<Misskey.entities.SignupResponse, 'id' | 'token'> | undefined;
 
 	if (userId) {
 		account = await getAccountFromId(userId);
 		if (!account) return;
 	}
 
-	return cli.request(endpoint, options, account?.token);
+	return (cli.request as <E extends keyof Misskey.Endpoints, P extends Misskey.Endpoints[E]['req']>(
+		endpoint: E,
+		params: P,
+		credential?: string | null,
+	) => Promise<Misskey.api.SwitchCaseResponseType<E, P>>)(endpoint, params, account?.token);
 }
 
 // mark-all-as-read送出を1秒間隔に制限する
@@ -33,7 +44,7 @@ export function sendMarkAllAsRead(userId: string): Promise<null | undefined | vo
 	return new Promise(resolve => {
 		setTimeout(() => {
 			readBlockingStatus.set(userId, false);
-			api('notifications/mark-all-as-read', userId).then(resolve, resolve);
+			(api('notifications/mark-all-as-read', userId) as Promise<void>).then(resolve, resolve);
 		}, 1000);
 	});
 }
@@ -51,6 +62,14 @@ export function openNote(noteId: string, loginId?: string): ReturnType<typeof op
 // noteIdからノートを開く
 export function openAntenna(antennaId: string, loginId: string): ReturnType<typeof openClient> {
 	return openClient('push', `/timeline/antenna/${antennaId}`, loginId, { antennaId });
+}
+
+export function openChat(body: any, loginId: string): ReturnType<typeof openClient> {
+	if (body.toRoomId != null) {
+		return openClient('push', `/chat/room/${body.toRoomId}`, loginId, { body });
+	} else {
+		return openClient('push', `/chat/user/${body.toUserId}`, loginId, { body });
+	}
 }
 
 // post-formのオプションから投稿フォームを開く

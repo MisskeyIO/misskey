@@ -22,16 +22,15 @@ export const meta = {
 		items: {
 			type: 'array',
 			optional: false, nullable: false,
-			items: {
-				anyOf: [
-					{
-						type: 'string',
-					},
-					{
-						type: 'number',
-					},
-				],
-			},
+			prefixItems: [
+				{
+					type: 'string',
+				},
+				{
+					type: 'number',
+				},
+			],
+			unevaluatedItems: false,
 		},
 		example: [[
 			'example.com',

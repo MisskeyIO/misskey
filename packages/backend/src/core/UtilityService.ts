@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { URL } from 'node:url';
+import { URL, domainToASCII } from 'node:url';
 import { isIP } from 'node:net';
 import punycode from 'punycode.js';
 import psl from 'psl';
@@ -12,6 +12,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { bindThis } from '@/decorators.js';
+import { MiMeta } from '@/models/Meta.js';
 import type { IObject } from '@/core/activitypub/type.js';
 
 @Injectable()
@@ -19,6 +20,10 @@ export class UtilityService {
 	constructor(
 		@Inject(DI.config)
 		private config: Config,
+
+		@Inject(DI.meta)
+		private meta: MiMeta,
+
 	) {
 	}
 
@@ -31,6 +36,14 @@ export class UtilityService {
 	public isSelfHost(host: string | null): boolean {
 		if (host == null) return true;
 		return this.normalizeHost(this.config.host) === this.normalizeHost(host);
+	}
+
+	// メールアドレスのバリデーションを行う
+	// https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address
+	@bindThis
+	public validateEmailFormat(email: string): boolean {
+		const regexp = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+		return regexp.test(email);
 	}
 
 	@bindThis
@@ -98,6 +111,23 @@ export class UtilityService {
 	}
 
 	@bindThis
+	public toPuny(host: string): string {
+		return domainToASCII(host.toLowerCase());
+	}
+
+	@bindThis
+	public toPunyNullable(host: string | null | undefined): string | null {
+		if (host == null) return null;
+		return domainToASCII(host.toLowerCase());
+	}
+
+	@bindThis
+	public punyHost(url: string): string {
+		const urlObj = new URL(url);
+		const host = `${this.toPuny(urlObj.hostname)}${urlObj.port.length > 0 ? ':' + urlObj.port : ''}`;
+		return host;
+	}
+	@bindThis
 	public isRelatedHosts(hostA: string, hostB: string): boolean {
 		// hostA と hostB は呼び出す側で正規化済みであることを前提とする
 
@@ -127,7 +157,7 @@ export class UtilityService {
 		const parsedB = psl.parse(hostB);
 
 		// どちらか一方でもパース失敗 or eTLD+1が異なる場合は false
-		if (parsedA.error || parsedB.error || parsedA.domain !== parsedB.domain) {
+		if (psl.isPslError(parsedA) || psl.isPslError(parsedB) || parsedA.domain !== parsedB.domain) {
 			return false;
 		}
 
@@ -153,7 +183,7 @@ export class UtilityService {
 			i < levelsA &&
 			i < levelsB &&
 			labelsA[levelsA - 1 - i] === labelsB[levelsB - 1 - i]
-			) {
+		) {
 			i++;
 		}
 
@@ -179,7 +209,7 @@ export class UtilityService {
 	}
 
 	@bindThis
-	public assertActivityRelatedToUrl(activity: IObject, url: string): void {
+	public assertActivityRelatedToUrl(activity: IObject, url: string ): void {
 		if (activity.id && this.isRelatedUris(activity.id, url)) return;
 
 		if (activity.url) {
@@ -193,5 +223,20 @@ export class UtilityService {
 		}
 
 		throw new Error(`Invalid object: neither id(${activity.id}) nor url(${activity.url}) related to ${url}`);
+	}
+
+	@bindThis
+	public isFederationAllowedHost(host: string): boolean {
+		if (this.meta.federation === 'none') return false;
+		if (this.meta.federation === 'specified' && !this.meta.federationHosts.some(x => `.${host.toLowerCase()}`.endsWith(`.${x}`))) return false;
+		if (this.isItemListedIn(host, this.meta.blockedHosts)) return false;
+
+		return true;
+	}
+
+	@bindThis
+	public isFederationAllowedUri(uri: string): boolean {
+		const host = this.extractHost(uri);
+		return this.isFederationAllowedHost(host);
 	}
 }

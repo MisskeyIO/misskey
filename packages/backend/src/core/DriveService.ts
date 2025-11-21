@@ -11,11 +11,10 @@ import { sharpBmp } from '@misskey-dev/sharp-read-bmp';
 import { IsNull } from 'typeorm';
 import { DeleteObjectCommandInput, PutObjectCommandInput, NoSuchKey } from '@aws-sdk/client-s3';
 import { DI } from '@/di-symbols.js';
-import type { DriveFilesRepository, UsersRepository, DriveFoldersRepository, UserProfilesRepository } from '@/models/_.js';
+import type { DriveFilesRepository, UsersRepository, DriveFoldersRepository, UserProfilesRepository, MiMeta } from '@/models/_.js';
 import type { Config } from '@/config.js';
 import Logger from '@/logger.js';
 import type { MiRemoteUser, MiUser } from '@/models/User.js';
-import { MetaService } from '@/core/MetaService.js';
 import { MiDriveFile } from '@/models/DriveFile.js';
 import { IdService } from '@/core/IdService.js';
 import { isDuplicateKeyValueError } from '@/misc/is-duplicate-key-value-error.js';
@@ -45,6 +44,7 @@ import { isMimeImage } from '@/misc/is-mime-image.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import { NotificationService } from '@/core/NotificationService.js';
+import { UtilityService } from '@/core/UtilityService.js';
 
 type AddFileArgs = {
 	/** User who wish to add file */
@@ -100,6 +100,9 @@ export class DriveService {
 		@Inject(DI.config)
 		private config: Config,
 
+		@Inject(DI.meta)
+		private meta: MiMeta,
+
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
 
@@ -116,7 +119,6 @@ export class DriveService {
 		private userEntityService: UserEntityService,
 		private driveFileEntityService: DriveFileEntityService,
 		private idService: IdService,
-		private metaService: MetaService,
 		private downloadService: DownloadService,
 		private internalStorageService: InternalStorageService,
 		private s3Service: S3Service,
@@ -131,6 +133,7 @@ export class DriveService {
 		private perUserDriveChart: PerUserDriveChart,
 		private instanceChart: InstanceChart,
 		private notificationService: NotificationService,
+		private utilityService: UtilityService,
 	) {
 		const logger = this.loggerService.getLogger('drive', 'blue');
 		this.registerLogger = logger.createSubLogger('register', 'yellow');
@@ -176,7 +179,8 @@ export class DriveService {
 				?? `${ this.config.s3.useSSL ? 'https' : 'http' }://${ this.config.s3.endpoint }/${ this.config.s3.bucket }`;
 
 			// for original
-			const key = `${this.config.s3.prefix}/${randomUUID()}${ext}`;
+			const prefix = this.config.s3.prefix ? `${this.config.s3.prefix}/` : '';
+			const key = `${prefix}${randomUUID()}${ext}`;
 			const url = `${ baseUrl }/${ key }`;
 
 			// for alts
@@ -193,7 +197,7 @@ export class DriveService {
 			];
 
 			if (alts.webpublic) {
-				webpublicKey = `${this.config.s3.prefix}/webpublic-${randomUUID()}.${alts.webpublic.ext}`;
+				webpublicKey = `${prefix}webpublic-${randomUUID()}.${alts.webpublic.ext}`;
 				webpublicUrl = `${ baseUrl }/${ webpublicKey }`;
 
 				this.registerLogger.info(`uploading webpublic: ${webpublicKey}`);
@@ -201,7 +205,7 @@ export class DriveService {
 			}
 
 			if (alts.thumbnail) {
-				thumbnailKey = `${this.config.s3.prefix}/thumbnail-${randomUUID()}.${alts.thumbnail.ext}`;
+				thumbnailKey = `${prefix}thumbnail-${randomUUID()}.${alts.thumbnail.ext}`;
 				thumbnailUrl = `${ baseUrl }/${ thumbnailKey }`;
 
 				this.registerLogger.info(`uploading thumbnail: ${thumbnailKey}`);
@@ -224,7 +228,7 @@ export class DriveService {
 			file.size = size;
 			file.storedInternal = false;
 
-			return await this.driveFilesRepository.insert(file).then(x => this.driveFilesRepository.findOneByOrFail(x.identifiers[0]));
+			return await this.driveFilesRepository.insertOne(file);
 		} else { // use internal storage
 			const accessKey = randomUUID();
 			const thumbnailAccessKey = 'thumbnail-' + randomUUID();
@@ -258,7 +262,7 @@ export class DriveService {
 			file.md5 = hash;
 			file.size = size;
 
-			return await this.driveFilesRepository.insert(file).then(x => this.driveFilesRepository.findOneByOrFail(x.identifiers[0]));
+			return await this.driveFilesRepository.insertOne(file);
 		}
 	}
 
@@ -462,7 +466,8 @@ export class DriveService {
 		ext = null,
 	}: AddFileArgs): Promise<MiDriveFile> {
 		let skipNsfwCheck = false;
-		const instance = await this.metaService.fetch();
+		const instance = this.meta;
+
 		const policies = user && await this.roleService.getUserPolicies(user.id);
 		const userRoleNSFW = policies?.alwaysMarkNsfw;
 		skipNsfwCheck ||= user == null;
@@ -486,7 +491,7 @@ export class DriveService {
 		this.registerLogger.info(`${JSON.stringify(info)}`);
 
 		// 現状 false positive が多すぎて実用に耐えない
-		//if (info.porn && instance.disallowUploadWhenPredictedAsPorn) {
+		//if (info.porn && this.meta.disallowUploadWhenPredictedAsPorn) {
 		//	throw new IdentifiableError('282f77bf-5816-4f72-9264-aa14d8261a21', 'Detected as porn.');
 		//}
 
@@ -500,20 +505,20 @@ export class DriveService {
 
 		if (user && !force) {
 		// Check if there is a file with the same hash
-			const much = await this.driveFilesRepository.findOneBy({
+			const matched = await this.driveFilesRepository.findOneBy({
 				md5: info.md5,
 				userId: user.id,
 			});
 
-			if (much) {
-				this.registerLogger.info(`file with same hash is found: ${much.id}`);
-				if (sensitive && !much.isSensitive) {
+			if (matched) {
+				this.registerLogger.info(`file with same hash is found: ${matched.id}`);
+				if (sensitive && !matched.isSensitive) {
 					// The file is federated as sensitive for this time, but was federated as non-sensitive before.
 					// Therefore, update the file to sensitive.
-					await this.driveFilesRepository.update({ id: much.id }, { isSensitive: true });
-					much.isSensitive = true;
+					await this.driveFilesRepository.update({ id: matched.id }, { isSensitive: true });
+					matched.isSensitive = true;
 				}
-				return much;
+				return matched;
 			}
 		}
 
@@ -525,8 +530,15 @@ export class DriveService {
 			const isLocalUser = this.userEntityService.isLocalUser(user);
 
 			const driveCapacity = 1024 * 1024 * policies.driveCapacityMb;
+			const maxFileSize = 1024 * 1024 * policies.maxFileSizeMb;
 			this.registerLogger.debug('drive capacity override applied');
 			this.registerLogger.debug(`overrideCap: ${driveCapacity}bytes, usage: ${usage}bytes, u+s: ${usage + info.size}bytes`);
+
+			if (maxFileSize < info.size) {
+				if (isLocalUser) {
+					throw new IdentifiableError('f9e4e5f3-4df4-40b5-b400-f236945f7073', 'Max file size exceeded.');
+				}
+			}
 
 			// If usage limit exceeded
 			if (driveCapacity < usage + info.size) {
@@ -590,7 +602,7 @@ export class DriveService {
 			: false;
 
 		if (info.sensitive && profile!.autoSensitive) file.isSensitive = true;
-		if (info.sensitive && instance.setSensitiveFlagAutomatically) file.isSensitive = true;
+		if (info.sensitive && this.meta.setSensitiveFlagAutomatically) file.isSensitive = true;
 		if (userRoleNSFW) file.isSensitive = true;
 
 		if (url !== null) {
@@ -617,7 +629,7 @@ export class DriveService {
 				file.type = info.type.mime;
 				file.storedInternal = false;
 
-				file = await this.driveFilesRepository.insert(file).then(x => this.driveFilesRepository.findOneByOrFail(x.identifiers[0]));
+				file = await this.driveFilesRepository.insertOne(file);
 			} catch (err) {
 			// duplicate key error (when already registered)
 				if (isDuplicateKeyValueError(err)) {
@@ -651,7 +663,7 @@ export class DriveService {
 			// ローカルユーザーのみ
 			this.perUserDriveChart.update(file, true);
 		} else {
-			if ((await this.metaService.fetch()).enableChartsForFederatedInstances) {
+			if (this.meta.enableChartsForFederatedInstances) {
 				this.instanceChart.updateDrive(file, true);
 			}
 		}
@@ -808,7 +820,7 @@ export class DriveService {
 			// ローカルユーザーのみ
 			this.perUserDriveChart.update(file, false);
 		} else {
-			if ((await this.metaService.fetch()).enableChartsForFederatedInstances) {
+			if (this.meta.enableChartsForFederatedInstances) {
 				this.instanceChart.updateDrive(file, false);
 			}
 		}

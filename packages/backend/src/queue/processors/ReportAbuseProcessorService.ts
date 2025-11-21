@@ -10,12 +10,12 @@ import { bindThis } from '@/decorators.js';
 import type Logger from '@/logger.js';
 import { RoleService } from '@/core/RoleService.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
-import { InstanceActorService } from '@/core/InstanceActorService.js';
+import { SystemAccountService } from '@/core/SystemAccountService.js';
 import type { AbuseReportResolversRepository, AbuseUserReportsRepository, UsersRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
 import { QueueService } from '@/core/QueueService.js';
-import { WebhookService } from '@/core/WebhookService.js';
+import { UserWebhookService } from '@/core/UserWebhookService.js';
 import { QueueLoggerService } from '../QueueLoggerService.js';
 import type { DbAbuseReportJobData } from '../types.js';
 import type * as Bull from 'bullmq';
@@ -36,11 +36,11 @@ export class ReportAbuseProcessorService {
 
 		private queueLoggerService: QueueLoggerService,
 		private globalEventService: GlobalEventService,
-		private instanceActorService: InstanceActorService,
+		private systemAccountService: SystemAccountService,
 		private apRendererService: ApRendererService,
 		private roleService: RoleService,
 		private queueService: QueueService,
-		private webhookService: WebhookService,
+		private userWebhookService: UserWebhookService,
 	) {
 		this.logger = this.queueLoggerService.logger.createSubLogger('report-abuse');
 	}
@@ -64,7 +64,7 @@ export class ReportAbuseProcessorService {
 			id: job.data.reporterId,
 		});
 
-		const actor = await this.instanceActorService.getInstanceActor();
+		const actor = await this.systemAccountService.fetch('actor');
 
 		const targetUserAcct = targetUser.host ? `${targetUser.username.toLowerCase()}@${targetUser.host}` : targetUser.username.toLowerCase();
 		const reporterAcct = reporter.host ? `${reporter.username.toLowerCase()}@${reporter.host}` : reporter.username.toLowerCase();
@@ -88,10 +88,10 @@ export class ReportAbuseProcessorService {
 					forwarded: resolver.forward && job.data.targetUserHost !== null && job.data.reporterHost === null,
 				});
 
-				const webhooks = (await this.webhookService.getActiveWebhooks()).filter(x => x.on.includes('reportAutoResolved'));
+				const webhooks = (await this.userWebhookService.fetchWebhooks()).filter(x => x.on.includes('reportAutoResolved'));
 				for (const webhook of webhooks) {
-					if (await this.roleService.isAdministrator({ id: webhook.userId, isRoot: false })) {
-						this.queueService.webhookDeliver(webhook, 'reportAutoResolved', {
+					if (await this.roleService.isAdministrator({ id: webhook.userId })) {
+						this.queueService.userWebhookDeliver(webhook, 'reportAutoResolved', {
 							resolver: resolver,
 							report: job.data,
 						});

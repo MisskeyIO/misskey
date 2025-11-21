@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div :class="$style.banner">
 		<i class="ti ti-user-edit"></i>
 	</div>
-	<MkSpacer :marginMin="20" :marginMax="32">
+	<div class="_spacer" style="--MI_SPACER-min: 20px; --MI_SPACER-max: 32px;">
 		<form class="_gaps_m" autocomplete="new-password" @submit.prevent="onSubmit">
 			<MkInput v-if="instance.disableRegistration" v-model="invitationCode" type="text" :spellcheck="false" required>
 				<template #label>{{ i18n.ts.invitationCode }}</template>
@@ -21,12 +21,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #caption>
 					<div><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.cannotBeChangedLater }}</div>
 					<span v-if="usernameState === 'wait'" style="color:#999"><MkLoading :em="true"/> {{ i18n.ts.checking }}</span>
-					<span v-else-if="usernameState === 'ok'" style="color: var(--success)"><i class="ti ti-check ti-fw"></i> {{ i18n.ts.available }}</span>
-					<span v-else-if="usernameState === 'unavailable'" style="color: var(--error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.unavailable }}</span>
-					<span v-else-if="usernameState === 'error'" style="color: var(--error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.error }}</span>
-					<span v-else-if="usernameState === 'invalid-format'" style="color: var(--error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.usernameInvalidFormat }}</span>
-					<span v-else-if="usernameState === 'min-range'" style="color: var(--error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.tooShort }}</span>
-					<span v-else-if="usernameState === 'max-range'" style="color: var(--error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.tooLong }}</span>
+					<span v-else-if="usernameState === 'ok'" style="color: var(--MI_THEME-success)"><i class="ti ti-check ti-fw"></i> {{ i18n.ts.available }}</span>
+					<span v-else-if="usernameState === 'unavailable'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.unavailable }}</span>
+					<span v-else-if="usernameState === 'error'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.error }}</span>
+					<span v-else-if="usernameState === 'invalid-format'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.usernameInvalidFormat }}</span>
+					<span v-else-if="usernameState === 'min-range'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.tooShort }}</span>
+					<span v-else-if="usernameState === 'max-range'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.tooLong }}</span>
 				</template>
 			</MkInput>
 			<MkInput v-if="instance.emailRequiredForSignup" v-model="email" :debounce="true" type="email" :spellcheck="false" required data-cy-signup-email @update:modelValue="onChangeEmail">
@@ -34,15 +34,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #prefix><i class="ti ti-mail"></i></template>
 				<template #caption>
 					<span v-if="emailState === 'wait'" style="color:#999"><MkLoading :em="true"/> {{ i18n.ts.checking }}</span>
-					<span v-else-if="emailState === 'ok'" style="color: var(--success)"><i class="ti ti-check ti-fw"></i> {{ i18n.ts.available }}</span>
-					<span v-else-if="emailState === 'unavailable:used'" style="color: var(--error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts._emailUnavailable.used }}</span>
-					<span v-else-if="emailState === 'unavailable:format'" style="color: var(--error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts._emailUnavailable.format }}</span>
-					<span v-else-if="emailState === 'unavailable:disposable'" style="color: var(--error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts._emailUnavailable.disposable }}</span>
-					<span v-else-if="emailState === 'unavailable:banned'" style="color: var(--error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts._emailUnavailable.banned }}</span>
-					<span v-else-if="emailState === 'unavailable:mx'" style="color: var(--error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts._emailUnavailable.mx }}</span>
-					<span v-else-if="emailState === 'unavailable:smtp'" style="color: var(--error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts._emailUnavailable.smtp }}</span>
-					<span v-else-if="emailState === 'unavailable'" style="color: var(--error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.unavailable }}</span>
-					<span v-else-if="emailState === 'error'" style="color: var(--error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.error }}</span>
+					<span v-else-if="emailState === 'ok'" style="color: var(--MI_THEME-success)"><i class="ti ti-check ti-fw"></i> {{ i18n.ts.available }}</span>
+					<span v-else-if="emailState === 'unavailable:used'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts._emailUnavailable.used }}</span>
+					<span v-else-if="emailState === 'unavailable:format'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts._emailUnavailable.format }}</span>
+					<span v-else-if="emailState === 'unavailable:disposable'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts._emailUnavailable.disposable }}</span>
+					<span v-else-if="emailState === 'unavailable:banned'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts._emailUnavailable.banned }}</span>
+					<span v-else-if="emailState === 'unavailable:mx'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts._emailUnavailable.mx }}</span>
+					<span v-else-if="emailState === 'unavailable:smtp'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts._emailUnavailable.smtp }}</span>
+					<span v-else-if="emailState === 'unavailable'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.unavailable }}</span>
+					<span v-else-if="emailState === 'error'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.error }}</span>
 				</template>
 			</MkInput>
 			<MkNewPassword ref="password" :label="i18n.ts.password"/>
@@ -50,6 +50,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkCaptcha v-if="instance.enableMcaptcha" ref="mcaptcha" v-model="mCaptchaResponse" :class="$style.captcha" provider="mcaptcha" :sitekey="instance.mcaptchaSiteKey" :instanceUrl="instance.mcaptchaInstanceUrl"/>
 			<MkCaptcha v-if="instance.enableRecaptcha" ref="recaptcha" v-model="reCaptchaResponse" :class="$style.captcha" provider="recaptcha" :sitekey="instance.recaptchaSiteKey"/>
 			<MkCaptcha v-if="instance.enableTurnstile" ref="turnstile" v-model="turnstileResponse" :class="$style.captcha" provider="turnstile" :sitekey="instance.turnstileSiteKey"/>
+			<MkCaptcha v-if="instance.enableTestcaptcha" ref="testcaptcha" v-model="testcaptchaResponse" :class="$style.captcha" provider="testcaptcha"/>
 			<MkButton type="submit" :disabled="shouldDisableSubmitting" large gradate rounded data-cy-signup-submit style="margin: 0 auto;">
 				<template v-if="submitting">
 					<MkLoading :em="true" :colored="false"/>
@@ -57,7 +58,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template v-else>{{ i18n.ts.start }}</template>
 			</MkButton>
 		</form>
-	</MkSpacer>
+	</div>
 </div>
 </template>
 
@@ -65,16 +66,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, computed, shallowRef } from 'vue';
 import { toUnicode } from 'punycode.js';
 import * as Misskey from 'misskey-js';
+import * as config from '@@/js/config.js';
 import MkButton from './MkButton.vue';
 import MkInput from './MkInput.vue';
 import MkNewPassword from '@/components/MkNewPassword.vue';
-import MkCaptcha, { type Captcha } from '@/components/MkCaptcha.vue';
-import * as config from '@/config.js';
+import type { Captcha } from '@/components/MkCaptcha.vue';
+import MkCaptcha from '@/components/MkCaptcha.vue';
 import * as os from '@/os.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
-import { login } from '@/account.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 import { instance } from '@/instance.js';
 import { i18n } from '@/i18n.js';
+import { login } from '@/accounts.js';
 
 const props = withDefaults(defineProps<{
 	autoSet?: boolean;
@@ -83,7 +85,7 @@ const props = withDefaults(defineProps<{
 });
 
 const emit = defineEmits<{
-	(ev: 'signup', user: Misskey.entities.SigninResponse): void;
+	(ev: 'signup', user: Misskey.entities.SignupResponse): void;
 	(ev: 'signupEmailPending'): void;
 }>();
 
@@ -93,6 +95,7 @@ const hcaptcha = ref<Captcha | undefined>();
 const mcaptcha = ref<Captcha | undefined>();
 const recaptcha = ref<Captcha | undefined>();
 const turnstile = ref<Captcha | undefined>();
+const testcaptcha = ref<Captcha | undefined>();
 
 const username = ref<string>('');
 const password = shallowRef<InstanceType<typeof MkNewPassword> | null>(null);
@@ -105,6 +108,7 @@ const hCaptchaResponse = ref<string | null>(null);
 const mCaptchaResponse = ref<string | null>(null);
 const reCaptchaResponse = ref<string | null>(null);
 const turnstileResponse = ref<string | null>(null);
+const testcaptchaResponse = ref<string | null>(null);
 const usernameAbortController = ref<null | AbortController>(null);
 const emailAbortController = ref<null | AbortController>(null);
 
@@ -114,6 +118,7 @@ const shouldDisableSubmitting = computed((): boolean => {
 		instance.enableMcaptcha && !mCaptchaResponse.value ||
 		instance.enableRecaptcha && !reCaptchaResponse.value ||
 		instance.enableTurnstile && !turnstileResponse.value ||
+		instance.enableTestcaptcha && !testcaptchaResponse.value ||
 		instance.emailRequiredForSignup && emailState.value !== 'ok' ||
 		usernameState.value !== 'ok' ||
 		!password.value?.isValid;
@@ -189,39 +194,64 @@ async function onSubmit(): Promise<void> {
 	if (!password.value?.isValid || submitting.value) return;
 	submitting.value = true;
 
-	try {
-		await os.apiWithDialog('signup', {
-			username: username.value,
-			password: password.value.password,
-			emailAddress: email.value,
-			invitationCode: invitationCode.value,
-			'hcaptcha-response': hCaptchaResponse.value,
-			'm-captcha-response': mCaptchaResponse.value,
-			'g-recaptcha-response': reCaptchaResponse.value,
-			'turnstile-response': turnstileResponse.value,
-		}, undefined, (res) => {
-			if (instance.emailRequiredForSignup) {
-				os.alert({
-					type: 'success',
-					title: i18n.ts._signup.almostThere,
-					text: i18n.tsx._signup.emailSent({ email: email.value }),
-				});
-				emit('signupEmailPending');
-			} else {
-				emit('signup', { id: res.id, i: res.token });
+	const signupPayload: Misskey.entities.SignupRequest = {
+		username: username.value,
+		password: password.value,
+		emailAddress: email.value,
+		invitationCode: invitationCode.value,
+		'hcaptcha-response': hCaptchaResponse.value,
+		'm-captcha-response': mCaptchaResponse.value,
+		'g-recaptcha-response': reCaptchaResponse.value,
+		'turnstile-response': turnstileResponse.value,
+		'testcaptcha-response': testcaptchaResponse.value,
+	};
 
-				if (props.autoSet) {
-					login(res.token);
-				}
+	const res = await window.fetch(`${config.apiUrl}/signup`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(signupPayload),
+	}).catch(() => {
+		onSignupApiError();
+		return null;
+	});
+
+	if (res && res.ok) {
+		if (res.status === 204 || instance.emailRequiredForSignup) {
+			os.alert({
+				type: 'success',
+				title: i18n.ts._signup.almostThere,
+				text: i18n.tsx._signup.emailSent({ email: email.value }),
+			});
+			emit('signupEmailPending');
+		} else {
+			const resJson = (await res.json()) as Misskey.entities.SignupResponse;
+			if (_DEV_) console.log(resJson);
+
+			emit('signup', resJson);
+
+			if (props.autoSet) {
+				await login(resJson.token);
 			}
-		});
-	} catch {
-		submitting.value = false;
-		hcaptcha.value?.reset?.();
-		mcaptcha.value?.reset?.();
-		recaptcha.value?.reset?.();
-		turnstile.value?.reset?.();
+		}
+	} else {
+		onSignupApiError();
 	}
+}
+
+function onSignupApiError() {
+	submitting.value = false;
+	hcaptcha.value?.reset?.();
+	mcaptcha.value?.reset?.();
+	recaptcha.value?.reset?.();
+	turnstile.value?.reset?.();
+	testcaptcha.value?.reset?.();
+
+	os.alert({
+		type: 'error',
+		text: i18n.ts.somethingHappened,
+	});
 }
 </script>
 
@@ -230,8 +260,8 @@ async function onSubmit(): Promise<void> {
 	padding: 16px;
 	text-align: center;
 	font-size: 26px;
-	background-color: var(--accentedBg);
-	color: var(--accent);
+	background-color: var(--MI_THEME-accentedBg);
+	color: var(--MI_THEME-accent);
 }
 
 .captcha {

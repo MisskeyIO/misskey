@@ -26,13 +26,17 @@ export class FollowRequestEntityService {
 	public async pack(
 		src: MiFollowRequest['id'] | MiFollowRequest,
 		me: { id: MiUser['id'] } | null | undefined,
+		hint?: {
+			packedFollower?: Packed<'UserLite'>,
+			packedFollowee?: Packed<'UserLite'>,
+		},
 	) : Promise<Packed<'FollowRequest'>> {
 		const request = typeof src === 'object' ? src : await this.followRequestsRepository.findOneByOrFail({ id: src });
 
 		return {
 			id: request.id,
-			follower: await this.userEntityService.pack(request.followerId, me),
-			followee: await this.userEntityService.pack(request.followeeId, me),
+			follower: hint?.packedFollower ?? await this.userEntityService.pack(request.followerId, me),
+			followee: hint?.packedFollowee ?? await this.userEntityService.pack(request.followeeId, me),
 		};
 	}
 

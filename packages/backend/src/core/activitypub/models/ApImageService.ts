@@ -5,7 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
-import type { DriveFilesRepository } from '@/models/_.js';
+import type { DriveFilesRepository, MiMeta } from '@/models/_.js';
 import type { MiRemoteUser } from '@/models/User.js';
 import type { MiDriveFile } from '@/models/DriveFile.js';
 import { truncate } from '@/misc/truncate.js';
@@ -23,6 +23,9 @@ export class ApImageService {
 	private logger: Logger;
 
 	constructor(
+		@Inject(DI.meta)
+		private meta: MiMeta,
+
 		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
 

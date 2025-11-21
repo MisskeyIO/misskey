@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
-		"target": "es6",
-		"module": "commonjs",
+		"target": "ESNext",
+		"module": "NodeNext",
 		"allowSyntheticDefaultImports": true
 	},
 	"exclude": [

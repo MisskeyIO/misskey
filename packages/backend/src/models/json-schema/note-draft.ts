@@ -4,12 +4,12 @@ export const packedNoteDraftSchema = {
 		id: {
 			type: 'string',
 			optional: false, nullable: false,
-			format: 'misskey:id'
+			format: 'misskey:id',
 		},
 		updatedAt: {
 			type: 'string',
 			optional: false, nullable: false,
-			format: 'date-time'
+			format: 'date-time',
 		},
 		scheduledAt: {
 			type: 'string',
@@ -18,7 +18,7 @@ export const packedNoteDraftSchema = {
 		},
 		reason: {
 			type: 'string',
-			optional: true, nullable: false
+			optional: true, nullable: false,
 		},
 		channel: {
 			type: 'object',
@@ -27,11 +27,11 @@ export const packedNoteDraftSchema = {
 				id: {
 					type: 'string',
 					optional: false, nullable: false,
-					format: 'misskey:id'
+					format: 'misskey:id',
 				},
 				name: {
 					type: 'string',
-					optional: false, nullable: false
+					optional: false, nullable: false,
 				},
 			},
 		},
@@ -89,7 +89,7 @@ export const packedNoteDraftSchema = {
 						id: {
 							type: 'string',
 							optional: false, nullable: false,
-							format: 'misskey:id'
+							format: 'misskey:id',
 						},
 						username: {
 							type: 'string',
@@ -160,7 +160,7 @@ export const packedNoteDraftSchema = {
 						expiredAfter: {
 							type: 'integer',
 							optional: false, nullable: true,
-							minimum: 1
+							minimum: 1,
 						},
 					},
 				},

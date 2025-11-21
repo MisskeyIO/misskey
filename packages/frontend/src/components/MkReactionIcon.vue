@@ -9,8 +9,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { defineAsyncComponent, shallowRef } from 'vue';
-import { useTooltip } from '@/scripts/use-tooltip.js';
+import { defineAsyncComponent, useTemplateRef } from 'vue';
+import { useTooltip } from '@/use/use-tooltip.js';
 import * as os from '@/os.js';
 
 const props = defineProps<{
@@ -20,11 +20,11 @@ const props = defineProps<{
 	withTooltip?: boolean;
 }>();
 
-const elRef = shallowRef();
+const elRef = useTemplateRef('elRef');
 
 if (props.withTooltip) {
-	useTooltip(elRef, (showing) => {
-		os.popup(defineAsyncComponent(() => import('@/components/MkReactionTooltip.vue')), {
+	useTooltip(elRef, async (showing) => {
+		await os.popup(defineAsyncComponent(() => import('@/components/MkReactionTooltip.vue')), {
 			showing,
 			reaction: props.reaction.replace(/^:(\w+):$/, ':$1@.:'),
 			targetElement: elRef.value.$el,

@@ -4,7 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<MkSpacer :contentMax="1200">
+	<div class="_spacer" style="--MI_SPACER-w: 1200px;">
 	<MkFoldableSection class="_margin" persistKey="explore-pinned-users">
 		<template #header><i class="ti ti-bookmark ti-fw" style="margin-right: 0.5em;"></i>{{ i18n.ts.pinnedUsers }}</template>
 		<MkUserList :pagination="pinnedUsers"/>
@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #header><i class="ti ti-chart-line ti-fw" style="margin-right: 0.5em;"></i>{{ i18n.ts.popularUsers }}</template>
 		<MkUserList :pagination="popularUsers"/>
 	</MkFoldableSection>
-</MkSpacer>
+</div>
 </template>
 
 <script lang="ts" setup>

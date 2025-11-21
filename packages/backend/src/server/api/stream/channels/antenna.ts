@@ -8,6 +8,7 @@ import { bindThis } from '@/decorators.js';
 import { RoleService } from '@/core/RoleService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import type { GlobalEvents } from '@/core/GlobalEventService.js';
+import type { JsonObject } from '@/misc/json-value.js';
 import Channel, { type MiChannelService } from '../channel.js';
 
 class AntennaChannel extends Channel {
@@ -30,9 +31,10 @@ class AntennaChannel extends Channel {
 	}
 
 	@bindThis
-	public async init(params: any) {
-		this.antennaId = params.antennaId as string;
-		this.minimize = params.minimize ?? false;
+	public async init(params: JsonObject) {
+		if (typeof params.antennaId !== 'string') return;
+		this.antennaId = params.antennaId;
+		this.minimize = !!(params.minimize ?? false);
 
 		// Subscribe stream
 		this.subscriber.on(`antennaStream:${this.antennaId}`, this.onEvent);

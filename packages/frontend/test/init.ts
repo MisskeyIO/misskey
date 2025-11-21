@@ -17,7 +17,7 @@ updateI18n(locales['en-US']);
 // XXX: misskey-js panics if WebSocket is not defined
 vi.stubGlobal('WebSocket', class WebSocket extends EventTarget { static CLOSING = 2; });
 
-export const defaultStoreState: Record<string, unknown> = {
+export const preferState: Record<string, unknown> = {
 
 	// なんかtestがうまいこと動かないのでここに書く
 	dataSaver: {
@@ -29,11 +29,11 @@ export const defaultStoreState: Record<string, unknown> = {
 
 };
 
-// XXX: defaultStore somehow becomes undefined in vitest?
-vi.mock('@/store.js', () => {
+// XXX: store somehow becomes undefined in vitest?
+vi.mock('@/preferences.js', () => {
 	return {
-		defaultStore: {
-			state: defaultStoreState,
+		prefer: {
+			s: preferState,
 		},
 	};
 });
@@ -55,3 +55,34 @@ const AudioContextMock = vi.fn(() => ({
 }));
 
 vi.stubGlobal('AudioContext', AudioContextMock);
+
+Object.defineProperty(window, 'matchMedia', {
+	writable: true,
+	value: vi.fn().mockImplementation((query: string) => ({
+		matches: false,
+		media: query,
+		onchange: null,
+		addListener: vi.fn(),
+		removeListener: vi.fn(),
+		addEventListener: vi.fn(),
+		removeEventListener: vi.fn(),
+		dispatchEvent: vi.fn(),
+	})),
+});
+
+const MockedResizeObserver = class MockedResizeObserver {
+	observe = vi.fn();
+	unobserve = vi.fn();
+	disconnect = vi.fn();
+};
+
+vi.stubGlobal('ResizeObserver', MockedResizeObserver);
+
+const MockedIntersectionObserver = class MockedIntersectionObserver {
+	observe = vi.fn();
+	unobserve = vi.fn();
+	disconnect = vi.fn();
+	takeRecords = vi.fn(() => []);
+};
+
+vi.stubGlobal('IntersectionObserver', MockedIntersectionObserver);

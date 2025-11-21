@@ -1,8 +1,9 @@
-import { mkdir, writeFile } from 'fs/promises';
+import assert from 'assert';
+import { mkdir, readFile, writeFile } from 'fs/promises';
 import { OpenAPIV3_1 } from 'openapi-types';
 import { toPascal } from 'ts-case-convert';
 import { parse as OpenAPIParser } from '@readme/openapi-parser';
-import openapiTS from 'openapi-typescript';
+import openapiTS, { astToString, OpenAPI3, OperationObject, PathItemObject } from 'openapi-typescript';
 
 async function generateBaseTypes(
 	openApiDocs: OpenAPIV3_1.Document,
@@ -20,8 +21,33 @@ async function generateBaseTypes(
 	}
 	lines.push('');
 
-	const generatedTypes = await openapiTS(openApiJsonPath, { exportType: true });
-	lines.push(generatedTypes);
+	// NOTE: Align `operationId` of GET and POST to avoid duplication of type definitions
+	const openApi = JSON.parse(await readFile(openApiJsonPath, 'utf8')) as OpenAPI3;
+	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+	for (const [key, item] of Object.entries(openApi.paths!)) {
+		assert('post' in item);
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		openApi.paths![key] = {
+			...('get' in item ? {
+				get: item.get,
+			} : {}),
+			post: {
+				...item.post,
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+				operationId: ((item as PathItemObject).post as OperationObject).operationId!.replaceAll('post___', ''),
+			},
+		};
+	}
+
+	const generatedTypes = await openapiTS(openApi, {
+		exportType: true,
+		transform(schemaObject) {
+			if ('format' in schemaObject && schemaObject.format === 'binary') {
+				return schemaObject.nullable ? 'Blob | null' : 'Blob';
+			}
+		},
+	});
+	lines.push(astToString(generatedTypes));
 	lines.push('');
 
 	await writeFile(typeFileName, lines.join('\n'));
@@ -40,7 +66,7 @@ async function generateSchemaEntities(
 	const schemaNames = Object.keys(schemas);
 	const typeAliasLines: string[] = [];
 
-	typeAliasLines.push(`import { components } from '${toImportPath(typeFileName)}';`);
+	typeAliasLines.push(`import type { components } from '${toImportPath(typeFileName)}';`);
 	typeAliasLines.push(
 		...schemaNames.map(it => `export type ${it} = components['schemas']['${it}'];`),
 	);
@@ -56,6 +82,8 @@ async function generateEndpoints(
 	endpointOutputPath: string,
 ) {
 	const endpoints: Endpoint[] = [];
+	const endpointReqMediaTypes: EndpointReqMediaType[] = [];
+	const endpointReqMediaTypesSet = new Set<string>();
 
 	// misskey-jsはPOST固定で送っているので、こちらも決め打ちする。別メソッドに対応することがあればこちらも直す必要あり
 	const paths = openApiDocs.paths ?? {};
@@ -69,7 +97,7 @@ async function generateEndpoints(
 	for (const operation of postPathItems) {
 		const path = operation._path_;
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		const operationId = operation.operationId!;
+		const operationId = operation.operationId!.replaceAll('get___', '').replaceAll('post___', '');
 		const endpoint = new Endpoint(path);
 		endpoints.push(endpoint);
 
@@ -78,12 +106,19 @@ async function generateEndpoints(
 			const supportMediaTypes = Object.keys(reqContent);
 			if (supportMediaTypes.length > 0) {
 				// いまのところ複数のメディアタイプをとるエンドポイントは無いので決め打ちする
-				endpoint.request = new OperationTypeAlias(
+				const req = new OperationTypeAlias(
 					operationId,
 					path,
 					supportMediaTypes[0],
 					OperationsAliasType.REQUEST,
 				);
+				endpoint.request = req;
+
+				const reqType = new EndpointReqMediaType(path, req);
+				if (reqType.getMediaType() !== 'application/json') {
+					endpointReqMediaTypesSet.add(reqType.getMediaType());
+					endpointReqMediaTypes.push(reqType);
+				}
 			}
 		}
 
@@ -106,7 +141,7 @@ async function generateEndpoints(
 
 	entitiesOutputLine.push('/* eslint @typescript-eslint/naming-convention: 0 */');
 
-	entitiesOutputLine.push(`import { operations } from '${toImportPath(typeFileName)}';`);
+	entitiesOutputLine.push(`import type { operations } from '${toImportPath(typeFileName)}';`);
 	entitiesOutputLine.push('');
 
 	entitiesOutputLine.push(new EmptyTypeAlias(OperationsAliasType.REQUEST).toLine());
@@ -134,7 +169,23 @@ async function generateEndpoints(
 	endpointOutputLine.push(
 		...endpoints.map(it => '\t' + it.toLine()),
 	);
-	endpointOutputLine.push('}');
+	endpointOutputLine.push('};');
+	endpointOutputLine.push('');
+
+	function generateEndpointReqMediaTypesType() {
+		return `{ [K in keyof Endpoints]?: ${[...endpointReqMediaTypesSet].map((t) => `'${t}'`).join(' | ')}; }`;
+	}
+
+	endpointOutputLine.push(`/**
+ * NOTE: The content-type for all endpoints not listed here is application/json.
+ */`);
+	endpointOutputLine.push('export const endpointReqTypes = {');
+
+	endpointOutputLine.push(
+		...endpointReqMediaTypes.map(it => '\t' + it.toLine()),
+	);
+
+	endpointOutputLine.push(`} as const satisfies ${generateEndpointReqMediaTypesType()};`);
 	endpointOutputLine.push('');
 
 	await writeFile(endpointOutputPath, endpointOutputLine.join('\n'));
@@ -163,7 +214,7 @@ async function generateApiClientJSDoc(
 
 	for (const operation of postPathItems) {
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		const operationId = operation.operationId!;
+		const operationId = operation.operationId!.replaceAll('get___', '').replaceAll('post___', '');
 
 		if (operation.description) {
 			endpoints.push({
@@ -311,6 +362,26 @@ class Endpoint {
 		const resName = this.response?.generateName() ?? emptyResponse.generateName();
 
 		return `'${this.path}': { req: ${reqName}; res: ${resName} };`;
+	}
+}
+
+class EndpointReqMediaType {
+	public readonly path: string;
+	public readonly mediaType: string;
+
+	constructor(path: string, request: OperationTypeAlias, mediaType?: undefined);
+	constructor(path: string, request: undefined, mediaType: string);
+	constructor(path: string, request: OperationTypeAlias | undefined, mediaType?: string) {
+		this.path = path;
+		this.mediaType = mediaType ?? request?.mediaType ?? 'application/json';
+	}
+
+	getMediaType(): string {
+		return this.mediaType;
+	}
+
+	toLine(): string {
+		return `'${this.path}': '${this.mediaType}',`;
 	}
 }
 

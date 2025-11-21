@@ -25,10 +25,10 @@ import { UtilityService } from '@/core/UtilityService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { QueueService } from '@/core/QueueService.js';
-import type { UsersRepository, NotesRepository, FollowingsRepository, AbuseUserReportsRepository, FollowRequestsRepository } from '@/models/_.js';
+import type { UsersRepository, NotesRepository, FollowingsRepository, AbuseUserReportsRepository, FollowRequestsRepository, MiMeta } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import type { MiLocalUser, MiRemoteUser } from '@/models/User.js';
-import { isNotNull } from '@/misc/is-not-null.js';
+import { AbuseReportService } from '@/core/AbuseReportService.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { getApHrefNullable, getApId, getApIds, getApType, isAccept, isActor, isAdd, isAnnounce, isBlock, isCollection, isCollectionOrOrderedCollection, isCreate, isDelete, isFlag, isFollow, isLike, isMove, isPost, isReject, isRemove, isTombstone, isUndo, isUpdate, validActor, validPost } from './type.js';
@@ -50,6 +50,9 @@ export class ApInboxService {
 		@Inject(DI.config)
 		private config: Config,
 
+		@Inject(DI.meta)
+		private meta: MiMeta,
+
 		@Inject(DI.redisForTimelines)
 		private redisForTimelines: Redis.Redis,
 
@@ -62,16 +65,17 @@ export class ApInboxService {
 		@Inject(DI.followingsRepository)
 		private followingsRepository: FollowingsRepository,
 
-		@Inject(DI.abuseUserReportsRepository)
-		private abuseUserReportsRepository: AbuseUserReportsRepository,
-
 		@Inject(DI.followRequestsRepository)
 		private followRequestsRepository: FollowRequestsRepository,
+
+		@Inject(DI.abuseUserReportsRepository)
+		private abuseUserReportsRepository: AbuseUserReportsRepository,
 
 		private userEntityService: UserEntityService,
 		private noteEntityService: NoteEntityService,
 		private utilityService: UtilityService,
 		private idService: IdService,
+		private abuseReportService: AbuseReportService,
 		private metaService: MetaService,
 		private userFollowingService: UserFollowingService,
 		private apAudienceService: ApAudienceService,
@@ -293,6 +297,9 @@ export class ApInboxService {
 
 		if (!activity.object) return 'skip: activity has no object property';
 
+		const targetUri = getApId(activity.object);
+		if (targetUri.startsWith('bear:')) return 'skip: bearcaps url not supported.';
+
 		const target = await resolver.resolve(activity.object).catch(err => {
 			this.logger.error(`Resolution failed: ${err}`, { error: err });
 			return err;
@@ -300,7 +307,7 @@ export class ApInboxService {
 
 		if (isPost(target)) await this.announceNote(actor, activity, target);
 
-		return `skip: unknown object type ${getApType(target) ?? 'undefined'}}`;
+		return `skip: unknown object type ${getApType(target)}`;
 	}
 
 	@bindThis
@@ -312,8 +319,7 @@ export class ApInboxService {
 		}
 
 		// アナウンス先をブロックしてたら中断
-		const meta = await this.metaService.fetch();
-		if (this.utilityService.isItemListedIn(this.utilityService.extractHost(uri), meta.blockedHosts)) return 'skip: blocked host';
+		if (!this.utilityService.isFederationAllowedUri(uri)) return 'skip: blocked host';
 
 		const unlock = await acquireApObjectLock(this.redisForTimelines, uri);
 
@@ -333,10 +339,10 @@ export class ApInboxService {
 				// 対象が4xxならスキップ
 				if (err instanceof StatusError) {
 					if (!err.isRetryable) {
-						return `skip: Ignored announce target ${target} - ${err.statusCode}`;
+						return `skip: Ignored announce target ${target.id} - ${err.statusCode}`;
 					}
 
-					this.logger.warn(`Error in announce target ${target} - ${err.statusCode}`);
+					this.logger.warn(`Error in announce target ${target.id} - ${err.statusCode}`);
 				}
 				throw err;
 			}
@@ -393,6 +399,10 @@ export class ApInboxService {
 		this.logger.info(`Create: ${uri}`);
 
 		if (!activity.object) return 'skip: activity has no object property';
+
+		if (!activity.object) return 'skip: activity has no object property';
+		const targetUri = getApId(activity.object);
+		if (targetUri.startsWith('bear:')) return 'skip: bearcaps url not supported.';
 
 		// copy audiences between activity <=> object.
 		if (typeof activity.object === 'object') {
@@ -460,7 +470,6 @@ export class ApInboxService {
 				await this.noteCreateService.appendNoteVisibleUser(actor, createdNote, additionalCc);
 				return 'ok: note visible user appended';
 			}
-
 			return 'ok';
 		} catch (err) {
 			if (err instanceof StatusError && !err.isRetryable) {
@@ -523,19 +532,12 @@ export class ApInboxService {
 			return `skip: delete actor ${actor.uri} !== ${uri}`;
 		}
 
-		const user = await this.usersRepository.findOneBy({ id: actor.id });
-		if (user == null) {
-			return 'skip: actor not found';
-		} else if (user.isDeleted) {
-			return 'skip: already deleted';
+		if (!(await this.usersRepository.update({ id: actor.id, isDeleted: false }, { isDeleted: true })).affected) {
+			return 'skip: already deleted or actor not found';
 		}
 
 		// リモートから消されたということなので、物理削除する
 		const job = await this.queueService.createDeleteAccountJob(actor, { force: true, soft: false });
-
-		await this.usersRepository.update(actor.id, {
-			isDeleted: true,
-		});
 
 		this.globalEventService.publishInternalEvent('remoteUserUpdated', { id: actor.id });
 
@@ -575,22 +577,19 @@ export class ApInboxService {
 		const userIds = uris
 			.filter(uri => uri.startsWith(this.config.url + '/users/'))
 			.map(uri => uri.split('/').at(-1))
-			.filter(isNotNull);
+			.filter(x => x != null);
 		const users = await this.usersRepository.findBy({
 			id: In(userIds),
 		});
 		if (users.length < 1) return 'skip';
 
-		const report = await this.abuseUserReportsRepository.insert({
-			id: this.idService.gen(),
+		await this.abuseReportService.report([{
 			targetUserId: users[0].id,
 			targetUserHost: users[0].host,
 			reporterId: actor.id,
 			reporterHost: actor.host,
 			comment: `${activity.content}\n${JSON.stringify(uris, null, 2)}`,
-		}).then(x => this.abuseUserReportsRepository.findOneByOrFail(x.identifiers[0]));
-
-		this.queueService.createReportAbuseJob(report);
+		}]);
 
 		return 'ok';
 	}
@@ -641,7 +640,7 @@ export class ApInboxService {
 	@bindThis
 	private async remove(actor: MiRemoteUser, activity: IRemove, resolver?: Resolver): Promise<string> {
 		if (actor.uri !== activity.actor) {
-			return 'skip: invalid actor';
+			return 'invalid actor';
 		}
 
 		if (activity.target == null) {

@@ -5,11 +5,17 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const WORKSPACE_PREFIX = 'workspace:';
 const CATALOG_VERSION = 'catalog:';
 
-function readFileIfExists(p) {
+function parseJsonIfExists(p) {
   if (!fs.existsSync(p)) return null;
-  return fs.readFileSync(p, 'utf8');
+	try {
+		return JSON.parse(fs.readFileSync(p, 'utf8'));
+	} catch (e) {
+		console.error(`Failed to parse JSON in ${p}:`, e.message);
+		return null;
+	}
 }
 
 function updateDepsSection(pkgJson, section) {
@@ -18,7 +24,7 @@ function updateDepsSection(pkgJson, section) {
 
   let changed = false;
   for (const name of Object.keys(deps)) {
-    if (!deps[name].startsWith('workspace:') && deps[name] !== CATALOG_VERSION) {
+    if (!deps[name].startsWith(WORKSPACE_PREFIX) && deps[name] !== CATALOG_VERSION) {
       deps[name] = CATALOG_VERSION;
       changed = true;
     }
@@ -27,43 +33,35 @@ function updateDepsSection(pkgJson, section) {
 }
 
 function processPackageJson(pkgJsonPath) {
-  const content = readFileIfExists(pkgJsonPath);
-  if (!content) {
+  const pkgJson = parseJsonIfExists(pkgJsonPath);
+  if (!pkgJson) {
     console.warn(`Skipping missing ${pkgJsonPath}`);
     return;
   }
 
-  let json;
-  try {
-    json = JSON.parse(content);
-  } catch (e) {
-    console.error(`Failed to parse JSON in ${pkgJsonPath}:`, e.message);
-    return;
-  }
-
   let changed = false;
-  if (updateDepsSection(json, 'dependencies')) changed = true;
-  if (updateDepsSection(json, 'devDependencies')) changed = true;
-  if (updateDepsSection(json, 'optionalDependencies')) changed = true;
+  if (updateDepsSection(pkgJson, 'dependencies')) changed = true;
+  if (updateDepsSection(pkgJson, 'devDependencies')) changed = true;
+  if (updateDepsSection(pkgJson, 'optionalDependencies')) changed = true;
 
   if (!changed) {
     console.log(`No changes in ${pkgJsonPath}`);
     return;
   }
 
-  fs.writeFileSync(pkgJsonPath, JSON.stringify(json, null, 2) + '\n', 'utf8');
+  fs.writeFileSync(pkgJsonPath, JSON.stringify(pkgJson, null, 2) + '\n', 'utf8');
   console.log(`Updated ${pkgJsonPath}`);
 }
 
 const rootDir = path.resolve(__dirname, '..');
 const rootPkgJsonPath = path.join(rootDir, 'package.json');
-const rootPkgJson = readFileIfExists(rootPkgJsonPath);
+const rootPkgJson = parseJsonIfExists(rootPkgJsonPath);
 if (!rootPkgJson) {
 	console.error('Root package.json not found.');
 	process.exit(1);
 }
 
-const workspaces = JSON.parse(rootPkgJson).workspaces || [];
+const workspaces = rootPkgJson.workspaces || [];
 [
 	rootPkgJsonPath,
 	...workspaces.map((pkgPath) => path.join(rootDir, pkgPath, 'package.json')),

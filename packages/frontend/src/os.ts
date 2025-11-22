@@ -43,9 +43,10 @@ export const apiWithDialog = (<E extends keyof Misskey.Endpoints, P extends Miss
 	token?: string | null | undefined,
 	onSuccess?: ((res: Misskey.api.SwitchCaseResponseType<E, P>) => void) | null | undefined,
 	onFailure?: ((err: Misskey.api.APIError) => void) | null,
+	customErrors?: ApiWithDialogCustomErrors,
 ): Promise<Misskey.api.SwitchCaseResponseType<E, P>> => {
 	const promise = misskeyApi(endpoint, data, token);
-	promiseDialog(promise, onSuccess, onFailure ?? (err => apiErrorHandler(err, endpoint)));
+	promiseDialog(promise, onSuccess, onFailure ?? (err => apiErrorHandler(err, endpoint, customErrors)));
 
 	return promise;
 });
@@ -699,8 +700,8 @@ export async function cropImage(image: Misskey.entities.DriveFile, options: {
 
 type AwaitType<T> =
 	T extends Promise<infer U> ? U :
-		T extends (...args: any[]) => Promise<infer V> ? V :
-			T;
+	T extends (...args: any[]) => Promise<infer V> ? V :
+	T;
 let openingEmojiPicker: AwaitType<ReturnType<typeof popup>> | null = null;
 let activeTextarea: HTMLTextAreaElement | HTMLInputElement | null = null;
 

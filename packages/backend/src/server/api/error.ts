@@ -11,15 +11,15 @@ export class ApiError extends Error {
 	public id: string;
 	public kind: string;
 	public httpStatusCode?: number;
-	public info?: Record<string, string>;
+	public info?: any;
 
-	constructor(err: E, info?: Record<string, string> | null | undefined) {
+	constructor(err: E, info?: any | null | undefined) {
 		super(err.message);
 		this.message = err.message;
 		this.code = err.code;
 		this.id = err.id;
 		this.kind = err.kind ?? 'client';
 		this.httpStatusCode = err.httpStatusCode;
-		this.info = info ?? undefined;
+		this.info = info;
 	}
 }

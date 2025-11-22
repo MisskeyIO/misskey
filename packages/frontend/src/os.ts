@@ -700,8 +700,8 @@ export async function cropImage(image: Misskey.entities.DriveFile, options: {
 
 type AwaitType<T> =
 	T extends Promise<infer U> ? U :
-	T extends (...args: any[]) => Promise<infer V> ? V :
-	T;
+		T extends (...args: any[]) => Promise<infer V> ? V :
+			T;
 let openingEmojiPicker: AwaitType<ReturnType<typeof popup>> | null = null;
 let activeTextarea: HTMLTextAreaElement | HTMLInputElement | null = null;
 

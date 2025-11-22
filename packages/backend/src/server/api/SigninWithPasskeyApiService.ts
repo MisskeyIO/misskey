@@ -86,7 +86,7 @@ export class SigninWithPasskeyApiService {
 
 		// Not more than 1 API call per 250ms and not more than 100 attempts per 30min
 		// NOTE: 1 Sign-in require 2 API calls
-		const rateLimit = await this.rateLimiterService.limit({ key: 'signin-with-passkey', duration: 60 * 60 * 1000, max: 200, minInterval: 250 }, getIpHash(request.ip));
+		const rateLimit = await this.rateLimiterService.limit({ key: 'signin-with-passkey', duration: 60 * 30 * 1000, max: 200, minInterval: 250 }, getIpHash(request.ip));
 		if (rateLimit != null) {
 			this.logger.warn('Too many failed attempts to sign in.');
 			reply.code(429);

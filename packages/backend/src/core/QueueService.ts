@@ -458,7 +458,7 @@ export class QueueService {
 		return this.systemQueue.add('scheduledNote', {
 			draftId,
 		}, {
-			jobId: `scheduledNote:${draftId}`,
+			jobId: `scheduledNote-${draftId}`,
 			delay: Math.max(scheduledAt.getTime() - Date.now(), 0) + Math.floor(Math.random() * 500 + 250),
 			removeOnComplete: true,
 			removeOnFail: true,

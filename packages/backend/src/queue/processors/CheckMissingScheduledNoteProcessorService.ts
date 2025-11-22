@@ -48,7 +48,7 @@ export class CheckMissingScheduledNoteProcessorService {
 			}
 
 			for (const draft of drafts.filter(draft => draft.scheduledAt !== null)) {
-				const jobState = await this.queueService.systemQueue.getJobState(`scheduledNote:${draft.id}`);
+				const jobState = await this.queueService.systemQueue.getJobState(`scheduledNote-${draft.id}`);
 				if (jobState !== 'unknown') continue;
 
 				this.logger.warn(`found missing scheduled note task: ${draft.id}`);

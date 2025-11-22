@@ -50,7 +50,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const draft = await this.scheduledNotesRepository.findOneBy({ id: ps.draftId, userId: me.id });
 			if (!draft) throw new ApiError(meta.errors.noSuchDraft);
 
-			await this.queueService.systemQueue.remove(`scheduledNote:${draft.id}`);
+			await this.queueService.systemQueue.remove(`scheduledNote-${draft.id}`);
 			await this.scheduledNotesRepository.delete({ id: draft.id });
 		});
 	}

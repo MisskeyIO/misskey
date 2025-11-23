@@ -43,9 +43,10 @@ export const apiWithDialog = (<E extends keyof Misskey.Endpoints, P extends Miss
 	token?: string | null | undefined,
 	onSuccess?: ((res: Misskey.api.SwitchCaseResponseType<E, P>) => void) | null | undefined,
 	onFailure?: ((err: Misskey.api.APIError) => void) | null,
+	customErrors?: ApiWithDialogCustomErrors,
 ): Promise<Misskey.api.SwitchCaseResponseType<E, P>> => {
 	const promise = misskeyApi(endpoint, data, token);
-	promiseDialog(promise, onSuccess, onFailure ?? (err => apiErrorHandler(err, endpoint)));
+	promiseDialog(promise, onSuccess, onFailure ?? (err => apiErrorHandler(err, endpoint, customErrors)));
 
 	return promise;
 });

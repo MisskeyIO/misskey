@@ -184,6 +184,16 @@ export const paramDef = {
 				type: 'string',
 			},
 		},
+		federation: {
+			type: 'string',
+			enum: ['all', 'none', 'specified'],
+		},
+		federationHosts: {
+			type: 'array',
+			items: {
+				type: 'string',
+			},
+		},
 	},
 	required: [],
 } as const;
@@ -663,6 +673,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (Array.isArray(ps.prohibitedWordsForNameOfUser)) {
 				set.prohibitedWordsForNameOfUser = ps.prohibitedWordsForNameOfUser.filter(Boolean);
+			}
+
+			if (ps.federation !== undefined) {
+				set.federation = ps.federation;
+			}
+
+			if (Array.isArray(ps.federationHosts)) {
+				set.federationHosts = ps.federationHosts.filter(Boolean).map(x => x.toLowerCase());
 			}
 
 			const before = await this.metaService.fetch(true);

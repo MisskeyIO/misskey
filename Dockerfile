@@ -10,7 +10,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 	; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache \
 	&& apt-get update \
 	&& apt-get install -yqq --no-install-recommends \
-	build-essential
+	build-essential libpq-dev
 
 WORKDIR /misskey
 
@@ -44,7 +44,7 @@ FROM --platform=$TARGETPLATFORM node:22 AS target-builder
 
 RUN apt-get update \
 	&& apt-get install -yqq --no-install-recommends \
-	build-essential
+	build-essential libpq-dev
 
 WORKDIR /misskey
 

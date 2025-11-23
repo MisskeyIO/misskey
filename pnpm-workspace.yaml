@@ -391,3 +391,6 @@ overrides:
   sharp: 0.34.5
   tough-cookie: 6.0.0
   web-streams-polyfill: 4.2.0
+
+patchedDependencies:
+  pg-pool@3.10.1: patches/pg-pool@3.10.1.patch

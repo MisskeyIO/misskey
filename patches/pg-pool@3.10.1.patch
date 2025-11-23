@@ -1,0 +1,13 @@
+diff --git a/index.js b/index.js
+index b3d9ada966db042d53e1b782230ccd1bc16ad33d..ef5d5a11b1877c87ff19d0c0a1531d8cf0ec8bc4 100644
+--- a/index.js
++++ b/index.js
+@@ -244,7 +244,7 @@ class Pool extends EventEmitter {
+         this.log('ending client due to timeout')
+         timeoutHit = true
+         // force kill the node driver, and let libpq do its teardown
+-        client.connection ? client.connection.stream.destroy() : client.end()
++        client.connection ? client.connection.end() : client.end()
+       }, this.options.connectionTimeoutMillis)
+     }
+ 

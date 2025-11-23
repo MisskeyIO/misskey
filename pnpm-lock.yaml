@@ -1000,6 +1000,11 @@ overrides:
   tough-cookie: 6.0.0
   web-streams-polyfill: 4.2.0
 
+patchedDependencies:
+  pg-pool@3.10.1:
+    hash: 8953dbbb66b2e1185925c17e8f6c9244912ba24ad4dc2d1a45fca6a6086a9a84
+    path: patches/pg-pool@3.10.1.patch
+
 importers:
 
   .:
@@ -21491,7 +21496,7 @@ snapshots:
 
   pg-int8@1.0.1: {}
 
-  pg-pool@3.10.1(pg@8.16.3):
+  pg-pool@3.10.1(patch_hash=8953dbbb66b2e1185925c17e8f6c9244912ba24ad4dc2d1a45fca6a6086a9a84)(pg@8.16.3):
     dependencies:
       pg: 8.16.3
 
@@ -21508,7 +21513,7 @@ snapshots:
   pg@8.16.3:
     dependencies:
       pg-connection-string: 2.9.1
-      pg-pool: 3.10.1(pg@8.16.3)
+      pg-pool: 3.10.1(patch_hash=8953dbbb66b2e1185925c17e8f6c9244912ba24ad4dc2d1a45fca6a6086a9a84)(pg@8.16.3)
       pg-protocol: 1.10.3
       pg-types: 2.2.0
       pgpass: 1.0.5

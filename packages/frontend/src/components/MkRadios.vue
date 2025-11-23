@@ -35,7 +35,7 @@ export default defineComponent({
 		if (options.length === 1 && options[0].props == null) options = options[0].children as VNode[];
 
 		// vnodeのうちv-if=falseなものを除外する(trueになるものはoptionなど他typeになる)
-		options = options.filter(vnode => !(typeof vnode.type === 'symbol' && vnode.type.description === 'v-cmt' && vnode.children === 'v-if'));
+		options = options.filter(vnode => !(typeof vnode.type === 'symbol' && vnode.type.description === 'v-cmt'));
 
 		return () => h('div', {
 			class: 'novjtcto',

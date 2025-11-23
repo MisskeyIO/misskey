@@ -83,6 +83,8 @@ RUN apt-get update \
 WORKDIR /misskey
 
 COPY --chown=misskey:misskey pnpm-lock.yaml ./
+COPY --chown=misskey:misskey patches ./patches
+COPY --chown=misskey:misskey scripts ./scripts
 RUN npm install -g pnpm@10
 
 COPY --chown=misskey:misskey --from=target-builder /root/.local/share/pnpm/.tools ./.local/share/pnpm/.tools

@@ -717,6 +717,24 @@ catalogs:
     pg:
       specifier: 8.16.3
       version: 8.16.3
+    pg-connection-string:
+      specifier: 2.9.1
+      version: 2.9.1
+    pg-native:
+      specifier: 3.5.2
+      version: 3.5.2
+    pg-pool:
+      specifier: 3.10.1
+      version: 3.10.1
+    pg-protocol:
+      specifier: 1.10.3
+      version: 1.10.3
+    pg-query-stream:
+      specifier: 4.10.3
+      version: 4.10.3
+    pg-types:
+      specifier: 4.1.0
+      version: 4.1.0
     photoswipe:
       specifier: 5.4.4
       version: 5.4.4
@@ -910,8 +928,8 @@ catalogs:
       specifier: 4.20.6
       version: 4.20.6
     typeorm:
-      specifier: 0.3.27
-      version: 0.3.27
+      specifier: 0.3.25
+      version: 0.3.25
     typescript:
       specifier: 5.9.3
       version: 5.9.3
@@ -1358,7 +1376,22 @@ importers:
         version: 8.0.0
       pg:
         specifier: 'catalog:'
-        version: 8.16.3
+        version: 8.16.3(pg-native@3.5.2)
+      pg-connection-string:
+        specifier: 'catalog:'
+        version: 2.9.1
+      pg-pool:
+        specifier: 'catalog:'
+        version: 3.10.1(patch_hash=8953dbbb66b2e1185925c17e8f6c9244912ba24ad4dc2d1a45fca6a6086a9a84)(pg@8.16.3(pg-native@3.5.2))
+      pg-protocol:
+        specifier: 'catalog:'
+        version: 1.10.3
+      pg-query-stream:
+        specifier: 'catalog:'
+        version: 4.10.3(pg@8.16.3(pg-native@3.5.2))
+      pg-types:
+        specifier: 'catalog:'
+        version: 4.1.0
       pino:
         specifier: 'catalog:'
         version: 10.1.0
@@ -1448,7 +1481,7 @@ importers:
         version: 4.2.0
       typeorm:
         specifier: 'catalog:'
-        version: 0.3.27(ioredis@5.8.2)(pg@8.16.3)(reflect-metadata@0.2.2)
+        version: 0.3.25(ioredis@5.8.2)(pg-native@3.5.2)(pg-query-stream@4.10.3(pg@8.16.3(pg-native@3.5.2)))(pg@8.16.3(pg-native@3.5.2))(reflect-metadata@0.2.2)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -1679,6 +1712,9 @@ importers:
       bufferutil:
         specifier: 'catalog:'
         version: 4.0.9
+      pg-native:
+        specifier: 'catalog:'
+        version: 3.5.2
       slacc-android-arm-eabi:
         specifier: 'catalog:'
         version: 0.0.10
@@ -6638,6 +6674,9 @@ packages:
     resolution: {integrity: sha512-nk5wEsP4RiKjG+vF+uG8lFsEn4d7Y6FVDamzzftSunXOoOcOOkzcWdKVlGgFFwlUQCj63SgnUkLLGF8v7lufhw==}
     engines: {node: '>=12'}
 
+  bindings@1.5.0:
+    resolution: {integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==}
+
   blob-util@2.0.2:
     resolution: {integrity: sha512-T7JQa+zsXXEa6/8ZhHcQEW1UFfVM49Ts65uBkFL6fz2QmrElqmbajIDJvuA0tEhRe5eIjpV9ZF+0RfZR9voJFQ==}
 
@@ -7913,6 +7952,9 @@ packages:
     resolution: {integrity: sha512-ifJXo8zUqbQ/bLbl9sFoqHNTNWbnPY1COImFfM6CCy7z+E+jC1eY9YfOKkx0fckIg+VljAy2/87T61fp0+eEkg==}
     engines: {node: '>=20'}
 
+  file-uri-to-path@1.0.0:
+    resolution: {integrity: sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==}
+
   filelist@1.0.4:
     resolution: {integrity: sha512-w1cEuf3S+DrLCQL7ET6kz+gmlJdbq9J7yXCSjK/OZCPA+qEN1WyF4ZAf0YYJa4/shHJra2t/d/r8SV4Ji+x+8Q==}
 
@@ -9044,6 +9086,9 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
+  libpq@1.8.15:
+    resolution: {integrity: sha512-4lSWmly2Nsj3LaTxxtFmJWuP3Kx+0hYHEd+aNrcXEWT0nKWaPd9/QZPiMkkC680zeALFGHQdQWjBvnilL+vgWA==}
+
   light-my-request@6.6.0:
     resolution: {integrity: sha512-CHYbu8RtboSIoVsHZ6Ye4cj4Aw/yg2oAFimlF7mNvfDV192LR7nDiKtSIfCuLT7KokPSTn/9kfVLm5OGN0A28A==}
 
@@ -9557,6 +9602,9 @@ packages:
   mz@2.7.0:
     resolution: {integrity: sha512-z81GNO7nnYMEhrGh9LeymoE4+Yr0Wn5McHIZMK5cfQCl+NDX08sCZgUc9/6MHni9IWuFLm1Z3HTCXu2z9fN62Q==}
 
+  nan@2.22.2:
+    resolution: {integrity: sha512-DANghxFkS1plDdRsX0X9pm0Z6SJNN6gBdtXfanwoZ8hooC5gosGFSBGRYHUVPz1asKA/kMRqDRdHrluZ61SpBQ==}
+
   nan@2.23.1:
     resolution: {integrity: sha512-r7bBUGKzlqk8oPBDYxt6Z0aEdF1G1rwlMcLk8LCOMbOzf0mG+JUfUzG4fIMWwHWP0iyaLWEQZJmtB7nOHEm/qw==}
 
@@ -9788,6 +9836,9 @@ packages:
     resolution: {integrity: sha512-QOUH5Xrsced9fKXaQTjWoDGKeS/Or7E2jB0FN63N4mkAO4qJdB7WR7e6qWAOHM5nk25FJ8TGjhP7DH4l6vFVLg==}
     engines: {node: '>=16'}
 
+  obuf@1.1.2:
+    resolution: {integrity: sha512-PX1wu0AmAdPqOL1mWhqmlOd8kOIZQwGZw6rh7uby9fTc5lhaOWFLX3I6R1hrF9k3zUY40e6igsLGkDXK92LJNg==}
+
   on-exit-leak-free@2.1.2:
     resolution: {integrity: sha512-0eJJY6hXLGf1udHwfNftBqH+g73EU4B504nZeKpz1sYRKafAghwxEJunB2O7rDZkL4PGfsMVnTXZ2EjibbqcsA==}
     engines: {node: '>=14.0.0'}
@@ -10005,9 +10056,21 @@ packages:
   pg-connection-string@2.9.1:
     resolution: {integrity: sha512-nkc6NpDcvPVpZXxrreI/FOtX3XemeLl8E0qFr6F2Lrm/I8WOnaWNhIPK2Z7OHpw7gh5XJThi6j6ppgNoaT1w4w==}
 
+  pg-cursor@2.15.3:
+    resolution: {integrity: sha512-eHw63TsiGtFEfAd7tOTZ+TLy+i/2ePKS20H84qCQ+aQ60pve05Okon9tKMC+YN3j6XyeFoHnaim7Lt9WVafQsA==}
+    peerDependencies:
+      pg: ^8
+
   pg-int8@1.0.1:
     resolution: {integrity: sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==}
     engines: {node: '>=4.0.0'}
+
+  pg-native@3.5.2:
+    resolution: {integrity: sha512-3oi+KVil86Vngo4H0IlhBaYSJWdcu8t2f1Y4TkQoQi5oZ9bNeYECGqW3oSGx69mjSZYHoC3h+3jYtqzRgndn5A==}
+
+  pg-numeric@1.0.2:
+    resolution: {integrity: sha512-BM/Thnrw5jm2kKLE5uJkXqqExRUY/toLHda65XgFTBTFYZyopbKjBe29Ii3RbkvlsMoFwD+tHeGaCjjv0gHlyw==}
+    engines: {node: '>=4'}
 
   pg-pool@3.10.1:
     resolution: {integrity: sha512-Tu8jMlcX+9d8+QVzKIvM/uJtp07PKr82IUOYEphaWcoBhIYkoHpLXN3qO59nAI11ripznDsEzEv8nUxBVWajGg==}
@@ -10017,9 +10080,18 @@ packages:
   pg-protocol@1.10.3:
     resolution: {integrity: sha512-6DIBgBQaTKDJyxnXaLiLR8wBpQQcGWuAESkRBX/t6OwA8YsqP+iVSiond2EDy6Y/dsGk8rh/jtax3js5NeV7JQ==}
 
+  pg-query-stream@4.10.3:
+    resolution: {integrity: sha512-h2utrzpOIzeT9JfaqfvBbVuvCfBjH86jNfVrGGTbyepKAIOyTfDew0lAt8bbJjs9n/I5bGDl7S2sx6h5hPyJxw==}
+    peerDependencies:
+      pg: ^8
+
   pg-types@2.2.0:
     resolution: {integrity: sha512-qTAAlrEsl8s4OiEQY69wDvcMIdQN6wdz5ojQiOy6YRMuynxenON0O5oCpJI6lshc6scgAY8qvJ2On/p+CXY0GA==}
     engines: {node: '>=4'}
+
+  pg-types@4.1.0:
+    resolution: {integrity: sha512-o2XFanIMy/3+mThw69O8d4n1E5zsLhdO+OPqswezu7Z5ekP4hYDqlDjlmOpYMbzY2Br0ufCwJLdDIXeNVwcWFg==}
+    engines: {node: '>=10'}
 
   pg@8.16.3:
     resolution: {integrity: sha512-enxc1h0jA/aq5oSDMvqyW3q89ra6XIIDZgCX9vkMrnz5DFTw/Ny3Li2lFQ+pt3L6MCgm/5o2o8HW9hiJji+xvw==}
@@ -10295,17 +10367,36 @@ packages:
     resolution: {integrity: sha512-VpZrUqU5A69eQyW2c5CA1jtLecCsN2U/bD6VilrFDWq5+5UIEVO7nazS3TEcHf1zuPYO/sqGvUvW62g86RXZuA==}
     engines: {node: '>=4'}
 
+  postgres-array@3.0.4:
+    resolution: {integrity: sha512-nAUSGfSDGOaOAEGwqsRY27GPOea7CNipJPOA7lPbdEpx5Kg3qzdP0AaWC5MlhTWV9s4hFX39nomVZ+C4tnGOJQ==}
+    engines: {node: '>=12'}
+
   postgres-bytea@1.0.0:
     resolution: {integrity: sha512-xy3pmLuQqRBZBXDULy7KbaitYqLcmxigw14Q5sj8QBVLqEwXfeybIKVWiqAXTlcvdvb0+xkOtDbfQMOf4lST1w==}
     engines: {node: '>=0.10.0'}
+
+  postgres-bytea@3.0.0:
+    resolution: {integrity: sha512-CNd4jim9RFPkObHSjVHlVrxoVQXz7quwNFpz7RY1okNNme49+sVyiTvTRobiLV548Hx/hb1BG+iE7h9493WzFw==}
+    engines: {node: '>= 6'}
 
   postgres-date@1.0.7:
     resolution: {integrity: sha512-suDmjLVQg78nMK2UZ454hAG+OAW+HQPZ6n++TNDUX+L0+uUlLywnoxJKDou51Zm+zTCjrCl0Nq6J9C5hP9vK/Q==}
     engines: {node: '>=0.10.0'}
 
+  postgres-date@2.1.0:
+    resolution: {integrity: sha512-K7Juri8gtgXVcDfZttFKVmhglp7epKb1K4pgrkLxehjqkrgPhfG6OO8LHLkfaqkbpjNRnra018XwAr1yQFWGcA==}
+    engines: {node: '>=12'}
+
   postgres-interval@1.2.0:
     resolution: {integrity: sha512-9ZhXKM/rw350N1ovuWHbGxnGh/SNJ4cnxHiM0rxE4VN41wsg8P8zWn9hv/buK00RP4WvlOyr/RBDiptyxVbkZQ==}
     engines: {node: '>=0.10.0'}
+
+  postgres-interval@3.0.0:
+    resolution: {integrity: sha512-BSNDnbyZCXSxgA+1f5UU2GmwhoI0aU5yMxRGO8CdFEcY2BQF9xm/7MqKnYoM1nJDk8nONNWDk9WeSmePFhQdlw==}
+    engines: {node: '>=12'}
+
+  postgres-range@1.1.4:
+    resolution: {integrity: sha512-i/hbxIE9803Alj/6ytL7UHQxRvZkI9O4Sy+J3HGc4F4oo/2eQAjTSNJ0bfxyse3bH0nuVesCk+3IRLaMtG3H6w==}
 
   prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
@@ -11623,14 +11714,15 @@ packages:
   typedarray@0.0.6:
     resolution: {integrity: sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==}
 
-  typeorm@0.3.27:
-    resolution: {integrity: sha512-pNV1bn+1n8qEe8tUNsNdD8ejuPcMAg47u2lUGnbsajiNUr3p2Js1XLKQjBMH0yMRMDfdX8T+fIRejFmIwy9x4A==}
+  typeorm@0.3.25:
+    resolution: {integrity: sha512-fTKDFzWXKwAaBdEMU4k661seZewbNYET4r1J/z3Jwf+eAvlzMVpTLKAVcAzg75WwQk7GDmtsmkZ5MfkmXCiFWg==}
     engines: {node: '>=16.13.0'}
     hasBin: true
     peerDependencies:
       '@google-cloud/spanner': ^5.18.0 || ^6.0.0 || ^7.0.0
-      '@sap/hana-client': ^2.14.22
-      better-sqlite3: ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0 || ^12.0.0
+      '@sap/hana-client': ^2.12.25
+      better-sqlite3: ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0
+      hdb-pool: ^0.1.6
       ioredis: ^5.0.4
       mongodb: ^5.8.0 || ^6.0.0
       mssql: ^9.1.1 || ^10.0.1 || ^11.0.1
@@ -11639,7 +11731,7 @@ packages:
       pg: ^8.5.1
       pg-native: ^3.0.0
       pg-query-stream: ^4.0.0
-      redis: ^3.1.1 || ^4.0.0 || ^5.0.14
+      redis: ^3.1.1 || ^4.0.0
       reflect-metadata: ^0.1.14 || ^0.2.0
       sql.js: ^1.4.0
       sqlite3: ^5.0.3
@@ -11651,6 +11743,8 @@ packages:
       '@sap/hana-client':
         optional: true
       better-sqlite3:
+        optional: true
+      hdb-pool:
         optional: true
       ioredis:
         optional: true
@@ -17323,6 +17417,11 @@ snapshots:
       execa: 5.1.1
       find-versions: 5.1.0
 
+  bindings@1.5.0:
+    dependencies:
+      file-uri-to-path: 1.0.0
+    optional: true
+
   blob-util@2.0.2: {}
 
   bluebird@3.7.2: {}
@@ -18961,6 +19060,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  file-uri-to-path@1.0.0:
+    optional: true
+
   filelist@1.0.4:
     dependencies:
       minimatch: 5.1.6
@@ -20370,6 +20472,12 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
+  libpq@1.8.15:
+    dependencies:
+      bindings: 1.5.0
+      nan: 2.22.2
+    optional: true
+
   light-my-request@6.6.0:
     dependencies:
       cookie: 1.0.2
@@ -21059,6 +21167,9 @@ snapshots:
       object-assign: 4.1.1
       thenify-all: 1.6.0
 
+  nan@2.22.2:
+    optional: true
+
   nan@2.23.1: {}
 
   nanoid@3.3.11: {}
@@ -21293,6 +21404,8 @@ snapshots:
 
   oblivious-set@2.0.0: {}
 
+  obuf@1.1.2: {}
+
   on-exit-leak-free@2.1.2: {}
 
   on-finished@2.4.1:
@@ -21494,13 +21607,30 @@ snapshots:
 
   pg-connection-string@2.9.1: {}
 
+  pg-cursor@2.15.3(pg@8.16.3(pg-native@3.5.2)):
+    dependencies:
+      pg: 8.16.3(pg-native@3.5.2)
+
   pg-int8@1.0.1: {}
 
-  pg-pool@3.10.1(patch_hash=8953dbbb66b2e1185925c17e8f6c9244912ba24ad4dc2d1a45fca6a6086a9a84)(pg@8.16.3):
+  pg-native@3.5.2:
     dependencies:
-      pg: 8.16.3
+      libpq: 1.8.15
+      pg-types: 2.2.0
+    optional: true
+
+  pg-numeric@1.0.2: {}
+
+  pg-pool@3.10.1(patch_hash=8953dbbb66b2e1185925c17e8f6c9244912ba24ad4dc2d1a45fca6a6086a9a84)(pg@8.16.3(pg-native@3.5.2)):
+    dependencies:
+      pg: 8.16.3(pg-native@3.5.2)
 
   pg-protocol@1.10.3: {}
+
+  pg-query-stream@4.10.3(pg@8.16.3(pg-native@3.5.2)):
+    dependencies:
+      pg: 8.16.3(pg-native@3.5.2)
+      pg-cursor: 2.15.3(pg@8.16.3(pg-native@3.5.2))
 
   pg-types@2.2.0:
     dependencies:
@@ -21510,15 +21640,26 @@ snapshots:
       postgres-date: 1.0.7
       postgres-interval: 1.2.0
 
-  pg@8.16.3:
+  pg-types@4.1.0:
+    dependencies:
+      pg-int8: 1.0.1
+      pg-numeric: 1.0.2
+      postgres-array: 3.0.4
+      postgres-bytea: 3.0.0
+      postgres-date: 2.1.0
+      postgres-interval: 3.0.0
+      postgres-range: 1.1.4
+
+  pg@8.16.3(pg-native@3.5.2):
     dependencies:
       pg-connection-string: 2.9.1
-      pg-pool: 3.10.1(patch_hash=8953dbbb66b2e1185925c17e8f6c9244912ba24ad4dc2d1a45fca6a6086a9a84)(pg@8.16.3)
+      pg-pool: 3.10.1(patch_hash=8953dbbb66b2e1185925c17e8f6c9244912ba24ad4dc2d1a45fca6a6086a9a84)(pg@8.16.3(pg-native@3.5.2))
       pg-protocol: 1.10.3
       pg-types: 2.2.0
       pgpass: 1.0.5
     optionalDependencies:
       pg-cloudflare: 1.2.7
+      pg-native: 3.5.2
 
   pgpass@1.0.5:
     dependencies:
@@ -21775,13 +21916,25 @@ snapshots:
 
   postgres-array@2.0.0: {}
 
+  postgres-array@3.0.4: {}
+
   postgres-bytea@1.0.0: {}
 
+  postgres-bytea@3.0.0:
+    dependencies:
+      obuf: 1.1.2
+
   postgres-date@1.0.7: {}
+
+  postgres-date@2.1.0: {}
 
   postgres-interval@1.2.0:
     dependencies:
       xtend: 4.0.2
+
+  postgres-interval@3.0.0: {}
+
+  postgres-range@1.1.4: {}
 
   prelude-ls@1.2.1: {}
 
@@ -23307,7 +23460,7 @@ snapshots:
 
   typedarray@0.0.6: {}
 
-  typeorm@0.3.27(ioredis@5.8.2)(pg@8.16.3)(reflect-metadata@0.2.2):
+  typeorm@0.3.25(ioredis@5.8.2)(pg-native@3.5.2)(pg-query-stream@4.10.3(pg@8.16.3(pg-native@3.5.2)))(pg@8.16.3(pg-native@3.5.2))(reflect-metadata@0.2.2):
     dependencies:
       '@sqltools/formatter': 1.2.5
       ansis: 3.17.0
@@ -23326,7 +23479,9 @@ snapshots:
       yargs: 17.7.2
     optionalDependencies:
       ioredis: 5.8.2
-      pg: 8.16.3
+      pg: 8.16.3(pg-native@3.5.2)
+      pg-native: 3.5.2
+      pg-query-stream: 4.10.3(pg@8.16.3(pg-native@3.5.2))
     transitivePeerDependencies:
       - babel-plugin-macros
       - supports-color

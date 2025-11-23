@@ -20,6 +20,7 @@ RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
 	pnpm fetch --ignore-scripts
 
 COPY --link ["pnpm-workspace.yaml", "package.json", "./"]
+COPY --link ["patches", "./patches"]
 COPY --link ["scripts", "./scripts"]
 COPY --link ["packages/backend/package.json", "./packages/backend/"]
 COPY --link ["packages/frontend-shared/package.json", "./packages/frontend-shared/"]
@@ -53,6 +54,7 @@ RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
 	pnpm fetch --ignore-scripts
 
 COPY --link ["pnpm-workspace.yaml", "package.json", "./"]
+COPY --link ["patches", "./patches"]
 COPY --link ["scripts", "./scripts"]
 COPY --link ["packages/backend/package.json", "./packages/backend/"]
 COPY --link ["packages/misskey-js/package.json", "./packages/misskey-js/"]

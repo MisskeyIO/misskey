@@ -16,7 +16,7 @@ services:
       "
 
   tester:
-    image: node:20
+    image: node:22
     depends_on:
       a.test:
         condition: service_healthy
@@ -63,6 +63,10 @@ services:
         target: /misskey/package.json
         read_only: true
       - type: bind
+        source: ../../../patches
+        target: /misskey/patches
+        read_only: true
+      - type: bind
         source: ../../../pnpm-lock.yaml
         target: /misskey/pnpm-lock.yaml
         read_only: true
@@ -85,7 +89,7 @@ services:
     command: pnpm -F backend test:fed
 
   daemon:
-    image: node:20
+    image: node:22
     depends_on:
       redis.test:
         condition: service_healthy
@@ -109,6 +113,10 @@ services:
       - type: bind
         source: ../../../pnpm-lock.yaml
         target: /misskey/pnpm-lock.yaml
+        read_only: true
+      - type: bind
+        source: ../../../patches
+        target: /misskey/patches
         read_only: true
       - type: bind
         source: ../../../pnpm-workspace.yaml

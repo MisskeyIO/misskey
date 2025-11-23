@@ -12,7 +12,7 @@ services:
       retries: 20
 
   misskey:
-    image: node:20
+    image: node:22
     env_file:
       - ./.config/docker.env
     environment:
@@ -66,6 +66,10 @@ services:
       - type: bind
         source: ../../../package.json
         target: /misskey/package.json
+        read_only: true
+      - type: bind
+        source: ../../../patches
+        target: /misskey/patches
         read_only: true
       - type: bind
         source: ../../../pnpm-lock.yaml

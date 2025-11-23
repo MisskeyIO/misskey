@@ -75,7 +75,7 @@ body:
         Examples:
           * Installation Method or Hosting Service: docker compose, k8s/docker, systemd, "Misskey install shell script", development environment
           * Misskey: 20xx.x.x
-          * Node: 24.x.x
+          * Node: 22.x.x
           * PostgreSQL: 17.x.x
           * Redis: 7.x.x
           * OS and Architecture: Ubuntu 24.04 LTS aarch64

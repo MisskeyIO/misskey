@@ -2592,8 +2592,8 @@ packages:
     resolution: {integrity: sha512-ioeNe6HSc7PxjsUQY7foSHmgesxM5KwAeUtPhIHgKx99nrM+7xYCfW4FMvHypUzz7ZOvqlCdH7CEAZ8ParBvVg==}
     engines: {node: '>=18.0.0'}
 
-  '@aws-sdk/client-sesv2@3.936.0':
-    resolution: {integrity: sha512-jRWRuFixdCB9x56Hs3GyOZwolD0W6EgJXdkLyjC7CxudMHSt5NHdAt5dDxof54azjT9Lnt3Fiae2gZ4SsGqOVg==}
+  '@aws-sdk/client-sesv2@3.938.0':
+    resolution: {integrity: sha512-GW07FQuZkW5ASm0WP+CWLetcortqup9l3+p1OlvuUN3rLBIzlWRqYd5Nf2GTS72sPbaNowE3dYJXCtwu1IlLuQ==}
     engines: {node: '>=18.0.0'}
 
   '@aws-sdk/client-sso@3.936.0':
@@ -10516,8 +10516,8 @@ packages:
     resolution: {integrity: sha512-8zGqypfENjCIqGhgXToC8aB2r7YrBX+AQAfIPs/Mlk+BtPTztOvTS01NRW/3Eh60J+a48lt8qsCzirQ6loCVfA==}
     engines: {node: '>= 0.8'}
 
-  raw-body@3.0.1:
-    resolution: {integrity: sha512-9G8cA+tuMS75+6G/TzW8OtLzmBDMo8p1JRxN5AZ+LAp8uxGA8V8GZm4GQ4/N5QNQEnLmg6SS7wyuSmbKepiKqA==}
+  raw-body@3.0.2:
+    resolution: {integrity: sha512-K5zQjDllxWkf7Z5xJdV0/B0WTNqx6vxG70zJE4N0kBs4LovmEYWJzQGxC9bS9RAKu3bgM40lrd5zoLJ12MQ5BA==}
     engines: {node: '>= 0.10'}
 
   rdf-canonize@5.0.0:
@@ -11434,11 +11434,11 @@ packages:
     resolution: {integrity: sha512-azl+t0z7pw/z958Gy9svOTuzqIk6xq+NSheJzn5MMWtWTFywIacg2wUlzKFGtt3cthx0r2SxMK0yzJOR0IES7Q==}
     engines: {node: '>=14.0.0'}
 
-  tldts-core@7.0.18:
-    resolution: {integrity: sha512-jqJC13oP4FFAahv4JT/0WTDrCF9Okv7lpKtOZUGPLiAnNbACcSg8Y8T+Z9xthOmRBqi/Sob4yi0TE0miRCvF7Q==}
+  tldts-core@7.0.19:
+    resolution: {integrity: sha512-lJX2dEWx0SGH4O6p+7FPwYmJ/bu1JbcGJ8RLaG9b7liIgZ85itUVEPbMtWRVrde/0fnDPEPHW10ZsKW3kVsE9A==}
 
-  tldts@7.0.18:
-    resolution: {integrity: sha512-lCcgTAgMxQ1JKOWrVGo6E69Ukbnx4Gc1wiYLRf6J5NN4HRYJtCby1rPF8rkQ4a6qqoFBK5dvjJ1zJ0F7VfDSvw==}
+  tldts@7.0.19:
+    resolution: {integrity: sha512-8PWx8tvC4jDB39BQw1m4x8y5MH1BcQ5xHeL2n7UVFulMPH/3Q0uiamahFJ3lXA0zO2SUyRXuVVbWSDmstlt9YA==}
     hasBin: true
 
   tmp@0.2.5:
@@ -11771,8 +11771,8 @@ packages:
     resolution: {integrity: sha512-4/u/j4FrCKdi17jaxuJA0jClGxB1AvU2hw/IuayPc4ay1XGaJs/rbb4v5WKwAjNifjmXK9PIFyuPiaK8azyR9w==}
     engines: {node: '>=14.0.0'}
 
-  unplugin@2.3.10:
-    resolution: {integrity: sha512-6NCPkv1ClwH+/BGE9QeoTIl09nuiAt0gS28nn1PvYXsGKRwM2TCbFA2QiilmehPDTXIe684k4rZI1yl3A1PCUw==}
+  unplugin@2.3.11:
+    resolution: {integrity: sha512-5uKD0nqiYVzlmCRs01Fhs2BdkEgBS3SAVP6ndrBsuK42iC2+JHyxM05Rm9G8+5mkmRtzMZGY8Ct5+mliZxU/Ww==}
     engines: {node: '>=18.12.0'}
 
   unrs-resolver@1.11.1:
@@ -12439,7 +12439,7 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/client-sesv2@3.936.0':
+  '@aws-sdk/client-sesv2@3.938.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
@@ -15636,7 +15636,7 @@ snapshots:
   '@storybook/csf-plugin@10.0.8(esbuild@0.27.0)(rollup@4.53.3)(storybook@10.0.8(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(msw@2.12.2(@types/node@24.10.1)(typescript@5.9.3))(prettier@3.6.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5)(vite@7.2.4(@types/node@24.10.1)(sass@1.94.2)(terser@5.44.1)(tsx@4.20.6)))(vite@7.2.4(@types/node@24.10.1)(sass@1.94.2)(terser@5.44.1)(tsx@4.20.6))':
     dependencies:
       storybook: 10.0.8(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(msw@2.12.2(@types/node@24.10.1)(typescript@5.9.3))(prettier@3.6.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5)(vite@7.2.4(@types/node@24.10.1)(sass@1.94.2)(terser@5.44.1)(tsx@4.20.6))
-      unplugin: 2.3.10
+      unplugin: 2.3.11
     optionalDependencies:
       esbuild: 0.27.0
       rollup: 4.53.3
@@ -16229,7 +16229,7 @@ snapshots:
 
   '@types/nodemailer@7.0.4':
     dependencies:
-      '@aws-sdk/client-sesv2': 3.936.0
+      '@aws-sdk/client-sesv2': 3.938.0
       '@types/node': 24.10.1
     transitivePeerDependencies:
       - aws-crt
@@ -17354,7 +17354,7 @@ snapshots:
       iconv-lite: 0.6.3
       on-finished: 2.4.1
       qs: 6.14.0
-      raw-body: 3.0.1
+      raw-body: 3.0.2
       type-is: 2.0.1
     transitivePeerDependencies:
       - supports-color
@@ -18867,7 +18867,7 @@ snapshots:
   fastify-raw-body@5.0.0:
     dependencies:
       fastify-plugin: 5.1.0
-      raw-body: 3.0.1
+      raw-body: 3.0.2
       secure-json-parse: 2.7.0
 
   fastify@5.6.2:
@@ -21991,10 +21991,10 @@ snapshots:
       iconv-lite: 0.4.24
       unpipe: 1.0.0
 
-  raw-body@3.0.1:
+  raw-body@3.0.2:
     dependencies:
       bytes: 3.1.2
-      http-errors: 2.0.0
+      http-errors: 2.0.1
       iconv-lite: 0.7.0
       unpipe: 1.0.0
 
@@ -23108,11 +23108,11 @@ snapshots:
 
   tinyspy@4.0.4: {}
 
-  tldts-core@7.0.18: {}
+  tldts-core@7.0.19: {}
 
-  tldts@7.0.18:
+  tldts@7.0.19:
     dependencies:
-      tldts-core: 7.0.18
+      tldts-core: 7.0.19
 
   tmp@0.2.5: {}
 
@@ -23146,7 +23146,7 @@ snapshots:
 
   tough-cookie@6.0.0:
     dependencies:
-      tldts: 7.0.18
+      tldts: 7.0.19
 
   tr46@0.0.3: {}
 
@@ -23406,7 +23406,7 @@ snapshots:
       acorn: 8.15.0
       webpack-virtual-modules: 0.6.2
 
-  unplugin@2.3.10:
+  unplugin@2.3.11:
     dependencies:
       '@jridgewell/remapping': 2.3.5
       acorn: 8.15.0

@@ -254,6 +254,12 @@ catalog:
   otpauth: 9.4.1
   parse5: 8.0.0
   pg: 8.16.3
+  pg-connection-string: 2.9.1
+  pg-native: 3.5.2
+  pg-pool: 3.10.1
+  pg-protocol: 1.10.3
+  pg-query-stream: 4.10.3
+  pg-types: 4.1.0
   photoswipe: 5.4.4
   pid-port: 2.0.0
   pino: 10.1.0
@@ -319,7 +325,7 @@ catalog:
   tsconfig-paths: 4.2.0
   tsd: 0.33.0
   tsx: 4.20.6
-  typeorm: 0.3.27
+  typeorm: 0.3.25
   typescript: 5.9.3
   ulid: 3.0.1
   utf-8-validate: 6.0.5
@@ -362,6 +368,7 @@ onlyBuiltDependencies:
   - core-js
   - cypress
   - esbuild
+  - libpq
   - msgpackr-extract
   - msw
   - nice-napi

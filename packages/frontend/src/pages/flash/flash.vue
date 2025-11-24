@@ -195,7 +195,7 @@ async function run() {
 	if (aiscript.value) aiscript.value.abort();
 	if (!flash.value) return;
 
-	const isLegacy = (getAiScriptVersion(flash.value.script) ?? 100) < 1.0;
+	const isLegacy = (getAiScriptVersion(flash.value.script) ?? 10000.0) < 1.0;
 
 	const { Interpreter, Parser, values } = isLegacy ? (await import('@syuilo/aiscript-0-19-0') as any) : await import('@syuilo/aiscript');
 

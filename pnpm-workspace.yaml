@@ -85,6 +85,7 @@ catalog:
   '@swc/core-win32-x64-msvc': 1.15.3
   '@swc/jest': 0.2.39
   '@syuilo/aiscript': 1.1.2
+  '@syuilo/aiscript-0-19-0': npm:@syuilo/aiscript@^0.19.0
   '@tabler/icons-webfont': 3.35.0
   '@tensorflow/tfjs': 4.22.0
   '@tensorflow/tfjs-node': 4.22.0

@@ -228,6 +228,9 @@ catalogs:
     '@syuilo/aiscript':
       specifier: 1.1.2
       version: 1.1.2
+    '@syuilo/aiscript-0-19-0':
+      specifier: npm:@syuilo/aiscript@^0.19.0
+      version: 0.19.0
     '@tabler/icons-webfont':
       specifier: 3.35.0
       version: 3.35.0
@@ -1793,6 +1796,9 @@ importers:
       '@syuilo/aiscript':
         specifier: 'catalog:'
         version: 1.1.2
+      '@syuilo/aiscript-0-19-0':
+        specifier: 'catalog:'
+        version: '@syuilo/aiscript@0.19.0'
       '@tabler/icons-webfont':
         specifier: 'catalog:'
         version: 3.35.0
@@ -5464,6 +5470,9 @@ packages:
 
   '@swc/types@0.1.25':
     resolution: {integrity: sha512-iAoY/qRhNH8a/hBvm3zKj9qQ4oc2+3w1unPJa2XvTK3XjeLXtzcCingVPw/9e5mn1+0yPqxcBGp9Jf0pkfMb1g==}
+
+  '@syuilo/aiscript@0.19.0':
+    resolution: {integrity: sha512-ZWG4s1m6RrFjE7NeIMaxFz769YO1jW5ReTrOROrEO4IHheOrjxxJ/Ffe2TUNqX9/XxDloMwfWplKhfSzx8LGMA==}
 
   '@syuilo/aiscript@1.1.2':
     resolution: {integrity: sha512-cijsHTiMjeECocElyjRIcWMPGDhZIX3YfCOyzI6AZM8ajxRQ2hSqJwEh9pDr4mVTml9kLMHWDHmgfHkTHRJ1sg==}
@@ -15940,6 +15949,12 @@ snapshots:
   '@swc/types@0.1.25':
     dependencies:
       '@swc/counter': 0.1.3
+
+  '@syuilo/aiscript@0.19.0':
+    dependencies:
+      seedrandom: 3.0.5
+      stringz: 2.1.0
+      uuid: 9.0.1
 
   '@syuilo/aiscript@1.1.2':
     dependencies:

@@ -87,6 +87,12 @@ export type FormItem = {
 
 export type Form = Record<string, FormItem>;
 
+export type FormItemWithDefault = FormItem & {
+	default: unknown;
+};
+
+export type FormWithDefault = Record<string, FormItemWithDefault>;
+
 type GetItemType<Item extends FormItem> =
 	Item['type'] extends 'string' ? string :
 	Item['type'] extends 'number' ? number :

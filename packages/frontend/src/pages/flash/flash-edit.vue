@@ -127,7 +127,7 @@ var results = []
 // どれだけ巻き戻しているか
 var cursor = 0
 
-@do() {
+@main() {
 	if (cursor != 0) {
 		results = results.slice(0, (cursor + 1))
 		cursor = 0
@@ -175,7 +175,7 @@ var cursor = 0
 						onClick: forward
 					}, {
 						text: "引き直す"
-						onClick: do
+						onClick: main
 					}]
 				})
 				Ui:C:postFormButton({
@@ -191,7 +191,7 @@ var cursor = 0
 	])
 }
 
-do()
+main()
 `;
 
 const PRESET_QUIZ = `/// @ ${AISCRIPT_VERSION}
@@ -412,9 +412,9 @@ function selectPreset(ev: MouseEvent) {
 }
 
 async function save() {
-	if (flash.value) {
+	if (flash.value != null) {
 		os.apiWithDialog('flash/update', {
-			flashId: props.id,
+			flashId: flash.value.id,
 			title: title.value,
 			summary: summary.value,
 			permissions: permissions.value,
@@ -444,6 +444,8 @@ function show() {
 }
 
 async function del() {
+	if (flash.value == null) return;
+
 	const { canceled } = await os.confirm({
 		type: 'warning',
 		text: i18n.tsx.deleteAreYouSure({ x: flash.value.title }),
@@ -451,7 +453,7 @@ async function del() {
 	if (canceled) return;
 
 	await os.apiWithDialog('flash/delete', {
-		flashId: props.id,
+		flashId: flash.value.id,
 	});
 	router.push('/play');
 }
@@ -464,6 +466,7 @@ definePage(() => ({
 	title: flash.value ? `${i18n.ts._play.edit}: ${flash.value.title}` : i18n.ts._play.new,
 }));
 </script>
+
 <style lang="scss" module>
 .footer {
 	backdrop-filter: var(--MI-blur, blur(15px));

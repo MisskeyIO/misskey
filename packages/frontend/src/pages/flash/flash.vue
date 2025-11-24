@@ -4,76 +4,77 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-	<PageWithHeader :actions="headerActions" :tabs="headerTabs">
-		<div class="_spacer" style="--MI_SPACER-w: 700px;">
-			<Transition :name="prefer.s.animation ? 'fade' : ''" mode="out-in">
-				<div v-if="flash" :key="flash.id">
-					<Transition :name="prefer.s.animation ? 'zoom' : ''" mode="out-in">
-						<div v-if="started" :class="$style.started">
-							<div class="main _panel">
-								<MkAsUi v-if="root" :component="root" :components="components"/>
-							</div>
-							<div class="actions _panel">
-								<div class="items">
-									<MkButton v-tooltip="i18n.ts.reload" class="button" rounded @click="reset"><i class="ti ti-reload"></i></MkButton>
-								</div>
-								<div class="items">
-									<MkButton v-if="flash.isLiked" v-tooltip="i18n.ts.unlike" asLike class="button" rounded primary @click="unlike()"><i class="ti ti-heart"></i><span v-if="flash?.likedCount && flash.likedCount > 0" style="margin-left: 6px;">{{ flash.likedCount }}</span></MkButton>
-									<MkButton v-else v-tooltip="i18n.ts.like" asLike class="button" rounded @click="like()"><i class="ti ti-heart"></i><span v-if="flash?.likedCount && flash.likedCount > 0" style="margin-left: 6px;">{{ flash.likedCount }}</span></MkButton>
-									<MkButton v-tooltip="i18n.ts.copyLink" class="button" rounded @click="copyLink"><i class="ti ti-link ti-fw"></i></MkButton>
-									<MkButton v-tooltip="i18n.ts.share" class="button" rounded @click="share"><i class="ti ti-share ti-fw"></i></MkButton>
-									<MkButton v-if="$i && $i.id !== flash.user.id" class="button" rounded @mousedown="showMenu"><i class="ti ti-dots ti-fw"></i></MkButton>
-								</div>
-							</div>
+<PageWithHeader :actions="headerActions" :tabs="headerTabs">
+	<div class="_spacer" style="--MI_SPACER-w: 700px;">
+		<Transition :name="prefer.s.animation ? 'fade' : ''" mode="out-in">
+			<div v-if="flash" :key="flash.id">
+				<Transition :name="prefer.s.animation ? 'zoom' : ''" mode="out-in">
+					<div v-if="started" :class="$style.started">
+						<div class="main _panel">
+							<MkAsUi v-if="root" :component="root" :components="components"/>
 						</div>
-						<div v-else :class="$style.ready">
-							<div class="_panel main">
-								<div class="title">{{ flash.title }}</div>
-								<div class="summary"><Mfm :text="flash.summary"/></div>
-								<MkButton class="start" gradate rounded large @click="start">Play</MkButton>
-								<div class="info">
-									<span v-tooltip="i18n.ts.numberOfLikes"><i class="ti ti-heart"></i> {{ flash.likedCount }}</span>
-								</div>
+						<div class="actions _panel">
+							<div class="items">
+								<MkButton v-tooltip="i18n.ts.reload" class="button" rounded @click="reset"><i class="ti ti-reload"></i></MkButton>
 							</div>
-						</div>
-					</Transition>
-					<MkFolder :defaultOpen="false" :max-height="280" class="_margin">
-						<template #icon><i class="ti ti-code"></i></template>
-						<template #label>{{ i18n.ts._play.viewSource }}</template>
-
-						<MkCode :code="flash.script" lang="is" class="_monospace"/>
-					</MkFolder>
-					<div :class="$style.footer">
-						<Mfm :text="`By @${flash.user.username}`"/>
-						<div class="date">
-							<div v-if="flash.createdAt != flash.updatedAt"><i class="ti ti-clock"></i> {{ i18n.ts.updatedAt }}: <MkTime :time="flash.updatedAt" mode="detail"/></div>
-							<div><i class="ti ti-clock"></i> {{ i18n.ts.createdAt }}: <MkTime :time="flash.createdAt" mode="detail"/></div>
+							<div class="items">
+								<MkButton v-if="flash.isLiked" v-tooltip="i18n.ts.unlike" asLike class="button" rounded primary @click="unlike()"><i class="ti ti-heart"></i><span v-if="flash?.likedCount && flash.likedCount > 0" style="margin-left: 6px;">{{ flash.likedCount }}</span></MkButton>
+								<MkButton v-else v-tooltip="i18n.ts.like" asLike class="button" rounded @click="like()"><i class="ti ti-heart"></i><span v-if="flash?.likedCount && flash.likedCount > 0" style="margin-left: 6px;">{{ flash.likedCount }}</span></MkButton>
+								<MkButton v-tooltip="i18n.ts.copyLink" class="button" rounded @click="copyLink"><i class="ti ti-link ti-fw"></i></MkButton>
+								<MkButton v-tooltip="i18n.ts.share" class="button" rounded @click="share"><i class="ti ti-share ti-fw"></i></MkButton>
+								<MkButton v-if="$i && $i.id !== flash.user.id" class="button" rounded @mousedown="showMenu"><i class="ti ti-dots ti-fw"></i></MkButton>
+							</div>
 						</div>
 					</div>
-					<MkA v-if="$i && $i.id === flash.userId" :to="`/play/${flash.id}/edit`" style="color: var(--MI_THEME-accent);">{{ i18n.ts._play.editThisPage }}</MkA>
-					<MkAd :preferForms="['horizontal', 'horizontal-big']"/>
+					<div v-else :class="$style.ready">
+						<div class="_panel main">
+							<div class="title">{{ flash.title }}</div>
+							<div class="summary"><Mfm :text="flash.summary"/></div>
+							<MkButton class="start" gradate rounded large @click="start">Play</MkButton>
+							<div class="info">
+								<span v-tooltip="i18n.ts.numberOfLikes"><i class="ti ti-heart"></i> {{ flash.likedCount }}</span>
+							</div>
+						</div>
+					</div>
+				</Transition>
+				<MkFolder :defaultOpen="false" :max-height="280" class="_margin">
+					<template #icon><i class="ti ti-code"></i></template>
+					<template #label>{{ i18n.ts._play.viewSource }}</template>
+
+					<MkCode :code="flash.script" lang="is" class="_monospace"/>
+				</MkFolder>
+				<div :class="$style.footer">
+					<Mfm :text="`By @${flash.user.username}`"/>
+					<div class="date">
+						<div v-if="flash.createdAt != flash.updatedAt"><i class="ti ti-clock"></i> {{ i18n.ts.updatedAt }}: <MkTime :time="flash.updatedAt" mode="detail"/></div>
+						<div><i class="ti ti-clock"></i> {{ i18n.ts.createdAt }}: <MkTime :time="flash.createdAt" mode="detail"/></div>
+					</div>
 				</div>
-				<MkError v-else-if="error" @retry="fetchFlash()"/>
-				<MkLoading v-else/>
-			</Transition>
-		</div>
-	</PageWithHeader>
+				<MkA v-if="$i && $i.id === flash.userId" :to="`/play/${flash.id}/edit`" style="color: var(--MI_THEME-accent);">{{ i18n.ts._play.editThisPage }}</MkA>
+				<MkAd :preferForms="['horizontal', 'horizontal-big']"/>
+			</div>
+			<MkError v-else-if="error" @retry="fetchFlash()"/>
+			<MkLoading v-else/>
+		</Transition>
+	</div>
+</PageWithHeader>
 </template>
 
 <script lang="ts" setup>
 import { computed, onDeactivated, onUnmounted, ref, watch, shallowRef, defineAsyncComponent } from 'vue';
 import * as Misskey from 'misskey-js';
-import { Interpreter, Parser, values } from '@syuilo/aiscript';
 import { url } from '@@/js/config.js';
 import type { Ref } from 'vue';
 import type { AsUiComponent, AsUiRoot } from '@/aiscript/ui.js';
 import type { MenuItem } from '@/types/menu.js';
+import type { Interpreter } from '@syuilo/aiscript';
 import MkButton from '@/components/MkButton.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import MkAsUi from '@/components/MkAsUi.vue';
+import { getAiScriptVersion } from '@/aiscript/common.js';
 import { registerAsUiLib } from '@/aiscript/ui.js';
 import { aiScriptReadline, createAiScriptEnv } from '@/aiscript/api.js';
 import MkFolder from '@/components/MkFolder.vue';
@@ -180,8 +181,6 @@ async function unlike() {
 
 watch(() => props.id, fetchFlash, { immediate: true });
 
-const parser = new Parser();
-
 const started = ref(false);
 const aiscript = shallowRef<Interpreter | null>(null);
 const root = ref<AsUiRoot>();
@@ -196,9 +195,16 @@ async function run() {
 	if (aiscript.value) aiscript.value.abort();
 	if (!flash.value) return;
 
+	const version = getAiScriptVersion(flash.value.script);
+	const isLegacy = version ? version.major < 1 : false;
+
+	const { Interpreter, Parser, values } = isLegacy ? (await import('@syuilo/aiscript-0-19-0') as any) : await import('@syuilo/aiscript');
+
+	const parser = new Parser();
+
 	components.value = [];
 
-	aiscript.value = new Interpreter({
+	const interpreter = new Interpreter({
 		...createAiScriptEnv({
 			storageKey: 'flash:' + flash.value.id,
 		}),
@@ -217,6 +223,8 @@ async function run() {
 		},
 	});
 
+	aiscript.value = interpreter;
+
 	let ast;
 	try {
 		ast = parser.parse(flash.value.script);
@@ -228,8 +236,8 @@ async function run() {
 		return;
 	}
 	try {
-		await aiscript.value.exec(ast);
-	} catch (err) {
+		await interpreter.exec(ast);
+	} catch (err: any) {
 		os.alert({
 			type: 'error',
 			title: 'AiScript Error',
@@ -238,7 +246,7 @@ async function run() {
 	}
 }
 
-function reportAbuse() {
+async function reportAbuse() {
 	if (!flash.value) return;
 
 	const pageUrl = `${url}/play/${flash.value.id}`;
@@ -364,6 +372,7 @@ definePage(() => ({
 
 			> .items {
 				display: flex;
+				flex-wrap: wrap;
 				justify-content: center;
 				gap: 12px;
 				padding: 16px;

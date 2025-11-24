@@ -33,6 +33,7 @@ export function channel(id = 'somechannelid', name = 'Some Channel', bannerUrl: 
 		description: null,
 		userId: null,
 		bannerUrl,
+		bannerId: null,
 		pinnedNoteIds: [],
 		color: '#000',
 		isArchived: false,
@@ -127,7 +128,7 @@ export function galleryPost(isSensitive = false) {
 	}
 }
 
-export function file(isSensitive = false) {
+export function file(isSensitive = false): entities.DriveFile {
 	return {
 		id: 'somefileid',
 		createdAt: '2016-12-28T22:49:51.000Z',
@@ -207,6 +208,7 @@ export function federationInstance(): entities.FederationInstance {
 		isSuspended: false,
 		suspensionState: 'none',
 		isBlocked: false,
+		isSensitiveMedia: false,
 		softwareName: 'misskey',
 		softwareVersion: '2024.5.0',
 		openRegistrations: false,
@@ -220,8 +222,6 @@ export function federationInstance(): entities.FederationInstance {
 		themeColor: '',
 		infoUpdatedAt: '',
 		latestRequestReceivedAt: '',
-		isMediaSilenced: false,
-		isSensitiveMedia: false,
 	};
 }
 
@@ -396,7 +396,9 @@ export function userDetailed(id = 'someuserid', username = 'miskist', host: enti
 		movedTo: null,
 		alsoKnownAs: null,
 		notify: 'none',
-		memo: null
+		memo: null,
+		canChat: true,
+		chatScope: 'everyone',
 	};
 }
 
@@ -441,26 +443,7 @@ export function role(params: {
 	asBadge?: boolean,
 	canEditMembersByModerator?: boolean,
 	usersCount?: number,
-}, seed?: string): {
-	id: string;
-	name: string;
-	color: string;
-	iconUrl: string | null;
-	description: string;
-	isModerator: boolean;
-	isAdministrator: boolean;
-	displayOrder: number;
-	createdAt: string;
-	updatedAt: string;
-	target: "manual" | "conditional";
-	isPublic: boolean;
-	isExplorable: boolean;
-	asBadge: boolean;
-	canEditMembersByModerator: boolean;
-	usersCount: number;
-	condFormula: { id: string; type: string; values: any[] };
-	policies: {}
-} {
+}, seed?: string): entities.Role {
 	const prefix = params.displayOrder ? params.displayOrder.toString().padStart(3, '0') + '-' : '';
 	const genId = text(36, seed);
 	const createdAt = params.createdAt ?? date({}, seed).toISOString();

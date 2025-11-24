@@ -830,12 +830,19 @@ export async function post(props: PostFormProps = {}): Promise<void> {
 	});
 	showMovedDialog();
 
-	// NOTE: MkPostFormDialogをdynamic importするとiOSでテキストエリアに自動フォーカスできない
-	// NOTE: ただ、dynamic importしない場合、MkPostFormDialogインスタンスが使いまわされ、
-	//       Vueが渡されたコンポーネントに内部的に__propsというプロパティを生やす影響で、
-	//       複数のpost formを開いたときに場合によってはエラーになる
-	//       もちろん複数のpost formを開けること自体Misskeyサイドのバグなのだが
-	await popup(MkPostFormDialog, props, {}, 'closed');
+	return new Promise(async (resolve) => {
+		// NOTE: MkPostFormDialogをdynamic importするとiOSでテキストエリアに自動フォーカスできない
+		// NOTE: ただ、dynamic importしない場合、MkPostFormDialogインスタンスが使いまわされ、
+		//       Vueが渡されたコンポーネントに内部的に__propsというプロパティを生やす影響で、
+		//       複数のpost formを開いたときに場合によってはエラーになる
+		//       もちろん複数のpost formを開けること自体Misskeyサイドのバグなのだが
+		const { dispose } = await popup(MkPostFormDialog, props, {
+			closed: () => {
+				resolve();
+				dispose();
+			},
+		});
+	});
 }
 
 export const deckGlobalEvents = new EventEmitter();

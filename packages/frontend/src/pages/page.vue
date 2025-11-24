@@ -80,9 +80,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<div v-if="page.createdAt != page.updatedAt"><i class="ti ti-clock-edit"></i> {{ i18n.ts.updatedAt }}: <MkTime :time="page.updatedAt" mode="detail"/></div>
 					</div>
 					<div :class="$style.pageLinks">
-						<MkA v-if="!$i || $i.id !== page.userId" :to="`/@${username}/pages/${pageName}/view-source`" class="link">{{ i18n.ts._pages.viewSource }}</MkA>
-						<template v-if="($i && $i.id === page.userId) && page.visibility === 'public'">
-							<MkA :to="`/pages/edit/${page.id}`" class="link">{{ i18n.ts._pages.editThisPage }}</MkA>
+						<MkA :to="`/pages/edit/${page.id}`" class="link">{{ $i?.id === page.userId ? i18n.ts._pages.editThisPage : i18n.ts._pages.viewSource }}</MkA>
+						<template v-if="($i?.id === page.userId) && page.visibility === 'public'">
 							<button v-if="$i.pinnedPageId === page.id" class="link _textButton" @click="pin(false)">{{ i18n.ts.unpin }}</button>
 							<button v-else class="link _textButton" @click="pin(true)">{{ i18n.ts.pin }}</button>
 						</template>

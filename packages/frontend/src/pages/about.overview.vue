@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <div class="_gaps_m">
 	<div :class="$style.banner" :style="{ backgroundImage: `url(${ instance.bannerUrl })` }">
 		<div style="overflow: clip;">
-			<img v-if="kawaiiMode" src="/client-assets/kawaii/misskey.png" alt="" :class="$style.bannerIconAlt"/>
+			<img v-if="kawaiiMode" src="/client-assets/kawaii/misskey-io.png" alt="" :class="$style.bannerIconAlt"/>
 			<img v-else :src="instance.iconUrl ?? instance.faviconUrl ?? '/favicon.ico'" alt="" :class="$style.bannerIcon"/>
 			<Mfm v-if="kawaiiMode" text="Logo by @sawaratsuki@misskey.io" :class="$style.iconCredit"/>
 			<div :class="$style.bannerName">

@@ -1,0 +1,178 @@
+name: Automated Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 0000.00.0-mhq.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Validate version string
+        run: |
+          if [[ ! "${{ github.event.inputs.version }}" =~ -mhq\. ]]; then
+            echo "Error: Version string must contain '-mhq.'"
+            exit 1
+          fi
+          echo "Version validation passed: ${{ github.event.inputs.version }}"
+
+      - name: Create version bump branch
+        run: |
+          BRANCH_NAME="version-bump-${{ github.event.inputs.version }}"
+          git checkout -b $BRANCH_NAME
+
+      - name: Bump version in package.json files
+        run: |
+          # Update root package.json
+          sed -i 's/"version": "[^"]*"/"version": "${{ github.event.inputs.version }}"/' package.json
+
+          # Update misskey-js package.json
+          sed -i 's/"version": "[^"]*"/"version": "${{ github.event.inputs.version }}"/' packages/misskey-js/package.json
+
+      - name: Commit version bump
+        run: |
+          git add package.json packages/misskey-js/package.json
+          git commit -m "Bump up version to ${{ github.event.inputs.version }}"
+
+      - name: Push version bump branch
+        run: |
+          BRANCH_NAME="version-bump-${{ github.event.inputs.version }}"
+          git push origin $BRANCH_NAME
+
+      - name: Create PR to main and enable auto-merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH_NAME="version-bump-${{ github.event.inputs.version }}"
+          PR_URL=$(gh pr create \
+            --base main \
+            --head $BRANCH_NAME \
+            --title "Bump up version to ${{ github.event.inputs.version }}" \
+            --body "Automated version bump to ${{ github.event.inputs.version }}" \
+            --repo ${{ github.repository }})
+
+          echo "PR created: $PR_URL"
+
+          # Extract PR number from URL
+          PR_NUMBER=$(echo $PR_URL | grep -oP '\d+$')
+
+          # Enable auto-merge with subject text including MisskeyIO#<PR_NUMBER>
+          gh pr merge $PR_URL --auto --squash --delete-branch --subject "Bump up version to ${{ github.event.inputs.version }} (MisskeyIO#${PR_NUMBER})"
+
+      - name: Wait for PR to be merged
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH_NAME="version-bump-${{ github.event.inputs.version }}"
+          echo "Waiting for PR to be merged..."
+
+          # Wait up to 5 minutes for the PR to be merged
+          for i in {1..60}; do
+            sleep 5
+
+            # Check if branch still exists (it will be deleted after merge)
+            if ! git ls-remote --heads origin $BRANCH_NAME | grep -q $BRANCH_NAME; then
+              echo "PR has been merged!"
+              break
+            fi
+
+            if [ $i -eq 60 ]; then
+              echo "Timeout waiting for PR to merge"
+              exit 1
+            fi
+          done
+
+      - name: Update local main branch
+        run: |
+          git checkout main
+          git pull origin main
+
+      - name: Create update-io branch and PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH_NAME="update-io-${{ github.event.inputs.version }}"
+          git checkout -b $BRANCH_NAME main
+
+          # Merge io branch into update-io, accepting conflicts
+          git fetch origin io:io
+          git merge io --no-edit --no-commit || true
+
+          # Checkout main's version of package.json files (overwrite any conflicts)
+          git checkout --ours package.json
+          git checkout --ours packages/misskey-js/package.json
+
+          # Replace version string: -mhq. -> -io.
+          IO_VERSION="${{ github.event.inputs.version }}"
+          IO_VERSION="${IO_VERSION//-mhq./-io.}"
+
+          # Update version in package.json files
+          sed -i "s/\"version\": \"[^\"]*\"/\"version\": \"$IO_VERSION\"/" package.json
+          sed -i "s/\"version\": \"[^\"]*\"/\"version\": \"$IO_VERSION\"/" packages/misskey-js/package.json
+
+          git add .
+          git commit -m "Update version to $IO_VERSION for io branch" || git commit -m "Merge main into io with version $IO_VERSION"
+
+          git push origin $BRANCH_NAME
+
+          gh pr create \
+            --base io \
+            --head $BRANCH_NAME \
+            --title "Update io to version $IO_VERSION" \
+            --body "Automated update of io branch to version $IO_VERSION" \
+            --repo ${{ github.repository }} || echo "PR already exists or failed to create"
+
+      - name: Create update-host branch and PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git checkout main
+          BRANCH_NAME="update-host-${{ github.event.inputs.version }}"
+          git checkout -b $BRANCH_NAME main
+
+          # Merge host branch into update-host, accepting conflicts
+          git fetch origin host:host
+          git merge host --no-edit --no-commit || true
+
+          # Checkout main's version of package.json files (overwrite any conflicts)
+          git checkout --ours package.json
+          git checkout --ours packages/misskey-js/package.json
+
+          # Replace version string: -mhq. -> -host.
+          HOST_VERSION="${{ github.event.inputs.version }}"
+          HOST_VERSION="${HOST_VERSION//-mhq./-host.}"
+
+          # Update version in package.json files
+          sed -i "s/\"version\": \"[^\"]*\"/\"version\": \"$HOST_VERSION\"/" package.json
+          sed -i "s/\"version\": \"[^\"]*\"/\"version\": \"$HOST_VERSION\"/" packages/misskey-js/package.json
+
+          git add .
+          git commit -m "Update version to $HOST_VERSION for host branch" || git commit -m "Merge main into host with version $HOST_VERSION"
+
+          git push origin $BRANCH_NAME
+
+          gh pr create \
+            --base host \
+            --head $BRANCH_NAME \
+            --title "Update host to version $HOST_VERSION" \
+            --body "Automated update of host branch to version $HOST_VERSION" \
+            --repo ${{ github.repository }} || echo "PR already exists or failed to create"

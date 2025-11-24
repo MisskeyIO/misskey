@@ -29,7 +29,7 @@ jobs:
 
       - name: Validate version string
         run: |
-          if [[ ! "${{ github.event.inputs.version }}" =~ -mhq\. ]]; then
+          if [[ "${{ github.event.inputs.version }}" != *"-mhq."* ]]; then
             echo "Error: Version string must contain '-mhq.'"
             exit 1
           fi
@@ -73,7 +73,7 @@ jobs:
           echo "PR created: $PR_URL"
 
           # Extract PR number from URL
-          PR_NUMBER=$(echo $PR_URL | grep -oP '\d+$')
+          PR_NUMBER=$(echo $PR_URL | awk -F'/' '{print $NF}')
 
           # Enable auto-merge with subject text including MisskeyIO#<PR_NUMBER>
           gh pr merge $PR_URL --auto --squash --delete-branch --subject "Bump up version to ${{ github.event.inputs.version }} (MisskeyIO#${PR_NUMBER})"

@@ -130,14 +130,14 @@ jobs:
           sed -i "s/\"version\": \"[^\"]*\"/\"version\": \"$IO_VERSION\"/" packages/misskey-js/package.json
 
           git add .
-          git commit -m "Update version to $IO_VERSION for io branch" || git commit -m "Merge main into io with version $IO_VERSION"
+          git commit -m "Merge version ${{ github.event.inputs.version }} into io as $IO_VERSION"
 
           git push origin $BRANCH_NAME
 
           gh pr create \
             --base io \
             --head $BRANCH_NAME \
-            --title "Update io to version $IO_VERSION" \
+            --title "Bump up version to $IO_VERSION" \
             --body "Automated update of io branch to version $IO_VERSION" \
             --repo ${{ github.repository }} || echo "PR already exists or failed to create"
 
@@ -166,13 +166,13 @@ jobs:
           sed -i "s/\"version\": \"[^\"]*\"/\"version\": \"$HOST_VERSION\"/" packages/misskey-js/package.json
 
           git add .
-          git commit -m "Update version to $HOST_VERSION for host branch" || git commit -m "Merge main into host with version $HOST_VERSION"
+          git commit -m "Merge version ${{ github.event.inputs.version }} into host as $HOST_VERSION"
 
           git push origin $BRANCH_NAME
 
           gh pr create \
             --base host \
             --head $BRANCH_NAME \
-            --title "Update host to version $HOST_VERSION" \
+            --title "Bump up version to $HOST_VERSION" \
             --body "Automated update of host branch to version $HOST_VERSION" \
             --repo ${{ github.repository }} || echo "PR already exists or failed to create"

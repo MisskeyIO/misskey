@@ -9,7 +9,6 @@ import pg from 'pg';
 import { DataSource, Logger, type QueryRunner } from 'typeorm';
 import { QueryResultCache } from 'typeorm/cache/QueryResultCache.js';
 import { QueryResultCacheOptions } from 'typeorm/cache/QueryResultCacheOptions.js';
-import * as highlight from 'cli-highlight';
 import { entities as charts } from '@/core/chart/entities.js';
 import { MiAbuseReportResolver } from '@/models/AbuseReportResolver.js';
 import { MiAbuseUserReport } from '@/models/AbuseUserReport.js';
@@ -108,12 +107,6 @@ export type LoggerProps = {
 	printReplicationMode?: boolean,
 };
 
-function highlightSql(sql: string) {
-	return highlight.highlight(sql, {
-		language: 'sql', ignoreIllegals: true,
-	});
-}
-
 function truncateSql(sql: string) {
 	return sql.length > 100 ? `${sql.substring(0, 100)}...` : sql;
 }
@@ -141,7 +134,7 @@ class MyCustomLogger implements Logger {
 
 		if (envOption.logJson) return sql;
 
-		return highlightSql(modded);
+		return modded;
 	}
 
 	@bindThis

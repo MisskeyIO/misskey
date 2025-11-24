@@ -46,7 +46,7 @@ catalog:
   '@rollup/plugin-replace': 6.0.3
   '@rollup/plugin-typescript': 12.3.0
   '@rollup/pluginutils': 5.3.0
-  '@sentry/node': 10.26.0
+  '@sentry/node': 10.27.0
   '@sentry/profiling-node': 10.26.0
   '@sentry/vue': 10.26.0
   '@simplewebauthn/browser': 13.2.2

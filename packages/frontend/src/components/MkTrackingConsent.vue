@@ -1,5 +1,5 @@
 <template>
-<div class="_panel _shadow" :class="$style.root">
+<div class="_panel _shadow" data-focus-trap-interactable="true" :class="$style.root">
 	<div :class="$style.main">
 		<div style="display: flex; align-items: center;">
 			<div :class="$style.headerIcon">

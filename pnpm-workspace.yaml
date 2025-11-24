@@ -234,7 +234,7 @@ catalog:
   mime-types: 3.0.2
   minimatch: 10.1.1
   mock-socket: 9.3.1
-  ms: 3.0.0-canary.1
+  ms: 3.0.0-canary.202508261828
   msw: 2.12.3
   msw-storybook-addon: 2.0.6
   nanoid: 5.1.6

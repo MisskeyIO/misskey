@@ -74,7 +74,7 @@ const $objectStorage: Provider = {
 
 const $userWebhookDeliver: Provider = {
 	provide: 'queue:userWebhookDeliver',
-	useFactory: (config: Config) => new Bull.Queue(QUEUE.USER_WEBHOOK_DELIVER, baseQueueOptions(config.redisForReactions, config.bullmqQueueOptions, QUEUE.USER_WEBHOOK_DELIVER)),
+	useFactory: (config: Config) => new Bull.Queue(QUEUE.USER_WEBHOOK_DELIVER, baseQueueOptions(config.redisForWebhookDeliverQueue, config.bullmqQueueOptions, QUEUE.USER_WEBHOOK_DELIVER)),
 	inject: [DI.config],
 };
 

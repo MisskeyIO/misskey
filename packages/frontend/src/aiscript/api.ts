@@ -4,7 +4,7 @@
  */
 
 import { errors, utils, values } from '@syuilo/aiscript';
-import { nyaize } from 'misskey-js';
+import * as Misskey from 'misskey-js';
 import { url, lang } from '@@/js/config.js';
 import { assertStringAndIsIn } from './common.js';
 import * as os from '@/os.js';
@@ -43,14 +43,15 @@ export function createAiScriptEnv(opts: { storageKey: string, token?: string }) 
 		LOCALE: values.STR(lang),
 		SERVER_URL: values.STR(url),
 		'Mk:dialog': values.FN_NATIVE(async ([title, text, type]) => {
-			utils.assertString(title);
+			if (title?.type !== 'null') utils.assertString(title);
+			else title = undefined;
 			utils.assertString(text);
 			if (type != null) {
 				assertStringAndIsIn(type, DIALOG_TYPES);
 			}
 			await os.alert({
 				type: type ? type.value : 'info',
-				title: title.value,
+				title: title?.value,
 				text: text.value,
 			});
 			return values.NULL;
@@ -67,6 +68,11 @@ export function createAiScriptEnv(opts: { storageKey: string, token?: string }) 
 				text: text.value,
 			});
 			return confirm.canceled ? values.FALSE : values.TRUE;
+		}),
+		'Mk:toast': values.FN_NATIVE(([text]) => {
+			utils.assertString(text);
+			os.toast(text.value);
+			return values.NULL;
 		}),
 		'Mk:api': values.FN_NATIVE(async ([ep, param, token]) => {
 			utils.assertString(ep);
@@ -85,7 +91,7 @@ export function createAiScriptEnv(opts: { storageKey: string, token?: string }) 
 			utils.assertObject(param);
 
 			if (!rateLimiter.hit(ep.value)) return values.ERROR('rate_limited', values.NULL);
-			return misskeyApi(ep.value, utils.valToJs(param), actualToken, undefined, 'aiscript').then(res => {
+			return misskeyApi(ep.value as keyof Misskey.Endpoints, utils.valToJs(param) as object, actualToken, undefined, 'aiscript').then(res => {
 				return utils.jsToVal(res);
 			}, err => {
 				return values.ERROR('request_failed', utils.jsToVal(err));
@@ -111,7 +117,7 @@ export function createAiScriptEnv(opts: { storageKey: string, token?: string }) 
 		}),
 		'Mk:nyaize': values.FN_NATIVE(([text]) => {
 			utils.assertString(text);
-			return values.STR(nyaize(text.value));
+			return values.STR(Misskey.nyaize(text.value));
 		}),
 	};
 }

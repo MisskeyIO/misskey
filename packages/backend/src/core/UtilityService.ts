@@ -11,8 +11,9 @@ import RE2 from 're2';
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import { bindThis } from '@/decorators.js';
 import { MiMeta } from '@/models/Meta.js';
+import { bindThis } from '@/decorators.js';
+import { isPslError } from '@/misc/psl.js';
 import type { IObject } from '@/core/activitypub/type.js';
 
 @Injectable()
@@ -157,7 +158,7 @@ export class UtilityService {
 		const parsedB = psl.parse(hostB);
 
 		// どちらか一方でもパース失敗 or eTLD+1が異なる場合は false
-		if (psl.isPslError(parsedA) || psl.isPslError(parsedB) || parsedA.domain !== parsedB.domain) {
+		if (isPslError(parsedA) || isPslError(parsedB) || parsedA.domain !== parsedB.domain) {
 			return false;
 		}
 

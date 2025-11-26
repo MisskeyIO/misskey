@@ -6,7 +6,7 @@
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 import { Injectable } from '@nestjs/common';
-import * as nsfw from 'nsfwjs';
+import type { NSFWJS, PredictionType } from 'nsfwjs';
 import si from 'systeminformation';
 import { Mutex } from 'async-mutex';
 import { sharpBmp } from '@misskey-dev/sharp-read-bmp';
@@ -24,7 +24,7 @@ let isSupportedCpu: undefined | boolean = undefined;
 @Injectable()
 export class AiService {
 	private logger: Logger;
-	private model: nsfw.NSFWJS;
+	private model: NSFWJS;
 	private modelLoadMutex: Mutex = new Mutex();
 
 	constructor(
@@ -34,7 +34,7 @@ export class AiService {
 	}
 
 	@bindThis
-	public async detectSensitive(path: string, mime: string): Promise<nsfw.PredictionType[] | null> {
+	public async detectSensitive(path: string, mime: string): Promise<PredictionType[] | null> {
 		try {
 			if (isSupportedCpu === undefined) {
 				isSupportedCpu = await this.computeIsSupportedCpu();
@@ -49,6 +49,7 @@ export class AiService {
 			tf.env().global.fetch = fetch;
 
 			if (this.model == null) {
+				const nsfw = await import('nsfwjs');
 				await this.modelLoadMutex.runExclusive(async () => {
 					if (this.model == null) {
 						this.model = await nsfw.load(`file://${_dirname}/../../nsfw-model/`, { size: 299 });

@@ -1921,7 +1921,7 @@ _role:
     canUpdateBioMedia: "Kann ein Profil- oder ein Bannerbild bearbeiten"
     pinMax: "Maximale Anzahl an angehefteten Notizen"
     antennaMax: "Maximale Anzahl an Antennen"
-    wordMuteMax: "Maximale Zeichenlänge für Wortstummschaltungen"
+    wordMuteMax: "Maximale Anzahl stummgeschalteter Wörter"
     webhookMax: "Maximale Anzahl an Webhooks"
     clipMax: "Maximale Anzahl an Clips"
     noteEachClipsMax: "Maximale Anzahl an Notizen innerhalb eines Clips"

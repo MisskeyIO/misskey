@@ -1919,7 +1919,7 @@ _role:
     canUpdateBioMedia: "Permitir a edição de ícone ou imagem do banner."
     pinMax: "Número máximo de notas fixadas"
     antennaMax: "Número máximo de antenas"
-    wordMuteMax: "Número máximo de caracteres nas palavras silenciadas"
+    wordMuteMax: "Número máximo de palavras silenciadas"
     webhookMax: "Número máximo de webhooks"
     clipMax: "Número máximo de clipes"
     noteEachClipsMax: "Número máximo de notas em um clipe"

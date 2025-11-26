@@ -1918,7 +1918,7 @@ _role:
     canUpdateBioMedia: "Può aggiornare foto profilo e di testata"
     pinMax: "Quantità massima di Note in primo piano"
     antennaMax: "Quantità massima di Antenne"
-    wordMuteMax: "Lunghezza massima del filtro parole"
+    wordMuteMax: "Numero massimo di parole silenziate"
     webhookMax: "Quantità massima di Webhook"
     clipMax: "Quantità massima di Clip"
     noteEachClipsMax: "Quantità massima di Note nella Clip"

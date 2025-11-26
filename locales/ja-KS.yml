@@ -1796,7 +1796,7 @@ _role:
     canUpdateBioMedia: "アイコンとバナーの更新を許可"
     pinMax: "ノートピン留めできる数"
     antennaMax: "アンテナ作れる数"
-    wordMuteMax: "ワードミュートの最大文字数"
+    wordMuteMax: "ワードミュートの最大数"
     webhookMax: "Webhook作れる数"
     clipMax: "クリップ作れる数"
     noteEachClipsMax: "クリップの中にノート作れる数"

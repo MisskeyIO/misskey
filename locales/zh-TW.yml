@@ -1922,7 +1922,7 @@ _role:
     canUpdateBioMedia: "允許更新大頭貼和橫幅"
     pinMax: "置頂貼文的最大數量"
     antennaMax: "可建立的天線數量"
-    wordMuteMax: "靜音文字的最大字數"
+    wordMuteMax: "靜音文字的最大數量"
     webhookMax: "可建立的 Webhook 數量"
     clipMax: "可建立的摘錄數量"
     noteEachClipsMax: "摘錄內貼文的最大數量"

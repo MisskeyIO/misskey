@@ -1921,7 +1921,7 @@ _role:
     canUpdateBioMedia: "Permet l'edició d'una icona o un bàner"
     pinMax: "Nombre màxim de notes fixades"
     antennaMax: "Nombre màxim d'antenes"
-    wordMuteMax: "Nombre màxim de caràcters permesos a les paraules silenciades"
+    wordMuteMax: "Nombre màxim de permesos a les paraules silenciades"
     webhookMax: "Nombre màxim de Webhooks"
     clipMax: "Nombre màxim de clips"
     noteEachClipsMax: "Nombre màxim de notes dintre d'un clip"

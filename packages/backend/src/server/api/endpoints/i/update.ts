@@ -344,20 +344,15 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (ps.followingVisibility !== undefined) profileUpdates.followingVisibility = ps.followingVisibility;
 			if (ps.followersVisibility !== undefined) profileUpdates.followersVisibility = ps.followersVisibility;
 			// if (ps.chatScope !== undefined) updates.chatScope = ps.chatScope;
-
-			function checkMuteWordCount(mutedWords: (string[] | string)[], limit: number) {
-				// TODO: ちゃんと数える
-				const length = JSON.stringify(mutedWords).length;
-				if (length > limit) {
+			if (ps.mutedWords !== undefined) {
+				const length = ps.mutedWords.length;
+				if (length > policy.wordMuteLimit) {
 					throw new ApiError(meta.errors.tooManyMutedWords);
 				}
-			}
 
-			function validateMuteWordRegex(mutedWords: (string[] | string)[]) {
-				for (const mutedWord of mutedWords) {
-					if (typeof mutedWord !== 'string') continue;
-
-					const regexp = mutedWord.match(/^\/(.+)\/(.*)$/);
+				// validate regular expression syntax
+				ps.mutedWords.filter(x => !Array.isArray(x)).forEach(x => {
+					const regexp = RegExp(/^\/(.+)\/(.*)$/).exec(x as string);
 					if (!regexp) throw new ApiError(meta.errors.invalidRegexp);
 
 					try {
@@ -365,18 +360,11 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					} catch (err) {
 						throw new ApiError(meta.errors.invalidRegexp);
 					}
-				}
-			}
-
-			if (ps.mutedWords !== undefined) {
-				policies ??= await this.roleService.getUserPolicies(user.id);
-				checkMuteWordCount(ps.mutedWords, policies.wordMuteLimit);
-				validateMuteWordRegex(ps.mutedWords);
+				});
 
 				profileUpdates.mutedWords = ps.mutedWords;
 				profileUpdates.enableWordMute = ps.mutedWords.length > 0;
 			}
-
 			if (ps.mutedInstances !== undefined) profileUpdates.mutedInstances = ps.mutedInstances;
 			if (ps.notificationRecieveConfig !== undefined) profileUpdates.notificationRecieveConfig = ps.notificationRecieveConfig;
 			if (typeof ps.isLocked === 'boolean') updates.isLocked = ps.isLocked;

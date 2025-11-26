@@ -91,27 +91,3 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=ghcr.io/misskeyio/misskey:buildcache-${{ env.BRANCH_NAME }}
           cache-to: type=registry,ref=ghcr.io/misskeyio/misskey:buildcache-${{ env.BRANCH_NAME }},mode=max
-      - name: Docker meta (with telemetry)
-        id: meta-telemetry
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/misskeyio/misskey
-          flavor: |
-            suffix=-telemetry
-          tags: |
-            type=ref,event=branch
-            type=ref,event=tag
-            type=semver,pattern={{version}}
-      - name: Build and Push to GitHub Container Registry (with telemetry)
-        uses: docker/build-push-action@v6
-        with:
-          builder: ${{ steps.buildx.outputs.name }}
-          context: .
-          file: Dockerfile.with-telemetry
-          build-args: |
-            BASE_IMAGE=ghcr.io/misskeyio/misskey@${{ steps.build.outputs.digest }}
-          push: true
-          platforms: ${{ steps.buildx.outputs.platforms }}
-          provenance: false
-          tags: ${{ steps.meta-telemetry.outputs.tags }}
-          labels: ${{ steps.meta-telemetry.outputs.labels }}

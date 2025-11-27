@@ -31,10 +31,12 @@ const resourceAttributes = {
   'k8s.node.name': process.env.K8S_NODE_NAME,
 };
 
-Object.keys(resourceAttributes).forEach((key) => resourceAttributes[key] === undefined && delete resourceAttributes[key]);
+const filteredAttributes = Object.fromEntries(
+  Object.entries(resourceAttributes).filter(([_, value]) => value !== undefined)
+);
 
 const sdk = new NodeSDK({
-  resource: Resource.default().merge(new Resource(resourceAttributes)),
+  resource: Resource.default().merge(new Resource(filteredAttributes)),
   traceExporter,
   metricReader: new PeriodicExportingMetricReader({ exporter: metricExporter }),
   instrumentations: [getNodeAutoInstrumentations()],
@@ -46,11 +48,11 @@ sdk.start()
   })
   .catch((error) => {
     console.error('Error initializing OpenTelemetry', error);
+    console.warn('WARNING: Application is running without telemetry. If telemetry is critical for your deployment, please investigate the initialization error above.');
   });
 
 process.once('SIGTERM', () => {
   sdk.shutdown()
     .then(() => console.log('OpenTelemetry SDK shut down'))
-    .catch((err) => console.error('Error during OpenTelemetry shutdown', err))
-    .finally(() => process.exit(0));
+    .catch((err) => console.error('Error during OpenTelemetry shutdown', err));
 });

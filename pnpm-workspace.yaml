@@ -40,14 +40,14 @@ catalog:
   '@nestjs/platform-express': 11.1.9
   '@nestjs/testing': 11.1.9
   '@opensearch-project/opensearch': 3.5.1
-  '@opentelemetry/api': latest
-  '@opentelemetry/auto-instrumentations-node': latest
-  '@opentelemetry/exporter-metrics-otlp-http': latest
-  '@opentelemetry/exporter-trace-otlp-http': latest
-  '@opentelemetry/resources': latest
-  '@opentelemetry/sdk-metrics': latest
-  '@opentelemetry/sdk-node': latest
-  '@opentelemetry/semantic-conventions': latest
+  '@opentelemetry/api': ^1.9.0
+  '@opentelemetry/auto-instrumentations-node': ^0.67.0
+  '@opentelemetry/exporter-metrics-otlp-http': ^0.208.0
+  '@opentelemetry/exporter-trace-otlp-http': ^0.208.0
+  '@opentelemetry/resources': ^2.2.0
+  '@opentelemetry/sdk-metrics': ^2.2.0
+  '@opentelemetry/sdk-node': ^0.208.0
+  '@opentelemetry/semantic-conventions': ^1.38.0
   '@peertube/http-signature': 1.7.0
   '@readme/openapi-parser': 5.2.1
   '@rollup/plugin-json': 6.1.0

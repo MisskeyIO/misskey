@@ -94,28 +94,28 @@ catalogs:
       specifier: 3.5.1
       version: 3.5.1
     '@opentelemetry/api':
-      specifier: latest
+      specifier: ^1.9.0
       version: 1.9.0
     '@opentelemetry/auto-instrumentations-node':
-      specifier: latest
+      specifier: ^0.67.0
       version: 0.67.2
     '@opentelemetry/exporter-metrics-otlp-http':
-      specifier: latest
+      specifier: ^0.208.0
       version: 0.208.0
     '@opentelemetry/exporter-trace-otlp-http':
-      specifier: latest
+      specifier: ^0.208.0
       version: 0.208.0
     '@opentelemetry/resources':
-      specifier: latest
+      specifier: ^2.2.0
       version: 2.2.0
     '@opentelemetry/sdk-metrics':
-      specifier: latest
+      specifier: ^2.2.0
       version: 2.2.0
     '@opentelemetry/sdk-node':
-      specifier: latest
+      specifier: ^0.208.0
       version: 0.208.0
     '@opentelemetry/semantic-conventions':
-      specifier: latest
+      specifier: ^1.38.0
       version: 1.38.0
     '@peertube/http-signature':
       specifier: 1.7.0

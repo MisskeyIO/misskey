@@ -601,6 +601,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				expiresAt: expiresAt,
 				memo: memo,
 			});
+
 			if (existing.expiresAt && (existing.expiresAt.getTime() < now)) {
 				created = await this.roleAssignmentsRepository.findOneByOrFail({ id: existing.id });
 			}
@@ -649,6 +650,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			});
 			existing = null;
 		}
+
 		if (!existing) {
 			throw new IdentifiableError('b9060ac7-5c94-4da4-9f55-2047c953df44', 'User was not assigned to this role.');
 		}

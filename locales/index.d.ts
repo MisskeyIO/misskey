@@ -7977,7 +7977,7 @@ export interface Locale extends ILocale {
              */
             "antennaNotesMax": string;
             /**
-             * ワードミュートの最大文字数
+             * ワードミュートの最大数
              */
             "wordMuteMax": string;
             /**

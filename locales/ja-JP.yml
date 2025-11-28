@@ -2060,7 +2060,7 @@ _role:
     pinMax: "ノートのピン留めの最大数"
     antennaMax: "アンテナの作成可能数"
     antennaNotesMax: "アンテナに保持する最大ノート数"
-    wordMuteMax: "ワードミュートの最大文字数"
+    wordMuteMax: "ワードミュートの最大数"
     webhookMax: "Webhookの作成可能数"
     clipMax: "クリップの作成可能数"
     noteEachClipsMax: "クリップ内のノートの最大数"

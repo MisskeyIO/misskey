@@ -319,8 +319,8 @@ export class DriveService {
 				type !== 'image/svg+xml' && // security reason
 				type !== 'image/avif' && // not supported by Mastodon and MS Edge
 			!(metadata.exif ?? metadata.iptc ?? metadata.xmp ?? metadata.tifftagPhotoshop) &&
-			metadata.width && metadata.width <= 2048 &&
-			metadata.height && metadata.height <= 2048
+			metadata.width && metadata.width <= 4096 &&
+			metadata.height && metadata.height <= 4096
 			);
 		} catch (err) {
 			this.registerLogger.warn(`sharp failed: ${err}`);
@@ -338,9 +338,9 @@ export class DriveService {
 
 			try {
 				if (['image/jpeg', 'image/webp', 'image/avif'].includes(type)) {
-					webpublic = await this.imageProcessingService.convertSharpToWebp(img, 2048, 2048);
+					webpublic = await this.imageProcessingService.convertSharpToWebp(img, 4096, 4096);
 				} else if (['image/png', 'image/bmp', 'image/svg+xml'].includes(type)) {
-					webpublic = await this.imageProcessingService.convertSharpToPng(img, 2048, 2048);
+					webpublic = await this.imageProcessingService.convertSharpToPng(img, 4096, 4096);
 				} else {
 					this.registerLogger.debug('web image not created (not an required image)');
 				}

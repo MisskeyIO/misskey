@@ -1645,7 +1645,7 @@ _role:
     canManageAvatarDecorations: "Gestion des décorations d'avatar"
     driveCapacity: "Capacité de stockage du Disque"
     antennaMax: "Nombre maximum d'antennes"
-    wordMuteMax: "Nombre maximal de caractères dans le filtre de mots"
+    wordMuteMax: "Nombre maximal de mots dans le filtre de mots"
     canUseTranslator: "Usage de la fonctionnalité de traduction"
     avatarDecorationLimit: "Nombre maximal de décorations d'avatar"
     canImportAntennas: "Autoriser l'importation d'antennes"

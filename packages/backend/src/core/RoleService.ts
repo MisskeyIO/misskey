@@ -141,8 +141,6 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	private rolesCache: MemorySingleCache<MiRole[]>;
 	private roleAssignmentByUserIdCache: MemoryKVCache<MiRoleAssignment[]>;
 	private notificationService: NotificationService;
-	public static AlreadyAssignedError = class extends Error {};
-	public static NotAssignedError = class extends Error {};
 
 	constructor(
 		private moduleRef: ModuleRef,
@@ -589,39 +587,24 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			userId: userId,
 		});
 
-		if (existing) {
-			if (existing.expiresAt && (existing.expiresAt.getTime() < now)) {
-				await this.roleAssignmentsRepository.delete({
-					roleId: roleId,
-					userId: userId,
-				});
-			} else {
-				throw new RoleService.AlreadyAssignedError();
-			}
-		}
+		let created: MiRoleAssignment | undefined;
 		if (!existing) {
-			const created = await this.roleAssignmentsRepository.insertOne({
+			created = await this.roleAssignmentsRepository.insertOne({
 				id: this.idService.gen(now),
 				expiresAt: expiresAt,
 				roleId: roleId,
 				userId: userId,
 				memo: memo,
 			});
-
-			this.globalEventService.publishInternalEvent('userRoleAssigned', created);
-
-			const user = await this.usersRepository.findOneByOrFail({ id: userId });
-
-			if (role.isPublic && user.host === null) {
-				this.notificationService.createNotification(userId, 'roleAssigned', {
-					roleId: roleId,
-				});
-			}
-		} else if (existing.expiresAt !== expiresAt || existing.memo !== memo) {
+		} else if (existing.expiresAt?.getTime() !== expiresAt?.getTime() || existing.memo !== memo) {
 			await this.roleAssignmentsRepository.update(existing.id, {
 				expiresAt: expiresAt,
 				memo: memo,
 			});
+
+			if (existing.expiresAt && (existing.expiresAt.getTime() < now)) {
+				created = await this.roleAssignmentsRepository.findOneByOrFail({ id: existing.id });
+			}
 		} else {
 			throw new IdentifiableError('67d8689c-25c6-435f-8ced-631e4b81fce1', 'User is already assigned to this role.');
 		}
@@ -631,6 +614,16 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		});
 
 		const user = await this.usersRepository.findOneByOrFail({ id: userId });
+
+		if (created) {
+			this.globalEventService.publishInternalEvent('userRoleAssigned', created);
+
+			if (role.isPublic && user.host === null) {
+				this.notificationService.createNotification(userId, 'roleAssigned', {
+					roleId: roleId,
+				});
+			}
+		}
 
 		if (moderator) {
 			this.moderationLogService.log(moderator, 'assignRole', {
@@ -649,15 +642,17 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	public async unassign(userId: MiUser['id'], roleId: MiRole['id'], moderator?: MiUser): Promise<void> {
 		const now = new Date();
 
-		const existing = await this.roleAssignmentsRepository.findOneBy({ roleId, userId });
-		if (existing == null) {
-			throw new RoleService.NotAssignedError();
-		} else if (existing.expiresAt && (existing.expiresAt.getTime() < now.getTime())) {
+		let existing = await this.roleAssignmentsRepository.findOneBy({ roleId, userId });
+		if (existing?.expiresAt && (existing.expiresAt.getTime() < now.getTime())) {
 			await this.roleAssignmentsRepository.delete({
 				roleId: roleId,
 				userId: userId,
 			});
-			throw new RoleService.NotAssignedError();
+			existing = null;
+		}
+
+		if (!existing) {
+			throw new IdentifiableError('b9060ac7-5c94-4da4-9f55-2047c953df44', 'User was not assigned to this role.');
 		}
 
 		await this.roleAssignmentsRepository.delete(existing.id);

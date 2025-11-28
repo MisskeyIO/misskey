@@ -27,6 +27,7 @@ import PerUserFollowingChart from '@/core/chart/charts/per-user-following.js';
 import { SystemAccountService } from '@/core/SystemAccountService.js';
 import { RoleService } from '@/core/RoleService.js';
 import { AntennaService } from '@/core/AntennaService.js';
+import { IdentifiableError } from '@/misc/identifiable-error.js';
 
 @Injectable()
 export class AccountMoveService {
@@ -236,9 +237,9 @@ export class AccountMoveService {
 			if (!role.preserveAssignmentOnMoveAccount) continue;
 
 			try {
-				await this.roleService.assign(dst.id, role.id, oldRoleAssignment.expiresAt ? oldRoleAssignment.expiresAt.toISOString() : null);
+				await this.roleService.assign(dst.id, role.id, oldRoleAssignment.memo, oldRoleAssignment.expiresAt);
 			} catch (e) {
-				if (e instanceof RoleService.AlreadyAssignedError) continue;
+				if (e instanceof IdentifiableError && e.id === '67d8689c-25c6-435f-8ced-631e4b81fce1') continue;
 				throw e;
 			}
 		}

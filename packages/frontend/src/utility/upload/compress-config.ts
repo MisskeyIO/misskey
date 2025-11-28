@@ -28,8 +28,8 @@ export async function getCompressionConfig(file: File): Promise<BrowserImageResi
 	}
 
 	return {
-		maxWidth: 2048,
-		maxHeight: 2048,
+		maxWidth: 4096,
+		maxHeight: 4096,
 		debug: true,
 		...imgConfig,
 	};

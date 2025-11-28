@@ -2033,7 +2033,7 @@ _role:
     canUpdateBioMedia: "아바타 및 배너 이미지 변경 허용"
     pinMax: "고정할 수 있는 노트 수"
     antennaMax: "만들 수 있는 안테나 수"
-    wordMuteMax: "단어 뮤트할 수 있는 문자 수"
+    wordMuteMax: "단어 뮤트할 수 있는 최대 수"
     webhookMax: "만들 수 있는 Webhook 수"
     clipMax: "만들 수 있는 클립 수"
     noteEachClipsMax: "클립에 넣을 수 있는 노트 수"

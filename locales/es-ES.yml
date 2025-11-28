@@ -1864,7 +1864,7 @@ _role:
     alwaysMarkNsfw: "Siempre marcar archivos como NSFW"
     pinMax: "Máximo de notas fijadas"
     antennaMax: "Máximo de antenas"
-    wordMuteMax: "Máximo de caracteres en palabras silenciadas"
+    wordMuteMax: "Máximo de palabras silenciadas"
     webhookMax: "Máximo de Webhooks"
     clipMax: "Máximo de clips"
     noteEachClipsMax: "Máximo de notas con clip"

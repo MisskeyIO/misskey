@@ -1,4 +1,0 @@
-ARG BASE_IMAGE=ghcr.io/misskeyio/misskey:main
-FROM ${BASE_IMAGE}
-
-RUN npm install --prefix ./telemetry --no-audit --no-fund --omit=dev @instana/collector

@@ -72,7 +72,7 @@ ARG GID="991"
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
 	curl ffmpeg libmimalloc-dev libmimalloc2.0 tini \
-	&& ln -s /usr/lib/$(uname -m)-linux-gnu/libmimalloc.so.2.0 /usr/local/lib/libmimalloc.so \
+	&& ln -s /usr/lib/$(uname -m)-linux-gnu/libmimalloc.so.2 /usr/local/lib/libmimalloc.so \
 	&& groupadd -g "${GID}" misskey \
 	&& useradd -l -u "${UID}" -g "${GID}" -m -d /misskey misskey \
 	&& find / -type d -path /sys -prune -o -type d -path /proc -prune -o -type f -perm /u+s -ignore_readdir_race -exec chmod u-s {} \; \

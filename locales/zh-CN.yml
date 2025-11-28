@@ -1939,7 +1939,7 @@ _role:
     canUpdateBioMedia: "可以更新头像和横幅"
     pinMax: "帖子置顶数量限制"
     antennaMax: "可创建的最大天线数量"
-    wordMuteMax: "隐藏词的字数限制"
+    wordMuteMax: "隐藏词的最大数量限制"
     webhookMax: "Webhook 创建数量限制"
     clipMax: "便签创建数量限制"
     noteEachClipsMax: "单个便签内的贴文数量限制"

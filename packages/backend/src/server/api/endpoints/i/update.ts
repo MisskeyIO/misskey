@@ -350,17 +350,26 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					throw new ApiError(meta.errors.tooManyMutedWords);
 				}
 
-				// validate regular expression syntax
-				ps.mutedWords.filter(x => !Array.isArray(x)).forEach(x => {
-					const regexp = RegExp(/^\/(.+)\/(.*)$/).exec(x as string);
-					if (!regexp) throw new ApiError(meta.errors.invalidRegexp);
+				const validateRegex = (value: string): void => {
+					const match = /^\/(.+)\/(.*)$/.exec(value);
+					if (!match) return;
 
 					try {
-						new RE2(regexp[1], regexp[2]);
-					} catch (err) {
+						new RE2(match[1], match[2]);
+					} catch {
 						throw new ApiError(meta.errors.invalidRegexp);
 					}
-				});
+				};
+
+				for (const entry of ps.mutedWords) {
+					if (Array.isArray(entry)) {
+						for (const value of entry) {
+							validateRegex(value);
+						}
+					} else {
+						validateRegex(entry);
+					}
+				}
 
 				profileUpdates.mutedWords = ps.mutedWords;
 				profileUpdates.enableWordMute = ps.mutedWords.length > 0;

@@ -50,16 +50,16 @@ const CROCKFORD_TO_STANDARD_MAP: readonly string[] = (() => {
 })();
 
 function normalizeCrockfordBase32(str: string): string {
-	let result = '';
+	const result: string[] = new Array(str.length);
 	for (let i = 0; i < str.length; i++) {
 		const charCode = str.charCodeAt(i);
 		const normalized = CROCKFORD_TO_STANDARD_MAP[charCode];
 		if (normalized === undefined) {
 			throw new Error(`Invalid Crockford Base32 character: '${str[i]}'`);
 		}
-		result += normalized;
+		result[i] = normalized;
 	}
-	return result;
+	return result.join('');
 }
 
 export function parseBigIntCrockfordBase32(str: string): bigint {

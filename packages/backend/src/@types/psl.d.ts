@@ -61,9 +61,4 @@ declare module 'psl' {
 	 * An array of TLDs used to parse domains.
 	 */
 	export const rules: string[];
-
-	// type guard
-	type PslParseResult = ReturnType<typeof parse>;
-	type PslErrorResult = Extract<PslParseResult, { error: unknown }>;
-	const isPslError = (result: PslParseResult): result is PslErrorResult => 'error' in result;
 }

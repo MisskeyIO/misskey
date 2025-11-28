@@ -1438,7 +1438,7 @@ _role:
     alwaysMarkNsfw: "Vždy označovat soubory jako NSFW"
     pinMax: "Maximální počet připnutých poznámek"
     antennaMax: "Maximální počet antén"
-    wordMuteMax: "Maximální počet znaků povolených v ztlumených slovech"
+    wordMuteMax: "Maximální počet ztlumených slov"
     webhookMax: "Maximální počet Webhooků"
     clipMax: "Maximální počet připnutí"
     noteEachClipsMax: "Maximální počet poznámek v připnutí"

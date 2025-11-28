@@ -19610,6 +19610,9 @@ export interface operations {
                     urlPreviewUserAgent?: string | null;
                     urlPreviewSummaryProxyUrl?: string | null;
                     prohibitedWordsForNameOfUser?: string[] | null;
+                    /** @enum {string} */
+                    federation?: 'all' | 'none' | 'specified';
+                    federationHosts?: string[];
                 };
             };
         };
@@ -31362,6 +31365,10 @@ export interface operations {
                      * @enum {string}
                      */
                     origin?: 'combined' | 'local' | 'remote';
+                    /** Format: misskey:id */
+                    sinceId?: string;
+                    /** Format: misskey:id */
+                    untilId?: string;
                 };
             };
         };

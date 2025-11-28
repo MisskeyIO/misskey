@@ -71,8 +71,8 @@ ARG GID="991"
 
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
-	curl ffmpeg libjemalloc-dev libjemalloc2 tini \
-	&& ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so \
+	curl ffmpeg libmimalloc-dev libmimalloc2.0 tini \
+	&& ln -s /usr/lib/$(uname -m)-linux-gnu/libmimalloc.so.2 /usr/local/lib/libmimalloc.so \
 	&& groupadd -g "${GID}" misskey \
 	&& useradd -l -u "${UID}" -g "${GID}" -m -d /misskey misskey \
 	&& find / -type d -path /sys -prune -o -type d -path /proc -prune -o -type f -perm /u+s -ignore_readdir_race -exec chmod u-s {} \; \
@@ -101,8 +101,8 @@ COPY --chown=misskey:misskey --from=native-builder /misskey/fluent-emojis /missk
 COPY --chown=misskey:misskey . ./
 
 USER misskey
-ENV LD_PRELOAD=/usr/local/lib/libjemalloc.so
-ENV MALLOC_CONF=background_thread:true,metadata_thp:auto,dirty_decay_ms:30000,muzzy_decay_ms:30000
+ENV LD_PRELOAD=/usr/local/lib/libmimalloc.so
+ENV MIMALLOC_LARGE_OS_PAGES=0
 ENV TF_CPP_MIN_LOG_LEVEL=2
 ENV NODE_ENV=production
 HEALTHCHECK --interval=5s --retries=20 CMD ["/bin/bash", "/misskey/healthcheck.sh"]

@@ -246,9 +246,9 @@ export class NotificationService implements OnApplicationShutdown {
 
 	private toXListId(id: string): string {
 		const { date, additional } = this.idService.parseFull(id);
-		// Redis stream ID の sequence 部分は 64 ビットまでなので、additional の下位 64 ビットのみを使用
-		const sequence = additional & ((1n << 64n) - 1n);
-		return date.toString() + '-' + sequence.toString();
+		// additional の下位 24 ビットのみを使用
+		const sequence = additional & ((1n << 24n) - 1n);
+		return `${date}-${sequence}`;
 	}
 
 	@bindThis

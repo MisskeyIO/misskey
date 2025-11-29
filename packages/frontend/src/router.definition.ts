@@ -469,10 +469,6 @@ export const ROUTE_DEF: RouteDef[] = [{
 		name: 'email-settings',
 		component: page(() => import('@/pages/admin/email-settings.vue')),
 	}, {
-		path: '/object-storage',
-		name: 'object-storage',
-		component: page(() => import('@/pages/admin/object-storage.vue')),
-	}, {
 		path: '/security',
 		name: 'security',
 		component: page(() => import('@/pages/admin/security.vue')),

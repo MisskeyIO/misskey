@@ -99,7 +99,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<template #caption>{{ i18n.ts.urlPreviewDenyListDescription }}</template>
 					</MkTextarea>
 
-					<MkButton primary @click="save_hiddenTags">{{ i18n.ts.save }}</MkButton>
+					<MkButton primary @click="save_urlSettings">{{ i18n.ts.save }}</MkButton>
 				</MkFolder>
 			</div>
 		</FormSuspense>
@@ -141,6 +141,8 @@ async function init() {
 	prohibitedWordsForNameOfUser.value = meta.prohibitedWordsForNameOfUser.join('\n');
 	hiddenTags.value = meta.hiddenTags.join('\n');
 	preservedUsernames.value = meta.preservedUsernames.join('\n');
+	wellKnownWebsites.value = meta.wellKnownWebsites.join('\n');
+	urlPreviewDenyList.value = meta.urlPreviewDenyList.join('\n');
 }
 
 async function onChange_enableRegistration(value: boolean) {
@@ -167,9 +169,6 @@ async function onChange_emailRequiredForSignup(value: boolean) {
 	}).then(() => {
 		fetchInstance(true);
 	});
-	const meta = await misskeyApi('admin/meta');
-	wellKnownWebsites.value = meta.wellKnownWebsites.join('\n');
-	urlPreviewDenyList.value = meta.urlPreviewDenyList.join('\n');
 }
 
 function save_preservedUsernames() {
@@ -207,6 +206,15 @@ function save_prohibitedWordsForNameOfUser() {
 function save_hiddenTags() {
 	os.apiWithDialog('admin/update-meta', {
 		hiddenTags: hiddenTags.value.split('\n'),
+	}).then(() => {
+		fetchInstance(true);
+	});
+}
+
+function save_urlSettings() {
+	os.apiWithDialog('admin/update-meta', {
+		wellKnownWebsites: wellKnownWebsites.value.split('\n'),
+		urlPreviewDenyList: urlPreviewDenyList.value.split('\n'),
 	}).then(() => {
 		fetchInstance(true);
 	});

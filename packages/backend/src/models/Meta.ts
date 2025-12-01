@@ -177,16 +177,6 @@ export class MiMeta {
 	@Column('boolean', {
 		default: false,
 	})
-	public cacheRemoteFiles: boolean;
-
-	@Column('boolean', {
-		default: true,
-	})
-	public cacheRemoteSensitiveFiles: boolean;
-
-	@Column('boolean', {
-		default: false,
-	})
 	public emailRequiredForSignup: boolean;
 
 	@Column('boolean', {
@@ -414,78 +404,6 @@ export class MiMeta {
 		nullable: true,
 	})
 	public defaultDarkTheme: string | null;
-
-	@Column('boolean', {
-		default: false,
-	})
-	public useObjectStorage: boolean;
-
-	@Column('varchar', {
-		length: 1024,
-		nullable: true,
-	})
-	public objectStorageBucket: string | null;
-
-	@Column('varchar', {
-		length: 1024,
-		nullable: true,
-	})
-	public objectStoragePrefix: string | null;
-
-	@Column('varchar', {
-		length: 1024,
-		nullable: true,
-	})
-	public objectStorageBaseUrl: string | null;
-
-	@Column('varchar', {
-		length: 1024,
-		nullable: true,
-	})
-	public objectStorageEndpoint: string | null;
-
-	@Column('varchar', {
-		length: 1024,
-		nullable: true,
-	})
-	public objectStorageRegion: string | null;
-
-	@Column('varchar', {
-		length: 1024,
-		nullable: true,
-	})
-	public objectStorageAccessKey: string | null;
-
-	@Column('varchar', {
-		length: 1024,
-		nullable: true,
-	})
-	public objectStorageSecretKey: string | null;
-
-	@Column('integer', {
-		nullable: true,
-	})
-	public objectStoragePort: number | null;
-
-	@Column('boolean', {
-		default: true,
-	})
-	public objectStorageUseSSL: boolean;
-
-	@Column('boolean', {
-		default: true,
-	})
-	public objectStorageUseProxy: boolean;
-
-	@Column('boolean', {
-		default: false,
-	})
-	public objectStorageSetPublicRead: boolean;
-
-	@Column('boolean', {
-		default: true,
-	})
-	public objectStorageS3ForcePathStyle: boolean;
 
 	@Column('boolean', {
 		default: false,

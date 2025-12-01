@@ -190,8 +190,8 @@ catalogs:
       specifier: 8.6.14
       version: 8.6.14
     '@storybook/react':
-      specifier: 10.1.1
-      version: 10.1.1
+      specifier: 10.1.2
+      version: 10.1.2
     '@storybook/react-vite':
       specifier: 10.1.1
       version: 10.1.1
@@ -2049,7 +2049,7 @@ importers:
         version: 8.6.14(storybook@10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5))
       '@storybook/react':
         specifier: 'catalog:'
-        version: 10.1.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(storybook@10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5))(typescript@5.9.3)
+        version: 10.1.2(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(storybook@10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5))(typescript@5.9.3)
       '@storybook/react-vite':
         specifier: 'catalog:'
         version: 10.1.1(esbuild@0.27.0)(msw@2.12.3(@types/node@24.10.1)(typescript@5.9.3))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(rollup@4.53.3)(storybook@10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5))(typescript@5.9.3)(vite@7.2.4(@types/node@24.10.1)(sass@1.94.2)(terser@5.44.1)(tsx@4.20.6))
@@ -5679,6 +5679,13 @@ packages:
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       storybook: ^10.1.1
 
+  '@storybook/react-dom-shim@10.1.2':
+    resolution: {integrity: sha512-HxmL6rD99qaZervm3S/g0QjflSpCk31kZX6+guLBD85KzH+sgo7XNjlipNqfdzAOfWpri0rh6zEGyNI0erFlag==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      storybook: ^10.1.2
+
   '@storybook/react-dom-shim@8.6.14':
     resolution: {integrity: sha512-0hixr3dOy3f3M+HBofp3jtMQMS+sqzjKNgl7Arfuj3fvjmyXOks/yGjDImySR4imPtEllvPZfhiQNlejheaInw==}
     peerDependencies:
@@ -5700,6 +5707,17 @@ packages:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       storybook: ^10.1.1
+      typescript: '>= 4.9.x'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@storybook/react@10.1.2':
+    resolution: {integrity: sha512-9fWP4EdQ2nYCtKr9wHGFrzxb/osPv0wJ3bbcZxZ1xN6RyDFDFBkwBJpl7NN+3KTFloXZJXYOkkc5rqmbMPi0fA==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      storybook: ^10.1.2
       typescript: '>= 4.9.x'
     peerDependenciesMeta:
       typescript:
@@ -16628,6 +16646,12 @@ snapshots:
       react-dom: 19.2.0(react@19.2.0)
       storybook: 10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5)
 
+  '@storybook/react-dom-shim@10.1.2(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(storybook@10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5))':
+    dependencies:
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
+      storybook: 10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5)
+
   '@storybook/react-dom-shim@8.6.14(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(storybook@10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5))':
     dependencies:
       react: 19.2.0
@@ -16661,6 +16685,19 @@ snapshots:
     dependencies:
       '@storybook/global': 5.0.0
       '@storybook/react-dom-shim': 10.1.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(storybook@10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5))
+      react: 19.2.0
+      react-docgen: 8.0.2
+      react-dom: 19.2.0(react@19.2.0)
+      storybook: 10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5)
+    optionalDependencies:
+      typescript: 5.9.3
+    transitivePeerDependencies:
+      - supports-color
+
+  '@storybook/react@10.1.2(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(storybook@10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5))(typescript@5.9.3)':
+    dependencies:
+      '@storybook/global': 5.0.0
+      '@storybook/react-dom-shim': 10.1.2(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(storybook@10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5))
       react: 19.2.0
       react-docgen: 8.0.2
       react-dom: 19.2.0(react@19.2.0)

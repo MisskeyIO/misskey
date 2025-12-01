@@ -166,8 +166,8 @@ catalogs:
       specifier: 8.6.14
       version: 8.6.14
     '@storybook/addon-links':
-      specifier: 10.1.1
-      version: 10.1.1
+      specifier: 10.1.2
+      version: 10.1.2
     '@storybook/addon-mdx-gfm':
       specifier: 8.6.14
       version: 8.6.14
@@ -2025,7 +2025,7 @@ importers:
         version: 8.6.14(storybook@10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5))
       '@storybook/addon-links':
         specifier: 'catalog:'
-        version: 10.1.1(react@19.2.0)(storybook@10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5))
+        version: 10.1.2(react@19.2.0)(storybook@10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5))
       '@storybook/addon-mdx-gfm':
         specifier: 'catalog:'
         version: 8.6.14(storybook@10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5))
@@ -5551,11 +5551,11 @@ packages:
     peerDependencies:
       storybook: ^8.6.14
 
-  '@storybook/addon-links@10.1.1':
-    resolution: {integrity: sha512-AWKxa2pdonbOj9GlDPXomugi/5CE741s/HTB1BAEzM59udGcU2OnIrZV8x5MZ2lU9YW1KkmepaPsYWlmSeZuPw==}
+  '@storybook/addon-links@10.1.2':
+    resolution: {integrity: sha512-xaXdzbIWeBjjlMbq2qZKiIRpp5+Rwo654xL0BczHLpKtSNvUWmvIUUuTWIMzGFi76obTsVZL5aJ22BCh9991Qw==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-      storybook: ^10.1.1
+      storybook: ^10.1.2
     peerDependenciesMeta:
       react:
         optional: true
@@ -16509,7 +16509,7 @@ snapshots:
       storybook: 10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5)
       ts-dedent: 2.2.0
 
-  '@storybook/addon-links@10.1.1(react@19.2.0)(storybook@10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5))':
+  '@storybook/addon-links@10.1.2(react@19.2.0)(storybook@10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5))':
     dependencies:
       '@storybook/global': 5.0.0
       storybook: 10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5)

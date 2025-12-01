@@ -205,8 +205,8 @@ catalogs:
       specifier: 8.6.14
       version: 8.6.14
     '@storybook/vue3':
-      specifier: 10.1.1
-      version: 10.1.1
+      specifier: 10.1.2
+      version: 10.1.2
     '@storybook/vue3-vite':
       specifier: 10.1.1
       version: 10.1.1
@@ -2064,7 +2064,7 @@ importers:
         version: 8.6.14(storybook@10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5))
       '@storybook/vue3':
         specifier: 'catalog:'
-        version: 10.1.1(storybook@10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5))(vue@3.5.25(typescript@5.9.3))
+        version: 10.1.2(storybook@10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5))(vue@3.5.25(typescript@5.9.3))
       '@storybook/vue3-vite':
         specifier: 'catalog:'
         version: 10.1.1(esbuild@0.27.0)(msw@2.12.3(@types/node@24.10.1)(typescript@5.9.3))(rollup@4.53.3)(storybook@10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5))(vite@7.2.4(@types/node@24.10.1)(sass@1.94.2)(terser@5.44.1)(tsx@4.20.6))(vue@3.5.25(typescript@5.9.3))
@@ -5735,6 +5735,12 @@ packages:
     resolution: {integrity: sha512-UCggA+BW390iZ4T2+tRiRt/dbw4QIj28AhQIf4bj6nVLrQS7Th0CRb3Bew1zHoHfQI0YeF3giOIePYirhu8V4Q==}
     peerDependencies:
       storybook: ^10.1.1
+      vue: ^3.0.0
+
+  '@storybook/vue3@10.1.2':
+    resolution: {integrity: sha512-aENHIjVCqv02rqZYo5qzVwRNRQsrNuY0Blh0Gt+y+hm3A62x0GvXfOjk+LKC+clwM6KEqYpe2jlqaTtP/Rifag==}
+    peerDependencies:
+      storybook: ^10.1.2
       vue: ^3.0.0
 
   '@stylistic/eslint-plugin@5.6.1':
@@ -16714,6 +16720,14 @@ snapshots:
       - webpack
 
   '@storybook/vue3@10.1.1(storybook@10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5))(vue@3.5.25(typescript@5.9.3))':
+    dependencies:
+      '@storybook/global': 5.0.0
+      storybook: 10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5)
+      type-fest: 2.19.0
+      vue: 3.5.25(typescript@5.9.3)
+      vue-component-type-helpers: 3.1.5
+
+  '@storybook/vue3@10.1.2(storybook@10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5))(vue@3.5.25(typescript@5.9.3))':
     dependencies:
       '@storybook/global': 5.0.0
       storybook: 10.1.1(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(utf-8-validate@6.0.5)

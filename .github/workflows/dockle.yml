@@ -32,11 +32,14 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          load: true
           push: false
           provenance: false
           cache-from: type=registry,ref=ghcr.io/misskeyio/misskey:io-buildcache
           tags: |
             misskey:scan
+      - name: Export image as tar for Dockle
+        run: docker save misskey:scan -o misskey-scan.tar
       - name: Run dockle
         uses: docker://goodwithtech/dockle:v0.4.15
         env:
@@ -46,4 +49,4 @@ jobs:
           DOCKLE_IGNORES: CIS-DI-0005,CIS-DI-0010
           DOCKLE_DEBUG: true
         with:
-          args: 'misskey:scan'
+          args: '--input misskey-scan.tar'

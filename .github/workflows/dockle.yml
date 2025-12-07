@@ -12,11 +12,12 @@ on:
 
 permissions:
   contents: read
-  packages: read
+  packages: write
 
 jobs:
   dockle:
     runs-on: ubuntu-latest
+    if: github.repository == 'MisskeyIO/misskey'
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -28,15 +29,43 @@ jobs:
         run: |
           set -euo pipefail
           printf '%s\n' "$(git rev-parse --short HEAD)" > .git-commit
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Prepare image metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ref_type="${{ github.ref_type }}"
+          ref_name="$(echo ${{ github.ref_name }} | sed -e 's/\//-/g')"
+
+          branch_name="main"
+          case "${ref_type}" in
+            branch)
+              branch_name="${ref_name}"
+              ;;
+            tag)
+              if [[ "${ref_name}" =~ -([a-zA-Z0-9]+)\..* ]]; then
+                branch_name="${BASH_REMATCH[1]}"
+              fi
+              ;;
+          esac
+
+          echo "BRANCH_NAME=${branch_name}" >> "${GITHUB_ENV}"
       - name: Build an image from Dockerfile
         uses: docker/build-push-action@v6
+        id: build-scan
         with:
           context: .
-          push: false
+          push: true
           provenance: false
-          cache-from: type=registry,ref=ghcr.io/misskeyio/misskey:io-buildcache
+          cache-from: type=registry,ref=ghcr.io/misskeyio/misskey:buildcache-${{ env.BRANCH_NAME }}
           tags: |
-            misskey:scan
+            ghcr.io/misskeyio/misskey:scan
       - name: Run dockle
         uses: docker://goodwithtech/dockle:v0.4.15
         env:
@@ -46,4 +75,4 @@ jobs:
           DOCKLE_IGNORES: CIS-DI-0005,CIS-DI-0010
           DOCKLE_DEBUG: true
         with:
-          args: 'misskey:scan'
+          args: 'ghcr.io/misskeyio/misskey@${{ steps.build-scan.outputs.digest }}'

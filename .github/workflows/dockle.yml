@@ -28,6 +28,27 @@ jobs:
         run: |
           set -euo pipefail
           printf '%s\n' "$(git rev-parse --short HEAD)" > .git-commit
+      - name: Prepare image metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ref_type="${{ github.ref_type }}"
+          ref_name="$(echo ${{ github.ref_name }} | sed -e 's/\//-/g')"
+
+          branch_name="main"
+          case "${ref_type}" in
+            branch)
+              branch_name="${ref_name}"
+              ;;
+            tag)
+              if [[ "${ref_name}" =~ -([a-zA-Z0-9]+)\..* ]]; then
+                branch_name="${BASH_REMATCH[1]}"
+              fi
+              ;;
+          esac
+
+          echo "BRANCH_NAME=${branch_name}" >> "${GITHUB_ENV}"
       - name: Build an image from Dockerfile
         uses: docker/build-push-action@v6
         with:
@@ -35,11 +56,9 @@ jobs:
           load: true
           push: false
           provenance: false
-          cache-from: type=registry,ref=ghcr.io/misskeyio/misskey:io-buildcache
+          cache-from: type=registry,ref=ghcr.io/misskeyio/misskey:buildcache-${{ env.BRANCH_NAME }}
           tags: |
             misskey:scan
-      - name: Export image as tar for Dockle
-        run: docker save misskey:scan -o misskey-scan.tar
       - name: Run dockle
         uses: docker://goodwithtech/dockle:v0.4.15
         env:
@@ -49,4 +68,4 @@ jobs:
           DOCKLE_IGNORES: CIS-DI-0005,CIS-DI-0010
           DOCKLE_DEBUG: true
         with:
-          args: '--input misskey-scan.tar'
+          args: 'misskey:scan'

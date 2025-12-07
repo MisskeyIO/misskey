@@ -53,19 +53,25 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          load: true
           push: false
           provenance: false
           cache-from: type=registry,ref=ghcr.io/misskeyio/misskey:buildcache-${{ env.BRANCH_NAME }}
           tags: |
             misskey:scan
       - name: Run dockle
-        uses: docker://goodwithtech/dockle:v0.4.15
         env:
           DOCKLE_OUTPUT_FORMAT: list
           DOCKLE_EXIT_CODE: 1
           DOCKLE_EXIT_LEVEL: WARN
           DOCKLE_IGNORES: CIS-DI-0005,CIS-DI-0010
           DOCKLE_DEBUG: true
-        with:
-          args: 'misskey:scan'
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -e DOCKLE_OUTPUT_FORMAT \
+            -e DOCKLE_EXIT_CODE \
+            -e DOCKLE_EXIT_LEVEL \
+            -e DOCKLE_IGNORES \
+            -e DOCKLE_DEBUG \
+            goodwithtech/dockle:v0.4.15 \
+            misskey:scan

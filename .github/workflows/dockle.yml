@@ -51,13 +51,14 @@ jobs:
           echo "BRANCH_NAME=${branch_name}" >> "${GITHUB_ENV}"
       - name: Build an image from Dockerfile
         uses: docker/build-push-action@v6
+        id: build-scan
         with:
           context: .
           push: false
           provenance: false
           cache-from: type=registry,ref=ghcr.io/misskeyio/misskey:buildcache-${{ env.BRANCH_NAME }}
           tags: |
-            ghcr.io/misskeyio/misskey:scan
+            misskey:scan
       - name: Run dockle
         uses: docker://goodwithtech/dockle:v0.4.15
         env:
@@ -67,4 +68,4 @@ jobs:
           DOCKLE_IGNORES: CIS-DI-0005,CIS-DI-0010
           DOCKLE_DEBUG: true
         with:
-          args: 'ghcr.io/misskeyio/misskey:scan'
+          args: 'misskey@${{ steps.build-scan.outputs.digest }}'

@@ -17,6 +17,7 @@ permissions:
 jobs:
   dockle:
     runs-on: ubuntu-latest
+    if: github.repository == 'MisskeyIO/misskey'
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -28,6 +29,12 @@ jobs:
         run: |
           set -euo pipefail
           printf '%s\n' "$(git rev-parse --short HEAD)" > .git-commit
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Prepare image metadata
         shell: bash
         run: |

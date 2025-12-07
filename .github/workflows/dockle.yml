@@ -12,7 +12,7 @@ on:
 
 permissions:
   contents: read
-  packages: read
+  packages: write
 
 jobs:
   dockle:
@@ -54,11 +54,11 @@ jobs:
         id: build-scan
         with:
           context: .
-          push: false
+          push: true
           provenance: false
           cache-from: type=registry,ref=ghcr.io/misskeyio/misskey:buildcache-${{ env.BRANCH_NAME }}
           tags: |
-            misskey:scan
+            ghcr.io/misskeyio/misskey:scan
       - name: Run dockle
         uses: docker://goodwithtech/dockle:v0.4.15
         env:
@@ -68,4 +68,4 @@ jobs:
           DOCKLE_IGNORES: CIS-DI-0005,CIS-DI-0010
           DOCKLE_DEBUG: true
         with:
-          args: 'misskey@${{ steps.build-scan.outputs.digest }}'
+          args: 'ghcr.io/misskeyio/misskey@${{ steps.build-scan.outputs.digest }}'

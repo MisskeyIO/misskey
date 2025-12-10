@@ -1,4 +1,4 @@
-name: Dockle
+name: Test (docker build)
 
 on:
   push:
@@ -15,7 +15,7 @@ permissions:
   packages: write
 
 jobs:
-  dockle:
+  docker:
     runs-on: ubuntu-latest
     if: github.repository == 'MisskeyIO/misskey'
     steps:
@@ -66,13 +66,15 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/misskeyio/misskey:buildcache-${{ env.BRANCH_NAME }}
           tags: |
             ghcr.io/misskeyio/misskey:scan
-      - name: Run dockle
-        uses: docker://goodwithtech/dockle:v0.4.15
+      - name: Run Snyk to check Docker image for vulnerabilities
+        uses: snyk/actions/docker@master
+        continue-on-error: true
         env:
-          DOCKLE_OUTPUT_FORMAT: list
-          DOCKLE_EXIT_CODE: 1
-          DOCKLE_EXIT_LEVEL: WARN
-          DOCKLE_IGNORES: CIS-DI-0005,CIS-DI-0010
-          DOCKLE_DEBUG: true
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: 'ghcr.io/misskeyio/misskey@${{ steps.build-scan.outputs.digest }}'
+          image: 'ghcr.io/misskeyio/misskey@${{ steps.build-scan.outputs.digest }}'
+          sarif: true
+      - name: Upload result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: snyk.sarif

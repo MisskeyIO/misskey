@@ -73,7 +73,7 @@ import MkNewPassword from '@/components/MkNewPassword.vue';
 import type { Captcha } from '@/components/MkCaptcha.vue';
 import MkCaptcha from '@/components/MkCaptcha.vue';
 import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
+import { generateClientTransactionId, misskeyApi } from '@/utility/misskey-api.js';
 import { instance } from '@/instance.js';
 import { i18n } from '@/i18n.js';
 import { login } from '@/accounts.js';
@@ -210,7 +210,9 @@ async function onSubmit(): Promise<void> {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
+			'X-Client-Transaction-Id': generateClientTransactionId('signup'),
 		},
+		credentials: 'include',
 		body: JSON.stringify(signupPayload),
 	}).catch(() => {
 		onSignupApiError();

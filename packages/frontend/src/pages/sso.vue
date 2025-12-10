@@ -20,6 +20,7 @@ import MkAnimBg from '@/components/MkAnimBg.vue';
 import { definePage } from '@/page.js';
 import MkAuthConfirm from '@/components/MkAuthConfirm.vue';
 import { $i } from '@/i.js';
+import { generateClientTransactionId } from '@/utility/misskey-api.js';
 
 const transactionIdMeta = window.document.querySelector<HTMLMetaElement>('meta[name="misskey:sso:transaction-id"]');
 if (transactionIdMeta) {
@@ -35,8 +36,10 @@ const authRoot = useTemplateRef('authRoot');
 async function onAccept(token: string) {
 	const result = await window.fetch(`/sso/${kind}/authorize`, {
 		method: 'POST',
+		credentials: 'include',
 		headers: {
 			'Content-Type': 'application/json',
+			'X-Client-Transaction-Id': generateClientTransactionId('sso'),
 		},
 		body: JSON.stringify({
 			transaction_id: transactionIdMeta?.content,

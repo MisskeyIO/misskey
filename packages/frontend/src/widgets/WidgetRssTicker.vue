@@ -37,6 +37,7 @@ import MkContainer from '@/components/MkContainer.vue';
 import { shuffle } from '@/utility/shuffle.js';
 import { url as base } from '@@/js/config.js';
 import { useInterval } from '@@/js/use-interval.js';
+import { generateClientTransactionId } from '@/utility/misskey-api.js';
 
 const name = 'rssTicker';
 
@@ -110,7 +111,12 @@ const key = ref(0);
 const tick = () => {
 	if (window.document.visibilityState === 'hidden' && rawItems.value.length !== 0) return;
 
-	window.fetch(fetchEndpoint.value, {})
+	window.fetch(fetchEndpoint.value, {
+		credentials: 'include',
+		headers: {
+			'X-Client-Transaction-Id': generateClientTransactionId('widget-rss-ticker'),
+		},
+	})
 		.then(res => res.json())
 		.then((feed: Misskey.entities.FetchRssResponse) => {
 			rawItems.value = feed.items;

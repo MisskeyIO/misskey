@@ -53,6 +53,7 @@ export function sendUsageReport() {
 		method: 'POST',
 		body: JSON.stringify(data),
 		cache: 'no-cache',
+		credentials: 'include',
 		headers: {
 			'Content-Type': 'application/json',
 			'X-Client-Transaction-Id': generateClientTransactionId('misskey'),

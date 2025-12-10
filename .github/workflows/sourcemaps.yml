@@ -1,0 +1,124 @@
+name: Upload Sentry sourcemaps
+
+on:
+  push:
+    branches:
+      - main
+      - next
+      - beta
+      - io
+      - host
+    tags:
+      - '**-mhq.*'
+      - '**-io.*'
+      - '**-host.*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    if: github.repository == 'MisskeyIO/misskey'
+
+    strategy:
+      matrix:
+        node-version: [22.x]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: true
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+
+      - name: Build project with sourcemaps
+        env:
+          NODE_ENV: production
+        run: pnpm build
+
+      - name: Collect release version
+        id: release
+        run: echo "version=$(node -p \"require('./package.json').version\")" >> "$GITHUB_OUTPUT"
+
+      - name: Upload backend and library sourcemaps to Sentry
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT_BACKEND }}
+          SENTRY_URL: ${{ secrets.SENTRY_URL }}
+        with:
+          release: ${{ steps.release.outputs.version }}
+          sourcemaps: |
+            packages/backend/built
+            packages/misskey-js/built
+          url_prefix: "~/"
+          ignore_empty: true
+          ignore_missing: true
+          finalize: true
+
+      - name: Upload frontend vite sourcemaps to Sentry
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT_FRONTEND }}
+          SENTRY_URL: ${{ secrets.SENTRY_URL }}
+        with:
+          release: ${{ steps.release.outputs.version }}
+          sourcemaps: built/_frontend_vite_
+          url_prefix: "~/vite/"
+          ignore_empty: true
+          ignore_missing: true
+          finalize: false
+
+      - name: Upload embed vite sourcemaps to Sentry
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT_FRONTEND }}
+          SENTRY_URL: ${{ secrets.SENTRY_URL }}
+        with:
+          release: ${{ steps.release.outputs.version }}
+          sourcemaps: built/_frontend_embed_vite_
+          url_prefix: "~/embed_vite/"
+          ignore_empty: true
+          ignore_missing: true
+          finalize: false
+
+      - name: Upload frontend and library sourcemaps to Sentry
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT_FRONTEND }}
+          SENTRY_URL: ${{ secrets.SENTRY_URL }}
+        with:
+          release: ${{ steps.release.outputs.version }}
+          sourcemaps: |
+            packages/misskey-js/built
+            packages/misskey-reversi/built
+            packages/misskey-bubble-game/built
+            packages/frontend-shared/js-built
+            built/_sw_dist_
+          url_prefix: "~/"
+          ignore_empty: true
+          ignore_missing: true
+          finalize: true

@@ -9,6 +9,7 @@ on:
       - io
       - host
     tags:
+      - '**-mhq.*'
       - '**-io.*'
       - '**-host.*'
   workflow_dispatch:

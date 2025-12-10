@@ -56,6 +56,7 @@
     "eslint-plugin-vue": "catalog:",
     "fast-glob": "catalog:",
     "jsdom": "catalog:",
+    "lightningcss": "catalog:",
     "micromatch": "catalog:",
     "msw": "catalog:",
     "nodemon": "catalog:",

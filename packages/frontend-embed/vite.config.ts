@@ -150,6 +150,7 @@ export function getConfig(): UserConfig {
 				},
 			},
 			cssCodeSplit: true,
+			cssMinify: 'lightningcss',
 			outDir: __dirname + '/../../built/_frontend_embed_vite_',
 			assetsDir: '.',
 			emptyOutDir: false,

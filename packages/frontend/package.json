@@ -132,6 +132,7 @@
     "eslint-plugin-vue": "catalog:",
     "fast-glob": "catalog:",
     "jsdom": "catalog:",
+    "lightningcss": "catalog:",
     "micromatch": "catalog:",
     "minimatch": "catalog:",
     "msw": "catalog:",

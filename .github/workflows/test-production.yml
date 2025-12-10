@@ -57,4 +57,5 @@ jobs:
       uses: github/codeql-action/upload-sarif@v4
       continue-on-error: true
       with:
+        category: Snyk Node.js Vulnerability Scan Result
         sarif_file: snyk.sarif

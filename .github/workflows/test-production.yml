@@ -46,3 +46,16 @@ jobs:
       run: cp .github/misskey/test.yml .config/default.yml
     - name: Build
       run: pnpm build
+    - name: Run Snyk to check for vulnerabilities
+      uses: snyk/actions/node@master
+      continue-on-error: true
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --all-projects --sarif-file-output=snyk.sarif
+    - name: Upload result to GitHub Code Scanning
+      uses: github/codeql-action/upload-sarif@v4
+      continue-on-error: true
+      with:
+        category: Snyk Node.js Vulnerability Scan Result
+        sarif_file: snyk.sarif

@@ -8,7 +8,7 @@
 		"noUnusedLocals": false,
 		"noFallthroughCasesInSwitch": true,
 		"declaration": false,
-		"sourceMap": false,
+		"sourceMap": true,
 		"target": "ESNext",
 		"module": "NodeNext",
 		"moduleResolution": "nodenext",

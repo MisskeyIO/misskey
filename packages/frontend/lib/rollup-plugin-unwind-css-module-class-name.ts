@@ -7,6 +7,7 @@ import { generate } from 'astring';
 import { walk } from '../node_modules/estree-walker/src/index.js';
 import type * as estree from 'estree';
 import type * as estreeWalker from 'estree-walker';
+import type { SourceMapInput } from 'rollup';
 import type { Plugin } from 'vite';
 
 function isFalsyIdentifier(identifier: estree.Identifier): boolean {
@@ -474,10 +475,11 @@ export function unwindCssModuleClassName(ast: estree.Node): void {
 export default function pluginUnwindCssModuleClassName(): Plugin {
 	return {
 		name: 'UnwindCssModuleClassName',
-		renderChunk(code): { code: string } {
+		renderChunk(code, chunk): { code: string; map: SourceMapInput | null } {
 			const ast = this.parse(code) as unknown as estree.Node;
 			unwindCssModuleClassName(ast);
-			return { code: generate(ast) };
+			const generated = generate(ast, { sourceMap: chunk.fileName, sourceMapWithCode: true });
+			return { code: generated.code, map: generated.map?.toJSON() ?? null };
 		},
 	};
 }

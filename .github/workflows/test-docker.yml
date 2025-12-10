@@ -78,9 +78,10 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           image: 'ghcr.io/misskeyio/misskey@${{ steps.build-scan.outputs.digest }}'
-          sarif: true
+          args: --sarif-file-output=snyk.sarif
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v4
         continue-on-error: true
         with:
+          category: Snyk Docker Vulnerability Scan Result
           sarif_file: snyk.sarif

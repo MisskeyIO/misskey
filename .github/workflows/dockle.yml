@@ -75,4 +75,4 @@ jobs:
           DOCKLE_IGNORES: CIS-DI-0005,CIS-DI-0010
           DOCKLE_DEBUG: true
         with:
-          args: 'ghcr.io/misskeyio/misskey@${{ steps.build-scan.outputs.digest }}'
+          args: 'ghcr.io/misskeyio/misskey@${{ steps.build-scan.outputs.imageid }}'

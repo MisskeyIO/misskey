@@ -41,7 +41,7 @@ jobs:
           set -euo pipefail
 
           ref_type="${{ github.ref_type }}"
-          ref_name="$(echo ${{ github.ref_name }} | sed -e 's/\//-/g')"
+          ref_name="$(echo ${{ github.base_ref || github.ref_name }} | sed -e 's/\//-/g')"
 
           branch_name="main"
           case "${ref_type}" in
@@ -75,4 +75,4 @@ jobs:
           DOCKLE_IGNORES: CIS-DI-0005,CIS-DI-0010
           DOCKLE_DEBUG: true
         with:
-          args: 'ghcr.io/misskeyio/misskey@${{ steps.build-scan.outputs.imageid }}'
+          args: 'ghcr.io/misskeyio/misskey@sha256:${{ steps.build-scan.outputs.digest }}'

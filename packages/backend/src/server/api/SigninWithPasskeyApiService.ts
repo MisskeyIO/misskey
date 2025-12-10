@@ -48,7 +48,7 @@ export class SigninWithPasskeyApiService {
 		private webAuthnService: WebAuthnService,
 		private loggerService: LoggerService,
 	) {
-		this.logger = this.loggerService.getLogger('PasskeyAuth');
+		this.logger = this.loggerService.getLogger('api:signin:passkey');
 	}
 
 	@bindThis
@@ -61,11 +61,11 @@ export class SigninWithPasskeyApiService {
 		}>,
 		reply: FastifyReply,
 	) {
-		reply.header('Access-Control-Allow-Origin', this.config.url);
-		reply.header('Access-Control-Allow-Credentials', 'true');
-
 		const body = request.body;
 		const credential = body['credential'];
+
+		this.logger.setContext({ credential: credential?.id, ip: request.ip, headers: request.headers, span: request.headers['x-client-transaction-id'] ?? randomUUID() });
+		this.logger.info('Requested to sign in with passkey.');
 
 		function error(status: number, error: { id: string }) {
 			reply.code(status);

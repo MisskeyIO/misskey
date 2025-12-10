@@ -66,6 +66,11 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/misskeyio/misskey:buildcache-${{ env.BRANCH_NAME }}
           tags: |
             ghcr.io/misskeyio/misskey:scan
+      - name: Remove docker build cache
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker builder prune -f
       - name: Run Snyk to check Docker image for vulnerabilities
         uses: snyk/actions/docker@master
         continue-on-error: true

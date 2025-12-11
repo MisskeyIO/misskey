@@ -90,18 +90,22 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const sanitizedPolicies = ps.policies.map(policy => this.validatePolicyInput(policy));
 			const before = (await this.userInlinePoliciesRepository.findBy({ userId: user.id })).map(this.serialize);
 
-			await this.userInlinePoliciesRepository.delete({ userId: user.id });
+			await this.userInlinePoliciesRepository.manager.transaction(async (manager) => {
+				await manager.delete(MiUserInlinePolicy, { userId: user.id });
 
-			await this.userInlinePoliciesRepository.insert(
-				sanitizedPolicies.map(inlinePolicy => ({
-					id: this.idService.gen(),
-					userId: user.id,
-					policy: inlinePolicy.policy,
-					operation: inlinePolicy.operation,
-					value: inlinePolicy.value,
-					memo: inlinePolicy.memo ?? null,
-				}))
-			);
+				if (sanitizedPolicies.length > 0) {
+					await manager.insert(MiUserInlinePolicy,
+						sanitizedPolicies.map(inlinePolicy => ({
+							id: this.idService.gen(),
+							userId: user.id,
+							policy: inlinePolicy.policy,
+							operation: inlinePolicy.operation,
+							value: inlinePolicy.value,
+							memo: inlinePolicy.memo ?? null,
+						}))
+					);
+                }
+			});
 
 			this.roleService.clearInlinePolicyCache(user.id);
 			const after = (await this.userInlinePoliciesRepository.findBy({ userId: user.id })).map(this.serialize);

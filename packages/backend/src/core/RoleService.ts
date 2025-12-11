@@ -505,10 +505,14 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				const delta = Number(inline.value ?? 0);
 				if (Number.isFinite(delta) && typeof updated[policyName] === 'number') {
 					// @ts-expect-error both variables should be number
-					updated[policyName] += delta;
+					(updated[policyName] as number) += delta;
 				}
 				continue;
 			}
+
+			const currentType = typeof updated[policyName];
+			const valueType = typeof inline.value;
+			if (inline.value !== null && currentType !== valueType) continue;
 
 			// @ts-expect-error overwrite to configured value
 			if (inline.value !== undefined) updated[policyName] = inline.value;

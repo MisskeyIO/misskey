@@ -14,7 +14,7 @@ import * as lolex from '@sinonjs/fake-timers';
 import type { TestingModule } from '@nestjs/testing';
 import type { MockMetadata } from 'jest-mock';
 import { GlobalModule } from '@/GlobalModule.js';
-import { RoleService } from '@/core/RoleService.js';
+import { RoleService, DEFAULT_POLICIES } from '@/core/RoleService.js';
 import {
 	MiMeta,
 	MiRole,
@@ -36,7 +36,6 @@ import { secureRndstr } from '@/misc/secure-rndstr.js';
 import { NotificationService } from '@/core/NotificationService.js';
 import { RoleCondFormulaValue } from '@/models/Role.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
-import { DEFAULT_POLICIES } from '@/core/RoleService.js';
 
 const moduleMocker = new ModuleMocker(global);
 

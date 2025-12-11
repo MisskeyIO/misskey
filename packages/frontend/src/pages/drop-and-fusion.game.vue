@@ -197,6 +197,7 @@ import * as Misskey from 'misskey-js';
 import { DropAndFusionGame } from 'misskey-bubble-game';
 import { useInterval } from '@@/js/use-interval.js';
 import { apiUrl } from '@@/js/config.js';
+import { generateClientTransactionId } from '@/utility/misskey-api.js';
 import type { Mono } from 'misskey-bubble-game';
 import { definePage } from '@/page.js';
 import MkRippleEffect from '@/components/MkRippleEffect.vue';
@@ -915,7 +916,9 @@ function getGameImageDriveFile() {
 					method: 'POST',
 					headers: {
 						'Authorization': `Bearer ${$i!.token}`,
+						'X-Client-Transaction-Id': generateClientTransactionId('bubble-game-share'),
 					},
+					credentials: 'include',
 					body: formData,
 				})
 					.then(response => response.json())

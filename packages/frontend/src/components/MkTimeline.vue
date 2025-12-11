@@ -114,7 +114,7 @@ async function fulfillNoteData(data) {
 	if (!data.visibility) {
 		const res = await window.fetch(`/notes/${data.id}.json`, {
 			method: 'GET',
-			credentials: 'omit',
+			credentials: 'include',
 			headers: {
 				'Authorization': 'anonymous',
 				'X-Client-Transaction-Id': generateClientTransactionId('misskey'),

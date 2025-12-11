@@ -79,9 +79,6 @@ export class SigninApiService {
 		logger.setContext({ username: request.body.username, ip: request.ip, headers: request.headers, span: request.headers['x-client-transaction-id'] ?? randomUUID() });
 		logger.info('Requested to sign in.');
 
-		reply.header('Access-Control-Allow-Origin', this.config.url);
-		reply.header('Access-Control-Allow-Credentials', 'true');
-
 		const body = request.body;
 		const username = body['username'];
 		const password = body['password'];

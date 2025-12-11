@@ -14,6 +14,7 @@ import { alert } from '@/os.js';
 import { i18n } from '@/i18n.js';
 import { instance } from '@/instance.js';
 import { prefer } from '@/preferences.js';
+import { generateClientTransactionId } from '@/utility/misskey-api.js';
 
 type Uploading = {
 	id: string;
@@ -99,7 +100,9 @@ export function uploadFile(
 
 			const xhr = new XMLHttpRequest();
 			xhr.open('POST', apiUrl + '/drive/files/create', true);
+			xhr.withCredentials = true;
 			xhr.setRequestHeader('Authorization', `Bearer ${$i!.token}`);
+			xhr.setRequestHeader('X-Client-Transaction-Id', generateClientTransactionId('upload'));
 			xhr.onload = ((ev: ProgressEvent<XMLHttpRequest>) => {
 				if (xhr.status !== 200 || ev.target == null || ev.target.response == null) {
 					// TODO: 消すのではなくて(ネットワーク的なエラーなら)再送できるようにしたい

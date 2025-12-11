@@ -4458,6 +4458,18 @@ export interface Locale extends ILocale {
      */
     "sensitiveWordsDescription2": string;
     /**
+     * ブロックするリモートカスタム絵文字
+     */
+    "blockedRemoteCustomEmojis": string;
+    /**
+     * name または name@host が一致するリモートカスタム絵文字を取得・表示しません。改行で区切って複数設定できます。
+     */
+    "blockedRemoteCustomEmojisDescription": string;
+    /**
+     * スペースで区切るとAND指定になり、キーワードをスラッシュで囲むと正規表現になります。
+     */
+    "blockedRemoteCustomEmojisDescription2": string;
+    /**
      * 禁止ワード
      */
     "prohibitedWords": string;

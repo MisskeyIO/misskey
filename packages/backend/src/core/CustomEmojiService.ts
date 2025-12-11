@@ -392,6 +392,7 @@ export class CustomEmojiService implements OnApplicationShutdown {
 		const { name, host } = this.parseEmojiStr(emojiName, noteUserHost);
 		if (name == null) return null;
 		if (host == null) return null;
+		if (this.utilityService.isBlockedRemoteCustomEmoji(name, host)) return null;
 
 		const queryOrNull = async () => (await this.emojisRepository.findOneBy({
 			name,
@@ -425,7 +426,9 @@ export class CustomEmojiService implements OnApplicationShutdown {
 	 */
 	@bindThis
 	public async prefetchEmojis(emojis: { name: string; host: string | null; }[]): Promise<void> {
-		const notCachedEmojis = emojis.filter(emoji => this.emojisCache.get(`${emoji.name} ${emoji.host}`) == null);
+		const notCachedEmojis = emojis
+			.filter(emoji => this.emojisCache.get(`${emoji.name} ${emoji.host}`) == null)
+			.filter(emoji => !this.utilityService.isBlockedRemoteCustomEmoji(emoji.name, emoji.host));
 		const emojisQuery: any[] = [];
 		const hosts = new Set(notCachedEmojis.map(e => e.host));
 		for (const host of hosts) {

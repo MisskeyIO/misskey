@@ -41,6 +41,11 @@ export const paramDef = {
 				type: 'string',
 			},
 		},
+		blockedRemoteCustomEmojis: {
+			type: 'array', nullable: true, items: {
+				type: 'string',
+			},
+		},
 		prohibitedWords: {
 			type: 'array', nullable: true, items: {
 				type: 'string',
@@ -225,6 +230,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (Array.isArray(ps.sensitiveWords)) {
 				set.sensitiveWords = ps.sensitiveWords.filter(Boolean);
+			}
+
+			if (Array.isArray(ps.blockedRemoteCustomEmojis)) {
+				set.blockedRemoteCustomEmojis = ps.blockedRemoteCustomEmojis.filter(Boolean);
 			}
 
 			if (Array.isArray(ps.prohibitedWords)) {

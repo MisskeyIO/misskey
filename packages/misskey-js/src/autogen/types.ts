@@ -15918,6 +15918,7 @@ export interface operations {
                         pinnedUsers: string[];
                         hiddenTags: string[];
                         blockedHosts: string[];
+                        blockedRemoteCustomEmojis: string[];
                         sensitiveWords: string[];
                         prohibitedWords: string[];
                         bannedEmailDomains?: string[];
@@ -19614,6 +19615,7 @@ export interface operations {
                     hiddenTags?: string[] | null;
                     blockedHosts?: string[] | null;
                     sensitiveWords?: string[] | null;
+                    blockedRemoteCustomEmojis?: string[] | null;
                     prohibitedWords?: string[] | null;
                     themeColor?: string | null;
                     mascotImageUrl?: string | null;

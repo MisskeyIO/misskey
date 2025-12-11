@@ -407,7 +407,9 @@ export class ApNoteService {
 		// eslint-disable-next-line no-param-reassign
 		host = this.utilityService.toPuny(host);
 
-		const eomjiTags = toArray(tags).filter(isEmoji);
+		const eomjiTags = toArray(tags)
+			.filter(isEmoji)
+			.filter(tag => !this.utilityService.isBlockedRemoteCustomEmoji(tag.name.replaceAll(':', ''), host));
 
 		const existingEmojis = await this.emojisRepository.findBy({
 			host,

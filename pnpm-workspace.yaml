@@ -299,7 +299,7 @@ catalog:
   rxjs: 7.8.2
   samlify: 2.10.2
   sanitize-html: 2.17.0
-  sass: 1.95.1
+  sass: 1.96.0
   secure-json-parse: 4.1.0
   seedrandom: 3.0.5
   sharp: 0.34.5

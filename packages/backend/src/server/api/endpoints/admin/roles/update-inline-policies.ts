@@ -104,7 +104,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 							memo: inlinePolicy.memo ?? null,
 						}))
 					);
-                }
+					}
 			});
 
 			this.roleService.clearInlinePolicyCache(user.id);

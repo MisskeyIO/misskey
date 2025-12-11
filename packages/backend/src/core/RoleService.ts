@@ -511,7 +511,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			}
 
 			// @ts-expect-error overwrite to configured value
-			updated[policyName] = inline.value ?? updated[policyName];
+			if (inline.value !== undefined) updated[policyName] = inline.value;
 		}
 
 		return updated;

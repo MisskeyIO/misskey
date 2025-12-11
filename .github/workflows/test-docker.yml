@@ -12,7 +12,7 @@ on:
 
 permissions:
   contents: read
-  packages: write
+  packages: read
 
 jobs:
   docker:
@@ -61,11 +61,9 @@ jobs:
         id: build-scan
         with:
           context: .
-          push: true
+          push: false
           provenance: false
           cache-from: type=registry,ref=ghcr.io/misskeyio/misskey:buildcache-${{ env.BRANCH_NAME }}
-          tags: |
-            ghcr.io/misskeyio/misskey:scan
       - name: Remove docker build cache
         shell: bash
         run: |
@@ -77,8 +75,8 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          image: 'ghcr.io/misskeyio/misskey@${{ steps.build-scan.outputs.digest }}'
-          args: --sarif-file-output=snyk.sarif
+          image: ${{ steps.build-scan.outputs.imageid }}
+          args: --severity-threshold=medium --sarif-file-output=snyk.sarif
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v4
         continue-on-error: true

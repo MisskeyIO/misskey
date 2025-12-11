@@ -9,6 +9,14 @@ export function decideCorsOptions(
 	request: FastifyRequest,
 	configUrl: string,
 ): CorsDecision {
+	const requestPath = request.url.includes('?') ? request.url.substring(0, request.url.indexOf('?')) : request.url;
+	if (['/api/signup', '/api/signin-flow', '/api/signin-with-passkey', '/api/signup-pending'].includes(requestPath)) {
+		return {
+			origin: configUrl,
+			credentials: true,
+		} satisfies CorsDecision;
+	}
+
 	const hasCookie = Object.keys(request.cookies).length > 0;
 	const hasTransactionId = request.headers['x-client-transaction-id'] !== undefined;
 
@@ -21,15 +29,15 @@ export function decideCorsOptions(
 
 	const requestOrigin = request.headers.origin
 		?? (['GET', 'HEAD'].includes(request.method) ? request.headers.referer : undefined);
-	if (!requestOrigin || !`${requestOrigin}/`.startsWith(configUrl + '/')) {
+	if (requestOrigin && `${requestOrigin}/`.startsWith(configUrl + '/')) {
 		return {
-			origin: true,
-			credentials: false,
+			origin: configUrl,
+			credentials: true,
 		} satisfies CorsDecision;
 	}
 
 	return {
-		origin: configUrl,
-		credentials: true,
+		origin: true,
+		credentials: false,
 	} satisfies CorsDecision;
 }

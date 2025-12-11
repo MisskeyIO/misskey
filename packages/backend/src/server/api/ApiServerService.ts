@@ -128,8 +128,6 @@ export class ApiServerService {
 			}
 		}>(
 			'/signup',
-			// @ts-expect-error fastify does not support dynamic type for plugin config
-			{ config: { cors: { origin: this.config.url, credentials: true } } },
 			(request, reply) => this.signupApiService.signup(request, reply),
 		);
 
@@ -147,8 +145,6 @@ export class ApiServerService {
 			};
 		}>(
 			'/signin-flow',
-			// @ts-expect-error fastify does not support dynamic type for plugin config
-			{ config: { cors: { origin: this.config.url, credentials: true } } },
 			(request, reply) => this.signinApiService.signin(request, reply),
 		);
 
@@ -159,15 +155,11 @@ export class ApiServerService {
 			};
 		}>(
 			'/signin-with-passkey',
-			// @ts-expect-error fastify does not support dynamic type for plugin config
-			{ config: { cors: { origin: this.config.url, credentials: true } } },
 			(request, reply) => this.signinWithPasskeyApiService.signin(request, reply),
 		);
 
 		fastify.post<{ Body: { code: string; } }>(
 			'/signup-pending',
-			// @ts-expect-error fastify does not support dynamic type for plugin config
-			{ config: { cors: { origin: this.config.url, credentials: true } } },
 			(request, reply) => this.signupApiService.signupPending(request, reply),
 		);
 

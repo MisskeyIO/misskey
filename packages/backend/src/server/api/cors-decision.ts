@@ -20,7 +20,7 @@ export function decideCorsOptions(
 	}
 
 	const requestOrigin = request.headers.origin
-		?? ['GET', 'HEAD'].includes(request.method) ? request.headers.referer : undefined;
+		?? (['GET', 'HEAD'].includes(request.method) ? request.headers.referer : undefined);
 	if (!requestOrigin || !`${requestOrigin}/`.startsWith(configUrl + '/')) {
 		return {
 			origin: true,

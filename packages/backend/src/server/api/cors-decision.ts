@@ -7,6 +7,7 @@ export type CorsDecision = {
 
 export function decideCorsOptions(
 	request: FastifyRequest,
+	configUrl: string,
 ): CorsDecision {
 	const hasCookie = Object.keys(request.cookies).length > 0;
 	const hasTransactionId = request.headers['x-client-transaction-id'] !== undefined;
@@ -14,6 +15,15 @@ export function decideCorsOptions(
 	if (!hasCookie && !hasTransactionId) {
 		return {
 			origin: '*',
+			credentials: false,
+		} satisfies CorsDecision;
+	}
+
+	const requestOrigin = request.headers.origin
+		?? ['GET', 'HEAD'].includes(request.method) ? request.headers.referer : undefined;
+	if (!requestOrigin || !`${requestOrigin}/`.startsWith(configUrl + '/')) {
+		return {
+			origin: true,
 			credentials: false,
 		} satisfies CorsDecision;
 	}

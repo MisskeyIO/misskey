@@ -50,7 +50,7 @@ export class ApiServerService {
 		fastify.register(cors, {
 			hook: 'preHandler',
 			delegator: (req: FastifyRequest, cb) => {
-				const corsDecision = decideCorsOptions(req);
+				const corsDecision = decideCorsOptions(req, this.config.url);
 				cb(null, corsDecision);
 			},
 		});

@@ -22,6 +22,12 @@ export const meta = {
 			id: 'f5b42979-e8e7-4027-9022-3e507ad29828',
 		},
 
+		invalidPolicy: {
+			message: 'Invalid policy.',
+			code: 'INVALID_PARAM',
+			id: '52109192-4e49-4d10-8844-899281fde5a3',
+		},
+
 		invalidOperation: {
 			message: 'Invalid operation.',
 			code: 'INVALID_PARAM',
@@ -131,7 +137,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 	}
 
 	private validatePolicyInput(input: InlinePolicyInput): Required<InlinePolicyInput> {
-		if (!this.policyNames.includes(input.policy)) throw new Error('invalid policy');
+		if (!this.policyNames.includes(input.policy)) throw new ApiError(meta.errors.invalidPolicy);
 
 		const baseValue = DEFAULT_POLICIES[input.policy];
 		const operation = input.operation ?? 'set';

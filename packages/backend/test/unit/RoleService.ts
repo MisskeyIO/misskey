@@ -180,13 +180,13 @@ describe('RoleService', () => {
 	afterEach(async () => {
 		clock.uninstall();
 
-			await Promise.all([
-				app.get(DI.metasRepository).delete({ id: Not(IsNull()) }),
-				usersRepository.delete({ id: Not(IsNull()) }),
-				rolesRepository.delete({ id: Not(IsNull()) }),
-				roleAssignmentsRepository.delete({ id: Not(IsNull()) }),
-				userInlinePoliciesRepository.delete({ id: Not(IsNull()) }),
-			]);
+		await Promise.all([
+			app.get(DI.metasRepository).delete({ id: Not(IsNull()) }),
+			usersRepository.delete({ id: Not(IsNull()) }),
+			rolesRepository.delete({ id: Not(IsNull()) }),
+			roleAssignmentsRepository.delete({ id: Not(IsNull()) }),
+			userInlinePoliciesRepository.delete({ id: Not(IsNull()) }),
+		]);
 
 		await app.close();
 	});

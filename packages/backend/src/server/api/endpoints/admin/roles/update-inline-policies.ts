@@ -92,16 +92,16 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			await this.userInlinePoliciesRepository.delete({ userId: user.id });
 
-			for (const inlinePolicy of sanitizedPolicies) {
-				await this.userInlinePoliciesRepository.insert({
+			await this.userInlinePoliciesRepository.insert(
+				sanitizedPolicies.map(inlinePolicy => ({
 					id: this.idService.gen(),
 					userId: user.id,
 					policy: inlinePolicy.policy,
 					operation: inlinePolicy.operation,
 					value: inlinePolicy.value,
 					memo: inlinePolicy.memo ?? null,
-				});
-			}
+				}))
+			);
 
 			this.roleService.clearInlinePolicyCache(user.id);
 			const after = (await this.userInlinePoliciesRepository.findBy({ userId: user.id })).map(this.serialize);

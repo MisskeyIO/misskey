@@ -493,7 +493,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
-private applyInlinePolicies(current: RolePolicies, inlinePolicies: MiUserInlinePolicy[]): RolePolicies {
+	private applyInlinePolicies(current: RolePolicies, inlinePolicies: MiUserInlinePolicy[]): RolePolicies {
 		if (inlinePolicies.length === 0) return current;
 		const updated = { ...current };
 

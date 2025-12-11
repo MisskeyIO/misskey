@@ -57,42 +57,7 @@ describe('CustomEmojiService', () => {
 					id: id,
 					updatedAt: new Date(),
 					...d,
-	});
-
-	describe('populateEmoji with remote blocks', () => {
-		afterEach(async () => {
-			await emojisRepository.createQueryBuilder().delete().execute();
-			meta.blockedRemoteCustomEmojis = [];
-		});
-
-		test('returns null when remote emoji is blocked', async () => {
-			const id = idService.gen();
-			await emojisRepository.insert({
-				id: id,
-				updatedAt: new Date(),
-				name: 'blockedone',
-				host: 'remote.example',
-				category: null,
-				originalUrl: 'https://remote.example/emoji.png',
-				publicUrl: 'https://remote.example/emoji.png',
-				type: 'image/png',
-				aliases: [],
-				license: null,
-				isSensitive: false,
-				localOnly: false,
-				requestedBy: null,
-				memo: '',
-				roleIdsThatCanBeUsedThisEmojiAsReaction: [],
-				roleIdsThatCanNotBeUsedThisEmojiAsReaction: [],
-			});
-
-			meta.blockedRemoteCustomEmojis = ['blockedone@remote.example'];
-
-			const result = await service.populateEmoji('blockedone@remote.example', 'remote.example');
-
-			expect(result).toBeNull();
-		});
-	});
+				});
 			}
 		}
 
@@ -850,6 +815,41 @@ describe('CustomEmojiService', () => {
 					expect(actual.emojis[2].name).toBe('emoji003');
 				});
 			});
+		});
+	});
+
+	describe('populateEmoji with remote blocks', () => {
+		afterEach(async () => {
+			await emojisRepository.createQueryBuilder().delete().execute();
+			meta.blockedRemoteCustomEmojis = [];
+		});
+
+		test('returns null when remote emoji is blocked', async () => {
+			const id = idService.gen();
+			await emojisRepository.insert({
+				id: id,
+				updatedAt: new Date(),
+				name: 'blockedone',
+				host: 'remote.example',
+				category: null,
+				originalUrl: 'https://remote.example/emoji.png',
+				publicUrl: 'https://remote.example/emoji.png',
+				type: 'image/png',
+				aliases: [],
+				license: null,
+				isSensitive: false,
+				localOnly: false,
+				requestedBy: null,
+				memo: '',
+				roleIdsThatCanBeUsedThisEmojiAsReaction: [],
+				roleIdsThatCanNotBeUsedThisEmojiAsReaction: [],
+			});
+
+			meta.blockedRemoteCustomEmojis = ['blockedone@remote.example'];
+
+			const result = await service.populateEmoji('blockedone@remote.example', 'remote.example');
+
+			expect(result).toBeNull();
 		});
 	});
 });

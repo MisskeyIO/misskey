@@ -504,7 +504,6 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			if (inline.operation === 'increment') {
 				const delta = Number(inline.value ?? 0);
 				if (Number.isFinite(delta) && typeof updated[policyName] === 'number') {
-					// @ts-expect-error both variables should be number
 					(updated[policyName] as number) += delta;
 				}
 				continue;

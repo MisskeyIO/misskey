@@ -67,8 +67,6 @@ globalThis.addEventListener('install', (ev) => {
 		// @ts-expect-error 実験的なAPIなので型定義がない
 		ev.addRoutes({
 			condition: {
-				// doc: https://developer.mozilla.org/ja/docs/Web/API/URLPattern
-				// @ts-expect-error 実験的なAPIなので型定義がない
 				urlPattern: new URLPattern({}),
 			},
 			source: 'fetch-event',

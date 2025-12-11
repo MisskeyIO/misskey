@@ -4262,6 +4262,26 @@ export interface Locale extends ILocale {
      */
     "unassign": string;
     /**
+     * インラインポリシー
+     */
+    "inlinePolicies": string;
+    /**
+     * ロールに加えて、ユーザー固有のポリシー値を調整します。
+     */
+    "inlinePoliciesDescription": string;
+    /**
+     * 値を設定
+     */
+    "inlinePolicyOperationSet": string;
+    /**
+     * 値を加算
+     */
+    "inlinePolicyOperationIncrement": string;
+    /**
+     * インラインポリシーを追加
+     */
+    "inlinePolicyAdd": string;
+    /**
      * 色
      */
     "color": string;

@@ -99,6 +99,49 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</MkFolder>
 
 						<MkFolder>
+							<template #icon><i class="ti ti-adjustments"></i></template>
+							<template #label>{{ i18n.ts.inlinePolicies }}</template>
+							<div class="_gaps">
+								<MkInfo>{{ i18n.ts.inlinePoliciesDescription }}</MkInfo>
+
+								<div v-for="(policy, index) in inlinePoliciesForm" :key="policy.id ?? index" :class="$style.inlinePolicyRow">
+									<MkSelect :modelValue="policy.policy" :class="$style.inlinePolicyField" @update:modelValue="value => onChangeInlinePolicy(index, value as string)">
+										<option v-for="option in inlinePolicyOptions" :key="option" :value="option">{{ option }}</option>
+									</MkSelect>
+
+									<MkSelect v-model="policy.operation" :class="$style.inlinePolicyField" :disabled="policyValueType(policy.policy) !== 'number'">
+										<option value="set">{{ i18n.ts.inlinePolicyOperationSet }}</option>
+										<option value="increment">{{ i18n.ts.inlinePolicyOperationIncrement }}</option>
+									</MkSelect>
+
+									<div :class="$style.inlinePolicyValue">
+										<MkSwitch v-if="policyValueType(policy.policy) === 'boolean'" v-model="policy.value">{{ i18n.ts.value }}</MkSwitch>
+										<MkInput
+											v-else-if="policyValueType(policy.policy) === 'number'"
+											:modelValue="policy.value"
+											type="number"
+											@update:modelValue="value => policy.value = value != null ? Number(value) : 0"
+										/>
+										<MkSelect v-else-if="policy.policy === 'chatAvailability'" v-model="policy.value">
+											<option v-for="option in chatAvailabilityOptions" :key="option" :value="option">{{ option }}</option>
+										</MkSelect>
+										<MkInput v-else v-model="policy.value" />
+									</div>
+
+									<MkInput v-model="policy.memo" :placeholder="i18n.ts.memo" :class="$style.inlinePolicyMemo" />
+									<MkButton inline danger @click="removeInlinePolicy(index)"><i class="ti ti-trash"></i></MkButton>
+								</div>
+
+								<MkButton inline @click="addInlinePolicy"><i class="ti ti-plus"></i> {{ i18n.ts.inlinePolicyAdd }}</MkButton>
+
+								<div class="_buttons">
+									<MkButton primary :disabled="!inlinePoliciesDirty" @click="saveInlinePolicies"><i class="ti ti-device-floppy"></i> {{ i18n.ts.save }}</MkButton>
+									<MkButton :disabled="!inlinePoliciesDirty" @click="resetInlinePolicies"><i class="ti ti-restore"></i> {{ i18n.ts.reset }}</MkButton>
+								</div>
+							</div>
+						</MkFolder>
+
+						<MkFolder>
 							<template #icon><i class="ti ti-password"></i></template>
 							<template #label>IP</template>
 							<MkInfo v-if="!iAmAdmin" warn>{{ i18n.ts.requireAdminForView }}</MkInfo>
@@ -246,6 +289,7 @@ import MkButton from '@/components/MkButton.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import MkKeyValue from '@/components/MkKeyValue.vue';
 import MkSelect from '@/components/MkSelect.vue';
+import MkInput from '@/components/MkInput.vue';
 import FormSuspense from '@/components/form/suspense.vue';
 import MkFileListForAdmin from '@/components/MkFileListForAdmin.vue';
 import MkInfo from '@/components/MkInfo.vue';
@@ -302,6 +346,20 @@ const announcementsPagination = {
 };
 const expandedRoles = ref([]);
 
+type InlinePolicyForm = {
+	id?: string;
+	policy: string;
+	operation: 'set' | 'increment';
+	value: any;
+	memo: string | null;
+};
+
+const inlinePoliciesForm = ref<InlinePolicyForm[]>([]);
+const inlinePoliciesInitial = ref<InlinePolicyForm[]>([]);
+const chatAvailabilityOptions = ['available', 'readonly', 'unavailable'];
+const inlinePolicyOptions = computed(() => Object.keys(info.value?.policies ?? {}));
+const inlinePoliciesDirty = computed(() => JSON.stringify(inlinePoliciesForm.value) !== JSON.stringify(inlinePoliciesInitial.value));
+
 function createFetcher() {
 	return () => Promise.all([misskeyApi('users/show', {
 		userId: props.userId,
@@ -321,12 +379,103 @@ function createFetcher() {
 		deleted.value = info.value.isDeleted;
 		moderationNote.value = info.value.moderationNote;
 		isSystem.value = user.value.host == null && user.value.username.includes('.');
+		resetInlinePoliciesFromInfo(_info);
 
 		watch(moderationNote, async () => {
 			await misskeyApi('admin/update-user-note', {
 				userId: user.value.id, text: moderationNote.value,
 			}).then(refreshUser);
 		});
+	});
+}
+
+function normalizeInlinePolicies(policies: any): InlinePolicyForm[] {
+	return (policies ?? []).map((policy: any) => ({
+		id: policy.id,
+		policy: policy.policy,
+		operation: policy.operation ?? 'set',
+		value: policy.value,
+		memo: policy.memo ?? null,
+	}));
+}
+
+function resetInlinePoliciesFromInfo(data: any) {
+	inlinePoliciesForm.value = normalizeInlinePolicies(data?.inlinePolicies);
+	inlinePoliciesInitial.value = structuredClone(inlinePoliciesForm.value);
+}
+
+function policyValueType(policy: string): 'boolean' | 'number' | 'string' | null {
+	const base = info.value?.policies?.[policy];
+	const type = typeof base;
+
+	return type === 'boolean' || type === 'number' || type === 'string' ? type : null;
+}
+
+function normalizedInlineValue(policy: string, value: any) {
+	const type = policyValueType(policy);
+
+	if (type === 'boolean') return typeof value === 'boolean' ? value : false;
+	if (type === 'number') return typeof value === 'number' && Number.isFinite(value) ? value : 0;
+	if (policy === 'chatAvailability') return chatAvailabilityOptions.includes(value) ? value : chatAvailabilityOptions[0];
+	return value ?? '';
+}
+
+function onChangeInlinePolicy(index: number, policyName: string) {
+	const row = inlinePoliciesForm.value[index];
+	row.policy = policyName;
+	row.operation = policyValueType(policyName) === 'number' ? row.operation : 'set';
+	row.value = normalizedInlineValue(policyName, row.value);
+}
+
+function addInlinePolicy() {
+	if (inlinePolicyOptions.value.length === 0) return;
+
+	const defaultPolicy = inlinePolicyOptions.value[0] ?? '';
+	inlinePoliciesForm.value.push({
+		policy: defaultPolicy,
+		operation: 'set',
+		value: normalizedInlineValue(defaultPolicy, undefined),
+		memo: null,
+	});
+}
+
+function removeInlinePolicy(index: number) {
+	inlinePoliciesForm.value.splice(index, 1);
+}
+
+function resetInlinePolicies() {
+	resetInlinePoliciesFromInfo(info.value);
+}
+
+async function saveInlinePolicies() {
+	if (!user.value) return;
+
+	const payload = inlinePoliciesForm.value
+		.filter(policy => policy.policy && inlinePolicyOptions.value.includes(policy.policy))
+		.map(policy => {
+			const type = policyValueType(policy.policy);
+			let value = policy.value;
+
+			if (type === 'number') {
+				value = Number(policy.value ?? 0);
+			} else if (type === 'boolean') {
+				value = !!policy.value;
+			}
+
+			return {
+				policy: policy.policy,
+				operation: type === 'number' ? policy.operation : 'set',
+				value,
+				memo: policy.memo ?? undefined,
+			};
+		});
+
+	await os.apiWithDialog('admin/roles/update-inline-policies', {
+		userId: user.value.id,
+		policies: payload,
+	}).then(() => {
+		inlinePoliciesInitial.value = structuredClone(inlinePoliciesForm.value);
+		refreshUser();
 	});
 }
 
@@ -780,6 +929,26 @@ definePage(() => ({
 	padding: 8px 12px;
 	border-radius: 6px;
 	cursor: pointer;
+}
+
+.inlinePolicyRow {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: flex-start;
+}
+
+.inlinePolicyField {
+	min-width: 140px;
+}
+
+.inlinePolicyValue {
+	flex: 1 1 200px;
+	min-width: 180px;
+}
+
+.inlinePolicyMemo {
+	flex: 1 1 200px;
 }
 
 .mutualLinkImg {

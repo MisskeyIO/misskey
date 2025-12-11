@@ -85,6 +85,7 @@ import { MiUserProfile } from '@/models/UserProfile.js';
 import { MiUserPublickey } from '@/models/UserPublickey.js';
 import { MiUserSecurityKey } from '@/models/UserSecurityKey.js';
 import { MiUserMemo } from '@/models/UserMemo.js';
+import { MiUserInlinePolicy } from '@/models/UserInlinePolicy.js';
 import { MiUserAccountMoveLog } from '@/models/UserAccountMoveLog.js';
 import { MiWebhook } from '@/models/Webhook.js';
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity.js';
@@ -171,6 +172,7 @@ export {
 	MiFlash,
 	MiFlashLike,
 	MiUserMemo,
+	MiUserInlinePolicy,
 	MiChatMessage,
 	MiChatRoom,
 	MiChatRoomMembership,
@@ -255,6 +257,7 @@ export type RoleAssignmentsRepository = Repository<MiRoleAssignment> & MiReposit
 export type FlashsRepository = Repository<MiFlash> & MiRepository<MiFlash>;
 export type FlashLikesRepository = Repository<MiFlashLike> & MiRepository<MiFlashLike>;
 export type UserMemoRepository = Repository<MiUserMemo> & MiRepository<MiUserMemo>;
+export type UserInlinePoliciesRepository = Repository<MiUserInlinePolicy> & MiRepository<MiUserInlinePolicy>;
 export type ChatMessagesRepository = Repository<MiChatMessage> & MiRepository<MiChatMessage>;
 export type ChatRoomsRepository = Repository<MiChatRoom> & MiRepository<MiChatRoom>;
 export type ChatRoomMembershipsRepository = Repository<MiChatRoomMembership> & MiRepository<MiChatRoomMembership>;

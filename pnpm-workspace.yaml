@@ -141,7 +141,7 @@ catalog:
   '@types/simple-oauth2': 5.0.8
   '@types/sinonjs__fake-timers': 15.0.1
   '@types/supertest': 6.0.3
-  '@types/three': 0.181.0
+  '@types/three': 0.182.0
   '@types/throttle-debounce': 5.0.2
   '@types/tinycolor2': 1.4.6
   '@types/tmp': 0.2.6

@@ -29,7 +29,7 @@ export function decideCorsOptions(
 	}
 
 	return {
-		origin: true,
+		origin: configUrl,
 		credentials: true,
 	} satisfies CorsDecision;
 }

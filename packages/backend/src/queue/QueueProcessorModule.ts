@@ -46,6 +46,7 @@ import { AggregateRetentionProcessorService } from './processors/AggregateRetent
 import { ExportFavoritesProcessorService } from './processors/ExportFavoritesProcessorService.js';
 import { RelationshipProcessorService } from './processors/RelationshipProcessorService.js';
 import { SendEmailProcessorService } from './processors/SendEmailProcessor.js';
+import { CleanBlockedRemoteCustomEmojisProcessorService } from './processors/CleanBlockedRemoteCustomEmojisProcessorService.js';
 
 @Module({
 	imports: [
@@ -81,6 +82,7 @@ import { SendEmailProcessorService } from './processors/SendEmailProcessor.js';
 		DeleteAccountProcessorService,
 		DeleteFileProcessorService,
 		CleanRemoteFilesProcessorService,
+		CleanBlockedRemoteCustomEmojisProcessorService,
 		RelationshipProcessorService,
 		ReportAbuseProcessorService,
 		ScheduledNoteProcessorService,

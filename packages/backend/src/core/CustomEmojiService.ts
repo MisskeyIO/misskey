@@ -5,14 +5,16 @@
 
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import * as Redis from 'ioredis';
-import { In, IsNull } from 'typeorm';
+import { In, IsNull, MoreThan, Not } from 'typeorm';
 import { EmojiEntityService } from '@/core/entities/EmojiEntityService.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
+import { LoggerService } from '@/core/LoggerService.js';
 import { IdService } from '@/core/IdService.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { bindThis } from '@/decorators.js';
 import { DI } from '@/di-symbols.js';
+import type Logger from '@/logger.js';
 import { MemoryKVCache, RedisSingleCache } from '@/misc/cache.js';
 import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
 import type { EmojisRepository, MiRole, MiUser } from '@/models/_.js';
@@ -59,20 +61,25 @@ export type FetchEmojisSortKeys = typeof fetchEmojisSortKeys[number];
 
 @Injectable()
 export class CustomEmojiService implements OnApplicationShutdown {
-	private emojisCache: MemoryKVCache<MiEmoji | null>;
+	public logger: Logger;
 	public localEmojisCache: RedisSingleCache<Map<string, MiEmoji>>;
+	private emojisCache: MemoryKVCache<MiEmoji | null>;
 
 	constructor(
 		@Inject(DI.redis)
 		private redisClient: Redis.Redis,
 		@Inject(DI.emojisRepository)
 		private emojisRepository: EmojisRepository,
+
 		private utilityService: UtilityService,
 		private idService: IdService,
+		private loggerService: LoggerService,
 		private emojiEntityService: EmojiEntityService,
 		private moderationLogService: ModerationLogService,
 		private globalEventService: GlobalEventService,
 	) {
+		this.logger = this.loggerService.getLogger('emoji');
+
 		this.emojisCache = new MemoryKVCache<MiEmoji | null>(1000 * 60 * 60 * 12); // 12h
 
 		this.localEmojisCache = new RedisSingleCache<Map<string, MiEmoji>>(this.redisClient, 'localEmojis', {
@@ -163,7 +170,7 @@ export class CustomEmojiService implements OnApplicationShutdown {
 		null
 		| 'NO_SUCH_EMOJI'
 		| 'SAME_NAME_EMOJI_EXISTS'
-		> {
+	> {
 		const emoji = data.id
 			? await this.getEmojiById(data.id)
 			: await this.getEmojiByName(data.name!);
@@ -332,7 +339,7 @@ export class CustomEmojiService implements OnApplicationShutdown {
 	}
 
 	@bindThis
-	public async deleteBulk(ids: MiEmoji['id'][], moderator?: MiUser) {
+	public async deleteBulk(ids: MiEmoji['id'][], moderator?: MiUser, quiet = false) {
 		const emojis = await this.emojisRepository.findBy({
 			id: In(ids),
 		});
@@ -348,11 +355,81 @@ export class CustomEmojiService implements OnApplicationShutdown {
 			}
 		}
 
-		this.localEmojisCache.refresh();
+		const hasLocalEmoji = emojis.some(e => e.host == null);
+		if (!quiet || hasLocalEmoji) this.localEmojisCache.refresh();
 
-		this.globalEventService.publishBroadcastStream('emojiDeleted', {
-			emojis: await this.emojiEntityService.packDetailedMany(emojis),
-		});
+		if (!quiet) {
+			this.globalEventService.publishBroadcastStream('emojiDeleted', {
+				emojis: await this.emojiEntityService.packDetailedMany(emojis),
+			});
+		}
+	}
+
+	@bindThis
+	public async removeBlockedRemoteCustomEmojis(blockedRemoteCustomEmojis: string[]): Promise<void> {
+		if (blockedRemoteCustomEmojis.length === 0) return;
+		const BATCH_SIZE = 1000;
+		const DELETE_BATCH_SIZE = 100;
+
+		let totalDeletedCount = 0;
+		const cacheKeysToDelete = new Set<string>();
+
+		try {
+			let remoteEmojis: MiEmoji[] = [];
+			let cursor: MiEmoji['id'] | undefined = undefined;
+
+			do {
+				remoteEmojis = await this.emojisRepository.find({
+					select: ['id', 'name', 'host'],
+					where: {
+						host: Not(IsNull()),
+						...(cursor ? { id: MoreThan(cursor) } : {}),
+					},
+					order: {
+						id: 'ASC',
+					},
+					take: BATCH_SIZE,
+				});
+
+				if (remoteEmojis.length === 0) {
+					break;
+				}
+
+				cursor = remoteEmojis.at(-1)?.id;
+
+				const blockedEmojis = remoteEmojis
+					.filter(emoji => emoji.host)
+					.filter(emoji => {
+						const normalizedHost = this.utilityService.normalizeHost(emoji.host!);
+						const candidates = [`${emoji.name}@${normalizedHost}`, emoji.name];
+						return candidates.some(target => this.utilityService.isKeyWordIncluded(target, blockedRemoteCustomEmojis));
+					});
+
+				for (let i = 0; i < blockedEmojis.length; i += DELETE_BATCH_SIZE) {
+					const chunk = blockedEmojis.slice(i, i + DELETE_BATCH_SIZE);
+					const chunkIds = chunk.map(emoji => emoji.id);
+
+					await this.deleteBulk(chunkIds, undefined, true)
+						.then(() => {
+							for (const emoji of chunk) {
+								const normalizedHost = this.utilityService.normalizeHost(emoji.host!);
+								cacheKeysToDelete.add(`${emoji.name} ${normalizedHost}`);
+							}
+							totalDeletedCount += chunk.length;
+						})
+						.catch((error) => {
+							this.logger.error('Failed to delete remote custom emoji', { error });
+							throw error;
+						});
+				}
+			} while (remoteEmojis.length >= BATCH_SIZE);
+		} finally {
+			if (totalDeletedCount > 0) {
+				for (const key of cacheKeysToDelete) {
+					this.emojisCache.delete(key);
+				}
+			}
+		}
 	}
 
 	@bindThis

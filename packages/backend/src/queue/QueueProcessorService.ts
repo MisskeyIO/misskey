@@ -50,6 +50,7 @@ import { CleanProcessorService } from './processors/CleanProcessorService.js';
 import { AggregateRetentionProcessorService } from './processors/AggregateRetentionProcessorService.js';
 import { QueueLoggerService } from './QueueLoggerService.js';
 import { QUEUE, baseQueueOptions, formatQueueName } from './const.js';
+import { CleanBlockedRemoteCustomEmojisProcessorService } from './processors/CleanBlockedRemoteCustomEmojisProcessorService.js';
 
 // ref. https://github.com/misskey-dev/misskey/pull/7635#issue-971097019
 function httpRelatedBackoff(attemptsMade: number) {
@@ -132,6 +133,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		private checkMissingScheduledNoteProcessorService: CheckMissingScheduledNoteProcessorService,
 		private cleanProcessorService: CleanProcessorService,
 		private sendEmailProcessorService: SendEmailProcessorService,
+		private cleanBlockedRemoteCustomEmojisProcessorService: CleanBlockedRemoteCustomEmojisProcessorService,
 	) {
 		this.logger = this.queueLoggerService.logger;
 
@@ -256,6 +258,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 					case 'deleteAccount': return this.deleteAccountProcessorService.process(job);
 					case 'userSuspend': return this.userSuspendProcessorService.process(job);
 					case 'reportAbuse': return this.reportAbuseProcessorService.process(job);
+					case 'cleanBlockedRemoteCustomEmojis': return this.cleanBlockedRemoteCustomEmojisProcessorService.process(job);
 					default: throw new Error(`unrecognized job type ${job.name} for db`);
 				}
 			};

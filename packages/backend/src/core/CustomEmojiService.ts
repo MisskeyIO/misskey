@@ -361,7 +361,8 @@ export class CustomEmojiService implements OnApplicationShutdown {
 	public async removeBlockedRemoteCustomEmojis(blockedRemoteCustomEmojis: string[]): Promise<void> {
 		if (blockedRemoteCustomEmojis.length === 0) return;
 		const batchSize = 1000;
-		const deleteBatchSize = 100; // Delete in smaller batches to avoid parameter limits
+		const deleteBatchSize = 100;
+		
 		let cursor: MiEmoji['id'] | null = null;
 		const cacheKeysToDelete: string[] = [];
 		let totalDeletedCount = 0;
@@ -386,8 +387,9 @@ export class CustomEmojiService implements OnApplicationShutdown {
 			cursor = remoteEmojis[remoteEmojis.length - 1].id;
 
 			const batchBlockedEmojis = remoteEmojis
+				.filter(emoji => emoji.host)
 				.filter(emoji => {
-					const normalizedHost = this.utilityService.normalizeHost(emoji.host);
+					const normalizedHost = this.utilityService.normalizeHost(emoji.host!);
 					const candidates = [`${emoji.name}@${normalizedHost}`, emoji.name];
 					return candidates.some(target => this.utilityService.isKeyWordIncluded(target, blockedRemoteCustomEmojis));
 				});

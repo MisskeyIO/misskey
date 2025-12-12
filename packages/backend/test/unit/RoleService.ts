@@ -14,15 +14,17 @@ import * as lolex from '@sinonjs/fake-timers';
 import type { TestingModule } from '@nestjs/testing';
 import type { MockMetadata } from 'jest-mock';
 import { GlobalModule } from '@/GlobalModule.js';
-import { RoleService } from '@/core/RoleService.js';
+import { RoleService, DEFAULT_POLICIES } from '@/core/RoleService.js';
 import {
 	MiMeta,
 	MiRole,
 	MiRoleAssignment,
 	MiUser,
+	MiUserInlinePolicy,
 	RoleAssignmentsRepository,
 	RolesRepository,
 	UsersRepository,
+	UserInlinePoliciesRepository,
 } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { MetaService } from '@/core/MetaService.js';
@@ -43,6 +45,7 @@ describe('RoleService', () => {
 	let usersRepository: UsersRepository;
 	let rolesRepository: RolesRepository;
 	let roleAssignmentsRepository: RoleAssignmentsRepository;
+	let userInlinePoliciesRepository: UserInlinePoliciesRepository;
 	let meta: jest.Mocked<MiMeta>;
 	let notificationService: jest.Mocked<NotificationService>;
 	let clock: lolex.InstalledClock;
@@ -99,6 +102,21 @@ describe('RoleService', () => {
 		return await roleAssignmentsRepository.findOneByOrFail({ id });
 	}
 
+	async function createInlinePolicy(data: Partial<MiUserInlinePolicy>) {
+		const id = genAidx(Date.now());
+
+		await userInlinePoliciesRepository.insert({
+			id,
+			userId: data.userId!,
+			policy: data.policy ?? 'driveCapacityMb',
+			operation: data.operation ?? 'set',
+			value: data.value ?? null,
+			memo: data.memo ?? null,
+		});
+
+		return await userInlinePoliciesRepository.findOneByOrFail({ id });
+	}
+
 	function aidx() {
 		return genAidx(Date.now());
 	}
@@ -150,6 +168,7 @@ describe('RoleService', () => {
 		usersRepository = app.get<UsersRepository>(DI.usersRepository);
 		rolesRepository = app.get<RolesRepository>(DI.rolesRepository);
 		roleAssignmentsRepository = app.get<RoleAssignmentsRepository>(DI.roleAssignmentsRepository);
+		userInlinePoliciesRepository = app.get<UserInlinePoliciesRepository>(DI.userInlinePoliciesRepository);
 
 		meta = app.get<MiMeta>(DI.meta) as jest.Mocked<MiMeta>;
 		notificationService = app.get<NotificationService>(NotificationService) as jest.Mocked<NotificationService>;
@@ -165,6 +184,7 @@ describe('RoleService', () => {
 			usersRepository.delete({ id: Not(IsNull()) }),
 			rolesRepository.delete({ id: Not(IsNull()) }),
 			roleAssignmentsRepository.delete({ id: Not(IsNull()) }),
+			userInlinePoliciesRepository.delete({ id: Not(IsNull()) }),
 		]);
 
 		await app.close();
@@ -281,6 +301,29 @@ describe('RoleService', () => {
 
 			const resultAfter25hAgain = await roleService.getUserPolicies(user.id);
 			expect(resultAfter25hAgain.canManageCustomEmojis).toBe(true);
+		});
+
+		test('inline policies override and accumulate', async () => {
+			const user = await createUser();
+
+			await createInlinePolicy({
+				userId: user.id,
+				policy: 'canHideAds',
+				operation: 'set',
+				value: true,
+			});
+
+			await createInlinePolicy({
+				userId: user.id,
+				policy: 'driveCapacityMb',
+				operation: 'increment',
+				value: 50,
+			});
+
+			const result = await roleService.getUserPolicies(user.id);
+
+			expect(result.canHideAds).toBe(true);
+			expect(result.driveCapacityMb).toBe(DEFAULT_POLICIES.driveCapacityMb + 50);
 		});
 	});
 

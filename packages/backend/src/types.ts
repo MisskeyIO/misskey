@@ -94,6 +94,7 @@ export const moderationLogTypes = [
 	'unsuspend',
 	'updateUserName',
 	'updateUserNote',
+	'updateInlinePolicies',
 	'addCustomEmoji',
 	'updateCustomEmoji',
 	'deleteCustomEmoji',
@@ -180,6 +181,13 @@ export type ModerationLogPayloads = {
 		userHost: string | null;
 		before: string | null;
 		after: string | null;
+	};
+	updateInlinePolicies: {
+		userId: string;
+		userUsername: string;
+		userHost: string | null;
+		before: any;
+		after: any;
 	};
 	addCustomEmoji: {
 		emojiId: string;

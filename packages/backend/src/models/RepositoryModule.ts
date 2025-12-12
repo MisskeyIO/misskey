@@ -75,6 +75,7 @@ import {
 	MiUserListFavorite,
 	MiUserListMembership,
 	MiUserMemo,
+	MiUserInlinePolicy,
 	MiUserNotePining,
 	MiUserPending,
 	MiUserProfile,
@@ -511,6 +512,12 @@ const $roleAssignmentsRepository: Provider = {
 	inject: [DI.db],
 };
 
+const $userInlinePoliciesRepository: Provider = {
+	provide: DI.userInlinePoliciesRepository,
+	useFactory: (db: DataSource) => db.getRepository(MiUserInlinePolicy).extend(miRepository as MiRepository<MiUserInlinePolicy>),
+	inject: [DI.db],
+};
+
 const $userMemosRepository: Provider = {
 	provide: DI.userMemosRepository,
 	useFactory: (db: DataSource) => db.getRepository(MiUserMemo).extend(miRepository as MiRepository<MiUserMemo>),
@@ -636,6 +643,7 @@ const $abuseReportResolversRepository: Provider = {
 		$retentionAggregationsRepository,
 		$rolesRepository,
 		$roleAssignmentsRepository,
+		$userInlinePoliciesRepository,
 		$flashsRepository,
 		$flashLikesRepository,
 		$userMemosRepository,
@@ -717,6 +725,7 @@ const $abuseReportResolversRepository: Provider = {
 		$retentionAggregationsRepository,
 		$rolesRepository,
 		$roleAssignmentsRepository,
+		$userInlinePoliciesRepository,
 		$flashsRepository,
 		$flashLikesRepository,
 		$userMemosRepository,

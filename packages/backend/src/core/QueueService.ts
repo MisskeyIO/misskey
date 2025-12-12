@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { randomUUID } from 'node:crypto';
+import { randomUUID, createHash } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import type { IActivity } from '@/core/activitypub/type.js';
 import type { MiDriveFile } from '@/models/DriveFile.js';
@@ -257,6 +257,34 @@ export class QueueService {
 		return this.dbQueue.add('exportFavorites', {
 			user: { id: user.id },
 		}, {
+			removeOnComplete: true,
+			removeOnFail: true,
+		});
+	}
+
+	@bindThis
+	public async createCleanBlockedRemoteCustomEmojisJob(blockedRemoteCustomEmojis: string[]) {
+		// Create a hash to identify the blockedRemoteCustomEmojis configuration
+		// Use a copy to avoid mutating the input array
+		const hash = createHash('sha256')
+			.update(JSON.stringify([...blockedRemoteCustomEmojis].sort()))
+			.digest('hex')
+			.substring(0, 16);
+		
+		const jobId = `cleanBlockedRemoteCustomEmojis-${hash}`;
+		
+		// Check if a job with the same hash is already in the queue
+		// Only skip if the job is waiting, active, or delayed (not completed or failed)
+		const existingJobState = await this.dbQueue.getJobState(jobId);
+		if (existingJobState === 'waiting' || existingJobState === 'active' || existingJobState === 'delayed') {
+			// Job with same hash is already pending, skip enqueuing
+			return null;
+		}
+		
+		return this.dbQueue.add('cleanBlockedRemoteCustomEmojis', {
+			blockedRemoteCustomEmojis,
+		}, {
+			jobId,
 			removeOnComplete: true,
 			removeOnFail: true,
 		});

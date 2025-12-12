@@ -64,6 +64,7 @@ export type DbJobMap = {
 	importUserLists: DbUserImportJobData;
 	importCustomEmojis: DbUserImportJobData;
 	deleteAccount: DbUserDeleteJobData;
+	cleanBlockedRemoteCustomEmojis: DbCleanBlockedRemoteCustomEmojis;
 };
 
 export type DbJobDataWithUser = {
@@ -106,6 +107,10 @@ export type DbUserImportToDbJobData = {
 	user: ThinUser;
 	target: string;
 	withReplies?: boolean;
+};
+
+export type DbCleanBlockedRemoteCustomEmojis = {
+	blockedRemoteCustomEmojis: string[];
 };
 
 export type DbAbuseReportJobData = MiAbuseUserReport;

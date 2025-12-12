@@ -92,7 +92,7 @@ export function misskeyApi<
 		window.fetch(`${apiUrl}/${endpoint}`, {
 			method: 'POST',
 			body: JSON.stringify(data),
-			credentials: 'omit',
+			credentials: 'include',
 			headers: {
 				'Content-Type': 'application/json',
 				'Authorization': credential ? `Bearer ${credential}` : 'anonymous',
@@ -102,8 +102,8 @@ export function misskeyApi<
 		}).then(res => {
 			if (instance.googleAnalyticsId) {
 				gtagTime({
-					name: 'api',
-					event_category: `/${endpoint}`,
+					event_category: 'api',
+					event_label: `/${endpoint}`,
 					value: Date.now() - initiateTime,
 				});
 			}
@@ -140,7 +140,7 @@ export function misskeyApiGet<
 		const initiateTime = Date.now();
 		window.fetch(`${apiUrl}/${endpoint}?${query}`, {
 			method: 'GET',
-			credentials: 'omit',
+			credentials: 'include',
 			headers: {
 				'Authorization': 'anonymous',
 				'X-Client-Transaction-Id': generateClientTransactionId(initiator),
@@ -148,8 +148,8 @@ export function misskeyApiGet<
 		}).then(res => {
 			if (instance.googleAnalyticsId) {
 				gtagTime({
-					name: 'api-get',
-					event_category: `/${endpoint}?${query}`,
+					event_category: 'api-get',
+					event_label: `/${endpoint}?${query}`,
 					value: Date.now() - initiateTime,
 				});
 			}

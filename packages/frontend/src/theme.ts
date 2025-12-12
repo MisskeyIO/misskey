@@ -123,8 +123,6 @@ export function applyTheme(theme: Theme, persist = true) {
 		}
 	}
 
-	console.log(props);
-
 	for (const [k, v] of Object.entries(props)) {
 		window.document.documentElement.style.setProperty(`--MI_THEME-${k}`, v.toString());
 	}

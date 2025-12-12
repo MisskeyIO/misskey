@@ -8,6 +8,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CustomEmojiService } from '@/core/CustomEmojiService.js';
 import { EmojiEntityService } from '@/core/entities/EmojiEntityService.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
+import { LoggerService } from '@/core/LoggerService.js';
 import { IdService } from '@/core/IdService.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
 import { UtilityService } from '@/core/UtilityService.js';
@@ -15,10 +16,12 @@ import { DI } from '@/di-symbols.js';
 import { GlobalModule } from '@/GlobalModule.js';
 import { EmojisRepository } from '@/models/_.js';
 import { MiEmoji } from '@/models/Emoji.js';
+import { MiMeta } from '@/models/Meta.js';
 
 describe('CustomEmojiService', () => {
 	let app: TestingModule;
 	let service: CustomEmojiService;
+	let meta: MiMeta;
 
 	let emojisRepository: EmojisRepository;
 	let idService: IdService;
@@ -33,6 +36,7 @@ describe('CustomEmojiService', () => {
 					CustomEmojiService,
 					UtilityService,
 					IdService,
+					LoggerService,
 					EmojiEntityService,
 					ModerationLogService,
 					GlobalEventService,
@@ -44,6 +48,7 @@ describe('CustomEmojiService', () => {
 		service = app.get<CustomEmojiService>(CustomEmojiService);
 		emojisRepository = app.get<EmojisRepository>(DI.emojisRepository);
 		idService = app.get<IdService>(IdService);
+		meta = app.get<MiMeta>(DI.meta);
 	});
 
 	describe('fetchEmojis', () => {
@@ -812,6 +817,92 @@ describe('CustomEmojiService', () => {
 					expect(actual.emojis[2].name).toBe('emoji003');
 				});
 			});
+		});
+	});
+
+	describe('populateEmoji with remote blocks', () => {
+		afterEach(async () => {
+			await emojisRepository.createQueryBuilder().delete().execute();
+			meta.blockedRemoteCustomEmojis = [];
+		});
+
+		test('returns null when remote emoji is blocked', async () => {
+			const id = idService.gen();
+			await emojisRepository.insert({
+				id: id,
+				updatedAt: new Date(),
+				name: 'blockedone',
+				host: 'remote.example',
+				category: null,
+				originalUrl: 'https://remote.example/emoji.png',
+				publicUrl: 'https://remote.example/emoji.png',
+				type: 'image/png',
+				aliases: [],
+				license: null,
+				isSensitive: false,
+				localOnly: false,
+				requestedBy: null,
+				memo: '',
+				roleIdsThatCanBeUsedThisEmojiAsReaction: [],
+				roleIdsThatCanNotBeUsedThisEmojiAsReaction: [],
+			});
+
+			meta.blockedRemoteCustomEmojis = ['blockedone@remote.example'];
+
+			const result = await service.populateEmoji('blockedone@remote.example', 'remote.example');
+
+			expect(result).toBeNull();
+		});
+	});
+
+	describe('removeBlockedRemoteCustomEmojis', () => {
+		afterEach(async () => {
+			await emojisRepository.createQueryBuilder().delete().execute();
+		});
+
+		test('removes already stored remote emojis that match block list', async () => {
+			await emojisRepository.insert([{
+				id: idService.gen(),
+				updatedAt: new Date(),
+				name: 'blockedone',
+				host: 'remote.example',
+				category: null,
+				originalUrl: 'https://remote.example/emoji.png',
+				publicUrl: 'https://remote.example/emoji.png',
+				type: 'image/png',
+				aliases: [],
+				license: null,
+				isSensitive: false,
+				localOnly: false,
+				requestedBy: null,
+				memo: '',
+				roleIdsThatCanBeUsedThisEmojiAsReaction: [],
+				roleIdsThatCanNotBeUsedThisEmojiAsReaction: [],
+			}, {
+				id: idService.gen(),
+				updatedAt: new Date(),
+				name: 'allowed',
+				host: 'remote.example',
+				category: null,
+				originalUrl: 'https://remote.example/emoji2.png',
+				publicUrl: 'https://remote.example/emoji2.png',
+				type: 'image/png',
+				aliases: [],
+				license: null,
+				isSensitive: false,
+				localOnly: false,
+				requestedBy: null,
+				memo: '',
+				roleIdsThatCanBeUsedThisEmojiAsReaction: [],
+				roleIdsThatCanNotBeUsedThisEmojiAsReaction: [],
+			}]);
+
+			await service.removeBlockedRemoteCustomEmojis(['blockedone@remote.example']);
+
+			const remaining = await emojisRepository.find({ order: { name: 'ASC' } });
+
+			expect(remaining).toHaveLength(1);
+			expect(remaining[0].name).toBe('allowed');
 		});
 	});
 });

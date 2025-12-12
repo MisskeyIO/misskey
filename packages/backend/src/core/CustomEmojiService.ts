@@ -393,17 +393,23 @@ export class CustomEmojiService implements OnApplicationShutdown {
 				});
 
 			// Process deletions in smaller batches to avoid SQL parameter limits
+			const deletionPromises = [];
 			for (let i = 0; i < batchBlockedEmojis.length; i += deleteBatchSize) {
 				const chunk = batchBlockedEmojis.slice(i, i + deleteBatchSize);
 				const chunkIds = chunk.map(emoji => emoji.id);
 				
 				// Delete batch with quiet mode to suppress broadcasts
-				await this.deleteBulk(chunkIds, undefined, true);
-				
-				// Accumulate cache keys for later purging
-				cacheKeysToDelete.push(...chunk.map(emoji => `${emoji.name} ${emoji.host}`));
-				totalDeletedCount += chunk.length;
+				deletionPromises.push(
+					this.deleteBulk(chunkIds, undefined, true).then(() => {
+						// Accumulate cache keys for later purging
+						cacheKeysToDelete.push(...chunk.map(emoji => `${emoji.name} ${emoji.host}`));
+						totalDeletedCount += chunk.length;
+					}),
+				);
 			}
+			
+			// Wait for all deletions in this page to complete
+			await Promise.all(deletionPromises);
 
 			if (remoteEmojis.length < batchSize) {
 				break;
@@ -412,7 +418,7 @@ export class CustomEmojiService implements OnApplicationShutdown {
 
 		if (totalDeletedCount === 0) return;
 
-		// Debounced cache purging: purge all at once
+		// Batch cache purging: purge all accumulated keys at once
 		for (const key of cacheKeysToDelete) {
 			this.emojisCache.delete(key);
 		}

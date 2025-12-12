@@ -5,7 +5,7 @@
 
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import * as Redis from 'ioredis';
-import { In, IsNull, Not } from 'typeorm';
+import { In, IsNull, MoreThan, Not } from 'typeorm';
 import { EmojiEntityService } from '@/core/entities/EmojiEntityService.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
 import { IdService } from '@/core/IdService.js';
@@ -332,7 +332,7 @@ export class CustomEmojiService implements OnApplicationShutdown {
 	}
 
 	@bindThis
-	public async deleteBulk(ids: MiEmoji['id'][], moderator?: MiUser) {
+	public async deleteBulk(ids: MiEmoji['id'][], moderator?: MiUser, quiet = false) {
 		const emojis = await this.emojisRepository.findBy({
 			id: In(ids),
 		});
@@ -348,60 +348,83 @@ export class CustomEmojiService implements OnApplicationShutdown {
 			}
 		}
 
-		this.localEmojisCache.refresh();
+		if (!quiet) {
+			this.localEmojisCache.refresh();
 
-		this.globalEventService.publishBroadcastStream('emojiDeleted', {
-			emojis: await this.emojiEntityService.packDetailedMany(emojis),
-		});
+			this.globalEventService.publishBroadcastStream('emojiDeleted', {
+				emojis: await this.emojiEntityService.packDetailedMany(emojis),
+			});
+		}
 	}
 
 	@bindThis
 	public async removeBlockedRemoteCustomEmojis(blockedRemoteCustomEmojis: string[]): Promise<void> {
 		if (blockedRemoteCustomEmojis.length === 0) return;
 		const batchSize = 1000;
-		let skip = 0;
-		let blockedEmojiIds: { id: string; key: string }[] = [];
+		const deleteBatchSize = 100; // Delete in smaller batches to avoid parameter limits
+		let cursor: MiEmoji['id'] | null = null;
+		const cacheKeysToDelete: string[] = [];
+		let totalDeletedCount = 0;
 
 		while (true) {
 			const remoteEmojis = await this.emojisRepository.find({
 				select: ['id', 'name', 'host'],
 				where: {
 					host: Not(IsNull()),
+					...(cursor ? { id: MoreThan(cursor) } : {}),
+				},
+				order: {
+					id: 'ASC',
 				},
 				take: batchSize,
-				skip: skip,
 			});
 
 			if (remoteEmojis.length === 0) {
 				break;
 			}
 
-			const batchBlockedEmojiIds = remoteEmojis
+			cursor = remoteEmojis[remoteEmojis.length - 1].id;
+
+			const batchBlockedEmojis = remoteEmojis
 				.filter(emoji => {
 					const normalizedHost = this.utilityService.normalizeHost(emoji.host);
 					const candidates = [`${emoji.name}@${normalizedHost}`, emoji.name];
 					return candidates.some(target => this.utilityService.isKeyWordIncluded(target, blockedRemoteCustomEmojis));
-				})
-				.map(emoji => ({
-					id: emoji.id,
-					key: `${emoji.name} ${emoji.host}`,
-				}));
+				});
 
-			blockedEmojiIds = blockedEmojiIds.concat(batchBlockedEmojiIds);
+			// Process deletions in smaller batches to avoid SQL parameter limits
+			const deletionPromises = [];
+			for (let i = 0; i < batchBlockedEmojis.length; i += deleteBatchSize) {
+				const chunk = batchBlockedEmojis.slice(i, i + deleteBatchSize);
+				const chunkIds = chunk.map(emoji => emoji.id);
+				
+				// Delete batch with quiet mode to suppress broadcasts
+				deletionPromises.push(
+					this.deleteBulk(chunkIds, undefined, true).then(() => {
+						// Accumulate cache keys for later purging
+						cacheKeysToDelete.push(...chunk.map(emoji => `${emoji.name} ${emoji.host}`));
+						totalDeletedCount += chunk.length;
+					}),
+				);
+			}
+			
+			// Wait for all deletions in this page to complete
+			await Promise.all(deletionPromises);
 
 			if (remoteEmojis.length < batchSize) {
 				break;
 			}
-
-			skip += batchSize;
 		}
-		if (blockedEmojiIds.length === 0) return;
 
-		await this.deleteBulk(blockedEmojiIds.map(emoji => emoji.id));
+		if (totalDeletedCount === 0) return;
 
-		for (const emoji of blockedEmojiIds) {
-			this.emojisCache.delete(emoji.key);
+		// Batch cache purging: purge all accumulated keys at once
+		for (const key of cacheKeysToDelete) {
+			this.emojisCache.delete(key);
 		}
+
+		// Refresh local emojis cache once at the end
+		this.localEmojisCache.refresh();
 	}
 
 	@bindThis

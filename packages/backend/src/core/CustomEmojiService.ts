@@ -355,9 +355,10 @@ export class CustomEmojiService implements OnApplicationShutdown {
 			}
 		}
 
-		if (!quiet) {
-			this.localEmojisCache.refresh();
+		const hasLocalEmoji = emojis.some(e => e.host == null);
+		if (!quiet || hasLocalEmoji) this.localEmojisCache.refresh();
 
+		if (!quiet) {
 			this.globalEventService.publishBroadcastStream('emojiDeleted', {
 				emojis: await this.emojiEntityService.packDetailedMany(emojis),
 			});

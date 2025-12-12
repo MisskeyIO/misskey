@@ -433,6 +433,7 @@ defineExpose({
 	append: appendItem,
 	removeItem,
 	updateItem,
+	isHead,
 	stopFetch: () => {
 		more.value = false;
 	},

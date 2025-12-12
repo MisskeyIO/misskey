@@ -101,6 +101,7 @@ describe('ActivityPub', () => {
 		perLocalUserUserTimelineCacheMax: 100,
 		perRemoteUserUserTimelineCacheMax: 100,
 		blockedHosts: [] as string[],
+		blockedRemoteCustomEmojis: [] as string[],
 		sensitiveWords: [] as string[],
 		prohibitedWords: [] as string[],
 	} as MiMeta;

@@ -420,7 +420,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					throw new ApiError(meta.errors.cannotReplyToInvisibleNote);
 				} else if (reply.visibility === 'specified' && ps.visibility !== 'specified') {
 					throw new ApiError(meta.errors.cannotReplyToSpecifiedVisibilityNoteWithExtendedVisibility);
-				} else if (me.isBot && reply.user!.isBot) {
+				} else if (me.isBot && reply.user!.isBot && reply.userId !== me.id) {
 					throw new ApiError(meta.errors.replyingToAnotherBot);
 				}
 

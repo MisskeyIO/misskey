@@ -15,6 +15,7 @@
 		"noUncheckedIndexedAccess": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
+		"allowJs": true,
 		"checkJs": true,
 		"esModuleInterop": true,
 		"skipLibCheck": true,

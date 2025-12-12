@@ -914,6 +914,17 @@ declare module '../api.js' {
     /**
      * No description provided.
      * 
+     * **Credential required**: *Yes* / **Permission**: *write:admin:roles*
+     */
+    request<E extends 'admin/roles/update-inline-policies', P extends Endpoints[E]['req']>(
+      endpoint: E,
+      params: P,
+      credential?: string | null,
+    ): Promise<SwitchCaseResponseType<E, P>>;
+
+    /**
+     * No description provided.
+     * 
      * **Credential required**: *No* / **Permission**: *read:admin:roles*
      */
     request<E extends 'admin/roles/users', P extends Endpoints[E]['req']>(

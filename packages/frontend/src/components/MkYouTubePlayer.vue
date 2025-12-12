@@ -29,6 +29,7 @@ import { versatileLang } from '@@/js/intl-const.js';
 import MkWindow from '@/components/MkWindow.vue';
 import { transformPlayerUrl } from '@/utility/player-url-transform.js';
 import { prefer } from '@/preferences.js';
+import { generateClientTransactionId } from '@/utility/misskey-api.js';
 
 const props = defineProps<{
 	url: string;
@@ -47,7 +48,12 @@ const player = ref({
 
 const ytFetch = (): void => {
 	fetching.value = true;
-	window.fetch(`/url?url=${encodeURIComponent(requestUrl.href)}&lang=${versatileLang}`).then(res => {
+	window.fetch(`/url?url=${encodeURIComponent(requestUrl.href)}&lang=${versatileLang}`, {
+		credentials: 'include',
+		headers: {
+			'X-Client-Transaction-Id': generateClientTransactionId('youtube-player'),
+		},
+	}).then(res => {
 		res.json().then(info => {
 			if (info.url == null) return;
 			title.value = info.title;

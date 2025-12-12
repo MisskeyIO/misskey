@@ -47,6 +47,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</MkFolder>
 
 				<MkFolder>
+					<template #icon><i class="ti ti-mood-empty"></i></template>
+					<template #label>{{ i18n.ts.blockedRemoteCustomEmojis }}</template>
+
+					<div class="_gaps">
+						<MkTextarea v-model="blockedRemoteCustomEmojis">
+							<template #caption>{{ i18n.ts.blockedRemoteCustomEmojisDescription }}<br>{{ i18n.ts.blockedRemoteCustomEmojisDescription2 }}</template>
+						</MkTextarea>
+						<MkButton primary @click="save_blockedRemoteCustomEmojis">{{ i18n.ts.save }}</MkButton>
+					</div>
+				</MkFolder>
+
+				<MkFolder>
 					<template #icon><i class="ti ti-message-x"></i></template>
 					<template #label>{{ i18n.ts.prohibitedWords }}</template>
 
@@ -125,6 +137,7 @@ import MkFolder from '@/components/MkFolder.vue';
 const enableRegistration = ref<boolean>(false);
 const emailRequiredForSignup = ref<boolean>(false);
 const sensitiveWords = ref<string>('');
+const blockedRemoteCustomEmojis = ref<string>('');
 const prohibitedWords = ref<string>('');
 const prohibitedWordsForNameOfUser = ref<string>('');
 const hiddenTags = ref<string>('');
@@ -137,6 +150,7 @@ async function init() {
 	enableRegistration.value = !meta.disableRegistration;
 	emailRequiredForSignup.value = meta.emailRequiredForSignup;
 	sensitiveWords.value = meta.sensitiveWords.join('\n');
+	blockedRemoteCustomEmojis.value = meta.blockedRemoteCustomEmojis.join('\n');
 	prohibitedWords.value = meta.prohibitedWords.join('\n');
 	prohibitedWordsForNameOfUser.value = meta.prohibitedWordsForNameOfUser.join('\n');
 	hiddenTags.value = meta.hiddenTags.join('\n');
@@ -182,6 +196,14 @@ function save_preservedUsernames() {
 function save_sensitiveWords() {
 	os.apiWithDialog('admin/update-meta', {
 		sensitiveWords: sensitiveWords.value.split('\n'),
+	}).then(() => {
+		fetchInstance(true);
+	});
+}
+
+function save_blockedRemoteCustomEmojis() {
+	os.apiWithDialog('admin/update-meta', {
+		blockedRemoteCustomEmojis: blockedRemoteCustomEmojis.value.split('\n'),
 	}).then(() => {
 		fetchInstance(true);
 	});

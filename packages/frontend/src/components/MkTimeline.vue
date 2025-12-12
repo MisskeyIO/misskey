@@ -29,7 +29,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 			>
 				<template v-for="(note, i) in (notes as Misskey.entities.Note[])" :key="note.id">
 					<div
-						v-if="note._shouldInsertAd_" :class="[$style.noteWithAd, { '_gaps': !noGap }]"
+						v-if="note['_shouldInsertGapMarker_']"
+						:class="[$style.gapMarker, $style.note, { '_gaps': !noGap }]"
+						:data-scroll-anchor="note.id"
+					>
+						<span aria-hidden="true">⋮</span>
+					</div>
+					<div
+						v-else-if="note['_shouldInsertAd_']" :class="[$style.noteWithAd, { '_gaps': !noGap }]"
 						:data-scroll-anchor="note.id"
 					>
 						<MkNote :class="$style.note" :note="note" :withHardMute="true"/>
@@ -114,7 +121,7 @@ async function fulfillNoteData(data) {
 	if (!data.visibility) {
 		const res = await window.fetch(`/notes/${data.id}.json`, {
 			method: 'GET',
-			credentials: 'omit',
+			credentials: 'include',
 			headers: {
 				'Authorization': 'anonymous',
 				'X-Client-Transaction-Id': generateClientTransactionId('misskey'),
@@ -169,11 +176,23 @@ async function loadUnloadedNotes() {
 		notVisibleNoteData.length = 0;
 
 		const notes = await Promise.allSettled(items.map(fulfillNoteData));
-		if (items.length >= 10) pagingComponent.value.deleteItem();
+		const fulfilledNotes = notes
+			.filter((i): i is PromiseFulfilledResult<object> => i.status === 'fulfilled' && i.value != null)
+			.map(i => i.value);
+		if (fulfilledNotes.length === 0) return;
 
-		for (const note of notes.filter(i => i.status === 'fulfilled' && i.value != null)) {
-			await prepend((note as PromiseFulfilledResult<object>).value);
+		if (items.length >= 10) {
+			if (pagingComponent.value.isHead?.() ?? true) {
+				pagingComponent.value.deleteItem();
+			} else {
+				pagingComponent.value.prepend({
+					id: `gap-marker-${Date.now()}`,
+					_shouldInsertGapMarker_: true,
+				} as never);
+			}
 		}
+
+		for (const note of fulfilledNotes) await prepend(note);
 	} finally {
 		pagingComponent.value.startFetch();
 	}
@@ -447,5 +466,15 @@ defineExpose({
 
 .ad:empty {
 	display: none;
+}
+
+.gapMarker {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--MI_THEME-textSoft);
+	padding: 8px 0;
+	font-size: 1.2em;
+	user-select: none;
 }
 </style>

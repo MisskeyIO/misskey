@@ -20,5 +20,7 @@
 		"target": "es2022",
 		"keepClassNames": true
 	},
+	"sourceMaps": true,
+	"inlineSourcesContent": true,
 	"minify": false
 }

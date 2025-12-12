@@ -1,3 +1,4 @@
+// This file has been automatically migrated to valid ESM format by Storybook.
 /*
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
@@ -14,27 +15,27 @@ const require = createRequire(import.meta.url);
 const _dirname = fileURLToPath(new URL('.', import.meta.url));
 
 const config = {
-	stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
-	staticDirs: [{ from: '../assets', to: '/client-assets' }],
-	addons: [
+    stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
+    staticDirs: [{ from: '../assets', to: '/client-assets' }],
+
+    addons: [
 		getAbsolutePath('@storybook/addon-essentials'),
 		getAbsolutePath('@storybook/addon-interactions'),
 		getAbsolutePath('@storybook/addon-links'),
 		getAbsolutePath('@storybook/addon-storysource'),
 		getAbsolutePath('@storybook/addon-mdx-gfm'),
-		resolve(_dirname, '../node_modules/storybook-addon-misskey-theme'),
 	],
-	framework: {
+
+    framework: {
 		name: getAbsolutePath('@storybook/vue3-vite') as '@storybook/vue3-vite',
 		options: {},
 	},
-	docs: {
-		autodocs: 'tag',
-	},
-	core: {
+
+    core: {
 		disableTelemetry: true,
 	},
-	async viteFinal(config) {
+
+    async viteFinal(config) {
 		const replacePluginForIsChromatic = config.plugins?.findIndex((plugin: Plugin) => plugin && plugin.name === 'replace') ?? -1;
 		if (~replacePluginForIsChromatic) {
 			config.plugins?.splice(replacePluginForIsChromatic, 1);
@@ -61,7 +62,7 @@ const config = {
 				],
 			},
 		});
-	},
+	}
 } satisfies StorybookConfig;
 export default config;
 

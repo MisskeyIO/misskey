@@ -6,8 +6,10 @@
 import { Injectable } from '@nestjs/common';
 import type { MiMeta } from '@/models/Meta.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
+import { LoggerService } from '@/core/LoggerService.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { MetaService } from '@/core/MetaService.js';
+import { QueueService } from '@/core/QueueService.js';
 
 export const meta = {
 	tags: ['admin'],
@@ -37,6 +39,11 @@ export const paramDef = {
 			},
 		},
 		sensitiveWords: {
+			type: 'array', nullable: true, items: {
+				type: 'string',
+			},
+		},
+		blockedRemoteCustomEmojis: {
 			type: 'array', nullable: true, items: {
 				type: 'string',
 			},
@@ -188,8 +195,11 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 	constructor(
 		private metaService: MetaService,
 		private moderationLogService: ModerationLogService,
+		private queueService: QueueService,
+		private loggerService: LoggerService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
+			const logger = this.loggerService.getLogger('api:admin:update-meta');
 			const set = {} as Partial<MiMeta>;
 
 			if (typeof ps.disableRegistration === 'boolean') {
@@ -210,6 +220,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (Array.isArray(ps.sensitiveWords)) {
 				set.sensitiveWords = ps.sensitiveWords.filter(Boolean);
+			}
+
+			if (Array.isArray(ps.blockedRemoteCustomEmojis)) {
+				set.blockedRemoteCustomEmojis = ps.blockedRemoteCustomEmojis.filter(Boolean);
 			}
 
 			if (Array.isArray(ps.prohibitedWords)) {
@@ -610,9 +624,22 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			const before = await this.metaService.fetch(true);
 
+			const shouldCleanupBlockedRemoteCustomEmojis = Array.isArray(ps.blockedRemoteCustomEmojis);
+
 			await this.metaService.update(set);
 
 			const after = await this.metaService.fetch(true);
+
+			if (shouldCleanupBlockedRemoteCustomEmojis) {
+				try {
+					const job = await this.queueService.createCleanBlockedRemoteCustomEmojisJob(after.blockedRemoteCustomEmojis ?? []);
+					if (job === null) {
+						logger.info('Cleanup job for blocked remote custom emojis already exists in queue, skipping duplicate');
+					}
+				} catch (err) {
+					logger.error('Failed to enqueue cleanup job for blocked remote custom emojis', { error: err });
+				}
+			}
 
 			this.moderationLogService.log(me, 'updateServerSettings', {
 				before,

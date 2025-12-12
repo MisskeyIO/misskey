@@ -42,6 +42,7 @@ import { $i } from '@/i.js';
 import { i18n } from '@/i18n.js';
 import { getProxiedImageUrl } from '@/utility/media-proxy.js';
 import { prefer } from '@/preferences.js';
+import { generateClientTransactionId } from '@/utility/misskey-api.js';
 
 const emit = defineEmits<{
 	(ev: 'ok', cropped: Misskey.entities.DriveFile): void;
@@ -88,7 +89,9 @@ const ok = async () => {
 				method: 'POST',
 				headers: {
 					'Authorization': `Bearer ${$i!.token}`,
+					'X-Client-Transaction-Id': generateClientTransactionId('cropper'),
 				},
+				credentials: 'include',
 				body: formData,
 			})
 				.then(response => response.json())

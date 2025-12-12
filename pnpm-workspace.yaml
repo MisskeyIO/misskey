@@ -289,7 +289,7 @@ catalog:
   random-seed: 0.3.0
   ratelimiter: 3.4.1
   re2: 1.22.3
-  react: 19.2.2
+  react: 19.2.3
   react-dom: 19.2.2
   redis-lock: 1.0.0
   reflect-metadata: 0.2.2

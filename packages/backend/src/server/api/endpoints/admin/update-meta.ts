@@ -707,7 +707,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (shouldCleanupBlockedRemoteCustomEmojis) {
 				try {
-					await this.queueService.createCleanBlockedRemoteCustomEmojisJob(after.blockedRemoteCustomEmojis ?? []);
+					const job = await this.queueService.createCleanBlockedRemoteCustomEmojisJob(after.blockedRemoteCustomEmojis ?? []);
+					if (job === null) {
+						logger.info('Cleanup job for blocked remote custom emojis already exists in queue, skipping duplicate');
+					}
 				} catch (err) {
 					logger.error('Failed to enqueue cleanup job for blocked remote custom emojis', { error: err });
 				}

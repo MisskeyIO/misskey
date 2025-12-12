@@ -367,7 +367,6 @@ export class CustomEmojiService implements OnApplicationShutdown {
 		});
 
 		const blockedEmojiIds = remoteEmojis
-			.filter(emoji => emoji.host != null)
 			.filter(emoji => {
 				const normalizedHost = this.utilityService.normalizeHost(emoji.host!);
 				const candidates = [`${emoji.name}@${normalizedHost}`, emoji.name];

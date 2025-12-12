@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { randomUUID } from 'node:crypto';
+import { randomUUID, createHash } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import type { IActivity } from '@/core/activitypub/type.js';
 import type { MiDriveFile } from '@/models/DriveFile.js';
@@ -263,10 +263,26 @@ export class QueueService {
 	}
 
 	@bindThis
-	public createCleanBlockedRemoteCustomEmojisJob(blockedRemoteCustomEmojis: string[]) {
+	public async createCleanBlockedRemoteCustomEmojisJob(blockedRemoteCustomEmojis: string[]) {
+		// Create a hash to identify the blockedRemoteCustomEmojis configuration
+		const hash = createHash('sha256')
+			.update(JSON.stringify(blockedRemoteCustomEmojis.sort()))
+			.digest('hex')
+			.substring(0, 16);
+		
+		const jobId = `cleanBlockedRemoteCustomEmojis-${hash}`;
+		
+		// Check if a job with the same hash is already in the queue
+		const existingJobState = await this.dbQueue.getJobState(jobId);
+		if (existingJobState !== 'unknown') {
+			// Job with same hash already exists, skip enqueuing
+			return null;
+		}
+		
 		return this.dbQueue.add('cleanBlockedRemoteCustomEmojis', {
 			blockedRemoteCustomEmojis,
 		}, {
+			jobId,
 			removeOnComplete: true,
 			removeOnFail: true,
 		});

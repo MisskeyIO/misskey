@@ -401,7 +401,7 @@ function normalizeInlinePolicies(policies: any): InlinePolicyForm[] {
 
 function resetInlinePoliciesFromInfo(data: any) {
 	inlinePoliciesForm.value = normalizeInlinePolicies(data?.inlinePolicies);
-	inlinePoliciesInitial.value = structuredClone(inlinePoliciesForm.value);
+	inlinePoliciesInitial.value = JSON.parse(JSON.stringify(inlinePoliciesForm.value));
 }
 
 function policyValueType(policy: string): 'boolean' | 'number' | 'string' | null {
@@ -474,7 +474,7 @@ async function saveInlinePolicies() {
 		userId: user.value.id,
 		policies: payload,
 	}).then(() => {
-		inlinePoliciesInitial.value = structuredClone(inlinePoliciesForm.value);
+		inlinePoliciesInitial.value = JSON.parse(JSON.stringify(inlinePoliciesForm.value));
 		refreshUser();
 	});
 }

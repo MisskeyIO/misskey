@@ -1,9 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { bindThis } from '@/decorators.js';
-import { DI } from '@/di-symbols.js';
 import type Logger from '@/logger.js';
 import { CustomEmojiService } from '@/core/CustomEmojiService.js';
-import type { MiMeta } from '@/models/Meta.js';
 import { QueueLoggerService } from '../QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 import type { DbCleanBlockedRemoteCustomEmojis } from '../types.js';
@@ -15,10 +13,8 @@ export class CleanBlockedRemoteCustomEmojisProcessorService {
 	constructor(
 		private customEmojiService: CustomEmojiService,
 		private queueLoggerService: QueueLoggerService,
-		@Inject(DI.meta)
-		private meta: MiMeta,
 	) {
-		this.logger = this.queueLoggerService.logger.createSubLogger('clean-blocked-remote-custom-emojis');
+		this.logger = this.queueLoggerService.logger.createSubLogger('emojis:clean:blocked-remote');
 	}
 
 	@bindThis

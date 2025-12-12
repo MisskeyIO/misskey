@@ -248,6 +248,11 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 					}
 					break;
 				}
+				case 'userInlinePoliciesUpdated': {
+					this.inlinePoliciesByUserIdCache.delete(body.userId);
+					await this.getUserInlinePolicies(body.userId);
+					break;
+				}
 				default:
 					break;
 			}

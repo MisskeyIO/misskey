@@ -186,7 +186,7 @@ async function loadUnloadedNotes() {
 				pagingComponent.value.deleteItem();
 			} else {
 				pagingComponent.value.prepend({
-					id: `buffer-marker-${Date.now()}`,
+					id: `gap-marker-${Date.now()}`,
 					_shouldInsertGapMarker_: true,
 				} as never);
 			}

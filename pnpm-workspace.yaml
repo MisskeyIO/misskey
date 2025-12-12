@@ -348,7 +348,7 @@ catalog:
 
 catalogMode: strict
 
-cleanupUnusedCatalogs: true
+cleanupUnusedCatalogs: false
 
 ignorePatchFailures: false
 

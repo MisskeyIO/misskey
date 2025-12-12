@@ -265,17 +265,19 @@ export class QueueService {
 	@bindThis
 	public async createCleanBlockedRemoteCustomEmojisJob(blockedRemoteCustomEmojis: string[]) {
 		// Create a hash to identify the blockedRemoteCustomEmojis configuration
+		// Use a copy to avoid mutating the input array
 		const hash = createHash('sha256')
-			.update(JSON.stringify(blockedRemoteCustomEmojis.sort()))
+			.update(JSON.stringify([...blockedRemoteCustomEmojis].sort()))
 			.digest('hex')
 			.substring(0, 16);
 		
 		const jobId = `cleanBlockedRemoteCustomEmojis-${hash}`;
 		
 		// Check if a job with the same hash is already in the queue
+		// Only skip if the job is waiting, active, or delayed (not completed or failed)
 		const existingJobState = await this.dbQueue.getJobState(jobId);
-		if (existingJobState !== 'unknown') {
-			// Job with same hash already exists, skip enqueuing
+		if (existingJobState === 'waiting' || existingJobState === 'active' || existingJobState === 'delayed') {
+			// Job with same hash is already pending, skip enqueuing
 			return null;
 		}
 		

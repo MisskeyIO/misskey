@@ -6,6 +6,7 @@
 import { Injectable } from '@nestjs/common';
 import type { MiMeta } from '@/models/Meta.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
+import { LoggerService } from '@/core/LoggerService.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { MetaService } from '@/core/MetaService.js';
 import { QueueService } from '@/core/QueueService.js';
@@ -210,8 +211,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private metaService: MetaService,
 		private moderationLogService: ModerationLogService,
 		private queueService: QueueService,
+		private loggerService: LoggerService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
+			const logger = this.loggerService.getLogger('api:admin:update-meta');
 			const set = {} as Partial<MiMeta>;
 
 			if (typeof ps.disableRegistration === 'boolean') {
@@ -703,7 +706,11 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const after = await this.metaService.fetch(true);
 
 			if (shouldCleanupBlockedRemoteCustomEmojis) {
-				await this.queueService.createCleanBlockedRemoteCustomEmojisJob(after.blockedRemoteCustomEmojis ?? []);
+				try {
+					await this.queueService.createCleanBlockedRemoteCustomEmojisJob(after.blockedRemoteCustomEmojis ?? []);
+				} catch (err) {
+					logger.error('Failed to enqueue cleanup job for blocked remote custom emojis', { error: err });
+				}
 			}
 
 			this.moderationLogService.log(me, 'updateServerSettings', {

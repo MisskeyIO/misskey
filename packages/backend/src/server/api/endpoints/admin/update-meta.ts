@@ -8,6 +8,7 @@ import type { MiMeta } from '@/models/Meta.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { MetaService } from '@/core/MetaService.js';
+import { QueueService } from '@/core/QueueService.js';
 
 export const meta = {
 	tags: ['admin'],
@@ -208,6 +209,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 	constructor(
 		private metaService: MetaService,
 		private moderationLogService: ModerationLogService,
+		private queueService: QueueService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const set = {} as Partial<MiMeta>;
@@ -694,9 +696,15 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			const before = await this.metaService.fetch(true);
 
+			const shouldCleanupBlockedRemoteCustomEmojis = Array.isArray(ps.blockedRemoteCustomEmojis);
+
 			await this.metaService.update(set);
 
 			const after = await this.metaService.fetch(true);
+
+			if (shouldCleanupBlockedRemoteCustomEmojis) {
+				await this.queueService.createCleanBlockedRemoteCustomEmojisJob(after.blockedRemoteCustomEmojis ?? []);
+			}
 
 			this.moderationLogService.log(me, 'updateServerSettings', {
 				before,

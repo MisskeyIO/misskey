@@ -5,7 +5,7 @@
 
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import * as Redis from 'ioredis';
-import { In, IsNull } from 'typeorm';
+import { In, IsNull, Not } from 'typeorm';
 import { EmojiEntityService } from '@/core/entities/EmojiEntityService.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
 import { IdService } from '@/core/IdService.js';
@@ -353,6 +353,38 @@ export class CustomEmojiService implements OnApplicationShutdown {
 		this.globalEventService.publishBroadcastStream('emojiDeleted', {
 			emojis: await this.emojiEntityService.packDetailedMany(emojis),
 		});
+	}
+
+	@bindThis
+	public async removeBlockedRemoteCustomEmojis(blockedRemoteCustomEmojis: string[]): Promise<void> {
+		if (blockedRemoteCustomEmojis.length === 0) return;
+
+		const remoteEmojis = await this.emojisRepository.find({
+			select: ['id', 'name', 'host'],
+			where: {
+				host: Not(IsNull()),
+			},
+		});
+
+		const blockedEmojiIds = remoteEmojis
+			.filter(emoji => emoji.host != null)
+			.filter(emoji => {
+				const normalizedHost = this.utilityService.normalizeHost(emoji.host!);
+				const candidates = [`${emoji.name}@${normalizedHost}`, emoji.name];
+				return candidates.some(target => this.utilityService.isKeyWordIncluded(target, blockedRemoteCustomEmojis));
+			})
+			.map(emoji => ({
+				id: emoji.id,
+				key: `${emoji.name} ${emoji.host}`,
+			}));
+
+		if (blockedEmojiIds.length === 0) return;
+
+		await this.deleteBulk(blockedEmojiIds.map(emoji => emoji.id));
+
+		for (const emoji of blockedEmojiIds) {
+			this.emojisCache.delete(emoji.key);
+		}
 	}
 
 	@bindThis

@@ -263,6 +263,16 @@ export class QueueService {
 	}
 
 	@bindThis
+	public createCleanBlockedRemoteCustomEmojisJob(blockedRemoteCustomEmojis: string[]) {
+		return this.dbQueue.add('cleanBlockedRemoteCustomEmojis', {
+			blockedRemoteCustomEmojis,
+		}, {
+			removeOnComplete: true,
+			removeOnFail: true,
+		});
+	}
+
+	@bindThis
 	public createExportFollowingJob(user: ThinUser, excludeMuting = false, excludeInactive = false) {
 		return this.dbQueue.add('exportFollowing', {
 			user: { id: user.id },

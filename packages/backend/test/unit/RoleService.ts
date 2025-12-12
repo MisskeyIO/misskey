@@ -325,6 +325,33 @@ describe('RoleService', () => {
 			expect(result.canHideAds).toBe(true);
 			expect(result.driveCapacityMb).toBe(DEFAULT_POLICIES.driveCapacityMb + 50);
 		});
+
+		test('inline policy cache is refreshed on internal events', async () => {
+			const user = await createUser();
+
+			const inlinePolicy = await createInlinePolicy({
+				userId: user.id,
+				policy: 'canHideAds',
+				operation: 'set',
+				value: true,
+			});
+
+			const initial = await roleService.getUserPolicies(user.id);
+			expect(initial.canHideAds).toBe(true);
+
+			await userInlinePoliciesRepository.update({ id: inlinePolicy.id }, { value: false });
+
+			await (roleService as any).onMessage('internal', JSON.stringify({
+				channel: 'internal',
+				message: {
+					type: 'userInlinePoliciesUpdated',
+					body: { userId: user.id },
+				},
+			}));
+
+			const updated = await roleService.getUserPolicies(user.id);
+			expect(updated.canHideAds).toBe(false);
+		});
 	});
 
 	describe('getModeratorIds', () => {

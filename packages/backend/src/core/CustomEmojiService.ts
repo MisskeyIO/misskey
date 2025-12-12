@@ -358,25 +358,44 @@ export class CustomEmojiService implements OnApplicationShutdown {
 	@bindThis
 	public async removeBlockedRemoteCustomEmojis(blockedRemoteCustomEmojis: string[]): Promise<void> {
 		if (blockedRemoteCustomEmojis.length === 0) return;
+		const batchSize = 1000;
+		let skip = 0;
+		let blockedEmojiIds: { id: string; key: string }[] = [];
 
-		const remoteEmojis = await this.emojisRepository.find({
-			select: ['id', 'name', 'host'],
-			where: {
-				host: Not(IsNull()),
-			},
-		});
+		while (true) {
+			const remoteEmojis = await this.emojisRepository.find({
+				select: ['id', 'name', 'host'],
+				where: {
+					host: Not(IsNull()),
+				},
+				take: batchSize,
+				skip: skip,
+			});
 
-		const blockedEmojiIds = remoteEmojis
-			.filter(emoji => {
-				const normalizedHost = this.utilityService.normalizeHost(emoji.host!);
-				const candidates = [`${emoji.name}@${normalizedHost}`, emoji.name];
-				return candidates.some(target => this.utilityService.isKeyWordIncluded(target, blockedRemoteCustomEmojis));
-			})
-			.map(emoji => ({
-				id: emoji.id,
-				key: `${emoji.name} ${emoji.host}`,
-			}));
+			if (remoteEmojis.length === 0) {
+				break;
+			}
 
+			const batchBlockedEmojiIds = remoteEmojis
+				.filter(emoji => emoji.host != null)
+				.filter(emoji => {
+					const normalizedHost = this.utilityService.normalizeHost(emoji.host!);
+					const candidates = [`${emoji.name}@${normalizedHost}`, emoji.name];
+					return candidates.some(target => this.utilityService.isKeyWordIncluded(target, blockedRemoteCustomEmojis));
+				})
+				.map(emoji => ({
+					id: emoji.id,
+					key: `${emoji.name} ${emoji.host}`,
+				}));
+
+			blockedEmojiIds = blockedEmojiIds.concat(batchBlockedEmojiIds);
+
+			if (remoteEmojis.length < batchSize) {
+				break;
+			}
+
+			skip += batchSize;
+		}
 		if (blockedEmojiIds.length === 0) return;
 
 		await this.deleteBulk(blockedEmojiIds.map(emoji => emoji.id));

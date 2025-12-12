@@ -23,7 +23,7 @@ export class CleanBlockedRemoteCustomEmojisProcessorService {
 
 	@bindThis
 	public async process(job: Bull.Job<DbCleanBlockedRemoteCustomEmojis>): Promise<void> {
-		const blockedRemoteCustomEmojis = job.data?.blockedRemoteCustomEmojis ?? this.meta.blockedRemoteCustomEmojis ?? [];
+		const blockedRemoteCustomEmojis = job.data.blockedRemoteCustomEmojis ?? [];
 
 		this.logger.info(`Removing blocked remote custom emojis (count=${blockedRemoteCustomEmojis.length})`);
 

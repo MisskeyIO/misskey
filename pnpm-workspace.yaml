@@ -290,7 +290,7 @@ catalog:
   ratelimiter: 3.4.1
   re2: 1.22.3
   react: 19.2.2
-  react-dom: 19.2.2
+  react-dom: 19.2.3
   redis-lock: 1.0.0
   reflect-metadata: 0.2.2
   rename: 1.0.4

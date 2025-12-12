@@ -184,7 +184,7 @@ function toStories(component: string): Promise<string> {
 		<program
 			body={[
 				<import-declaration
-					source={<literal value='@storybook/vue3' /> as estree.Literal}
+					source={<literal value='@storybook/vue3-vite' /> as estree.Literal}
 					specifiers={[
 						<import-specifier
 							local={<identifier name='Meta' /> as estree.Identifier}

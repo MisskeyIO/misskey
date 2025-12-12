@@ -7,6 +7,7 @@ import { DEFAULT_POLICIES, RoleService } from '@/core/RoleService.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
 import { IdService } from '@/core/IdService.js';
 import { ApiError } from '@/server/api/error.js';
+import { GlobalEventService } from '@/core/GlobalEventService.js';
 
 export const meta = {
 	tags: ['admin', 'role'],
@@ -85,6 +86,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private roleService: RoleService,
 		private moderationLogService: ModerationLogService,
 		private idService: IdService,
+		private globalEventService: GlobalEventService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const user = await this.usersRepository.findOneBy({ id: ps.userId });
@@ -110,10 +112,11 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 							memo: inlinePolicy.memo ?? null,
 						}))
 					);
-					}
+				}
 			});
 
 			this.roleService.clearInlinePolicyCache(user.id);
+			this.globalEventService.publishInternalEvent('userInlinePoliciesUpdated', { userId: user.id });
 			const after = (await this.userInlinePoliciesRepository.findBy({ userId: user.id })).map(this.serialize);
 
 			this.moderationLogService.log(me, 'updateInlinePolicies', {

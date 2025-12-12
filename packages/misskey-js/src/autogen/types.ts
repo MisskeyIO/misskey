@@ -15887,8 +15887,6 @@ export interface operations {
                 };
                 content: {
                     'application/json': {
-                        cacheRemoteFiles: boolean;
-                        cacheRemoteSensitiveFiles: boolean;
                         emailRequiredForSignup: boolean;
                         enableHcaptcha: boolean;
                         hcaptchaSiteKey: string | null;
@@ -15940,18 +15938,6 @@ export interface operations {
                         smtpUser: string | null;
                         smtpPass: string | null;
                         swPrivateKey: string | null;
-                        useObjectStorage: boolean;
-                        objectStorageBaseUrl: string | null;
-                        objectStorageBucket: string | null;
-                        objectStoragePrefix: string | null;
-                        objectStorageEndpoint: string | null;
-                        objectStorageRegion: string | null;
-                        objectStoragePort: number | null;
-                        objectStorageAccessKey: string | null;
-                        objectStorageSecretKey: string | null;
-                        objectStorageUseSSL: boolean;
-                        objectStorageUseProxy: boolean;
-                        objectStorageSetPublicRead: boolean;
                         enableIpLogging: boolean;
                         enableActiveEmailValidation: boolean;
                         enableVerifymailApi: boolean;
@@ -15987,7 +15973,6 @@ export interface operations {
                         maintainerName: string | null;
                         name: string | null;
                         shortName: string | null;
-                        objectStorageS3ForcePathStyle: boolean;
                         privacyPolicyUrl: string | null;
                         repositoryUrl: string | null;
                         /**
@@ -19633,8 +19618,6 @@ export interface operations {
                     description?: string | null;
                     defaultLightTheme?: string | null;
                     defaultDarkTheme?: string | null;
-                    cacheRemoteFiles?: boolean;
-                    cacheRemoteSensitiveFiles?: boolean;
                     emailRequiredForSignup?: boolean;
                     enableHcaptcha?: boolean;
                     hcaptchaSiteKey?: string | null;
@@ -19676,19 +19659,6 @@ export interface operations {
                     feedbackUrl?: string | null;
                     impressumUrl?: string | null;
                     privacyPolicyUrl?: string | null;
-                    useObjectStorage?: boolean;
-                    objectStorageBaseUrl?: string | null;
-                    objectStorageBucket?: string | null;
-                    objectStoragePrefix?: string | null;
-                    objectStorageEndpoint?: string | null;
-                    objectStorageRegion?: string | null;
-                    objectStoragePort?: number | null;
-                    objectStorageAccessKey?: string | null;
-                    objectStorageSecretKey?: string | null;
-                    objectStorageUseSSL?: boolean;
-                    objectStorageUseProxy?: boolean;
-                    objectStorageSetPublicRead?: boolean;
-                    objectStorageS3ForcePathStyle?: boolean;
                     enableIpLogging?: boolean;
                     enableActiveEmailValidation?: boolean;
                     enableVerifymailApi?: boolean;

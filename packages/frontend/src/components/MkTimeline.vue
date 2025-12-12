@@ -29,7 +29,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			>
 				<template v-for="(note, i) in (notes as Misskey.entities.Note[])" :key="note.id">
 					<div
-						v-if="note['_isBufferedMarker_']"
+						v-if="note['_shouldInsertGapMarker_']"
 						:class="[$style.gapMarker, $style.note, { '_gaps': !noGap }]"
 						:data-scroll-anchor="note.id"
 					>
@@ -187,7 +187,7 @@ async function loadUnloadedNotes() {
 			} else {
 				pagingComponent.value.prepend({
 					id: `buffer-marker-${Date.now()}`,
-					_isBufferedMarker_: true,
+					_shouldInsertGapMarker_: true,
 				} as never);
 			}
 		}
@@ -462,19 +462,19 @@ defineExpose({
 			border-radius: var(--MI-radius);
 		}
 	}
-
-	.gapMarker {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: var(--MI_THEME-textSoft);
-		padding: 8px 0;
-		font-size: 1.2em;
-		user-select: none;
-	}
 }
 
 .ad:empty {
 	display: none;
+}
+
+.gapMarker {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--MI_THEME-textSoft);
+	padding: 8px 0;
+	font-size: 1.2em;
+	user-select: none;
 }
 </style>

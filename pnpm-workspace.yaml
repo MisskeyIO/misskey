@@ -61,7 +61,6 @@ catalog:
   '@simplewebauthn/server': 13.2.2
   '@sinonjs/fake-timers': 15.0.0
   '@smithy/node-http-handler': 4.4.5
-  '@storybook/addon-actions': 9.0.8
   '@storybook/addon-links': 10.1.7
   '@storybook/react-vite': 10.1.7
   '@storybook/vue3-vite': 10.1.7

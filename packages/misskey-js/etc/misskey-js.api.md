@@ -29,7 +29,6 @@ declare namespace acct {
         Acct
     }
 }
-export { acct }
 
 // @public (undocumented)
 type Ad = components['schemas']['Ad'];
@@ -563,7 +562,6 @@ declare namespace api {
         APIClient
     }
 }
-export { api }
 
 // @public (undocumented)
 class APIClient {
@@ -632,6 +630,9 @@ type AuthSessionUserkeyRequest = operations['auth___session___userkey']['request
 type AuthSessionUserkeyResponse = operations['auth___session___userkey']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
+export type AvatarDecoration = UserLite['avatarDecorations'][number];
+
+// @public (undocumented)
 type Blocking = components['schemas']['Blocking'];
 
 // @public (undocumented)
@@ -651,6 +652,15 @@ type BlockingListRequest = operations['blocking___list']['requestBody']['content
 
 // @public (undocumented)
 type BlockingListResponse = operations['blocking___list']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+export type BroadcastEvents = {
+    noteUpdated: (payload: NoteUpdatedEvent) => void;
+    emojiAdded: (payload: EmojiAdded) => void;
+    emojiUpdated: (payload: EmojiUpdated) => void;
+    emojiDeleted: (payload: EmojiDeleted) => void;
+    announcementCreated: (payload: AnnouncementCreated) => void;
+};
 
 // @public (undocumented)
 type BubbleGameRankingRequest = operations['bubble-game___ranking']['requestBody']['content']['application/json'];
@@ -1162,6 +1172,12 @@ type ClipsUpdateRequest = operations['clips___update']['requestBody']['content']
 
 // @public (undocumented)
 type ClipsUpdateResponse = operations['clips___update']['responses']['200']['content']['application/json'];
+
+// Warning: (ae-forgotten-export) The symbol "Events" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+type CloseEvent_2 = Events.CloseEvent;
+export { CloseEvent_2 as CloseEvent }
 
 // @public (undocumented)
 type DateString = string;
@@ -2097,10 +2113,17 @@ declare namespace entities {
         ChatRoomMembership
     }
 }
-export { entities }
 
 // @public (undocumented)
 type Error_2 = components['schemas']['Error'];
+
+// @public (undocumented)
+type ErrorEvent_2 = Events.ErrorEvent;
+export { ErrorEvent_2 as ErrorEvent }
+
+// @public (undocumented)
+type Event_2 = Events.Event;
+export { Event_2 as Event }
 
 // @public (undocumented)
 type FederationFollowersRequest = operations['federation___followers']['requestBody']['content']['application/json'];
@@ -2673,10 +2696,21 @@ type IWebhooksTestRequest = operations['i___webhooks___test']['requestBody']['co
 type IWebhooksUpdateRequest = operations['i___webhooks___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
+export type ListenersMap = {
+    error: Array<Events.WebSocketEventListenerMap['error']>;
+    message: Array<Events.WebSocketEventListenerMap['message']>;
+    open: Array<Events.WebSocketEventListenerMap['open']>;
+    close: Array<Events.WebSocketEventListenerMap['close']>;
+};
+
+// @public (undocumented)
 type MeDetailed = components['schemas']['MeDetailed'];
 
 // @public (undocumented)
 type MeDetailedOnly = components['schemas']['MeDetailedOnly'];
+
+// @public (undocumented)
+export type Message = Parameters<WebSocket['send']>[0];
 
 // @public (undocumented)
 type MetaDetailed = components['schemas']['MetaDetailed'];
@@ -2876,6 +2910,308 @@ type ModerationLog = {
 });
 
 // @public (undocumented)
+export type ModerationLogPayloads = {
+    updateServerSettings: {
+        before: MetaDetailed | null;
+        after: MetaDetailed | null;
+    };
+    suspend: {
+        userId: string;
+        userUsername: string;
+        userHost: string | null;
+    };
+    unsuspend: {
+        userId: string;
+        userUsername: string;
+        userHost: string | null;
+    };
+    updateUserName: {
+        userId: string;
+        userUsername: string;
+        userHost: string | null;
+        before: string | null;
+        after: string | null;
+    };
+    updateUserNote: {
+        userId: string;
+        userUsername: string;
+        userHost: string | null;
+        before: string | null;
+        after: string | null;
+    };
+    addCustomEmoji: {
+        emojiId: string;
+        emoji: EmojiDetailed;
+    };
+    updateCustomEmoji: {
+        emojiId: string;
+        before: EmojiDetailed;
+        after: EmojiDetailed;
+    };
+    deleteCustomEmoji: {
+        emojiId: string;
+        emoji: EmojiDetailed;
+    };
+    assignRole: {
+        userId: string;
+        userUsername: string;
+        userHost: string | null;
+        roleId: string;
+        roleName: string;
+        expiresAt: string | null;
+        memo: string | null;
+    };
+    unassignRole: {
+        userId: string;
+        userUsername: string;
+        userHost: string | null;
+        roleId: string;
+        roleName: string;
+        memo: string | null;
+    };
+    createRole: {
+        roleId: string;
+        role: Role;
+    };
+    updateRole: {
+        roleId: string;
+        before: Role;
+        after: Role;
+    };
+    deleteRole: {
+        roleId: string;
+        role: Role;
+    };
+    clearQueue: Record<string, never>;
+    promoteQueue: Record<string, never>;
+    deleteDriveFile: {
+        fileId: string;
+        fileUserId: string | null;
+        fileUserUsername: string | null;
+        fileUserHost: string | null;
+    };
+    deleteNote: {
+        noteId: string;
+        noteUserId: string;
+        noteUserUsername: string;
+        noteUserHost: string | null;
+        note: Note;
+    };
+    createGlobalAnnouncement: {
+        announcementId: string;
+        announcement: Announcement;
+    };
+    createUserAnnouncement: {
+        announcementId: string;
+        announcement: Announcement;
+        userId: string;
+        userUsername: string;
+        userHost: string | null;
+    };
+    updateGlobalAnnouncement: {
+        announcementId: string;
+        before: Announcement;
+        after: Announcement;
+    };
+    updateUserAnnouncement: {
+        announcementId: string;
+        before: Announcement;
+        after: Announcement;
+        userId: string;
+        userUsername: string;
+        userHost: string | null;
+    };
+    deleteGlobalAnnouncement: {
+        announcementId: string;
+        announcement: Announcement;
+    };
+    deleteUserAnnouncement: {
+        announcementId: string;
+        announcement: Announcement;
+        userId: string;
+        userUsername: string;
+        userHost: string | null;
+    };
+    resetPassword: {
+        userId: string;
+        userUsername: string;
+        userHost: string | null;
+    };
+    regenerateUserToken: {
+        userId: string;
+        userUsername: string;
+        userHost: string | null;
+    };
+    suspendRemoteInstance: {
+        id: string;
+        host: string;
+    };
+    unsuspendRemoteInstance: {
+        id: string;
+        host: string;
+    };
+    updateRemoteInstanceNote: {
+        id: string;
+        host: string;
+        before: string | null;
+        after: string | null;
+    };
+    markSensitiveDriveFile: {
+        fileId: string;
+        fileUserId: string | null;
+        fileUserUsername: string | null;
+        fileUserHost: string | null;
+    };
+    unmarkSensitiveDriveFile: {
+        fileId: string;
+        fileUserId: string | null;
+        fileUserUsername: string | null;
+        fileUserHost: string | null;
+    };
+    resolveAbuseReport: {
+        reportId: string;
+        report: ReceivedAbuseReport;
+        forwarded?: boolean;
+        resolvedAs?: string | null;
+    };
+    forwardAbuseReport: {
+        reportId: string;
+        report: ReceivedAbuseReport;
+    };
+    updateAbuseReportNote: {
+        reportId: string;
+        report: ReceivedAbuseReport;
+        before: string;
+        after: string;
+    };
+    createInvitation: {
+        invitations: InviteCode[];
+    };
+    createAd: {
+        adId: string;
+        ad: Ad;
+    };
+    updateAd: {
+        adId: string;
+        before: Ad;
+        after: Ad;
+    };
+    deleteAd: {
+        adId: string;
+        ad: Ad;
+    };
+    createIndieAuthClient: {
+        clientId: string;
+        client: any;
+    };
+    updateIndieAuthClient: {
+        clientId: string;
+        before: any;
+        after: any;
+    };
+    deleteIndieAuthClient: {
+        clientId: string;
+        client: any;
+    };
+    createSSOServiceProvider: {
+        serviceId: string;
+        service: any;
+    };
+    updateSSOServiceProvider: {
+        serviceId: string;
+        before: any;
+        after: any;
+    };
+    deleteSSOServiceProvider: {
+        serviceId: string;
+        service: any;
+    };
+    createAvatarDecoration: {
+        avatarDecorationId: string;
+        avatarDecoration: AvatarDecoration;
+    };
+    updateAvatarDecoration: {
+        avatarDecorationId: string;
+        before: AvatarDecoration;
+        after: AvatarDecoration;
+    };
+    deleteAvatarDecoration: {
+        avatarDecorationId: string;
+        avatarDecoration: AvatarDecoration;
+    };
+    unsetUserAvatar: {
+        userId: string;
+        userUsername: string;
+        userHost: string | null;
+        fileId: string;
+    };
+    unsetUserBanner: {
+        userId: string;
+        userUsername: string;
+        userHost: string | null;
+        fileId: string;
+    };
+    unsetUserMutualLink: {
+        userId: string;
+        userUsername: string;
+        mutualLinkSections: string;
+    };
+    createSystemWebhook: {
+        systemWebhookId: string;
+        webhook: SystemWebhook;
+    };
+    updateSystemWebhook: {
+        systemWebhookId: string;
+        before: SystemWebhook;
+        after: SystemWebhook;
+    };
+    deleteSystemWebhook: {
+        systemWebhookId: string;
+        webhook: SystemWebhook;
+    };
+    createAbuseReportNotificationRecipient: {
+        recipientId: string;
+        recipient: AbuseReportNotificationRecipient;
+    };
+    updateAbuseReportNotificationRecipient: {
+        recipientId: string;
+        before: AbuseReportNotificationRecipient;
+        after: AbuseReportNotificationRecipient;
+    };
+    deleteAbuseReportNotificationRecipient: {
+        recipientId: string;
+        recipient: AbuseReportNotificationRecipient;
+    };
+    deleteAccount: {
+        userId: string;
+        userUsername: string;
+        userHost: string | null;
+    };
+    deletePage: {
+        pageId: string;
+        pageUserId: string;
+        pageUserUsername: string;
+        page: Page;
+    };
+    deleteFlash: {
+        flashId: string;
+        flashUserId: string;
+        flashUserUsername: string;
+        flash: Flash;
+    };
+    deleteGalleryPost: {
+        postId: string;
+        postUserId: string;
+        postUserUsername: string;
+        post: GalleryPost;
+    };
+    deleteChatRoom: {
+        roomId: string;
+        room: ChatRoom;
+    };
+};
+
+// @public (undocumented)
 export const moderationLogTypes: readonly ["updateServerSettings", "suspend", "unsuspend", "updateUserName", "updateUserNote", "addCustomEmoji", "updateCustomEmoji", "deleteCustomEmoji", "assignRole", "unassignRole", "createRole", "updateRole", "deleteRole", "clearQueue", "promoteQueue", "deleteDriveFile", "deleteNote", "createGlobalAnnouncement", "createUserAnnouncement", "updateGlobalAnnouncement", "updateUserAnnouncement", "deleteGlobalAnnouncement", "deleteUserAnnouncement", "resetPassword", "regenerateUserToken", "suspendRemoteInstance", "unsuspendRemoteInstance", "updateRemoteInstanceNote", "markSensitiveDriveFile", "unmarkSensitiveDriveFile", "resolveAbuseReport", "forwardAbuseReport", "updateAbuseReportNote", "createInvitation", "createAd", "updateAd", "deleteAd", "createIndieAuthClient", "updateIndieAuthClient", "deleteIndieAuthClient", "createSSOServiceProvider", "updateSSOServiceProvider", "deleteSSOServiceProvider", "createAvatarDecoration", "updateAvatarDecoration", "deleteAvatarDecoration", "unsetUserAvatar", "unsetUserBanner", "unsetUserMutualBanner", "createSystemWebhook", "updateSystemWebhook", "deleteSystemWebhook", "createAbuseReportNotificationRecipient", "updateAbuseReportNotificationRecipient", "deleteAbuseReportNotificationRecipient", "deleteAccount", "deletePage", "deleteFlash", "deleteGalleryPost", "deleteChatRoom"];
 
 // @public (undocumented)
@@ -2910,7 +3246,6 @@ declare namespace note {
         isPureRenote
     }
 }
-export { note }
 
 // @public (undocumented)
 type NoteDraft = components['schemas']['NoteDraft'];
@@ -3084,6 +3419,35 @@ type NotesUserListTimelineRequest = operations['notes___user-list-timeline']['re
 type NotesUserListTimelineResponse = operations['notes___user-list-timeline']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
+export type NoteUpdatedEvent = {
+    id: Note['id'];
+} & ({
+    type: 'reacted';
+    body: {
+        reaction: string;
+        emoji: string | null;
+        userId: User['id'];
+    };
+} | {
+    type: 'unreacted';
+    body: {
+        reaction: string;
+        userId: User['id'];
+    };
+} | {
+    type: 'deleted';
+    body: {
+        deletedAt: string;
+    };
+} | {
+    type: 'pollVoted';
+    body: {
+        choice: number;
+        userId: User['id'];
+    };
+});
+
+// @public (undocumented)
 export const noteVisibilities: readonly ["public", "home", "followers", "specified"];
 
 // @public (undocumented)
@@ -3147,7 +3511,7 @@ type PagesUnlikeRequest = operations['pages___unlike']['requestBody']['content']
 type PagesUpdateRequest = operations['pages___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-function parse(_acct: string): Acct;
+export function parse(_acct: string): Acct;
 
 // Warning: (ae-forgotten-export) The symbol "Values" needs to be exported by the entry point index.d.ts
 //
@@ -3200,6 +3564,83 @@ type QueueStats = {
 
 // @public (undocumented)
 type QueueStatsLog = QueueStats[];
+
+// @public (undocumented)
+export type ReceivedAbuseReport = {
+    reportId: AbuseReportNotificationRecipient['id'];
+    report: operations['admin___abuse-user-reports']['responses'][200]['content']['application/json'];
+    forwarded: boolean;
+};
+
+// @public (undocumented)
+export class ReconnectingWebSocket {
+    constructor(url: UrlProvider, protocols?: string | string[], options?: ReconnectingWebSocketOptions);
+    // (undocumented)
+    addEventListener<T extends keyof Events.WebSocketEventListenerMap>(type: T, listener: Events.WebSocketEventListenerMap[T]): void;
+    // (undocumented)
+    get binaryType(): BinaryType;
+    set binaryType(value: BinaryType);
+    // (undocumented)
+    get bufferedAmount(): number;
+    // (undocumented)
+    close(code?: number, reason?: string): void;
+    // (undocumented)
+    static get CLOSED(): number;
+    // (undocumented)
+    get CLOSED(): number;
+    // (undocumented)
+    static get CLOSING(): number;
+    // (undocumented)
+    get CLOSING(): number;
+    // (undocumented)
+    static get CONNECTING(): number;
+    // (undocumented)
+    get CONNECTING(): number;
+    // (undocumented)
+    dispatchEvent(event: Event_2): boolean;
+    // (undocumented)
+    get extensions(): string;
+    // (undocumented)
+    onclose: ((event: Events.CloseEvent) => void) | null;
+    // (undocumented)
+    onerror: ((event: Events.ErrorEvent) => void) | null;
+    // (undocumented)
+    onmessage: ((event: MessageEvent) => void) | null;
+    // (undocumented)
+    onopen: ((event: Event_2) => void) | null;
+    // (undocumented)
+    static get OPEN(): number;
+    // (undocumented)
+    get OPEN(): number;
+    // (undocumented)
+    get protocol(): string;
+    // (undocumented)
+    get readyState(): number;
+    // (undocumented)
+    reconnect(code?: number, reason?: string): void;
+    // (undocumented)
+    removeEventListener<T extends keyof Events.WebSocketEventListenerMap>(type: T, listener: Events.WebSocketEventListenerMap[T]): void;
+    // (undocumented)
+    get retryCount(): number;
+    // (undocumented)
+    send(data: Message): void;
+    // (undocumented)
+    get url(): string;
+}
+
+// @public (undocumented)
+export type ReconnectingWebSocketOptions = {
+    WebSocket?: any;
+    maxReconnectionDelay?: number;
+    minReconnectionDelay?: number;
+    reconnectionDelayGrowFactor?: number;
+    minUptime?: number;
+    connectionTimeout?: number;
+    maxRetries?: number;
+    maxEnqueuedMessages?: number;
+    startClosed?: boolean;
+    debug?: boolean;
+};
 
 // @public (undocumented)
 type RenoteMuteCreateRequest = operations['renote-mute___create']['requestBody']['content']['application/json'];
@@ -3259,7 +3700,16 @@ type ReversiShowGameResponse = operations['reversi___show-game']['responses']['2
 type ReversiSurrenderRequest = operations['reversi___surrender']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
+export type ReversiUpdateKey = typeof reversiUpdateKeys[number];
+
+// @public (undocumented)
 export const reversiUpdateKeys: ["map", "bw", "isLlotheo", "canPutEverywhere", "loopedBoard", "timeLimitForEachTurn"];
+
+// @public (undocumented)
+export type ReversiUpdateSettings<K extends ReversiUpdateKey> = {
+    key: K;
+    value: ReversiGameDetailed[K];
+};
 
 // @public (undocumented)
 type ReversiVerifyRequest = operations['reversi___verify']['requestBody']['content']['application/json'];
@@ -3429,7 +3879,7 @@ export class Stream extends EventEmitter<StreamEvents> implements IStream {
     constructor(origin: string, user: {
         token: string;
     } | null, options?: {
-        WebSocket?: Options['WebSocket'];
+        WebSocket?: ReconnectingWebSocketOptions['WebSocket'];
         binaryType?: ReconnectingWebSocket['binaryType'];
     });
     // (undocumented)
@@ -3456,8 +3906,6 @@ export class Stream extends EventEmitter<StreamEvents> implements IStream {
     useChannel<C extends keyof Channels>(channel: C, params?: Channels[C]['params'], name?: string): ChannelConnection<Channels[C]>;
 }
 
-// Warning: (ae-forgotten-export) The symbol "BroadcastEvents" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export type StreamEvents = {
     _connected_: void;
@@ -3469,7 +3917,7 @@ export type StreamEvents = {
 // Warning: (ae-forgotten-export) The symbol "GetCaseResult" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-type SwitchCaseResponseType<E extends keyof Endpoints, P extends Endpoints[E]['req']> = Endpoints[E]['res'] extends SwitchCase ? IsCaseMatched<E, P, 0> extends true ? GetCaseResult<E, P, 0> : IsCaseMatched<E, P, 1> extends true ? GetCaseResult<E, P, 1> : IsCaseMatched<E, P, 2> extends true ? GetCaseResult<E, P, 2> : IsCaseMatched<E, P, 3> extends true ? GetCaseResult<E, P, 3> : IsCaseMatched<E, P, 4> extends true ? GetCaseResult<E, P, 4> : IsCaseMatched<E, P, 5> extends true ? GetCaseResult<E, P, 5> : IsCaseMatched<E, P, 6> extends true ? GetCaseResult<E, P, 6> : IsCaseMatched<E, P, 7> extends true ? GetCaseResult<E, P, 7> : IsCaseMatched<E, P, 8> extends true ? GetCaseResult<E, P, 8> : IsCaseMatched<E, P, 9> extends true ? GetCaseResult<E, P, 9> : Endpoints[E]['res']['$switch']['$default'] : Endpoints[E]['res'];
+export type SwitchCaseResponseType<E extends keyof Endpoints, P extends Endpoints[E]['req']> = Endpoints[E]['res'] extends SwitchCase ? IsCaseMatched<E, P, 0> extends true ? GetCaseResult<E, P, 0> : IsCaseMatched<E, P, 1> extends true ? GetCaseResult<E, P, 1> : IsCaseMatched<E, P, 2> extends true ? GetCaseResult<E, P, 2> : IsCaseMatched<E, P, 3> extends true ? GetCaseResult<E, P, 3> : IsCaseMatched<E, P, 4> extends true ? GetCaseResult<E, P, 4> : IsCaseMatched<E, P, 5> extends true ? GetCaseResult<E, P, 5> : IsCaseMatched<E, P, 6> extends true ? GetCaseResult<E, P, 6> : IsCaseMatched<E, P, 7> extends true ? GetCaseResult<E, P, 7> : IsCaseMatched<E, P, 8> extends true ? GetCaseResult<E, P, 8> : IsCaseMatched<E, P, 9> extends true ? GetCaseResult<E, P, 9> : Endpoints[E]['res']['$switch']['$default'] : Endpoints[E]['res'];
 
 // @public (undocumented)
 type SwRegisterRequest = operations['sw___register']['requestBody']['content']['application/json'];
@@ -3503,6 +3951,13 @@ type TestResponse = operations['test']['responses']['200']['content']['applicati
 
 // @public (undocumented)
 function toString_2(acct: Acct): string;
+export { toString_2 as toString }
+
+// @public (undocumented)
+export type UrlProvider = string | (() => string) | (() => Promise<string>);
+
+// @public (undocumented)
+export function urlQuery(obj: Record<string, string | number | boolean | undefined>): string;
 
 // @public (undocumented)
 type User = components['schemas']['User'];
@@ -3725,14 +4180,6 @@ type V2AdminEmojiListRequest = operations['v2___admin___emoji___list']['requestB
 
 // @public (undocumented)
 type V2AdminEmojiListResponse = operations['v2___admin___emoji___list']['responses']['200']['content']['application/json'];
-
-// Warnings were encountered during analysis:
-//
-// src/entities.ts:50:2 - (ae-forgotten-export) The symbol "ModerationLogPayloads" needs to be exported by the entry point index.d.ts
-// src/streaming.ts:53:3 - (ae-forgotten-export) The symbol "Options" needs to be exported by the entry point index.d.ts
-// src/streaming.ts:54:3 - (ae-forgotten-export) The symbol "ReconnectingWebSocket" needs to be exported by the entry point index.d.ts
-// src/streaming.types.ts:226:4 - (ae-forgotten-export) The symbol "ReversiUpdateKey" needs to be exported by the entry point index.d.ts
-// src/streaming.types.ts:236:4 - (ae-forgotten-export) The symbol "ReversiUpdateSettings" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

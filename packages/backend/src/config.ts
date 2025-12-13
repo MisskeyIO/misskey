@@ -111,6 +111,8 @@ type Source = {
 
 	contentSecurityPolicy?: string;
 
+	disallowExternalApRedirect?: boolean;
+
 	maxFileSize?: number;
 
 	clusterLimit?: number;

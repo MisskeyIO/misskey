@@ -46,13 +46,13 @@ export class NoteDraftEntityService implements OnModuleInit {
 	}
 
 	@bindThis
-	public async packAttachedFiles(fileIds: MiNote['fileIds'], packedFiles: Map<MiNote['fileIds'][number], Packed<'DriveFile'> | null>): Promise<Packed<'DriveFile'>[]> {
+	public async packAttachedFiles(fileIds: MiNote['fileIds'], packedFiles: Map<MiNote['fileIds'][number], Packed<'DriveFile'> | null>, me: { id: MiUser['id'] } | null | undefined): Promise<Packed<'DriveFile'>[]> {
 		const missingIds = [];
 		for (const id of fileIds) {
 			if (!packedFiles.has(id)) missingIds.push(id);
 		}
 		if (missingIds.length) {
-			const additionalMap = await this.driveFileEntityService.packManyByIdsMap(missingIds);
+			const additionalMap = await this.driveFileEntityService.packManyByIdsMap(missingIds, me);
 			for (const [k, v] of additionalMap) {
 				packedFiles.set(k, v);
 			}
@@ -117,7 +117,7 @@ export class NoteDraftEntityService implements OnModuleInit {
 			visibleUserIds: noteDraft.visibleUserIds,
 			hashtag: noteDraft.hashtag,
 			fileIds: noteDraft.fileIds,
-			files: packedFiles != null ? this.packAttachedFiles(noteDraft.fileIds, packedFiles) : this.driveFileEntityService.packManyByIds(noteDraft.fileIds),
+			files: packedFiles != null ? this.packAttachedFiles(noteDraft.fileIds, packedFiles, me) : this.driveFileEntityService.packManyByIds(noteDraft.fileIds, me),
 			replyId: noteDraft.replyId,
 			renoteId: noteDraft.renoteId,
 			channelId: noteDraft.channelId,
@@ -164,7 +164,7 @@ export class NoteDraftEntityService implements OnModuleInit {
 
 		// TODO: 本当は renote とか reply がないのに renoteId とか replyId があったらここで解決しておく
 		const fileIds = noteDrafts.map(n => [n.fileIds, n.renote?.fileIds, n.reply?.fileIds]).flat(2).filter(x => x != null);
-		const packedFiles = fileIds.length > 0 ? await this.driveFileEntityService.packManyByIdsMap(fileIds) : new Map();
+		const packedFiles = fileIds.length > 0 ? await this.driveFileEntityService.packManyByIdsMap(fileIds, me) : new Map();
 		const users = [
 			...noteDrafts.map(({ user, userId }) => user ?? userId),
 		];

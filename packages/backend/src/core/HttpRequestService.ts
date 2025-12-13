@@ -343,7 +343,6 @@ export class HttpRequestService {
 			},
 			body: args.body,
 			size: args.size ?? 10 * 1024 * 1024,
-			// @ts-expect-error typedef of fetch does not considered for https agent
 			agent: (url) => this.getAgentByUrl(url, false, isLocalAddressAllowed),
 			signal: controller.signal,
 		});

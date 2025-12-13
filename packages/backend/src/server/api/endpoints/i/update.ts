@@ -379,18 +379,20 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					}
 				};
 
-				for (const entry of ps.mutedWords) {
-					if (Array.isArray(entry)) {
-						for (const value of entry) {
-							validateRegex(value);
+				if (ps.mutedWords) {
+					for (const entry of ps.mutedWords) {
+						if (Array.isArray(entry)) {
+							for (const value of entry) {
+								validateRegex(value);
+							}
+						} else {
+							validateRegex(entry);
 						}
-					} else {
-						validateRegex(entry);
 					}
-				}
 
-				profileUpdates.mutedWords = ps.mutedWords;
-				profileUpdates.enableWordMute = ps.mutedWords.length > 0;
+					profileUpdates.mutedWords = ps.mutedWords;
+					profileUpdates.enableWordMute = ps.mutedWords.length > 0;
+				}
 			}
 			if (ps.mutedInstances !== undefined) profileUpdates.mutedInstances = ps.mutedInstances;
 			if (ps.notificationRecieveConfig !== undefined) profileUpdates.notificationRecieveConfig = ps.notificationRecieveConfig;

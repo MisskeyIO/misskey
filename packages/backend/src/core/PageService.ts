@@ -66,7 +66,7 @@ export class PageService {
 			name: body.name,
 		}).then(result => {
 			if (result.length > 0) {
-				throw new IdentifiableError('1a79e38e-3d83-4423-845b-a9d83ff93b61');
+				throw new IdentifiableError('1a79e38e-3d83-4423-845b-a9d83ff93b61', 'Page with this name already exists.');
 			}
 		});
 
@@ -110,10 +110,10 @@ export class PageService {
 			});
 
 			if (page == null) {
-				throw new IdentifiableError('66aefd3c-fdb2-4a71-85ae-cc18bea85d3f');
+				throw new IdentifiableError('66aefd3c-fdb2-4a71-85ae-cc18bea85d3f', 'Page not found.');
 			}
 			if (page.userId !== me.id) {
-				throw new IdentifiableError('d0017699-8256-46f1-aed4-bc03bed73616');
+				throw new IdentifiableError('d0017699-8256-46f1-aed4-bc03bed73616', 'You are not the owner of this page.');
 			}
 
 			if (body.name != null) {
@@ -123,7 +123,7 @@ export class PageService {
 					name: body.name,
 				}).then(result => {
 					if (result.length > 0) {
-						throw new IdentifiableError('d05bfe24-24b6-4ea2-a3ec-87cc9bf4daa4');
+						throw new IdentifiableError('d05bfe24-24b6-4ea2-a3ec-87cc9bf4daa4', 'Page with this name already exists.');
 					}
 				});
 			}
@@ -172,11 +172,11 @@ export class PageService {
 			});
 
 			if (page == null) {
-				throw new IdentifiableError('66aefd3c-fdb2-4a71-85ae-cc18bea85d3f');
+				throw new IdentifiableError('66aefd3c-fdb2-4a71-85ae-cc18bea85d3f', 'Page not found');
 			}
 
 			if (!await this.roleService.isModerator(me) && page.userId !== me.id) {
-				throw new IdentifiableError('d0017699-8256-46f1-aed4-bc03bed73616');
+				throw new IdentifiableError('d0017699-8256-46f1-aed4-bc03bed73616', 'Access denied');
 			}
 
 			await transaction.delete(MiPage, page.id);

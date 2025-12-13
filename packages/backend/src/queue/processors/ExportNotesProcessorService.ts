@@ -38,7 +38,7 @@ class NoteStream extends ReadableStream<Record<string, unknown>> {
 		let exportedNotesCount = 0;
 		let cursor: MiNote['id'] | null = null;
 
-		const totalPromise = notesRepository.countBy({ userId });
+		const totalPromise = notesRepository.countBy({ userId: user.id });
 
 		const serialize = (
 			note: MiNote,

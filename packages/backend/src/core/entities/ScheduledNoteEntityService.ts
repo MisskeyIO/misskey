@@ -1,11 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
-import type { ScheduledNotesRepository } from '@/models/_.js';
+import type { ScheduledNotesRepository, ChannelsRepository } from '@/models/_.js';
 import type { MiUser } from '@/models/User.js';
 import type { MiScheduledNote } from '@/models/ScheduledNote.js';
 import { bindThis } from '@/decorators.js';
 import { Packed } from '@/misc/json-schema.js';
+import { IdService } from '@/core/IdService.js';
 import { DriveFileEntityService } from './DriveFileEntityService.js';
+import type { UserEntityService } from './UserEntityService.js';
+import type { NoteEntityService } from './NoteEntityService.js';
 
 @Injectable()
 export class ScheduledNoteEntityService {
@@ -14,6 +17,9 @@ export class ScheduledNoteEntityService {
 		private scheduledNotesRepository: ScheduledNotesRepository,
 
 		private driveFileEntityService: DriveFileEntityService,
+		private userEntityService: UserEntityService,
+		private noteEntityService: NoteEntityService,
+		private idService: IdService
 	) {
 	}
 
@@ -24,43 +30,44 @@ export class ScheduledNoteEntityService {
 	) : Promise<Packed<'NoteDraft'>> {
 		const item = typeof src === 'object' ? src : await this.scheduledNotesRepository.findOneByOrFail({ id: src, userId: me.id });
 
+		const channel = item.draft.channel ?? null;
+
 		return {
 			id: item.id,
-			updatedAt: item.createdAt.toISOString(),
-			scheduledAt: item.scheduledAt?.toISOString() ?? null,
+			createdAt: this.idService.parse(item.id).date.toISOString(),
+			scheduledAt: item.scheduledAt?.getTime() ?? null,
+			isActuallyScheduled: item.scheduledAt != null,
 			reason: item.reason ?? undefined,
-			channel: item.draft.channel ? {
-				id: item.draft.channel.id,
-				name: item.draft.channel.name,
+			text: item.draft.text ?? null,
+			cw: item.draft.cw ?? null,
+			userId: item.userId,
+			user: await this.userEntityService.pack(item.user ?? item.userId, me),
+			replyId: item.draft.reply?.id ?? null,
+			renoteId: item.draft.renote?.id ?? null,
+			reply: item.draft.reply ? await this.noteEntityService.pack(item.draft.reply, me, { detail: false }) : undefined,
+			renote: item.draft.renote ? await this.noteEntityService.pack(item.draft.renote, me, { detail: true }) : undefined,
+			visibility: (item.draft.visibility ?? 'public') as 'public' | 'home' | 'followers' | 'specified',
+			localOnly: item.draft.localOnly ?? false,
+			reactionAcceptance: item.draft.reactionAcceptance ?? null,
+			visibleUserIds: item.draft.visibleUsers?.map(x => x.id) ?? [],
+			hashtag: null,
+			fileIds: item.draft.files?.map(f => f.id) ?? [],
+			files: item.draft.files ? await this.driveFileEntityService.packMany(item.draft.files, me) : [],
+			channelId: channel?.id ?? null,
+			channel: channel ? {
+				id: channel.id,
+				name: channel.name,
+				color: channel.color,
+				isSensitive: channel.isSensitive,
+				allowRenoteToExternal: channel.allowRenoteToExternal,
+				userId: channel.userId,
 			} : undefined,
-			renote: item.draft.renote ? {
-				id: item.draft.renote.id,
-				text: (item.draft.renote.cw ?? item.draft.renote.text)?.substring(0, 100) ?? null,
-				user: {
-					id: item.draft.renote.userId,
-					username: item.draft.renote.user!.username,
-					host: item.draft.renote.user!.host,
-				},
-			} : undefined,
-			reply: item.draft.reply ? {
-				id: item.draft.reply.id,
-				text: (item.draft.reply.cw ?? item.draft.reply.text)?.substring(0, 100) ?? null,
-				user: {
-					id: item.draft.reply.userId,
-					username: item.draft.reply.user!.username,
-					host: item.draft.reply.user!.host,
-				},
-			} : undefined,
-			data: {
-				text: item.draft.text ?? null,
-				useCw: !!item.draft.cw,
-				cw: item.draft.cw ?? null,
-				visibility: item.draft.visibility as 'public' | 'followers' | 'home' | 'specified',
-				localOnly: item.draft.localOnly ?? false,
-				files: item.draft.files ? await this.driveFileEntityService.packMany(item.draft.files, me) : [],
-				poll: item.draft.poll ? { ...item.draft.poll, expiresAt: item.draft.poll.expiresAt?.getTime() ?? null, expiredAfter: null } : null,
-				visibleUserIds: item.draft.visibility === 'specified' ? item.draft.visibleUsers?.map(x => x.id) : undefined,
-			},
+			poll: item.draft.poll ? {
+				choices: item.draft.poll.choices,
+				multiple: item.draft.poll.multiple,
+				expiresAt: item.draft.poll.expiresAt?.toISOString(),
+				expiredAfter: null,
+			} : null,
 		};
 	}
 

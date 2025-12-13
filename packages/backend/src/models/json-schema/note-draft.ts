@@ -25,6 +25,10 @@ export const packedNoteDraftSchema = {
 			type: 'boolean',
 			optional: false, nullable: false,
 		},
+		reason: {
+			type: 'string',
+			optional: true, nullable: true,
+		},
 		text: {
 			type: 'string',
 			optional: false, nullable: true,

@@ -563,7 +563,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 					return this.postScheduledNoteProcessorService.process(job);
 				}
 			}, {
-				...baseWorkerOptions(this.config, QUEUE.POST_SCHEDULED_NOTE),
+				...baseQueueOptions(this.config.redisForSystemQueue, this.config.bullmqWorkerOptions, QUEUE.POST_SCHEDULED_NOTE),
 				autorun: false,
 			});
 		}

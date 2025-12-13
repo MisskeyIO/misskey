@@ -26,14 +26,11 @@ import { packedFollowRequestSchema, packedFollowingSchema } from '@/models/json-
 import { packedGalleryLikeSchema, packedGalleryPostSchema } from '@/models/json-schema/gallery.js';
 import { packedMutingSchema } from '@/models/json-schema/muting.js';
 import { packedRenoteMutingSchema } from '@/models/json-schema/renote-muting.js';
-import { packedBlockingSchema } from '@/models/json-schema/blocking.js';
 import { packedNoteReactionSchema, packedNoteReactionWithNoteSchema } from '@/models/json-schema/note-reaction.js';
 import { packedHashtagSchema } from '@/models/json-schema/hashtag.js';
 import { packedInviteCodeSchema } from '@/models/json-schema/invite-code.js';
 import { packedModerationLogSchema } from '@/models/json-schema/moderation-log.js';
-import { packedMutingSchema } from '@/models/json-schema/muting.js';
 import { packedNoteFavoriteSchema } from '@/models/json-schema/note-favorite.js';
-import { packedNoteReactionSchema } from '@/models/json-schema/note-reaction.js';
 import { packedNoteSchema } from '@/models/json-schema/note.js';
 import { packedNoteDraftSchema } from '@/models/json-schema/note-draft.js';
 import { packedNotificationSchema } from '@/models/json-schema/notification.js';
@@ -43,17 +40,11 @@ import {
 	packedQueueMetricsSchema,
 	packedQueueJobSchema,
 } from '@/models/json-schema/queue.js';
-import { packedGalleryPostSchema } from '@/models/json-schema/gallery-post.js';
-import { packedChannelSchema } from '@/models/json-schema/channel.js';
-import { packedAntennaSchema } from '@/models/json-schema/antenna.js';
-import { packedClipSchema } from '@/models/json-schema/clip.js';
-import { packedFederationInstanceSchema } from '@/models/json-schema/federation-instance.js';
 import {
 	packedEmojiDetailedAdminSchema,
 	packedEmojiDetailedSchema,
 	packedEmojiSimpleSchema,
 } from '@/models/json-schema/emoji.js';
-import { packedRenoteMutingSchema } from '@/models/json-schema/renote-muting.js';
 import { packedUserListMembershipSchema, packedUserListSchema } from '@/models/json-schema/user-list.js';
 import { packedUserAccountMoveLogSchema } from '@/models/json-schema/user-account-move-log.js';
 import { packedAnnouncementSchema } from '@/models/json-schema/announcement.js';
@@ -86,7 +77,6 @@ import { packedChatRoomSchema } from '@/models/json-schema/chat-room.js';
 import { packedChatRoomInvitationSchema } from '@/models/json-schema/chat-room-invitation.js';
 import { packedChatRoomMembershipSchema } from '@/models/json-schema/chat-room-membership.js';
 import { packedAchievementNameSchema, packedAchievementSchema } from '@/models/json-schema/achievement.js';
-import { packedNoteDraftSchema } from '@/models/json-schema/note-draft.js';
 
 export const refs = {
 	UserLite: packedUserLiteSchema,

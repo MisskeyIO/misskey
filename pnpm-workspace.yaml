@@ -292,6 +292,7 @@ catalog:
   sass: 1.96.0
   secure-json-parse: 4.1.0
   seedrandom: 3.0.5
+  semver: 7.7.1
   sharp: 0.34.5
   shiki: 3.19.0
   simple-oauth2: 5.1.0

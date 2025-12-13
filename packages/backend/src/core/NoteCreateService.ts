@@ -379,7 +379,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 			apMentions: data.apMentions,
 			apHashtags: data.apHashtags,
 			apEmojis: data.apEmojis,
-		});
+		}) as Promise<MiNote>;
 	}
 
 	@bindThis

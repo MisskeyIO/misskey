@@ -4,7 +4,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import { MiAbuseUserReport, MiNote, MiUser, MiWebhook } from '@/models/_.js';
+import { MiAbuseReportResolver, MiAbuseUserReport, MiNote, MiUser, MiWebhook } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { MiSystemWebhook, type SystemWebhookEventType } from '@/models/SystemWebhook.js';
 import { type AbuseReportPayload, SystemWebhookPayload, SystemWebhookService } from '@/core/SystemWebhookService.js';
@@ -246,6 +246,24 @@ export class WebhookTestService {
 			// まだ実装されていない (#9485)
 			case 'reaction':
 				return;
+			case 'reportCreated':
+			case 'reportResolved':
+				return;
+			case 'reportAutoResolved': {
+				send('reportAutoResolved', {
+					report: this.generateDummyAbuseReportEntity({
+						targetUserId: dummyUser1.id,
+						targetUser: dummyUser1,
+						reporterId: dummyUser2.id,
+						reporter: dummyUser2,
+						assigneeId: dummyUser3.id,
+						assignee: dummyUser3,
+						resolved: true,
+					}),
+					resolver: this.generateDummyAbuseReportResolver(),
+				});
+				break;
+			}
 			default: {
 				const _exhaustiveAssertion: never = params.type;
 				throw new Error(`Unhandled webhook type: ${_exhaustiveAssertion}`);
@@ -328,6 +346,20 @@ export class WebhookTestService {
 				send('inactiveModeratorsInvitationOnlyChanged', {});
 				break;
 			}
+			case 'reportAutoResolved':
+				send('reportAutoResolved', {
+					resolver: await this.toPackedUserLite(dummyUser3),
+					report: await this.generateAbuseReport({
+						targetUserId: dummyUser1.id,
+						targetUser: dummyUser1,
+						reporterId: dummyUser2.id,
+						reporter: dummyUser2,
+						assigneeId: dummyUser3.id,
+						assignee: dummyUser3,
+						resolved: true,
+					}),
+				});
+				break;
 			default: {
 				const _exhaustiveAssertion: never = params.type;
 				throw new Error(`Unhandled system webhook type: ${_exhaustiveAssertion}`);
@@ -337,7 +369,19 @@ export class WebhookTestService {
 
 	@bindThis
 	private async generateAbuseReport(override?: Partial<MiAbuseUserReport>): Promise<AbuseReportPayload> {
-		const result: MiAbuseUserReport = {
+		const result = this.generateDummyAbuseReportEntity(override);
+
+		return {
+			...result,
+			targetUser: result.targetUser ? await this.toPackedUserLite(result.targetUser) : null,
+			reporter: result.reporter ? await this.toPackedUserLite(result.reporter) : null,
+			assignee: result.assignee ? await this.toPackedUserLite(result.assignee) : null,
+		};
+	}
+
+	@bindThis
+	private generateDummyAbuseReportEntity(override?: Partial<MiAbuseUserReport>): MiAbuseUserReport {
+		return {
 			id: 'dummy-abuse-report1',
 			targetUserId: 'dummy-target-user',
 			targetUser: null,
@@ -356,13 +400,23 @@ export class WebhookTestService {
 			createdAt: new Date(),
 			...override,
 		};
+	}
 
+	@bindThis
+	private generateDummyAbuseReportResolver(override?: Partial<MiAbuseReportResolver>): MiAbuseReportResolver {
 		return {
-			...result,
-			targetUser: result.targetUser ? await this.toPackedUserLite(result.targetUser) : null,
-			reporter: result.reporter ? await this.toPackedUserLite(result.reporter) : null,
-			assignee: result.assignee ? await this.toPackedUserLite(result.assignee) : null,
-		};
+			id: 'dummy-resolver-1',
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			name: 'Dummy Resolver',
+			targetUserPattern: null,
+			reporterPattern: null,
+			reportContentPattern: null,
+			expirationDate: null,
+			expiresAt: 'indefinitely',
+			forward: false,
+			...override,
+		} as MiAbuseReportResolver;
 	}
 
 	@bindThis

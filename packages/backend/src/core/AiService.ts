@@ -34,9 +34,9 @@ export class AiService {
 		this.logger = this.loggerService.getLogger('ai');
 	}
 
-	@bindThis
 	public async detectSensitive(path: string, mime: string): Promise<PredictionType[] | null>;
 	public async detectSensitive(source: string | Buffer): Promise<PredictionType[] | null>;
+	@bindThis
 	public async detectSensitive(sourceOrPath: string | Buffer, mime?: string): Promise<PredictionType[] | null> {
 		try {
 			if (isSupportedCpu === undefined) {

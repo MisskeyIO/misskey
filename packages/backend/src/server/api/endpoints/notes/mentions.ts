@@ -5,6 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import type { NotesRepository, FollowingsRepository } from '@/models/_.js';
+import { Brackets } from 'typeorm';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { QueryService } from '@/core/QueryService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';

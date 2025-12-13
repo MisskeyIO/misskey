@@ -156,8 +156,8 @@ export class MetaEntityService {
 
 		return {
 			...packed,
-			cacheRemoteFiles: instance.cacheRemoteFiles,
-			cacheRemoteSensitiveFiles: instance.cacheRemoteSensitiveFiles,
+			cacheRemoteFiles: false,
+			cacheRemoteSensitiveFiles: false,
 			requireSetup: this.meta.rootUserId == null,
 			proxyAccountName: proxyAccount.username,
 			features: {
@@ -172,7 +172,7 @@ export class MetaEntityService {
 				reCaptcha: instance.enableRecaptcha,
 				recaptcha: instance.enableRecaptcha,
 				turnstile: instance.enableTurnstile,
-				objectStorage: instance.useObjectStorage,
+				objectStorage: !!this.config.s3,
 				serviceWorker: instance.enableServiceWorker,
 				miauth: true,
 			},

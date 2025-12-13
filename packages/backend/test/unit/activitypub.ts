@@ -95,8 +95,6 @@ describe('ActivityPub', () => {
 	let resolver: MockResolver;
 
 	const metaInitial = {
-		cacheRemoteFiles: true,
-		cacheRemoteSensitiveFiles: true,
 		enableFanoutTimeline: true,
 		enableFanoutTimelineDbFallback: true,
 		perUserHomeTimelineCacheMax: 100,
@@ -354,65 +352,7 @@ describe('ActivityPub', () => {
 				await createRandomRemoteUser(resolver, personService),
 				imageObject,
 			);
-			assert.ok(driveFile && !driveFile.isLink);
-
-			const sensitiveImageObject: IApDocument = {
-				type: 'Document',
-				mediaType: 'image/png',
-				url: 'http://host1.test/bar.png',
-				name: '',
-				sensitive: true,
-			};
-			const sensitiveDriveFile = await imageService.createImage(
-				await createRandomRemoteUser(resolver, personService),
-				sensitiveImageObject,
-			);
-			assert.ok(sensitiveDriveFile && !sensitiveDriveFile.isLink);
-		});
-
-		test('cacheRemoteFiles=false disables caching', async () => {
-			updateMeta({ ...metaInitial, cacheRemoteFiles: false });
-
-			const imageObject: IApDocument = {
-				type: 'Document',
-				mediaType: 'image/png',
-				url: 'http://host1.test/foo.png',
-				name: '',
-			};
-			const driveFile = await imageService.createImage(
-				await createRandomRemoteUser(resolver, personService),
-				imageObject,
-			);
 			assert.ok(driveFile && driveFile.isLink);
-
-			const sensitiveImageObject: IApDocument = {
-				type: 'Document',
-				mediaType: 'image/png',
-				url: 'http://host1.test/bar.png',
-				name: '',
-				sensitive: true,
-			};
-			const sensitiveDriveFile = await imageService.createImage(
-				await createRandomRemoteUser(resolver, personService),
-				sensitiveImageObject,
-			);
-			assert.ok(sensitiveDriveFile && sensitiveDriveFile.isLink);
-		});
-
-		test('cacheRemoteSensitiveFiles=false only affects sensitive files', async () => {
-			updateMeta({ ...metaInitial, cacheRemoteSensitiveFiles: false });
-
-			const imageObject: IApDocument = {
-				type: 'Document',
-				mediaType: 'image/png',
-				url: 'http://host1.test/foo.png',
-				name: '',
-			};
-			const driveFile = await imageService.createImage(
-				await createRandomRemoteUser(resolver, personService),
-				imageObject,
-			);
-			assert.ok(driveFile && !driveFile.isLink);
 
 			const sensitiveImageObject: IApDocument = {
 				type: 'Document',

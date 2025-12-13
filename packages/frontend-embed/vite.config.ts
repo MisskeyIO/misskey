@@ -138,6 +138,17 @@ export function getConfig(): UserConfig {
 					},
 					chunkFileNames: process.env.NODE_ENV === 'production' ? '[hash:8].js' : '[name]-[hash:8].js',
 					assetFileNames: process.env.NODE_ENV === 'production' ? '[hash:8][extname]' : '[name]-[hash:8][extname]',
+					sourcemapPathTransform: (relativeSourcePath, sourcemapPath) => {
+						const repoRoot = path.resolve(__dirname, '../..');
+						const absoluteSourcePath = path.isAbsolute(relativeSourcePath)
+							? relativeSourcePath
+							: path.resolve(path.dirname(sourcemapPath), relativeSourcePath);
+						const rootedPath = path.relative(repoRoot, absoluteSourcePath);
+
+						return rootedPath.startsWith('..')
+							? relativeSourcePath.replaceAll('\\', '/')
+							: rootedPath.replaceAll('\\', '/');
+					},
 					paths(id) {
 						for (const p of externalPackages) {
 							if (p.match.test(id)) {

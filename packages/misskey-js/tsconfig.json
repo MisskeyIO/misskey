@@ -7,6 +7,7 @@
 		"declaration": true,
 		"declarationMap": true,
 		"sourceMap": true,
+		"sourceRoot": "/",
 		"outDir": "./built/",
 		"removeComments": true,
 		"strict": true,

@@ -4,7 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<PageWithHeader :actions="headerActions" :tabs="headerTabs">
+<PageWithHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs">
 	<div class="_spacer" style="--MI_SPACER-w: 800px;">
 			<div v-if="tab === 'all'">
 				<MkNotes ref="notes" class="" :pagination="pagination"/>

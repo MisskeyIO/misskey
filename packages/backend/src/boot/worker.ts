@@ -4,11 +4,19 @@
  */
 
 import cluster from 'node:cluster';
+import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
 import * as Sentry from '@sentry/node';
 import { nodeProfilingIntegration } from '@sentry/profiling-node';
 import { envOption } from '@/env.js';
 import { loadConfig } from '@/config.js';
 import { jobQueue, server } from './common.js';
+
+const _filename = fileURLToPath(import.meta.url);
+const _dirname = dirname(_filename);
+
+const meta = JSON.parse(fs.readFileSync(`${_dirname}/../../../../built/meta.json`, 'utf-8'));
 
 /**
  * Init worker process
@@ -18,16 +26,13 @@ export async function workerMain() {
 
 	if (config.sentryForBackend) {
 		Sentry.init({
+			release: meta.version,
 			integrations: [
 				...(config.sentryForBackend.enableNodeProfiling ? [nodeProfilingIntegration()] : []),
 			],
 
-			// Performance Monitoring
-			tracesSampleRate: 1.0, //  Capture 100% of the transactions
-
-			// Set sampling rate for profiling - this is relative to tracesSampleRate
-			profilesSampleRate: 1.0,
-
+			tracesSampleRate: 1,
+			profileSessionSampleRate: 1,
 			maxBreadcrumbs: 0,
 
 			...config.sentryForBackend.options,

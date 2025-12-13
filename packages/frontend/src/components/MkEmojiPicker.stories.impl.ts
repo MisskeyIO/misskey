@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { action } from '@storybook/addon-actions';
-import { expect, userEvent, waitFor, within } from '@storybook/test';
-import type { StoryObj } from '@storybook/vue3';
+import { action } from 'storybook/actions';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+import type { StoryObj } from '@storybook/vue3-vite';
 import MkEmojiPicker from './MkEmojiPicker.vue';
 import { i18n } from '@/i18n.js';
 export const Default = {

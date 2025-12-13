@@ -309,6 +309,18 @@ export class ClientServerService {
 			reply.header('Content-Security-Policy-Report-Only', csp.replace('{scriptNonce}', `'nonce-${scriptNonce}'`));
 			done();
 		});
+
+		fastify.addHook('onSend', (request, reply, payload, done) => {
+			const contentType = reply.getHeader('Content-Type');
+			if (Array.isArray(contentType)
+				? contentType.some(v => v.startsWith('text/html'))
+				: typeof contentType === 'string' && contentType.startsWith('text/html')
+			) {
+				reply.header('Cache-Tag', 'misskey-html');
+			}
+			done();
+		});
+
 		//#region vite assets
 		if (this.config.frontendEmbedManifestExists) {
 			fastify.register((fastify, options, done) => {

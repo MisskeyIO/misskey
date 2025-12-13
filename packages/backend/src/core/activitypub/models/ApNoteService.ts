@@ -7,8 +7,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { In } from 'typeorm';
 import * as Redis from 'ioredis';
 import { DI } from '@/di-symbols.js';
-import type { UsersRepository, PollsRepository, EmojisRepository, MiMeta } from '@/models/_.js';
-import type { Config } from '@/config.js';
+import type { PollsRepository, EmojisRepository } from '@/models/_.js';
 import type { MiRemoteUser } from '@/models/User.js';
 import type { MiNote } from '@/models/Note.js';
 import { acquireApObjectLock } from '@/misc/distributed-lock.js';
@@ -44,9 +43,6 @@ export class ApNoteService {
 	private logger: Logger;
 
 	constructor(
-		@Inject(DI.config)
-		private config: Config,
-
 		@Inject(DI.redisForTimelines)
 		private redisForTimelines: Redis.Redis,
 
@@ -407,9 +403,16 @@ export class ApNoteService {
 		// eslint-disable-next-line no-param-reassign
 		host = this.utilityService.toPuny(host);
 
+		const meta = await this.metaService.fetch();
+		const normalizedHost = this.utilityService.normalizeHost(host);
+		const isBlocked = (name: string): boolean => {
+			const candidates = [`${name}@${normalizedHost}`, name];
+			return candidates.some(target => this.utilityService.isFilterMatches(target, meta.blockedRemoteCustomEmojis));
+		};
+
 		const eomjiTags = toArray(tags)
 			.filter(isEmoji)
-			.filter(tag => !this.utilityService.isBlockedRemoteCustomEmoji(tag.name.replaceAll(':', ''), host));
+			.filter(tag => !isBlocked(tag.name.replaceAll(':', '')));
 
 		const existingEmojis = await this.emojisRepository.findBy({
 			host,

@@ -1112,7 +1112,7 @@ sensitiveWordsDescription: "설정한 단어가 포함된 노트의 공개 범�
 sensitiveWordsDescription2: "공백으로 구분하면 AND 지정이 되며, 키워드를 슬래시로 둘러싸면 정규 표현식이 됩니다."
 blockedRemoteCustomEmojis: "차단할 리모트 커스텀 이모지"
 blockedRemoteCustomEmojisDescription: "name 또는 name@host가 이 표현식과 일치하는 리모트 커스텀 이모지는 가져오거나 표시하지 않습니다. 줄 바꿈으로 여러 개를 설정할 수 있습니다."
-blockedRemoteCustomEmojisDescription2: "공백으로 구분하면 AND 지정이 되며, 키워드를 슬래시로 둘러싸면 정규 표현식이 됩니다."
+blockedRemoteCustomEmojisDescription2: "항목을 슬래시로 둘러싸면 정규 표현식이 됩니다."
 prohibitedWords: "금지된 단어"
 prohibitedWordsDescription: "설정한 단어가 포함된 노트는 게시할 수 없게 됩니다. 개행으로 구분하여 여러 개를 지정할 수 있습니다."
 prohibitedWordsDescription2: "공백으로 구분하면 AND 지정이 되며, 키워드를 슬래시로 둘러싸면 정규 표현식이 됩니다."

@@ -400,7 +400,7 @@ export class CustomEmojiService implements OnApplicationShutdown {
 
 				cursor = remoteEmojis.at(-1)?.id;
 
-				const blockedEmojis = remoteEmojis.filter(this.isBlockedRemoteEmoji);
+				const blockedEmojis = remoteEmojis.filter(emoji => this.isBlockedRemoteEmoji(emoji, blockedRemoteCustomEmojis));
 				for (let i = 0; i < blockedEmojis.length; i += DELETE_BATCH_SIZE) {
 					const chunk = blockedEmojis.slice(i, i + DELETE_BATCH_SIZE);
 					const chunkIds = chunk.map(emoji => emoji.id);
@@ -429,7 +429,7 @@ export class CustomEmojiService implements OnApplicationShutdown {
 	}
 
 	@bindThis
-	private isBlockedRemoteEmoji(emoji: MiEmoji | { name: string; host: string | null; }): boolean {
+	private isBlockedRemoteEmoji(emoji: MiEmoji | { name: string; host: string | null; }, blockedRemoteCustomEmojis?: string[]): boolean {
 		if (emoji.host == null) return false;
 
 		const normalizedHost = this.utilityService.normalizeHost(emoji.host);
@@ -437,7 +437,7 @@ export class CustomEmojiService implements OnApplicationShutdown {
 		return [
 			`${emoji.name}@${normalizedHost}`,
 			emoji.name,
-		].some(target => this.utilityService.isFilterMatches(target, this.meta.blockedRemoteCustomEmojis));
+		].some(target => this.utilityService.isFilterMatches(target, blockedRemoteCustomEmojis ?? this.meta.blockedRemoteCustomEmojis));
 	}
 
 	@bindThis

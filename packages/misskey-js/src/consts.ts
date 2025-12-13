@@ -198,9 +198,9 @@ export const reversiUpdateKeys = [
 
 export type ReversiUpdateKey = typeof reversiUpdateKeys[number];
 
-type AvatarDecoration = UserLite['avatarDecorations'][number];
+export type AvatarDecoration = UserLite['avatarDecorations'][number];
 
-type ReceivedAbuseReport = {
+export type ReceivedAbuseReport = {
 	reportId: AbuseReportNotificationRecipient['id'];
 	report: operations['admin___abuse-user-reports']['responses'][200]['content']['application/json'];
 	forwarded: boolean;

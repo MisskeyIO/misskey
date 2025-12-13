@@ -23,6 +23,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<template #caption><SearchText>{{ i18n.ts.totpDescription }}</SearchText></template>
 						<template #suffix><i v-if="$i.twoFactorEnabled" class="ti ti-check" style="color: var(--MI_THEME-success)"></i></template>
 
+					<div class="_gaps_s">
+						<MkInfo>
+							<Mfm :text="i18n.tsx._2fa.detailedGuide({ link: `[${i18n.ts.here}](https://go.misskey.io/howto-2fa)`})"/>
+						</MkInfo>
+						<MkInfo v-if="$i.securityKeysList?.length > 0">{{ i18n.ts._2fa.whyTOTPOnlyRenew }}</MkInfo>
+
 						<div v-if="$i.twoFactorEnabled" class="_gaps_s">
 							<div v-text="i18n.ts._2fa.alreadyRegistered"/>
 							<template v-if="$i.securityKeysList!.length > 0">
@@ -32,11 +38,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<MkButton v-else danger @click="unregisterTOTP">{{ i18n.ts.unregister }}</MkButton>
 						</div>
 
-						<MkButton v-else primary gradate @click="registerTOTP">
+						<MkButton v-else-if="!$i.twoFactorEnabled" primary gradate @click="registerTOTP">
 							{{ i18n.ts._2fa.registerTOTP }}
 						</MkButton>
-					</MkFolder>
-				</SearchMarker>
+					</div>
+				</MkFolder>
+			</SearchMarker>
 
 			<SearchMarker :keywords="['security', 'key', 'passkey']">
 				<MkFolder>
@@ -57,7 +64,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 						<template v-else>
 							<MkButton primary @click="addSecurityKey">{{ i18n.ts._2fa.registerSecurityKey }}</MkButton>
-							<MkFolder v-for="key in $i.securityKeysList!" :key="key.id">
+							<MkFolder v-for="key in $i.securityKeysList" :key="key.id">
 								<template #label>{{ key.name }}</template>
 								<template #suffix><I18n :src="i18n.ts.lastUsedAt"><template #t><MkTime :time="key.lastUsed"/></template></I18n></template>
 								<div class="_buttons">
@@ -83,7 +90,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { defineAsyncComponent, computed } from 'vue';
-import { browserSupportsWebAuthn as webAuthnSupported, startRegistration, parseCreationOptionsFromJSON } from '@simplewebauthn/browser'; // FIXME Check
+import { browserSupportsWebAuthn as webAuthnSupported, startRegistration } from '@simplewebauthn/browser';
 import MkButton from '@/components/MkButton.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
@@ -115,7 +122,7 @@ async function registerTOTP(): Promise<void> {
 		token: auth.result.token,
 	});
 
-	await os.popupAsyncWithDialog(import('./2fa.qrdialog.vue').then(x => x.default), {
+	os.popup(defineAsyncComponent(() => import('./2fa.qrdialog.vue')), {
 		twoFactorData,
 	}, {}, 'closed');
 }
@@ -195,12 +202,9 @@ async function addSecurityKey() {
 	const auth = await os.authenticateDialog();
 	if (auth.canceled) return;
 
-	const registrationOptions = parseCreationOptionsFromJSON({
-		// @ts-expect-error misskey-js側に型がない
-		publicKey: await os.apiWithDialog('i/2fa/register-key', {
-			password: auth.result.password,
-			token: auth.result.token,
-		}),
+	const registrationOptions = await os.apiWithDialog('i/2fa/register-key', {
+		password: auth.result.password,
+		token: auth.result.token,
 	});
 
 	const name = await os.inputText({
@@ -224,11 +228,11 @@ async function addSecurityKey() {
 	if (auth2.canceled) return;
 
 	await os.apiWithDialog('i/2fa/key-done', {
-		password: auth2.result.password,
-		token: auth2.result.token,
+		password: auth.result.password,
+		token: auth.result.token,
 		name: name.result,
 		// @ts-expect-error misskey-js側に型がない
-		credential: credential.toJSON(),
+		credential,
 	});
 }
 

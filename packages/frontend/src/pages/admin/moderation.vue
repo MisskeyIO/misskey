@@ -165,7 +165,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</MkFolder>
 				</SearchMarker>
 	</div>
-</PageWithHeader>
+		</SearchMarker>
+</div></PageWithHeader>
 </template>
 
 <script lang="ts" setup>

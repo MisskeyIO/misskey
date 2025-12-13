@@ -79,8 +79,6 @@ import * as Misskey from 'misskey-js';
 import MkInfo from '@/components/MkInfo.vue';
 import MkMediaList from '@/components/MkMediaList.vue';
 import MkKeyValue from '@/components/MkKeyValue.vue';
-import MkResult from '@/components/MkResult.vue';
-import MkTime from '@/components/MkTime.vue';
 import bytes from '@/filters/bytes.js';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';

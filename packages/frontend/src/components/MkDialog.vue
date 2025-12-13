@@ -138,7 +138,6 @@ const emit = defineEmits<{
 const modal = useTemplateRef('modal');
 
 const inputValue = ref<string | number | null>(props.input?.default ?? null);
-const selectedValue = ref(props.select?.default ?? null);
 const switchValue = ref<boolean>(false);
 
 const sec = ref(props.okWaitDuration);

@@ -81,10 +81,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</MkInput>
 							</SearchMarker>
 
-							<MkInfo v-if="!instance.providesTarball && !infoForm.state.repositoryUrl" warn>
-								{{ i18n.ts.repositoryUrlOrTarballRequired }}
-							</MkInfo>
-
 							<SearchMarker :keywords="['impressum', 'legalNotice']">
 								<MkInput v-model="infoForm.state.impressumUrl" type="url">
 									<template #label><SearchLabel>{{ i18n.ts.impressumUrl }}</SearchLabel><span v-if="infoForm.modifiedStates.impressumUrl" class="_modified">{{ i18n.ts.modified }}</span></template>
@@ -376,8 +372,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed } from 'vue';
-import MkSwitch from '@/components/MkSwitch.vue';
-
 import MkInput from '@/components/MkInput.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import MkTextarea from '@/components/MkTextarea.vue';

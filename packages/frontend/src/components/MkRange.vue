@@ -157,6 +157,7 @@ onBeforeUnmount(() => {
 	tooltipForHoverShowing.value = false;
 });
 
+async function onMouseenter() {
 	if (isTouchUsing) return;
 
 	tooltipForHoverShowing.value = true;
@@ -176,7 +177,7 @@ onBeforeUnmount(() => {
 
 let lastClickTime: number | null = null;
 
-function onMousedown(ev: MouseEvent | TouchEvent) {
+async function onMousedown(ev: MouseEvent | TouchEvent) {
 	if (props.disabled) return; // Prevent interaction if disabled
 	ev.preventDefault();
 

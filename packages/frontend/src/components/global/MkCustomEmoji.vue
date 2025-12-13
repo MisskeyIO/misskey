@@ -12,7 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	style="-webkit-user-drag: none;"
 	@click="onClick"
 />
-<img
+<span
 	v-else-if="errored && !fallbackToImage">:{{ customEmojiName }}:</span>
 <img v-else-if="errored" src="/client-assets/dummy.png" :alt="alt" :title="alt" decoding="async" style="-webkit-user-drag: none;" :class="[$style.root, { [$style.normal]: normal, [$style.noStyle]: noStyle }]"/>
 <img

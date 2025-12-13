@@ -432,6 +432,7 @@ function menuEdit() {
 	.instanceIconAlt {
 		display: inline-block;
 		width: 85%;
+	}
 	.realtimeMode {
 		display: inline-block;
 		width: var(--top-height);

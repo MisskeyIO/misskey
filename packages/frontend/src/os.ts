@@ -646,8 +646,7 @@ export async function selectUser(opts: {
 
 export async function selectDriveFile(multiple: boolean): Promise<Misskey.entities.DriveFile[]> {
 	return new Promise(async (resolve) => {
-		await popup(defineAsyncComponent(() => import('@/components/MkDriveSelectDialog.vue')), {
-			type: 'file',
+		await popup(defineAsyncComponent(() => import('@/components/MkDriveFileSelectDialog.vue')), {
 			multiple,
 		}, {
 			done: files => {
@@ -661,7 +660,7 @@ export async function selectDriveFile(multiple: boolean): Promise<Misskey.entiti
 
 export async function selectDriveFolder(multiple: boolean): Promise<Misskey.entities.DriveFolder[]> {
 	return new Promise(async (resolve) => {
-		await popup(defineAsyncComponent(() => import('@/components/MkDriveSelectDialog.vue')), {
+		await popup(defineAsyncComponent(() => import('@/components/MkDriveFolderSelectDialog.vue')), {
 			type: 'folder',
 			multiple,
 		}, {

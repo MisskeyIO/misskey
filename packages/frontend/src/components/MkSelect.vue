@@ -35,7 +35,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="const ITEMS extends MkSelectItem[], MODELT extends OptionValue">
 import { onMounted, nextTick, ref, watch, computed, toRefs, useSlots, useTemplateRef } from 'vue';
 import { useInterval } from '@@/js/use-interval.js';
 import type { VNode, VNodeChild } from 'vue';
@@ -67,37 +67,6 @@ export type GetMkSelectValueType<T extends MkSelectItem> = T extends ItemGroup
 export type GetMkSelectValueTypesFromDef<T extends MkSelectItem[]> = T[number] extends MkSelectItem
 	? GetMkSelectValueType<T[number]>
 	: never;
-
-export type ItemOption<T extends OptionValue = OptionValue> = {
-	type?: 'option';
-	value: T;
-	label: string;
-};
-
-export type ItemGroup<T extends OptionValue = OptionValue> = {
-	type: 'group';
-	label?: string;
-	items: ItemOption<T>[];
-};
-
-export type MkSelectItem<T extends OptionValue = OptionValue> = ItemOption<T> | ItemGroup<T>;
-
-export type GetMkSelectValueType<T extends MkSelectItem> = T extends ItemGroup
-	? T['items'][number]['value']
-	: T extends ItemOption
-		? T['value']
-		: never;
-
-export type GetMkSelectValueTypesFromDef<T extends MkSelectItem[]> = T[number] extends MkSelectItem
-	? GetMkSelectValueType<T[number]>
-	: never;
-</script>
-
-<script lang="ts" setup generic="const ITEMS extends MkSelectItem[], MODELT extends OptionValue">
-import { onMounted, nextTick, ref, watch, computed, toRefs, useTemplateRef } from 'vue';
-import { useInterval } from '@@/js/use-interval.js';
-import type { MenuItem } from '@/types/menu.js';
-import * as os from '@/os.js';
 
 const props = defineProps<{
 	items: ITEMS;
@@ -201,24 +170,25 @@ function show() {
 					type: 'label',
 					text: item.label,
 				});
-				for (const option of item.items) {
-					menu.push({
-						text: option.label,
-						active: computed(() => model.value === option.value),
-						action: () => {
-							model.value = option.value as ModelTChecked;
-						},
-					});
-				}
-			} else {
+			}
+			for (const option of item.items) {
 				menu.push({
-					text: item.label,
-					active: computed(() => model.value === item.value),
+					text: option.label,
+					active: computed(() => model.value === option.value),
 					action: () => {
-						model.value = item.value as ModelTChecked;
+						model.value = option.value as ModelTChecked;
 					},
 				});
 			}
+		} else {
+			menu.push({
+				text: item.label,
+				active: computed(() => model.value === item.value),
+				action: () => {
+					model.value = item.value as ModelTChecked;
+				},
+			});
+		}
 	}
 
 	os.popupMenu(menu, container.value, {

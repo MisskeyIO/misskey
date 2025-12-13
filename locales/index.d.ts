@@ -5481,6 +5481,10 @@ export interface Locale extends ILocale {
      */
     "autoloadDrafts": string;
     /**
+     * 下書き
+     */
+    "drafts": string;
+    /**
      * 未送信
      */
     "unsent": string;
@@ -8371,30 +8375,6 @@ export interface Locale extends ILocale {
              * チャットを許可
              */
             "chatAvailability": string;
-            /**
-             * アップロード可能なファイル種別
-             */
-            "uploadableFileTypes": string;
-            /**
-             * MIMEタイプを指定します。改行で区切って複数指定できるほか、アスタリスク(*)でワイルドカード指定できます。(例: image/*)
-             */
-            "uploadableFileTypes_caption": string;
-            /**
-             * ファイルによっては種別を判定できないことがあります。そのようなファイルを許可する場合は {x} を指定に追加してください。
-             */
-            "uploadableFileTypes_caption2": ParameterizedString<"x">;
-            /**
-             * サーバーサイドのノートの下書きの作成可能数
-             */
-            "noteDraftLimit": string;
-            /**
-             * 予約投稿の同時作成可能数
-             */
-            "scheduledNoteLimit": string;
-            /**
-             * ウォーターマーク機能の使用可否
-             */
-            "watermarkAvailable": string;
         };
         "_condition": {
             /**
@@ -13413,10 +13393,6 @@ export interface Locale extends ILocale {
             "circle": string;
         };
     };
-    /**
-     * 下書き
-     */
-    "drafts": string;
     "_drafts": {
         /**
          * 下書きを選択

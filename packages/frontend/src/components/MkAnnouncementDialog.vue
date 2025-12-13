@@ -104,47 +104,47 @@ function onBgClick() {
 const hasReachedBottom = ref(false);
 
 onMounted(() => {
-\tif (sec.value > 0) {
-\t\tconst waitTimer = window.setInterval(() => {
-\t\t\tif (sec.value === 0) {
-\t\t\t\twindow.clearInterval(waitTimer);
-\t\t\t\tgotItDisabled.value = false;
-\t\t\t\tsecVisible.value = false;
-\t\t\t} else {
-\t\t\t\tgotItDisabled.value = true;
-\t\t\t}
-\t\t\tsec.value = sec.value - 1;
-\t\t}, 1000);
-\t} else {
-\t\tgotItDisabled.value = false;
-\t\tsecVisible.value = false;
-\t}
+	if (sec.value > 0) {
+		const waitTimer = window.setInterval(() => {
+			if (sec.value === 0) {
+				window.clearInterval(waitTimer);
+				gotItDisabled.value = false;
+				secVisible.value = false;
+			} else {
+				gotItDisabled.value = true;
+			}
+			sec.value = sec.value - 1;
+		}, 1000);
+	} else {
+		gotItDisabled.value = false;
+		secVisible.value = false;
+	}
 
-\tif (bottomEl.value && rootEl.value) {
-\t\tconst bottomElRect = bottomEl.value.getBoundingClientRect();
-\t\tconst rootElRect = rootEl.value.getBoundingClientRect();
-\t\tif (
-\t\t\tbottomElRect.top >= rootElRect.top &&
-\t\t\tbottomElRect.top <= (rootElRect.bottom - 66) // 66 ≒ 75 * 0.9 (modalのアニメーション分)
-\t\t) {
-\t\t\thasReachedBottom.value = true;
-\t\t\treturn;
-\t\t}
+	if (bottomEl.value && rootEl.value) {
+		const bottomElRect = bottomEl.value.getBoundingClientRect();
+		const rootElRect = rootEl.value.getBoundingClientRect();
+		if (
+			bottomElRect.top >= rootElRect.top &&
+   bottomElRect.top <= (rootElRect.bottom - 66) // 66 ≒ 75 * 0.9 (modalのアニメーション分)
+		) {
+			hasReachedBottom.value = true;
+			return;
+		}
 
-\t\tconst observer = new IntersectionObserver(entries => {
-\t\t\tfor (const entry of entries) {
-\t\t\t\tif (entry.isIntersecting) {
-\t\t\t\t\thasReachedBottom.value = true;
-\t\t\t\t\tobserver.disconnect();
-\t\t\t\t}
-\t\t\t}
-\t\t}, {
-\t\t\troot: rootEl.value,
-\t\t\trootMargin: '0px 0px -75px 0px',
-\t\t});
+		const observer = new IntersectionObserver(entries => {
+			for (const entry of entries) {
+				if (entry.isIntersecting) {
+					hasReachedBottom.value = true;
+					observer.disconnect();
+				}
+			}
+		}, {
+			root: rootEl.value,
+			rootMargin: '0px 0px -75px 0px',
+		});
 
-\t\tobserver.observe(bottomEl.value);
-\t}
+		observer.observe(bottomEl.value);
+	}
 });
 </script>
 

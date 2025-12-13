@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <PageWithHeader :actions="headerActions" :tabs="headerTabs">
 	<div class="_spacer" style="--MI_SPACER-w: 700px; --MI_SPACER-min: 16px; --MI_SPACER-max: 32px;">
 		<SearchMarker path="/admin/external-services" :label="i18n.ts.externalServices" :keywords="['external', 'services', 'thirdparty']" icon="ti ti-link">
-			<FormSuspense :p="init">
+			<MkSuspense :p="init">
 				<div class="_gaps_m">
 					<MkFolder>
 						<template #label>Google Analytics<span class="_beta">{{ i18n.ts.beta }}</span></template>
@@ -24,20 +24,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkFolder>
 						<template #label>DeepL Translation</template>
 
-				<div class="_gaps_m">
-					<MkInput v-model="deeplAuthKey">
-						<template #prefix><i class="ti ti-key"></i></template>
-						<template #label>DeepL Auth Key</template>
-					</MkInput>
-					<MkSwitch v-model="deeplIsPro">
-						<template #label>Pro account</template>
-					</MkSwitch>
-					<MkButton primary @click="save_deepl">Save</MkButton>
+						<div class="_gaps_m">
+							<MkInput v-model="deeplAuthKey">
+								<template #prefix><i class="ti ti-key"></i></template>
+								<template #label>DeepL Auth Key</template>
+							</MkInput>
+							<MkSwitch v-model="deeplIsPro">
+								<template #label>Pro account</template>
+							</MkSwitch>
+							<MkButton primary @click="save_deepl">Save</MkButton>
+						</div>
+					</MkFolder>
 				</div>
-			</MkFolder>
-		</FormSuspense>
-	</div>
-</PageWithHeader>
+			</MkSuspense>
+		</SearchMarker>
 	</div>
 	<template #footer>
 		<div :class="$style.footer">
@@ -61,17 +61,39 @@ import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import MkFolder from '@/components/MkFolder.vue';
 
-const meta = await misskeyApi('admin/meta');
+const deeplAuthKey = ref('');
+const deeplIsPro = ref(false);
+const googleAnalyticsMeasurementId = ref('');
 
-const deeplAuthKey = ref(meta.deeplAuthKey ?? '');
-const deeplIsPro = ref(meta.deeplIsPro);
-const googleAnalyticsMeasurementId = ref(meta.googleAnalyticsMeasurementId ?? '');
+async function init() {
+	const meta = await misskeyApi('admin/meta');
+	deeplAuthKey.value = meta.deeplAuthKey ?? '';
+	deeplIsPro.value = meta.deeplIsPro;
+	googleAnalyticsMeasurementId.value = meta.googleAnalyticsMeasurementId ?? '';
+}
 
 function save() {
 	os.apiWithDialog('admin/update-meta', {
 		deeplAuthKey: deeplAuthKey.value,
 		deeplIsPro: deeplIsPro.value,
-		googleAnalyticsId: googleAnalyticsId.value,
+		googleAnalyticsMeasurementId: googleAnalyticsMeasurementId.value,
+	}).then(() => {
+		fetchInstance(true);
+	});
+}
+
+function save_googleAnalytics() {
+	os.apiWithDialog('admin/update-meta', {
+		googleAnalyticsMeasurementId: googleAnalyticsMeasurementId.value,
+	}).then(() => {
+		fetchInstance(true);
+	});
+}
+
+function save_deepl() {
+	os.apiWithDialog('admin/update-meta', {
+		deeplAuthKey: deeplAuthKey.value,
+		deeplIsPro: deeplIsPro.value,
 	}).then(() => {
 		fetchInstance(true);
 	});

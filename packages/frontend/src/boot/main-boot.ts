@@ -4,7 +4,8 @@
  */
 
 import { createApp, defineAsyncComponent, markRaw } from 'vue';
-import { lang, locale, ui, updateLocale, version } from '@@/js/config.js';
+import { lang, ui, version } from '@@/js/config.js';
+import { locale, updateLocale } from '@@/js/locale.js';
 import * as Misskey from 'misskey-js';
 import { compareVersions } from 'compare-versions';
 import { common } from './common.js';

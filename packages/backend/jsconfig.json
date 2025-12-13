@@ -5,8 +5,9 @@
 		"moduleResolution": "nodenext",
 		"allowSyntheticDefaultImports": true,
 		"sourceMap": true,
-		"sourceRoot": "/"
-  },
+		"sourceRoot": "/",
+		"inlineSources": true
+	},
 	"exclude": [
 		"node_modules",
 		"jspm_packages",

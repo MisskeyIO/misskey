@@ -8,6 +8,7 @@
 		"declarationMap": true,
 		"sourceMap": true,
 		"sourceRoot": "/",
+		"inlineSources": true,
 		"outDir": "./js-built/",
 		"removeComments": true,
 		"resolveJsonModule": true,

@@ -167,6 +167,17 @@ export function getConfig(): UserConfig {
 					entryFileNames: `${meta.version}.[hash].js`,
 					chunkFileNames: `${meta.version}.[hash].js`,
 					assetFileNames: `${meta.version}.[hash][extname]`,
+					sourcemapPathTransform: (relativeSourcePath, sourcemapPath) => {
+						const repoRoot = path.resolve(__dirname, '../..');
+						const absoluteSourcePath = path.isAbsolute(relativeSourcePath)
+							? relativeSourcePath
+							: path.resolve(path.dirname(sourcemapPath), relativeSourcePath);
+						const rootedPath = path.relative(repoRoot, absoluteSourcePath);
+
+						return rootedPath.startsWith('..')
+							? relativeSourcePath.replaceAll('\\', '/')
+							: rootedPath.replaceAll('\\', '/');
+					},
 					paths(id: string): string {
 						for (const p of externalPackages) {
 							if (p.match.test(id)) return p.path(id, p.match);

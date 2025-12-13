@@ -20,6 +20,7 @@ const buildOptions = {
 	absWorkingDir: __dirname,
 	bundle: true,
 	sourcemap: true,
+	sourceRoot: '/',
 	define: {
 		_DEV_: JSON.stringify(process.env.NODE_ENV !== 'production'),
 		_ENV_: JSON.stringify(process.env.NODE_ENV ?? ''), // `NODE_ENV`が`undefined`なとき`JSON.stringify`が`undefined`を返してエラーになってしまうので`??`を使っている

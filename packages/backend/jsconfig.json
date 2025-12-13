@@ -2,7 +2,11 @@
 	"compilerOptions": {
 		"target": "ESNext",
 		"module": "NodeNext",
-		"allowSyntheticDefaultImports": true
+		"moduleResolution": "nodenext",
+		"allowSyntheticDefaultImports": true,
+		"sourceMap": true,
+		"sourceRoot": "/",
+		"inlineSources": true
 	},
 	"exclude": [
 		"node_modules",

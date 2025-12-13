@@ -5,7 +5,7 @@
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable import/no-default-export */
-import type { StoryObj } from '@storybook/vue3';
+import type { StoryObj } from '@storybook/vue3-vite';
 import { channel } from '../../.storybook/fakes.js';
 import MkChannelPreview from './MkChannelPreview.vue';
 export const Default = {

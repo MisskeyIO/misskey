@@ -87,7 +87,6 @@
   "devDependencies": {
     "@misskey-dev/eslint-plugin": "catalog:",
     "@misskey-dev/summaly": "catalog:",
-    "@storybook/addon-actions": "catalog:",
     "@storybook/addon-links": "catalog:",
     "@storybook/react-vite": "catalog:",
     "@storybook/vue3-vite": "catalog:",

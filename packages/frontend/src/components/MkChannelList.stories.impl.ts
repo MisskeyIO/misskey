@@ -5,9 +5,9 @@
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable import/no-default-export */
-import type { StoryObj } from '@storybook/vue3';
+import type { StoryObj } from '@storybook/vue3-vite';
 import { HttpResponse, http } from 'msw';
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 import { channel } from '../../.storybook/fakes.js';
 import { commonHandlers } from '../../.storybook/mocks.js';
 import MkChannelList from './MkChannelList.vue';

@@ -4,8 +4,8 @@
  */
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { expect } from '@storybook/test';
-import type { StoryObj } from '@storybook/vue3';
+import { expect } from 'storybook/test';
+import type { StoryObj } from '@storybook/vue3-vite';
 import { userDetailed } from '../../../.storybook/fakes.js';
 import MkUserName from './MkUserName.vue';
 export const Default = {

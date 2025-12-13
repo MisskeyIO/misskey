@@ -22,9 +22,9 @@
     "tsd": "tsd",
     "api": "pnpm api-extractor run --local --verbose",
     "api-prod": "pnpm api-extractor run --verbose",
-    "eslint": "eslint './**/*.{js,jsx,ts,tsx}'",
     "typecheck": "tsc --noEmit",
-    "lint": "pnpm typecheck && pnpm eslint",
+    "format": "biome check --write",
+    "lint": "pnpm typecheck && biome check",
     "jest": "jest --coverage --detectOpenHandles",
     "test": "pnpm jest && pnpm tsd",
     "update-autogen-code": "pnpm --filter misskey-js-type-generator generate && ncp generator/built/autogen src/autogen"
@@ -35,15 +35,12 @@
     "directory": "packages/misskey-js"
   },
   "devDependencies": {
+    "@biomejs/biome": "catalog:",
     "@microsoft/api-extractor": "catalog:",
-    "@misskey-dev/eslint-plugin": "catalog:",
     "@swc/jest": "catalog:",
     "@types/jest": "catalog:",
     "@types/node": "catalog:",
-    "@typescript-eslint/eslint-plugin": "catalog:",
-    "@typescript-eslint/parser": "catalog:",
     "esbuild": "catalog:",
-    "eslint": "catalog:",
     "glob": "catalog:",
     "jest": "catalog:",
     "jest-fetch-mock": "catalog:",

@@ -7,12 +7,9 @@
 		"generate": "tsx src/generator.ts && eslint ./built/**/*.ts --fix"
 	},
 	"devDependencies": {
-		"@misskey-dev/eslint-plugin": "catalog:",
+		"@biomejs/biome": "catalog:",
 		"@readme/openapi-parser": "catalog:",
 		"@types/node": "catalog:",
-		"@typescript-eslint/eslint-plugin": "catalog:",
-		"@typescript-eslint/parser": "catalog:",
-		"eslint": "catalog:",
 		"openapi-types": "catalog:",
 		"openapi-typescript": "catalog:",
 		"ts-case-convert": "catalog:",

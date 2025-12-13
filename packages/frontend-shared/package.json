@@ -16,19 +16,16 @@
   "scripts": {
     "build": "node ./build.js",
     "watch": "nodemon -w package.json -e json --exec \"node ./build.js --watch\"",
-    "eslint": "eslint './**/*.{js,jsx,ts,tsx}'",
     "typecheck": "tsc --noEmit",
-    "lint": "pnpm typecheck && pnpm eslint"
+    "format": "biome check --write",
+    "lint": "pnpm typecheck && biome check"
   },
   "devDependencies": {
+    "@biomejs/biome": "catalog:",
     "@types/node": "catalog:",
-    "@typescript-eslint/eslint-plugin": "catalog:",
-    "@typescript-eslint/parser": "catalog:",
     "esbuild": "catalog:",
-    "eslint-plugin-vue": "catalog:",
     "nodemon": "catalog:",
-    "typescript": "catalog:",
-    "vue-eslint-parser": "catalog:"
+    "typescript": "catalog:"
   },
   "files": [
     "js-built"

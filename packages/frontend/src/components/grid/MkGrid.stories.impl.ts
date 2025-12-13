@@ -5,7 +5,7 @@
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { action } from 'storybook/actions';
-import type { StoryObj } from '@storybook/vue3';
+import type { StoryObj } from '@storybook/vue3-vite';
 import { ref } from 'vue';
 import { commonHandlers } from '../../../.storybook/mocks.js';
 import { boolean, choose, country, date, firstName, integer, lastName, text } from '../../../.storybook/fake-utils.js';

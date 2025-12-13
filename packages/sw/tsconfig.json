@@ -9,6 +9,8 @@
 		"noFallthroughCasesInSwitch": true,
 		"declaration": false,
 		"sourceMap": true,
+		"sourceRoot": "/",
+		"inlineSources": true,
 		"target": "ES2022",
 		"module": "ES2022",
 		"moduleResolution": "bundler",

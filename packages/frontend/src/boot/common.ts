@@ -358,8 +358,10 @@ export async function common(createVue: () => Promise<App<Element>>) {
 
 	if (instance.sentryForFrontend) {
 		const Sentry = await import('@sentry/vue');
+
 		Sentry.init({
 			app,
+			release: version,
 			integrations: [
 				...(instance.sentryForFrontend.vueIntegration !== undefined ? [
 					Sentry.vueIntegration(instance.sentryForFrontend.vueIntegration ?? undefined),

@@ -7,7 +7,7 @@ import { http, HttpResponse } from 'msw';
 import { action } from 'storybook/actions';
 import { chatMessage } from '../../.storybook/fakes';
 import MkChatHistories from './MkChatHistories.vue';
-import type { StoryObj } from '@storybook/vue3';
+import type { StoryObj } from '@storybook/vue3-vite';
 import type * as Misskey from 'misskey-js';
 export const Default = {
 	render(args) {

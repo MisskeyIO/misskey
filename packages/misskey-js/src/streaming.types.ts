@@ -27,7 +27,7 @@ import type {
 	ReversiUpdateKey,
 } from './consts.js';
 
-type ReversiUpdateSettings<K extends ReversiUpdateKey> = {
+export type ReversiUpdateSettings<K extends ReversiUpdateKey> = {
 	key: K;
 	value: ReversiGameDetailed[K];
 };

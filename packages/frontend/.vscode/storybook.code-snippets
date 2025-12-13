@@ -4,7 +4,7 @@
 		"prefix": "storyimpl",
 		"body": [
 			"/* eslint-disable @typescript-eslint/explicit-function-return-type */",
-			"import { StoryObj } from '@storybook/vue3';",
+			"import { StoryObj } from '@storybook/vue3-vite';",
 			"import $1 from './$1.vue';",
 			"export const Default = {",
 			"\trender(args) {",
@@ -43,7 +43,7 @@
 		"body": [
 			"/* eslint-disable @typescript-eslint/explicit-function-return-type */",
 			"import { action } from 'storybook/actions';",
-			"import { StoryObj } from '@storybook/vue3';",
+			"import { StoryObj } from '@storybook/vue3-vite';",
 			"import $1 from './$1.vue';",
 			"export const Default = {",
 			"\trender(args) {",

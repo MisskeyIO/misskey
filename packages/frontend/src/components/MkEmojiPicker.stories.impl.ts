@@ -4,8 +4,8 @@
  */
 
 import { action } from 'storybook/actions';
-import { expect, userEvent, waitFor, within } from '@storybook/test';
-import type { StoryObj } from '@storybook/vue3';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+import type { StoryObj } from '@storybook/vue3-vite';
 import MkEmojiPicker from './MkEmojiPicker.vue';
 import { i18n } from '@/i18n.js';
 export const Default = {

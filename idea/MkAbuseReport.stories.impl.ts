@@ -5,7 +5,7 @@
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { action } from 'storybook/actions';
-import type { StoryObj } from '@storybook/vue3';
+import { StoryObj } from '@storybook/vue3-vite';
 import { HttpResponse, http } from 'msw';
 import { abuseUserReport } from '../packages/frontend/.storybook/fakes.js';
 import { commonHandlers } from '../packages/frontend/.storybook/mocks.js';

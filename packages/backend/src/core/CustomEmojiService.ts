@@ -19,6 +19,7 @@ import { MemoryKVCache, RedisSingleCache } from '@/misc/cache.js';
 import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
 import type { EmojisRepository, MiRole, MiUser } from '@/models/_.js';
 import type { MiEmoji } from '@/models/Emoji.js';
+import type { MiMeta } from '@/models/Meta.js';
 import type { Serialized } from '@/types.js';
 
 const parseEmojiStrRegexp = /^([-\w]+)(?:@([\w.-]+))?$/;
@@ -66,6 +67,8 @@ export class CustomEmojiService implements OnApplicationShutdown {
 	private emojisCache: MemoryKVCache<MiEmoji | null>;
 
 	constructor(
+		@Inject(DI.meta)
+		private meta: MiMeta,
 		@Inject(DI.redis)
 		private redisClient: Redis.Redis,
 		@Inject(DI.emojisRepository)
@@ -397,14 +400,7 @@ export class CustomEmojiService implements OnApplicationShutdown {
 
 				cursor = remoteEmojis.at(-1)?.id;
 
-				const blockedEmojis = remoteEmojis
-					.filter(emoji => emoji.host)
-					.filter(emoji => {
-						const normalizedHost = this.utilityService.normalizeHost(emoji.host!);
-						const candidates = [`${emoji.name}@${normalizedHost}`, emoji.name];
-						return candidates.some(target => this.utilityService.isKeyWordIncluded(target, blockedRemoteCustomEmojis));
-					});
-
+				const blockedEmojis = remoteEmojis.filter(emoji => this.isBlockedRemoteEmoji(emoji, blockedRemoteCustomEmojis));
 				for (let i = 0; i < blockedEmojis.length; i += DELETE_BATCH_SIZE) {
 					const chunk = blockedEmojis.slice(i, i + DELETE_BATCH_SIZE);
 					const chunkIds = chunk.map(emoji => emoji.id);
@@ -430,6 +426,18 @@ export class CustomEmojiService implements OnApplicationShutdown {
 				}
 			}
 		}
+	}
+
+	@bindThis
+	private isBlockedRemoteEmoji(emoji: MiEmoji | { name: string; host: string | null; }, blockedRemoteCustomEmojis?: string[]): boolean {
+		if (emoji.host == null) return false;
+
+		const normalizedHost = this.utilityService.normalizeHost(emoji.host);
+
+		return [
+			`${emoji.name}@${normalizedHost}`,
+			emoji.name,
+		].some(target => this.utilityService.isFilterMatches(target, blockedRemoteCustomEmojis ?? this.meta.blockedRemoteCustomEmojis));
 	}
 
 	@bindThis
@@ -469,7 +477,7 @@ export class CustomEmojiService implements OnApplicationShutdown {
 		const { name, host } = this.parseEmojiStr(emojiName, noteUserHost);
 		if (name == null) return null;
 		if (host == null) return null;
-		if (this.utilityService.isBlockedRemoteCustomEmoji(name, host)) return null;
+		if (this.isBlockedRemoteEmoji({ name, host })) return null;
 
 		const queryOrNull = async () => (await this.emojisRepository.findOneBy({
 			name,
@@ -505,7 +513,7 @@ export class CustomEmojiService implements OnApplicationShutdown {
 	public async prefetchEmojis(emojis: { name: string; host: string | null; }[]): Promise<void> {
 		const notCachedEmojis = emojis
 			.filter(emoji => this.emojisCache.get(`${emoji.name} ${emoji.host}`) == null)
-			.filter(emoji => !this.utilityService.isBlockedRemoteCustomEmoji(emoji.name, emoji.host));
+			.filter(emoji => !this.isBlockedRemoteEmoji(emoji));
 		const emojisQuery: any[] = [];
 		const hosts = new Set(notCachedEmojis.map(e => e.host));
 		for (const host of hosts) {

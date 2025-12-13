@@ -4,7 +4,7 @@
  */
 
 import { action } from 'storybook/actions';
-import type { StoryObj } from '@storybook/vue3';
+import type { StoryObj } from '@storybook/vue3-vite';
 import { http, HttpResponse } from 'msw';
 import * as Misskey from 'misskey-js';
 import { folder } from '../../.storybook/fakes.js';

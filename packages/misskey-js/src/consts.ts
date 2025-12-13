@@ -277,7 +277,7 @@ export const reversiUpdateKeys = [
 
 export type ReversiUpdateKey = typeof reversiUpdateKeys[number];
 
-type AvatarDecoration = {
+export type AvatarDecoration = {
 	id: string;
 	name: string;
 	url: string;
@@ -287,7 +287,7 @@ type AvatarDecoration = {
 	offsetY?: number;
 };
 
-type ReceivedAbuseReport = {
+export type ReceivedAbuseReport = {
 	reportId: AbuseReportNotificationRecipient['id'];
 	report: operations['admin___abuse-user-reports']['responses'][200]['content']['application/json'];
 	forwarded: boolean;

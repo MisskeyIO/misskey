@@ -74,16 +74,13 @@ export async function masterMain() {
 
 	if (config.sentryForBackend) {
 		Sentry.init({
+			release: meta.version,
 			integrations: [
 				...(config.sentryForBackend.enableNodeProfiling ? [nodeProfilingIntegration()] : []),
 			],
 
-			// Performance Monitoring
-			tracesSampleRate: 1.0, //  Capture 100% of the transactions
-
-			// Set sampling rate for profiling - this is relative to tracesSampleRate
-			profilesSampleRate: 1.0,
-
+			tracesSampleRate: 1,
+			profileSessionSampleRate: 1,
 			maxBreadcrumbs: 0,
 
 			...config.sentryForBackend.options,

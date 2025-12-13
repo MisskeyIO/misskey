@@ -21,6 +21,7 @@ const options = {
 	platform: 'browser',
 	format: 'esm',
 	sourcemap: true,
+	sourceRoot: '/',
 };
 
 const args = process.argv.slice(2).map(arg => arg.toLowerCase());

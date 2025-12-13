@@ -5,10 +5,10 @@
 
 import { HttpResponse, http } from 'msw';
 import { action } from 'storybook/actions';
-import { expect, userEvent, within } from '@storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 import { commonHandlers } from '../../.storybook/mocks.js';
 import MkClickerGame from './MkClickerGame.vue';
-import type { StoryObj } from '@storybook/vue3';
+import type { StoryObj } from '@storybook/vue3-vite';
 
 function sleep(ms: number) {
 	return new Promise(resolve => window.setTimeout(resolve, ms));

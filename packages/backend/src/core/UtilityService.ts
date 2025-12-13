@@ -77,6 +77,26 @@ export class UtilityService {
 	private static readonly isFilterRegExpPattern = /^\/(.+)\/(.*)$/;
 
 	@bindThis
+	public isFilterMatches(text: string, filters: string[]): boolean {
+		if (filters.length === 0) return false;
+		if (text === '') return false;
+
+		return filters.some(filter => {
+			const regexp = UtilityService.isFilterRegExpPattern.exec(filter);
+
+			if (!regexp) return filter === text;
+
+			try {
+				// TODO: RE2インスタンスをキャッシュ
+				return new RE2(regexp[1], regexp[2]).test(text);
+			} catch (err) {
+				// This should never happen due to input sanitization.
+				return false;
+			}
+		});
+	}
+
+	@bindThis
 	public isKeyWordIncluded(text: string, keyWords: string[]): boolean {
 		if (keyWords.length === 0) return false;
 		if (text === '') return false;
@@ -97,16 +117,6 @@ export class UtilityService {
 				return false;
 			}
 		});
-	}
-
-	@bindThis
-	public isBlockedRemoteCustomEmoji(name: string, host: string | null): boolean {
-		if (host == null) return false;
-
-		const normalizedHost = this.normalizeHost(host);
-		const candidates = [`${name}@${normalizedHost}`, name];
-
-		return candidates.some(target => this.isKeyWordIncluded(target, this.meta.blockedRemoteCustomEmojis));
 	}
 
 	@bindThis

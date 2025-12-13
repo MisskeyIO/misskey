@@ -1,6 +1,6 @@
 import { EventEmitter } from 'eventemitter3';
 import { ReconnectingWebSocket } from './lib/reconnecting-websocket/reconnecting-websocket.js';
-import type { Options } from './lib/reconnecting-websocket/reconnecting-websocket.js';
+import type { ReconnectingWebSocketOptions } from './lib/reconnecting-websocket/reconnecting-websocket.js';
 import type { BroadcastEvents, Channels } from './streaming.types.js';
 
 export function urlQuery(obj: Record<string, string | number | boolean | undefined>): string {
@@ -40,8 +40,7 @@ export interface IStream extends EventEmitter<StreamEvents> {
 /**
  * Misskey stream connection
  */
-// eslint-disable-next-line import/no-default-export
-export default class Stream extends EventEmitter<StreamEvents> implements IStream {
+export class Stream extends EventEmitter<StreamEvents> implements IStream {
 	private stream: ReconnectingWebSocket;
 	public state: 'initializing' | 'reconnecting' | 'connected' = 'initializing';
 	private sharedConnectionPools: Pool[] = [];
@@ -50,7 +49,7 @@ export default class Stream extends EventEmitter<StreamEvents> implements IStrea
 	private idCounter = 0;
 
 	constructor(origin: string, user: { token: string; } | null, options?: {
-		WebSocket?: Options['WebSocket'];
+		WebSocket?: ReconnectingWebSocketOptions['WebSocket'];
 		binaryType?: ReconnectingWebSocket['binaryType'];
 	}) {
 		super();
@@ -96,7 +95,7 @@ export default class Stream extends EventEmitter<StreamEvents> implements IStrea
 		return (++this.idCounter).toString();
 	}
 
-	public useChannel<C extends keyof Channels>(channel: C, params?: Channels[C]['params'], name?: string): Connection<Channels[C]> {
+	public useChannel<C extends keyof Channels>(channel: C, params?: Channels[C]['params'], name?: string): ChannelConnection<Channels[C]> {
 		if (params) {
 			return this.connectToChannel(channel, params);
 		} else {
@@ -170,7 +169,7 @@ export default class Stream extends EventEmitter<StreamEvents> implements IStrea
 		if (type === 'channel') {
 			const id = body.id;
 
-			let connections: Connection[];
+			let connections: ChannelConnection[];
 
 			connections = this.sharedConnections.filter(c => c.id === id);
 
@@ -307,7 +306,7 @@ export interface IChannelConnection<Channel extends AnyOf<Channels> = AnyOf<Chan
 	dispose(): void;
 }
 
-export abstract class Connection<Channel extends AnyOf<Channels> = AnyOf<Channels>> extends EventEmitter<Channel['events']> implements IChannelConnection<Channel> {
+export abstract class ChannelConnection<Channel extends AnyOf<Channels> = AnyOf<Channels>> extends EventEmitter<Channel['events']> implements IChannelConnection<Channel> {
 	public channel: string;
 	protected stream: Stream;
 	public abstract id: string;
@@ -341,7 +340,7 @@ export abstract class Connection<Channel extends AnyOf<Channels> = AnyOf<Channel
 	public abstract dispose(): void;
 }
 
-class SharedConnection<Channel extends AnyOf<Channels> = AnyOf<Channels>> extends Connection<Channel> {
+class SharedConnection<Channel extends AnyOf<Channels> = AnyOf<Channels>> extends ChannelConnection<Channel> {
 	private pool: Pool;
 
 	public get id(): string {
@@ -364,7 +363,7 @@ class SharedConnection<Channel extends AnyOf<Channels> = AnyOf<Channels>> extend
 	}
 }
 
-class NonSharedConnection<Channel extends AnyOf<Channels> = AnyOf<Channels>> extends Connection<Channel> {
+class NonSharedConnection<Channel extends AnyOf<Channels> = AnyOf<Channels>> extends ChannelConnection<Channel> {
 	public id: string;
 	protected params: Channel['params'];
 

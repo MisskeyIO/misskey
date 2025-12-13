@@ -310,7 +310,7 @@ You can override the default story by creating a impl story file (`MyComponent.s
 
 ```ts
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { StoryObj } from '@storybook/vue3';
+import { StoryObj } from '@storybook/vue3-vite';
 import MyComponent from './MyComponent.vue';
 export const Default = {
 	render(args) {

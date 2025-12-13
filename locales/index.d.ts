@@ -4466,7 +4466,7 @@ export interface Locale extends ILocale {
      */
     "blockedRemoteCustomEmojisDescription": string;
     /**
-     * スペースで区切るとAND指定になり、キーワードをスラッシュで囲むと正規表現になります。
+     * 項目をスラッシュで囲むと正規表現になります。
      */
     "blockedRemoteCustomEmojisDescription2": string;
     /**

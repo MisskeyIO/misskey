@@ -5,7 +5,7 @@
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import MkAbuseReportResolver from './MkAbuseReportResolver.vue';
-import type { StoryObj } from '@storybook/vue3';
+import type { StoryObj } from '@storybook/vue3-vite';
 export const Default = {
 	render(args) {
 		return {

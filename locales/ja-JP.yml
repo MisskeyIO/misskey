@@ -1111,7 +1111,7 @@ sensitiveWordsDescription: "設定したワードが含まれるノートの公�
 sensitiveWordsDescription2: "スペースで区切るとAND指定になり、キーワードをスラッシュで囲むと正規表現になります。"
 blockedRemoteCustomEmojis: "ブロックするリモートカスタム絵文字"
 blockedRemoteCustomEmojisDescription: "name または name@host が一致するリモートカスタム絵文字を取得・表示しません。改行で区切って複数設定できます。"
-blockedRemoteCustomEmojisDescription2: "スペースで区切るとAND指定になり、キーワードをスラッシュで囲むと正規表現になります。"
+blockedRemoteCustomEmojisDescription2: "項目をスラッシュで囲むと正規表現になります。"
 prohibitedWords: "禁止ワード"
 prohibitedWordsDescription: "設定したワードが含まれるノートを投稿しようとした際、エラーとなるようにします。改行で区切って複数設定できます。"
 prohibitedWordsDescription2: "スペースで区切るとAND指定になり、キーワードをスラッシュで囲むと正規表現になります。"

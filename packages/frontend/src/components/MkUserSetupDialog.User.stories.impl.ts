@@ -4,7 +4,7 @@
  */
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import type { StoryObj } from '@storybook/vue3';
+import type { StoryObj } from '@storybook/vue3-vite';
 import { userDetailed } from '../../.storybook/fakes.js';
 import MkUserSetupDialog_User from './MkUserSetupDialog.User.vue';
 export const Default = {

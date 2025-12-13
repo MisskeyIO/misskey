@@ -2,10 +2,10 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
- 
-import { waitFor } from '@storybook/test';
+
+import { waitFor } from 'storybook/test';
 import MkPageHeader from './MkPageHeader.vue';
-import type { StoryObj } from '@storybook/vue3';
+import type { StoryObj } from '@storybook/vue3-vite';
 export const Empty = {
 	render(args) {
 		return {

@@ -4,7 +4,7 @@
  */
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import type { StoryObj } from '@storybook/vue3';
+import type { StoryObj } from '@storybook/vue3-vite';
 import { HttpResponse, http } from 'msw';
 import { commonHandlers } from '../../.storybook/mocks.js';
 import { userDetailed } from '../../.storybook/fakes.js';

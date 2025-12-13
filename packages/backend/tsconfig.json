@@ -9,6 +9,8 @@
 		"noFallthroughCasesInSwitch": true,
 		"declaration": false,
 		"sourceMap": true,
+		"sourceRoot": "/",
+		"inlineSources": true,
 		"target": "ESNext",
 		"module": "NodeNext",
 		"moduleResolution": "nodenext",

@@ -11,10 +11,10 @@ import type { PublicKeyCredentialRequestOptionsJSON as PublicKeyCredentialReques
 // Warning: (ae-forgotten-export) The symbol "components" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-type AbuseReportNotificationRecipient = components['schemas']['AbuseReportNotificationRecipient'];
+export type AbuseReportNotificationRecipient = components['schemas']['AbuseReportNotificationRecipient'];
 
 // @public (undocumented)
-type AbuseUserReport = components['schemas']['AbuseUserReport'];
+export type AbuseUserReport = components['schemas']['AbuseUserReport'];
 
 // @public (undocumented)
 export type Acct = {
@@ -31,527 +31,527 @@ declare namespace acct {
 }
 
 // @public (undocumented)
-type Ad = components['schemas']['Ad'];
+export type Ad = components['schemas']['Ad'];
 
 // Warning: (ae-forgotten-export) The symbol "operations" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-type AdminAbuseReportNotificationRecipientCreateRequest = operations['admin___abuse-report___notification-recipient___create']['requestBody']['content']['application/json'];
+export type AdminAbuseReportNotificationRecipientCreateRequest = operations['admin___abuse-report___notification-recipient___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAbuseReportNotificationRecipientCreateResponse = operations['admin___abuse-report___notification-recipient___create']['responses']['200']['content']['application/json'];
+export type AdminAbuseReportNotificationRecipientCreateResponse = operations['admin___abuse-report___notification-recipient___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAbuseReportNotificationRecipientDeleteRequest = operations['admin___abuse-report___notification-recipient___delete']['requestBody']['content']['application/json'];
+export type AdminAbuseReportNotificationRecipientDeleteRequest = operations['admin___abuse-report___notification-recipient___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAbuseReportNotificationRecipientListRequest = operations['admin___abuse-report___notification-recipient___list']['requestBody']['content']['application/json'];
+export type AdminAbuseReportNotificationRecipientListRequest = operations['admin___abuse-report___notification-recipient___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAbuseReportNotificationRecipientListResponse = operations['admin___abuse-report___notification-recipient___list']['responses']['200']['content']['application/json'];
+export type AdminAbuseReportNotificationRecipientListResponse = operations['admin___abuse-report___notification-recipient___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAbuseReportNotificationRecipientShowRequest = operations['admin___abuse-report___notification-recipient___show']['requestBody']['content']['application/json'];
+export type AdminAbuseReportNotificationRecipientShowRequest = operations['admin___abuse-report___notification-recipient___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAbuseReportNotificationRecipientShowResponse = operations['admin___abuse-report___notification-recipient___show']['responses']['200']['content']['application/json'];
+export type AdminAbuseReportNotificationRecipientShowResponse = operations['admin___abuse-report___notification-recipient___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAbuseReportNotificationRecipientUpdateRequest = operations['admin___abuse-report___notification-recipient___update']['requestBody']['content']['application/json'];
+export type AdminAbuseReportNotificationRecipientUpdateRequest = operations['admin___abuse-report___notification-recipient___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAbuseReportNotificationRecipientUpdateResponse = operations['admin___abuse-report___notification-recipient___update']['responses']['200']['content']['application/json'];
+export type AdminAbuseReportNotificationRecipientUpdateResponse = operations['admin___abuse-report___notification-recipient___update']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAbuseReportResolverCreateRequest = operations['admin___abuse-report-resolver___create']['requestBody']['content']['application/json'];
+export type AdminAbuseReportResolverCreateRequest = operations['admin___abuse-report-resolver___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAbuseReportResolverCreateResponse = operations['admin___abuse-report-resolver___create']['responses']['200']['content']['application/json'];
+export type AdminAbuseReportResolverCreateResponse = operations['admin___abuse-report-resolver___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAbuseReportResolverDeleteRequest = operations['admin___abuse-report-resolver___delete']['requestBody']['content']['application/json'];
+export type AdminAbuseReportResolverDeleteRequest = operations['admin___abuse-report-resolver___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAbuseReportResolverListRequest = operations['admin___abuse-report-resolver___list']['requestBody']['content']['application/json'];
+export type AdminAbuseReportResolverListRequest = operations['admin___abuse-report-resolver___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAbuseReportResolverListResponse = operations['admin___abuse-report-resolver___list']['responses']['200']['content']['application/json'];
+export type AdminAbuseReportResolverListResponse = operations['admin___abuse-report-resolver___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAbuseReportResolverUpdateRequest = operations['admin___abuse-report-resolver___update']['requestBody']['content']['application/json'];
+export type AdminAbuseReportResolverUpdateRequest = operations['admin___abuse-report-resolver___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAbuseUserReportsRequest = operations['admin___abuse-user-reports']['requestBody']['content']['application/json'];
+export type AdminAbuseUserReportsRequest = operations['admin___abuse-user-reports']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAbuseUserReportsResponse = operations['admin___abuse-user-reports']['responses']['200']['content']['application/json'];
+export type AdminAbuseUserReportsResponse = operations['admin___abuse-user-reports']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAccountsCreateRequest = operations['admin___accounts___create']['requestBody']['content']['application/json'];
+export type AdminAccountsCreateRequest = operations['admin___accounts___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAccountsCreateResponse = operations['admin___accounts___create']['responses']['200']['content']['application/json'];
+export type AdminAccountsCreateResponse = operations['admin___accounts___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAccountsDeleteRequest = operations['admin___accounts___delete']['requestBody']['content']['application/json'];
+export type AdminAccountsDeleteRequest = operations['admin___accounts___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAccountsFindByEmailRequest = operations['admin___accounts___find-by-email']['requestBody']['content']['application/json'];
+export type AdminAccountsFindByEmailRequest = operations['admin___accounts___find-by-email']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAccountsFindByEmailResponse = operations['admin___accounts___find-by-email']['responses']['200']['content']['application/json'];
+export type AdminAccountsFindByEmailResponse = operations['admin___accounts___find-by-email']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAccountsPendingListRequest = operations['admin___accounts___pending___list']['requestBody']['content']['application/json'];
+export type AdminAccountsPendingListRequest = operations['admin___accounts___pending___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAccountsPendingListResponse = operations['admin___accounts___pending___list']['responses']['200']['content']['application/json'];
+export type AdminAccountsPendingListResponse = operations['admin___accounts___pending___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAccountsPendingRevokeRequest = operations['admin___accounts___pending___revoke']['requestBody']['content']['application/json'];
+export type AdminAccountsPendingRevokeRequest = operations['admin___accounts___pending___revoke']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAdCreateRequest = operations['admin___ad___create']['requestBody']['content']['application/json'];
+export type AdminAdCreateRequest = operations['admin___ad___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAdCreateResponse = operations['admin___ad___create']['responses']['200']['content']['application/json'];
+export type AdminAdCreateResponse = operations['admin___ad___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAdDeleteRequest = operations['admin___ad___delete']['requestBody']['content']['application/json'];
+export type AdminAdDeleteRequest = operations['admin___ad___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAdListRequest = operations['admin___ad___list']['requestBody']['content']['application/json'];
+export type AdminAdListRequest = operations['admin___ad___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAdListResponse = operations['admin___ad___list']['responses']['200']['content']['application/json'];
+export type AdminAdListResponse = operations['admin___ad___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAdUpdateRequest = operations['admin___ad___update']['requestBody']['content']['application/json'];
+export type AdminAdUpdateRequest = operations['admin___ad___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAnnouncementsCreateRequest = operations['admin___announcements___create']['requestBody']['content']['application/json'];
+export type AdminAnnouncementsCreateRequest = operations['admin___announcements___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAnnouncementsCreateResponse = operations['admin___announcements___create']['responses']['200']['content']['application/json'];
+export type AdminAnnouncementsCreateResponse = operations['admin___announcements___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAnnouncementsDeleteRequest = operations['admin___announcements___delete']['requestBody']['content']['application/json'];
+export type AdminAnnouncementsDeleteRequest = operations['admin___announcements___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAnnouncementsListRequest = operations['admin___announcements___list']['requestBody']['content']['application/json'];
+export type AdminAnnouncementsListRequest = operations['admin___announcements___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAnnouncementsListResponse = operations['admin___announcements___list']['responses']['200']['content']['application/json'];
+export type AdminAnnouncementsListResponse = operations['admin___announcements___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAnnouncementsUpdateRequest = operations['admin___announcements___update']['requestBody']['content']['application/json'];
+export type AdminAnnouncementsUpdateRequest = operations['admin___announcements___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAvatarDecorationsCreateRequest = operations['admin___avatar-decorations___create']['requestBody']['content']['application/json'];
+export type AdminAvatarDecorationsCreateRequest = operations['admin___avatar-decorations___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAvatarDecorationsCreateResponse = operations['admin___avatar-decorations___create']['responses']['200']['content']['application/json'];
+export type AdminAvatarDecorationsCreateResponse = operations['admin___avatar-decorations___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAvatarDecorationsDeleteRequest = operations['admin___avatar-decorations___delete']['requestBody']['content']['application/json'];
+export type AdminAvatarDecorationsDeleteRequest = operations['admin___avatar-decorations___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAvatarDecorationsListRequest = operations['admin___avatar-decorations___list']['requestBody']['content']['application/json'];
+export type AdminAvatarDecorationsListRequest = operations['admin___avatar-decorations___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAvatarDecorationsListResponse = operations['admin___avatar-decorations___list']['responses']['200']['content']['application/json'];
+export type AdminAvatarDecorationsListResponse = operations['admin___avatar-decorations___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAvatarDecorationsUpdateRequest = operations['admin___avatar-decorations___update']['requestBody']['content']['application/json'];
+export type AdminAvatarDecorationsUpdateRequest = operations['admin___avatar-decorations___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminCaptchaCurrentResponse = operations['admin___captcha___current']['responses']['200']['content']['application/json'];
+export type AdminCaptchaCurrentResponse = operations['admin___captcha___current']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminCaptchaSaveRequest = operations['admin___captcha___save']['requestBody']['content']['application/json'];
+export type AdminCaptchaSaveRequest = operations['admin___captcha___save']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminDriveDeleteAllFilesOfAUserRequest = operations['admin___drive___delete-all-files-of-a-user']['requestBody']['content']['application/json'];
+export type AdminDriveDeleteAllFilesOfAUserRequest = operations['admin___drive___delete-all-files-of-a-user']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminDriveFilesRequest = operations['admin___drive___files']['requestBody']['content']['application/json'];
+export type AdminDriveFilesRequest = operations['admin___drive___files']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminDriveFilesResponse = operations['admin___drive___files']['responses']['200']['content']['application/json'];
+export type AdminDriveFilesResponse = operations['admin___drive___files']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminDriveShowFileRequest = operations['admin___drive___show-file']['requestBody']['content']['application/json'];
+export type AdminDriveShowFileRequest = operations['admin___drive___show-file']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminDriveShowFileResponse = operations['admin___drive___show-file']['responses']['200']['content']['application/json'];
+export type AdminDriveShowFileResponse = operations['admin___drive___show-file']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminEmojiAddAliasesBulkRequest = operations['admin___emoji___add-aliases-bulk']['requestBody']['content']['application/json'];
+export type AdminEmojiAddAliasesBulkRequest = operations['admin___emoji___add-aliases-bulk']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminEmojiAddRequest = operations['admin___emoji___add']['requestBody']['content']['application/json'];
+export type AdminEmojiAddRequest = operations['admin___emoji___add']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminEmojiAddResponse = operations['admin___emoji___add']['responses']['200']['content']['application/json'];
+export type AdminEmojiAddResponse = operations['admin___emoji___add']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminEmojiCopyRequest = operations['admin___emoji___copy']['requestBody']['content']['application/json'];
+export type AdminEmojiCopyRequest = operations['admin___emoji___copy']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminEmojiCopyResponse = operations['admin___emoji___copy']['responses']['200']['content']['application/json'];
+export type AdminEmojiCopyResponse = operations['admin___emoji___copy']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminEmojiDeleteBulkRequest = operations['admin___emoji___delete-bulk']['requestBody']['content']['application/json'];
+export type AdminEmojiDeleteBulkRequest = operations['admin___emoji___delete-bulk']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminEmojiDeleteRequest = operations['admin___emoji___delete']['requestBody']['content']['application/json'];
+export type AdminEmojiDeleteRequest = operations['admin___emoji___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminEmojiImportZipRequest = operations['admin___emoji___import-zip']['requestBody']['content']['application/json'];
+export type AdminEmojiImportZipRequest = operations['admin___emoji___import-zip']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminEmojiListRemoteRequest = operations['admin___emoji___list-remote']['requestBody']['content']['application/json'];
+export type AdminEmojiListRemoteRequest = operations['admin___emoji___list-remote']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminEmojiListRemoteResponse = operations['admin___emoji___list-remote']['responses']['200']['content']['application/json'];
+export type AdminEmojiListRemoteResponse = operations['admin___emoji___list-remote']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminEmojiListRequest = operations['admin___emoji___list']['requestBody']['content']['application/json'];
+export type AdminEmojiListRequest = operations['admin___emoji___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminEmojiListResponse = operations['admin___emoji___list']['responses']['200']['content']['application/json'];
+export type AdminEmojiListResponse = operations['admin___emoji___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminEmojiRemoveAliasesBulkRequest = operations['admin___emoji___remove-aliases-bulk']['requestBody']['content']['application/json'];
+export type AdminEmojiRemoveAliasesBulkRequest = operations['admin___emoji___remove-aliases-bulk']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminEmojiSetAliasesBulkRequest = operations['admin___emoji___set-aliases-bulk']['requestBody']['content']['application/json'];
+export type AdminEmojiSetAliasesBulkRequest = operations['admin___emoji___set-aliases-bulk']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminEmojiSetCategoryBulkRequest = operations['admin___emoji___set-category-bulk']['requestBody']['content']['application/json'];
+export type AdminEmojiSetCategoryBulkRequest = operations['admin___emoji___set-category-bulk']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminEmojiSetLicenseBulkRequest = operations['admin___emoji___set-license-bulk']['requestBody']['content']['application/json'];
+export type AdminEmojiSetLicenseBulkRequest = operations['admin___emoji___set-license-bulk']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminEmojiUpdateRequest = operations['admin___emoji___update']['requestBody']['content']['application/json'];
+export type AdminEmojiUpdateRequest = operations['admin___emoji___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminFederationDeleteAllFilesRequest = operations['admin___federation___delete-all-files']['requestBody']['content']['application/json'];
+export type AdminFederationDeleteAllFilesRequest = operations['admin___federation___delete-all-files']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminFederationRefreshRemoteInstanceMetadataRequest = operations['admin___federation___refresh-remote-instance-metadata']['requestBody']['content']['application/json'];
+export type AdminFederationRefreshRemoteInstanceMetadataRequest = operations['admin___federation___refresh-remote-instance-metadata']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminFederationRemoveAllFollowingRequest = operations['admin___federation___remove-all-following']['requestBody']['content']['application/json'];
+export type AdminFederationRemoveAllFollowingRequest = operations['admin___federation___remove-all-following']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminFederationUpdateInstanceRequest = operations['admin___federation___update-instance']['requestBody']['content']['application/json'];
+export type AdminFederationUpdateInstanceRequest = operations['admin___federation___update-instance']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminForwardAbuseUserReportRequest = operations['admin___forward-abuse-user-report']['requestBody']['content']['application/json'];
+export type AdminForwardAbuseUserReportRequest = operations['admin___forward-abuse-user-report']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminGetIndexStatsResponse = operations['admin___get-index-stats']['responses']['200']['content']['application/json'];
+export type AdminGetIndexStatsResponse = operations['admin___get-index-stats']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminGetTableStatsResponse = operations['admin___get-table-stats']['responses']['200']['content']['application/json'];
+export type AdminGetTableStatsResponse = operations['admin___get-table-stats']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminGetUserIpsRequest = operations['admin___get-user-ips']['requestBody']['content']['application/json'];
+export type AdminGetUserIpsRequest = operations['admin___get-user-ips']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminGetUserIpsResponse = operations['admin___get-user-ips']['responses']['200']['content']['application/json'];
+export type AdminGetUserIpsResponse = operations['admin___get-user-ips']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminIndieAuthCreateRequest = operations['admin___indie-auth___create']['requestBody']['content']['application/json'];
+export type AdminIndieAuthCreateRequest = operations['admin___indie-auth___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminIndieAuthCreateResponse = operations['admin___indie-auth___create']['responses']['200']['content']['application/json'];
+export type AdminIndieAuthCreateResponse = operations['admin___indie-auth___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminIndieAuthDeleteRequest = operations['admin___indie-auth___delete']['requestBody']['content']['application/json'];
+export type AdminIndieAuthDeleteRequest = operations['admin___indie-auth___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminIndieAuthListRequest = operations['admin___indie-auth___list']['requestBody']['content']['application/json'];
+export type AdminIndieAuthListRequest = operations['admin___indie-auth___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminIndieAuthListResponse = operations['admin___indie-auth___list']['responses']['200']['content']['application/json'];
+export type AdminIndieAuthListResponse = operations['admin___indie-auth___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminIndieAuthUpdateRequest = operations['admin___indie-auth___update']['requestBody']['content']['application/json'];
+export type AdminIndieAuthUpdateRequest = operations['admin___indie-auth___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminInviteCreateRequest = operations['admin___invite___create']['requestBody']['content']['application/json'];
+export type AdminInviteCreateRequest = operations['admin___invite___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminInviteCreateResponse = operations['admin___invite___create']['responses']['200']['content']['application/json'];
+export type AdminInviteCreateResponse = operations['admin___invite___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminInviteListRequest = operations['admin___invite___list']['requestBody']['content']['application/json'];
+export type AdminInviteListRequest = operations['admin___invite___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminInviteListResponse = operations['admin___invite___list']['responses']['200']['content']['application/json'];
+export type AdminInviteListResponse = operations['admin___invite___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminMetaResponse = operations['admin___meta']['responses']['200']['content']['application/json'];
+export type AdminMetaResponse = operations['admin___meta']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminPromoCreateRequest = operations['admin___promo___create']['requestBody']['content']['application/json'];
+export type AdminPromoCreateRequest = operations['admin___promo___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminQueueClearRequest = operations['admin___queue___clear']['requestBody']['content']['application/json'];
+export type AdminQueueClearRequest = operations['admin___queue___clear']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminQueueDeliverDelayedResponse = operations['admin___queue___deliver-delayed']['responses']['200']['content']['application/json'];
+export type AdminQueueDeliverDelayedResponse = operations['admin___queue___deliver-delayed']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminQueueInboxDelayedResponse = operations['admin___queue___inbox-delayed']['responses']['200']['content']['application/json'];
+export type AdminQueueInboxDelayedResponse = operations['admin___queue___inbox-delayed']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminQueuePromoteRequest = operations['admin___queue___promote']['requestBody']['content']['application/json'];
+export type AdminQueuePromoteRequest = operations['admin___queue___promote']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminQueueStatsResponse = operations['admin___queue___stats']['responses']['200']['content']['application/json'];
+export type AdminQueueStatsResponse = operations['admin___queue___stats']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminRegenerateUserTokenRequest = operations['admin___regenerate-user-token']['requestBody']['content']['application/json'];
+export type AdminRegenerateUserTokenRequest = operations['admin___regenerate-user-token']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminRelaysAddRequest = operations['admin___relays___add']['requestBody']['content']['application/json'];
+export type AdminRelaysAddRequest = operations['admin___relays___add']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminRelaysAddResponse = operations['admin___relays___add']['responses']['200']['content']['application/json'];
+export type AdminRelaysAddResponse = operations['admin___relays___add']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminRelaysListResponse = operations['admin___relays___list']['responses']['200']['content']['application/json'];
+export type AdminRelaysListResponse = operations['admin___relays___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminRelaysRemoveRequest = operations['admin___relays___remove']['requestBody']['content']['application/json'];
+export type AdminRelaysRemoveRequest = operations['admin___relays___remove']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminResetPasswordRequest = operations['admin___reset-password']['requestBody']['content']['application/json'];
+export type AdminResetPasswordRequest = operations['admin___reset-password']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminResetPasswordResponse = operations['admin___reset-password']['responses']['200']['content']['application/json'];
+export type AdminResetPasswordResponse = operations['admin___reset-password']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminResolveAbuseUserReportRequest = operations['admin___resolve-abuse-user-report']['requestBody']['content']['application/json'];
+export type AdminResolveAbuseUserReportRequest = operations['admin___resolve-abuse-user-report']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminRolesAssignRequest = operations['admin___roles___assign']['requestBody']['content']['application/json'];
+export type AdminRolesAssignRequest = operations['admin___roles___assign']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminRolesCreateRequest = operations['admin___roles___create']['requestBody']['content']['application/json'];
+export type AdminRolesCreateRequest = operations['admin___roles___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminRolesCreateResponse = operations['admin___roles___create']['responses']['200']['content']['application/json'];
+export type AdminRolesCreateResponse = operations['admin___roles___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminRolesDeleteRequest = operations['admin___roles___delete']['requestBody']['content']['application/json'];
+export type AdminRolesDeleteRequest = operations['admin___roles___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminRolesListResponse = operations['admin___roles___list']['responses']['200']['content']['application/json'];
+export type AdminRolesListResponse = operations['admin___roles___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminRolesShowRequest = operations['admin___roles___show']['requestBody']['content']['application/json'];
+export type AdminRolesShowRequest = operations['admin___roles___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminRolesShowResponse = operations['admin___roles___show']['responses']['200']['content']['application/json'];
+export type AdminRolesShowResponse = operations['admin___roles___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminRolesUnassignRequest = operations['admin___roles___unassign']['requestBody']['content']['application/json'];
+export type AdminRolesUnassignRequest = operations['admin___roles___unassign']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminRolesUpdateDefaultPoliciesRequest = operations['admin___roles___update-default-policies']['requestBody']['content']['application/json'];
+export type AdminRolesUpdateDefaultPoliciesRequest = operations['admin___roles___update-default-policies']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminRolesUpdateInlinePoliciesRequest = operations['admin___roles___update-inline-policies']['requestBody']['content']['application/json'];
+export type AdminRolesUpdateInlinePoliciesRequest = operations['admin___roles___update-inline-policies']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminRolesUpdateRequest = operations['admin___roles___update']['requestBody']['content']['application/json'];
+export type AdminRolesUpdateRequest = operations['admin___roles___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminRolesUsersRequest = operations['admin___roles___users']['requestBody']['content']['application/json'];
+export type AdminRolesUsersRequest = operations['admin___roles___users']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminRolesUsersResponse = operations['admin___roles___users']['responses']['200']['content']['application/json'];
+export type AdminRolesUsersResponse = operations['admin___roles___users']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminSendEmailRequest = operations['admin___send-email']['requestBody']['content']['application/json'];
+export type AdminSendEmailRequest = operations['admin___send-email']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminServerInfoResponse = operations['admin___server-info']['responses']['200']['content']['application/json'];
+export type AdminServerInfoResponse = operations['admin___server-info']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminShowModerationLogsRequest = operations['admin___show-moderation-logs']['requestBody']['content']['application/json'];
+export type AdminShowModerationLogsRequest = operations['admin___show-moderation-logs']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminShowModerationLogsResponse = operations['admin___show-moderation-logs']['responses']['200']['content']['application/json'];
+export type AdminShowModerationLogsResponse = operations['admin___show-moderation-logs']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminShowUserAccountMoveLogsRequest = operations['admin___show-user-account-move-logs']['requestBody']['content']['application/json'];
+export type AdminShowUserAccountMoveLogsRequest = operations['admin___show-user-account-move-logs']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminShowUserAccountMoveLogsResponse = operations['admin___show-user-account-move-logs']['responses']['200']['content']['application/json'];
+export type AdminShowUserAccountMoveLogsResponse = operations['admin___show-user-account-move-logs']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminShowUserRequest = operations['admin___show-user']['requestBody']['content']['application/json'];
+export type AdminShowUserRequest = operations['admin___show-user']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminShowUserResponse = operations['admin___show-user']['responses']['200']['content']['application/json'];
+export type AdminShowUserResponse = operations['admin___show-user']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminShowUsersRequest = operations['admin___show-users']['requestBody']['content']['application/json'];
+export type AdminShowUsersRequest = operations['admin___show-users']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminShowUsersResponse = operations['admin___show-users']['responses']['200']['content']['application/json'];
+export type AdminShowUsersResponse = operations['admin___show-users']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminSsoCreateRequest = operations['admin___sso___create']['requestBody']['content']['application/json'];
+export type AdminSsoCreateRequest = operations['admin___sso___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminSsoCreateResponse = operations['admin___sso___create']['responses']['200']['content']['application/json'];
+export type AdminSsoCreateResponse = operations['admin___sso___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminSsoDeleteRequest = operations['admin___sso___delete']['requestBody']['content']['application/json'];
+export type AdminSsoDeleteRequest = operations['admin___sso___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminSsoListRequest = operations['admin___sso___list']['requestBody']['content']['application/json'];
+export type AdminSsoListRequest = operations['admin___sso___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminSsoListResponse = operations['admin___sso___list']['responses']['200']['content']['application/json'];
+export type AdminSsoListResponse = operations['admin___sso___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminSsoUpdateRequest = operations['admin___sso___update']['requestBody']['content']['application/json'];
+export type AdminSsoUpdateRequest = operations['admin___sso___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminSuspendUserRequest = operations['admin___suspend-user']['requestBody']['content']['application/json'];
+export type AdminSuspendUserRequest = operations['admin___suspend-user']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminSystemWebhookCreateRequest = operations['admin___system-webhook___create']['requestBody']['content']['application/json'];
+export type AdminSystemWebhookCreateRequest = operations['admin___system-webhook___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminSystemWebhookCreateResponse = operations['admin___system-webhook___create']['responses']['200']['content']['application/json'];
+export type AdminSystemWebhookCreateResponse = operations['admin___system-webhook___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminSystemWebhookDeleteRequest = operations['admin___system-webhook___delete']['requestBody']['content']['application/json'];
+export type AdminSystemWebhookDeleteRequest = operations['admin___system-webhook___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminSystemWebhookListRequest = operations['admin___system-webhook___list']['requestBody']['content']['application/json'];
+export type AdminSystemWebhookListRequest = operations['admin___system-webhook___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminSystemWebhookListResponse = operations['admin___system-webhook___list']['responses']['200']['content']['application/json'];
+export type AdminSystemWebhookListResponse = operations['admin___system-webhook___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminSystemWebhookShowRequest = operations['admin___system-webhook___show']['requestBody']['content']['application/json'];
+export type AdminSystemWebhookShowRequest = operations['admin___system-webhook___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminSystemWebhookShowResponse = operations['admin___system-webhook___show']['responses']['200']['content']['application/json'];
+export type AdminSystemWebhookShowResponse = operations['admin___system-webhook___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminSystemWebhookTestRequest = operations['admin___system-webhook___test']['requestBody']['content']['application/json'];
+export type AdminSystemWebhookTestRequest = operations['admin___system-webhook___test']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminSystemWebhookUpdateRequest = operations['admin___system-webhook___update']['requestBody']['content']['application/json'];
+export type AdminSystemWebhookUpdateRequest = operations['admin___system-webhook___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminSystemWebhookUpdateResponse = operations['admin___system-webhook___update']['responses']['200']['content']['application/json'];
+export type AdminSystemWebhookUpdateResponse = operations['admin___system-webhook___update']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminUnsetUserAvatarRequest = operations['admin___unset-user-avatar']['requestBody']['content']['application/json'];
+export type AdminUnsetUserAvatarRequest = operations['admin___unset-user-avatar']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminUnsetUserBannerRequest = operations['admin___unset-user-banner']['requestBody']['content']['application/json'];
+export type AdminUnsetUserBannerRequest = operations['admin___unset-user-banner']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminUnsetUserMutualLinkRequest = operations['admin___unset-user-mutual-link']['requestBody']['content']['application/json'];
+export type AdminUnsetUserMutualLinkRequest = operations['admin___unset-user-mutual-link']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminUnsuspendUserRequest = operations['admin___unsuspend-user']['requestBody']['content']['application/json'];
+export type AdminUnsuspendUserRequest = operations['admin___unsuspend-user']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminUpdateAbuseUserReportRequest = operations['admin___update-abuse-user-report']['requestBody']['content']['application/json'];
+export type AdminUpdateAbuseUserReportRequest = operations['admin___update-abuse-user-report']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminUpdateMetaRequest = operations['admin___update-meta']['requestBody']['content']['application/json'];
+export type AdminUpdateMetaRequest = operations['admin___update-meta']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminUpdateProxyAccountRequest = operations['admin___update-proxy-account']['requestBody']['content']['application/json'];
+export type AdminUpdateProxyAccountRequest = operations['admin___update-proxy-account']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminUpdateProxyAccountResponse = operations['admin___update-proxy-account']['responses']['200']['content']['application/json'];
+export type AdminUpdateProxyAccountResponse = operations['admin___update-proxy-account']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminUpdateUserNameRequest = operations['admin___update-user-name']['requestBody']['content']['application/json'];
+export type AdminUpdateUserNameRequest = operations['admin___update-user-name']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminUpdateUserNoteRequest = operations['admin___update-user-note']['requestBody']['content']['application/json'];
+export type AdminUpdateUserNoteRequest = operations['admin___update-user-note']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type Announcement = components['schemas']['Announcement'];
+export type Announcement = components['schemas']['Announcement'];
 
 // @public (undocumented)
-type AnnouncementCreated = {
+export type AnnouncementCreated = {
     announcement: Announcement;
 };
 
 // @public (undocumented)
-type AnnouncementRequest = operations['announcement']['requestBody']['content']['application/json'];
+export type AnnouncementRequest = operations['announcement']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AnnouncementResponse = operations['announcement']['responses']['200']['content']['application/json'];
+export type AnnouncementResponse = operations['announcement']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AnnouncementsRequest = operations['announcements']['requestBody']['content']['application/json'];
+export type AnnouncementsRequest = operations['announcements']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AnnouncementsResponse = operations['announcements']['responses']['200']['content']['application/json'];
+export type AnnouncementsResponse = operations['announcements']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AnnouncementsShowRequest = operations['announcements___show']['requestBody']['content']['application/json'];
+export type AnnouncementsShowRequest = operations['announcements___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AnnouncementsShowResponse = operations['announcements___show']['responses']['200']['content']['application/json'];
+export type AnnouncementsShowResponse = operations['announcements___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type Antenna = components['schemas']['Antenna'];
+export type Antenna = components['schemas']['Antenna'];
 
 // @public (undocumented)
-type AntennasCreateRequest = operations['antennas___create']['requestBody']['content']['application/json'];
+export type AntennasCreateRequest = operations['antennas___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AntennasCreateResponse = operations['antennas___create']['responses']['200']['content']['application/json'];
+export type AntennasCreateResponse = operations['antennas___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AntennasDeleteRequest = operations['antennas___delete']['requestBody']['content']['application/json'];
+export type AntennasDeleteRequest = operations['antennas___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AntennasListResponse = operations['antennas___list']['responses']['200']['content']['application/json'];
+export type AntennasListResponse = operations['antennas___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AntennasNotesRequest = operations['antennas___notes']['requestBody']['content']['application/json'];
+export type AntennasNotesRequest = operations['antennas___notes']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AntennasNotesResponse = operations['antennas___notes']['responses']['200']['content']['application/json'];
+export type AntennasNotesResponse = operations['antennas___notes']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AntennasShowRequest = operations['antennas___show']['requestBody']['content']['application/json'];
+export type AntennasShowRequest = operations['antennas___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AntennasShowResponse = operations['antennas___show']['responses']['200']['content']['application/json'];
+export type AntennasShowResponse = operations['antennas___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AntennasUpdateRequest = operations['antennas___update']['requestBody']['content']['application/json'];
+export type AntennasUpdateRequest = operations['antennas___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AntennasUpdateResponse = operations['antennas___update']['responses']['200']['content']['application/json'];
+export type AntennasUpdateResponse = operations['antennas___update']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ApGetRequest = operations['ap___get']['requestBody']['content']['application/json'];
+export type ApGetRequest = operations['ap___get']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ApGetResponse = operations['ap___get']['responses']['200']['content']['application/json'];
+export type ApGetResponse = operations['ap___get']['responses']['200']['content']['application/json'];
 
 declare namespace api {
     export {
@@ -588,70 +588,70 @@ type APIError = {
 };
 
 // @public (undocumented)
-type App = components['schemas']['App'];
+export type App = components['schemas']['App'];
 
 // @public (undocumented)
-type AppCreateRequest = operations['app___create']['requestBody']['content']['application/json'];
+export type AppCreateRequest = operations['app___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AppCreateResponse = operations['app___create']['responses']['200']['content']['application/json'];
+export type AppCreateResponse = operations['app___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AppShowRequest = operations['app___show']['requestBody']['content']['application/json'];
+export type AppShowRequest = operations['app___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AppShowResponse = operations['app___show']['responses']['200']['content']['application/json'];
+export type AppShowResponse = operations['app___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ApShowRequest = operations['ap___show']['requestBody']['content']['application/json'];
+export type ApShowRequest = operations['ap___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ApShowResponse = operations['ap___show']['responses']['200']['content']['application/json'];
+export type ApShowResponse = operations['ap___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AuthAcceptRequest = operations['auth___accept']['requestBody']['content']['application/json'];
+export type AuthAcceptRequest = operations['auth___accept']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AuthSessionGenerateRequest = operations['auth___session___generate']['requestBody']['content']['application/json'];
+export type AuthSessionGenerateRequest = operations['auth___session___generate']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AuthSessionGenerateResponse = operations['auth___session___generate']['responses']['200']['content']['application/json'];
+export type AuthSessionGenerateResponse = operations['auth___session___generate']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AuthSessionShowRequest = operations['auth___session___show']['requestBody']['content']['application/json'];
+export type AuthSessionShowRequest = operations['auth___session___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AuthSessionShowResponse = operations['auth___session___show']['responses']['200']['content']['application/json'];
+export type AuthSessionShowResponse = operations['auth___session___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AuthSessionUserkeyRequest = operations['auth___session___userkey']['requestBody']['content']['application/json'];
+export type AuthSessionUserkeyRequest = operations['auth___session___userkey']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AuthSessionUserkeyResponse = operations['auth___session___userkey']['responses']['200']['content']['application/json'];
+export type AuthSessionUserkeyResponse = operations['auth___session___userkey']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 export type AvatarDecoration = UserLite['avatarDecorations'][number];
 
 // @public (undocumented)
-type Blocking = components['schemas']['Blocking'];
+export type Blocking = components['schemas']['Blocking'];
 
 // @public (undocumented)
-type BlockingCreateRequest = operations['blocking___create']['requestBody']['content']['application/json'];
+export type BlockingCreateRequest = operations['blocking___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type BlockingCreateResponse = operations['blocking___create']['responses']['200']['content']['application/json'];
+export type BlockingCreateResponse = operations['blocking___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type BlockingDeleteRequest = operations['blocking___delete']['requestBody']['content']['application/json'];
+export type BlockingDeleteRequest = operations['blocking___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type BlockingDeleteResponse = operations['blocking___delete']['responses']['200']['content']['application/json'];
+export type BlockingDeleteResponse = operations['blocking___delete']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type BlockingListRequest = operations['blocking___list']['requestBody']['content']['application/json'];
+export type BlockingListRequest = operations['blocking___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type BlockingListResponse = operations['blocking___list']['responses']['200']['content']['application/json'];
+export type BlockingListResponse = operations['blocking___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 export type BroadcastEvents = {
@@ -663,16 +663,16 @@ export type BroadcastEvents = {
 };
 
 // @public (undocumented)
-type BubbleGameRankingRequest = operations['bubble-game___ranking']['requestBody']['content']['application/json'];
+export type BubbleGameRankingRequest = operations['bubble-game___ranking']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type BubbleGameRankingResponse = operations['bubble-game___ranking']['responses']['200']['content']['application/json'];
+export type BubbleGameRankingResponse = operations['bubble-game___ranking']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type BubbleGameRegisterRequest = operations['bubble-game___register']['requestBody']['content']['application/json'];
+export type BubbleGameRegisterRequest = operations['bubble-game___register']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type Channel = components['schemas']['Channel'];
+export type Channel = components['schemas']['Channel'];
 
 // Warning: (ae-forgotten-export) The symbol "AnyOf" needs to be exported by the entry point index.d.ts
 //
@@ -970,208 +970,208 @@ export type Channels = {
 };
 
 // @public (undocumented)
-type ChannelsCreateRequest = operations['channels___create']['requestBody']['content']['application/json'];
+export type ChannelsCreateRequest = operations['channels___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChannelsCreateResponse = operations['channels___create']['responses']['200']['content']['application/json'];
+export type ChannelsCreateResponse = operations['channels___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChannelsFavoriteRequest = operations['channels___favorite']['requestBody']['content']['application/json'];
+export type ChannelsFavoriteRequest = operations['channels___favorite']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChannelsFeaturedGamesResponse = operations['channels___featured-games']['responses']['200']['content']['application/json'];
+export type ChannelsFeaturedGamesResponse = operations['channels___featured-games']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChannelsFeaturedResponse = operations['channels___featured']['responses']['200']['content']['application/json'];
+export type ChannelsFeaturedResponse = operations['channels___featured']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChannelsFollowedRequest = operations['channels___followed']['requestBody']['content']['application/json'];
+export type ChannelsFollowedRequest = operations['channels___followed']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChannelsFollowedResponse = operations['channels___followed']['responses']['200']['content']['application/json'];
+export type ChannelsFollowedResponse = operations['channels___followed']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChannelsFollowRequest = operations['channels___follow']['requestBody']['content']['application/json'];
+export type ChannelsFollowRequest = operations['channels___follow']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChannelsMyFavoritesResponse = operations['channels___my-favorites']['responses']['200']['content']['application/json'];
+export type ChannelsMyFavoritesResponse = operations['channels___my-favorites']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChannelsOwnedRequest = operations['channels___owned']['requestBody']['content']['application/json'];
+export type ChannelsOwnedRequest = operations['channels___owned']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChannelsOwnedResponse = operations['channels___owned']['responses']['200']['content']['application/json'];
+export type ChannelsOwnedResponse = operations['channels___owned']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChannelsSearchRequest = operations['channels___search']['requestBody']['content']['application/json'];
+export type ChannelsSearchRequest = operations['channels___search']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChannelsSearchResponse = operations['channels___search']['responses']['200']['content']['application/json'];
+export type ChannelsSearchResponse = operations['channels___search']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChannelsShowRequest = operations['channels___show']['requestBody']['content']['application/json'];
+export type ChannelsShowRequest = operations['channels___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChannelsShowResponse = operations['channels___show']['responses']['200']['content']['application/json'];
+export type ChannelsShowResponse = operations['channels___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChannelsTimelineRequest = operations['channels___timeline']['requestBody']['content']['application/json'];
+export type ChannelsTimelineRequest = operations['channels___timeline']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChannelsTimelineResponse = operations['channels___timeline']['responses']['200']['content']['application/json'];
+export type ChannelsTimelineResponse = operations['channels___timeline']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChannelsUnfavoriteRequest = operations['channels___unfavorite']['requestBody']['content']['application/json'];
+export type ChannelsUnfavoriteRequest = operations['channels___unfavorite']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChannelsUnfollowRequest = operations['channels___unfollow']['requestBody']['content']['application/json'];
+export type ChannelsUnfollowRequest = operations['channels___unfollow']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChannelsUpdateRequest = operations['channels___update']['requestBody']['content']['application/json'];
+export type ChannelsUpdateRequest = operations['channels___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChannelsUpdateResponse = operations['channels___update']['responses']['200']['content']['application/json'];
+export type ChannelsUpdateResponse = operations['channels___update']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsActiveUsersRequest = operations['charts___active-users']['requestBody']['content']['application/json'];
+export type ChartsActiveUsersRequest = operations['charts___active-users']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsActiveUsersResponse = operations['charts___active-users']['responses']['200']['content']['application/json'];
+export type ChartsActiveUsersResponse = operations['charts___active-users']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsApRequestRequest = operations['charts___ap-request']['requestBody']['content']['application/json'];
+export type ChartsApRequestRequest = operations['charts___ap-request']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsApRequestResponse = operations['charts___ap-request']['responses']['200']['content']['application/json'];
+export type ChartsApRequestResponse = operations['charts___ap-request']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsDriveRequest = operations['charts___drive']['requestBody']['content']['application/json'];
+export type ChartsDriveRequest = operations['charts___drive']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsDriveResponse = operations['charts___drive']['responses']['200']['content']['application/json'];
+export type ChartsDriveResponse = operations['charts___drive']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsFederationRequest = operations['charts___federation']['requestBody']['content']['application/json'];
+export type ChartsFederationRequest = operations['charts___federation']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsFederationResponse = operations['charts___federation']['responses']['200']['content']['application/json'];
+export type ChartsFederationResponse = operations['charts___federation']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsInstanceRequest = operations['charts___instance']['requestBody']['content']['application/json'];
+export type ChartsInstanceRequest = operations['charts___instance']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsInstanceResponse = operations['charts___instance']['responses']['200']['content']['application/json'];
+export type ChartsInstanceResponse = operations['charts___instance']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsNotesRequest = operations['charts___notes']['requestBody']['content']['application/json'];
+export type ChartsNotesRequest = operations['charts___notes']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsNotesResponse = operations['charts___notes']['responses']['200']['content']['application/json'];
+export type ChartsNotesResponse = operations['charts___notes']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsUserDriveRequest = operations['charts___user___drive']['requestBody']['content']['application/json'];
+export type ChartsUserDriveRequest = operations['charts___user___drive']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsUserDriveResponse = operations['charts___user___drive']['responses']['200']['content']['application/json'];
+export type ChartsUserDriveResponse = operations['charts___user___drive']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsUserFollowingRequest = operations['charts___user___following']['requestBody']['content']['application/json'];
+export type ChartsUserFollowingRequest = operations['charts___user___following']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsUserFollowingResponse = operations['charts___user___following']['responses']['200']['content']['application/json'];
+export type ChartsUserFollowingResponse = operations['charts___user___following']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsUserNotesRequest = operations['charts___user___notes']['requestBody']['content']['application/json'];
+export type ChartsUserNotesRequest = operations['charts___user___notes']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsUserNotesResponse = operations['charts___user___notes']['responses']['200']['content']['application/json'];
+export type ChartsUserNotesResponse = operations['charts___user___notes']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsUserPvRequest = operations['charts___user___pv']['requestBody']['content']['application/json'];
+export type ChartsUserPvRequest = operations['charts___user___pv']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsUserPvResponse = operations['charts___user___pv']['responses']['200']['content']['application/json'];
+export type ChartsUserPvResponse = operations['charts___user___pv']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsUserReactionsRequest = operations['charts___user___reactions']['requestBody']['content']['application/json'];
+export type ChartsUserReactionsRequest = operations['charts___user___reactions']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsUserReactionsResponse = operations['charts___user___reactions']['responses']['200']['content']['application/json'];
+export type ChartsUserReactionsResponse = operations['charts___user___reactions']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsUsersRequest = operations['charts___users']['requestBody']['content']['application/json'];
+export type ChartsUsersRequest = operations['charts___users']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChartsUsersResponse = operations['charts___users']['responses']['200']['content']['application/json'];
+export type ChartsUsersResponse = operations['charts___users']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ChatMessage = components['schemas']['ChatMessage'];
+export type ChatMessage = components['schemas']['ChatMessage'];
 
 // @public (undocumented)
-type ChatMessageLite = components['schemas']['ChatMessageLite'];
+export type ChatMessageLite = components['schemas']['ChatMessageLite'];
 
 // @public (undocumented)
-type ChatMessageLiteFor1on1 = components['schemas']['ChatMessageLiteFor1on1'];
+export type ChatMessageLiteFor1on1 = components['schemas']['ChatMessageLiteFor1on1'];
 
 // @public (undocumented)
-type ChatMessageLiteForRoom = components['schemas']['ChatMessageLiteForRoom'];
+export type ChatMessageLiteForRoom = components['schemas']['ChatMessageLiteForRoom'];
 
 // @public (undocumented)
-type ChatRoom = components['schemas']['ChatRoom'];
+export type ChatRoom = components['schemas']['ChatRoom'];
 
 // @public (undocumented)
-type ChatRoomInvitation = components['schemas']['ChatRoomInvitation'];
+export type ChatRoomInvitation = components['schemas']['ChatRoomInvitation'];
 
 // @public (undocumented)
-type ChatRoomMembership = components['schemas']['ChatRoomMembership'];
+export type ChatRoomMembership = components['schemas']['ChatRoomMembership'];
 
 // @public (undocumented)
-type Clip = components['schemas']['Clip'];
+export type Clip = components['schemas']['Clip'];
 
 // @public (undocumented)
-type ClipsAddNoteRequest = operations['clips___add-note']['requestBody']['content']['application/json'];
+export type ClipsAddNoteRequest = operations['clips___add-note']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ClipsCreateRequest = operations['clips___create']['requestBody']['content']['application/json'];
+export type ClipsCreateRequest = operations['clips___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ClipsCreateResponse = operations['clips___create']['responses']['200']['content']['application/json'];
+export type ClipsCreateResponse = operations['clips___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ClipsDeleteRequest = operations['clips___delete']['requestBody']['content']['application/json'];
+export type ClipsDeleteRequest = operations['clips___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ClipsFavoriteRequest = operations['clips___favorite']['requestBody']['content']['application/json'];
+export type ClipsFavoriteRequest = operations['clips___favorite']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ClipsListResponse = operations['clips___list']['responses']['200']['content']['application/json'];
+export type ClipsListResponse = operations['clips___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ClipsMyFavoritesResponse = operations['clips___my-favorites']['responses']['200']['content']['application/json'];
+export type ClipsMyFavoritesResponse = operations['clips___my-favorites']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ClipsNotesRequest = operations['clips___notes']['requestBody']['content']['application/json'];
+export type ClipsNotesRequest = operations['clips___notes']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ClipsNotesResponse = operations['clips___notes']['responses']['200']['content']['application/json'];
+export type ClipsNotesResponse = operations['clips___notes']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ClipsRemoveNoteRequest = operations['clips___remove-note']['requestBody']['content']['application/json'];
+export type ClipsRemoveNoteRequest = operations['clips___remove-note']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ClipsShowRequest = operations['clips___show']['requestBody']['content']['application/json'];
+export type ClipsShowRequest = operations['clips___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ClipsShowResponse = operations['clips___show']['responses']['200']['content']['application/json'];
+export type ClipsShowResponse = operations['clips___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ClipsUnfavoriteRequest = operations['clips___unfavorite']['requestBody']['content']['application/json'];
+export type ClipsUnfavoriteRequest = operations['clips___unfavorite']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ClipsUpdateRequest = operations['clips___update']['requestBody']['content']['application/json'];
+export type ClipsUpdateRequest = operations['clips___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ClipsUpdateResponse = operations['clips___update']['responses']['200']['content']['application/json'];
+export type ClipsUpdateResponse = operations['clips___update']['responses']['200']['content']['application/json'];
 
 // Warning: (ae-forgotten-export) The symbol "Events" needs to be exported by the entry point index.d.ts
 //
@@ -1180,160 +1180,160 @@ type CloseEvent_2 = Events.CloseEvent;
 export { CloseEvent_2 as CloseEvent }
 
 // @public (undocumented)
-type DateString = string;
+export type DateString = string;
 
 // @public (undocumented)
-type DriveFile = components['schemas']['DriveFile'];
+export type DriveFile = components['schemas']['DriveFile'];
 
 // @public (undocumented)
-type DriveFilesAttachedNotesRequest = operations['drive___files___attached-notes']['requestBody']['content']['application/json'];
+export type DriveFilesAttachedNotesRequest = operations['drive___files___attached-notes']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFilesAttachedNotesResponse = operations['drive___files___attached-notes']['responses']['200']['content']['application/json'];
+export type DriveFilesAttachedNotesResponse = operations['drive___files___attached-notes']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFilesCheckExistenceRequest = operations['drive___files___check-existence']['requestBody']['content']['application/json'];
+export type DriveFilesCheckExistenceRequest = operations['drive___files___check-existence']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFilesCheckExistenceResponse = operations['drive___files___check-existence']['responses']['200']['content']['application/json'];
+export type DriveFilesCheckExistenceResponse = operations['drive___files___check-existence']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFilesCreateRequest = operations['drive___files___create']['requestBody']['content']['multipart/form-data'];
+export type DriveFilesCreateRequest = operations['drive___files___create']['requestBody']['content']['multipart/form-data'];
 
 // @public (undocumented)
-type DriveFilesCreateResponse = operations['drive___files___create']['responses']['200']['content']['application/json'];
+export type DriveFilesCreateResponse = operations['drive___files___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFilesDeleteRequest = operations['drive___files___delete']['requestBody']['content']['application/json'];
+export type DriveFilesDeleteRequest = operations['drive___files___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFilesFindByHashRequest = operations['drive___files___find-by-hash']['requestBody']['content']['application/json'];
+export type DriveFilesFindByHashRequest = operations['drive___files___find-by-hash']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFilesFindByHashResponse = operations['drive___files___find-by-hash']['responses']['200']['content']['application/json'];
+export type DriveFilesFindByHashResponse = operations['drive___files___find-by-hash']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFilesFindRequest = operations['drive___files___find']['requestBody']['content']['application/json'];
+export type DriveFilesFindRequest = operations['drive___files___find']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFilesFindResponse = operations['drive___files___find']['responses']['200']['content']['application/json'];
+export type DriveFilesFindResponse = operations['drive___files___find']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFilesRequest = operations['drive___files']['requestBody']['content']['application/json'];
+export type DriveFilesRequest = operations['drive___files']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFilesResponse = operations['drive___files']['responses']['200']['content']['application/json'];
+export type DriveFilesResponse = operations['drive___files']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFilesShowRequest = operations['drive___files___show']['requestBody']['content']['application/json'];
+export type DriveFilesShowRequest = operations['drive___files___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFilesShowResponse = operations['drive___files___show']['responses']['200']['content']['application/json'];
+export type DriveFilesShowResponse = operations['drive___files___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFilesUpdateRequest = operations['drive___files___update']['requestBody']['content']['application/json'];
+export type DriveFilesUpdateRequest = operations['drive___files___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFilesUpdateResponse = operations['drive___files___update']['responses']['200']['content']['application/json'];
+export type DriveFilesUpdateResponse = operations['drive___files___update']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFilesUploadFromUrlRequest = operations['drive___files___upload-from-url']['requestBody']['content']['application/json'];
+export type DriveFilesUploadFromUrlRequest = operations['drive___files___upload-from-url']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFolder = components['schemas']['DriveFolder'];
+export type DriveFolder = components['schemas']['DriveFolder'];
 
 // @public (undocumented)
-type DriveFoldersCreateRequest = operations['drive___folders___create']['requestBody']['content']['application/json'];
+export type DriveFoldersCreateRequest = operations['drive___folders___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFoldersCreateResponse = operations['drive___folders___create']['responses']['200']['content']['application/json'];
+export type DriveFoldersCreateResponse = operations['drive___folders___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFoldersDeleteRequest = operations['drive___folders___delete']['requestBody']['content']['application/json'];
+export type DriveFoldersDeleteRequest = operations['drive___folders___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFoldersFindRequest = operations['drive___folders___find']['requestBody']['content']['application/json'];
+export type DriveFoldersFindRequest = operations['drive___folders___find']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFoldersFindResponse = operations['drive___folders___find']['responses']['200']['content']['application/json'];
+export type DriveFoldersFindResponse = operations['drive___folders___find']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFoldersRequest = operations['drive___folders']['requestBody']['content']['application/json'];
+export type DriveFoldersRequest = operations['drive___folders']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFoldersResponse = operations['drive___folders']['responses']['200']['content']['application/json'];
+export type DriveFoldersResponse = operations['drive___folders']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFoldersShowRequest = operations['drive___folders___show']['requestBody']['content']['application/json'];
+export type DriveFoldersShowRequest = operations['drive___folders___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFoldersShowResponse = operations['drive___folders___show']['responses']['200']['content']['application/json'];
+export type DriveFoldersShowResponse = operations['drive___folders___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFoldersUpdateRequest = operations['drive___folders___update']['requestBody']['content']['application/json'];
+export type DriveFoldersUpdateRequest = operations['drive___folders___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type DriveFoldersUpdateResponse = operations['drive___folders___update']['responses']['200']['content']['application/json'];
+export type DriveFoldersUpdateResponse = operations['drive___folders___update']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type DriveResponse = operations['drive']['responses']['200']['content']['application/json'];
+export type DriveResponse = operations['drive']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type DriveStreamRequest = operations['drive___stream']['requestBody']['content']['application/json'];
+export type DriveStreamRequest = operations['drive___stream']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type DriveStreamResponse = operations['drive___stream']['responses']['200']['content']['application/json'];
+export type DriveStreamResponse = operations['drive___stream']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type EmailAddressAvailableRequest = operations['email-address___available']['requestBody']['content']['application/json'];
+export type EmailAddressAvailableRequest = operations['email-address___available']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type EmailAddressAvailableResponse = operations['email-address___available']['responses']['200']['content']['application/json'];
+export type EmailAddressAvailableResponse = operations['email-address___available']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type EmojiAdded = {
+export type EmojiAdded = {
     emoji: EmojiDetailed;
 };
 
 // @public (undocumented)
-type EmojiDeleted = {
+export type EmojiDeleted = {
     emojis: EmojiDetailed[];
 };
 
 // @public (undocumented)
-type EmojiDetailed = components['schemas']['EmojiDetailed'];
+export type EmojiDetailed = components['schemas']['EmojiDetailed'];
 
 // @public (undocumented)
-type EmojiDetailedAdmin = components['schemas']['EmojiDetailedAdmin'];
+export type EmojiDetailedAdmin = components['schemas']['EmojiDetailedAdmin'];
 
 // @public (undocumented)
-type EmojiRequest = operations['emoji']['requestBody']['content']['application/json'];
+export type EmojiRequest = operations['emoji']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type EmojiResponse = operations['emoji']['responses']['200']['content']['application/json'];
+export type EmojiResponse = operations['emoji']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type EmojiSimple = components['schemas']['EmojiSimple'];
+export type EmojiSimple = components['schemas']['EmojiSimple'];
 
 // @public (undocumented)
-type EmojisResponse = operations['emojis']['responses']['200']['content']['application/json'];
+export type EmojisResponse = operations['emojis']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type EmojiUpdated = {
+export type EmojiUpdated = {
     emojis: EmojiDetailed[];
 };
 
 // @public (undocumented)
-type EmptyRequest = Record<string, unknown> | undefined;
+export type EmptyRequest = Record<string, unknown> | undefined;
 
 // @public (undocumented)
-type EmptyResponse = Record<string, unknown> | undefined;
+export type EmptyResponse = Record<string, unknown> | undefined;
 
 // @public (undocumented)
-type EndpointRequest = operations['endpoint']['requestBody']['content']['application/json'];
+export type EndpointRequest = operations['endpoint']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type EndpointResponse = operations['endpoint']['responses']['200']['content']['application/json'];
+export type EndpointResponse = operations['endpoint']['responses']['200']['content']['application/json'];
 
 // Warning: (ae-forgotten-export) The symbol "Overwrite" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "Endpoints_2" needs to be exported by the entry point index.d.ts
@@ -1387,7 +1387,7 @@ export type Endpoints = Overwrite<Endpoints_2, {
 }>;
 
 // @public (undocumented)
-type EndpointsResponse = operations['endpoints']['responses']['200']['content']['application/json'];
+export type EndpointsResponse = operations['endpoints']['responses']['200']['content']['application/json'];
 
 declare namespace entities {
     export {
@@ -2116,6 +2116,7 @@ declare namespace entities {
 
 // @public (undocumented)
 type Error_2 = components['schemas']['Error'];
+export { Error_2 as Error }
 
 // @public (undocumented)
 type ErrorEvent_2 = Events.ErrorEvent;
@@ -2126,52 +2127,52 @@ type Event_2 = Events.Event;
 export { Event_2 as Event }
 
 // @public (undocumented)
-type FederationFollowersRequest = operations['federation___followers']['requestBody']['content']['application/json'];
+export type FederationFollowersRequest = operations['federation___followers']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FederationFollowersResponse = operations['federation___followers']['responses']['200']['content']['application/json'];
+export type FederationFollowersResponse = operations['federation___followers']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type FederationFollowingRequest = operations['federation___following']['requestBody']['content']['application/json'];
+export type FederationFollowingRequest = operations['federation___following']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FederationFollowingResponse = operations['federation___following']['responses']['200']['content']['application/json'];
+export type FederationFollowingResponse = operations['federation___following']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type FederationInstance = components['schemas']['FederationInstance'];
+export type FederationInstance = components['schemas']['FederationInstance'];
 
 // @public (undocumented)
-type FederationInstancesRequest = operations['federation___instances']['requestBody']['content']['application/json'];
+export type FederationInstancesRequest = operations['federation___instances']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FederationInstancesResponse = operations['federation___instances']['responses']['200']['content']['application/json'];
+export type FederationInstancesResponse = operations['federation___instances']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type FederationShowInstanceRequest = operations['federation___show-instance']['requestBody']['content']['application/json'];
+export type FederationShowInstanceRequest = operations['federation___show-instance']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FederationShowInstanceResponse = operations['federation___show-instance']['responses']['200']['content']['application/json'];
+export type FederationShowInstanceResponse = operations['federation___show-instance']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type FederationStatsRequest = operations['federation___stats']['requestBody']['content']['application/json'];
+export type FederationStatsRequest = operations['federation___stats']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FederationStatsResponse = operations['federation___stats']['responses']['200']['content']['application/json'];
+export type FederationStatsResponse = operations['federation___stats']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type FederationUpdateRemoteUserRequest = operations['federation___update-remote-user']['requestBody']['content']['application/json'];
+export type FederationUpdateRemoteUserRequest = operations['federation___update-remote-user']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FederationUsersRequest = operations['federation___users']['requestBody']['content']['application/json'];
+export type FederationUsersRequest = operations['federation___users']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FederationUsersResponse = operations['federation___users']['responses']['200']['content']['application/json'];
+export type FederationUsersResponse = operations['federation___users']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type FetchExternalResourcesRequest = operations['fetch-external-resources']['requestBody']['content']['application/json'];
+export type FetchExternalResourcesRequest = operations['fetch-external-resources']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FetchExternalResourcesResponse = operations['fetch-external-resources']['responses']['200']['content']['application/json'];
+export type FetchExternalResourcesResponse = operations['fetch-external-resources']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 type FetchLike = (input: string, init?: {
@@ -2188,256 +2189,256 @@ type FetchLike = (input: string, init?: {
 }>;
 
 // @public (undocumented)
-type FetchRssRequest = operations['fetch-rss']['requestBody']['content']['application/json'];
+export type FetchRssRequest = operations['fetch-rss']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FetchRssResponse = operations['fetch-rss']['responses']['200']['content']['application/json'];
+export type FetchRssResponse = operations['fetch-rss']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type Flash = components['schemas']['Flash'];
+export type Flash = components['schemas']['Flash'];
 
 // @public (undocumented)
-type FlashCreateRequest = operations['flash___create']['requestBody']['content']['application/json'];
+export type FlashCreateRequest = operations['flash___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FlashCreateResponse = operations['flash___create']['responses']['200']['content']['application/json'];
+export type FlashCreateResponse = operations['flash___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type FlashDeleteRequest = operations['flash___delete']['requestBody']['content']['application/json'];
+export type FlashDeleteRequest = operations['flash___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FlashFeaturedRequest = operations['flash___featured']['requestBody']['content']['application/json'];
+export type FlashFeaturedRequest = operations['flash___featured']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FlashFeaturedResponse = operations['flash___featured']['responses']['200']['content']['application/json'];
+export type FlashFeaturedResponse = operations['flash___featured']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type FlashLike = components['schemas']['FlashLike'];
+export type FlashLike = components['schemas']['FlashLike'];
 
 // @public (undocumented)
-type FlashLikeRequest = operations['flash___like']['requestBody']['content']['application/json'];
+export type FlashLikeRequest = operations['flash___like']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FlashMyLikesRequest = operations['flash___my-likes']['requestBody']['content']['application/json'];
+export type FlashMyLikesRequest = operations['flash___my-likes']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FlashMyLikesResponse = operations['flash___my-likes']['responses']['200']['content']['application/json'];
+export type FlashMyLikesResponse = operations['flash___my-likes']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type FlashMyRequest = operations['flash___my']['requestBody']['content']['application/json'];
+export type FlashMyRequest = operations['flash___my']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FlashMyResponse = operations['flash___my']['responses']['200']['content']['application/json'];
+export type FlashMyResponse = operations['flash___my']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type FlashShowRequest = operations['flash___show']['requestBody']['content']['application/json'];
+export type FlashShowRequest = operations['flash___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FlashShowResponse = operations['flash___show']['responses']['200']['content']['application/json'];
+export type FlashShowResponse = operations['flash___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type FlashUnlikeRequest = operations['flash___unlike']['requestBody']['content']['application/json'];
+export type FlashUnlikeRequest = operations['flash___unlike']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FlashUpdateRequest = operations['flash___update']['requestBody']['content']['application/json'];
+export type FlashUpdateRequest = operations['flash___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 export const followersVisibilities: readonly ["public", "followers", "private"];
 
 // @public (undocumented)
-type Following = components['schemas']['Following'];
+export type Following = components['schemas']['Following'];
 
 // @public (undocumented)
-type FollowingCreateRequest = operations['following___create']['requestBody']['content']['application/json'];
+export type FollowingCreateRequest = operations['following___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FollowingCreateResponse = operations['following___create']['responses']['200']['content']['application/json'];
+export type FollowingCreateResponse = operations['following___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type FollowingDeleteRequest = operations['following___delete']['requestBody']['content']['application/json'];
+export type FollowingDeleteRequest = operations['following___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FollowingDeleteResponse = operations['following___delete']['responses']['200']['content']['application/json'];
+export type FollowingDeleteResponse = operations['following___delete']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type FollowingInvalidateRequest = operations['following___invalidate']['requestBody']['content']['application/json'];
+export type FollowingInvalidateRequest = operations['following___invalidate']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FollowingInvalidateResponse = operations['following___invalidate']['responses']['200']['content']['application/json'];
+export type FollowingInvalidateResponse = operations['following___invalidate']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type FollowingRequestsAcceptRequest = operations['following___requests___accept']['requestBody']['content']['application/json'];
+export type FollowingRequestsAcceptRequest = operations['following___requests___accept']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FollowingRequestsCancelRequest = operations['following___requests___cancel']['requestBody']['content']['application/json'];
+export type FollowingRequestsCancelRequest = operations['following___requests___cancel']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FollowingRequestsCancelResponse = operations['following___requests___cancel']['responses']['200']['content']['application/json'];
+export type FollowingRequestsCancelResponse = operations['following___requests___cancel']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type FollowingRequestsListRequest = operations['following___requests___list']['requestBody']['content']['application/json'];
+export type FollowingRequestsListRequest = operations['following___requests___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FollowingRequestsListResponse = operations['following___requests___list']['responses']['200']['content']['application/json'];
+export type FollowingRequestsListResponse = operations['following___requests___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type FollowingRequestsRejectRequest = operations['following___requests___reject']['requestBody']['content']['application/json'];
+export type FollowingRequestsRejectRequest = operations['following___requests___reject']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FollowingRequestsSentRequest = operations['following___requests___sent']['requestBody']['content']['application/json'];
+export type FollowingRequestsSentRequest = operations['following___requests___sent']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FollowingRequestsSentResponse = operations['following___requests___sent']['responses']['200']['content']['application/json'];
+export type FollowingRequestsSentResponse = operations['following___requests___sent']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type FollowingUpdateAllRequest = operations['following___update-all']['requestBody']['content']['application/json'];
+export type FollowingUpdateAllRequest = operations['following___update-all']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FollowingUpdateRequest = operations['following___update']['requestBody']['content']['application/json'];
+export type FollowingUpdateRequest = operations['following___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type FollowingUpdateResponse = operations['following___update']['responses']['200']['content']['application/json'];
+export type FollowingUpdateResponse = operations['following___update']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 export const followingVisibilities: readonly ["public", "followers", "private"];
 
 // @public (undocumented)
-type FollowRequest = components['schemas']['FollowRequest'];
+export type FollowRequest = components['schemas']['FollowRequest'];
 
 // @public (undocumented)
-type GalleryFeaturedRequest = operations['gallery___featured']['requestBody']['content']['application/json'];
+export type GalleryFeaturedRequest = operations['gallery___featured']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type GalleryFeaturedResponse = operations['gallery___featured']['responses']['200']['content']['application/json'];
+export type GalleryFeaturedResponse = operations['gallery___featured']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type GalleryLike = components['schemas']['GalleryLike'];
+export type GalleryLike = components['schemas']['GalleryLike'];
 
 // @public (undocumented)
-type GalleryPopularResponse = operations['gallery___popular']['responses']['200']['content']['application/json'];
+export type GalleryPopularResponse = operations['gallery___popular']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type GalleryPost = components['schemas']['GalleryPost'];
+export type GalleryPost = components['schemas']['GalleryPost'];
 
 // @public (undocumented)
-type GalleryPostsCreateRequest = operations['gallery___posts___create']['requestBody']['content']['application/json'];
+export type GalleryPostsCreateRequest = operations['gallery___posts___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type GalleryPostsCreateResponse = operations['gallery___posts___create']['responses']['200']['content']['application/json'];
+export type GalleryPostsCreateResponse = operations['gallery___posts___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type GalleryPostsDeleteRequest = operations['gallery___posts___delete']['requestBody']['content']['application/json'];
+export type GalleryPostsDeleteRequest = operations['gallery___posts___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type GalleryPostsLikeRequest = operations['gallery___posts___like']['requestBody']['content']['application/json'];
+export type GalleryPostsLikeRequest = operations['gallery___posts___like']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type GalleryPostsRequest = operations['gallery___posts']['requestBody']['content']['application/json'];
+export type GalleryPostsRequest = operations['gallery___posts']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type GalleryPostsResponse = operations['gallery___posts']['responses']['200']['content']['application/json'];
+export type GalleryPostsResponse = operations['gallery___posts']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type GalleryPostsShowRequest = operations['gallery___posts___show']['requestBody']['content']['application/json'];
+export type GalleryPostsShowRequest = operations['gallery___posts___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type GalleryPostsShowResponse = operations['gallery___posts___show']['responses']['200']['content']['application/json'];
+export type GalleryPostsShowResponse = operations['gallery___posts___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type GalleryPostsUnlikeRequest = operations['gallery___posts___unlike']['requestBody']['content']['application/json'];
+export type GalleryPostsUnlikeRequest = operations['gallery___posts___unlike']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type GalleryPostsUpdateRequest = operations['gallery___posts___update']['requestBody']['content']['application/json'];
+export type GalleryPostsUpdateRequest = operations['gallery___posts___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type GalleryPostsUpdateResponse = operations['gallery___posts___update']['responses']['200']['content']['application/json'];
+export type GalleryPostsUpdateResponse = operations['gallery___posts___update']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type GetAvatarDecorationsResponse = operations['get-avatar-decorations']['responses']['200']['content']['application/json'];
+export type GetAvatarDecorationsResponse = operations['get-avatar-decorations']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type GetOnlineUsersCountResponse = operations['get-online-users-count']['responses']['200']['content']['application/json'];
+export type GetOnlineUsersCountResponse = operations['get-online-users-count']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type Hashtag = components['schemas']['Hashtag'];
+export type Hashtag = components['schemas']['Hashtag'];
 
 // @public (undocumented)
-type HashtagsListRequest = operations['hashtags___list']['requestBody']['content']['application/json'];
+export type HashtagsListRequest = operations['hashtags___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type HashtagsListResponse = operations['hashtags___list']['responses']['200']['content']['application/json'];
+export type HashtagsListResponse = operations['hashtags___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type HashtagsSearchRequest = operations['hashtags___search']['requestBody']['content']['application/json'];
+export type HashtagsSearchRequest = operations['hashtags___search']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type HashtagsSearchResponse = operations['hashtags___search']['responses']['200']['content']['application/json'];
+export type HashtagsSearchResponse = operations['hashtags___search']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type HashtagsShowRequest = operations['hashtags___show']['requestBody']['content']['application/json'];
+export type HashtagsShowRequest = operations['hashtags___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type HashtagsShowResponse = operations['hashtags___show']['responses']['200']['content']['application/json'];
+export type HashtagsShowResponse = operations['hashtags___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type HashtagsTrendResponse = operations['hashtags___trend']['responses']['200']['content']['application/json'];
+export type HashtagsTrendResponse = operations['hashtags___trend']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type HashtagsUsersRequest = operations['hashtags___users']['requestBody']['content']['application/json'];
+export type HashtagsUsersRequest = operations['hashtags___users']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type HashtagsUsersResponse = operations['hashtags___users']['responses']['200']['content']['application/json'];
+export type HashtagsUsersResponse = operations['hashtags___users']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type I2faDoneRequest = operations['i___2fa___done']['requestBody']['content']['application/json'];
+export type I2faDoneRequest = operations['i___2fa___done']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type I2faDoneResponse = operations['i___2fa___done']['responses']['200']['content']['application/json'];
+export type I2faDoneResponse = operations['i___2fa___done']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type I2faKeyDoneRequest = operations['i___2fa___key-done']['requestBody']['content']['application/json'];
+export type I2faKeyDoneRequest = operations['i___2fa___key-done']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type I2faKeyDoneResponse = operations['i___2fa___key-done']['responses']['200']['content']['application/json'];
+export type I2faKeyDoneResponse = operations['i___2fa___key-done']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type I2faPasswordLessRequest = operations['i___2fa___password-less']['requestBody']['content']['application/json'];
+export type I2faPasswordLessRequest = operations['i___2fa___password-less']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type I2faRegisterKeyRequest = operations['i___2fa___register-key']['requestBody']['content']['application/json'];
+export type I2faRegisterKeyRequest = operations['i___2fa___register-key']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type I2faRegisterKeyResponse = operations['i___2fa___register-key']['responses']['200']['content']['application/json'];
+export type I2faRegisterKeyResponse = operations['i___2fa___register-key']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type I2faRegisterRequest = operations['i___2fa___register']['requestBody']['content']['application/json'];
+export type I2faRegisterRequest = operations['i___2fa___register']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type I2faRegisterResponse = operations['i___2fa___register']['responses']['200']['content']['application/json'];
+export type I2faRegisterResponse = operations['i___2fa___register']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type I2faRemoveKeyRequest = operations['i___2fa___remove-key']['requestBody']['content']['application/json'];
+export type I2faRemoveKeyRequest = operations['i___2fa___remove-key']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type I2faUnregisterRequest = operations['i___2fa___unregister']['requestBody']['content']['application/json'];
+export type I2faUnregisterRequest = operations['i___2fa___unregister']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type I2faUpdateKeyRequest = operations['i___2fa___update-key']['requestBody']['content']['application/json'];
+export type I2faUpdateKeyRequest = operations['i___2fa___update-key']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IAppsRequest = operations['i___apps']['requestBody']['content']['application/json'];
+export type IAppsRequest = operations['i___apps']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IAppsResponse = operations['i___apps']['responses']['200']['content']['application/json'];
+export type IAppsResponse = operations['i___apps']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IAuthorizedAppsRequest = operations['i___authorized-apps']['requestBody']['content']['application/json'];
+export type IAuthorizedAppsRequest = operations['i___authorized-apps']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IAuthorizedAppsResponse = operations['i___authorized-apps']['responses']['200']['content']['application/json'];
+export type IAuthorizedAppsResponse = operations['i___authorized-apps']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IChangePasswordRequest = operations['i___change-password']['requestBody']['content']['application/json'];
+export type IChangePasswordRequest = operations['i___change-password']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 export interface IChannelConnection<Channel extends AnyOf<Channels> = AnyOf<Channels>> extends EventEmitter<Channel['events']> {
@@ -2458,166 +2459,166 @@ export interface IChannelConnection<Channel extends AnyOf<Channels> = AnyOf<Chan
 }
 
 // @public (undocumented)
-type IClaimAchievementRequest = operations['i___claim-achievement']['requestBody']['content']['application/json'];
+export type IClaimAchievementRequest = operations['i___claim-achievement']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ID = string;
+export type ID = string;
 
 // @public (undocumented)
-type IDeleteAccountRequest = operations['i___delete-account']['requestBody']['content']['application/json'];
+export type IDeleteAccountRequest = operations['i___delete-account']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IExportFollowingRequest = operations['i___export-following']['requestBody']['content']['application/json'];
+export type IExportFollowingRequest = operations['i___export-following']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IFavoritesRequest = operations['i___favorites']['requestBody']['content']['application/json'];
+export type IFavoritesRequest = operations['i___favorites']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IFavoritesResponse = operations['i___favorites']['responses']['200']['content']['application/json'];
+export type IFavoritesResponse = operations['i___favorites']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IGalleryLikesRequest = operations['i___gallery___likes']['requestBody']['content']['application/json'];
+export type IGalleryLikesRequest = operations['i___gallery___likes']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IGalleryLikesResponse = operations['i___gallery___likes']['responses']['200']['content']['application/json'];
+export type IGalleryLikesResponse = operations['i___gallery___likes']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IGalleryPostsRequest = operations['i___gallery___posts']['requestBody']['content']['application/json'];
+export type IGalleryPostsRequest = operations['i___gallery___posts']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IGalleryPostsResponse = operations['i___gallery___posts']['responses']['200']['content']['application/json'];
+export type IGalleryPostsResponse = operations['i___gallery___posts']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IImportAntennasRequest = operations['i___import-antennas']['requestBody']['content']['application/json'];
+export type IImportAntennasRequest = operations['i___import-antennas']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IImportBlockingRequest = operations['i___import-blocking']['requestBody']['content']['application/json'];
+export type IImportBlockingRequest = operations['i___import-blocking']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IImportFollowingRequest = operations['i___import-following']['requestBody']['content']['application/json'];
+export type IImportFollowingRequest = operations['i___import-following']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IImportMutingRequest = operations['i___import-muting']['requestBody']['content']['application/json'];
+export type IImportMutingRequest = operations['i___import-muting']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IImportUserListsRequest = operations['i___import-user-lists']['requestBody']['content']['application/json'];
+export type IImportUserListsRequest = operations['i___import-user-lists']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IMoveRequest = operations['i___move']['requestBody']['content']['application/json'];
+export type IMoveRequest = operations['i___move']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IMoveResponse = operations['i___move']['responses']['200']['content']['application/json'];
+export type IMoveResponse = operations['i___move']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type INotificationsGroupedRequest = operations['i___notifications-grouped']['requestBody']['content']['application/json'];
+export type INotificationsGroupedRequest = operations['i___notifications-grouped']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type INotificationsGroupedResponse = operations['i___notifications-grouped']['responses']['200']['content']['application/json'];
+export type INotificationsGroupedResponse = operations['i___notifications-grouped']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type INotificationsRequest = operations['i___notifications']['requestBody']['content']['application/json'];
+export type INotificationsRequest = operations['i___notifications']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type INotificationsResponse = operations['i___notifications']['responses']['200']['content']['application/json'];
+export type INotificationsResponse = operations['i___notifications']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type InviteCode = components['schemas']['InviteCode'];
+export type InviteCode = components['schemas']['InviteCode'];
 
 // @public (undocumented)
-type InviteCreateResponse = operations['invite___create']['responses']['200']['content']['application/json'];
+export type InviteCreateResponse = operations['invite___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type InviteDeleteRequest = operations['invite___delete']['requestBody']['content']['application/json'];
+export type InviteDeleteRequest = operations['invite___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type InviteLimitResponse = operations['invite___limit']['responses']['200']['content']['application/json'];
+export type InviteLimitResponse = operations['invite___limit']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type InviteListRequest = operations['invite___list']['requestBody']['content']['application/json'];
+export type InviteListRequest = operations['invite___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type InviteListResponse = operations['invite___list']['responses']['200']['content']['application/json'];
+export type InviteListResponse = operations['invite___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IPageLikesRequest = operations['i___page-likes']['requestBody']['content']['application/json'];
+export type IPageLikesRequest = operations['i___page-likes']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IPageLikesResponse = operations['i___page-likes']['responses']['200']['content']['application/json'];
+export type IPageLikesResponse = operations['i___page-likes']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IPagesRequest = operations['i___pages']['requestBody']['content']['application/json'];
+export type IPagesRequest = operations['i___pages']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IPagesResponse = operations['i___pages']['responses']['200']['content']['application/json'];
+export type IPagesResponse = operations['i___pages']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IPinRequest = operations['i___pin']['requestBody']['content']['application/json'];
+export type IPinRequest = operations['i___pin']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IPinResponse = operations['i___pin']['responses']['200']['content']['application/json'];
+export type IPinResponse = operations['i___pin']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IReadAnnouncementRequest = operations['i___read-announcement']['requestBody']['content']['application/json'];
+export type IReadAnnouncementRequest = operations['i___read-announcement']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IRegenerateTokenRequest = operations['i___regenerate-token']['requestBody']['content']['application/json'];
+export type IRegenerateTokenRequest = operations['i___regenerate-token']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IRegistryGetAllRequest = operations['i___registry___get-all']['requestBody']['content']['application/json'];
+export type IRegistryGetAllRequest = operations['i___registry___get-all']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IRegistryGetAllResponse = operations['i___registry___get-all']['responses']['200']['content']['application/json'];
+export type IRegistryGetAllResponse = operations['i___registry___get-all']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IRegistryGetDetailRequest = operations['i___registry___get-detail']['requestBody']['content']['application/json'];
+export type IRegistryGetDetailRequest = operations['i___registry___get-detail']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IRegistryGetDetailResponse = operations['i___registry___get-detail']['responses']['200']['content']['application/json'];
+export type IRegistryGetDetailResponse = operations['i___registry___get-detail']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IRegistryGetRequest = operations['i___registry___get']['requestBody']['content']['application/json'];
+export type IRegistryGetRequest = operations['i___registry___get']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IRegistryGetResponse = operations['i___registry___get']['responses']['200']['content']['application/json'];
+export type IRegistryGetResponse = operations['i___registry___get']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IRegistryKeysRequest = operations['i___registry___keys']['requestBody']['content']['application/json'];
+export type IRegistryKeysRequest = operations['i___registry___keys']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IRegistryKeysResponse = operations['i___registry___keys']['responses']['200']['content']['application/json'];
+export type IRegistryKeysResponse = operations['i___registry___keys']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IRegistryKeysWithTypeRequest = operations['i___registry___keys-with-type']['requestBody']['content']['application/json'];
+export type IRegistryKeysWithTypeRequest = operations['i___registry___keys-with-type']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IRegistryKeysWithTypeResponse = operations['i___registry___keys-with-type']['responses']['200']['content']['application/json'];
+export type IRegistryKeysWithTypeResponse = operations['i___registry___keys-with-type']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IRegistryRemoveRequest = operations['i___registry___remove']['requestBody']['content']['application/json'];
+export type IRegistryRemoveRequest = operations['i___registry___remove']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IRegistryScopesWithDomainResponse = operations['i___registry___scopes-with-domain']['responses']['200']['content']['application/json'];
+export type IRegistryScopesWithDomainResponse = operations['i___registry___scopes-with-domain']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IRegistrySetRequest = operations['i___registry___set']['requestBody']['content']['application/json'];
+export type IRegistrySetRequest = operations['i___registry___set']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IResponse = operations['i']['responses']['200']['content']['application/json'];
+export type IResponse = operations['i']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IRevokeTokenRequest = operations['i___revoke-token']['requestBody']['content']['application/json'];
+export type IRevokeTokenRequest = operations['i___revoke-token']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 function isAPIError(reason: Record<PropertyKey, unknown>): reason is APIError;
 
 // @public (undocumented)
-type ISigninHistoryRequest = operations['i___signin-history']['requestBody']['content']['application/json'];
+export type ISigninHistoryRequest = operations['i___signin-history']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ISigninHistoryResponse = operations['i___signin-history']['responses']['200']['content']['application/json'];
+export type ISigninHistoryResponse = operations['i___signin-history']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-function isPureRenote(note: Note): note is PureRenote;
+export function isPureRenote(note: Note): note is PureRenote;
 
 // @public (undocumented)
 export interface IStream extends EventEmitter<StreamEvents> {
@@ -2654,46 +2655,46 @@ export interface IStream extends EventEmitter<StreamEvents> {
 }
 
 // @public (undocumented)
-type IUnpinRequest = operations['i___unpin']['requestBody']['content']['application/json'];
+export type IUnpinRequest = operations['i___unpin']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IUnpinResponse = operations['i___unpin']['responses']['200']['content']['application/json'];
+export type IUnpinResponse = operations['i___unpin']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IUpdateEmailRequest = operations['i___update-email']['requestBody']['content']['application/json'];
+export type IUpdateEmailRequest = operations['i___update-email']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IUpdateEmailResponse = operations['i___update-email']['responses']['200']['content']['application/json'];
+export type IUpdateEmailResponse = operations['i___update-email']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IUpdateRequest = operations['i___update']['requestBody']['content']['application/json'];
+export type IUpdateRequest = operations['i___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IUpdateResponse = operations['i___update']['responses']['200']['content']['application/json'];
+export type IUpdateResponse = operations['i___update']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IWebhooksCreateRequest = operations['i___webhooks___create']['requestBody']['content']['application/json'];
+export type IWebhooksCreateRequest = operations['i___webhooks___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IWebhooksCreateResponse = operations['i___webhooks___create']['responses']['200']['content']['application/json'];
+export type IWebhooksCreateResponse = operations['i___webhooks___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IWebhooksDeleteRequest = operations['i___webhooks___delete']['requestBody']['content']['application/json'];
+export type IWebhooksDeleteRequest = operations['i___webhooks___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IWebhooksListResponse = operations['i___webhooks___list']['responses']['200']['content']['application/json'];
+export type IWebhooksListResponse = operations['i___webhooks___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IWebhooksShowRequest = operations['i___webhooks___show']['requestBody']['content']['application/json'];
+export type IWebhooksShowRequest = operations['i___webhooks___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IWebhooksShowResponse = operations['i___webhooks___show']['responses']['200']['content']['application/json'];
+export type IWebhooksShowResponse = operations['i___webhooks___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type IWebhooksTestRequest = operations['i___webhooks___test']['requestBody']['content']['application/json'];
+export type IWebhooksTestRequest = operations['i___webhooks___test']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type IWebhooksUpdateRequest = operations['i___webhooks___update']['requestBody']['content']['application/json'];
+export type IWebhooksUpdateRequest = operations['i___webhooks___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 export type ListenersMap = {
@@ -2704,37 +2705,37 @@ export type ListenersMap = {
 };
 
 // @public (undocumented)
-type MeDetailed = components['schemas']['MeDetailed'];
+export type MeDetailed = components['schemas']['MeDetailed'];
 
 // @public (undocumented)
-type MeDetailedOnly = components['schemas']['MeDetailedOnly'];
+export type MeDetailedOnly = components['schemas']['MeDetailedOnly'];
 
 // @public (undocumented)
 export type Message = Parameters<WebSocket['send']>[0];
 
 // @public (undocumented)
-type MetaDetailed = components['schemas']['MetaDetailed'];
+export type MetaDetailed = components['schemas']['MetaDetailed'];
 
 // @public (undocumented)
-type MetaDetailedOnly = components['schemas']['MetaDetailedOnly'];
+export type MetaDetailedOnly = components['schemas']['MetaDetailedOnly'];
 
 // @public (undocumented)
-type MetaLite = components['schemas']['MetaLite'];
+export type MetaLite = components['schemas']['MetaLite'];
 
 // @public (undocumented)
-type MetaRequest = operations['meta']['requestBody']['content']['application/json'];
+export type MetaRequest = operations['meta']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type MetaResponse = operations['meta']['responses']['200']['content']['application/json'];
+export type MetaResponse = operations['meta']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type MiauthGenTokenRequest = operations['miauth___gen-token']['requestBody']['content']['application/json'];
+export type MiauthGenTokenRequest = operations['miauth___gen-token']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type MiauthGenTokenResponse = operations['miauth___gen-token']['responses']['200']['content']['application/json'];
+export type MiauthGenTokenResponse = operations['miauth___gen-token']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ModerationLog = {
+export type ModerationLog = {
     id: ID;
     createdAt: DateString;
     userId: User['id'];
@@ -3215,31 +3216,31 @@ export type ModerationLogPayloads = {
 export const moderationLogTypes: readonly ["updateServerSettings", "suspend", "unsuspend", "updateUserName", "updateUserNote", "addCustomEmoji", "updateCustomEmoji", "deleteCustomEmoji", "assignRole", "unassignRole", "createRole", "updateRole", "deleteRole", "clearQueue", "promoteQueue", "deleteDriveFile", "deleteNote", "createGlobalAnnouncement", "createUserAnnouncement", "updateGlobalAnnouncement", "updateUserAnnouncement", "deleteGlobalAnnouncement", "deleteUserAnnouncement", "resetPassword", "regenerateUserToken", "suspendRemoteInstance", "unsuspendRemoteInstance", "updateRemoteInstanceNote", "markSensitiveDriveFile", "unmarkSensitiveDriveFile", "resolveAbuseReport", "forwardAbuseReport", "updateAbuseReportNote", "createInvitation", "createAd", "updateAd", "deleteAd", "createIndieAuthClient", "updateIndieAuthClient", "deleteIndieAuthClient", "createSSOServiceProvider", "updateSSOServiceProvider", "deleteSSOServiceProvider", "createAvatarDecoration", "updateAvatarDecoration", "deleteAvatarDecoration", "unsetUserAvatar", "unsetUserBanner", "unsetUserMutualBanner", "createSystemWebhook", "updateSystemWebhook", "deleteSystemWebhook", "createAbuseReportNotificationRecipient", "updateAbuseReportNotificationRecipient", "deleteAbuseReportNotificationRecipient", "deleteAccount", "deletePage", "deleteFlash", "deleteGalleryPost", "deleteChatRoom"];
 
 // @public (undocumented)
-type MuteCreateRequest = operations['mute___create']['requestBody']['content']['application/json'];
+export type MuteCreateRequest = operations['mute___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type MuteDeleteRequest = operations['mute___delete']['requestBody']['content']['application/json'];
+export type MuteDeleteRequest = operations['mute___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 export const mutedNoteReasons: readonly ["word", "manual", "spam", "other"];
 
 // @public (undocumented)
-type MuteListRequest = operations['mute___list']['requestBody']['content']['application/json'];
+export type MuteListRequest = operations['mute___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type MuteListResponse = operations['mute___list']['responses']['200']['content']['application/json'];
+export type MuteListResponse = operations['mute___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type Muting = components['schemas']['Muting'];
+export type Muting = components['schemas']['Muting'];
 
 // @public (undocumented)
-type MyAppsRequest = operations['my___apps']['requestBody']['content']['application/json'];
+export type MyAppsRequest = operations['my___apps']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type MyAppsResponse = operations['my___apps']['responses']['200']['content']['application/json'];
+export type MyAppsResponse = operations['my___apps']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type Note = components['schemas']['Note'];
+export type Note = components['schemas']['Note'];
 
 declare namespace note {
     export {
@@ -3248,175 +3249,175 @@ declare namespace note {
 }
 
 // @public (undocumented)
-type NoteDraft = components['schemas']['NoteDraft'];
+export type NoteDraft = components['schemas']['NoteDraft'];
 
 // @public (undocumented)
-type NoteFavorite = components['schemas']['NoteFavorite'];
+export type NoteFavorite = components['schemas']['NoteFavorite'];
 
 // @public (undocumented)
-type NoteReaction = components['schemas']['NoteReaction'];
+export type NoteReaction = components['schemas']['NoteReaction'];
 
 // @public (undocumented)
-type NotesChildrenRequest = operations['notes___children']['requestBody']['content']['application/json'];
+export type NotesChildrenRequest = operations['notes___children']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesChildrenResponse = operations['notes___children']['responses']['200']['content']['application/json'];
+export type NotesChildrenResponse = operations['notes___children']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesClipsRequest = operations['notes___clips']['requestBody']['content']['application/json'];
+export type NotesClipsRequest = operations['notes___clips']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesClipsResponse = operations['notes___clips']['responses']['200']['content']['application/json'];
+export type NotesClipsResponse = operations['notes___clips']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesConversationRequest = operations['notes___conversation']['requestBody']['content']['application/json'];
+export type NotesConversationRequest = operations['notes___conversation']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesConversationResponse = operations['notes___conversation']['responses']['200']['content']['application/json'];
+export type NotesConversationResponse = operations['notes___conversation']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesCreateRequest = operations['notes___create']['requestBody']['content']['application/json'];
+export type NotesCreateRequest = operations['notes___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesCreateResponse = operations['notes___create']['responses']['200']['content']['application/json'];
+export type NotesCreateResponse = operations['notes___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesDeleteRequest = operations['notes___delete']['requestBody']['content']['application/json'];
+export type NotesDeleteRequest = operations['notes___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesFavoritesCreateRequest = operations['notes___favorites___create']['requestBody']['content']['application/json'];
+export type NotesFavoritesCreateRequest = operations['notes___favorites___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesFavoritesDeleteRequest = operations['notes___favorites___delete']['requestBody']['content']['application/json'];
+export type NotesFavoritesDeleteRequest = operations['notes___favorites___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesFeaturedRequest = operations['notes___featured']['requestBody']['content']['application/json'];
+export type NotesFeaturedRequest = operations['notes___featured']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesFeaturedResponse = operations['notes___featured']['responses']['200']['content']['application/json'];
+export type NotesFeaturedResponse = operations['notes___featured']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesGlobalTimelineRequest = operations['notes___global-timeline']['requestBody']['content']['application/json'];
+export type NotesGlobalTimelineRequest = operations['notes___global-timeline']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesGlobalTimelineResponse = operations['notes___global-timeline']['responses']['200']['content']['application/json'];
+export type NotesGlobalTimelineResponse = operations['notes___global-timeline']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesHybridTimelineRequest = operations['notes___hybrid-timeline']['requestBody']['content']['application/json'];
+export type NotesHybridTimelineRequest = operations['notes___hybrid-timeline']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesHybridTimelineResponse = operations['notes___hybrid-timeline']['responses']['200']['content']['application/json'];
+export type NotesHybridTimelineResponse = operations['notes___hybrid-timeline']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesLocalTimelineRequest = operations['notes___local-timeline']['requestBody']['content']['application/json'];
+export type NotesLocalTimelineRequest = operations['notes___local-timeline']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesLocalTimelineResponse = operations['notes___local-timeline']['responses']['200']['content']['application/json'];
+export type NotesLocalTimelineResponse = operations['notes___local-timeline']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesMentionsRequest = operations['notes___mentions']['requestBody']['content']['application/json'];
+export type NotesMentionsRequest = operations['notes___mentions']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesMentionsResponse = operations['notes___mentions']['responses']['200']['content']['application/json'];
+export type NotesMentionsResponse = operations['notes___mentions']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesPollsRecommendationRequest = operations['notes___polls___recommendation']['requestBody']['content']['application/json'];
+export type NotesPollsRecommendationRequest = operations['notes___polls___recommendation']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesPollsRecommendationResponse = operations['notes___polls___recommendation']['responses']['200']['content']['application/json'];
+export type NotesPollsRecommendationResponse = operations['notes___polls___recommendation']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesPollsVoteRequest = operations['notes___polls___vote']['requestBody']['content']['application/json'];
+export type NotesPollsVoteRequest = operations['notes___polls___vote']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesReactionsCreateRequest = operations['notes___reactions___create']['requestBody']['content']['application/json'];
+export type NotesReactionsCreateRequest = operations['notes___reactions___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesReactionsDeleteRequest = operations['notes___reactions___delete']['requestBody']['content']['application/json'];
+export type NotesReactionsDeleteRequest = operations['notes___reactions___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesReactionsRequest = operations['notes___reactions']['requestBody']['content']['application/json'];
+export type NotesReactionsRequest = operations['notes___reactions']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesReactionsResponse = operations['notes___reactions']['responses']['200']['content']['application/json'];
+export type NotesReactionsResponse = operations['notes___reactions']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesRenotesRequest = operations['notes___renotes']['requestBody']['content']['application/json'];
+export type NotesRenotesRequest = operations['notes___renotes']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesRenotesResponse = operations['notes___renotes']['responses']['200']['content']['application/json'];
+export type NotesRenotesResponse = operations['notes___renotes']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesRepliesRequest = operations['notes___replies']['requestBody']['content']['application/json'];
+export type NotesRepliesRequest = operations['notes___replies']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesRepliesResponse = operations['notes___replies']['responses']['200']['content']['application/json'];
+export type NotesRepliesResponse = operations['notes___replies']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesRequest = operations['notes']['requestBody']['content']['application/json'];
+export type NotesRequest = operations['notes']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesResponse = operations['notes']['responses']['200']['content']['application/json'];
+export type NotesResponse = operations['notes']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesScheduledCancelRequest = operations['notes___scheduled___cancel']['requestBody']['content']['application/json'];
+export type NotesScheduledCancelRequest = operations['notes___scheduled___cancel']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesScheduledListRequest = operations['notes___scheduled___list']['requestBody']['content']['application/json'];
+export type NotesScheduledListRequest = operations['notes___scheduled___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesScheduledListResponse = operations['notes___scheduled___list']['responses']['200']['content']['application/json'];
+export type NotesScheduledListResponse = operations['notes___scheduled___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesSearchByTagRequest = operations['notes___search-by-tag']['requestBody']['content']['application/json'];
+export type NotesSearchByTagRequest = operations['notes___search-by-tag']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesSearchByTagResponse = operations['notes___search-by-tag']['responses']['200']['content']['application/json'];
+export type NotesSearchByTagResponse = operations['notes___search-by-tag']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesSearchRequest = operations['notes___search']['requestBody']['content']['application/json'];
+export type NotesSearchRequest = operations['notes___search']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesSearchResponse = operations['notes___search']['responses']['200']['content']['application/json'];
+export type NotesSearchResponse = operations['notes___search']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesShowRequest = operations['notes___show']['requestBody']['content']['application/json'];
+export type NotesShowRequest = operations['notes___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesShowResponse = operations['notes___show']['responses']['200']['content']['application/json'];
+export type NotesShowResponse = operations['notes___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesStateRequest = operations['notes___state']['requestBody']['content']['application/json'];
+export type NotesStateRequest = operations['notes___state']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesStateResponse = operations['notes___state']['responses']['200']['content']['application/json'];
+export type NotesStateResponse = operations['notes___state']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesThreadMutingCreateRequest = operations['notes___thread-muting___create']['requestBody']['content']['application/json'];
+export type NotesThreadMutingCreateRequest = operations['notes___thread-muting___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesThreadMutingDeleteRequest = operations['notes___thread-muting___delete']['requestBody']['content']['application/json'];
+export type NotesThreadMutingDeleteRequest = operations['notes___thread-muting___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesTimelineRequest = operations['notes___timeline']['requestBody']['content']['application/json'];
+export type NotesTimelineRequest = operations['notes___timeline']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesTimelineResponse = operations['notes___timeline']['responses']['200']['content']['application/json'];
+export type NotesTimelineResponse = operations['notes___timeline']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesTranslateRequest = operations['notes___translate']['requestBody']['content']['application/json'];
+export type NotesTranslateRequest = operations['notes___translate']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesTranslateResponse = operations['notes___translate']['responses']['200']['content']['application/json'];
+export type NotesTranslateResponse = operations['notes___translate']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesUnrenoteRequest = operations['notes___unrenote']['requestBody']['content']['application/json'];
+export type NotesUnrenoteRequest = operations['notes___unrenote']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesUserListTimelineRequest = operations['notes___user-list-timeline']['requestBody']['content']['application/json'];
+export type NotesUserListTimelineRequest = operations['notes___user-list-timeline']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesUserListTimelineResponse = operations['notes___user-list-timeline']['responses']['200']['content']['application/json'];
+export type NotesUserListTimelineResponse = operations['notes___user-list-timeline']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 export type NoteUpdatedEvent = {
@@ -3452,9 +3453,10 @@ export const noteVisibilities: readonly ["public", "home", "followers", "specifi
 
 // @public (undocumented)
 type Notification_2 = components['schemas']['Notification'];
+export { Notification_2 as Notification }
 
 // @public (undocumented)
-type NotificationsCreateRequest = operations['notifications___create']['requestBody']['content']['application/json'];
+export type NotificationsCreateRequest = operations['notifications___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 export const notificationTypes: readonly ["note", "follow", "mention", "reply", "renote", "quote", "reaction", "pollVote", "pollEnded", "receiveFollowRequest", "followRequestAccepted", "groupInvited", "app", "roleAssigned", "chatRoomInvitationReceived", "achievementEarned", "noteScheduled", "scheduledNotePosted", "scheduledNoteError"];
@@ -3463,13 +3465,13 @@ export const notificationTypes: readonly ["note", "follow", "mention", "reply", 
 export function nyaize(text: string): string;
 
 // @public (undocumented)
-type Page = components['schemas']['Page'];
+export type Page = components['schemas']['Page'];
 
 // @public (undocumented)
-type PageBlock = components['schemas']['PageBlock'];
+export type PageBlock = components['schemas']['PageBlock'];
 
 // @public (undocumented)
-type PageEvent = {
+export type PageEvent = {
     pageId: Page['id'];
     event: string;
     var: any;
@@ -3478,37 +3480,37 @@ type PageEvent = {
 };
 
 // @public (undocumented)
-type PageLike = components['schemas']['PageLike'];
+export type PageLike = components['schemas']['PageLike'];
 
 // @public (undocumented)
-type PagePushRequest = operations['page-push']['requestBody']['content']['application/json'];
+export type PagePushRequest = operations['page-push']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type PagesCreateRequest = operations['pages___create']['requestBody']['content']['application/json'];
+export type PagesCreateRequest = operations['pages___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type PagesCreateResponse = operations['pages___create']['responses']['200']['content']['application/json'];
+export type PagesCreateResponse = operations['pages___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type PagesDeleteRequest = operations['pages___delete']['requestBody']['content']['application/json'];
+export type PagesDeleteRequest = operations['pages___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type PagesFeaturedResponse = operations['pages___featured']['responses']['200']['content']['application/json'];
+export type PagesFeaturedResponse = operations['pages___featured']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type PagesLikeRequest = operations['pages___like']['requestBody']['content']['application/json'];
+export type PagesLikeRequest = operations['pages___like']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type PagesShowRequest = operations['pages___show']['requestBody']['content']['application/json'];
+export type PagesShowRequest = operations['pages___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type PagesShowResponse = operations['pages___show']['responses']['200']['content']['application/json'];
+export type PagesShowResponse = operations['pages___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type PagesUnlikeRequest = operations['pages___unlike']['requestBody']['content']['application/json'];
+export type PagesUnlikeRequest = operations['pages___unlike']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type PagesUpdateRequest = operations['pages___update']['requestBody']['content']['application/json'];
+export type PagesUpdateRequest = operations['pages___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 export function parse(_acct: string): Acct;
@@ -3516,7 +3518,7 @@ export function parse(_acct: string): Acct;
 // Warning: (ae-forgotten-export) The symbol "Values" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-type PartialRolePolicyOverride = Partial<{
+export type PartialRolePolicyOverride = Partial<{
     [k in keyof RolePolicies]: Omit<Values<Role['policies']>, 'value'> & {
         value: RolePolicies[k];
     };
@@ -3526,28 +3528,28 @@ type PartialRolePolicyOverride = Partial<{
 export const permissions: readonly ["read:account", "write:account", "read:blocks", "write:blocks", "read:drive", "write:drive", "read:favorites", "write:favorites", "read:following", "write:following", "read:messaging", "write:messaging", "read:mutes", "write:mutes", "write:notes", "read:notifications", "write:notifications", "read:reactions", "write:reactions", "write:votes", "read:pages", "write:pages", "write:page-likes", "read:page-likes", "read:user-groups", "write:user-groups", "read:channels", "write:channels", "read:gallery", "write:gallery", "read:gallery-likes", "write:gallery-likes", "read:flash", "write:flash", "read:flash-likes", "write:flash-likes", "read:admin:abuse-user-reports", "read:admin:abuse-report-resolvers", "write:admin:abuse-report-resolvers", "read:admin:index-stats", "read:admin:table-stats", "read:admin:user-ips", "read:admin:meta", "write:admin:reset-password", "write:admin:regenerate-user-token", "write:admin:resolve-abuse-user-report", "write:admin:send-email", "read:admin:server-info", "read:admin:show-moderation-log", "read:admin:show-account-move-log", "read:admin:show-user", "write:admin:suspend-user", "write:admin:unsuspend-user", "write:admin:meta", "write:admin:user-name", "write:admin:user-note", "write:admin:user-avatar", "write:admin:user-banner", "write:admin:user-mutual-link", "write:admin:roles", "read:admin:roles", "write:admin:relays", "read:admin:relays", "write:admin:invite-codes", "read:admin:invite-codes", "write:admin:announcements", "read:admin:announcements", "write:admin:avatar-decorations", "read:admin:avatar-decorations", "write:admin:federation", "write:admin:indie-auth", "read:admin:indie-auth", "write:admin:account", "read:admin:account", "write:admin:emoji", "read:admin:emoji", "write:admin:queue", "read:admin:queue", "write:admin:promo", "write:admin:drive", "read:admin:drive", "write:admin:sso", "read:admin:sso", "write:admin:ad", "read:admin:ad", "write:invite-codes", "read:invite-codes", "write:clip-favorite", "read:clip-favorite", "read:federation", "write:report-abuse", "write:chat", "read:chat"];
 
 // @public (undocumented)
-type PingResponse = operations['ping']['responses']['200']['content']['application/json'];
+export type PingResponse = operations['ping']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type PinnedUsersResponse = operations['pinned-users']['responses']['200']['content']['application/json'];
+export type PinnedUsersResponse = operations['pinned-users']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type PromoReadRequest = operations['promo___read']['requestBody']['content']['application/json'];
+export type PromoReadRequest = operations['promo___read']['requestBody']['content']['application/json'];
 
 // Warning: (ae-forgotten-export) The symbol "AllNullRecord" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "NonNullableRecord" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-type PureRenote = Omit<Note, 'renote' | 'renoteId' | 'reply' | 'replyId' | 'text' | 'cw' | 'files' | 'fileIds' | 'poll'> & AllNullRecord<Pick<Note, 'reply' | 'replyId' | 'text' | 'cw' | 'poll'>> & {
+export type PureRenote = Omit<Note, 'renote' | 'renoteId' | 'reply' | 'replyId' | 'text' | 'cw' | 'files' | 'fileIds' | 'poll'> & AllNullRecord<Pick<Note, 'reply' | 'replyId' | 'text' | 'cw' | 'poll'>> & {
     files: [];
     fileIds: [];
 } & NonNullableRecord<Pick<Note, 'renote' | 'renoteId'>>;
 
 // @public (undocumented)
-type QueueCount = components['schemas']['QueueCount'];
+export type QueueCount = components['schemas']['QueueCount'];
 
 // @public (undocumented)
-type QueueStats = {
+export type QueueStats = {
     deliver: {
         activeSincePrevTick: number;
         active: number;
@@ -3563,7 +3565,7 @@ type QueueStats = {
 };
 
 // @public (undocumented)
-type QueueStatsLog = QueueStats[];
+export type QueueStatsLog = QueueStats[];
 
 // @public (undocumented)
 export type ReceivedAbuseReport = {
@@ -3643,61 +3645,61 @@ export type ReconnectingWebSocketOptions = {
 };
 
 // @public (undocumented)
-type RenoteMuteCreateRequest = operations['renote-mute___create']['requestBody']['content']['application/json'];
+export type RenoteMuteCreateRequest = operations['renote-mute___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type RenoteMuteDeleteRequest = operations['renote-mute___delete']['requestBody']['content']['application/json'];
+export type RenoteMuteDeleteRequest = operations['renote-mute___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type RenoteMuteListRequest = operations['renote-mute___list']['requestBody']['content']['application/json'];
+export type RenoteMuteListRequest = operations['renote-mute___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type RenoteMuteListResponse = operations['renote-mute___list']['responses']['200']['content']['application/json'];
+export type RenoteMuteListResponse = operations['renote-mute___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type RenoteMuting = components['schemas']['RenoteMuting'];
+export type RenoteMuting = components['schemas']['RenoteMuting'];
 
 // @public (undocumented)
-type RequestResetPasswordRequest = operations['request-reset-password']['requestBody']['content']['application/json'];
+export type RequestResetPasswordRequest = operations['request-reset-password']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ResetPasswordRequest = operations['reset-password']['requestBody']['content']['application/json'];
+export type ResetPasswordRequest = operations['reset-password']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type RetentionResponse = operations['retention']['responses']['200']['content']['application/json'];
+export type RetentionResponse = operations['retention']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ReversiCancelMatchRequest = operations['reversi___cancel-match']['requestBody']['content']['application/json'];
+export type ReversiCancelMatchRequest = operations['reversi___cancel-match']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ReversiGameDetailed = components['schemas']['ReversiGameDetailed'];
+export type ReversiGameDetailed = components['schemas']['ReversiGameDetailed'];
 
 // @public (undocumented)
-type ReversiGameLite = components['schemas']['ReversiGameLite'];
+export type ReversiGameLite = components['schemas']['ReversiGameLite'];
 
 // @public (undocumented)
-type ReversiGamesRequest = operations['reversi___games']['requestBody']['content']['application/json'];
+export type ReversiGamesRequest = operations['reversi___games']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ReversiGamesResponse = operations['reversi___games']['responses']['200']['content']['application/json'];
+export type ReversiGamesResponse = operations['reversi___games']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ReversiInvitationsResponse = operations['reversi___invitations']['responses']['200']['content']['application/json'];
+export type ReversiInvitationsResponse = operations['reversi___invitations']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ReversiMatchRequest = operations['reversi___match']['requestBody']['content']['application/json'];
+export type ReversiMatchRequest = operations['reversi___match']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ReversiMatchResponse = operations['reversi___match']['responses']['200']['content']['application/json'];
+export type ReversiMatchResponse = operations['reversi___match']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ReversiShowGameRequest = operations['reversi___show-game']['requestBody']['content']['application/json'];
+export type ReversiShowGameRequest = operations['reversi___show-game']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ReversiShowGameResponse = operations['reversi___show-game']['responses']['200']['content']['application/json'];
+export type ReversiShowGameResponse = operations['reversi___show-game']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ReversiSurrenderRequest = operations['reversi___surrender']['requestBody']['content']['application/json'];
+export type ReversiSurrenderRequest = operations['reversi___surrender']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 export type ReversiUpdateKey = typeof reversiUpdateKeys[number];
@@ -3712,70 +3714,70 @@ export type ReversiUpdateSettings<K extends ReversiUpdateKey> = {
 };
 
 // @public (undocumented)
-type ReversiVerifyRequest = operations['reversi___verify']['requestBody']['content']['application/json'];
+export type ReversiVerifyRequest = operations['reversi___verify']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ReversiVerifyResponse = operations['reversi___verify']['responses']['200']['content']['application/json'];
+export type ReversiVerifyResponse = operations['reversi___verify']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type Role = components['schemas']['Role'];
+export type Role = components['schemas']['Role'];
 
 // @public (undocumented)
-type RoleCondFormulaFollowersOrFollowingOrNotes = components['schemas']['RoleCondFormulaFollowersOrFollowingOrNotes'];
+export type RoleCondFormulaFollowersOrFollowingOrNotes = components['schemas']['RoleCondFormulaFollowersOrFollowingOrNotes'];
 
 // @public (undocumented)
-type RoleCondFormulaLogics = components['schemas']['RoleCondFormulaLogics'];
+export type RoleCondFormulaLogics = components['schemas']['RoleCondFormulaLogics'];
 
 // @public (undocumented)
-type RoleCondFormulaValue = components['schemas']['RoleCondFormulaValue'];
+export type RoleCondFormulaValue = components['schemas']['RoleCondFormulaValue'];
 
 // @public (undocumented)
-type RoleCondFormulaValueAssignedRole = components['schemas']['RoleCondFormulaValueAssignedRole'];
+export type RoleCondFormulaValueAssignedRole = components['schemas']['RoleCondFormulaValueAssignedRole'];
 
 // @public (undocumented)
-type RoleCondFormulaValueCreated = components['schemas']['RoleCondFormulaValueCreated'];
+export type RoleCondFormulaValueCreated = components['schemas']['RoleCondFormulaValueCreated'];
 
 // @public (undocumented)
-type RoleCondFormulaValueIsLocalOrRemote = components['schemas']['RoleCondFormulaValueIsLocalOrRemote'];
+export type RoleCondFormulaValueIsLocalOrRemote = components['schemas']['RoleCondFormulaValueIsLocalOrRemote'];
 
 // @public (undocumented)
-type RoleCondFormulaValueNot = components['schemas']['RoleCondFormulaValueNot'];
+export type RoleCondFormulaValueNot = components['schemas']['RoleCondFormulaValueNot'];
 
 // @public (undocumented)
-type RoleCondFormulaValueUserSettingBooleanSchema = components['schemas']['RoleCondFormulaValueUserSettingBooleanSchema'];
+export type RoleCondFormulaValueUserSettingBooleanSchema = components['schemas']['RoleCondFormulaValueUserSettingBooleanSchema'];
 
 // @public (undocumented)
-type RoleLite = components['schemas']['RoleLite'];
+export type RoleLite = components['schemas']['RoleLite'];
 
 // @public (undocumented)
-type RolePolicies = components['schemas']['RolePolicies'];
+export type RolePolicies = components['schemas']['RolePolicies'];
 
 // @public (undocumented)
-type RolesListResponse = operations['roles___list']['responses']['200']['content']['application/json'];
+export type RolesListResponse = operations['roles___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type RolesNotesRequest = operations['roles___notes']['requestBody']['content']['application/json'];
+export type RolesNotesRequest = operations['roles___notes']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type RolesNotesResponse = operations['roles___notes']['responses']['200']['content']['application/json'];
+export type RolesNotesResponse = operations['roles___notes']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type RolesShowRequest = operations['roles___show']['requestBody']['content']['application/json'];
+export type RolesShowRequest = operations['roles___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type RolesShowResponse = operations['roles___show']['responses']['200']['content']['application/json'];
+export type RolesShowResponse = operations['roles___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type RolesUsersRequest = operations['roles___users']['requestBody']['content']['application/json'];
+export type RolesUsersRequest = operations['roles___users']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type RolesUsersResponse = operations['roles___users']['responses']['200']['content']['application/json'];
+export type RolesUsersResponse = operations['roles___users']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ServerInfoResponse = operations['server-info']['responses']['200']['content']['application/json'];
+export type ServerInfoResponse = operations['server-info']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type ServerStats = {
+export type ServerStats = {
     cpu: number;
     mem: {
         used: number;
@@ -3792,13 +3794,13 @@ type ServerStats = {
 };
 
 // @public (undocumented)
-type ServerStatsLog = ServerStats[];
+export type ServerStatsLog = ServerStats[];
 
 // @public (undocumented)
-type Signin = components['schemas']['Signin'];
+export type Signin = components['schemas']['Signin'];
 
 // @public (undocumented)
-type SigninFlowRequest = {
+export type SigninFlowRequest = {
     username: string;
     password?: string;
     token?: string;
@@ -3810,7 +3812,7 @@ type SigninFlowRequest = {
 };
 
 // @public (undocumented)
-type SigninFlowResponse = {
+export type SigninFlowResponse = {
     finished: true;
     id: User['id'];
     i: string;
@@ -3824,37 +3826,37 @@ type SigninFlowResponse = {
 };
 
 // @public (undocumented)
-type SigninWithPasskeyInitResponse = {
+export type SigninWithPasskeyInitResponse = {
     option: PublicKeyCredentialRequestOptionsJSON_2;
     context: string;
 };
 
 // @public (undocumented)
-type SigninWithPasskeyRequest = {
+export type SigninWithPasskeyRequest = {
     credential?: AuthenticationResponseJSON;
     context?: string;
 };
 
 // @public (undocumented)
-type SigninWithPasskeyResponse = {
+export type SigninWithPasskeyResponse = {
     signinResponse: SigninFlowResponse & {
         finished: true;
     };
 };
 
 // @public (undocumented)
-type SignupPendingRequest = {
+export type SignupPendingRequest = {
     code: string;
 };
 
 // @public (undocumented)
-type SignupPendingResponse = {
+export type SignupPendingResponse = {
     id: User['id'];
     i: string;
 };
 
 // @public (undocumented)
-type SignupRequest = {
+export type SignupRequest = {
     username: string;
     password: string;
     host?: string;
@@ -3867,12 +3869,12 @@ type SignupRequest = {
 };
 
 // @public (undocumented)
-type SignupResponse = MeDetailed & {
+export type SignupResponse = MeDetailed & {
     token: string;
 };
 
 // @public (undocumented)
-type StatsResponse = operations['stats']['responses']['200']['content']['application/json'];
+export type StatsResponse = operations['stats']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 export class Stream extends EventEmitter<StreamEvents> implements IStream {
@@ -3920,34 +3922,34 @@ export type StreamEvents = {
 export type SwitchCaseResponseType<E extends keyof Endpoints, P extends Endpoints[E]['req']> = Endpoints[E]['res'] extends SwitchCase ? IsCaseMatched<E, P, 0> extends true ? GetCaseResult<E, P, 0> : IsCaseMatched<E, P, 1> extends true ? GetCaseResult<E, P, 1> : IsCaseMatched<E, P, 2> extends true ? GetCaseResult<E, P, 2> : IsCaseMatched<E, P, 3> extends true ? GetCaseResult<E, P, 3> : IsCaseMatched<E, P, 4> extends true ? GetCaseResult<E, P, 4> : IsCaseMatched<E, P, 5> extends true ? GetCaseResult<E, P, 5> : IsCaseMatched<E, P, 6> extends true ? GetCaseResult<E, P, 6> : IsCaseMatched<E, P, 7> extends true ? GetCaseResult<E, P, 7> : IsCaseMatched<E, P, 8> extends true ? GetCaseResult<E, P, 8> : IsCaseMatched<E, P, 9> extends true ? GetCaseResult<E, P, 9> : Endpoints[E]['res']['$switch']['$default'] : Endpoints[E]['res'];
 
 // @public (undocumented)
-type SwRegisterRequest = operations['sw___register']['requestBody']['content']['application/json'];
+export type SwRegisterRequest = operations['sw___register']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type SwRegisterResponse = operations['sw___register']['responses']['200']['content']['application/json'];
+export type SwRegisterResponse = operations['sw___register']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type SwShowRegistrationRequest = operations['sw___show-registration']['requestBody']['content']['application/json'];
+export type SwShowRegistrationRequest = operations['sw___show-registration']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type SwShowRegistrationResponse = operations['sw___show-registration']['responses']['200']['content']['application/json'];
+export type SwShowRegistrationResponse = operations['sw___show-registration']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type SwUnregisterRequest = operations['sw___unregister']['requestBody']['content']['application/json'];
+export type SwUnregisterRequest = operations['sw___unregister']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type SwUpdateRegistrationRequest = operations['sw___update-registration']['requestBody']['content']['application/json'];
+export type SwUpdateRegistrationRequest = operations['sw___update-registration']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type SwUpdateRegistrationResponse = operations['sw___update-registration']['responses']['200']['content']['application/json'];
+export type SwUpdateRegistrationResponse = operations['sw___update-registration']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type SystemWebhook = components['schemas']['SystemWebhook'];
+export type SystemWebhook = components['schemas']['SystemWebhook'];
 
 // @public (undocumented)
-type TestRequest = operations['test']['requestBody']['content']['application/json'];
+export type TestRequest = operations['test']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type TestResponse = operations['test']['responses']['200']['content']['application/json'];
+export type TestResponse = operations['test']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 function toString_2(acct: Acct): string;
@@ -3960,226 +3962,226 @@ export type UrlProvider = string | (() => string) | (() => Promise<string>);
 export function urlQuery(obj: Record<string, string | number | boolean | undefined>): string;
 
 // @public (undocumented)
-type User = components['schemas']['User'];
+export type User = components['schemas']['User'];
 
 // @public (undocumented)
-type UserAccountMoveLog = components['schemas']['UserAccountMoveLog'];
+export type UserAccountMoveLog = components['schemas']['UserAccountMoveLog'];
 
 // @public (undocumented)
-type UserDetailed = components['schemas']['UserDetailed'];
+export type UserDetailed = components['schemas']['UserDetailed'];
 
 // @public (undocumented)
-type UserDetailedNotMe = components['schemas']['UserDetailedNotMe'];
+export type UserDetailedNotMe = components['schemas']['UserDetailedNotMe'];
 
 // @public (undocumented)
-type UserDetailedNotMeOnly = components['schemas']['UserDetailedNotMeOnly'];
+export type UserDetailedNotMeOnly = components['schemas']['UserDetailedNotMeOnly'];
 
 // @public (undocumented)
-type UserList = components['schemas']['UserList'];
+export type UserList = components['schemas']['UserList'];
 
 // @public (undocumented)
-type UserListMembership = components['schemas']['UserListMembership'];
+export type UserListMembership = components['schemas']['UserListMembership'];
 
 // @public (undocumented)
-type UserLite = components['schemas']['UserLite'];
+export type UserLite = components['schemas']['UserLite'];
 
 // @public (undocumented)
-type UsernameAvailableRequest = operations['username___available']['requestBody']['content']['application/json'];
+export type UsernameAvailableRequest = operations['username___available']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsernameAvailableResponse = operations['username___available']['responses']['200']['content']['application/json'];
+export type UsernameAvailableResponse = operations['username___available']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersAchievementsRequest = operations['users___achievements']['requestBody']['content']['application/json'];
+export type UsersAchievementsRequest = operations['users___achievements']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersAchievementsResponse = operations['users___achievements']['responses']['200']['content']['application/json'];
+export type UsersAchievementsResponse = operations['users___achievements']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersClipsRequest = operations['users___clips']['requestBody']['content']['application/json'];
+export type UsersClipsRequest = operations['users___clips']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersClipsResponse = operations['users___clips']['responses']['200']['content']['application/json'];
+export type UsersClipsResponse = operations['users___clips']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersFeaturedNotesRequest = operations['users___featured-notes']['requestBody']['content']['application/json'];
+export type UsersFeaturedNotesRequest = operations['users___featured-notes']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersFeaturedNotesResponse = operations['users___featured-notes']['responses']['200']['content']['application/json'];
+export type UsersFeaturedNotesResponse = operations['users___featured-notes']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersFlashsRequest = operations['users___flashs']['requestBody']['content']['application/json'];
+export type UsersFlashsRequest = operations['users___flashs']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersFlashsResponse = operations['users___flashs']['responses']['200']['content']['application/json'];
+export type UsersFlashsResponse = operations['users___flashs']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersFollowersRequest = operations['users___followers']['requestBody']['content']['application/json'];
+export type UsersFollowersRequest = operations['users___followers']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersFollowersResponse = operations['users___followers']['responses']['200']['content']['application/json'];
+export type UsersFollowersResponse = operations['users___followers']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersFollowingRequest = operations['users___following']['requestBody']['content']['application/json'];
+export type UsersFollowingRequest = operations['users___following']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersFollowingResponse = operations['users___following']['responses']['200']['content']['application/json'];
+export type UsersFollowingResponse = operations['users___following']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersGalleryPostsRequest = operations['users___gallery___posts']['requestBody']['content']['application/json'];
+export type UsersGalleryPostsRequest = operations['users___gallery___posts']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersGalleryPostsResponse = operations['users___gallery___posts']['responses']['200']['content']['application/json'];
+export type UsersGalleryPostsResponse = operations['users___gallery___posts']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersGetFollowingBirthdayUsersRequest = operations['users___get-following-birthday-users']['requestBody']['content']['application/json'];
+export type UsersGetFollowingBirthdayUsersRequest = operations['users___get-following-birthday-users']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersGetFollowingBirthdayUsersResponse = operations['users___get-following-birthday-users']['responses']['200']['content']['application/json'];
+export type UsersGetFollowingBirthdayUsersResponse = operations['users___get-following-birthday-users']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersGetFrequentlyRepliedUsersRequest = operations['users___get-frequently-replied-users']['requestBody']['content']['application/json'];
+export type UsersGetFrequentlyRepliedUsersRequest = operations['users___get-frequently-replied-users']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersGetFrequentlyRepliedUsersResponse = operations['users___get-frequently-replied-users']['responses']['200']['content']['application/json'];
+export type UsersGetFrequentlyRepliedUsersResponse = operations['users___get-frequently-replied-users']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersGetSecurityInfoRequest = operations['users___get-security-info']['requestBody']['content']['application/json'];
+export type UsersGetSecurityInfoRequest = operations['users___get-security-info']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersGetSecurityInfoResponse = operations['users___get-security-info']['responses']['200']['content']['application/json'];
+export type UsersGetSecurityInfoResponse = operations['users___get-security-info']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersGetSkebStatusRequest = operations['users___get-skeb-status']['requestBody']['content']['application/json'];
+export type UsersGetSkebStatusRequest = operations['users___get-skeb-status']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersGetSkebStatusResponse = operations['users___get-skeb-status']['responses']['200']['content']['application/json'];
+export type UsersGetSkebStatusResponse = operations['users___get-skeb-status']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersListsCreateFromPublicRequest = operations['users___lists___create-from-public']['requestBody']['content']['application/json'];
+export type UsersListsCreateFromPublicRequest = operations['users___lists___create-from-public']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersListsCreateFromPublicResponse = operations['users___lists___create-from-public']['responses']['200']['content']['application/json'];
+export type UsersListsCreateFromPublicResponse = operations['users___lists___create-from-public']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersListsCreateRequest = operations['users___lists___create']['requestBody']['content']['application/json'];
+export type UsersListsCreateRequest = operations['users___lists___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersListsCreateResponse = operations['users___lists___create']['responses']['200']['content']['application/json'];
+export type UsersListsCreateResponse = operations['users___lists___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersListsDeleteRequest = operations['users___lists___delete']['requestBody']['content']['application/json'];
+export type UsersListsDeleteRequest = operations['users___lists___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersListsFavoriteRequest = operations['users___lists___favorite']['requestBody']['content']['application/json'];
+export type UsersListsFavoriteRequest = operations['users___lists___favorite']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersListsGetMembershipsRequest = operations['users___lists___get-memberships']['requestBody']['content']['application/json'];
+export type UsersListsGetMembershipsRequest = operations['users___lists___get-memberships']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersListsGetMembershipsResponse = operations['users___lists___get-memberships']['responses']['200']['content']['application/json'];
+export type UsersListsGetMembershipsResponse = operations['users___lists___get-memberships']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersListsListRequest = operations['users___lists___list']['requestBody']['content']['application/json'];
+export type UsersListsListRequest = operations['users___lists___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersListsListResponse = operations['users___lists___list']['responses']['200']['content']['application/json'];
+export type UsersListsListResponse = operations['users___lists___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersListsPullRequest = operations['users___lists___pull']['requestBody']['content']['application/json'];
+export type UsersListsPullRequest = operations['users___lists___pull']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersListsPushRequest = operations['users___lists___push']['requestBody']['content']['application/json'];
+export type UsersListsPushRequest = operations['users___lists___push']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersListsShowRequest = operations['users___lists___show']['requestBody']['content']['application/json'];
+export type UsersListsShowRequest = operations['users___lists___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersListsShowResponse = operations['users___lists___show']['responses']['200']['content']['application/json'];
+export type UsersListsShowResponse = operations['users___lists___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersListsUnfavoriteRequest = operations['users___lists___unfavorite']['requestBody']['content']['application/json'];
+export type UsersListsUnfavoriteRequest = operations['users___lists___unfavorite']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersListsUpdateMembershipRequest = operations['users___lists___update-membership']['requestBody']['content']['application/json'];
+export type UsersListsUpdateMembershipRequest = operations['users___lists___update-membership']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersListsUpdateRequest = operations['users___lists___update']['requestBody']['content']['application/json'];
+export type UsersListsUpdateRequest = operations['users___lists___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersListsUpdateResponse = operations['users___lists___update']['responses']['200']['content']['application/json'];
+export type UsersListsUpdateResponse = operations['users___lists___update']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersNotesRequest = operations['users___notes']['requestBody']['content']['application/json'];
+export type UsersNotesRequest = operations['users___notes']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersNotesResponse = operations['users___notes']['responses']['200']['content']['application/json'];
+export type UsersNotesResponse = operations['users___notes']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersPagesRequest = operations['users___pages']['requestBody']['content']['application/json'];
+export type UsersPagesRequest = operations['users___pages']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersPagesResponse = operations['users___pages']['responses']['200']['content']['application/json'];
+export type UsersPagesResponse = operations['users___pages']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersReactionsRequest = operations['users___reactions']['requestBody']['content']['application/json'];
+export type UsersReactionsRequest = operations['users___reactions']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersReactionsResponse = operations['users___reactions']['responses']['200']['content']['application/json'];
+export type UsersReactionsResponse = operations['users___reactions']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersRecommendationRequest = operations['users___recommendation']['requestBody']['content']['application/json'];
+export type UsersRecommendationRequest = operations['users___recommendation']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersRecommendationResponse = operations['users___recommendation']['responses']['200']['content']['application/json'];
+export type UsersRecommendationResponse = operations['users___recommendation']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersRelationRequest = operations['users___relation']['requestBody']['content']['application/json'];
+export type UsersRelationRequest = operations['users___relation']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersRelationResponse = operations['users___relation']['responses']['200']['content']['application/json'];
+export type UsersRelationResponse = operations['users___relation']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersReportAbuseRequest = operations['users___report-abuse']['requestBody']['content']['application/json'];
+export type UsersReportAbuseRequest = operations['users___report-abuse']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersRequest = operations['users']['requestBody']['content']['application/json'];
+export type UsersRequest = operations['users']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersResponse = operations['users']['responses']['200']['content']['application/json'];
+export type UsersResponse = operations['users']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersSearchByUsernameAndHostRequest = operations['users___search-by-username-and-host']['requestBody']['content']['application/json'];
+export type UsersSearchByUsernameAndHostRequest = operations['users___search-by-username-and-host']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersSearchByUsernameAndHostResponse = operations['users___search-by-username-and-host']['responses']['200']['content']['application/json'];
+export type UsersSearchByUsernameAndHostResponse = operations['users___search-by-username-and-host']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersSearchRequest = operations['users___search']['requestBody']['content']['application/json'];
+export type UsersSearchRequest = operations['users___search']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersSearchResponse = operations['users___search']['responses']['200']['content']['application/json'];
+export type UsersSearchResponse = operations['users___search']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersShowRequest = operations['users___show']['requestBody']['content']['application/json'];
+export type UsersShowRequest = operations['users___show']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersShowResponse = operations['users___show']['responses']['200']['content']['application/json'];
+export type UsersShowResponse = operations['users___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersStatsRequest = operations['users___stats']['requestBody']['content']['application/json'];
+export type UsersStatsRequest = operations['users___stats']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type UsersStatsResponse = operations['users___stats']['responses']['200']['content']['application/json'];
+export type UsersStatsResponse = operations['users___stats']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersUpdateMemoRequest = operations['users___update-memo']['requestBody']['content']['application/json'];
+export type UsersUpdateMemoRequest = operations['users___update-memo']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type V2AdminEmojiListRequest = operations['v2___admin___emoji___list']['requestBody']['content']['application/json'];
+export type V2AdminEmojiListRequest = operations['v2___admin___emoji___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type V2AdminEmojiListResponse = operations['v2___admin___emoji___list']['responses']['200']['content']['application/json'];
+export type V2AdminEmojiListResponse = operations['v2___admin___emoji___list']['responses']['200']['content']['application/json'];
 
 // (No @packageDocumentation comment for this package)
 

@@ -8,8 +8,10 @@ export * from './consts.js';
 export type * from './consts.js';
 
 export * as entities from './entities.js';
+export type * from './entities.js';
 
 export * as note from './note.js';
+export type * from './note.js';
 
 export * from './nyaize.js';
 

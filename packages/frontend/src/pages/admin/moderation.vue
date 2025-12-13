@@ -64,6 +64,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</MkFolder>
 				</SearchMarker>
 
+				<MkFolder>
+					<template #icon><i class="ti ti-mood-empty"></i></template>
+					<template #label>{{ i18n.ts.blockedRemoteCustomEmojis }}</template>
+
+					<div class="_gaps">
+						<MkTextarea v-model="blockedRemoteCustomEmojis">
+							<template #caption>{{ i18n.ts.blockedRemoteCustomEmojisDescription }}<br>{{ i18n.ts.blockedRemoteCustomEmojisDescription2 }}</template>
+						</MkTextarea>
+						<MkButton primary @click="save_blockedRemoteCustomEmojis">{{ i18n.ts.save }}</MkButton>
+					</div>
+				</MkFolder>
+
 				<SearchMarker :keywords="['prohibited', 'words']">
 					<MkFolder>
 						<template #icon><SearchIcon><i class="ti ti-message-x"></i></SearchIcon></template>
@@ -97,60 +109,61 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<template #icon><SearchIcon><i class="ti ti-user-x"></i></SearchIcon></template>
 						<template #label><SearchLabel>{{ i18n.ts.hiddenTags }}</SearchLabel></template>
 
-					<MkTextarea v-model="hiddenTags">
-						<template #label>{{ i18n.ts.hiddenTags }}</template>
+						<div class="_gaps">
+							<MkTextarea v-model="hiddenTags">
+								<template #caption>{{ i18n.ts.hiddenTagsDescription }}</template>
+							</MkTextarea>
+							<MkButton primary @click="save_hiddenTags">{{ i18n.ts.save }}</MkButton>
+						</div>
+					</MkFolder>
+				</SearchMarker>
 
-<div class="_gaps">
-	<MkTextarea v-model="hiddenTags">
-		<template #caption>{{ i18n.ts.hiddenTagsDescription }}</template>
-	</MkTextarea>
-	<MkButton primary @click="save_hiddenTags">{{ i18n.ts.save }}</MkButton>
-</div>
-<SearchMarker :keywords="['silenced', 'servers', 'hosts']">
-	<MkFolder>
-		<template #icon><SearchIcon><i class="ti ti-eye-off"></i></SearchIcon></template>
-		<template #label><SearchLabel>{{ i18n.ts.silencedInstances }}</SearchLabel></template>
+				<SearchMarker :keywords="['silenced', 'servers', 'hosts']">
+					<MkFolder>
+						<template #icon><SearchIcon><i class="ti ti-eye-off"></i></SearchIcon></template>
+						<template #label><SearchLabel>{{ i18n.ts.silencedInstances }}</SearchLabel></template>
 
-		<div class="_gaps">
-			<MkTextarea v-model="silencedHosts">
-				<template #caption>{{ i18n.ts.silencedInstancesDescription }}</template>
-			</MkTextarea>
-			<MkButton primary @click="save_silencedHosts">{{ i18n.ts.save }}</MkButton>
-		</div>
-	</MkFolder>
-</SearchMarker>
+						<div class="_gaps">
+							<MkTextarea v-model="silencedHosts">
+								<template #caption>{{ i18n.ts.silencedInstancesDescription }}</template>
+							</MkTextarea>
+							<MkButton primary @click="save_silencedHosts">{{ i18n.ts.save }}</MkButton>
+						</div>
+					</MkFolder>
+				</SearchMarker>
 
 				<SearchMarker :keywords="['media', 'silenced', 'servers', 'hosts']">
 					<MkFolder>
 						<template #icon><SearchIcon><i class="ti ti-user-x"></i></SearchIcon></template>
 						<template #label><SearchLabel>{{ i18n.ts.urlAndSiteSettings }}</SearchLabel></template>
-					<MkTextarea v-model="wellKnownWebsites">
-						<template #label>{{ i18n.ts.wellKnownWebsites }}</template>
-							<template #caption>{{ i18n.ts.wellKnownWebsitesDescription }}</template>
-						</MkTextarea>
+
+						<div class="_gaps">
+							<MkTextarea v-model="wellKnownWebsites">
+								<template #label>{{ i18n.ts.wellKnownWebsites }}</template>
+								<template #caption>{{ i18n.ts.wellKnownWebsitesDescription }}</template>
+							</MkTextarea>
+							<MkTextarea v-model="urlPreviewDenyList">
+								<template #label>{{ i18n.ts.urlPreviewDenyList }}</template>
+								<template #caption>{{ i18n.ts.urlPreviewDenyListDescription }}</template>
+							</MkTextarea>
+							<MkButton primary @click="save_urlSettings">{{ i18n.ts.save }}</MkButton>
+						</div>
+					</MkFolder>
 				</SearchMarker>
 
-<MkTextarea v-model="urlPreviewDenyList">
-	<template #label>{{ i18n.ts.urlPreviewDenyList }}</template>
-	<template #caption>{{ i18n.ts.urlPreviewDenyListDescription }}</template>
-</MkTextarea>
+				<SearchMarker :keywords="['blocked', 'servers', 'hosts']">
+					<MkFolder>
+						<template #icon><SearchIcon><i class="ti ti-ban"></i></SearchIcon></template>
+						<template #label><SearchLabel>{{ i18n.ts.blockedInstances }}</SearchLabel></template>
 
-<MkButton primary @click="save_urlSettings">{{ i18n.ts.save }}</MkButton>
-<SearchMarker :keywords="['blocked', 'servers', 'hosts']">
-	<MkFolder>
-		<template #icon><SearchIcon><i class="ti ti-ban"></i></SearchIcon></template>
-		<template #label><SearchLabel>{{ i18n.ts.blockedInstances }}</SearchLabel></template>
-
-		<div class="_gaps">
-			<MkTextarea v-model="blockedHosts">
-				<template #caption>{{ i18n.ts.blockedInstancesDescription }}</template>
-			</MkTextarea>
-			<MkButton primary @click="save_blockedHosts">{{ i18n.ts.save }}</MkButton>
-		</div>
-	</MkFolder>
-</SearchMarker>
-			</div>
-		</SearchMarker>
+						<div class="_gaps">
+							<MkTextarea v-model="blockedHosts">
+								<template #caption>{{ i18n.ts.blockedInstancesDescription }}</template>
+							</MkTextarea>
+							<MkButton primary @click="save_blockedHosts">{{ i18n.ts.save }}</MkButton>
+						</div>
+					</MkFolder>
+				</SearchMarker>
 	</div>
 </PageWithHeader>
 </template>
@@ -189,15 +202,16 @@ const {
 	initialValue: meta.ugcVisibilityForVisitor,
 });
 const sensitiveWords = ref(meta.sensitiveWords.join('\n'));
+const blockedRemoteCustomEmojis = ref(meta.blockedRemoteCustomEmojis.join('\n'));
 const prohibitedWords = ref(meta.prohibitedWords.join('\n'));
 const prohibitedWordsForNameOfUser = ref(meta.prohibitedWordsForNameOfUser.join('\n'));
 const hiddenTags = ref(meta.hiddenTags.join('\n'));
 const preservedUsernames = ref(meta.preservedUsernames.join('\n'));
 const blockedHosts = ref(meta.blockedHosts.join('\n'));
 const silencedHosts = ref(meta.silencedHosts?.join('\n') ?? '');
-const mediaSilencedHosts = ref(meta.mediaSilencedHosts.join('\n'));
-const wellKnownWebsites = ref('');
-const urlPreviewDenyList = ref('');
+// const mediaSilencedHosts = ref(meta.mediaSilencedHosts.join('\n'));
+const wellKnownWebsites = ref(meta.wellKnownWebsites.join('\n'));
+const urlPreviewDenyList = ref(meta.urlPreviewDenyList.join('\n'));
 
 async function onChange_enableRegistration(value: boolean) {
 	if (value) {
@@ -249,6 +263,14 @@ function save_sensitiveWords() {
 	});
 }
 
+function save_blockedRemoteCustomEmojis() {
+	os.apiWithDialog('admin/update-meta', {
+		blockedRemoteCustomEmojis: blockedRemoteCustomEmojis.value.split('\n'),
+	}).then(() => {
+		fetchInstance(true);
+	});
+}
+
 function save_prohibitedWords() {
 	os.apiWithDialog('admin/update-meta', {
 		prohibitedWords: prohibitedWords.value.split('\n'),
@@ -277,6 +299,14 @@ function save_urlSettings() {
 	os.apiWithDialog('admin/update-meta', {
 		wellKnownWebsites: wellKnownWebsites.value.split('\n'),
 		urlPreviewDenyList: urlPreviewDenyList.value.split('\n'),
+	}).then(() => {
+		fetchInstance(true);
+	});
+}
+
+function save_silencedHosts() {
+	os.apiWithDialog('admin/update-meta', {
+		silencedHosts: silencedHosts.value.split('\n'),
 	}).then(() => {
 		fetchInstance(true);
 	});

@@ -4318,6 +4318,26 @@ export interface Locale extends ILocale {
      */
     "unassign": string;
     /**
+     * インラインポリシー
+     */
+    "inlinePolicies": string;
+    /**
+     * ロールに加えて、ユーザー固有のポリシー値を調整します。
+     */
+    "inlinePoliciesDescription": string;
+    /**
+     * 値を設定
+     */
+    "inlinePolicyOperationSet": string;
+    /**
+     * 値を加算
+     */
+    "inlinePolicyOperationIncrement": string;
+    /**
+     * インラインポリシーを追加
+     */
+    "inlinePolicyAdd": string;
+    /**
      * 色
      */
     "color": string;
@@ -4497,6 +4517,18 @@ export interface Locale extends ILocale {
      * スペースで区切るとAND指定になり、キーワードをスラッシュで囲むと正規表現になります。
      */
     "sensitiveWordsDescription2": string;
+    /**
+     * ブロックするリモートカスタム絵文字
+     */
+    "blockedRemoteCustomEmojis": string;
+    /**
+     * name または name@host が一致するリモートカスタム絵文字を取得・表示しません。改行で区切って複数設定できます。
+     */
+    "blockedRemoteCustomEmojisDescription": string;
+    /**
+     * スペースで区切るとAND指定になり、キーワードをスラッシュで囲むと正規表現になります。
+     */
+    "blockedRemoteCustomEmojisDescription2": string;
     /**
      * 禁止ワード
      */

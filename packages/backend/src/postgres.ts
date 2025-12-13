@@ -83,6 +83,7 @@ import { MiRoleAssignment } from '@/models/RoleAssignment.js';
 import { MiFlash } from '@/models/Flash.js';
 import { MiFlashLike } from '@/models/FlashLike.js';
 import { MiUserMemo } from '@/models/UserMemo.js';
+import { MiUserInlinePolicy } from '@/models/UserInlinePolicy.js';
 import { MiChatMessage } from '@/models/ChatMessage.js';
 import { MiChatRoom } from '@/models/ChatRoom.js';
 import { MiChatRoomMembership } from '@/models/ChatRoomMembership.js';
@@ -258,6 +259,7 @@ export const entities = [
 	MiFlash,
 	MiFlashLike,
 	MiUserMemo,
+	MiUserInlinePolicy,
 	MiChatMessage,
 	MiChatRoom,
 	MiChatRoomMembership,

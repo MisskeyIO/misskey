@@ -10,7 +10,6 @@ import { promises as fsp } from 'fs';
 import locales from '../../locales/index.js';
 import meta from '../../package.json';
 import packageInfo from './package.json' with { type: 'json' };
-import pluginUnwindCssModuleClassName from './lib/rollup-plugin-unwind-css-module-class-name.js';
 import pluginJson5 from './vite.json5.js';
 import pluginCreateSearchIndex from './lib/vite-plugin-create-search-index.js';
 import type { Options as SearchIndexOptions } from './lib/vite-plugin-create-search-index.js';
@@ -110,7 +109,6 @@ export function getConfig(): UserConfig {
 			...searchIndexes.map(options => pluginCreateSearchIndex(options)),
 			pluginVue(),
 			pluginRemoveUnrefI18n(),
-			pluginUnwindCssModuleClassName(),
 			pluginJson5(),
 			pluginGlsl({ minify: true }),
 			...process.env.NODE_ENV === 'production'
@@ -198,10 +196,11 @@ export function getConfig(): UserConfig {
 				},
 			},
 			cssCodeSplit: true,
+			cssMinify: 'lightningcss',
 			outDir: __dirname + '/../../built/_frontend_vite_',
 			assetsDir: '.',
 			emptyOutDir: false,
-			sourcemap: process.env.NODE_ENV === 'development',
+			sourcemap: true,
 			reportCompressedSize: false,
 		},
 

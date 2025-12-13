@@ -112,6 +112,7 @@ const shouldEnableInfiniteScroll = computed(() => {
 function onContextmenu(ev: MouseEvent) {
 	if (ev.target && isLink(ev.target as HTMLElement)) return;
 	if (window.getSelection()?.toString() !== '') return;
+	if (!paginator) return;
 
 	os.contextMenu([{
 		icon: 'ti ti-refresh',
@@ -148,6 +149,8 @@ const upButtonLoading = computed(() => {
 });
 
 function upButtonClick() {
+	if (!paginator) return;
+
 	if (paginator.order.value === 'oldest') {
 		paginator.fetchOlder();
 	} else {
@@ -163,6 +166,8 @@ const downButtonLoading = computed(() => {
 });
 
 function downButtonClick() {
+	if (!paginator) return;
+
 	if (paginator.order.value === 'oldest') {
 		paginator.fetchNewer();
 	} else {

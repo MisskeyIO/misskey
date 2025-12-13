@@ -115,8 +115,6 @@ function applyThemeInternal(theme: Theme, persist: boolean) {
 		}
 	}
 
-	console.log(props);
-
 	for (const [k, v] of Object.entries(props)) {
 		window.document.documentElement.style.setProperty(`--MI_THEME-${k}`, v.toString());
 	}

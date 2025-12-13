@@ -5,6 +5,7 @@
 
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import postcssPresetEnv from 'postcss-preset-env';
 import cssnano from 'cssnano';
 import postcss from 'postcss';
 import * as terser from 'terser';
@@ -85,7 +86,14 @@ async function buildBackendStyle() {
     './packages/backend/src/server/web/error.css'
   ]) {
     const source = await fs.readFile(file, { encoding: 'utf-8' });
-    const { css } = await postcss([cssnano({ zindex: false })]).process(source, { from: undefined });
+    const { css } = await postcss([
+			postcssPresetEnv({
+				stage: 3,
+				autoprefixer: { flexbox: 'no-2009' },
+				features: { 'custom-properties': false },
+			}),
+			cssnano({ preset: 'default' }),
+		]).process(source, { from: undefined });
     await fs.writeFile(`./packages/backend/built/server/web/${path.basename(file)}`, css);
   }
 }

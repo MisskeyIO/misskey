@@ -719,6 +719,28 @@ export type paths = {
          */
         post: operations['admin___roles___update-default-policies'];
     };
+    '/admin/roles/update-inline-policies': {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * admin/roles/update-inline-policies
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:admin:roles*
+         */
+        post: operations['admin___roles___update-inline-policies'];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     '/admin/roles/users': {
         /**
          * admin/roles/users
@@ -9383,6 +9405,7 @@ export interface operations {
                         pinnedUsers: string[];
                         hiddenTags: string[];
                         blockedHosts: string[];
+                        blockedRemoteCustomEmojis: string[];
                         sensitiveWords: string[];
                         prohibitedWords: string[];
                         prohibitedWordsForNameOfUser: string[];
@@ -11294,6 +11317,88 @@ export interface operations {
             };
         };
     };
+    'admin___roles___update-inline-policies': {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    userId: string;
+                    policies: {
+                        id?: string | null;
+                        /** @enum {string} */
+                        policy: 'gtlAvailable' | 'ltlAvailable' | 'canPublicNote' | 'canScheduleNote' | 'scheduleNoteLimit' | 'scheduleNoteMaxDays' | 'canInitiateConversation' | 'canCreateContent' | 'canUpdateContent' | 'canDeleteContent' | 'canPurgeAccount' | 'canUpdateAvatar' | 'canUpdateBanner' | 'mentionLimit' | 'canInvite' | 'inviteLimit' | 'inviteLimitCycle' | 'inviteExpirationTime' | 'canManageCustomEmojis' | 'canManageAvatarDecorations' | 'canSearchNotes' | 'canUseTranslator' | 'canUseDriveFileInSoundSettings' | 'canUseReaction' | 'canHideAds' | 'driveCapacityMb' | 'maxFileSizeMb' | 'alwaysMarkNsfw' | 'canUpdateBioMedia' | 'skipNsfwDetection' | 'pinLimit' | 'antennaLimit' | 'antennaNotesLimit' | 'wordMuteLimit' | 'webhookLimit' | 'clipLimit' | 'noteEachClipsLimit' | 'userListLimit' | 'userEachUserListsLimit' | 'rateLimitFactor' | 'avatarDecorationLimit' | 'canImportAntennas' | 'canImportBlocking' | 'canImportFollowing' | 'canImportMuting' | 'canImportUserLists' | 'mutualLinkSectionLimit' | 'mutualLinkLimit' | 'chatAvailability';
+                        /**
+                         * @default set
+                         * @enum {string}
+                         */
+                        operation?: 'set' | 'increment';
+                        value?: boolean | number | string | null;
+                        memo?: string | null;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
     admin___roles___users: {
         requestBody: {
             content: {
@@ -11806,6 +11911,15 @@ export interface operations {
                             createdAt: string;
                             expiresAt: string | null;
                             roleId: string;
+                        }[];
+                        inlinePolicies: {
+                            id: string;
+                            createdAt: string;
+                            updatedAt: string;
+                            policy: string;
+                            operation: string;
+                            value: boolean | number | string | null;
+                            memo: string | null;
                         }[];
                     };
                 };
@@ -12684,6 +12798,7 @@ export interface operations {
                     hiddenTags?: string[] | null;
                     blockedHosts?: string[] | null;
                     sensitiveWords?: string[] | null;
+                    blockedRemoteCustomEmojis?: string[] | null;
                     prohibitedWords?: string[] | null;
                     prohibitedWordsForNameOfUser?: string[] | null;
                     themeColor?: string | null;

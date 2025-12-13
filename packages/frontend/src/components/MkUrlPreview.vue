@@ -104,6 +104,7 @@ import { store } from '@/store.js';
 import { prefer } from '@/preferences.js';
 import { warningExternalWebsite } from '@/utility/warning-external-website.js';
 import { maybeMakeRelative } from '@@/js/url.js';
+import { generateClientTransactionId } from '@/utility/misskey-api.js';
 
 type SummalyResult = Awaited<ReturnType<typeof summaly>>;
 
@@ -162,7 +163,12 @@ if (requestUrl.hostname === 'music.youtube.com' && requestUrl.pathname.match('^/
 
 requestUrl.hash = '';
 
-window.fetch(`/url?url=${encodeURIComponent(requestUrl.href)}&lang=${versatileLang}`)
+window.fetch(`/url?url=${encodeURIComponent(requestUrl.href)}&lang=${versatileLang}`, {
+	credentials: 'include',
+	headers: {
+		'X-Client-Transaction-Id': generateClientTransactionId('url-preview'),
+	},
+})
 	.then(res => {
 		if (!res.ok) {
 			if (_DEV_) {

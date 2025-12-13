@@ -59,6 +59,7 @@
     "happy-dom": "catalog:",
     "intersection-observer": "catalog:",
     "jsdom": "catalog:",
+    "lightningcss": "catalog:",
     "micromatch": "catalog:",
     "msw": "catalog:",
     "nodemon": "catalog:",

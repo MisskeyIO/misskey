@@ -14,6 +14,8 @@ import type {
 	RoleAssignmentsRepository,
 	RolesRepository,
 	UsersRepository,
+	UserInlinePoliciesRepository,
+	MiUserInlinePolicy,
 } from '@/models/_.js';
 import { MemoryKVCache, MemorySingleCache } from '@/misc/cache.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
@@ -157,6 +159,7 @@ export const DEFAULT_POLICIES: RolePolicies = {
 export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	private rolesCache: MemorySingleCache<MiRole[]>;
 	private roleAssignmentByUserIdCache: MemoryKVCache<MiRoleAssignment[]>;
+	private inlinePoliciesByUserIdCache: MemoryKVCache<MiUserInlinePolicy[]>;
 	private notificationService: NotificationService;
 
 	constructor(
@@ -180,6 +183,9 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		@Inject(DI.roleAssignmentsRepository)
 		private roleAssignmentsRepository: RoleAssignmentsRepository,
 
+		@Inject(DI.userInlinePoliciesRepository)
+		private userInlinePoliciesRepository: UserInlinePoliciesRepository,
+
 		private cacheService: CacheService,
 		private userEntityService: UserEntityService,
 		private globalEventService: GlobalEventService,
@@ -189,6 +195,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	) {
 		this.rolesCache = new MemorySingleCache<MiRole[]>(1000 * 60 * 60); // 1h
 		this.roleAssignmentByUserIdCache = new MemoryKVCache<MiRoleAssignment[]>(1000 * 60 * 5); // 5m
+		this.inlinePoliciesByUserIdCache = new MemoryKVCache<MiUserInlinePolicy[]>(1000 * 60 * 5);
 
 		this.redisForSub.on('message', this.onMessage);
 	}
@@ -256,6 +263,10 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 					if (cached) {
 						this.roleAssignmentByUserIdCache.set(body.userId, cached.filter(x => x.id !== body.id));
 					}
+					break;
+				}
+				case 'userInlinePoliciesUpdated': {
+					this.inlinePoliciesByUserIdCache.delete(body.userId);
 					break;
 				}
 				default:
@@ -369,6 +380,11 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
+	public getUserInlinePolicies(userId: MiUser['id']): Promise<MiUserInlinePolicy[]> {
+		return this.inlinePoliciesByUserIdCache.fetch(userId, () => this.userInlinePoliciesRepository.findBy({ userId }));
+	}
+
+	@bindThis
 	public async getUserRoles(userId: MiUser['id']) {
 		const roles = await this.rolesCache.fetch(() => this.rolesRepository.findBy({}));
 		const assigns = await this.getUserAssigns(userId);
@@ -420,6 +436,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		if (userId == null) return basePolicies;
 
 		const roles = await this.getUserRoles(userId);
+		const inlinePolicies = (await this.getUserInlinePolicies(userId)).sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
 		function calc<T extends keyof RolePolicies>(name: T, aggregate: (values: RolePolicies[T][]) => RolePolicies[T]) {
 			if (roles.length === 0) return basePolicies[name];
@@ -441,7 +458,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			return 'unavailable';
 		}
 
-		return {
+		const aggregated = {
 			gtlAvailable: calc('gtlAvailable', vs => vs.some(v => v === true)),
 			ltlAvailable: calc('ltlAvailable', vs => vs.some(v => v === true)),
 			canPublicNote: calc('canPublicNote', vs => vs.some(v => v === true)),
@@ -506,6 +523,41 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			scheduledNoteLimit: calc('scheduledNoteLimit', vs => Math.max(...vs)),
 			watermarkAvailable: calc('watermarkAvailable', vs => vs.some(v => v === true)),
 		};
+
+		return this.applyInlinePolicies(aggregated, inlinePolicies);
+	}
+
+	@bindThis
+	private applyInlinePolicies(current: RolePolicies, inlinePolicies: MiUserInlinePolicy[]): RolePolicies {
+		if (inlinePolicies.length === 0) return current;
+		const updated = { ...current };
+
+		for (const inline of inlinePolicies) {
+			const policyName = inline.policy as keyof RolePolicies;
+			if (!(policyName in updated)) continue;
+
+			if (inline.operation === 'increment') {
+				const delta = Number(inline.value ?? 0);
+				if (Number.isFinite(delta) && typeof updated[policyName] === 'number') {
+					(updated[policyName] as number) += delta;
+				}
+				continue;
+			}
+
+			const currentType = typeof updated[policyName];
+			const valueType = typeof inline.value;
+			if (inline.value !== null && currentType !== valueType) continue;
+
+			// @ts-expect-error overwrite to configured value
+			if (inline.value !== undefined) updated[policyName] = inline.value;
+		}
+
+		return updated;
+	}
+
+	@bindThis
+	public clearInlinePolicyCache(userId: MiUser['id']) {
+		this.inlinePoliciesByUserIdCache.delete(userId);
 	}
 
 	@bindThis

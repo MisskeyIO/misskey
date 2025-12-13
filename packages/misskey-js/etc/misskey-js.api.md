@@ -360,6 +360,9 @@ type AdminRolesUnassignRequest = operations['admin___roles___unassign']['request
 type AdminRolesUpdateDefaultPoliciesRequest = operations['admin___roles___update-default-policies']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
+type AdminRolesUpdateInlinePoliciesRequest = operations['admin___roles___update-inline-policies']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
 type AdminRolesUpdateRequest = operations['admin___roles___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
@@ -1613,6 +1616,7 @@ declare namespace entities {
         AdminRolesUnassignRequest,
         AdminRolesUpdateRequest,
         AdminRolesUpdateDefaultPoliciesRequest,
+        AdminRolesUpdateInlinePoliciesRequest,
         AdminRolesUsersRequest,
         AdminRolesUsersResponse,
         AdminSendEmailRequest,

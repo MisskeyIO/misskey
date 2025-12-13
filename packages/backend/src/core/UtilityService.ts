@@ -102,6 +102,16 @@ export class UtilityService {
 	}
 
 	@bindThis
+	public isBlockedRemoteCustomEmoji(name: string, host: string | null): boolean {
+		if (host == null) return false;
+
+		const normalizedHost = this.normalizeHost(host);
+		const candidates = [`${name}@${normalizedHost}`, name];
+
+		return candidates.some(target => this.isKeyWordIncluded(target, this.meta.blockedRemoteCustomEmojis));
+	}
+
+	@bindThis
 	public normalizeHost(host: string): string {
 		return punycode.toASCII(host.toLowerCase());
 	}

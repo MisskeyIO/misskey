@@ -28,7 +28,7 @@ import { useWidgetPropsManager } from './widget.js';
 import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from './widget.js';
 import type { FormWithDefault, GetFormResultType } from '@/utility/form.js';
 import MkContainer from '@/components/MkContainer.vue';
-import { i18n } from '@/i18n.js';
+import { generateClientTransactionId } from '@/utility/misskey-api.js';
 
 const name = 'rss';
 
@@ -75,7 +75,12 @@ const intervalClear = ref<(() => void) | undefined>();
 const tick = () => {
 	if (window.document.visibilityState === 'hidden' && rawItems.value.length !== 0) return;
 
-	window.fetch(fetchEndpoint.value, {})
+	window.fetch(fetchEndpoint.value, {
+		credentials: 'include',
+		headers: {
+			'X-Client-Transaction-Id': generateClientTransactionId('widget-rss'),
+		},
+	})
 		.then(res => res.json())
 		.then((feed: Misskey.entities.FetchRssResponse) => {
 			rawItems.value = feed.items;

@@ -108,6 +108,7 @@ import type {
 	AdminRolesUnassignRequest,
 	AdminRolesUpdateRequest,
 	AdminRolesUpdateDefaultPoliciesRequest,
+	AdminRolesUpdateInlinePoliciesRequest,
 	AdminRolesUsersRequest,
 	AdminRolesUsersResponse,
 	AdminSendEmailRequest,
@@ -739,6 +740,7 @@ export type Endpoints = {
 	'admin/roles/unassign': { req: AdminRolesUnassignRequest; res: EmptyResponse };
 	'admin/roles/update': { req: AdminRolesUpdateRequest; res: EmptyResponse };
 	'admin/roles/update-default-policies': { req: AdminRolesUpdateDefaultPoliciesRequest; res: EmptyResponse };
+	'admin/roles/update-inline-policies': { req: AdminRolesUpdateInlinePoliciesRequest; res: EmptyResponse };
 	'admin/roles/users': { req: AdminRolesUsersRequest; res: AdminRolesUsersResponse };
 	'admin/send-email': { req: AdminSendEmailRequest; res: EmptyResponse };
 	'admin/server-info': { req: EmptyRequest; res: AdminServerInfoResponse };

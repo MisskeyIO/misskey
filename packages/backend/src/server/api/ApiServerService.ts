@@ -19,7 +19,8 @@ import { ApiCallService } from './ApiCallService.js';
 import { SignupApiService } from './SignupApiService.js';
 import { SigninApiService } from './SigninApiService.js';
 import { SigninWithPasskeyApiService } from './SigninWithPasskeyApiService.js';
-import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
+import { decideCorsOptions } from './cors-decision.js';
+import type { FastifyInstance, FastifyPluginOptions, FastifyRequest } from 'fastify';
 
 @Injectable()
 export class ApiServerService {
@@ -47,7 +48,11 @@ export class ApiServerService {
 	@bindThis
 	public createServer(fastify: FastifyInstance, options: FastifyPluginOptions, done: (err?: Error) => void) {
 		fastify.register(cors, {
-			origin: '*',
+			hook: 'preHandler',
+			delegator: (req: FastifyRequest, cb) => {
+				const corsDecision = decideCorsOptions(req, this.config.url);
+				cb(null, corsDecision);
+			},
 		});
 
 		fastify.register(multipart, {
@@ -121,7 +126,10 @@ export class ApiServerService {
 				'm-captcha-response'?: string;
 				'testcaptcha-response'?: string;
 			}
-		}>('/signup', (request, reply) => this.signupApiService.signup(request, reply));
+		}>(
+			'/signup',
+			(request, reply) => this.signupApiService.signup(request, reply),
+		);
 
 		fastify.post<{
 			Body: {
@@ -135,16 +143,25 @@ export class ApiServerService {
 				'm-captcha-response'?: string;
 				'testcaptcha-response'?: string;
 			};
-		}>('/signin-flow', (request, reply) => this.signinApiService.signin(request, reply));
+		}>(
+			'/signin-flow',
+			(request, reply) => this.signinApiService.signin(request, reply),
+		);
 
 		fastify.post<{
 			Body: {
 				credential?: AuthenticationResponseJSON;
 				context?: string;
 			};
-		}>('/signin-with-passkey', (request, reply) => this.signinWithPasskeyApiService.signin(request, reply));
+		}>(
+			'/signin-with-passkey',
+			(request, reply) => this.signinWithPasskeyApiService.signin(request, reply),
+		);
 
-		fastify.post<{ Body: { code: string; } }>('/signup-pending', (request, reply) => this.signupApiService.signupPending(request, reply));
+		fastify.post<{ Body: { code: string; } }>(
+			'/signup-pending',
+			(request, reply) => this.signupApiService.signupPending(request, reply),
+		);
 
 		fastify.get('/v1/instance/peers', async (request, reply) => {
 			const instances = await this.instancesRepository.find({

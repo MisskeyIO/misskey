@@ -111,6 +111,7 @@ export type AdminRolesShowResponse = operations['admin___roles___show']['respons
 export type AdminRolesUnassignRequest = operations['admin___roles___unassign']['requestBody']['content']['application/json'];
 export type AdminRolesUpdateRequest = operations['admin___roles___update']['requestBody']['content']['application/json'];
 export type AdminRolesUpdateDefaultPoliciesRequest = operations['admin___roles___update-default-policies']['requestBody']['content']['application/json'];
+export type AdminRolesUpdateInlinePoliciesRequest = operations['admin___roles___update-inline-policies']['requestBody']['content']['application/json'];
 export type AdminRolesUsersRequest = operations['admin___roles___users']['requestBody']['content']['application/json'];
 export type AdminRolesUsersResponse = operations['admin___roles___users']['responses']['200']['content']['application/json'];
 export type AdminSendEmailRequest = operations['admin___send-email']['requestBody']['content']['application/json'];

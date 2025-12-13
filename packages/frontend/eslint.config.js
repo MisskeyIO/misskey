@@ -1,3 +1,6 @@
+// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
+import storybook from "eslint-plugin-storybook";
+
 import globals from 'globals';
 import tsParser from '@typescript-eslint/parser';
 import parser from 'vue-eslint-parser';
@@ -31,6 +34,9 @@ export default [
 				_VERSION_: false,
 				_ENV_: false,
 				_PERF_PREFIX_: false,
+				_DATA_TRANSFER_DRIVE_FILE_: false,
+				_DATA_TRANSFER_DRIVE_FOLDER_: false,
+				_DATA_TRANSFER_DECK_COLUMN_: false,
 			},
 			parser,
 			parserOptions: {
@@ -159,4 +165,5 @@ export default [
 			}],
 		},
 	},
+	...storybook.configs["flat/recommended"],
 ];

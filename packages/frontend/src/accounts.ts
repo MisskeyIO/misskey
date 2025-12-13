@@ -6,6 +6,7 @@
 import { defineAsyncComponent, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { apiUrl, host } from '@@/js/config.js';
+import { generateClientTransactionId } from '@/utility/misskey-api.js';
 import type { MenuItem } from '@/types/menu.js';
 import { showSuspendedDialog } from '@/utility/show-suspended-dialog.js';
 import { i18n } from '@/i18n.js';
@@ -66,8 +67,10 @@ function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Pr
 			body: JSON.stringify({
 				i: token,
 			}),
+			credentials: 'include',
 			headers: {
 				'Content-Type': 'application/json',
+				'X-Client-Transaction-Id': generateClientTransactionId('accounts'),
 			},
 		})
 			.then(res => new Promise<Misskey.entities.MeDetailed | { error: Record<string, any> }>((done2, fail2) => {

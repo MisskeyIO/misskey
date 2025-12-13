@@ -32,6 +32,7 @@ import * as Misskey from 'misskey-js';
 import { useInterval } from '@@/js/use-interval.js';
 import MkMarqueeText from '@/components/MkMarqueeText.vue';
 import { shuffle } from '@/utility/shuffle.js';
+import { generateClientTransactionId } from '@/utility/misskey-api.js';
 
 const props = defineProps<{
 	url: string;
@@ -48,7 +49,12 @@ const fetching = ref(true);
 const key = ref(0);
 
 const tick = () => {
-	window.fetch(`/api/fetch-rss?url=${encodeURIComponent(props.url)}`, {}).then(res => {
+	window.fetch(`/api/fetch-rss?url=${encodeURIComponent(props.url)}`, {
+		credentials: 'include',
+		headers: {
+			'X-Client-Transaction-Id': generateClientTransactionId('fetch-rss'),
+		},
+	}).then(res => {
 		res.json().then((feed: Misskey.entities.FetchRssResponse) => {
 			if (props.shuffle) {
 				shuffle(feed.items);

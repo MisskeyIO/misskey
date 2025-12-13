@@ -2,103 +2,7 @@
 /* eslint @typescript-eslint/no-explicit-any: 0 */
 
 export type paths = {
-    '/admin/abuse-report-resolver/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * admin/abuse-report-resolver/create
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *write:admin:abuse-report-resolvers*
-         */
-        post: operations['admin___abuse-report-resolver___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/admin/abuse-report-resolver/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * admin/abuse-report-resolver/delete
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *write:admin:abuse-report-resolvers*
-         */
-        post: operations['admin___abuse-report-resolver___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/admin/abuse-report-resolver/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * admin/abuse-report-resolver/list
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *read:admin:abuse-report-resolvers*
-         */
-        post: operations['admin___abuse-report-resolver___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/admin/abuse-report-resolver/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * admin/abuse-report-resolver/update
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *write:admin:abuse-report-resolvers*
-         */
-        post: operations['admin___abuse-report-resolver___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     '/admin/abuse-report/notification-recipient/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/abuse-report/notification-recipient/create
          * @description No description provided.
@@ -107,21 +11,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:abuse-report:notification-recipient*
          */
         post: operations['admin___abuse-report___notification-recipient___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/abuse-report/notification-recipient/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/abuse-report/notification-recipient/delete
          * @description No description provided.
@@ -130,21 +21,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:abuse-report:notification-recipient*
          */
         post: operations['admin___abuse-report___notification-recipient___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/abuse-report/notification-recipient/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/abuse-report/notification-recipient/list
          * @description No description provided.
@@ -153,21 +31,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:abuse-report:notification-recipient*
          */
         post: operations['admin___abuse-report___notification-recipient___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/abuse-report/notification-recipient/show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/abuse-report/notification-recipient/show
          * @description No description provided.
@@ -176,21 +41,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:abuse-report:notification-recipient*
          */
         post: operations['admin___abuse-report___notification-recipient___show'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/abuse-report/notification-recipient/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/abuse-report/notification-recipient/update
          * @description No description provided.
@@ -199,21 +51,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:abuse-report:notification-recipient*
          */
         post: operations['admin___abuse-report___notification-recipient___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/abuse-user-reports': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/abuse-user-reports
          * @description No description provided.
@@ -221,21 +60,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:abuse-user-reports*
          */
         post: operations['admin___abuse-user-reports'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/accounts/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/accounts/create
          * @description No description provided.
@@ -243,21 +69,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['admin___accounts___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/accounts/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/accounts/delete
          * @description No description provided.
@@ -265,21 +78,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:account*
          */
         post: operations['admin___accounts___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/accounts/find-by-email': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/accounts/find-by-email
          * @description No description provided.
@@ -287,65 +87,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:account*
          */
         post: operations['admin___accounts___find-by-email'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/admin/accounts/pending/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * admin/accounts/pending/list
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *read:admin:account*
-         */
-        post: operations['admin___accounts___pending___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/admin/accounts/pending/revoke': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * admin/accounts/pending/revoke
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *write:admin:account*
-         */
-        post: operations['admin___accounts___pending___revoke'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/ad/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/ad/create
          * @description No description provided.
@@ -353,21 +96,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:ad*
          */
         post: operations['admin___ad___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/ad/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/ad/delete
          * @description No description provided.
@@ -375,21 +105,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:ad*
          */
         post: operations['admin___ad___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/ad/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/ad/list
          * @description No description provided.
@@ -397,21 +114,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:ad*
          */
         post: operations['admin___ad___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/ad/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/ad/update
          * @description No description provided.
@@ -419,21 +123,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:ad*
          */
         post: operations['admin___ad___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/announcements/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/announcements/create
          * @description No description provided.
@@ -441,21 +132,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:announcements*
          */
         post: operations['admin___announcements___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/announcements/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/announcements/delete
          * @description No description provided.
@@ -463,21 +141,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:announcements*
          */
         post: operations['admin___announcements___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/announcements/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/announcements/list
          * @description No description provided.
@@ -485,21 +150,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:announcements*
          */
         post: operations['admin___announcements___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/announcements/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/announcements/update
          * @description No description provided.
@@ -507,21 +159,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:announcements*
          */
         post: operations['admin___announcements___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/avatar-decorations/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/avatar-decorations/create
          * @description No description provided.
@@ -529,21 +168,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:avatar-decorations*
          */
         post: operations['admin___avatar-decorations___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/avatar-decorations/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/avatar-decorations/delete
          * @description No description provided.
@@ -551,21 +177,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:avatar-decorations*
          */
         post: operations['admin___avatar-decorations___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/avatar-decorations/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/avatar-decorations/list
          * @description No description provided.
@@ -573,21 +186,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:avatar-decorations*
          */
         post: operations['admin___avatar-decorations___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/avatar-decorations/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/avatar-decorations/update
          * @description No description provided.
@@ -595,21 +195,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:avatar-decorations*
          */
         post: operations['admin___avatar-decorations___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/captcha/current': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/captcha/current
          * @description No description provided.
@@ -617,21 +204,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:meta*
          */
         post: operations['admin___captcha___current'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/captcha/save': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/captcha/save
          * @description No description provided.
@@ -639,21 +213,26 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:meta*
          */
         post: operations['admin___captcha___save'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    };
+    '/admin/delete-account': {
+        /**
+         * admin/delete-account
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:admin:delete-account*
+         */
+        post: operations['admin___delete-account'];
+    };
+    '/admin/delete-all-files-of-a-user': {
+        /**
+         * admin/delete-all-files-of-a-user
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:admin:delete-all-files-of-a-user*
+         */
+        post: operations['admin___delete-all-files-of-a-user'];
     };
     '/admin/drive/clean-remote-files': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/drive/clean-remote-files
          * @description No description provided.
@@ -661,21 +240,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:drive*
          */
         post: operations['admin___drive___clean-remote-files'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/drive/cleanup': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/drive/cleanup
          * @description No description provided.
@@ -683,43 +249,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:drive*
          */
         post: operations['admin___drive___cleanup'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/admin/drive/delete-all-files-of-a-user': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * admin/drive/delete-all-files-of-a-user
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *write:admin:drive*
-         */
-        post: operations['admin___drive___delete-all-files-of-a-user'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/drive/files': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/drive/files
          * @description No description provided.
@@ -727,21 +258,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:drive*
          */
         post: operations['admin___drive___files'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/drive/show-file': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/drive/show-file
          * @description No description provided.
@@ -749,21 +267,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:drive*
          */
         post: operations['admin___drive___show-file'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/emoji/add': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/emoji/add
          * @description No description provided.
@@ -771,21 +276,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:emoji*
          */
         post: operations['admin___emoji___add'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/emoji/add-aliases-bulk': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/emoji/add-aliases-bulk
          * @description No description provided.
@@ -793,21 +285,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:emoji*
          */
         post: operations['admin___emoji___add-aliases-bulk'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/emoji/copy': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/emoji/copy
          * @description No description provided.
@@ -815,21 +294,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:emoji*
          */
         post: operations['admin___emoji___copy'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/emoji/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/emoji/delete
          * @description No description provided.
@@ -837,21 +303,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:emoji*
          */
         post: operations['admin___emoji___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/emoji/delete-bulk': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/emoji/delete-bulk
          * @description No description provided.
@@ -859,21 +312,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:emoji*
          */
         post: operations['admin___emoji___delete-bulk'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/emoji/import-zip': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/emoji/import-zip
          * @description No description provided.
@@ -882,21 +322,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['admin___emoji___import-zip'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/emoji/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/emoji/list
          * @description No description provided.
@@ -904,21 +331,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:emoji*
          */
         post: operations['admin___emoji___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/emoji/list-remote': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/emoji/list-remote
          * @description No description provided.
@@ -926,21 +340,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:emoji*
          */
         post: operations['admin___emoji___list-remote'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/emoji/remove-aliases-bulk': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/emoji/remove-aliases-bulk
          * @description No description provided.
@@ -948,21 +349,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:emoji*
          */
         post: operations['admin___emoji___remove-aliases-bulk'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/emoji/set-aliases-bulk': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/emoji/set-aliases-bulk
          * @description No description provided.
@@ -970,21 +358,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:emoji*
          */
         post: operations['admin___emoji___set-aliases-bulk'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/emoji/set-category-bulk': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/emoji/set-category-bulk
          * @description No description provided.
@@ -992,21 +367,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:emoji*
          */
         post: operations['admin___emoji___set-category-bulk'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/emoji/set-license-bulk': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/emoji/set-license-bulk
          * @description No description provided.
@@ -1014,21 +376,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:emoji*
          */
         post: operations['admin___emoji___set-license-bulk'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/emoji/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/emoji/update
          * @description No description provided.
@@ -1036,21 +385,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:emoji*
          */
         post: operations['admin___emoji___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/federation/delete-all-files': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/federation/delete-all-files
          * @description No description provided.
@@ -1058,21 +394,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:federation*
          */
         post: operations['admin___federation___delete-all-files'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/federation/refresh-remote-instance-metadata': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/federation/refresh-remote-instance-metadata
          * @description No description provided.
@@ -1080,21 +403,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:federation*
          */
         post: operations['admin___federation___refresh-remote-instance-metadata'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/federation/remove-all-following': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/federation/remove-all-following
          * @description No description provided.
@@ -1102,21 +412,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:federation*
          */
         post: operations['admin___federation___remove-all-following'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/federation/update-instance': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/federation/update-instance
          * @description No description provided.
@@ -1124,21 +421,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:federation*
          */
         post: operations['admin___federation___update-instance'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/forward-abuse-user-report': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/forward-abuse-user-report
          * @description No description provided.
@@ -1146,21 +430,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:resolve-abuse-user-report*
          */
         post: operations['admin___forward-abuse-user-report'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/get-index-stats': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/get-index-stats
          * @description No description provided.
@@ -1168,21 +439,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:index-stats*
          */
         post: operations['admin___get-index-stats'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/get-table-stats': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/get-table-stats
          * @description No description provided.
@@ -1190,21 +448,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:table-stats*
          */
         post: operations['admin___get-table-stats'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/get-user-ips': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/get-user-ips
          * @description No description provided.
@@ -1212,109 +457,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:user-ips*
          */
         post: operations['admin___get-user-ips'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/admin/indie-auth/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * admin/indie-auth/create
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *write:admin:indie-auth*
-         */
-        post: operations['admin___indie-auth___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/admin/indie-auth/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * admin/indie-auth/delete
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *write:admin:indie-auth*
-         */
-        post: operations['admin___indie-auth___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/admin/indie-auth/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * admin/indie-auth/list
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *read:admin:indie-auth*
-         */
-        post: operations['admin___indie-auth___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/admin/indie-auth/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * admin/indie-auth/update
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *write:admin:indie-auth*
-         */
-        post: operations['admin___indie-auth___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/invite/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/invite/create
          * @description No description provided.
@@ -1322,21 +466,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:invite-codes*
          */
         post: operations['admin___invite___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/invite/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/invite/list
          * @description No description provided.
@@ -1344,21 +475,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:invite-codes*
          */
         post: operations['admin___invite___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/meta': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/meta
          * @description No description provided.
@@ -1366,21 +484,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:meta*
          */
         post: operations['admin___meta'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/promo/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/promo/create
          * @description No description provided.
@@ -1388,21 +493,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:promo*
          */
         post: operations['admin___promo___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/queue/clear': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/queue/clear
          * @description No description provided.
@@ -1410,21 +502,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:queue*
          */
         post: operations['admin___queue___clear'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/queue/deliver-delayed': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/queue/deliver-delayed
          * @description No description provided.
@@ -1432,21 +511,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:queue*
          */
         post: operations['admin___queue___deliver-delayed'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/queue/inbox-delayed': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/queue/inbox-delayed
          * @description No description provided.
@@ -1454,43 +520,80 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:queue*
          */
         post: operations['admin___queue___inbox-delayed'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
-    '/admin/queue/promote': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
+    '/admin/queue/jobs': {
         /**
-         * admin/queue/promote
+         * admin/queue/jobs
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:admin:queue*
+         */
+        post: operations['admin___queue___jobs'];
+    };
+    '/admin/queue/promote-jobs': {
+        /**
+         * admin/queue/promote-jobs
          * @description No description provided.
          *
          *     **Credential required**: *Yes* / **Permission**: *write:admin:queue*
          */
-        post: operations['admin___queue___promote'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        post: operations['admin___queue___promote-jobs'];
+    };
+    '/admin/queue/queue-stats': {
+        /**
+         * admin/queue/queue-stats
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:admin:queue*
+         */
+        post: operations['admin___queue___queue-stats'];
+    };
+    '/admin/queue/queues': {
+        /**
+         * admin/queue/queues
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:admin:queue*
+         */
+        post: operations['admin___queue___queues'];
+    };
+    '/admin/queue/remove-job': {
+        /**
+         * admin/queue/remove-job
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:admin:queue*
+         */
+        post: operations['admin___queue___remove-job'];
+    };
+    '/admin/queue/retry-job': {
+        /**
+         * admin/queue/retry-job
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:admin:queue*
+         */
+        post: operations['admin___queue___retry-job'];
+    };
+    '/admin/queue/show-job': {
+        /**
+         * admin/queue/show-job
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:admin:queue*
+         */
+        post: operations['admin___queue___show-job'];
+    };
+    '/admin/queue/show-job-logs': {
+        /**
+         * admin/queue/show-job-logs
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:admin:queue*
+         */
+        post: operations['admin___queue___show-job-logs'];
     };
     '/admin/queue/stats': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/queue/stats
          * @description No description provided.
@@ -1498,43 +601,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:emoji*
          */
         post: operations['admin___queue___stats'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/admin/regenerate-user-token': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * admin/regenerate-user-token
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *write:admin:regenerate-user-token*
-         */
-        post: operations['admin___regenerate-user-token'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/relays/add': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/relays/add
          * @description No description provided.
@@ -1542,21 +610,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:relays*
          */
         post: operations['admin___relays___add'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/relays/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/relays/list
          * @description No description provided.
@@ -1564,21 +619,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:relays*
          */
         post: operations['admin___relays___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/relays/remove': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/relays/remove
          * @description No description provided.
@@ -1586,21 +628,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:relays*
          */
         post: operations['admin___relays___remove'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/reset-password': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/reset-password
          * @description No description provided.
@@ -1608,21 +637,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:reset-password*
          */
         post: operations['admin___reset-password'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/resolve-abuse-user-report': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/resolve-abuse-user-report
          * @description No description provided.
@@ -1630,21 +646,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:resolve-abuse-user-report*
          */
         post: operations['admin___resolve-abuse-user-report'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/roles/assign': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/roles/assign
          * @description No description provided.
@@ -1652,21 +655,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:roles*
          */
         post: operations['admin___roles___assign'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/roles/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/roles/create
          * @description No description provided.
@@ -1674,21 +664,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:roles*
          */
         post: operations['admin___roles___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/roles/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/roles/delete
          * @description No description provided.
@@ -1696,21 +673,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:roles*
          */
         post: operations['admin___roles___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/roles/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/roles/list
          * @description No description provided.
@@ -1718,21 +682,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:roles*
          */
         post: operations['admin___roles___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/roles/show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/roles/show
          * @description No description provided.
@@ -1740,21 +691,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:roles*
          */
         post: operations['admin___roles___show'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/roles/unassign': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/roles/unassign
          * @description No description provided.
@@ -1762,21 +700,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:roles*
          */
         post: operations['admin___roles___unassign'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/roles/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/roles/update
          * @description No description provided.
@@ -1784,21 +709,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:roles*
          */
         post: operations['admin___roles___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/roles/update-default-policies': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/roles/update-default-policies
          * @description No description provided.
@@ -1806,21 +718,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:roles*
          */
         post: operations['admin___roles___update-default-policies'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/roles/users': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/roles/users
          * @description No description provided.
@@ -1828,21 +727,8 @@ export type paths = {
          *     **Credential required**: *No* / **Permission**: *read:admin:roles*
          */
         post: operations['admin___roles___users'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/send-email': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/send-email
          * @description No description provided.
@@ -1850,21 +736,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:send-email*
          */
         post: operations['admin___send-email'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/server-info': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/server-info
          * @description No description provided.
@@ -1872,21 +745,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:server-info*
          */
         post: operations['admin___server-info'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/show-moderation-logs': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/show-moderation-logs
          * @description No description provided.
@@ -1894,21 +754,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:show-moderation-log*
          */
         post: operations['admin___show-moderation-logs'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/show-user': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/show-user
          * @description No description provided.
@@ -1916,43 +763,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:show-user*
          */
         post: operations['admin___show-user'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/admin/show-user-account-move-logs': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * admin/show-user-account-move-logs
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *read:admin:show-account-move-log*
-         */
-        post: operations['admin___show-user-account-move-logs'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/show-users': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/show-users
          * @description No description provided.
@@ -1960,109 +772,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:show-user*
          */
         post: operations['admin___show-users'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/admin/sso/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * admin/sso/create
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *write:admin:sso*
-         */
-        post: operations['admin___sso___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/admin/sso/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * admin/sso/delete
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *write:admin:sso*
-         */
-        post: operations['admin___sso___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/admin/sso/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * admin/sso/list
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *read:admin:sso*
-         */
-        post: operations['admin___sso___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/admin/sso/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * admin/sso/update
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *write:admin:sso*
-         */
-        post: operations['admin___sso___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/suspend-user': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/suspend-user
          * @description No description provided.
@@ -2070,21 +781,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:suspend-user*
          */
         post: operations['admin___suspend-user'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/system-webhook/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/system-webhook/create
          * @description No description provided.
@@ -2093,21 +791,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:system-webhook*
          */
         post: operations['admin___system-webhook___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/system-webhook/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/system-webhook/delete
          * @description No description provided.
@@ -2116,21 +801,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:system-webhook*
          */
         post: operations['admin___system-webhook___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/system-webhook/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/system-webhook/list
          * @description No description provided.
@@ -2139,21 +811,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:system-webhook*
          */
         post: operations['admin___system-webhook___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/system-webhook/show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/system-webhook/show
          * @description No description provided.
@@ -2162,21 +821,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:system-webhook*
          */
         post: operations['admin___system-webhook___show'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/system-webhook/test': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/system-webhook/test
          * @description No description provided.
@@ -2185,21 +831,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:system-webhook*
          */
         post: operations['admin___system-webhook___test'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/system-webhook/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/system-webhook/update
          * @description No description provided.
@@ -2208,87 +841,26 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:system-webhook*
          */
         post: operations['admin___system-webhook___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/unset-user-avatar': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/unset-user-avatar
          * @description No description provided.
          *
-         *     **Credential required**: *Yes* / **Permission**: *write:admin:user-avatar*
+         *     **Credential required**: *Yes* / **Permission**: *write:admin:unset-user-avatar*
          */
         post: operations['admin___unset-user-avatar'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/unset-user-banner': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/unset-user-banner
          * @description No description provided.
          *
-         *     **Credential required**: *Yes* / **Permission**: *write:admin:user-banner*
+         *     **Credential required**: *Yes* / **Permission**: *write:admin:unset-user-banner*
          */
         post: operations['admin___unset-user-banner'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/admin/unset-user-mutual-link': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * admin/unset-user-mutual-link
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *write:admin:user-mutual-link*
-         */
-        post: operations['admin___unset-user-mutual-link'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/unsuspend-user': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/unsuspend-user
          * @description No description provided.
@@ -2296,21 +868,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:unsuspend-user*
          */
         post: operations['admin___unsuspend-user'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/update-abuse-user-report': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/update-abuse-user-report
          * @description No description provided.
@@ -2318,21 +877,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:resolve-abuse-user-report*
          */
         post: operations['admin___update-abuse-user-report'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/update-meta': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/update-meta
          * @description No description provided.
@@ -2340,21 +886,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:meta*
          */
         post: operations['admin___update-meta'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/update-proxy-account': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/update-proxy-account
          * @description No description provided.
@@ -2362,43 +895,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:account*
          */
         post: operations['admin___update-proxy-account'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/admin/update-user-name': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * admin/update-user-name
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *write:admin:user-name*
-         */
-        post: operations['admin___update-user-name'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/admin/update-user-note': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * admin/update-user-note
          * @description No description provided.
@@ -2406,43 +904,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:admin:user-note*
          */
         post: operations['admin___update-user-note'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/announcement': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * announcement
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        post: operations['announcement'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/announcements': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * announcements
          * @description No description provided.
@@ -2450,21 +913,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['announcements'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/announcements/show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * announcements/show
          * @description No description provided.
@@ -2472,21 +922,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['announcements___show'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/antennas/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * antennas/create
          * @description No description provided.
@@ -2494,21 +931,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['antennas___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/antennas/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * antennas/delete
          * @description No description provided.
@@ -2516,21 +940,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['antennas___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/antennas/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * antennas/list
          * @description No description provided.
@@ -2538,21 +949,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['antennas___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/antennas/notes': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * antennas/notes
          * @description No description provided.
@@ -2560,21 +958,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['antennas___notes'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/antennas/show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * antennas/show
          * @description No description provided.
@@ -2582,21 +967,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['antennas___show'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/antennas/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * antennas/update
          * @description No description provided.
@@ -2604,21 +976,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['antennas___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/ap/get': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * ap/get
          * @description No description provided.
@@ -2626,21 +985,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:federation*
          */
         post: operations['ap___get'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/ap/show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * ap/show
          * @description No description provided.
@@ -2648,21 +994,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['ap___show'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/app/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * app/create
          * @description No description provided.
@@ -2670,21 +1003,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['app___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/app/show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * app/show
          * @description No description provided.
@@ -2692,21 +1012,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['app___show'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/auth/accept': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * auth/accept
          * @description No description provided.
@@ -2715,21 +1022,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['auth___accept'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/auth/session/generate': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * auth/session/generate
          * @description No description provided.
@@ -2737,21 +1031,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['auth___session___generate'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/auth/session/show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * auth/session/show
          * @description No description provided.
@@ -2759,21 +1040,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['auth___session___show'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/auth/session/userkey': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * auth/session/userkey
          * @description No description provided.
@@ -2781,21 +1049,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['auth___session___userkey'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/blocking/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * blocking/create
          * @description No description provided.
@@ -2803,21 +1058,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:blocks*
          */
         post: operations['blocking___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/blocking/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * blocking/delete
          * @description No description provided.
@@ -2825,21 +1067,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:blocks*
          */
         post: operations['blocking___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/blocking/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * blocking/list
          * @description No description provided.
@@ -2847,27 +1076,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:blocks*
          */
         post: operations['blocking___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/bubble-game/ranking': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * bubble-game/ranking
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___bubble-game___ranking'];
-        put?: never;
         /**
          * bubble-game/ranking
          * @description No description provided.
@@ -2875,21 +1085,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['bubble-game___ranking'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/bubble-game/register': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * bubble-game/register
          * @description No description provided.
@@ -2897,21 +1094,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['bubble-game___register'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/channels/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * channels/create
          * @description No description provided.
@@ -2919,21 +1103,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:channels*
          */
         post: operations['channels___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/channels/favorite': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * channels/favorite
          * @description No description provided.
@@ -2941,21 +1112,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:channels*
          */
         post: operations['channels___favorite'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/channels/featured': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * channels/featured
          * @description No description provided.
@@ -2963,43 +1121,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['channels___featured'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/channels/featured-games': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * channels/featured-games
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        post: operations['channels___featured-games'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/channels/follow': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * channels/follow
          * @description No description provided.
@@ -3007,21 +1130,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:channels*
          */
         post: operations['channels___follow'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/channels/followed': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * channels/followed
          * @description No description provided.
@@ -3029,21 +1139,35 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:channels*
          */
         post: operations['channels___followed'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    };
+    '/channels/mute/create': {
+        /**
+         * channels/mute/create
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:channels*
+         */
+        post: operations['channels___mute___create'];
+    };
+    '/channels/mute/delete': {
+        /**
+         * channels/mute/delete
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:channels*
+         */
+        post: operations['channels___mute___delete'];
+    };
+    '/channels/mute/list': {
+        /**
+         * channels/mute/list
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:channels*
+         */
+        post: operations['channels___mute___list'];
     };
     '/channels/my-favorites': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * channels/my-favorites
          * @description No description provided.
@@ -3051,21 +1175,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:channels*
          */
         post: operations['channels___my-favorites'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/channels/owned': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * channels/owned
          * @description No description provided.
@@ -3073,21 +1184,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:channels*
          */
         post: operations['channels___owned'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/channels/search': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * channels/search
          * @description No description provided.
@@ -3095,21 +1193,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['channels___search'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/channels/show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * channels/show
          * @description No description provided.
@@ -3117,21 +1202,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['channels___show'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/channels/timeline': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * channels/timeline
          * @description No description provided.
@@ -3139,21 +1211,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['channels___timeline'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/channels/unfavorite': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * channels/unfavorite
          * @description No description provided.
@@ -3161,21 +1220,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:channels*
          */
         post: operations['channels___unfavorite'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/channels/unfollow': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * channels/unfollow
          * @description No description provided.
@@ -3183,21 +1229,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:channels*
          */
         post: operations['channels___unfollow'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/channels/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * channels/update
          * @description No description provided.
@@ -3205,27 +1238,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:channels*
          */
         post: operations['channels___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/charts/active-users': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * charts/active-users
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___charts___active-users'];
-        put?: never;
         /**
          * charts/active-users
          * @description No description provided.
@@ -3233,27 +1247,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['charts___active-users'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/charts/ap-request': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * charts/ap-request
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___charts___ap-request'];
-        put?: never;
         /**
          * charts/ap-request
          * @description No description provided.
@@ -3261,27 +1256,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['charts___ap-request'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/charts/drive': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * charts/drive
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___charts___drive'];
-        put?: never;
         /**
          * charts/drive
          * @description No description provided.
@@ -3289,27 +1265,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['charts___drive'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/charts/federation': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * charts/federation
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___charts___federation'];
-        put?: never;
         /**
          * charts/federation
          * @description No description provided.
@@ -3317,27 +1274,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['charts___federation'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/charts/instance': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * charts/instance
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___charts___instance'];
-        put?: never;
         /**
          * charts/instance
          * @description No description provided.
@@ -3345,27 +1283,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['charts___instance'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/charts/notes': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * charts/notes
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___charts___notes'];
-        put?: never;
         /**
          * charts/notes
          * @description No description provided.
@@ -3373,27 +1292,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['charts___notes'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/charts/user/drive': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * charts/user/drive
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___charts___user___drive'];
-        put?: never;
         /**
          * charts/user/drive
          * @description No description provided.
@@ -3401,27 +1301,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['charts___user___drive'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/charts/user/following': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * charts/user/following
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___charts___user___following'];
-        put?: never;
         /**
          * charts/user/following
          * @description No description provided.
@@ -3429,27 +1310,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['charts___user___following'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/charts/user/notes': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * charts/user/notes
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___charts___user___notes'];
-        put?: never;
         /**
          * charts/user/notes
          * @description No description provided.
@@ -3457,27 +1319,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['charts___user___notes'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/charts/user/pv': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * charts/user/pv
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___charts___user___pv'];
-        put?: never;
         /**
          * charts/user/pv
          * @description No description provided.
@@ -3485,27 +1328,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['charts___user___pv'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/charts/user/reactions': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * charts/user/reactions
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___charts___user___reactions'];
-        put?: never;
         /**
          * charts/user/reactions
          * @description No description provided.
@@ -3513,27 +1337,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['charts___user___reactions'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/charts/users': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * charts/users
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___charts___users'];
-        put?: never;
         /**
          * charts/users
          * @description No description provided.
@@ -3541,21 +1346,233 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['charts___users'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    };
+    '/chat/history': {
+        /**
+         * chat/history
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:chat*
+         */
+        post: operations['chat___history'];
+    };
+    '/chat/messages/create-to-room': {
+        /**
+         * chat/messages/create-to-room
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:chat*
+         */
+        post: operations['chat___messages___create-to-room'];
+    };
+    '/chat/messages/create-to-user': {
+        /**
+         * chat/messages/create-to-user
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:chat*
+         */
+        post: operations['chat___messages___create-to-user'];
+    };
+    '/chat/messages/delete': {
+        /**
+         * chat/messages/delete
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:chat*
+         */
+        post: operations['chat___messages___delete'];
+    };
+    '/chat/messages/react': {
+        /**
+         * chat/messages/react
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:chat*
+         */
+        post: operations['chat___messages___react'];
+    };
+    '/chat/messages/room-timeline': {
+        /**
+         * chat/messages/room-timeline
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:chat*
+         */
+        post: operations['chat___messages___room-timeline'];
+    };
+    '/chat/messages/search': {
+        /**
+         * chat/messages/search
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:chat*
+         */
+        post: operations['chat___messages___search'];
+    };
+    '/chat/messages/show': {
+        /**
+         * chat/messages/show
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:chat*
+         */
+        post: operations['chat___messages___show'];
+    };
+    '/chat/messages/unreact': {
+        /**
+         * chat/messages/unreact
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:chat*
+         */
+        post: operations['chat___messages___unreact'];
+    };
+    '/chat/messages/user-timeline': {
+        /**
+         * chat/messages/user-timeline
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:chat*
+         */
+        post: operations['chat___messages___user-timeline'];
+    };
+    '/chat/read-all': {
+        /**
+         * chat/read-all
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:chat*
+         */
+        post: operations['chat___read-all'];
+    };
+    '/chat/rooms/create': {
+        /**
+         * chat/rooms/create
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:chat*
+         */
+        post: operations['chat___rooms___create'];
+    };
+    '/chat/rooms/delete': {
+        /**
+         * chat/rooms/delete
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:chat*
+         */
+        post: operations['chat___rooms___delete'];
+    };
+    '/chat/rooms/invitations/create': {
+        /**
+         * chat/rooms/invitations/create
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:chat*
+         */
+        post: operations['chat___rooms___invitations___create'];
+    };
+    '/chat/rooms/invitations/ignore': {
+        /**
+         * chat/rooms/invitations/ignore
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:chat*
+         */
+        post: operations['chat___rooms___invitations___ignore'];
+    };
+    '/chat/rooms/invitations/inbox': {
+        /**
+         * chat/rooms/invitations/inbox
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:chat*
+         */
+        post: operations['chat___rooms___invitations___inbox'];
+    };
+    '/chat/rooms/invitations/outbox': {
+        /**
+         * chat/rooms/invitations/outbox
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:chat*
+         */
+        post: operations['chat___rooms___invitations___outbox'];
+    };
+    '/chat/rooms/join': {
+        /**
+         * chat/rooms/join
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:chat*
+         */
+        post: operations['chat___rooms___join'];
+    };
+    '/chat/rooms/joining': {
+        /**
+         * chat/rooms/joining
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:chat*
+         */
+        post: operations['chat___rooms___joining'];
+    };
+    '/chat/rooms/leave': {
+        /**
+         * chat/rooms/leave
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:chat*
+         */
+        post: operations['chat___rooms___leave'];
+    };
+    '/chat/rooms/members': {
+        /**
+         * chat/rooms/members
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:chat*
+         */
+        post: operations['chat___rooms___members'];
+    };
+    '/chat/rooms/mute': {
+        /**
+         * chat/rooms/mute
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:chat*
+         */
+        post: operations['chat___rooms___mute'];
+    };
+    '/chat/rooms/owned': {
+        /**
+         * chat/rooms/owned
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:chat*
+         */
+        post: operations['chat___rooms___owned'];
+    };
+    '/chat/rooms/show': {
+        /**
+         * chat/rooms/show
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:chat*
+         */
+        post: operations['chat___rooms___show'];
+    };
+    '/chat/rooms/update': {
+        /**
+         * chat/rooms/update
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:chat*
+         */
+        post: operations['chat___rooms___update'];
     };
     '/clips/add-note': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * clips/add-note
          * @description No description provided.
@@ -3563,21 +1580,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['clips___add-note'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/clips/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * clips/create
          * @description No description provided.
@@ -3585,21 +1589,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['clips___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/clips/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * clips/delete
          * @description No description provided.
@@ -3607,21 +1598,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['clips___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/clips/favorite': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * clips/favorite
          * @description No description provided.
@@ -3629,21 +1607,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:clip-favorite*
          */
         post: operations['clips___favorite'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/clips/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * clips/list
          * @description No description provided.
@@ -3651,21 +1616,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['clips___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/clips/my-favorites': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * clips/my-favorites
          * @description No description provided.
@@ -3673,21 +1625,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:clip-favorite*
          */
         post: operations['clips___my-favorites'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/clips/notes': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * clips/notes
          * @description No description provided.
@@ -3695,21 +1634,8 @@ export type paths = {
          *     **Credential required**: *No* / **Permission**: *read:account*
          */
         post: operations['clips___notes'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/clips/remove-note': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * clips/remove-note
          * @description No description provided.
@@ -3717,21 +1643,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['clips___remove-note'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/clips/show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * clips/show
          * @description No description provided.
@@ -3739,21 +1652,8 @@ export type paths = {
          *     **Credential required**: *No* / **Permission**: *read:account*
          */
         post: operations['clips___show'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/clips/unfavorite': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * clips/unfavorite
          * @description No description provided.
@@ -3761,21 +1661,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:clip-favorite*
          */
         post: operations['clips___unfavorite'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/clips/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * clips/update
          * @description No description provided.
@@ -3783,21 +1670,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['clips___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/drive': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * drive
          * @description No description provided.
@@ -3805,21 +1679,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:drive*
          */
         post: operations['drive'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/drive/files': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * drive/files
          * @description No description provided.
@@ -3827,21 +1688,17 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:drive*
          */
         post: operations['drive___files'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    };
+    '/drive/files/attached-chat-messages': {
+        /**
+         * drive/files/attached-chat-messages
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:drive*
+         */
+        post: operations['drive___files___attached-chat-messages'];
     };
     '/drive/files/attached-notes': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * drive/files/attached-notes
          * @description Find the notes to which the given file is attached.
@@ -3849,21 +1706,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:drive*
          */
         post: operations['drive___files___attached-notes'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/drive/files/check-existence': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * drive/files/check-existence
          * @description Check if a given file exists.
@@ -3871,21 +1715,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:drive*
          */
         post: operations['drive___files___check-existence'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/drive/files/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * drive/files/create
          * @description Upload a new drive file.
@@ -3893,21 +1724,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:drive*
          */
         post: operations['drive___files___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/drive/files/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * drive/files/delete
          * @description Delete an existing drive file.
@@ -3915,21 +1733,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:drive*
          */
         post: operations['drive___files___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/drive/files/find': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * drive/files/find
          * @description Search for a drive file by the given parameters.
@@ -3937,21 +1742,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:drive*
          */
         post: operations['drive___files___find'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/drive/files/find-by-hash': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * drive/files/find-by-hash
          * @description Search for a drive file by a hash of the contents.
@@ -3959,21 +1751,17 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:drive*
          */
         post: operations['drive___files___find-by-hash'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    };
+    '/drive/files/move-bulk': {
+        /**
+         * drive/files/move-bulk
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:drive*
+         */
+        post: operations['drive___files___move-bulk'];
     };
     '/drive/files/show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * drive/files/show
          * @description Show the properties of a drive file.
@@ -3981,21 +1769,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:drive*
          */
         post: operations['drive___files___show'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/drive/files/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * drive/files/update
          * @description Update the properties of a drive file.
@@ -4003,21 +1778,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:drive*
          */
         post: operations['drive___files___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/drive/files/upload-from-url': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * drive/files/upload-from-url
          * @description Request the server to download a new drive file from the specified URL.
@@ -4025,21 +1787,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:drive*
          */
         post: operations['drive___files___upload-from-url'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/drive/folders': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * drive/folders
          * @description No description provided.
@@ -4047,21 +1796,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:drive*
          */
         post: operations['drive___folders'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/drive/folders/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * drive/folders/create
          * @description No description provided.
@@ -4069,21 +1805,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:drive*
          */
         post: operations['drive___folders___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/drive/folders/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * drive/folders/delete
          * @description No description provided.
@@ -4091,21 +1814,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:drive*
          */
         post: operations['drive___folders___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/drive/folders/find': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * drive/folders/find
          * @description No description provided.
@@ -4113,21 +1823,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:drive*
          */
         post: operations['drive___folders___find'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/drive/folders/show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * drive/folders/show
          * @description No description provided.
@@ -4135,21 +1832,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:drive*
          */
         post: operations['drive___folders___show'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/drive/folders/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * drive/folders/update
          * @description No description provided.
@@ -4157,21 +1841,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:drive*
          */
         post: operations['drive___folders___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/drive/stream': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * drive/stream
          * @description No description provided.
@@ -4179,21 +1850,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:drive*
          */
         post: operations['drive___stream'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/email-address/available': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * email-address/available
          * @description No description provided.
@@ -4201,27 +1859,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['email-address___available'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/emoji': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * emoji
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___emoji'];
-        put?: never;
         /**
          * emoji
          * @description No description provided.
@@ -4229,27 +1868,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['emoji'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/emojis': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * emojis
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___emojis'];
-        put?: never;
         /**
          * emojis
          * @description No description provided.
@@ -4257,21 +1877,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['emojis'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/endpoint': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * endpoint
          * @description No description provided.
@@ -4279,21 +1886,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['endpoint'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/endpoints': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * endpoints
          * @description No description provided.
@@ -4301,21 +1895,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['endpoints'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/export-custom-emojis': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * export-custom-emojis
          * @description No description provided.
@@ -4324,21 +1905,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['export-custom-emojis'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/federation/followers': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * federation/followers
          * @description No description provided.
@@ -4346,21 +1914,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['federation___followers'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/federation/following': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * federation/following
          * @description No description provided.
@@ -4368,27 +1923,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['federation___following'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/federation/instances': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * federation/instances
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___federation___instances'];
-        put?: never;
         /**
          * federation/instances
          * @description No description provided.
@@ -4396,21 +1932,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['federation___instances'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/federation/show-instance': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * federation/show-instance
          * @description No description provided.
@@ -4418,27 +1941,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['federation___show-instance'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/federation/stats': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * federation/stats
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___federation___stats'];
-        put?: never;
         /**
          * federation/stats
          * @description No description provided.
@@ -4446,21 +1950,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['federation___stats'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/federation/update-remote-user': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * federation/update-remote-user
          * @description No description provided.
@@ -4468,21 +1959,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['federation___update-remote-user'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/federation/users': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * federation/users
          * @description No description provided.
@@ -4490,21 +1968,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['federation___users'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/fetch-external-resources': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * fetch-external-resources
          * @description No description provided.
@@ -4513,27 +1978,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['fetch-external-resources'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/fetch-rss': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * fetch-rss
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___fetch-rss'];
-        put?: never;
         /**
          * fetch-rss
          * @description No description provided.
@@ -4541,21 +1987,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['fetch-rss'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/flash/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * flash/create
          * @description No description provided.
@@ -4563,21 +1996,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:flash*
          */
         post: operations['flash___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/flash/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * flash/delete
          * @description No description provided.
@@ -4585,21 +2005,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:flash*
          */
         post: operations['flash___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/flash/featured': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * flash/featured
          * @description No description provided.
@@ -4607,21 +2014,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['flash___featured'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/flash/like': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * flash/like
          * @description No description provided.
@@ -4629,21 +2023,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:flash-likes*
          */
         post: operations['flash___like'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/flash/my': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * flash/my
          * @description No description provided.
@@ -4651,21 +2032,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:flash*
          */
         post: operations['flash___my'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/flash/my-likes': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * flash/my-likes
          * @description No description provided.
@@ -4673,21 +2041,17 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:flash-likes*
          */
         post: operations['flash___my-likes'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    };
+    '/flash/search': {
+        /**
+         * flash/search
+         * @description No description provided.
+         *
+         *     **Credential required**: *No*
+         */
+        post: operations['flash___search'];
     };
     '/flash/show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * flash/show
          * @description No description provided.
@@ -4695,21 +2059,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['flash___show'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/flash/unlike': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * flash/unlike
          * @description No description provided.
@@ -4717,21 +2068,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:flash-likes*
          */
         post: operations['flash___unlike'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/flash/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * flash/update
          * @description No description provided.
@@ -4739,21 +2077,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:flash*
          */
         post: operations['flash___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/following/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * following/create
          * @description No description provided.
@@ -4761,21 +2086,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:following*
          */
         post: operations['following___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/following/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * following/delete
          * @description No description provided.
@@ -4783,21 +2095,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:following*
          */
         post: operations['following___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/following/invalidate': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * following/invalidate
          * @description No description provided.
@@ -4805,21 +2104,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:following*
          */
         post: operations['following___invalidate'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/following/requests/accept': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * following/requests/accept
          * @description No description provided.
@@ -4827,21 +2113,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:following*
          */
         post: operations['following___requests___accept'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/following/requests/cancel': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * following/requests/cancel
          * @description No description provided.
@@ -4849,21 +2122,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:following*
          */
         post: operations['following___requests___cancel'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/following/requests/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * following/requests/list
          * @description No description provided.
@@ -4871,21 +2131,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:following*
          */
         post: operations['following___requests___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/following/requests/reject': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * following/requests/reject
          * @description No description provided.
@@ -4893,21 +2140,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:following*
          */
         post: operations['following___requests___reject'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/following/requests/sent': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * following/requests/sent
          * @description No description provided.
@@ -4915,21 +2149,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:following*
          */
         post: operations['following___requests___sent'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/following/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * following/update
          * @description No description provided.
@@ -4937,21 +2158,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:following*
          */
         post: operations['following___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/following/update-all': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * following/update-all
          * @description No description provided.
@@ -4959,21 +2167,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:following*
          */
         post: operations['following___update-all'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/gallery/featured': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * gallery/featured
          * @description No description provided.
@@ -4981,21 +2176,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['gallery___featured'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/gallery/popular': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * gallery/popular
          * @description No description provided.
@@ -5003,21 +2185,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['gallery___popular'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/gallery/posts': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * gallery/posts
          * @description No description provided.
@@ -5025,21 +2194,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['gallery___posts'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/gallery/posts/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * gallery/posts/create
          * @description No description provided.
@@ -5047,21 +2203,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:gallery*
          */
         post: operations['gallery___posts___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/gallery/posts/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * gallery/posts/delete
          * @description No description provided.
@@ -5069,21 +2212,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:gallery*
          */
         post: operations['gallery___posts___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/gallery/posts/like': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * gallery/posts/like
          * @description No description provided.
@@ -5091,21 +2221,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:gallery-likes*
          */
         post: operations['gallery___posts___like'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/gallery/posts/show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * gallery/posts/show
          * @description No description provided.
@@ -5113,21 +2230,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['gallery___posts___show'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/gallery/posts/unlike': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * gallery/posts/unlike
          * @description No description provided.
@@ -5135,21 +2239,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:gallery-likes*
          */
         post: operations['gallery___posts___unlike'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/gallery/posts/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * gallery/posts/update
          * @description No description provided.
@@ -5157,21 +2248,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:gallery*
          */
         post: operations['gallery___posts___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/get-avatar-decorations': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * get-avatar-decorations
          * @description No description provided.
@@ -5179,27 +2257,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['get-avatar-decorations'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/get-online-users-count': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * get-online-users-count
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___get-online-users-count'];
-        put?: never;
         /**
          * get-online-users-count
          * @description No description provided.
@@ -5207,21 +2266,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['get-online-users-count'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/hashtags/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * hashtags/list
          * @description No description provided.
@@ -5229,21 +2275,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['hashtags___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/hashtags/search': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * hashtags/search
          * @description No description provided.
@@ -5251,21 +2284,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['hashtags___search'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/hashtags/show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * hashtags/show
          * @description No description provided.
@@ -5273,27 +2293,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['hashtags___show'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/hashtags/trend': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * hashtags/trend
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___hashtags___trend'];
-        put?: never;
         /**
          * hashtags/trend
          * @description No description provided.
@@ -5301,21 +2302,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['hashtags___trend'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/hashtags/users': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * hashtags/users
          * @description No description provided.
@@ -5323,21 +2311,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['hashtags___users'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i
          * @description No description provided.
@@ -5345,21 +2320,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['i'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/2fa/done': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/2fa/done
          * @description No description provided.
@@ -5368,21 +2330,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___2fa___done'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/2fa/key-done': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/2fa/key-done
          * @description No description provided.
@@ -5391,21 +2340,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___2fa___key-done'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/2fa/password-less': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/2fa/password-less
          * @description No description provided.
@@ -5414,21 +2350,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___2fa___password-less'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/2fa/register': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/2fa/register
          * @description No description provided.
@@ -5437,21 +2360,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___2fa___register'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/2fa/register-key': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/2fa/register-key
          * @description No description provided.
@@ -5460,21 +2370,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___2fa___register-key'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/2fa/remove-key': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/2fa/remove-key
          * @description No description provided.
@@ -5483,21 +2380,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___2fa___remove-key'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/2fa/unregister': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/2fa/unregister
          * @description No description provided.
@@ -5506,21 +2390,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___2fa___unregister'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/2fa/update-key': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/2fa/update-key
          * @description No description provided.
@@ -5529,21 +2400,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___2fa___update-key'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/apps': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/apps
          * @description No description provided.
@@ -5552,21 +2410,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___apps'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/authorized-apps': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/authorized-apps
          * @description No description provided.
@@ -5575,21 +2420,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___authorized-apps'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/change-password': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/change-password
          * @description No description provided.
@@ -5598,21 +2430,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___change-password'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/claim-achievement': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/claim-achievement
          * @description No description provided.
@@ -5620,21 +2439,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['i___claim-achievement'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/delete-account': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/delete-account
          * @description No description provided.
@@ -5643,21 +2449,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___delete-account'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/export-antennas': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/export-antennas
          * @description No description provided.
@@ -5666,21 +2459,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___export-antennas'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/export-blocking': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/export-blocking
          * @description No description provided.
@@ -5689,21 +2469,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___export-blocking'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/export-clips': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/export-clips
          * @description No description provided.
@@ -5712,21 +2479,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___export-clips'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/export-favorites': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/export-favorites
          * @description No description provided.
@@ -5735,21 +2489,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___export-favorites'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/export-following': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/export-following
          * @description No description provided.
@@ -5758,21 +2499,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___export-following'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/export-mute': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/export-mute
          * @description No description provided.
@@ -5781,21 +2509,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___export-mute'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/export-notes': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/export-notes
          * @description No description provided.
@@ -5804,21 +2519,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___export-notes'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/export-user-lists': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/export-user-lists
          * @description No description provided.
@@ -5827,21 +2529,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___export-user-lists'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/favorites': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/favorites
          * @description No description provided.
@@ -5849,21 +2538,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:favorites*
          */
         post: operations['i___favorites'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/gallery/likes': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/gallery/likes
          * @description No description provided.
@@ -5871,21 +2547,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:gallery-likes*
          */
         post: operations['i___gallery___likes'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/gallery/posts': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/gallery/posts
          * @description No description provided.
@@ -5893,21 +2556,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:gallery*
          */
         post: operations['i___gallery___posts'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/import-antennas': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/import-antennas
          * @description No description provided.
@@ -5916,21 +2566,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___import-antennas'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/import-blocking': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/import-blocking
          * @description No description provided.
@@ -5939,21 +2576,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___import-blocking'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/import-following': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/import-following
          * @description No description provided.
@@ -5962,21 +2586,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___import-following'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/import-muting': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/import-muting
          * @description No description provided.
@@ -5985,21 +2596,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___import-muting'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/import-user-lists': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/import-user-lists
          * @description No description provided.
@@ -6008,21 +2606,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___import-user-lists'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/move': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/move
          * @description No description provided.
@@ -6031,21 +2616,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___move'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/notifications': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/notifications
          * @description No description provided.
@@ -6053,21 +2625,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:notifications*
          */
         post: operations['i___notifications'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/notifications-grouped': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/notifications-grouped
          * @description No description provided.
@@ -6075,21 +2634,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:notifications*
          */
         post: operations['i___notifications-grouped'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/page-likes': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/page-likes
          * @description No description provided.
@@ -6097,21 +2643,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:page-likes*
          */
         post: operations['i___page-likes'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/pages': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/pages
          * @description No description provided.
@@ -6119,21 +2652,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:pages*
          */
         post: operations['i___pages'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/pin': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/pin
          * @description No description provided.
@@ -6141,21 +2661,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['i___pin'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/read-announcement': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/read-announcement
          * @description No description provided.
@@ -6163,21 +2670,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['i___read-announcement'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/regenerate-token': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/regenerate-token
          * @description No description provided.
@@ -6186,21 +2680,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___regenerate-token'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/registry/get': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/registry/get
          * @description No description provided.
@@ -6208,21 +2689,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['i___registry___get'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/registry/get-all': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/registry/get-all
          * @description No description provided.
@@ -6230,21 +2698,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['i___registry___get-all'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/registry/get-detail': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/registry/get-detail
          * @description No description provided.
@@ -6252,21 +2707,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['i___registry___get-detail'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/registry/keys': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/registry/keys
          * @description No description provided.
@@ -6274,21 +2716,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['i___registry___keys'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/registry/keys-with-type': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/registry/keys-with-type
          * @description No description provided.
@@ -6296,21 +2725,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['i___registry___keys-with-type'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/registry/remove': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/registry/remove
          * @description No description provided.
@@ -6318,21 +2734,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['i___registry___remove'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/registry/scopes-with-domain': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/registry/scopes-with-domain
          * @description No description provided.
@@ -6341,21 +2744,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___registry___scopes-with-domain'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/registry/set': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/registry/set
          * @description No description provided.
@@ -6363,21 +2753,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['i___registry___set'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/revoke-token': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/revoke-token
          * @description No description provided.
@@ -6386,21 +2763,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___revoke-token'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/signin-history': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/signin-history
          * @description No description provided.
@@ -6409,21 +2773,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___signin-history'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/unpin': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/unpin
          * @description No description provided.
@@ -6431,21 +2782,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['i___unpin'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/update
          * @description No description provided.
@@ -6453,21 +2791,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['i___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/update-email': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/update-email
          * @description No description provided.
@@ -6476,21 +2801,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['i___update-email'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/webhooks/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/webhooks/create
          * @description No description provided.
@@ -6498,21 +2810,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['i___webhooks___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/webhooks/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/webhooks/delete
          * @description No description provided.
@@ -6520,21 +2819,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['i___webhooks___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/webhooks/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/webhooks/list
          * @description No description provided.
@@ -6542,21 +2828,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['i___webhooks___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/webhooks/show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/webhooks/show
          * @description No description provided.
@@ -6564,21 +2837,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['i___webhooks___show'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/webhooks/test': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/webhooks/test
          * @description No description provided.
@@ -6587,21 +2847,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['i___webhooks___test'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/i/webhooks/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * i/webhooks/update
          * @description No description provided.
@@ -6609,21 +2856,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['i___webhooks___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/invite/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * invite/create
          * @description No description provided.
@@ -6631,21 +2865,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:invite-codes*
          */
         post: operations['invite___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/invite/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * invite/delete
          * @description No description provided.
@@ -6653,21 +2874,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:invite-codes*
          */
         post: operations['invite___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/invite/limit': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * invite/limit
          * @description No description provided.
@@ -6675,21 +2883,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:invite-codes*
          */
         post: operations['invite___limit'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/invite/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * invite/list
          * @description No description provided.
@@ -6697,27 +2892,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:invite-codes*
          */
         post: operations['invite___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/meta': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * meta
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___meta'];
-        put?: never;
         /**
          * meta
          * @description No description provided.
@@ -6725,21 +2901,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['meta'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/miauth/gen-token': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * miauth/gen-token
          * @description No description provided.
@@ -6748,21 +2911,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['miauth___gen-token'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/mute/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * mute/create
          * @description No description provided.
@@ -6770,21 +2920,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:mutes*
          */
         post: operations['mute___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/mute/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * mute/delete
          * @description No description provided.
@@ -6792,21 +2929,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:mutes*
          */
         post: operations['mute___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/mute/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * mute/list
          * @description No description provided.
@@ -6814,21 +2938,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:mutes*
          */
         post: operations['mute___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/my/apps': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * my/apps
          * @description No description provided.
@@ -6836,21 +2947,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['my___apps'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes
          * @description No description provided.
@@ -6858,21 +2956,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['notes'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/children': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/children
          * @description No description provided.
@@ -6880,21 +2965,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['notes___children'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/clips': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/clips
          * @description No description provided.
@@ -6902,21 +2974,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['notes___clips'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/conversation': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/conversation
          * @description No description provided.
@@ -6924,21 +2983,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['notes___conversation'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/create
          * @description No description provided.
@@ -6946,21 +2992,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:notes*
          */
         post: operations['notes___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/delete
          * @description No description provided.
@@ -6968,21 +3001,53 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:notes*
          */
         post: operations['notes___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    };
+    '/notes/drafts/count': {
+        /**
+         * notes/drafts/count
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:account*
+         */
+        post: operations['notes___drafts___count'];
+    };
+    '/notes/drafts/create': {
+        /**
+         * notes/drafts/create
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:account*
+         */
+        post: operations['notes___drafts___create'];
+    };
+    '/notes/drafts/delete': {
+        /**
+         * notes/drafts/delete
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:account*
+         */
+        post: operations['notes___drafts___delete'];
+    };
+    '/notes/drafts/list': {
+        /**
+         * notes/drafts/list
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:account*
+         */
+        post: operations['notes___drafts___list'];
+    };
+    '/notes/drafts/update': {
+        /**
+         * notes/drafts/update
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:account*
+         */
+        post: operations['notes___drafts___update'];
     };
     '/notes/favorites/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/favorites/create
          * @description No description provided.
@@ -6990,21 +3055,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:favorites*
          */
         post: operations['notes___favorites___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/favorites/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/favorites/delete
          * @description No description provided.
@@ -7012,27 +3064,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:favorites*
          */
         post: operations['notes___favorites___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/featured': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * notes/featured
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___notes___featured'];
-        put?: never;
         /**
          * notes/featured
          * @description No description provided.
@@ -7040,21 +3073,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['notes___featured'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/global-timeline': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/global-timeline
          * @description No description provided.
@@ -7062,21 +3082,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['notes___global-timeline'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/hybrid-timeline': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/hybrid-timeline
          * @description No description provided.
@@ -7084,21 +3091,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['notes___hybrid-timeline'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/local-timeline': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/local-timeline
          * @description No description provided.
@@ -7106,21 +3100,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['notes___local-timeline'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/mentions': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/mentions
          * @description No description provided.
@@ -7128,21 +3109,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['notes___mentions'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/polls/recommendation': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/polls/recommendation
          * @description No description provided.
@@ -7150,21 +3118,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['notes___polls___recommendation'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/polls/vote': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/polls/vote
          * @description No description provided.
@@ -7172,27 +3127,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:votes*
          */
         post: operations['notes___polls___vote'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/reactions': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * notes/reactions
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___notes___reactions'];
-        put?: never;
         /**
          * notes/reactions
          * @description No description provided.
@@ -7200,21 +3136,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['notes___reactions'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/reactions/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/reactions/create
          * @description No description provided.
@@ -7222,21 +3145,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:reactions*
          */
         post: operations['notes___reactions___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/reactions/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/reactions/delete
          * @description No description provided.
@@ -7244,21 +3154,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:reactions*
          */
         post: operations['notes___reactions___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/renotes': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/renotes
          * @description No description provided.
@@ -7266,21 +3163,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['notes___renotes'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/replies': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/replies
          * @description No description provided.
@@ -7288,65 +3172,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['notes___replies'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/notes/scheduled/cancel': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * notes/scheduled/cancel
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *write:notes*
-         */
-        post: operations['notes___scheduled___cancel'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/notes/scheduled/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * notes/scheduled/list
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *write:notes*
-         */
-        post: operations['notes___scheduled___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/search': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/search
          * @description No description provided.
@@ -7354,21 +3181,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['notes___search'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/search-by-tag': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/search-by-tag
          * @description No description provided.
@@ -7376,21 +3190,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['notes___search-by-tag'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/show
          * @description No description provided.
@@ -7398,21 +3199,17 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['notes___show'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    };
+    '/notes/show-partial-bulk': {
+        /**
+         * notes/show-partial-bulk
+         * @description No description provided.
+         *
+         *     **Credential required**: *No*
+         */
+        post: operations['notes___show-partial-bulk'];
     };
     '/notes/state': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/state
          * @description No description provided.
@@ -7420,21 +3217,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['notes___state'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/thread-muting/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/thread-muting/create
          * @description No description provided.
@@ -7442,21 +3226,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['notes___thread-muting___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/thread-muting/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/thread-muting/delete
          * @description No description provided.
@@ -7464,21 +3235,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['notes___thread-muting___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/timeline': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/timeline
          * @description No description provided.
@@ -7486,21 +3244,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['notes___timeline'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/translate': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/translate
          * @description No description provided.
@@ -7508,21 +3253,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['notes___translate'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/unrenote': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/unrenote
          * @description No description provided.
@@ -7530,21 +3262,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:notes*
          */
         post: operations['notes___unrenote'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notes/user-list-timeline': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notes/user-list-timeline
          * @description No description provided.
@@ -7552,21 +3271,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['notes___user-list-timeline'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notifications/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notifications/create
          * @description No description provided.
@@ -7574,21 +3280,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:notifications*
          */
         post: operations['notifications___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notifications/flush': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notifications/flush
          * @description No description provided.
@@ -7596,21 +3289,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:notifications*
          */
         post: operations['notifications___flush'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notifications/mark-all-as-read': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notifications/mark-all-as-read
          * @description No description provided.
@@ -7618,21 +3298,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:notifications*
          */
         post: operations['notifications___mark-all-as-read'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/notifications/test-notification': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * notifications/test-notification
          * @description No description provided.
@@ -7640,21 +3307,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:notifications*
          */
         post: operations['notifications___test-notification'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/page-push': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * page-push
          * @description No description provided.
@@ -7663,21 +3317,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['page-push'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/pages/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * pages/create
          * @description No description provided.
@@ -7685,21 +3326,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:pages*
          */
         post: operations['pages___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/pages/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * pages/delete
          * @description No description provided.
@@ -7707,21 +3335,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:pages*
          */
         post: operations['pages___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/pages/featured': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * pages/featured
          * @description No description provided.
@@ -7729,21 +3344,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['pages___featured'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/pages/like': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * pages/like
          * @description No description provided.
@@ -7751,21 +3353,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:page-likes*
          */
         post: operations['pages___like'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/pages/show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * pages/show
          * @description No description provided.
@@ -7773,21 +3362,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['pages___show'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/pages/unlike': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * pages/unlike
          * @description No description provided.
@@ -7795,21 +3371,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:page-likes*
          */
         post: operations['pages___unlike'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/pages/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * pages/update
          * @description No description provided.
@@ -7817,21 +3380,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:pages*
          */
         post: operations['pages___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/ping': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * ping
          * @description No description provided.
@@ -7839,21 +3389,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['ping'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/pinned-users': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * pinned-users
          * @description No description provided.
@@ -7861,21 +3398,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['pinned-users'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/promo/read': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * promo/read
          * @description No description provided.
@@ -7883,21 +3407,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['promo___read'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/renote-mute/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * renote-mute/create
          * @description No description provided.
@@ -7905,21 +3416,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:mutes*
          */
         post: operations['renote-mute___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/renote-mute/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * renote-mute/delete
          * @description No description provided.
@@ -7927,21 +3425,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:mutes*
          */
         post: operations['renote-mute___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/renote-mute/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * renote-mute/list
          * @description No description provided.
@@ -7949,21 +3434,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:mutes*
          */
         post: operations['renote-mute___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/request-reset-password': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * request-reset-password
          * @description Request a users password to be reset.
@@ -7971,21 +3443,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['request-reset-password'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/reset-db': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * reset-db
          * @description Only available when running with <code>NODE_ENV=testing</code>. Reset the database and flush Redis.
@@ -7993,21 +3452,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['reset-db'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/reset-password': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * reset-password
          * @description Complete the password reset that was previously requested.
@@ -8015,27 +3461,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['reset-password'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/retention': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * retention
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___retention'];
-        put?: never;
         /**
          * retention
          * @description No description provided.
@@ -8043,43 +3470,17 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['retention'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/reversi/cancel-match': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * reversi/cancel-match
          * @description No description provided.
          *
-         *     **Credential required**: *Yes* / **Permission**: *read:account*
+         *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['reversi___cancel-match'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/reversi/games': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * reversi/games
          * @description No description provided.
@@ -8087,21 +3488,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['reversi___games'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/reversi/invitations': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * reversi/invitations
          * @description No description provided.
@@ -8109,43 +3497,17 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['reversi___invitations'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/reversi/match': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * reversi/match
          * @description No description provided.
          *
-         *     **Credential required**: *Yes* / **Permission**: *read:account*
+         *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['reversi___match'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/reversi/show-game': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * reversi/show-game
          * @description No description provided.
@@ -8153,43 +3515,17 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['reversi___show-game'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/reversi/surrender': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * reversi/surrender
          * @description No description provided.
          *
-         *     **Credential required**: *Yes* / **Permission**: *read:account*
+         *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['reversi___surrender'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/reversi/verify': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * reversi/verify
          * @description No description provided.
@@ -8197,21 +3533,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['reversi___verify'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/roles/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * roles/list
          * @description No description provided.
@@ -8219,21 +3542,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['roles___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/roles/notes': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * roles/notes
          * @description No description provided.
@@ -8241,21 +3551,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['roles___notes'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/roles/show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * roles/show
          * @description No description provided.
@@ -8263,21 +3560,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['roles___show'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/roles/users': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * roles/users
          * @description No description provided.
@@ -8285,27 +3569,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['roles___users'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/server-info': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * server-info
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___server-info'];
-        put?: never;
         /**
          * server-info
          * @description No description provided.
@@ -8313,27 +3578,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['server-info'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/stats': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * stats
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___stats'];
-        put?: never;
         /**
          * stats
          * @description No description provided.
@@ -8341,21 +3587,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['stats'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/sw/register': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * sw/register
          * @description Register to receive push notifications.
@@ -8364,21 +3597,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['sw___register'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/sw/show-registration': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * sw/show-registration
          * @description Check push notification registration exists.
@@ -8387,21 +3607,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['sw___show-registration'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/sw/unregister': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * sw/unregister
          * @description Unregister from receiving push notifications.
@@ -8409,21 +3616,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['sw___unregister'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/sw/update-registration': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * sw/update-registration
          * @description Update push notification registration.
@@ -8432,21 +3626,8 @@ export type paths = {
          *     **Credential required**: *Yes*
          */
         post: operations['sw___update-registration'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/test': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * test
          * @description Endpoint for testing input validation.
@@ -8454,21 +3635,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['test'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/username/available': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * username/available
          * @description No description provided.
@@ -8476,21 +3644,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['username___available'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users
          * @description No description provided.
@@ -8498,21 +3653,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['users'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/achievements': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/achievements
          * @description No description provided.
@@ -8520,21 +3662,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['users___achievements'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/clips': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/clips
          * @description Show all clips this user owns.
@@ -8542,27 +3671,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['users___clips'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/featured-notes': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * users/featured-notes
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___users___featured-notes'];
-        put?: never;
         /**
          * users/featured-notes
          * @description No description provided.
@@ -8570,21 +3680,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['users___featured-notes'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/flashs': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/flashs
          * @description Show all flashs this user created.
@@ -8592,21 +3689,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['users___flashs'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/followers': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/followers
          * @description Show everyone that follows this user.
@@ -8614,21 +3698,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['users___followers'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/following': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/following
          * @description Show everyone that this user is following.
@@ -8636,21 +3707,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['users___following'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/gallery/posts': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/gallery/posts
          * @description Show all gallery posts by the given user.
@@ -8658,43 +3716,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['users___gallery___posts'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/users/get-following-birthday-users': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * users/get-following-birthday-users
-         * @description Find users who have a birthday on the specified range.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *read:account*
-         */
-        post: operations['users___get-following-birthday-users'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/get-frequently-replied-users': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/get-frequently-replied-users
          * @description Get a list of other users that the specified user frequently replies to.
@@ -8702,71 +3725,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['users___get-frequently-replied-users'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/users/get-security-info': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * users/get-security-info
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        post: operations['users___get-security-info'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/users/get-skeb-status': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * users/get-skeb-status
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___users___get-skeb-status'];
-        put?: never;
-        /**
-         * users/get-skeb-status
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        post: operations['users___get-skeb-status'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/lists/create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/lists/create
          * @description Create a new list of users.
@@ -8774,21 +3734,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['users___lists___create'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/lists/create-from-public': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/lists/create-from-public
          * @description No description provided.
@@ -8796,21 +3743,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['users___lists___create-from-public'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/lists/delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/lists/delete
          * @description Delete an existing list of users.
@@ -8818,21 +3752,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['users___lists___delete'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/lists/favorite': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/lists/favorite
          * @description No description provided.
@@ -8840,21 +3761,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['users___lists___favorite'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/lists/get-memberships': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/lists/get-memberships
          * @description No description provided.
@@ -8862,21 +3770,8 @@ export type paths = {
          *     **Credential required**: *No* / **Permission**: *read:account*
          */
         post: operations['users___lists___get-memberships'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/lists/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/lists/list
          * @description Show all lists that the authenticated user has created.
@@ -8884,21 +3779,8 @@ export type paths = {
          *     **Credential required**: *No* / **Permission**: *read:account*
          */
         post: operations['users___lists___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/lists/pull': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/lists/pull
          * @description Remove a user from a list.
@@ -8906,21 +3788,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['users___lists___pull'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/lists/push': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/lists/push
          * @description Add a user to an existing list.
@@ -8928,21 +3797,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['users___lists___push'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/lists/show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/lists/show
          * @description Show the properties of a list.
@@ -8950,21 +3806,8 @@ export type paths = {
          *     **Credential required**: *No* / **Permission**: *read:account*
          */
         post: operations['users___lists___show'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/lists/unfavorite': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/lists/unfavorite
          * @description No description provided.
@@ -8972,21 +3815,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['users___lists___unfavorite'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/lists/update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/lists/update
          * @description Update the properties of a list.
@@ -8994,21 +3824,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['users___lists___update'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/lists/update-membership': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/lists/update-membership
          * @description No description provided.
@@ -9016,21 +3833,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['users___lists___update-membership'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/notes': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/notes
          * @description No description provided.
@@ -9038,21 +3842,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['users___notes'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/pages': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/pages
          * @description Show all pages this user created.
@@ -9060,21 +3851,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['users___pages'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/reactions': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/reactions
          * @description Show all reactions this user made.
@@ -9082,21 +3860,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['users___reactions'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/recommendation': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/recommendation
          * @description Show users that the authenticated user might be interested to follow.
@@ -9104,21 +3869,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['users___recommendation'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/relation': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/relation
          * @description Show the different kinds of relations between the authenticated user and the specified user(s).
@@ -9126,21 +3878,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
         post: operations['users___relation'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/report-abuse': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/report-abuse
          * @description File a report.
@@ -9148,21 +3887,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:report-abuse*
          */
         post: operations['users___report-abuse'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/search': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/search
          * @description Search for users.
@@ -9170,21 +3896,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['users___search'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/search-by-username-and-host': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/search-by-username-and-host
          * @description Search for a user by username and/or host.
@@ -9192,21 +3905,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['users___search-by-username-and-host'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/show
          * @description Show the properties of a user.
@@ -9214,43 +3914,8 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['users___show'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/users/stats': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * users/stats
-         * @description Show statistics about a user.
-         *
-         *     **Credential required**: *No*
-         */
-        post: operations['users___stats'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/users/update-memo': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * users/update-memo
          * @description No description provided.
@@ -9258,21 +3923,8 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:account*
          */
         post: operations['users___update-memo'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/v2/admin/emoji/list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /**
          * v2/admin/emoji/list
          * @description No description provided.
@@ -9280,11 +3932,15 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:admin:emoji*
          */
         post: operations['v2___admin___emoji___list'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    };
+    '/verify-email': {
+        /**
+         * verify-email
+         * @description No description provided.
+         *
+         *     **Credential required**: *No*
+         */
+        post: operations['verify-email'];
     };
 };
 export type webhooks = Record<string, never>;
@@ -9320,7 +3976,7 @@ export type components = {
              */
             host: string | null;
             /** Format: url */
-            avatarUrl: string | null;
+            avatarUrl: string;
             avatarBlurhash: string | null;
             avatarDecorations: {
                 /** Format: id */
@@ -9354,7 +4010,6 @@ export type components = {
                 name: string;
                 iconUrl: string | null;
                 displayOrder: number;
-                behavior?: string;
             }[];
         };
         UserDetailedNotMeOnly: {
@@ -9376,7 +4031,6 @@ export type components = {
             bannerBlurhash: string | null;
             isLocked: boolean;
             isSilenced: boolean;
-            isLimited: boolean;
             /** @example false */
             isSuspended: boolean;
             /** @example Hi masters, I am Ai! */
@@ -9397,7 +4051,7 @@ export type components = {
             pinnedNoteIds: string[];
             pinnedNotes: components['schemas']['Note'][];
             pinnedPageId: string | null;
-            pinnedPage: ((components['schemas']['Page'] | null) | null) | components['schemas']['Page'] | null;
+            pinnedPage: components['schemas']['Page'] | null;
             publicReactions: boolean;
             /** @enum {string} */
             followingVisibility: 'public' | 'followers' | 'private';
@@ -9413,19 +4067,6 @@ export type components = {
             twoFactorEnabled?: boolean;
             usePasswordLessLogin?: boolean;
             securityKeys?: boolean;
-            mutualLinkSections: {
-                name: string | null;
-                mutualLinks: {
-                    /** Format: misskey:id */
-                    id: string;
-                    /** Format: url */
-                    url: string;
-                    /** Format: misskey:id */
-                    fileId: string;
-                    description: string | null;
-                    imgSrc: string;
-                }[];
-            }[];
             isFollowing?: boolean;
             isFollowed?: boolean;
             hasPendingFollowRequestFromYou?: boolean;
@@ -9444,8 +4085,8 @@ export type components = {
             /** Format: id */
             bannerId: string | null;
             followedMessage: string | null;
-            isModerator: boolean | null;
-            isAdmin: boolean | null;
+            isModerator: boolean;
+            isAdmin: boolean;
             injectFeaturedNote: boolean;
             receiveAnnouncementEmail: boolean;
             alwaysMarkNsfw: boolean;
@@ -9470,7 +4111,8 @@ export type components = {
             hasPendingReceivedFollowRequest: boolean;
             unreadNotificationsCount: number;
             mutedWords: string[][];
-            mutedInstances: string[] | null;
+            hardMutedWords: string[][];
+            mutedInstances: string[];
             notificationRecieveConfig: {
                 note?: {
                     /** @enum {string} */
@@ -9544,6 +4186,24 @@ export type components = {
                     /** Format: misskey:id */
                     userListId: string;
                 };
+                scheduledNotePosted?: {
+                    /** @enum {string} */
+                    type: 'all' | 'following' | 'follower' | 'mutualFollow' | 'followingOrFollower' | 'never';
+                } | {
+                    /** @enum {string} */
+                    type: 'list';
+                    /** Format: misskey:id */
+                    userListId: string;
+                };
+                scheduledNotePostFailed?: {
+                    /** @enum {string} */
+                    type: 'all' | 'following' | 'follower' | 'mutualFollow' | 'followingOrFollower' | 'never';
+                } | {
+                    /** @enum {string} */
+                    type: 'list';
+                    /** Format: misskey:id */
+                    userListId: string;
+                };
                 receiveFollowRequest?: {
                     /** @enum {string} */
                     type: 'all' | 'following' | 'follower' | 'mutualFollow' | 'followingOrFollower' | 'never';
@@ -9609,10 +4269,7 @@ export type components = {
                 };
             };
             emailNotificationTypes: string[];
-            achievements: {
-                name: string;
-                unlockedAt: number;
-            }[];
+            achievements: components['schemas']['Achievement'][];
             loggedInDays: number;
             policies: components['schemas']['RolePolicies'];
             /** @default false */
@@ -9650,37 +4307,12 @@ export type components = {
             userIds?: string[];
             isPublic: boolean;
         };
-        UserListMembership: {
-            /**
-             * Format: id
-             * @example xxxxxxxxxx
-             */
-            id: string;
-            /** Format: date-time */
-            createdAt: string;
-            /**
-             * Format: id
-             * @example xxxxxxxxxx
-             */
-            userId: string;
-            user: components['schemas']['UserLite'];
-            withReplies: boolean;
+        Achievement: {
+            name: components['schemas']['AchievementName'];
+            unlockedAt: number;
         };
-        UserAccountMoveLog: {
-            /**
-             * Format: id
-             * @example xxxxxxxxxx
-             */
-            id: string;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: id */
-            movedToId: string;
-            movedTo: components['schemas']['UserDetailed'];
-            /** Format: id */
-            movedFromId: string;
-            movedFrom: components['schemas']['UserDetailed'];
-        };
+        /** @enum {string} */
+        AchievementName: 'notes1' | 'notes10' | 'notes100' | 'notes500' | 'notes1000' | 'notes5000' | 'notes10000' | 'notes20000' | 'notes30000' | 'notes40000' | 'notes50000' | 'notes60000' | 'notes70000' | 'notes80000' | 'notes90000' | 'notes100000' | 'login3' | 'login7' | 'login15' | 'login30' | 'login60' | 'login100' | 'login200' | 'login300' | 'login400' | 'login500' | 'login600' | 'login700' | 'login800' | 'login900' | 'login1000' | 'passedSinceAccountCreated1' | 'passedSinceAccountCreated2' | 'passedSinceAccountCreated3' | 'loggedInOnBirthday' | 'loggedInOnNewYearsDay' | 'noteClipped1' | 'noteFavorited1' | 'myNoteFavorited1' | 'profileFilled' | 'markedAsCat' | 'following1' | 'following10' | 'following50' | 'following100' | 'following300' | 'followers1' | 'followers10' | 'followers50' | 'followers100' | 'followers300' | 'followers500' | 'followers1000' | 'collectAchievements30' | 'viewAchievements3min' | 'iLoveMisskey' | 'foundTreasure' | 'client30min' | 'client60min' | 'noteDeletedWithin1min' | 'postedAtLateNight' | 'postedAt0min0sec' | 'selfQuote' | 'htl20npm' | 'viewInstanceChart' | 'outputHelloWorldOnScratchpad' | 'open3windows' | 'driveFolderCircularReference' | 'reactWithoutRead' | 'clickedClickHere' | 'justPlainLucky' | 'setNameToSyuilo' | 'cookieClicked' | 'brainDiver' | 'smashTestNotificationButton' | 'tutorialCompleted' | 'bubbleGameExplodingHead' | 'bubbleGameDoubleExplodingHead';
         Ad: {
             /**
              * Format: id
@@ -9698,6 +4330,7 @@ export type components = {
             imageUrl: string;
             memo: string;
             dayOfWeek: number;
+            isSensitive: boolean;
         };
         Announcement: {
             /**
@@ -9717,11 +4350,8 @@ export type components = {
             /** @enum {string} */
             display: 'dialog' | 'normal' | 'banner';
             needConfirmationToRead: boolean;
-            needEnrollmentTutorialToRead: boolean;
-            forYou: boolean;
-            closeDuration: number;
-            displayOrder: number;
             silence: boolean;
+            forYou: boolean;
             isRead?: boolean;
         };
         App: {
@@ -9757,8 +4387,8 @@ export type components = {
              * @example xxxxxxxxxx
              */
             renoteId?: string | null;
-            reply?: ((components['schemas']['Note'] | null) | null) | components['schemas']['Note'] | null;
-            renote?: ((components['schemas']['Note'] | null) | null) | components['schemas']['Note'] | null;
+            reply?: components['schemas']['Note'] | null;
+            renote?: components['schemas']['Note'] | null;
             isHidden?: boolean;
             /** @enum {string} */
             visibility: 'public' | 'home' | 'followers' | 'specified';
@@ -9809,61 +4439,10 @@ export type components = {
             url?: string;
             reactionAndUserPairCache?: string[];
             clippedCount?: number;
+            hasPoll?: boolean;
             myReaction?: string | null;
         };
         NoteDraft: {
-            /** Format: misskey:id */
-            id: string;
-            /** Format: date-time */
-            updatedAt: string;
-            /** Format: date-time */
-            scheduledAt: string | null;
-            reason?: string;
-            channel?: {
-                /** Format: misskey:id */
-                id: string;
-                name: string;
-            } | null;
-            renote?: {
-                /** Format: misskey:id */
-                id: string;
-                text: string | null;
-                user: {
-                    /** Format: misskey:id */
-                    id: string;
-                    username: string;
-                    host: string | null;
-                };
-            } | null;
-            reply?: {
-                /** Format: misskey:id */
-                id: string;
-                text: string | null;
-                user: {
-                    /** Format: misskey:id */
-                    id: string;
-                    username: string;
-                    host: string | null;
-                };
-            } | null;
-            data: {
-                text: string | null;
-                useCw: boolean;
-                cw: string | null;
-                /** @enum {string} */
-                visibility: 'public' | 'home' | 'followers' | 'specified';
-                localOnly: boolean;
-                files: components['schemas']['DriveFile'][];
-                poll: {
-                    choices: string[];
-                    multiple: boolean;
-                    expiresAt: number | null;
-                    expiredAfter: number | null;
-                } | null;
-                visibleUserIds?: string[];
-            };
-        };
-        NoteReaction: {
             /**
              * Format: id
              * @example xxxxxxxxxx
@@ -9871,8 +4450,62 @@ export type components = {
             id: string;
             /** Format: date-time */
             createdAt: string;
+            text: string | null;
+            cw: string | null;
+            /** Format: id */
+            userId: string;
+            user: components['schemas']['UserLite'];
+            /** Format: id */
+            replyId: string | null;
+            /** Format: id */
+            renoteId: string | null;
+            reply?: components['schemas']['Note'] | null;
+            renote?: components['schemas']['Note'] | null;
+            /** @enum {string} */
+            visibility: 'public' | 'home' | 'followers' | 'specified';
+            visibleUserIds: string[];
+            fileIds: string[];
+            files?: components['schemas']['DriveFile'][];
+            hashtag: string | null;
+            poll: {
+                /** Format: date-time */
+                expiresAt?: string | null;
+                expiredAfter?: number | null;
+                multiple: boolean;
+                choices: string[];
+            } | null;
+            /** Format: id */
+            channelId: string | null;
+            channel?: {
+                id: string;
+                name: string;
+                color: string;
+                isSensitive: boolean;
+                allowRenoteToExternal: boolean;
+                userId: string | null;
+            } | null;
+            localOnly: boolean;
+            /** @enum {string|null} */
+            reactionAcceptance: 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote' | null;
+            scheduledAt: number | null;
+            isActuallyScheduled: boolean;
+        };
+        NoteReaction: {
+            /** Format: id */
+            id: string;
+            /** Format: date-time */
+            createdAt: string;
             user: components['schemas']['UserLite'];
             type: string;
+        };
+        NoteReactionWithNote: {
+            /** Format: id */
+            id: string;
+            /** Format: date-time */
+            createdAt: string;
+            user: components['schemas']['UserLite'];
+            type: string;
+            note: components['schemas']['Note'];
         };
         NoteFavorite: {
             /**
@@ -9970,6 +4603,22 @@ export type components = {
             /** Format: date-time */
             createdAt: string;
             /** @enum {string} */
+            type: 'scheduledNotePosted';
+            note: components['schemas']['Note'];
+        } | {
+            /** Format: id */
+            id: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** @enum {string} */
+            type: 'scheduledNotePostFailed';
+            noteDraft: components['schemas']['NoteDraft'];
+        } | {
+            /** Format: id */
+            id: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** @enum {string} */
             type: 'follow';
             user: components['schemas']['UserLite'];
             /** Format: id */
@@ -10018,8 +4667,7 @@ export type components = {
             createdAt: string;
             /** @enum {string} */
             type: 'achievementEarned';
-            /** @enum {string} */
-            achievement: 'notes1' | 'notes10' | 'notes100' | 'notes500' | 'notes1000' | 'notes5000' | 'notes10000' | 'notes20000' | 'notes30000' | 'notes40000' | 'notes50000' | 'notes60000' | 'notes70000' | 'notes80000' | 'notes90000' | 'notes100000' | 'login3' | 'login7' | 'login15' | 'login30' | 'login60' | 'login100' | 'login200' | 'login300' | 'login400' | 'login500' | 'login600' | 'login700' | 'login800' | 'login900' | 'login1000' | 'passedSinceAccountCreated1' | 'passedSinceAccountCreated2' | 'passedSinceAccountCreated3' | 'loggedInOnBirthday' | 'loggedInOnNewYearsDay' | 'noteClipped1' | 'noteFavorited1' | 'myNoteFavorited1' | 'profileFilled' | 'markedAsCat' | 'following1' | 'following10' | 'following50' | 'following100' | 'following300' | 'followers1' | 'followers10' | 'followers50' | 'followers100' | 'followers300' | 'followers500' | 'followers1000' | 'collectAchievements30' | 'viewAchievements3min' | 'iLoveMisskey' | 'foundTreasure' | 'client30min' | 'client60min' | 'noteDeletedWithin1min' | 'postedAtLateNight' | 'postedAt0min0sec' | 'selfQuote' | 'htl20npm' | 'viewInstanceChart' | 'outputHelloWorldOnScratchpad' | 'open3windows' | 'driveFolderCircularReference' | 'reactWithoutRead' | 'clickedClickHere' | 'justPlainLucky' | 'setNameToSyuilo' | 'cookieClicked' | 'brainDiver' | 'smashTestNotificationButton' | 'tutorialCompleted' | 'bubbleGameExplodingHead' | 'bubbleGameDoubleExplodingHead';
+            achievement: components['schemas']['AchievementName'];
         } | {
             /** Format: id */
             id: string;
@@ -10038,38 +4686,6 @@ export type components = {
             createdAt: string;
             /** @enum {string} */
             type: 'login';
-        } | {
-            /** Format: id */
-            id: string;
-            /** Format: date-time */
-            createdAt: string;
-            /** @enum {string} */
-            type: 'noteScheduled';
-            draft: components['schemas']['NoteDraft'];
-        } | {
-            /** Format: id */
-            id: string;
-            /** Format: date-time */
-            createdAt: string;
-            /** @enum {string} */
-            type: 'scheduledNotePosted';
-            note: components['schemas']['Note'];
-        } | {
-            /** Format: id */
-            id: string;
-            /** Format: date-time */
-            createdAt: string;
-            /** @enum {string} */
-            type: 'scheduledNoteError';
-            draft: components['schemas']['NoteDraft'];
-        } | {
-            /** Format: id */
-            id: string;
-            /** Format: date-time */
-            createdAt: string;
-            /** @enum {string} */
-            type: 'sensitiveFlagAssigned';
-            fileId: unknown;
         } | {
             /** Format: id */
             id: string;
@@ -10136,7 +4752,6 @@ export type components = {
             /** @example 51469 */
             size: number;
             isSensitive: boolean;
-            isSensitiveByModerator?: boolean | null;
             blurhash: string | null;
             properties: {
                 /** @example 1280 */
@@ -10158,13 +4773,13 @@ export type components = {
              * @example xxxxxxxxxx
              */
             folderId: string | null;
-            folder?: ((components['schemas']['DriveFolder'] | null) | null) | components['schemas']['DriveFolder'] | null;
+            folder?: components['schemas']['DriveFolder'] | null;
             /**
              * Format: id
              * @example xxxxxxxxxx
              */
             userId: string | null;
-            user?: ((components['schemas']['UserLite'] | null) | null) | components['schemas']['UserLite'] | null;
+            user?: components['schemas']['UserLite'] | null;
         };
         DriveFolder: {
             /**
@@ -10182,7 +4797,7 @@ export type components = {
             parentId: string | null;
             foldersCount?: number;
             filesCount?: number;
-            parent?: ((components['schemas']['DriveFolder'] | null) | null) | components['schemas']['DriveFolder'] | null;
+            parent?: components['schemas']['DriveFolder'] | null;
         };
         Following: {
             /**
@@ -10196,17 +4811,8 @@ export type components = {
             followeeId: string;
             /** Format: id */
             followerId: string;
-            followee?: components['schemas']['UserDetailedNotMe'] | null;
-            follower?: components['schemas']['UserDetailedNotMe'] | null;
-        };
-        FollowRequest: {
-            /**
-             * Format: id
-             * @example xxxxxxxxxx
-             */
-            id: string;
-            follower: components['schemas']['UserLite'];
-            followee: components['schemas']['UserLite'];
+            followee?: components['schemas']['UserDetailedNotMe'];
+            follower?: components['schemas']['UserDetailedNotMe'];
         };
         Muting: {
             /**
@@ -10268,8 +4874,8 @@ export type components = {
             expiresAt: string | null;
             /** Format: date-time */
             createdAt: string;
-            createdBy: ((components['schemas']['UserLite'] | null) | null) | components['schemas']['UserLite'] | null;
-            usedBy: ((components['schemas']['UserLite'] | null) | null) | components['schemas']['UserLite'] | null;
+            createdBy: components['schemas']['UserLite'] | null;
+            usedBy: components['schemas']['UserLite'] | null;
             /** Format: date-time */
             usedAt: string | null;
             used: boolean;
@@ -10294,15 +4900,14 @@ export type components = {
             summary: string | null;
             hideTitleWhenPinned: boolean;
             alignCenter: boolean;
-            font: string;
+            /** @enum {string} */
+            font: 'serif' | 'sans-serif';
             script: string;
             eyeCatchingImageId: string | null;
-            eyeCatchingImage: ((components['schemas']['DriveFile'] | null) | null) | components['schemas']['DriveFile'] | null;
+            eyeCatchingImage: components['schemas']['DriveFile'] | null;
             attachedFiles: components['schemas']['DriveFile'][];
             likedCount: number;
             isLiked?: boolean;
-            /** @enum {string} */
-            visibility: 'public' | 'private';
         };
         PageBlock: {
             id: string;
@@ -10327,14 +4932,6 @@ export type components = {
             detailed: boolean;
             note: string | null;
         };
-        PageLike: {
-            /**
-             * Format: id
-             * @example xxxxxxxxxx
-             */
-            id: string;
-            page: components['schemas']['Page'];
-        };
         Channel: {
             /**
              * Format: id
@@ -10351,6 +4948,8 @@ export type components = {
             userId: string | null;
             /** Format: url */
             bannerUrl: string | null;
+            /** Format: id */
+            bannerId: string | null;
             pinnedNoteIds: string[];
             color: string;
             isArchived: boolean;
@@ -10360,6 +4959,7 @@ export type components = {
             allowRenoteToExternal: boolean;
             isFollowing?: boolean;
             isFavorited?: boolean;
+            isMuting?: boolean;
             pinnedNotes?: components['schemas']['Note'][];
         };
         QueueCount: {
@@ -10368,6 +4968,32 @@ export type components = {
             completed: number;
             failed: number;
             delayed: number;
+        };
+        QueueMetrics: {
+            meta: {
+                count: number;
+                prevTS: number;
+                prevCount: number;
+            };
+            data: number[];
+            count: number;
+        };
+        QueueJob: {
+            id: string;
+            name: string;
+            data: Record<string, never>;
+            opts: Record<string, never>;
+            timestamp: number;
+            processedOn?: number;
+            processedBy?: string;
+            finishedOn?: number;
+            progress: Record<string, never>;
+            attempts: number;
+            delay: number;
+            failedReason: string;
+            stacktrace: string[];
+            returnValue: Record<string, never>;
+            isFailed: boolean;
         };
         Antenna: {
             /** Format: id */
@@ -10433,7 +5059,7 @@ export type components = {
             isNotResponding: boolean;
             isSuspended: boolean;
             /** @enum {string} */
-            suspensionState: 'none' | 'manuallySuspended' | 'goneSuspended' | 'autoSuspendedForNotResponding';
+            suspensionState: 'none' | 'manuallySuspended' | 'goneSuspended' | 'autoSuspendedForNotResponding' | 'softwareSuspended';
             isBlocked: boolean;
             /** @example misskey */
             softwareName: string | null;
@@ -10445,7 +5071,7 @@ export type components = {
             maintainerName: string | null;
             maintainerEmail: string | null;
             isSilenced: boolean;
-            isSensitiveMedia: boolean;
+            isMediaSilenced: boolean;
             /** Format: url */
             iconUrl: string | null;
             /** Format: url */
@@ -10479,14 +5105,6 @@ export type components = {
             likedCount: number;
             isLiked?: boolean;
         };
-        GalleryLike: {
-            /**
-             * Format: id
-             * @example xxxxxxxxxx
-             */
-            id: string;
-            post: components['schemas']['GalleryPost'];
-        };
         EmojiSimple: {
             aliases: string[];
             name: string;
@@ -10495,15 +5113,10 @@ export type components = {
             localOnly?: boolean;
             isSensitive?: boolean;
             roleIdsThatCanBeUsedThisEmojiAsReaction?: string[];
-            roleIdsThatCanNotBeUsedThisEmojiAsReaction?: string[];
         };
         EmojiDetailed: {
             /** Format: id */
             id: string;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: string | null;
             aliases: string[];
             name: string;
             category: string | null;
@@ -10513,10 +5126,7 @@ export type components = {
             license: string | null;
             isSensitive: boolean;
             localOnly: boolean;
-            requestedBy?: string | null;
-            memo?: string | null;
-            roleIdsThatCanBeUsedThisEmojiAsReaction?: string[];
-            roleIdsThatCanNotBeUsedThisEmojiAsReaction?: string[];
+            roleIdsThatCanBeUsedThisEmojiAsReaction: string[];
         };
         EmojiDetailedAdmin: {
             /** Format: id */
@@ -10559,16 +5169,8 @@ export type components = {
             script: string;
             /** @enum {string} */
             visibility: 'private' | 'public';
-            likedCount: number | null;
+            likedCount: number;
             isLiked?: boolean;
-        };
-        FlashLike: {
-            /**
-             * Format: id
-             * @example xxxxxxxxxx
-             */
-            id: string;
-            flash: components['schemas']['Flash'];
         };
         Signin: {
             id: string;
@@ -10658,7 +5260,6 @@ export type components = {
             asBadge: boolean;
             /** @example false */
             preserveAssignmentOnMoveAccount: boolean;
-            badgeBehavior: string | null;
             /** @example false */
             canEditMembersByModerator: boolean;
             policies: {
@@ -10674,16 +5275,6 @@ export type components = {
             gtlAvailable: boolean;
             ltlAvailable: boolean;
             canPublicNote: boolean;
-            canScheduleNote: boolean;
-            scheduleNoteLimit: number;
-            scheduleNoteMaxDays: number;
-            canInitiateConversation: boolean;
-            canCreateContent: boolean;
-            canUpdateContent: boolean;
-            canDeleteContent: boolean;
-            canPurgeAccount: boolean;
-            canUpdateAvatar: boolean;
-            canUpdateBanner: boolean;
             mentionLimit: number;
             canInvite: boolean;
             inviteLimit: number;
@@ -10692,18 +5283,16 @@ export type components = {
             canManageCustomEmojis: boolean;
             canManageAvatarDecorations: boolean;
             canSearchNotes: boolean;
+            canSearchUsers: boolean;
             canUseTranslator: boolean;
-            canUseDriveFileInSoundSettings: boolean;
-            canUseReaction: boolean;
             canHideAds: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
+            uploadableFileTypes: string[];
             alwaysMarkNsfw: boolean;
-            skipNsfwDetection: boolean;
             canUpdateBioMedia: boolean;
             pinLimit: number;
             antennaLimit: number;
-            antennaNotesLimit: number;
             wordMuteLimit: number;
             webhookLimit: number;
             clipLimit: number;
@@ -10717,10 +5306,11 @@ export type components = {
             canImportFollowing: boolean;
             canImportMuting: boolean;
             canImportUserLists: boolean;
-            mutualLinkSectionLimit: number;
-            mutualLinkLimit: number;
             /** @enum {string} */
             chatAvailability: 'available' | 'readonly' | 'unavailable';
+            noteDraftLimit: number;
+            scheduledNoteLimit: number;
+            watermarkAvailable: boolean;
         };
         ReversiGameLite: {
             /** Format: id */
@@ -10741,7 +5331,7 @@ export type components = {
             user2: components['schemas']['UserLite'];
             /** Format: id */
             winnerId: string | null;
-            winner: ((components['schemas']['UserLite'] | null) | null) | components['schemas']['UserLite'] | null;
+            winner: components['schemas']['UserLite'] | null;
             /** Format: id */
             surrenderedUserId: string | null;
             /** Format: id */
@@ -10777,7 +5367,7 @@ export type components = {
             user2: components['schemas']['UserLite'];
             /** Format: id */
             winnerId: string | null;
-            winner: ((components['schemas']['UserLite'] | null) | null) | components['schemas']['UserLite'] | null;
+            winner: components['schemas']['UserLite'] | null;
             /** Format: id */
             surrenderedUserId: string | null;
             /** Format: id */
@@ -10796,6 +5386,7 @@ export type components = {
             maintainerName: string | null;
             maintainerEmail: string | null;
             version: string;
+            providesTarball: boolean;
             name: string | null;
             shortName: string | null;
             /**
@@ -10812,6 +5403,7 @@ export type components = {
             feedbackUrl: string | null;
             defaultDarkTheme: string | null;
             defaultLightTheme: string | null;
+            clientOptions: Record<string, never>;
             disableRegistration: boolean;
             emailRequiredForSignup: boolean;
             enableHcaptcha: boolean;
@@ -10823,8 +5415,8 @@ export type components = {
             recaptchaSiteKey: string | null;
             enableTurnstile: boolean;
             turnstileSiteKey: string | null;
-            googleAnalyticsId: string | null;
             enableTestcaptcha: boolean;
+            googleAnalyticsMeasurementId: string | null;
             swPublickey: string | null;
             /** @default /assets/ai.png */
             mascotImageUrl: string;
@@ -10842,14 +5434,13 @@ export type components = {
                 id: string;
                 /** Format: url */
                 url: string;
-                /** @enum {string} */
-                place: 'square' | 'horizontal' | 'horizontal-big' | 'vertical';
+                place: string;
                 ratio: number;
                 /** Format: url */
                 imageUrl: string;
                 dayOfWeek: number;
+                isSensitive?: boolean;
             }[];
-            wellKnownWebsites: string[];
             /** @default 0 */
             notesPerOneAd: number;
             enableEmail: boolean;
@@ -10873,7 +5464,6 @@ export type components = {
             } | null;
             mediaProxy: string;
             enableUrlPreview: boolean;
-            enableSkebStatus: boolean;
             backgroundImageUrl: string | null;
             impressumUrl: string | null;
             logoImageUrl: string | null;
@@ -10897,16 +5487,9 @@ export type components = {
                 emailRequiredForSignup: boolean;
                 localTimeline: boolean;
                 globalTimeline: boolean;
-                hCaptcha: boolean;
-                /** @description Alias of hCaptcha */
                 hcaptcha: boolean;
-                mCaptcha: boolean;
-                /** @description Alias of mCaptcha */
-                mcaptcha: boolean;
-                reCaptcha: boolean;
-                /** @description Alias of reCaptcha */
-                recaptcha: boolean;
                 turnstile: boolean;
+                recaptcha: boolean;
                 objectStorage: boolean;
                 serviceWorker: boolean;
                 /** @default true */
@@ -10919,45 +5502,19 @@ export type components = {
             cacheRemoteSensitiveFiles: boolean;
         };
         MetaDetailed: components['schemas']['MetaLite'] & components['schemas']['MetaDetailedOnly'];
-        AbuseUserReport: {
-            /**
-             * Format: id
-             * @example xxxxxxxxxx
-             */
+        UserWebhook: {
+            /** Format: id */
             id: string;
-            category: string;
-            /** Format: date-time */
-            createdAt: string;
-            comment: string;
-            resolved: boolean;
             /** Format: id */
-            reporterId: string;
-            reporter: components['schemas']['UserDetailed'];
-            /** Format: id */
-            targetUserId: string;
-            targetUser: components['schemas']['UserDetailed'];
-            /** Format: id */
-            assigneeId: string | null;
-            assignee?: ((components['schemas']['UserDetailed'] | null) | null) | components['schemas']['UserDetailed'] | null;
-            forwarded: boolean;
-            moderationNote: string;
-        };
-        ModerationLog: {
-            /**
-             * Format: id
-             * @example xxxxxxxxxx
-             */
-            id: string;
-            /** Format: date-time */
-            createdAt: string;
-            type: string;
-            info: Record<string, never>;
-            /**
-             * Format: id
-             * @example xxxxxxxxxx
-             */
             userId: string;
-            user: components['schemas']['UserDetailed'];
+            name: string;
+            on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
+            url: string;
+            secret: string;
+            active: boolean;
+            /** Format: date-time */
+            latestSentAt: string | null;
+            latestStatus: number | null;
         };
         SystemWebhook: {
             id: string;
@@ -10968,7 +5525,7 @@ export type components = {
             latestSentAt: string | null;
             latestStatus: number | null;
             name: string;
-            on: ('abuseReport' | 'abuseReportResolved' | 'userCreated' | 'inactiveModeratorsWarning' | 'inactiveModeratorsInvitationOnlyChanged' | 'reportAutoResolved')[];
+            on: ('abuseReport' | 'abuseReportResolved' | 'userCreated' | 'inactiveModeratorsWarning' | 'inactiveModeratorsInvitationOnlyChanged')[];
             url: string;
             secret: string;
         };
@@ -10981,9 +5538,9 @@ export type components = {
             /** @enum {string} */
             method: 'email' | 'webhook';
             userId?: string;
-            user?: components['schemas']['UserLite'] | null;
+            user?: components['schemas']['UserLite'];
             systemWebhookId?: string;
-            systemWebhook?: components['schemas']['SystemWebhook'] | null;
+            systemWebhook?: components['schemas']['SystemWebhook'];
         };
         ChatMessage: {
             id: string;
@@ -10992,12 +5549,12 @@ export type components = {
             fromUserId: string;
             fromUser: components['schemas']['UserLite'];
             toUserId?: string | null;
-            toUser?: ((components['schemas']['UserLite'] | null) | null) | components['schemas']['UserLite'] | null;
+            toUser?: components['schemas']['UserLite'] | null;
             toRoomId?: string | null;
-            toRoom?: ((components['schemas']['ChatRoom'] | null) | null) | components['schemas']['ChatRoom'] | null;
+            toRoom?: components['schemas']['ChatRoom'] | null;
             text?: string | null;
             fileId?: string | null;
-            file?: ((components['schemas']['DriveFile'] | null) | null) | components['schemas']['DriveFile'] | null;
+            file?: components['schemas']['DriveFile'] | null;
             isRead?: boolean;
             reactions: {
                 reaction: string;
@@ -11009,15 +5566,15 @@ export type components = {
             /** Format: date-time */
             createdAt: string;
             fromUserId: string;
-            fromUser?: components['schemas']['UserLite'] | null;
+            fromUser?: components['schemas']['UserLite'];
             toUserId?: string | null;
             toRoomId?: string | null;
             text?: string | null;
             fileId?: string | null;
-            file?: ((components['schemas']['DriveFile'] | null) | null) | components['schemas']['DriveFile'] | null;
+            file?: components['schemas']['DriveFile'] | null;
             reactions: {
                 reaction: string;
-                user?: ((components['schemas']['UserLite'] | null) | null) | components['schemas']['UserLite'] | null;
+                user?: components['schemas']['UserLite'] | null;
             }[];
         };
         ChatMessageLiteFor1on1: {
@@ -11028,7 +5585,7 @@ export type components = {
             toUserId: string;
             text?: string | null;
             fileId?: string | null;
-            file?: ((components['schemas']['DriveFile'] | null) | null) | components['schemas']['DriveFile'] | null;
+            file?: components['schemas']['DriveFile'] | null;
             reactions: {
                 reaction: string;
             }[];
@@ -11042,7 +5599,7 @@ export type components = {
             toRoomId: string;
             text?: string | null;
             fileId?: string | null;
-            file?: ((components['schemas']['DriveFile'] | null) | null) | components['schemas']['DriveFile'] | null;
+            file?: components['schemas']['DriveFile'] | null;
             reactions: {
                 reaction: string;
                 user: components['schemas']['UserLite'];
@@ -11057,6 +5614,7 @@ export type components = {
             name: string;
             description: string;
             isMuted?: boolean;
+            invitationExists?: boolean;
         };
         ChatRoomInvitation: {
             id: string;
@@ -11072,9 +5630,9 @@ export type components = {
             /** Format: date-time */
             createdAt: string;
             userId: string;
-            user?: components['schemas']['UserLite'] | null;
+            user?: components['schemas']['UserLite'];
             roomId: string;
-            room?: components['schemas']['ChatRoom'] | null;
+            room?: components['schemas']['ChatRoom'];
         };
     };
     responses: never;
@@ -11085,327 +5643,7 @@ export type components = {
 };
 export type $defs = Record<string, never>;
 export interface operations {
-    'admin___abuse-report-resolver___create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    name: string;
-                    targetUserPattern: string | null;
-                    reporterPattern: string | null;
-                    reportContentPattern: string | null;
-                    /** @enum {string} */
-                    expiresAt: '1hour' | '12hours' | '1day' | '1week' | '1month' | '3months' | '6months' | '1year' | 'indefinitely';
-                    forward: boolean;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        name: string;
-                        targetUserPattern: string | null;
-                        reporterPattern: string | null;
-                        reportContentPattern: string | null;
-                        expiresAt: string;
-                        forward: boolean;
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    'admin___abuse-report-resolver___delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** Format: misskey:id */
-                    resolverId: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (without any results) */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    'admin___abuse-report-resolver___list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @default 10 */
-                    limit?: number;
-                    /** Format: misskey:id */
-                    sinceId?: string;
-                    /** Format: misskey:id */
-                    untilId?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        name: string;
-                        targetUserPattern: string | null;
-                        reporterPattern: string | null;
-                        reportContentPattern: string | null;
-                        expiresAt: string;
-                        forward: boolean;
-                    }[];
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    'admin___abuse-report-resolver___update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** Format: misskey:id */
-                    resolverId: string;
-                    name?: string;
-                    targetUserPattern?: string | null;
-                    reporterPattern?: string | null;
-                    reportContentPattern?: string | null;
-                    /** @enum {string} */
-                    expiresAt?: '1hour' | '12hours' | '1day' | '1week' | '1month' | '3months' | '6months' | '1year' | 'indefinitely';
-                    forward?: boolean;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (without any results) */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     'admin___abuse-report___notification-recipient___create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -11478,12 +5716,6 @@ export interface operations {
         };
     };
     'admin___abuse-report___notification-recipient___delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -11498,7 +5730,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -11548,12 +5779,6 @@ export interface operations {
         };
     };
     'admin___abuse-report___notification-recipient___list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -11619,12 +5844,6 @@ export interface operations {
         };
     };
     'admin___abuse-report___notification-recipient___show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -11691,12 +5910,6 @@ export interface operations {
         };
     };
     'admin___abuse-report___notification-recipient___update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -11771,12 +5984,6 @@ export interface operations {
         };
     };
     'admin___abuse-user-reports': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -11786,6 +5993,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default null */
                     state?: string | null;
                     /**
@@ -11798,10 +6007,6 @@ export interface operations {
                      * @enum {string}
                      */
                     targetUserOrigin?: 'combined' | 'local' | 'remote';
-                    /** @default false */
-                    forwarded?: boolean;
-                    /** @default null */
-                    category?: string | null;
                 };
             };
         };
@@ -11823,21 +6028,19 @@ export interface operations {
                         comment: string;
                         /** @example false */
                         resolved: boolean;
-                        /** @example false */
-                        forwarded: boolean;
-                        /** @enum {string|null} */
-                        resolvedAs: 'accept' | 'reject' | null;
                         /** Format: id */
                         reporterId: string;
                         /** Format: id */
                         targetUserId: string;
                         /** Format: id */
                         assigneeId: string | null;
-                        reporter: components['schemas']['UserDetailed'];
-                        targetUser: components['schemas']['UserDetailed'];
-                        assignee?: ((components['schemas']['UserDetailed'] | null) | null) | components['schemas']['UserDetailed'] | null;
-                        category: string;
-                        moderationNote: string | null;
+                        reporter: components['schemas']['UserDetailedNotMe'];
+                        targetUser: components['schemas']['UserDetailedNotMe'];
+                        assignee: components['schemas']['UserDetailedNotMe'] | null;
+                        forwarded: boolean;
+                        /** @enum {string|null} */
+                        resolvedAs: 'accept' | 'reject' | null;
+                        moderationNote: string;
                     }[];
                 };
             };
@@ -11889,12 +6092,6 @@ export interface operations {
         };
     };
     admin___accounts___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -11911,7 +6108,9 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    'application/json': components['schemas']['MeDetailed'];
+                    'application/json': components['schemas']['MeDetailed'] & {
+                        token: string;
+                    };
                 };
             };
             /** @description Client error */
@@ -11962,22 +6161,11 @@ export interface operations {
         };
     };
     admin___accounts___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
                     /** Format: misskey:id */
                     userId: string;
-                    /**
-                     * @description Since deletion by an administrator is a moderation action, the default is to soft delete.
-                     * @default true
-                     */
-                    soft?: boolean;
                 };
             };
         };
@@ -11987,7 +6175,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -12037,12 +6224,6 @@ export interface operations {
         };
     };
     'admin___accounts___find-by-email': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -12057,173 +6238,8 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    'application/json': components['schemas']['UserDetailed'];
+                    'application/json': components['schemas']['UserDetailedNotMe'];
                 };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    admin___accounts___pending___list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @default 10 */
-                    limit?: number;
-                    /** @default 0 */
-                    offset?: number;
-                    /** @enum {string} */
-                    sort?: '+createdAt' | '-createdAt';
-                    /** @default null */
-                    username?: string | null;
-                    /** @default null */
-                    email?: string | null;
-                    /** @default null */
-                    code?: string | null;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        /**
-                         * Format: id
-                         * @example xxxxxxxxxx
-                         */
-                        id: string;
-                        /** Format: date-time */
-                        createdAt: string;
-                        code: string;
-                        /** @example ai */
-                        username: string;
-                        email?: string | null;
-                    }[];
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    admin___accounts___pending___revoke: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** Format: misskey:id */
-                    id?: string;
-                    code?: string;
-                } | unknown | unknown;
-            };
-        };
-        responses: {
-            /** @description OK (without any results) */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -12273,12 +6289,6 @@ export interface operations {
         };
     };
     admin___ad___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -12291,6 +6301,7 @@ export interface operations {
                     startsAt: number;
                     imageUrl: string;
                     dayOfWeek: number;
+                    isSensitive?: boolean;
                 };
             };
         };
@@ -12352,12 +6363,6 @@ export interface operations {
         };
     };
     admin___ad___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -12372,7 +6377,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -12422,12 +6426,6 @@ export interface operations {
         };
     };
     admin___ad___list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -12437,6 +6435,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default null */
                     publishing?: boolean | null;
                 };
@@ -12500,12 +6500,6 @@ export interface operations {
         };
     };
     admin___ad___update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -12520,6 +6514,7 @@ export interface operations {
                     expiresAt?: number;
                     startsAt?: number;
                     dayOfWeek?: number;
+                    isSensitive?: boolean;
                 };
             };
         };
@@ -12529,7 +6524,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -12579,12 +6573,6 @@ export interface operations {
         };
     };
     admin___announcements___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -12604,15 +6592,9 @@ export interface operations {
                     /** @default false */
                     forExistingUsers?: boolean;
                     /** @default false */
-                    needConfirmationToRead?: boolean;
-                    /** @default false */
-                    needEnrollmentTutorialToRead?: boolean;
-                    /** @default 0 */
-                    closeDuration?: number;
-                    /** @default 0 */
-                    displayOrder?: number;
-                    /** @default false */
                     silence?: boolean;
+                    /** @default false */
+                    needConfirmationToRead?: boolean;
                     /**
                      * Format: misskey:id
                      * @default null
@@ -12641,15 +6623,6 @@ export interface operations {
                         title: string;
                         text: string;
                         imageUrl: string | null;
-                        icon: string;
-                        display: string;
-                        forYou: boolean;
-                        needConfirmationToRead: boolean;
-                        needEnrollmentTutorialToRead: boolean;
-                        closeDuration: number;
-                        displayOrder: number;
-                        silence: boolean;
-                        isRead?: boolean;
                     };
                 };
             };
@@ -12701,12 +6674,6 @@ export interface operations {
         };
     };
     admin___announcements___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -12721,7 +6688,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -12771,23 +6737,24 @@ export interface operations {
         };
     };
     admin___announcements___list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
                     /** @default 10 */
                     limit?: number;
-                    /** @default 0 */
-                    offset?: number;
+                    /** Format: misskey:id */
+                    sinceId?: string;
+                    /** Format: misskey:id */
+                    untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** Format: misskey:id */
                     userId?: string | null;
-                    /** @enum {string|null} */
-                    status?: 'active' | 'archived' | null;
+                    /**
+                     * @default active
+                     * @enum {string}
+                     */
+                    status?: 'all' | 'active' | 'archived';
                 };
             };
         };
@@ -12809,22 +6776,16 @@ export interface operations {
                         /** Format: date-time */
                         updatedAt: string | null;
                         text: string;
-                        isActive: boolean;
                         title: string;
-                        imageUrl: string | null;
-                        icon: string;
+                        icon: string | null;
                         display: string;
+                        isActive: boolean;
                         forExistingUsers: boolean;
-                        needConfirmationToRead: boolean;
-                        needEnrollmentTutorialToRead: boolean;
-                        closeDuration: number;
-                        displayOrder: number;
                         silence: boolean;
+                        needConfirmationToRead: boolean;
                         userId: string | null;
-                        user: ((components['schemas']['UserLite'] | null) | null) | components['schemas']['UserLite'] | null;
+                        imageUrl: string | null;
                         reads: number;
-                        /** Format: date-time */
-                        lastReadAt: string | null;
                     }[];
                 };
             };
@@ -12876,12 +6837,6 @@ export interface operations {
         };
     };
     admin___announcements___update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -12895,13 +6850,8 @@ export interface operations {
                     /** @enum {string} */
                     display?: 'normal' | 'banner' | 'dialog';
                     forExistingUsers?: boolean;
-                    needConfirmationToRead?: boolean;
-                    needEnrollmentTutorialToRead?: boolean;
-                    /** @default 0 */
-                    closeDuration?: number;
-                    /** @default 0 */
-                    displayOrder?: number;
                     silence?: boolean;
+                    needConfirmationToRead?: boolean;
                     isActive?: boolean;
                 };
             };
@@ -12912,7 +6862,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -12962,12 +6911,6 @@ export interface operations {
         };
     };
     'admin___avatar-decorations___create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -13047,12 +6990,6 @@ export interface operations {
         };
     };
     'admin___avatar-decorations___delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -13067,7 +7004,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -13117,12 +7053,6 @@ export interface operations {
         };
     };
     'admin___avatar-decorations___list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -13132,6 +7062,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** Format: misskey:id */
                     userId?: string | null;
                 };
@@ -13209,12 +7141,6 @@ export interface operations {
         };
     };
     'admin___avatar-decorations___update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -13233,7 +7159,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -13283,13 +7208,6 @@ export interface operations {
         };
     };
     admin___captcha___current: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -13368,12 +7286,6 @@ export interface operations {
         };
     };
     admin___captcha___save: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -13392,7 +7304,132 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    'admin___delete-account': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    userId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    'admin___delete-all-files-of-a-user': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    userId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
             };
             /** @description Client error */
             400: {
@@ -13442,20 +7479,12 @@ export interface operations {
         };
     };
     'admin___drive___clean-remote-files': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (without any results) */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -13505,90 +7534,12 @@ export interface operations {
         };
     };
     admin___drive___cleanup: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (without any results) */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    'admin___drive___delete-all-files-of-a-user': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** Format: misskey:id */
-                    userId: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (without any results) */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -13638,12 +7589,6 @@ export interface operations {
         };
     };
     admin___drive___files: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -13653,6 +7598,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** Format: misskey:id */
                     userId?: string | null;
                     type?: string | null;
@@ -13727,19 +7674,14 @@ export interface operations {
         };
     };
     'admin___drive___show-file': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
                     /** Format: misskey:id */
-                    fileId?: string;
-                    url?: string;
-                } | unknown | unknown;
+                    fileId: string;
+                } | {
+                    url: string;
+                };
             };
         };
         responses: {
@@ -13803,6 +7745,10 @@ export interface operations {
                         folderId: string | null;
                         isSensitive: boolean;
                         isLink: boolean;
+                        maybeSensitive: boolean;
+                        maybePorn: boolean;
+                        requestIp: string | null;
+                        requestHeaders: Record<string, never> | null;
                     };
                 };
             };
@@ -13854,12 +7800,6 @@ export interface operations {
         };
     };
     admin___emoji___add: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -13872,10 +7812,7 @@ export interface operations {
                     license?: string | null;
                     isSensitive?: boolean;
                     localOnly?: boolean;
-                    requestedBy?: string | null;
-                    memo?: string | null;
                     roleIdsThatCanBeUsedThisEmojiAsReaction?: string[];
-                    roleIdsThatCanNotBeUsedThisEmojiAsReaction?: string[];
                 };
             };
         };
@@ -13937,12 +7874,6 @@ export interface operations {
         };
     };
     'admin___emoji___add-aliases-bulk': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -13957,7 +7888,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -14007,12 +7937,6 @@ export interface operations {
         };
     };
     admin___emoji___copy: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -14082,12 +8006,6 @@ export interface operations {
         };
     };
     admin___emoji___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -14102,7 +8020,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -14152,12 +8069,6 @@ export interface operations {
         };
     };
     'admin___emoji___delete-bulk': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -14171,7 +8082,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -14221,12 +8131,6 @@ export interface operations {
         };
     };
     'admin___emoji___import-zip': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -14241,7 +8145,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -14291,12 +8194,6 @@ export interface operations {
         };
     };
     admin___emoji___list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -14308,6 +8205,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -14378,12 +8277,6 @@ export interface operations {
         };
     };
     'admin___emoji___list-remote': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -14400,6 +8293,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -14470,12 +8365,6 @@ export interface operations {
         };
     };
     'admin___emoji___remove-aliases-bulk': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -14490,7 +8379,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -14540,12 +8428,6 @@ export interface operations {
         };
     };
     'admin___emoji___set-aliases-bulk': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -14560,7 +8442,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -14610,12 +8491,6 @@ export interface operations {
         };
     };
     'admin___emoji___set-category-bulk': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -14631,7 +8506,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -14681,12 +8555,6 @@ export interface operations {
         };
     };
     'admin___emoji___set-license-bulk': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -14702,7 +8570,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -14752,18 +8619,14 @@ export interface operations {
         };
     };
     admin___emoji___update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
-                'application/json': {
+                'application/json': ({
                     /** Format: misskey:id */
-                    id?: string;
-                    name?: string;
+                    id: string;
+                } | {
+                    name: string;
+                }) & {
                     /** Format: misskey:id */
                     fileId?: string;
                     /** @description Use `null` to reset the category. */
@@ -14772,11 +8635,8 @@ export interface operations {
                     license?: string | null;
                     isSensitive?: boolean;
                     localOnly?: boolean;
-                    requestedBy?: string | null;
-                    memo?: string | null;
                     roleIdsThatCanBeUsedThisEmojiAsReaction?: string[];
-                    roleIdsThatCanNotBeUsedThisEmojiAsReaction?: string[];
-                } | unknown | unknown;
+                };
             };
         };
         responses: {
@@ -14785,7 +8645,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -14835,12 +8694,6 @@ export interface operations {
         };
     };
     'admin___federation___delete-all-files': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -14854,7 +8707,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -14904,12 +8756,6 @@ export interface operations {
         };
     };
     'admin___federation___refresh-remote-instance-metadata': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -14923,7 +8769,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -14973,12 +8818,6 @@ export interface operations {
         };
     };
     'admin___federation___remove-all-following': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -14992,7 +8831,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -15042,12 +8880,6 @@ export interface operations {
         };
     };
     'admin___federation___update-instance': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -15063,7 +8895,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -15113,12 +8944,6 @@ export interface operations {
         };
     };
     'admin___forward-abuse-user-report': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -15133,7 +8958,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -15183,13 +9007,6 @@ export interface operations {
         };
     };
     'admin___get-index-stats': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -15251,13 +9068,6 @@ export interface operations {
         };
     };
     'admin___get-table-stats': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -15321,12 +9131,6 @@ export interface operations {
         };
     };
     'admin___get-user-ips': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -15396,312 +9200,7 @@ export interface operations {
             };
         };
     };
-    'admin___indie-auth___create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    id: string;
-                    name?: string | null;
-                    redirectUris?: string[];
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        id: string;
-                        /** Format: date-time */
-                        createdAt: string;
-                        name: string | null;
-                        redirectUris: string[];
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    'admin___indie-auth___delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    id: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (without any results) */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    'admin___indie-auth___list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @default 10 */
-                    limit?: number;
-                    /** @default 0 */
-                    offset?: number;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        id: string;
-                        /** Format: date-time */
-                        createdAt: string;
-                        name: string | null;
-                        redirectUris: string[];
-                    }[];
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    'admin___indie-auth___update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    id: string;
-                    name?: string | null;
-                    redirectUris?: string[];
-                };
-            };
-        };
-        responses: {
-            /** @description OK (without any results) */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     admin___invite___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -15769,12 +9268,6 @@ export interface operations {
         };
     };
     admin___invite___list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -15850,13 +9343,6 @@ export interface operations {
         };
     };
     admin___meta: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -15877,7 +9363,8 @@ export interface operations {
                         recaptchaSiteKey: string | null;
                         enableTurnstile: boolean;
                         turnstileSiteKey: string | null;
-                        googleAnalyticsId: string | null;
+                        enableTestcaptcha: boolean;
+                        googleAnalyticsMeasurementId: string | null;
                         swPublickey: string | null;
                         /** @default /assets/ai.png */
                         mascotImageUrl: string | null;
@@ -15892,20 +9379,23 @@ export interface operations {
                         enableServiceWorker: boolean;
                         translatorAvailable: boolean;
                         silencedHosts?: string[];
-                        sensitiveMediaHosts?: string[];
+                        mediaSilencedHosts: string[];
                         pinnedUsers: string[];
                         hiddenTags: string[];
                         blockedHosts: string[];
                         sensitiveWords: string[];
                         prohibitedWords: string[];
+                        prohibitedWordsForNameOfUser: string[];
                         bannedEmailDomains?: string[];
                         preservedUsernames: string[];
                         hcaptchaSecretKey: string | null;
                         mcaptchaSecretKey: string | null;
                         recaptchaSecretKey: string | null;
                         turnstileSecretKey: string | null;
-                        sensitiveMediaDetection: string;
-                        sensitiveMediaDetectionSensitivity: string;
+                        /** @enum {string} */
+                        sensitiveMediaDetection: 'none' | 'all' | 'local' | 'remote';
+                        /** @enum {string} */
+                        sensitiveMediaDetectionSensitivity: 'medium' | 'low' | 'high' | 'veryLow' | 'veryHigh';
                         setSensitiveFlagAutomatically: boolean;
                         enableSensitiveMediaDetectionForVideos: boolean;
                         /** Format: id */
@@ -15938,6 +9428,7 @@ export interface operations {
                         truemailAuthKey: string | null;
                         enableChartsForRemoteUser: boolean;
                         enableChartsForFederatedInstances: boolean;
+                        enableStatsForFederatedInstances: boolean;
                         enableServerMachineStats: boolean;
                         enableIdenticonGeneration: boolean;
                         manifestJsonOverride: string;
@@ -15948,15 +9439,14 @@ export interface operations {
                         perRemoteUserUserTimelineCacheMax: number;
                         perUserHomeTimelineCacheMax: number;
                         perUserListTimelineCacheMax: number;
+                        enableReactionsBuffering: boolean;
                         notesPerOneAd: number;
-                        wellKnownWebsites: string[];
-                        urlPreviewDenyList: string[];
-                        featuredGameChannels: string[];
                         backgroundImageUrl: string | null;
                         deeplAuthKey: string | null;
                         deeplIsPro: boolean;
                         defaultDarkTheme: string | null;
                         defaultLightTheme: string | null;
+                        clientOptions: Record<string, never>;
                         description: string | null;
                         disableRegistration: boolean;
                         impressumUrl: string | null;
@@ -15966,7 +9456,9 @@ export interface operations {
                         shortName: string | null;
                         objectStorageS3ForcePathStyle: boolean;
                         privacyPolicyUrl: string | null;
+                        inquiryUrl: string | null;
                         repositoryUrl: string | null;
+                        feedbackUrl: string | null;
                         /**
                          * @deprecated
                          * @description [Deprecated] Use "urlPreviewSummaryProxyUrl" instead.
@@ -15977,6 +9469,7 @@ export interface operations {
                         uri: string;
                         version: string;
                         urlPreviewEnabled: boolean;
+                        urlPreviewAllowRedirect: boolean;
                         urlPreviewTimeout: number;
                         urlPreviewMaximumContentLength: number;
                         urlPreviewRequireContentLength: boolean;
@@ -15985,8 +9478,20 @@ export interface operations {
                         /** @enum {string} */
                         federation: 'all' | 'specified' | 'none';
                         federationHosts: string[];
-                        prohibitedWordsForNameOfUser: string[];
-                        inquiryUrl: string | null;
+                        deliverSuspendedSoftware: {
+                            software: string;
+                            versionRange: string;
+                        }[];
+                        singleUserMode: boolean;
+                        /** @enum {string} */
+                        ugcVisibilityForVisitor: 'all' | 'local' | 'none';
+                        proxyRemoteFiles: boolean;
+                        signToActivityPubGet: boolean;
+                        allowExternalApRedirect: boolean;
+                        enableRemoteNotesCleaning: boolean;
+                        remoteNotesCleaningExpiryDaysForEachNotes: number;
+                        remoteNotesCleaningMaxProcessingDurationInMinutes: number;
+                        showRoleBadgesOfRemoteUsers: boolean;
                     };
                 };
             };
@@ -16038,12 +9543,6 @@ export interface operations {
         };
     };
     admin___promo___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -16059,7 +9558,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -16109,19 +9607,13 @@ export interface operations {
         };
     };
     admin___queue___clear: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
                     /** @enum {string} */
-                    type: 'system' | 'endedPollNotification' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
+                    queue: 'system' | 'endedPollNotification' | 'postScheduledNote' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
                     /** @enum {string} */
-                    state: '*' | 'wait' | 'delayed';
+                    state: '*' | 'completed' | 'wait' | 'active' | 'paused' | 'prioritized' | 'delayed' | 'failed';
                 };
             };
         };
@@ -16131,7 +9623,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -16181,13 +9672,6 @@ export interface operations {
         };
     };
     'admin___queue___deliver-delayed': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -16249,13 +9733,6 @@ export interface operations {
         };
     };
     'admin___queue___inbox-delayed': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -16316,18 +9793,80 @@ export interface operations {
             };
         };
     };
-    admin___queue___promote: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
+    admin___queue___jobs: {
         requestBody: {
             content: {
                 'application/json': {
                     /** @enum {string} */
-                    type: 'deliver' | 'inbox';
+                    queue: 'system' | 'endedPollNotification' | 'postScheduledNote' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
+                    state: ('active' | 'wait' | 'delayed' | 'completed' | 'failed' | 'paused')[];
+                    search?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['QueueJob'][];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    'admin___queue___promote-jobs': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** @enum {string} */
+                    queue: 'system' | 'endedPollNotification' | 'postScheduledNote' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
                 };
             };
         };
@@ -16337,7 +9876,435 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    'admin___queue___queue-stats': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** @enum {string} */
+                    queue: 'system' | 'endedPollNotification' | 'postScheduledNote' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        /** @enum {string} */
+                        name: 'system' | 'endedPollNotification' | 'postScheduledNote' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
+                        qualifiedName: string;
+                        counts: {
+                            [key: string]: number;
+                        };
+                        isPaused: boolean;
+                        metrics: {
+                            completed: components['schemas']['QueueMetrics'];
+                            failed: components['schemas']['QueueMetrics'];
+                        };
+                        db: {
+                            version: string;
+                            /** @enum {string} */
+                            mode: 'cluster' | 'standalone' | 'sentinel';
+                            runId: string;
+                            processId: string;
+                            port: number;
+                            os: string;
+                            uptime: number;
+                            memory: {
+                                total: number;
+                                used: number;
+                                fragmentationRatio: number;
+                                peak: number;
+                            };
+                            clients: {
+                                blocked: number;
+                                connected: number;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    admin___queue___queues: {
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        /** @enum {string} */
+                        name: 'system' | 'endedPollNotification' | 'postScheduledNote' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
+                        counts: {
+                            [key: string]: number;
+                        };
+                        isPaused: boolean;
+                        metrics: {
+                            completed: components['schemas']['QueueMetrics'];
+                            failed: components['schemas']['QueueMetrics'];
+                        };
+                    }[];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    'admin___queue___remove-job': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** @enum {string} */
+                    queue: 'system' | 'endedPollNotification' | 'postScheduledNote' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
+                    jobId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    'admin___queue___retry-job': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** @enum {string} */
+                    queue: 'system' | 'endedPollNotification' | 'postScheduledNote' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
+                    jobId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    'admin___queue___show-job': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** @enum {string} */
+                    queue: 'system' | 'endedPollNotification' | 'postScheduledNote' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
+                    jobId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['QueueJob'];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    'admin___queue___show-job-logs': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** @enum {string} */
+                    queue: 'system' | 'endedPollNotification' | 'postScheduledNote' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
+                    jobId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': string[];
+                };
             };
             /** @description Client error */
             400: {
@@ -16387,13 +10354,6 @@ export interface operations {
         };
     };
     admin___queue___stats: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -16456,83 +10416,7 @@ export interface operations {
             };
         };
     };
-    'admin___regenerate-user-token': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** Format: misskey:id */
-                    userId: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (without any results) */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     admin___relays___add: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -16608,13 +10492,6 @@ export interface operations {
         };
     };
     admin___relays___list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -16683,12 +10560,6 @@ export interface operations {
         };
     };
     admin___relays___remove: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -16702,7 +10573,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -16752,12 +10622,6 @@ export interface operations {
         };
     };
     'admin___reset-password': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -16826,12 +10690,6 @@ export interface operations {
         };
     };
     'admin___resolve-abuse-user-report': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -16839,8 +10697,6 @@ export interface operations {
                     reportId: string;
                     /** @enum {string|null} */
                     resolvedAs?: 'accept' | 'reject' | null;
-                    /** @default false */
-                    forward?: boolean;
                 };
             };
         };
@@ -16850,7 +10706,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -16900,12 +10755,6 @@ export interface operations {
         };
     };
     admin___roles___assign: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -16913,7 +10762,6 @@ export interface operations {
                     roleId: string;
                     /** Format: misskey:id */
                     userId: string;
-                    memo?: string;
                     expiresAt?: number | null;
                 };
             };
@@ -16924,7 +10772,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -16974,12 +10821,6 @@ export interface operations {
         };
     };
     admin___roles___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -16996,7 +10837,6 @@ export interface operations {
                     /** @default false */
                     isExplorable?: boolean;
                     asBadge: boolean;
-                    badgeBehavior?: string | null;
                     preserveAssignmentOnMoveAccount?: boolean;
                     canEditMembersByModerator: boolean;
                     displayOrder: number;
@@ -17062,12 +10902,6 @@ export interface operations {
         };
     };
     admin___roles___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -17082,7 +10916,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -17132,13 +10965,6 @@ export interface operations {
         };
     };
     admin___roles___list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -17197,12 +11023,6 @@ export interface operations {
         };
     };
     admin___roles___show: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -17269,12 +11089,6 @@ export interface operations {
         };
     };
     admin___roles___unassign: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -17291,7 +11105,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -17341,12 +11154,6 @@ export interface operations {
         };
     };
     admin___roles___update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -17364,7 +11171,6 @@ export interface operations {
                     isAdministrator?: boolean;
                     isExplorable?: boolean;
                     asBadge?: boolean;
-                    badgeBehavior?: string | null;
                     preserveAssignmentOnMoveAccount?: boolean;
                     canEditMembersByModerator?: boolean;
                     displayOrder?: number;
@@ -17378,7 +11184,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -17428,12 +11233,6 @@ export interface operations {
         };
     };
     'admin___roles___update-default-policies': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -17447,7 +11246,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -17497,12 +11295,6 @@ export interface operations {
         };
     };
     admin___roles___users: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -17512,6 +11304,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                 };
@@ -17530,7 +11324,6 @@ export interface operations {
                         /** Format: date-time */
                         createdAt: string;
                         user: components['schemas']['UserDetailed'];
-                        memo: string | null;
                         /** Format: date-time */
                         expiresAt: string | null;
                     }[];
@@ -17584,12 +11377,6 @@ export interface operations {
         };
     };
     'admin___send-email': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -17605,7 +11392,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -17655,13 +11441,6 @@ export interface operations {
         };
     };
     'admin___server-info': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -17744,12 +11523,6 @@ export interface operations {
         };
     };
     'admin___show-moderation-logs': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -17759,9 +11532,12 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     type?: string | null;
                     /** Format: misskey:id */
                     userId?: string | null;
+                    search?: string | null;
                 };
             };
         };
@@ -17781,7 +11557,7 @@ export interface operations {
                         info: Record<string, never>;
                         /** Format: id */
                         userId: string;
-                        user: components['schemas']['UserDetailed'];
+                        user: components['schemas']['UserDetailedNotMe'];
                     }[];
                 };
             };
@@ -17833,12 +11609,6 @@ export interface operations {
         };
     };
     'admin___show-user': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -17941,6 +11711,24 @@ export interface operations {
                                 /** Format: misskey:id */
                                 userListId: string;
                             };
+                            scheduledNotePosted?: {
+                                /** @enum {string} */
+                                type: 'all' | 'following' | 'follower' | 'mutualFollow' | 'followingOrFollower' | 'never';
+                            } | {
+                                /** @enum {string} */
+                                type: 'list';
+                                /** Format: misskey:id */
+                                userListId: string;
+                            };
+                            scheduledNotePostFailed?: {
+                                /** @enum {string} */
+                                type: 'all' | 'following' | 'follower' | 'mutualFollow' | 'followingOrFollower' | 'never';
+                            } | {
+                                /** @enum {string} */
+                                type: 'list';
+                                /** Format: misskey:id */
+                                userListId: string;
+                            };
                             receiveFollowRequest?: {
                                 /** @enum {string} */
                                 type: 'all' | 'following' | 'follower' | 'mutualFollow' | 'followingOrFollower' | 'never';
@@ -18007,8 +11795,6 @@ export interface operations {
                         };
                         isModerator: boolean;
                         isSilenced: boolean;
-                        isLimited: boolean;
-                        isDeleted: boolean;
                         isSuspended: boolean;
                         isHibernated: boolean;
                         lastActiveDate: string | null;
@@ -18020,7 +11806,6 @@ export interface operations {
                             createdAt: string;
                             expiresAt: string | null;
                             roleId: string;
-                            memo: string | null;
                         }[];
                     };
                 };
@@ -18072,108 +11857,7 @@ export interface operations {
             };
         };
     };
-    'admin___show-user-account-move-logs': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @default 10 */
-                    limit?: number;
-                    /** Format: misskey:id */
-                    sinceId?: string;
-                    /** Format: misskey:id */
-                    untilId?: string;
-                    /** Format: misskey:id */
-                    movedFromId?: string | null;
-                    /** Format: misskey:id */
-                    movedToId?: string | null;
-                    /** @enum {string|null} */
-                    from?: 'local' | 'remote' | 'all' | null;
-                    /** @enum {string|null} */
-                    to?: 'local' | 'remote' | 'all' | null;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        /** Format: id */
-                        id: string;
-                        /** Format: date-time */
-                        createdAt: string;
-                        /** Format: id */
-                        movedToId: string;
-                        movedTo: components['schemas']['UserDetailed'];
-                        /** Format: id */
-                        movedFromId: string;
-                        movedFrom: components['schemas']['UserDetailed'];
-                    }[];
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     'admin___show-users': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -18260,365 +11944,7 @@ export interface operations {
             };
         };
     };
-    admin___sso___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    name?: string | null;
-                    /** @enum {string} */
-                    type: 'saml' | 'jwt';
-                    issuer: string;
-                    /** @default [] */
-                    audience?: string[];
-                    /** @enum {string} */
-                    binding?: 'post' | 'redirect';
-                    acsUrl: string;
-                    signatureAlgorithm: string;
-                    cipherAlgorithm?: string | null;
-                    /** @default false */
-                    wantAuthnRequestsSigned?: boolean;
-                    /** @default true */
-                    wantAssertionsSigned?: boolean;
-                    /** @default true */
-                    wantEmailAddressNormalized?: boolean;
-                    /** @default true */
-                    useCertificate: boolean;
-                    secret?: string | null;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        id: string;
-                        /** Format: date-time */
-                        createdAt: string;
-                        name: string | null;
-                        /** @enum {string} */
-                        type: 'saml' | 'jwt';
-                        issuer: string;
-                        audience: string[];
-                        /** @enum {string} */
-                        binding: 'post' | 'redirect';
-                        acsUrl: string;
-                        publicKey: string;
-                        signatureAlgorithm: string;
-                        cipherAlgorithm?: string | null;
-                        wantAuthnRequestsSigned: boolean;
-                        wantAssertionsSigned: boolean;
-                        wantEmailAddressNormalized: boolean;
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    admin___sso___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    id: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (without any results) */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    admin___sso___list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @default 10 */
-                    limit?: number;
-                    /** @default 0 */
-                    offset?: number;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        id: string;
-                        /** Format: date-time */
-                        createdAt: string;
-                        name: string | null;
-                        /** @enum {string} */
-                        type: 'saml' | 'jwt';
-                        issuer: string;
-                        audience: string[];
-                        /** @enum {string} */
-                        binding: 'post' | 'redirect';
-                        acsUrl: string;
-                        useCertificate: boolean;
-                        publicKey: string;
-                        signatureAlgorithm: string;
-                        cipherAlgorithm?: string | null;
-                        wantAuthnRequestsSigned: boolean;
-                        wantAssertionsSigned: boolean;
-                        wantEmailAddressNormalized: boolean;
-                    }[];
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    admin___sso___update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    id: string;
-                    name?: string | null;
-                    issuer?: string;
-                    audience?: string[];
-                    /** @enum {string} */
-                    binding?: 'post' | 'redirect';
-                    acsUrl?: string;
-                    signatureAlgorithm?: string;
-                    cipherAlgorithm?: string | null;
-                    wantAuthnRequestsSigned?: boolean;
-                    wantAssertionsSigned?: boolean;
-                    wantEmailAddressNormalized?: boolean;
-                    regenerateCertificate?: boolean | null;
-                    secret?: string | null;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (without any results) */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     'admin___suspend-user': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -18633,7 +11959,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -18683,20 +12008,15 @@ export interface operations {
         };
     };
     'admin___system-webhook___create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
                     isActive: boolean;
                     name: string;
-                    on: ('abuseReport' | 'abuseReportResolved' | 'userCreated' | 'inactiveModeratorsWarning' | 'inactiveModeratorsInvitationOnlyChanged' | 'reportAutoResolved')[];
+                    on: ('abuseReport' | 'abuseReportResolved' | 'userCreated' | 'inactiveModeratorsWarning' | 'inactiveModeratorsInvitationOnlyChanged')[];
                     url: string;
-                    secret: string;
+                    /** @default  */
+                    secret?: string;
                 };
             };
         };
@@ -18758,12 +12078,6 @@ export interface operations {
         };
     };
     'admin___system-webhook___delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -18778,7 +12092,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -18828,17 +12141,11 @@ export interface operations {
         };
     };
     'admin___system-webhook___list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
                     isActive?: boolean;
-                    on?: ('abuseReport' | 'abuseReportResolved' | 'userCreated' | 'inactiveModeratorsWarning' | 'inactiveModeratorsInvitationOnlyChanged' | 'reportAutoResolved')[];
+                    on?: ('abuseReport' | 'abuseReportResolved' | 'userCreated' | 'inactiveModeratorsWarning' | 'inactiveModeratorsInvitationOnlyChanged')[];
                 };
             };
         };
@@ -18900,12 +12207,6 @@ export interface operations {
         };
     };
     'admin___system-webhook___show': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -18972,19 +12273,13 @@ export interface operations {
         };
     };
     'admin___system-webhook___test': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
                     /** Format: misskey:id */
                     webhookId: string;
                     /** @enum {string} */
-                    type: 'abuseReport' | 'abuseReportResolved' | 'userCreated' | 'inactiveModeratorsWarning' | 'inactiveModeratorsInvitationOnlyChanged' | 'reportAutoResolved';
+                    type: 'abuseReport' | 'abuseReportResolved' | 'userCreated' | 'inactiveModeratorsWarning' | 'inactiveModeratorsInvitationOnlyChanged';
                     override?: {
                         url?: string;
                         secret?: string;
@@ -18998,7 +12293,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -19057,12 +12351,6 @@ export interface operations {
         };
     };
     'admin___system-webhook___update': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -19070,9 +12358,10 @@ export interface operations {
                     id: string;
                     isActive: boolean;
                     name: string;
-                    on: ('abuseReport' | 'abuseReportResolved' | 'userCreated' | 'inactiveModeratorsWarning' | 'inactiveModeratorsInvitationOnlyChanged' | 'reportAutoResolved')[];
+                    on: ('abuseReport' | 'abuseReportResolved' | 'userCreated' | 'inactiveModeratorsWarning' | 'inactiveModeratorsInvitationOnlyChanged')[];
                     url: string;
-                    secret: string;
+                    /** @default  */
+                    secret?: string;
                 };
             };
         };
@@ -19134,12 +12423,6 @@ export interface operations {
         };
     };
     'admin___unset-user-avatar': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -19154,7 +12437,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -19204,12 +12486,6 @@ export interface operations {
         };
     };
     'admin___unset-user-banner': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -19224,79 +12500,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    'admin___unset-user-mutual-link': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** Format: misskey:id */
-                    userId: string;
-                    /** Format: misskey:id */
-                    itemId: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (without any results) */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -19346,12 +12549,6 @@ export interface operations {
         };
     };
     'admin___unsuspend-user': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -19366,7 +12563,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -19416,12 +12612,6 @@ export interface operations {
         };
     };
     'admin___update-abuse-user-report': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -19437,7 +12627,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -19487,12 +12676,6 @@ export interface operations {
         };
     };
     'admin___update-meta': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -19502,6 +12685,7 @@ export interface operations {
                     blockedHosts?: string[] | null;
                     sensitiveWords?: string[] | null;
                     prohibitedWords?: string[] | null;
+                    prohibitedWordsForNameOfUser?: string[] | null;
                     themeColor?: string | null;
                     mascotImageUrl?: string | null;
                     bannerUrl?: string | null;
@@ -19518,6 +12702,7 @@ export interface operations {
                     description?: string | null;
                     defaultLightTheme?: string | null;
                     defaultDarkTheme?: string | null;
+                    clientOptions?: Record<string, never>;
                     cacheRemoteFiles?: boolean;
                     cacheRemoteSensitiveFiles?: boolean;
                     emailRequiredForSignup?: boolean;
@@ -19534,7 +12719,8 @@ export interface operations {
                     enableTurnstile?: boolean;
                     turnstileSiteKey?: string | null;
                     turnstileSecretKey?: string | null;
-                    googleAnalyticsId?: string | null;
+                    enableTestcaptcha?: boolean;
+                    googleAnalyticsMeasurementId?: string | null;
                     /** @enum {string} */
                     sensitiveMediaDetection?: 'none' | 'all' | 'local' | 'remote';
                     /** @enum {string} */
@@ -19561,6 +12747,7 @@ export interface operations {
                     feedbackUrl?: string | null;
                     impressumUrl?: string | null;
                     privacyPolicyUrl?: string | null;
+                    inquiryUrl?: string | null;
                     useObjectStorage?: boolean;
                     objectStorageBaseUrl?: string | null;
                     objectStorageBucket?: string | null;
@@ -19583,6 +12770,7 @@ export interface operations {
                     truemailAuthKey?: string | null;
                     enableChartsForRemoteUser?: boolean;
                     enableChartsForFederatedInstances?: boolean;
+                    enableStatsForFederatedInstances?: boolean;
                     enableServerMachineStats?: boolean;
                     enableIdenticonGeneration?: boolean;
                     serverRules?: string[];
@@ -19595,24 +12783,36 @@ export interface operations {
                     perRemoteUserUserTimelineCacheMax?: number;
                     perUserHomeTimelineCacheMax?: number;
                     perUserListTimelineCacheMax?: number;
+                    enableReactionsBuffering?: boolean;
                     notesPerOneAd?: number;
                     silencedHosts?: string[] | null;
-                    sensitiveMediaHosts?: string[] | null;
-                    wellKnownWebsites?: string[] | null;
-                    urlPreviewDenyList?: string[] | null;
-                    featuredGameChannels?: string[] | null;
+                    mediaSilencedHosts?: string[] | null;
                     /** @description [Deprecated] Use "urlPreviewSummaryProxyUrl" instead. */
                     summalyProxy?: string | null;
                     urlPreviewEnabled?: boolean;
+                    urlPreviewAllowRedirect?: boolean;
                     urlPreviewTimeout?: number;
                     urlPreviewMaximumContentLength?: number;
                     urlPreviewRequireContentLength?: boolean;
                     urlPreviewUserAgent?: string | null;
                     urlPreviewSummaryProxyUrl?: string | null;
-                    prohibitedWordsForNameOfUser?: string[] | null;
                     /** @enum {string} */
                     federation?: 'all' | 'none' | 'specified';
                     federationHosts?: string[];
+                    deliverSuspendedSoftware?: {
+                        software: string;
+                        versionRange: string;
+                    }[];
+                    singleUserMode?: boolean;
+                    /** @enum {string} */
+                    ugcVisibilityForVisitor?: 'all' | 'local' | 'none';
+                    proxyRemoteFiles?: boolean;
+                    signToActivityPubGet?: boolean;
+                    allowExternalApRedirect?: boolean;
+                    enableRemoteNotesCleaning?: boolean;
+                    remoteNotesCleaningExpiryDaysForEachNotes?: number;
+                    remoteNotesCleaningMaxProcessingDurationInMinutes?: number;
+                    showRoleBadgesOfRemoteUsers?: boolean;
                 };
             };
         };
@@ -19622,7 +12822,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -19672,12 +12871,6 @@ export interface operations {
         };
     };
     'admin___update-proxy-account': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -19742,84 +12935,7 @@ export interface operations {
             };
         };
     };
-    'admin___update-user-name': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** Format: misskey:id */
-                    userId: string;
-                    name?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (without any results) */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     'admin___update-user-note': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -19834,79 +12950,6 @@ export interface operations {
             204: {
                 headers: {
                     [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    announcement: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** Format: misskey:id */
-                    announcementId: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Announcement'];
                 };
             };
             /** @description Client error */
@@ -19957,12 +13000,6 @@ export interface operations {
         };
     };
     announcements: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -19972,8 +13009,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
-                    /** @default 0 */
-                    offset?: number;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default true */
                     isActive?: boolean;
                 };
@@ -20037,12 +13074,6 @@ export interface operations {
         };
     };
     announcements___show: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -20109,12 +13140,6 @@ export interface operations {
         };
     };
     antennas___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -20193,12 +13218,6 @@ export interface operations {
         };
     };
     antennas___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -20213,7 +13232,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -20263,13 +13281,6 @@ export interface operations {
         };
     };
     antennas___list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -20328,12 +13339,6 @@ export interface operations {
         };
     };
     antennas___notes: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -20408,12 +13413,6 @@ export interface operations {
         };
     };
     antennas___show: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -20480,12 +13479,6 @@ export interface operations {
         };
     };
     antennas___update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -20566,12 +13559,6 @@ export interface operations {
         };
     };
     ap___get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -20646,12 +13633,6 @@ export interface operations {
         };
     };
     ap___show: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -20734,12 +13715,6 @@ export interface operations {
         };
     };
     app___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -20808,12 +13783,6 @@ export interface operations {
         };
     };
     app___show: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -20880,12 +13849,6 @@ export interface operations {
         };
     };
     auth___accept: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -20899,7 +13862,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -20949,12 +13911,6 @@ export interface operations {
         };
     };
     auth___session___generate: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -21024,12 +13980,6 @@ export interface operations {
         };
     };
     auth___session___show: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -21100,12 +14050,6 @@ export interface operations {
         };
     };
     auth___session___userkey: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -21123,7 +14067,7 @@ export interface operations {
                 content: {
                     'application/json': {
                         accessToken: string;
-                        user: components['schemas']['UserDetailed'];
+                        user: components['schemas']['UserDetailedNotMe'];
                     };
                 };
             };
@@ -21175,12 +14119,6 @@ export interface operations {
         };
     };
     blocking___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -21256,12 +14194,6 @@ export interface operations {
         };
     };
     blocking___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -21337,12 +14269,6 @@ export interface operations {
         };
     };
     blocking___list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -21352,6 +14278,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -21412,89 +14340,7 @@ export interface operations {
             };
         };
     };
-    'get___bubble-game___ranking': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    gameMode: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        /** Format: misskey:id */
-                        id: string;
-                        score: number;
-                        user?: components['schemas']['UserLite'] | null;
-                    }[];
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     'bubble-game___ranking': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -21513,7 +14359,7 @@ export interface operations {
                         /** Format: misskey:id */
                         id: string;
                         score: number;
-                        user?: components['schemas']['UserLite'] | null;
+                        user?: components['schemas']['UserLite'];
                     }[];
                 };
             };
@@ -21565,12 +14411,6 @@ export interface operations {
         };
     };
     'bubble-game___register': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -21588,7 +14428,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -21647,12 +14486,6 @@ export interface operations {
         };
     };
     channels___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -21733,12 +14566,6 @@ export interface operations {
         };
     };
     channels___favorite: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -21753,7 +14580,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -21803,78 +14629,6 @@ export interface operations {
         };
     };
     channels___featured: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Channel'][];
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    'channels___featured-games': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -21933,12 +14687,6 @@ export interface operations {
         };
     };
     channels___follow: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -21953,7 +14701,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -22003,12 +14750,6 @@ export interface operations {
         };
     };
     channels___followed: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -22016,6 +14757,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 5 */
                     limit?: number;
                 };
@@ -22078,14 +14821,193 @@ export interface operations {
             };
         };
     };
-    'channels___my-favorites': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    channels___mute___create: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    channelId: string;
+                    /** @description A Unix Epoch timestamp that must lie in the future. `null` means an indefinite mute. */
+                    expiresAt?: number | null;
+                };
+            };
         };
-        requestBody?: never;
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    channels___mute___delete: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    channelId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    channels___mute___list: {
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Channel'][];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    'channels___my-favorites': {
         responses: {
             /** @description OK (with results) */
             200: {
@@ -22144,12 +15066,6 @@ export interface operations {
         };
     };
     channels___owned: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -22157,6 +15073,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 5 */
                     limit?: number;
                 };
@@ -22220,12 +15138,6 @@ export interface operations {
         };
     };
     channels___search: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -22239,6 +15151,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 5 */
                     limit?: number;
                 };
@@ -22302,12 +15216,6 @@ export interface operations {
         };
     };
     channels___show: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -22374,12 +15282,6 @@ export interface operations {
         };
     };
     channels___timeline: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -22456,12 +15358,6 @@ export interface operations {
         };
     };
     channels___unfavorite: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -22476,7 +15372,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -22526,12 +15421,6 @@ export interface operations {
         };
     };
     channels___unfollow: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -22546,7 +15435,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -22596,12 +15484,6 @@ export interface operations {
         };
     };
     channels___update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -22676,99 +15558,7 @@ export interface operations {
             };
         };
     };
-    'get___charts___active-users': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @enum {string} */
-                    span: 'day' | 'hour';
-                    /** @default 30 */
-                    limit?: number;
-                    /** @default null */
-                    offset?: number | null;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        readWrite: number[];
-                        read: number[];
-                        write: number[];
-                        registeredWithinWeek: number[];
-                        registeredWithinMonth: number[];
-                        registeredWithinYear: number[];
-                        registeredOutsideWeek: number[];
-                        registeredOutsideMonth: number[];
-                        registeredOutsideYear: number[];
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     'charts___active-users': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -22798,86 +15588,6 @@ export interface operations {
                         registeredOutsideWeek: number[];
                         registeredOutsideMonth: number[];
                         registeredOutsideYear: number[];
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    'get___charts___ap-request': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @enum {string} */
-                    span: 'day' | 'hour';
-                    /** @default 30 */
-                    limit?: number;
-                    /** @default null */
-                    offset?: number | null;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        deliverFailed: number[];
-                        deliverSucceeded: number[];
-                        inboxReceived: number[];
                     };
                 };
             };
@@ -22929,12 +15639,6 @@ export interface operations {
         };
     };
     'charts___ap-request': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -23008,102 +15712,7 @@ export interface operations {
             };
         };
     };
-    get___charts___drive: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @enum {string} */
-                    span: 'day' | 'hour';
-                    /** @default 30 */
-                    limit?: number;
-                    /** @default null */
-                    offset?: number | null;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        local: {
-                            incCount: number[];
-                            incSize: number[];
-                            decCount: number[];
-                            decSize: number[];
-                        };
-                        remote: {
-                            incCount: number[];
-                            incSize: number[];
-                            decCount: number[];
-                            decSize: number[];
-                        };
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     charts___drive: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -23136,91 +15745,6 @@ export interface operations {
                             decCount: number[];
                             decSize: number[];
                         };
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    get___charts___federation: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @enum {string} */
-                    span: 'day' | 'hour';
-                    /** @default 30 */
-                    limit?: number;
-                    /** @default null */
-                    offset?: number | null;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        deliveredInstances: number[];
-                        inboxInstances: number[];
-                        stalled: number[];
-                        sub: number[];
-                        pub: number[];
-                        pubsub: number[];
-                        subActive: number[];
-                        pubActive: number[];
                     };
                 };
             };
@@ -23272,12 +15796,6 @@ export interface operations {
         };
     };
     charts___federation: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -23356,129 +15874,7 @@ export interface operations {
             };
         };
     };
-    get___charts___instance: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @enum {string} */
-                    span: 'day' | 'hour';
-                    /** @default 30 */
-                    limit?: number;
-                    /** @default null */
-                    offset?: number | null;
-                    host: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        requests: {
-                            failed: number[];
-                            succeeded: number[];
-                            received: number[];
-                        };
-                        notes: {
-                            total: number[];
-                            inc: number[];
-                            dec: number[];
-                            diffs: {
-                                normal: number[];
-                                reply: number[];
-                                renote: number[];
-                                withFile: number[];
-                            };
-                        };
-                        users: {
-                            total: number[];
-                            inc: number[];
-                            dec: number[];
-                        };
-                        following: {
-                            total: number[];
-                            inc: number[];
-                            dec: number[];
-                        };
-                        followers: {
-                            total: number[];
-                            inc: number[];
-                            dec: number[];
-                        };
-                        drive: {
-                            totalFiles: number[];
-                            incFiles: number[];
-                            decFiles: number[];
-                            incUsage: number[];
-                            decUsage: number[];
-                        };
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     charts___instance: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -23537,105 +15933,6 @@ export interface operations {
                             decFiles: number[];
                             incUsage: number[];
                             decUsage: number[];
-                        };
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    get___charts___notes: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @enum {string} */
-                    span: 'day' | 'hour';
-                    /** @default 30 */
-                    limit?: number;
-                    /** @default null */
-                    offset?: number | null;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        local: {
-                            total: number[];
-                            inc: number[];
-                            dec: number[];
-                            diffs: {
-                                normal: number[];
-                                reply: number[];
-                                renote: number[];
-                                withFile: number[];
-                            };
-                        };
-                        remote: {
-                            total: number[];
-                            inc: number[];
-                            dec: number[];
-                            diffs: {
-                                normal: number[];
-                                reply: number[];
-                                renote: number[];
-                                withFile: number[];
-                            };
                         };
                     };
                 };
@@ -23688,12 +15985,6 @@ export interface operations {
         };
     };
     charts___notes: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -23736,91 +16027,6 @@ export interface operations {
                                 withFile: number[];
                             };
                         };
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    get___charts___user___drive: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @enum {string} */
-                    span: 'day' | 'hour';
-                    /** @default 30 */
-                    limit?: number;
-                    /** @default null */
-                    offset?: number | null;
-                    /** Format: misskey:id */
-                    userId: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        totalCount: number[];
-                        totalSize: number[];
-                        incCount: number[];
-                        incSize: number[];
-                        decCount: number[];
-                        decSize: number[];
                     };
                 };
             };
@@ -23872,12 +16078,6 @@ export interface operations {
         };
     };
     charts___user___drive: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -23956,116 +16156,7 @@ export interface operations {
             };
         };
     };
-    get___charts___user___following: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @enum {string} */
-                    span: 'day' | 'hour';
-                    /** @default 30 */
-                    limit?: number;
-                    /** @default null */
-                    offset?: number | null;
-                    /** Format: misskey:id */
-                    userId: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        local: {
-                            followings: {
-                                total: number[];
-                                inc: number[];
-                                dec: number[];
-                            };
-                            followers: {
-                                total: number[];
-                                inc: number[];
-                                dec: number[];
-                            };
-                        };
-                        remote: {
-                            followings: {
-                                total: number[];
-                                inc: number[];
-                                dec: number[];
-                            };
-                            followers: {
-                                total: number[];
-                                inc: number[];
-                                dec: number[];
-                            };
-                        };
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     charts___user___following: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -24111,94 +16202,6 @@ export interface operations {
                                 inc: number[];
                                 dec: number[];
                             };
-                        };
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    get___charts___user___notes: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @enum {string} */
-                    span: 'day' | 'hour';
-                    /** @default 30 */
-                    limit?: number;
-                    /** @default null */
-                    offset?: number | null;
-                    /** Format: misskey:id */
-                    userId: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        total: number[];
-                        inc: number[];
-                        dec: number[];
-                        diffs: {
-                            normal: number[];
-                            reply: number[];
-                            renote: number[];
-                            withFile: number[];
                         };
                     };
                 };
@@ -24251,12 +16254,6 @@ export interface operations {
         };
     };
     charts___user___notes: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -24338,100 +16335,7 @@ export interface operations {
             };
         };
     };
-    get___charts___user___pv: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @enum {string} */
-                    span: 'day' | 'hour';
-                    /** @default 30 */
-                    limit?: number;
-                    /** @default null */
-                    offset?: number | null;
-                    /** Format: misskey:id */
-                    userId: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        upv: {
-                            user: number[];
-                            visitor: number[];
-                        };
-                        pv: {
-                            user: number[];
-                            visitor: number[];
-                        };
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     charts___user___pv: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -24461,91 +16365,6 @@ export interface operations {
                         pv: {
                             user: number[];
                             visitor: number[];
-                        };
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    get___charts___user___reactions: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @enum {string} */
-                    span: 'day' | 'hour';
-                    /** @default 30 */
-                    limit?: number;
-                    /** @default null */
-                    offset?: number | null;
-                    /** Format: misskey:id */
-                    userId: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        local: {
-                            count: number[];
-                        };
-                        remote: {
-                            count: number[];
                         };
                     };
                 };
@@ -24598,12 +16417,6 @@ export interface operations {
         };
     };
     charts___user___reactions: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -24682,13 +16495,7 @@ export interface operations {
             };
         };
     };
-    get___charts___users: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
+    charts___users: {
         requestBody: {
             content: {
                 'application/json': {
@@ -24769,22 +16576,14 @@ export interface operations {
             };
         };
     };
-    charts___users: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
+    chat___history: {
         requestBody: {
             content: {
                 'application/json': {
-                    /** @enum {string} */
-                    span: 'day' | 'hour';
-                    /** @default 30 */
+                    /** @default 10 */
                     limit?: number;
-                    /** @default null */
-                    offset?: number | null;
+                    /** @default false */
+                    room?: boolean;
                 };
             };
         };
@@ -24795,18 +16594,1660 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    'application/json': {
-                        local: {
-                            total: number[];
-                            inc: number[];
-                            dec: number[];
-                        };
-                        remote: {
-                            total: number[];
-                            inc: number[];
-                            dec: number[];
-                        };
-                    };
+                    'application/json': components['schemas']['ChatMessage'][];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    'chat___messages___create-to-room': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    text?: string | null;
+                    /** Format: misskey:id */
+                    fileId?: string;
+                    /** Format: misskey:id */
+                    toRoomId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['ChatMessageLiteForRoom'];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    'chat___messages___create-to-user': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    text?: string | null;
+                    /** Format: misskey:id */
+                    fileId?: string;
+                    /** Format: misskey:id */
+                    toUserId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['ChatMessageLiteFor1on1'];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    chat___messages___delete: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    messageId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    chat___messages___react: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    messageId: string;
+                    reaction: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    'chat___messages___room-timeline': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** @default 10 */
+                    limit?: number;
+                    /** Format: misskey:id */
+                    sinceId?: string;
+                    /** Format: misskey:id */
+                    untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
+                    /** Format: misskey:id */
+                    roomId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['ChatMessageLiteForRoom'][];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    chat___messages___search: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    query: string;
+                    /** @default 10 */
+                    limit?: number;
+                    /** Format: misskey:id */
+                    userId?: string | null;
+                    /** Format: misskey:id */
+                    roomId?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['ChatMessage'][];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    chat___messages___show: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    messageId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['ChatMessage'];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    chat___messages___unreact: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    messageId: string;
+                    reaction: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    'chat___messages___user-timeline': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** @default 10 */
+                    limit?: number;
+                    /** Format: misskey:id */
+                    sinceId?: string;
+                    /** Format: misskey:id */
+                    untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
+                    /** Format: misskey:id */
+                    userId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['ChatMessageLiteFor1on1'][];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    'chat___read-all': {
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    chat___rooms___create: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    name: string;
+                    description?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['ChatRoom'];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    chat___rooms___delete: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    roomId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    chat___rooms___invitations___create: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    roomId: string;
+                    /** Format: misskey:id */
+                    userId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['ChatRoomInvitation'];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    chat___rooms___invitations___ignore: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    roomId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    chat___rooms___invitations___inbox: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** @default 30 */
+                    limit?: number;
+                    /** Format: misskey:id */
+                    sinceId?: string;
+                    /** Format: misskey:id */
+                    untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['ChatRoomInvitation'][];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    chat___rooms___invitations___outbox: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    roomId: string;
+                    /** @default 30 */
+                    limit?: number;
+                    /** Format: misskey:id */
+                    sinceId?: string;
+                    /** Format: misskey:id */
+                    untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['ChatRoomInvitation'][];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    chat___rooms___join: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    roomId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    chat___rooms___joining: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** @default 30 */
+                    limit?: number;
+                    /** Format: misskey:id */
+                    sinceId?: string;
+                    /** Format: misskey:id */
+                    untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['ChatRoomMembership'][];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    chat___rooms___leave: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    roomId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    chat___rooms___members: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    roomId: string;
+                    /** @default 30 */
+                    limit?: number;
+                    /** Format: misskey:id */
+                    sinceId?: string;
+                    /** Format: misskey:id */
+                    untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['ChatRoomMembership'][];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    chat___rooms___mute: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    roomId: string;
+                    mute: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    chat___rooms___owned: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** @default 30 */
+                    limit?: number;
+                    /** Format: misskey:id */
+                    sinceId?: string;
+                    /** Format: misskey:id */
+                    untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['ChatRoom'][];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    chat___rooms___show: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    roomId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['ChatRoom'];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    chat___rooms___update: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    roomId: string;
+                    name?: string;
+                    description?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['ChatRoom'];
                 };
             };
             /** @description Client error */
@@ -24857,12 +18298,6 @@ export interface operations {
         };
     };
     'clips___add-note': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -24879,7 +18314,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -24938,12 +18372,6 @@ export interface operations {
         };
     };
     clips___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -25012,12 +18440,6 @@ export interface operations {
         };
     };
     clips___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -25032,7 +18454,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -25082,12 +18503,6 @@ export interface operations {
         };
     };
     clips___favorite: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -25102,7 +18517,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -25152,13 +18566,20 @@ export interface operations {
         };
     };
     clips___list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** @default 10 */
+                    limit?: number;
+                    /** Format: misskey:id */
+                    sinceId?: string;
+                    /** Format: misskey:id */
+                    untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
+                };
+            };
         };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -25217,13 +18638,6 @@ export interface operations {
         };
     };
     'clips___my-favorites': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -25282,12 +18696,6 @@ export interface operations {
         };
     };
     clips___notes: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -25299,6 +18707,9 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
+                    search?: string | null;
                 };
             };
         };
@@ -25360,12 +18771,6 @@ export interface operations {
         };
     };
     'clips___remove-note': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -25382,7 +18787,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -25432,12 +18836,6 @@ export interface operations {
         };
     };
     clips___show: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -25504,12 +18902,6 @@ export interface operations {
         };
     };
     clips___unfavorite: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -25524,7 +18916,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -25574,12 +18965,6 @@ export interface operations {
         };
     };
     clips___update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -25649,13 +19034,6 @@ export interface operations {
         };
     };
     drive: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -25717,12 +19095,6 @@ export interface operations {
         };
     };
     drive___files: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -25732,6 +19104,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /**
                      * Format: misskey:id
                      * @default null
@@ -25800,13 +19174,7 @@ export interface operations {
             };
         };
     };
-    'drive___files___attached-notes': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
+    'drive___files___attached-chat-messages': {
         requestBody: {
             content: {
                 'application/json': {
@@ -25814,6 +19182,82 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
+                    /** @default 10 */
+                    limit?: number;
+                    /** Format: misskey:id */
+                    fileId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['ChatMessage'][];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    'drive___files___attached-notes': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    sinceId?: string;
+                    /** Format: misskey:id */
+                    untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                     /** Format: misskey:id */
@@ -25879,12 +19323,6 @@ export interface operations {
         };
     };
     'drive___files___check-existence': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -25950,12 +19388,6 @@ export interface operations {
         };
     };
     drive___files___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'multipart/form-data': {
@@ -25976,7 +19408,7 @@ export interface operations {
                      * Format: binary
                      * @description The file contents.
                      */
-                    file: string;
+                    file: Blob;
                 };
             };
         };
@@ -26047,12 +19479,6 @@ export interface operations {
         };
     };
     drive___files___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -26067,7 +19493,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -26117,12 +19542,6 @@ export interface operations {
         };
     };
     drive___files___find: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -26193,12 +19612,6 @@ export interface operations {
         };
     };
     'drive___files___find-by-hash': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -26263,20 +19676,79 @@ export interface operations {
             };
         };
     };
-    drive___files___show: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    'drive___files___move-bulk': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    fileIds: string[];
+                    /** Format: misskey:id */
+                    folderId?: string | null;
+                };
+            };
         };
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    drive___files___show: {
         requestBody: {
             content: {
                 'application/json': {
                     /** Format: misskey:id */
-                    fileId?: string;
-                    url?: string;
-                } | unknown | unknown;
+                    fileId: string;
+                } | {
+                    url: string;
+                };
             };
         };
         responses: {
@@ -26337,12 +19809,6 @@ export interface operations {
         };
     };
     drive___files___update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -26414,12 +19880,6 @@ export interface operations {
         };
     };
     'drive___files___upload-from-url': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -26446,7 +19906,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -26505,12 +19964,6 @@ export interface operations {
         };
     };
     drive___folders: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -26520,6 +19973,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /**
                      * Format: misskey:id
                      * @default null
@@ -26586,12 +20041,6 @@ export interface operations {
         };
     };
     drive___folders___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -26669,12 +20118,6 @@ export interface operations {
         };
     };
     drive___folders___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -26689,7 +20132,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -26739,12 +20181,6 @@ export interface operations {
         };
     };
     drive___folders___find: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -26815,12 +20251,6 @@ export interface operations {
         };
     };
     drive___folders___show: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -26887,12 +20317,6 @@ export interface operations {
         };
     };
     drive___folders___update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -26962,12 +20386,6 @@ export interface operations {
         };
     };
     drive___stream: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -26977,6 +20395,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     type?: string;
                 };
             };
@@ -27039,12 +20459,6 @@ export interface operations {
         };
     };
     'email-address___available': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -27112,84 +20526,7 @@ export interface operations {
             };
         };
     };
-    get___emoji: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    name: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['EmojiDetailed'];
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     emoji: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -27205,73 +20542,6 @@ export interface operations {
                 };
                 content: {
                     'application/json': components['schemas']['EmojiDetailed'];
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    get___emojis: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        emojis: components['schemas']['EmojiSimple'][];
-                    };
                 };
             };
             /** @description Client error */
@@ -27322,13 +20592,6 @@ export interface operations {
         };
     };
     emojis: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -27389,12 +20652,6 @@ export interface operations {
         };
     };
     endpoint: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -27422,7 +20679,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -27472,13 +20728,6 @@ export interface operations {
         };
     };
     endpoints: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -27537,20 +20786,12 @@ export interface operations {
         };
     };
     'export-custom-emojis': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (without any results) */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -27609,12 +20850,6 @@ export interface operations {
         };
     };
     federation___followers: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -27623,6 +20858,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                 };
@@ -27686,12 +20923,6 @@ export interface operations {
         };
     };
     federation___following: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -27700,6 +20931,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                 };
@@ -27762,98 +20995,7 @@ export interface operations {
             };
         };
     };
-    get___federation___instances: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @description Omit or use `null` to not filter by host. */
-                    host?: string | null;
-                    blocked?: boolean | null;
-                    notResponding?: boolean | null;
-                    suspended?: boolean | null;
-                    silenced?: boolean | null;
-                    federating?: boolean | null;
-                    subscribing?: boolean | null;
-                    publishing?: boolean | null;
-                    /** @default 30 */
-                    limit?: number;
-                    /** @default 0 */
-                    offset?: number;
-                    /** @enum {string|null} */
-                    sort?: '+pubSub' | '-pubSub' | '+notes' | '-notes' | '+users' | '-users' | '+following' | '-following' | '+followers' | '-followers' | '+firstRetrievedAt' | '-firstRetrievedAt' | '+latestRequestReceivedAt' | '-latestRequestReceivedAt' | null;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['FederationInstance'][];
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     federation___instances: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -27933,12 +21075,6 @@ export interface operations {
         };
     };
     'federation___show-instance': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -27953,91 +21089,13 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    'application/json': ((components['schemas']['FederationInstance'] | null) | null) | components['schemas']['FederationInstance'] | null;
+                    'application/json': components['schemas']['FederationInstance'] | null;
                 };
             };
             /** @description OK (without any results) */
             204: {
                 headers: {
                     [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    get___federation___stats: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @default 10 */
-                    limit?: number;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        topSubInstances: components['schemas']['FederationInstance'][];
-                        otherFollowersCount: number;
-                        topPubInstances: components['schemas']['FederationInstance'][];
-                        otherFollowingCount: number;
-                    };
                 };
             };
             /** @description Client error */
@@ -28088,12 +21146,6 @@ export interface operations {
         };
     };
     federation___stats: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -28165,12 +21217,6 @@ export interface operations {
         };
     };
     'federation___update-remote-user': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -28185,7 +21231,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -28235,12 +21280,6 @@ export interface operations {
         };
     };
     federation___users: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -28249,6 +21288,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                 };
@@ -28312,12 +21353,6 @@ export interface operations {
         };
     };
     'fetch-external-resources': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -28395,132 +21430,7 @@ export interface operations {
             };
         };
     };
-    'get___fetch-rss': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    url: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        image?: {
-                            link?: string;
-                            url: string;
-                            title?: string;
-                        };
-                        paginationLinks?: {
-                            self?: string;
-                            first?: string;
-                            next?: string;
-                            last?: string;
-                            prev?: string;
-                        };
-                        link?: string;
-                        title?: string;
-                        items: {
-                            link?: string;
-                            guid?: string;
-                            title?: string;
-                            pubDate?: string;
-                            creator?: string;
-                            summary?: string;
-                            content?: string;
-                            isoDate?: string;
-                            categories?: string[];
-                            contentSnippet?: string;
-                            enclosure?: {
-                                url: string;
-                                length?: number;
-                                type?: string;
-                            };
-                        }[];
-                        feedUrl?: string;
-                        description?: string;
-                        itunes?: {
-                            image?: string;
-                            owner?: {
-                                name?: string;
-                                email?: string;
-                            };
-                            author?: string;
-                            summary?: string;
-                            explicit?: string;
-                            categories?: string[];
-                            keywords?: string[];
-                        } & {
-                            [key: string]: unknown;
-                        };
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     'fetch-rss': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -28634,12 +21544,6 @@ export interface operations {
         };
     };
     flash___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -28722,12 +21626,6 @@ export interface operations {
         };
     };
     flash___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -28742,7 +21640,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -28792,12 +21689,6 @@ export interface operations {
         };
     };
     flash___featured: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -28866,12 +21757,6 @@ export interface operations {
         };
     };
     flash___like: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -28886,7 +21771,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -28936,12 +21820,6 @@ export interface operations {
         };
     };
     flash___my: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -28951,6 +21829,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -29012,12 +21892,6 @@ export interface operations {
         };
     };
     'flash___my-likes': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -29027,6 +21901,9 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
+                    search?: string | null;
                 };
             };
         };
@@ -29091,13 +21968,80 @@ export interface operations {
             };
         };
     };
-    flash___show: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    flash___search: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    query: string;
+                    /** Format: misskey:id */
+                    sinceId?: string;
+                    /** Format: misskey:id */
+                    untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
+                    /** @default 5 */
+                    limit?: number;
+                };
+            };
         };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Flash'][];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    flash___show: {
         requestBody: {
             content: {
                 'application/json': {
@@ -29164,12 +22108,6 @@ export interface operations {
         };
     };
     flash___unlike: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -29184,7 +22122,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -29234,12 +22171,6 @@ export interface operations {
         };
     };
     flash___update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -29260,7 +22191,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -29319,12 +22249,6 @@ export interface operations {
         };
     };
     following___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -29401,12 +22325,6 @@ export interface operations {
         };
     };
     following___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -29482,12 +22400,6 @@ export interface operations {
         };
     };
     following___invalidate: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -29563,12 +22475,6 @@ export interface operations {
         };
     };
     following___requests___accept: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -29583,7 +22489,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -29633,12 +22538,6 @@ export interface operations {
         };
     };
     following___requests___cancel: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -29705,12 +22604,6 @@ export interface operations {
         };
     };
     following___requests___list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -29718,6 +22611,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                 };
@@ -29786,12 +22681,6 @@ export interface operations {
         };
     };
     following___requests___reject: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -29806,7 +22695,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -29856,12 +22744,6 @@ export interface operations {
         };
     };
     following___requests___sent: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -29869,6 +22751,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                 };
@@ -29937,12 +22821,6 @@ export interface operations {
         };
     };
     following___update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -30021,12 +22899,6 @@ export interface operations {
         };
     };
     'following___update-all': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -30042,7 +22914,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -30101,12 +22972,6 @@ export interface operations {
         };
     };
     gallery___featured: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -30175,13 +23040,6 @@ export interface operations {
         };
     };
     gallery___popular: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -30240,12 +23098,6 @@ export interface operations {
         };
     };
     gallery___posts: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -30255,6 +23107,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -30316,12 +23170,6 @@ export interface operations {
         };
     };
     gallery___posts___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -30400,12 +23248,6 @@ export interface operations {
         };
     };
     gallery___posts___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -30420,7 +23262,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -30470,12 +23311,6 @@ export interface operations {
         };
     };
     gallery___posts___like: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -30490,7 +23325,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -30540,12 +23374,6 @@ export interface operations {
         };
     };
     gallery___posts___show: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -30612,12 +23440,6 @@ export interface operations {
         };
     };
     gallery___posts___unlike: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -30632,7 +23454,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -30682,12 +23503,6 @@ export interface operations {
         };
     };
     gallery___posts___update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -30768,13 +23583,6 @@ export interface operations {
         };
     };
     'get-avatar-decorations': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -30842,81 +23650,7 @@ export interface operations {
             };
         };
     };
-    'get___get-online-users-count': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        count: number;
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     'get-online-users-count': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -30977,12 +23711,6 @@ export interface operations {
         };
     };
     hashtags___list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -31057,12 +23785,6 @@ export interface operations {
         };
     };
     hashtags___search: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -31132,12 +23854,6 @@ export interface operations {
         };
     };
     hashtags___show: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -31202,83 +23918,7 @@ export interface operations {
             };
         };
     };
-    get___hashtags___trend: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        tag: string;
-                        chart: number[];
-                        usersCount: number;
-                    }[];
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     hashtags___trend: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -31341,12 +23981,6 @@ export interface operations {
         };
     };
     hashtags___users: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -31365,10 +23999,6 @@ export interface operations {
                      * @enum {string}
                      */
                     origin?: 'combined' | 'local' | 'remote';
-                    /** Format: misskey:id */
-                    sinceId?: string;
-                    /** Format: misskey:id */
-                    untilId?: string;
                 };
             };
         };
@@ -31430,13 +24060,6 @@ export interface operations {
         };
     };
     i: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -31495,12 +24118,6 @@ export interface operations {
         };
     };
     i___2fa___done: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -31568,12 +24185,6 @@ export interface operations {
         };
     };
     'i___2fa___key-done': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -31645,12 +24256,6 @@ export interface operations {
         };
     };
     'i___2fa___password-less': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -31664,7 +24269,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -31714,12 +24318,6 @@ export interface operations {
         };
     };
     i___2fa___register: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -31792,12 +24390,6 @@ export interface operations {
         };
     };
     'i___2fa___register-key': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -31898,12 +24490,6 @@ export interface operations {
         };
     };
     'i___2fa___remove-key': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -31919,7 +24505,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -31969,12 +24554,6 @@ export interface operations {
         };
     };
     i___2fa___unregister: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -31989,7 +24568,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -32039,12 +24617,6 @@ export interface operations {
         };
     };
     'i___2fa___update-key': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -32059,7 +24631,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -32109,12 +24680,6 @@ export interface operations {
         };
     };
     i___apps: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -32139,6 +24704,8 @@ export interface operations {
                         /** Format: date-time */
                         lastUsedAt?: string;
                         permission: string[];
+                        iconUrl?: string | null;
+                        description?: string | null;
                     }[];
                 };
             };
@@ -32190,12 +24757,6 @@ export interface operations {
         };
     };
     'i___authorized-apps': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -32276,12 +24837,6 @@ export interface operations {
         };
     };
     'i___change-password': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -32297,7 +24852,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -32347,12 +24901,6 @@ export interface operations {
         };
     };
     'i___claim-achievement': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -32367,7 +24915,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -32417,12 +24964,6 @@ export interface operations {
         };
     };
     'i___delete-account': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -32437,7 +24978,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -32487,20 +25027,12 @@ export interface operations {
         };
     };
     'i___export-antennas': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (without any results) */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -32559,20 +25091,12 @@ export interface operations {
         };
     };
     'i___export-blocking': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (without any results) */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -32631,20 +25155,12 @@ export interface operations {
         };
     };
     'i___export-clips': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (without any results) */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -32703,20 +25219,12 @@ export interface operations {
         };
     };
     'i___export-favorites': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (without any results) */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -32775,12 +25283,6 @@ export interface operations {
         };
     };
     'i___export-following': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -32797,7 +25299,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -32856,20 +25357,12 @@ export interface operations {
         };
     };
     'i___export-mute': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (without any results) */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -32928,20 +25421,12 @@ export interface operations {
         };
     };
     'i___export-notes': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (without any results) */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -33000,20 +25485,12 @@ export interface operations {
         };
     };
     'i___export-user-lists': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (without any results) */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -33072,12 +25549,6 @@ export interface operations {
         };
     };
     i___favorites: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -33087,6 +25558,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -33148,12 +25621,6 @@ export interface operations {
         };
     };
     i___gallery___likes: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -33163,6 +25630,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -33228,12 +25697,6 @@ export interface operations {
         };
     };
     i___gallery___posts: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -33243,6 +25706,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -33304,12 +25769,6 @@ export interface operations {
         };
     };
     'i___import-antennas': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -33324,7 +25783,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -33383,12 +25841,6 @@ export interface operations {
         };
     };
     'i___import-blocking': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -33403,7 +25855,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -33462,12 +25913,6 @@ export interface operations {
         };
     };
     'i___import-following': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -33483,7 +25928,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -33542,12 +25986,6 @@ export interface operations {
         };
     };
     'i___import-muting': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -33562,7 +26000,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -33621,12 +26058,6 @@ export interface operations {
         };
     };
     'i___import-user-lists': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -33641,7 +26072,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -33700,12 +26130,6 @@ export interface operations {
         };
     };
     i___move: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -33780,12 +26204,6 @@ export interface operations {
         };
     };
     i___notifications: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -33795,10 +26213,12 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default true */
                     markAsRead?: boolean;
-                    includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'noteScheduled' | 'scheduledNotePosted' | 'scheduledNoteError' | 'sensitiveFlagAssigned' | 'createToken' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
-                    excludeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'noteScheduled' | 'scheduledNotePosted' | 'scheduledNoteError' | 'sensitiveFlagAssigned' | 'createToken' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
+                    includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'scheduledNotePostFailed' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
+                    excludeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'scheduledNotePostFailed' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
                 };
             };
         };
@@ -33869,12 +26289,6 @@ export interface operations {
         };
     };
     'i___notifications-grouped': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -33884,10 +26298,12 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default true */
                     markAsRead?: boolean;
-                    includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'noteScheduled' | 'scheduledNotePosted' | 'scheduledNoteError' | 'sensitiveFlagAssigned' | 'createToken' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
-                    excludeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'noteScheduled' | 'scheduledNotePosted' | 'scheduledNoteError' | 'sensitiveFlagAssigned' | 'createToken' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
+                    includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'scheduledNotePostFailed' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
+                    excludeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'scheduledNotePostFailed' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
                 };
             };
         };
@@ -33958,12 +26374,6 @@ export interface operations {
         };
     };
     'i___page-likes': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -33973,6 +26383,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -34038,12 +26450,6 @@ export interface operations {
         };
     };
     i___pages: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -34053,6 +26459,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -34114,12 +26522,6 @@ export interface operations {
         };
     };
     i___pin: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -34186,12 +26588,6 @@ export interface operations {
         };
     };
     'i___read-announcement': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -34206,7 +26602,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -34256,12 +26651,6 @@ export interface operations {
         };
     };
     'i___regenerate-token': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -34275,7 +26664,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -34325,12 +26713,6 @@ export interface operations {
         };
     };
     i___registry___get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -34399,12 +26781,6 @@ export interface operations {
         };
     };
     'i___registry___get-all': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -34472,12 +26848,6 @@ export interface operations {
         };
     };
     'i___registry___get-detail': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -34549,12 +26919,6 @@ export interface operations {
         };
     };
     i___registry___keys: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -34622,12 +26986,6 @@ export interface operations {
         };
     };
     'i___registry___keys-with-type': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -34697,12 +27055,6 @@ export interface operations {
         };
     };
     i___registry___remove: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -34719,7 +27071,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -34769,13 +27120,6 @@ export interface operations {
         };
     };
     'i___registry___scopes-with-domain': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -34837,12 +27181,6 @@ export interface operations {
         };
     };
     i___registry___set: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -34860,7 +27198,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -34910,19 +27247,14 @@ export interface operations {
         };
     };
     'i___revoke-token': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
                     /** Format: misskey:id */
-                    tokenId?: string;
-                    token?: string | null;
-                } | unknown | unknown;
+                    tokenId: string;
+                } | {
+                    token: string | null;
+                };
             };
         };
         responses: {
@@ -34931,7 +27263,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -34981,12 +27312,6 @@ export interface operations {
         };
     };
     'i___signin-history': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -34996,6 +27321,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -35057,12 +27384,6 @@ export interface operations {
         };
     };
     i___unpin: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -35129,12 +27450,6 @@ export interface operations {
         };
     };
     i___update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -35187,6 +27502,7 @@ export interface operations {
                     /** Format: misskey:id */
                     pinnedPageId?: string | null;
                     mutedWords?: (string[] | string)[];
+                    hardMutedWords?: (string[] | string)[];
                     mutedInstances?: string[];
                     notificationRecieveConfig?: {
                         note?: {
@@ -35261,6 +27577,24 @@ export interface operations {
                             /** Format: misskey:id */
                             userListId: string;
                         };
+                        scheduledNotePosted?: {
+                            /** @enum {string} */
+                            type: 'all' | 'following' | 'follower' | 'mutualFollow' | 'followingOrFollower' | 'never';
+                        } | {
+                            /** @enum {string} */
+                            type: 'list';
+                            /** Format: misskey:id */
+                            userListId: string;
+                        };
+                        scheduledNotePostFailed?: {
+                            /** @enum {string} */
+                            type: 'all' | 'following' | 'follower' | 'mutualFollow' | 'followingOrFollower' | 'never';
+                        } | {
+                            /** @enum {string} */
+                            type: 'list';
+                            /** Format: misskey:id */
+                            userListId: string;
+                        };
                         receiveFollowRequest?: {
                             /** @enum {string} */
                             type: 'all' | 'following' | 'follower' | 'mutualFollow' | 'followingOrFollower' | 'never';
@@ -35327,16 +27661,6 @@ export interface operations {
                     };
                     emailNotificationTypes?: string[];
                     alsoKnownAs?: string[];
-                    mutualLinkSections?: {
-                        name?: string | null;
-                        mutualLinks: {
-                            /** Format: url */
-                            url: string;
-                            /** Format: misskey:id */
-                            fileId: string;
-                            description?: string | null;
-                        }[];
-                    }[];
                 };
             };
         };
@@ -35407,12 +27731,6 @@ export interface operations {
         };
     };
     'i___update-email': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -35489,12 +27807,6 @@ export interface operations {
         };
     };
     i___webhooks___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -35502,7 +27814,7 @@ export interface operations {
                     url: string;
                     /** @default  */
                     secret?: string;
-                    on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction' | 'reportCreated' | 'reportResolved' | 'reportAutoResolved')[];
+                    on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
                 };
             };
         };
@@ -35519,7 +27831,7 @@ export interface operations {
                         /** Format: misskey:id */
                         userId: string;
                         name: string;
-                        on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction' | 'reportCreated' | 'reportResolved' | 'reportAutoResolved')[];
+                        on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
                         url: string;
                         secret: string;
                         active: boolean;
@@ -35577,12 +27889,6 @@ export interface operations {
         };
     };
     i___webhooks___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -35597,7 +27903,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -35647,13 +27952,6 @@ export interface operations {
         };
     };
     i___webhooks___list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -35661,20 +27959,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    'application/json': {
-                        /** Format: misskey:id */
-                        id: string;
-                        /** Format: misskey:id */
-                        userId: string;
-                        name: string;
-                        on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction' | 'reportCreated' | 'reportResolved' | 'reportAutoResolved')[];
-                        url: string;
-                        secret: string;
-                        active: boolean;
-                        /** Format: date-time */
-                        latestSentAt: string | null;
-                        latestStatus: number | null;
-                    }[];
+                    'application/json': components['schemas']['UserWebhook'][];
                 };
             };
             /** @description Client error */
@@ -35725,12 +28010,6 @@ export interface operations {
         };
     };
     i___webhooks___show: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -35746,20 +28025,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    'application/json': {
-                        /** Format: misskey:id */
-                        id: string;
-                        /** Format: misskey:id */
-                        userId: string;
-                        name: string;
-                        on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction' | 'reportCreated' | 'reportResolved' | 'reportAutoResolved')[];
-                        url: string;
-                        secret: string;
-                        active: boolean;
-                        /** Format: date-time */
-                        latestSentAt: string | null;
-                        latestStatus: number | null;
-                    };
+                    'application/json': components['schemas']['UserWebhook'];
                 };
             };
             /** @description Client error */
@@ -35810,19 +28076,13 @@ export interface operations {
         };
     };
     i___webhooks___test: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
                     /** Format: misskey:id */
                     webhookId: string;
                     /** @enum {string} */
-                    type: 'mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction' | 'reportCreated' | 'reportResolved' | 'reportAutoResolved';
+                    type: 'mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction';
                     override?: {
                         url?: string;
                         secret?: string;
@@ -35836,7 +28096,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -35895,12 +28154,6 @@ export interface operations {
         };
     };
     i___webhooks___update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -35909,7 +28162,7 @@ export interface operations {
                     name?: string;
                     url?: string;
                     secret?: string | null;
-                    on?: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction' | 'reportCreated' | 'reportResolved' | 'reportAutoResolved')[];
+                    on?: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
                     active?: boolean;
                 };
             };
@@ -35920,7 +28173,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -35970,13 +28222,6 @@ export interface operations {
         };
     };
     invite___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -36035,12 +28280,6 @@ export interface operations {
         };
     };
     invite___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -36055,7 +28294,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -36105,13 +28343,6 @@ export interface operations {
         };
     };
     invite___limit: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -36172,12 +28403,6 @@ export interface operations {
         };
     };
     invite___list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -36187,6 +28412,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -36247,85 +28474,7 @@ export interface operations {
             };
         };
     };
-    get___meta: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @default true */
-                    detail?: boolean;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['MetaLite'] | components['schemas']['MetaDetailed'];
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     meta: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -36392,12 +28541,6 @@ export interface operations {
         };
     };
     'miauth___gen-token': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -36469,12 +28612,6 @@ export interface operations {
         };
     };
     mute___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -36491,7 +28628,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -36550,12 +28686,6 @@ export interface operations {
         };
     };
     mute___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -36570,7 +28700,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -36620,12 +28749,6 @@ export interface operations {
         };
     };
     mute___list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -36635,6 +28758,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -36696,12 +28821,6 @@ export interface operations {
         };
     };
     my___apps: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -36770,12 +28889,6 @@ export interface operations {
         };
     };
     notes: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -36791,6 +28904,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -36852,12 +28967,6 @@ export interface operations {
         };
     };
     notes___children: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -36869,6 +28978,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -36930,12 +29041,6 @@ export interface operations {
         };
     };
     notes___clips: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -37002,12 +29107,6 @@ export interface operations {
         };
     };
     notes___conversation: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -37078,12 +29177,6 @@ export interface operations {
         };
     };
     notes___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -37122,9 +29215,6 @@ export interface operations {
                         expiresAt?: number | null;
                         expiredAfter?: number | null;
                     } | null;
-                    scheduledAt?: number | null;
-                    /** @default false */
-                    noCreatedNote?: boolean;
                 };
             };
         };
@@ -37139,13 +29229,6 @@ export interface operations {
                         createdNote: components['schemas']['Note'];
                     };
                 };
-            };
-            /** @description OK (without any results) */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -37204,12 +29287,6 @@ export interface operations {
         };
     };
     notes___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -37224,7 +29301,408 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    notes___drafts___count: {
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': number;
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    notes___drafts___create: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /**
+                     * @default public
+                     * @enum {string}
+                     */
+                    visibility?: 'public' | 'home' | 'followers' | 'specified';
+                    visibleUserIds?: string[];
+                    cw?: string | null;
+                    hashtag?: string | null;
+                    /** @default false */
+                    localOnly?: boolean;
+                    /**
+                     * @default null
+                     * @enum {string|null}
+                     */
+                    reactionAcceptance?: null | 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote';
+                    /** Format: misskey:id */
+                    replyId?: string | null;
+                    /** Format: misskey:id */
+                    renoteId?: string | null;
+                    /** Format: misskey:id */
+                    channelId?: string | null;
+                    text?: string | null;
+                    fileIds?: string[];
+                    poll?: {
+                        choices: string[];
+                        multiple?: boolean;
+                        expiresAt?: number | null;
+                        expiredAfter?: number | null;
+                    } | null;
+                    scheduledAt?: number | null;
+                    /** @default false */
+                    isActuallyScheduled?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        createdDraft: components['schemas']['NoteDraft'];
+                    };
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    notes___drafts___delete: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    draftId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    notes___drafts___list: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** @default 30 */
+                    limit?: number;
+                    /** Format: misskey:id */
+                    sinceId?: string;
+                    /** Format: misskey:id */
+                    untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
+                    scheduled?: boolean | null;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['NoteDraft'][];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    notes___drafts___update: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    draftId: string;
+                    /** @enum {string} */
+                    visibility?: 'public' | 'home' | 'followers' | 'specified';
+                    visibleUserIds?: string[];
+                    cw?: string | null;
+                    hashtag?: string | null;
+                    localOnly?: boolean;
+                    /** @enum {string|null} */
+                    reactionAcceptance?: null | 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote';
+                    /** Format: misskey:id */
+                    replyId?: string | null;
+                    /** Format: misskey:id */
+                    renoteId?: string | null;
+                    /** Format: misskey:id */
+                    channelId?: string | null;
+                    text?: string | null;
+                    fileIds?: string[];
+                    poll?: {
+                        choices: string[];
+                        multiple?: boolean;
+                        expiresAt?: number | null;
+                        expiredAfter?: number | null;
+                    } | null;
+                    scheduledAt?: number | null;
+                    isActuallyScheduled?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        updatedDraft: components['schemas']['NoteDraft'];
+                    };
+                };
             };
             /** @description Client error */
             400: {
@@ -37283,12 +29761,6 @@ export interface operations {
         };
     };
     notes___favorites___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -37303,7 +29775,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -37362,12 +29833,6 @@ export interface operations {
         };
     };
     notes___favorites___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -37381,83 +29846,6 @@ export interface operations {
             204: {
                 headers: {
                     [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    get___notes___featured: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @default 10 */
-                    limit?: number;
-                    /** Format: misskey:id */
-                    untilId?: string;
-                    /** Format: misskey:id */
-                    channelId?: string | null;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Note'][];
                 };
             };
             /** @description Client error */
@@ -37508,12 +29896,6 @@ export interface operations {
         };
     };
     notes___featured: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -37584,12 +29966,6 @@ export interface operations {
         };
     };
     'notes___global-timeline': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -37666,12 +30042,6 @@ export interface operations {
         };
     };
     'notes___hybrid-timeline': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -37758,12 +30128,6 @@ export interface operations {
         };
     };
     'notes___local-timeline': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -37844,12 +30208,6 @@ export interface operations {
         };
     };
     notes___mentions: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -37861,6 +30219,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     visibility?: string;
                 };
             };
@@ -37923,12 +30283,6 @@ export interface operations {
         };
     };
     notes___polls___recommendation: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -37999,12 +30353,6 @@ export interface operations {
         };
     };
     notes___polls___vote: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -38019,86 +30367,6 @@ export interface operations {
             204: {
                 headers: {
                     [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    get___notes___reactions: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** Format: misskey:id */
-                    noteId: string;
-                    type?: string | null;
-                    /** @default 10 */
-                    limit?: number;
-                    /** Format: misskey:id */
-                    sinceId?: string;
-                    /** Format: misskey:id */
-                    untilId?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['NoteReaction'][];
                 };
             };
             /** @description Client error */
@@ -38149,12 +30417,6 @@ export interface operations {
         };
     };
     notes___reactions: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -38167,6 +30429,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -38228,12 +30492,6 @@ export interface operations {
         };
     };
     notes___reactions___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -38249,7 +30507,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -38299,12 +30556,6 @@ export interface operations {
         };
     };
     notes___reactions___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -38319,7 +30570,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -38378,12 +30628,6 @@ export interface operations {
         };
     };
     notes___renotes: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -38395,6 +30639,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -38456,12 +30702,6 @@ export interface operations {
         };
     };
     notes___replies: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -38471,6 +30711,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                 };
@@ -38533,166 +30775,7 @@ export interface operations {
             };
         };
     };
-    notes___scheduled___cancel: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** Format: misskey:id */
-                    draftId: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (without any results) */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Too many requests */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    notes___scheduled___list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @default 10 */
-                    limit?: number;
-                    /** @default 0 */
-                    offset?: number;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['NoteDraft'][];
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     notes___search: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -38701,6 +30784,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                     /** @default 0 */
@@ -38778,17 +30863,14 @@ export interface operations {
         };
     };
     'notes___search-by-tag': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
-                'application/json': {
-                    /** @default null */
-                    local?: boolean | null;
+                'application/json': ({
+                    tag: string;
+                } | {
+                    /** @description The outer arrays are chained with OR, the inner arrays are chained with AND. */
+                    query: string[][];
+                }) & {
                     /** @default null */
                     reply?: boolean | null;
                     /** @default null */
@@ -38804,12 +30886,11 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
-                    tag?: string;
-                    /** @description The outer arrays are chained with OR, the inner arrays are chained with AND. */
-                    query?: string[][];
-                } | unknown | unknown;
+                };
             };
         };
         responses: {
@@ -38870,12 +30951,6 @@ export interface operations {
         };
     };
     notes___show: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -38941,13 +31016,80 @@ export interface operations {
             };
         };
     };
-    notes___state: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    'notes___show-partial-bulk': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    noteIds: string[];
+                };
+            };
         };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        id: string;
+                        reactions: {
+                            [key: string]: number;
+                        };
+                        reactionEmojis: {
+                            [key: string]: string;
+                        };
+                    }[];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    notes___state: {
         requestBody: {
             content: {
                 'application/json': {
@@ -39017,12 +31159,6 @@ export interface operations {
         };
     };
     'notes___thread-muting___create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -39037,7 +31173,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -39096,12 +31231,6 @@ export interface operations {
         };
     };
     'notes___thread-muting___delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -39116,7 +31245,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -39166,12 +31294,6 @@ export interface operations {
         };
     };
     notes___timeline: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -39256,12 +31378,6 @@ export interface operations {
         };
     };
     notes___translate: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -39289,7 +31405,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -39339,12 +31454,6 @@ export interface operations {
         };
     };
     notes___unrenote: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -39359,7 +31468,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -39418,12 +31526,6 @@ export interface operations {
         };
     };
     'notes___user-list-timeline': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -39513,12 +31615,6 @@ export interface operations {
         };
     };
     notifications___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -39534,7 +31630,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -39572,6 +31667,15 @@ export interface operations {
                     'application/json': components['schemas']['Error'];
                 };
             };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
             /** @description Internal server error */
             500: {
                 headers: {
@@ -39584,20 +31688,12 @@ export interface operations {
         };
     };
     notifications___flush: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (without any results) */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -39647,20 +31743,12 @@ export interface operations {
         };
     };
     'notifications___mark-all-as-read': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (without any results) */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -39710,20 +31798,12 @@ export interface operations {
         };
     };
     'notifications___test-notification': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (without any results) */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -39782,12 +31862,6 @@ export interface operations {
         };
     };
     'page-push': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -39804,7 +31878,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -39854,12 +31927,6 @@ export interface operations {
         };
     };
     pages___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -39884,8 +31951,6 @@ export interface operations {
                     alignCenter?: boolean;
                     /** @default false */
                     hideTitleWhenPinned?: boolean;
-                    /** @enum {string} */
-                    visibility?: 'public' | 'private';
                 };
             };
         };
@@ -39956,12 +32021,6 @@ export interface operations {
         };
     };
     pages___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -39976,7 +32035,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -40026,13 +32084,6 @@ export interface operations {
         };
     };
     pages___featured: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -40091,12 +32142,6 @@ export interface operations {
         };
     };
     pages___like: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -40111,7 +32156,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -40161,20 +32205,15 @@ export interface operations {
         };
     };
     pages___show: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
                     /** Format: misskey:id */
-                    pageId?: string;
-                    name?: string;
-                    username?: string;
-                } | unknown | unknown;
+                    pageId: string;
+                } | {
+                    name: string;
+                    username: string;
+                };
             };
         };
         responses: {
@@ -40235,12 +32274,6 @@ export interface operations {
         };
     };
     pages___unlike: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -40255,7 +32288,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -40305,12 +32337,6 @@ export interface operations {
         };
     };
     pages___update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -40332,8 +32358,6 @@ export interface operations {
                     font?: 'serif' | 'sans-serif';
                     alignCenter?: boolean;
                     hideTitleWhenPinned?: boolean;
-                    /** @enum {string} */
-                    visibility?: 'public' | 'private';
                 };
             };
         };
@@ -40343,7 +32367,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -40402,13 +32425,6 @@ export interface operations {
         };
     };
     ping: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -40469,13 +32485,6 @@ export interface operations {
         };
     };
     'pinned-users': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -40534,12 +32543,6 @@ export interface operations {
         };
     };
     promo___read: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -40554,7 +32557,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -40604,12 +32606,6 @@ export interface operations {
         };
     };
     'renote-mute___create': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -40624,7 +32620,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -40683,12 +32678,6 @@ export interface operations {
         };
     };
     'renote-mute___delete': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -40703,7 +32692,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -40753,12 +32741,6 @@ export interface operations {
         };
     };
     'renote-mute___list': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -40768,6 +32750,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -40829,12 +32813,6 @@ export interface operations {
         };
     };
     'request-reset-password': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -40849,7 +32827,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -40908,20 +32885,12 @@ export interface operations {
         };
     };
     'reset-db': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (without any results) */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -40971,12 +32940,6 @@ export interface operations {
         };
     };
     'reset-password': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -40990,79 +32953,6 @@ export interface operations {
             204: {
                 headers: {
                     [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    get___retention: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        /** Format: date-time */
-                        createdAt: string;
-                        users: number;
-                        data: {
-                            [key: string]: number;
-                        };
-                    }[];
                 };
             };
             /** @description Client error */
@@ -41113,13 +33003,6 @@ export interface operations {
         };
     };
     retention: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -41185,12 +33068,6 @@ export interface operations {
         };
     };
     'reversi___cancel-match': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -41205,7 +33082,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -41255,12 +33131,6 @@ export interface operations {
         };
     };
     reversi___games: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -41270,6 +33140,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default false */
                     my?: boolean;
                 };
@@ -41333,13 +33205,6 @@ export interface operations {
         };
     };
     reversi___invitations: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -41398,12 +33263,6 @@ export interface operations {
         };
     };
     reversi___match: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -41423,7 +33282,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    'application/json': components['schemas']['ReversiGameDetailed'] | null;
+                    'application/json': components['schemas']['ReversiGameDetailed'];
                 };
             };
             /** @description OK (without any results) */
@@ -41431,7 +33290,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -41481,12 +33339,6 @@ export interface operations {
         };
     };
     'reversi___show-game': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -41553,12 +33405,6 @@ export interface operations {
         };
     };
     reversi___surrender: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -41573,7 +33419,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -41623,12 +33468,6 @@ export interface operations {
         };
     };
     reversi___verify: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -41647,7 +33486,7 @@ export interface operations {
                 content: {
                     'application/json': {
                         desynced: boolean;
-                        game?: ((components['schemas']['ReversiGameDetailed'] | null) | null) | components['schemas']['ReversiGameDetailed'] | null;
+                        game?: components['schemas']['ReversiGameDetailed'] | null;
                     };
                 };
             };
@@ -41699,13 +33538,6 @@ export interface operations {
         };
     };
     roles___list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -41764,12 +33596,6 @@ export interface operations {
         };
     };
     roles___notes: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -41844,12 +33670,6 @@ export interface operations {
         };
     };
     roles___show: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -41916,12 +33736,6 @@ export interface operations {
         };
     };
     roles___users: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -41931,6 +33745,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                 };
@@ -41997,92 +33813,7 @@ export interface operations {
             };
         };
     };
-    'get___server-info': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        machine: string;
-                        cpu: {
-                            model: string;
-                            cores: number;
-                        };
-                        mem: {
-                            total: number;
-                        };
-                        fs: {
-                            total: number;
-                            used: number;
-                        };
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     'server-info': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -42103,79 +33834,6 @@ export interface operations {
                             total: number;
                             used: number;
                         };
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    get___stats: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        notesCount: number;
-                        originalNotesCount: number;
-                        usersCount: number;
-                        originalUsersCount: number;
-                        instances: number;
-                        driveUsageLocal: number;
-                        driveUsageRemote: number;
                     };
                 };
             };
@@ -42227,13 +33885,6 @@ export interface operations {
         };
     };
     stats: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description OK (with results) */
             200: {
@@ -42300,12 +33951,6 @@ export interface operations {
         };
     };
     sw___register: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -42382,12 +34027,6 @@ export interface operations {
         };
     };
     'sw___show-registration': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -42414,7 +34053,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -42464,12 +34102,6 @@ export interface operations {
         };
     };
     sw___unregister: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -42483,7 +34115,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -42533,12 +34164,6 @@ export interface operations {
         };
     };
     'sw___update-registration': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -42609,12 +34234,6 @@ export interface operations {
         };
     };
     test: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -42695,12 +34314,6 @@ export interface operations {
         };
     };
     username___available: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -42768,12 +34381,6 @@ export interface operations {
         };
     };
     users: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -42782,7 +34389,7 @@ export interface operations {
                     /** @default 0 */
                     offset?: number;
                     /** @enum {string} */
-                    sort?: '+follower' | '-follower' | '+createdAt' | '-createdAt' | '+updatedAt' | '-updatedAt' | '+pv' | '-pv';
+                    sort?: '+follower' | '-follower' | '+createdAt' | '-createdAt' | '+updatedAt' | '-updatedAt';
                     /**
                      * @default all
                      * @enum {string}
@@ -42859,12 +34466,6 @@ export interface operations {
         };
     };
     users___achievements: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -42880,10 +34481,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    'application/json': {
-                        name: string;
-                        unlockedAt: number;
-                    }[];
+                    'application/json': components['schemas']['Achievement'][];
                 };
             };
             /** @description Client error */
@@ -42934,12 +34532,6 @@ export interface operations {
         };
     };
     users___clips: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -42951,6 +34543,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -43011,89 +34605,7 @@ export interface operations {
             };
         };
     };
-    'get___users___featured-notes': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @default 10 */
-                    limit?: number;
-                    /** Format: misskey:id */
-                    untilId?: string;
-                    /** Format: misskey:id */
-                    userId: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Note'][];
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     'users___featured-notes': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -43164,12 +34676,6 @@ export interface operations {
         };
     };
     users___flashs: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -43181,6 +34687,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -43242,27 +34750,25 @@ export interface operations {
         };
     };
     users___followers: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
-                'application/json': {
+                'application/json': ({
+                    /** Format: misskey:id */
+                    userId: string;
+                } | {
+                    username: string;
+                    /** @description The local host is represented with `null`. */
+                    host: string | null;
+                }) & {
                     /** Format: misskey:id */
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
-                    /** Format: misskey:id */
-                    userId?: string;
-                    username?: string;
-                    /** @description The local host is represented with `null`. */
-                    host?: string | null;
-                } | unknown | unknown;
+                };
             };
         };
         responses: {
@@ -43323,29 +34829,26 @@ export interface operations {
         };
     };
     users___following: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
-                'application/json': {
+                'application/json': ({
+                    /** Format: misskey:id */
+                    userId: string;
+                } | {
+                    username: string;
+                    /** @description The local host is represented with `null`. */
+                    host: string | null;
+                }) & {
                     /** Format: misskey:id */
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
-                    /** Format: misskey:id */
-                    userId?: string;
-                    username?: string;
-                    /** @description The local host is represented with `null`. */
-                    host?: string | null;
-                    /** @description @deprecated use get-following-birthday-users instead. */
                     birthday?: string | null;
-                } | unknown | unknown;
+                };
             };
         };
         responses: {
@@ -43406,12 +34909,6 @@ export interface operations {
         };
     };
     users___gallery___posts: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -43423,6 +34920,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -43483,103 +34982,7 @@ export interface operations {
             };
         };
     };
-    'users___get-following-birthday-users': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** @default 10 */
-                    limit?: number;
-                    /** @default 0 */
-                    offset?: number;
-                    birthday: {
-                        month?: number;
-                        day?: number;
-                        begin?: {
-                            month: number;
-                            day: number;
-                        };
-                        end?: {
-                            month: number;
-                            day: number;
-                        };
-                    } | unknown | unknown;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        /** Format: date-time */
-                        birthday: string;
-                        user: components['schemas']['UserLite'];
-                    }[];
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     'users___get-frequently-replied-users': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -43650,264 +35053,7 @@ export interface operations {
             };
         };
     };
-    'users___get-security-info': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    email: string;
-                    password: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        twoFactorEnabled: boolean;
-                        usePasswordLessLogin: boolean;
-                        securityKeys: boolean;
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Too many requests */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    'get___users___get-skeb-status': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** Format: misskey:id */
-                    userId: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        screenName: string;
-                        isCreator: boolean;
-                        isAcceptable: boolean;
-                        creatorRequestCount: number;
-                        clientRequestCount: number;
-                        skills: {
-                            amount: number;
-                            /** @enum {string} */
-                            genre: 'art' | 'comic' | 'voice' | 'novel' | 'video' | 'music' | 'correction';
-                        }[];
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    'users___get-skeb-status': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
-                    /** Format: misskey:id */
-                    userId: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        screenName: string;
-                        isCreator: boolean;
-                        isAcceptable: boolean;
-                        creatorRequestCount: number;
-                        clientRequestCount: number;
-                        skills: {
-                            amount: number;
-                            /** @enum {string} */
-                            genre: 'art' | 'comic' | 'voice' | 'novel' | 'video' | 'music' | 'correction';
-                        }[];
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
     users___lists___create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -43973,12 +35119,6 @@ export interface operations {
         };
     };
     'users___lists___create-from-public': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -44046,12 +35186,6 @@ export interface operations {
         };
     };
     users___lists___delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -44066,7 +35200,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -44116,12 +35249,6 @@ export interface operations {
         };
     };
     users___lists___favorite: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -44136,7 +35263,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -44186,12 +35312,6 @@ export interface operations {
         };
     };
     'users___lists___get-memberships': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -44205,6 +35325,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -44275,12 +35397,6 @@ export interface operations {
         };
     };
     users___lists___list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -44347,12 +35463,6 @@ export interface operations {
         };
     };
     users___lists___pull: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -44369,7 +35479,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -44419,12 +35528,6 @@ export interface operations {
         };
     };
     users___lists___push: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -44441,7 +35544,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -44500,12 +35602,6 @@ export interface operations {
         };
     };
     users___lists___show: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -44523,7 +35619,10 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    'application/json': components['schemas']['UserList'];
+                    'application/json': components['schemas']['UserList'] & {
+                        likedCount?: number;
+                        isLiked?: boolean;
+                    };
                 };
             };
             /** @description Client error */
@@ -44574,12 +35673,6 @@ export interface operations {
         };
     };
     users___lists___unfavorite: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -44594,7 +35687,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -44644,12 +35736,6 @@ export interface operations {
         };
     };
     users___lists___update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -44718,12 +35804,6 @@ export interface operations {
         };
     };
     'users___lists___update-membership': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -44741,7 +35821,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -44791,12 +35870,6 @@ export interface operations {
         };
     };
     users___notes: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -44881,12 +35954,6 @@ export interface operations {
         };
     };
     users___pages: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -44898,6 +35965,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -44959,12 +36028,6 @@ export interface operations {
         };
     };
     users___reactions: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -44988,7 +36051,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    'application/json': components['schemas']['NoteReaction'][];
+                    'application/json': components['schemas']['NoteReactionWithNote'][];
                 };
             };
             /** @description Client error */
@@ -45039,12 +36102,6 @@ export interface operations {
         };
     };
     users___recommendation: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -45113,12 +36170,6 @@ export interface operations {
         };
     };
     users___relation: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -45206,23 +36257,12 @@ export interface operations {
         };
     };
     'users___report-abuse': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
                     /** Format: misskey:id */
                     userId: string;
                     comment: string;
-                    /**
-                     * @default other
-                     * @enum {string}
-                     */
-                    category?: 'nsfw' | 'spam' | 'explicit' | 'phishing' | 'personalInfoLeak' | 'selfHarm' | 'criticalBreach' | 'otherBreach' | 'violationRights' | 'violationRightsOther' | 'other';
                 };
             };
         };
@@ -45232,7 +36272,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -45282,12 +36321,6 @@ export interface operations {
         };
     };
     users___search: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -45364,22 +36397,18 @@ export interface operations {
         };
     };
     'users___search-by-username-and-host': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
-                'application/json': {
+                'application/json': ({
+                    username: string | null;
+                } | {
+                    host: string | null;
+                }) & {
                     /** @default 10 */
                     limit?: number;
                     /** @default true */
                     detail?: boolean;
-                    username?: string | null;
-                    host?: string | null;
-                } | unknown | unknown;
+                };
             };
         };
         responses: {
@@ -45440,95 +36469,18 @@ export interface operations {
         };
     };
     users___show: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
-                'application/json': {
-                    /** Format: misskey:id */
-                    userId?: string;
-                    userIds?: string[];
-                    username?: string;
-                    /** @description The local host is represented with `null`. */
-                    host?: string | null;
-                    /** @default true */
-                    detailed?: boolean;
-                } | unknown | unknown | unknown;
-            };
-        };
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['UserLite'] | components['schemas']['UserDetailed'] | components['schemas']['UserLite'][] | components['schemas']['UserDetailed'][];
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    users___stats: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                'application/json': {
+                'application/json': ({
                     /** Format: misskey:id */
                     userId: string;
+                } | {
+                    userIds: string[];
+                } | {
+                    username: string;
+                }) & {
+                    /** @description The local host is represented with `null`. */
+                    host?: string | null;
                 };
             };
         };
@@ -45539,29 +36491,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    'application/json': {
-                        notesCount: number;
-                        repliesCount: number;
-                        renotesCount: number;
-                        repliedCount: number;
-                        renotedCount: number;
-                        pollVotesCount: number;
-                        pollVotedCount: number;
-                        localFollowingCount: number;
-                        remoteFollowingCount: number;
-                        localFollowersCount: number;
-                        remoteFollowersCount: number;
-                        followingCount: number;
-                        followersCount: number;
-                        sentReactionsCount: number;
-                        receivedReactionsCount: number;
-                        noteFavoritesCount: number;
-                        pageLikesCount: number;
-                        pageLikedCount: number;
-                        driveFilesCount: number;
-                        /** @description Drive usage in bytes */
-                        driveUsage: number;
-                    };
+                    'application/json': components['schemas']['UserDetailed'] | components['schemas']['UserDetailed'][];
                 };
             };
             /** @description Client error */
@@ -45612,12 +36542,6 @@ export interface operations {
         };
     };
     'users___update-memo': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -45634,7 +36558,6 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
             };
             /** @description Client error */
             400: {
@@ -45684,12 +36607,6 @@ export interface operations {
         };
     };
     v2___admin___emoji___list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody: {
             content: {
                 'application/json': {
@@ -45718,6 +36635,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                     page?: number;
@@ -45743,6 +36662,68 @@ export interface operations {
                         allCount: number;
                         allPages: number;
                     };
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    'verify-email': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    code: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
                 };
             };
             /** @description Client error */

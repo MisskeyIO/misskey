@@ -4,17 +4,16 @@
 
 ```ts
 
-import type { AuthenticationResponseJSON } from '@simplewebauthn/browser';
+import type { AuthenticationResponseJSON } from '@simplewebauthn/types';
 import { EventEmitter } from 'eventemitter3';
-import type { PublicKeyCredentialRequestOptionsJSON as PublicKeyCredentialRequestOptionsJSON_2 } from '@simplewebauthn/browser';
+import { Options } from 'reconnecting-websocket';
+import type { PublicKeyCredentialRequestOptionsJSON as PublicKeyCredentialRequestOptionsJSON_2 } from '@simplewebauthn/types';
+import _ReconnectingWebSocket from 'reconnecting-websocket';
 
 // Warning: (ae-forgotten-export) The symbol "components" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 type AbuseReportNotificationRecipient = components['schemas']['AbuseReportNotificationRecipient'];
-
-// @public (undocumented)
-type AbuseUserReport = components['schemas']['AbuseUserReport'];
 
 // @public (undocumented)
 export type Acct = {
@@ -30,6 +29,12 @@ declare namespace acct {
     }
 }
 export { acct }
+
+// @public (undocumented)
+type Achievement = components['schemas']['Achievement'];
+
+// @public (undocumented)
+type AchievementName = components['schemas']['AchievementName'];
 
 // @public (undocumented)
 type Ad = components['schemas']['Ad'];
@@ -64,24 +69,6 @@ type AdminAbuseReportNotificationRecipientUpdateRequest = operations['admin___ab
 type AdminAbuseReportNotificationRecipientUpdateResponse = operations['admin___abuse-report___notification-recipient___update']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminAbuseReportResolverCreateRequest = operations['admin___abuse-report-resolver___create']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type AdminAbuseReportResolverCreateResponse = operations['admin___abuse-report-resolver___create']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type AdminAbuseReportResolverDeleteRequest = operations['admin___abuse-report-resolver___delete']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type AdminAbuseReportResolverListRequest = operations['admin___abuse-report-resolver___list']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type AdminAbuseReportResolverListResponse = operations['admin___abuse-report-resolver___list']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type AdminAbuseReportResolverUpdateRequest = operations['admin___abuse-report-resolver___update']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
 type AdminAbuseUserReportsRequest = operations['admin___abuse-user-reports']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
@@ -101,15 +88,6 @@ type AdminAccountsFindByEmailRequest = operations['admin___accounts___find-by-em
 
 // @public (undocumented)
 type AdminAccountsFindByEmailResponse = operations['admin___accounts___find-by-email']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type AdminAccountsPendingListRequest = operations['admin___accounts___pending___list']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type AdminAccountsPendingListResponse = operations['admin___accounts___pending___list']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type AdminAccountsPendingRevokeRequest = operations['admin___accounts___pending___revoke']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 type AdminAdCreateRequest = operations['admin___ad___create']['requestBody']['content']['application/json'];
@@ -172,7 +150,10 @@ type AdminCaptchaCurrentResponse = operations['admin___captcha___current']['resp
 type AdminCaptchaSaveRequest = operations['admin___captcha___save']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminDriveDeleteAllFilesOfAUserRequest = operations['admin___drive___delete-all-files-of-a-user']['requestBody']['content']['application/json'];
+type AdminDeleteAccountRequest = operations['admin___delete-account']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type AdminDeleteAllFilesOfAUserRequest = operations['admin___delete-all-files-of-a-user']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 type AdminDriveFilesRequest = operations['admin___drive___files']['requestBody']['content']['application/json'];
@@ -265,24 +246,6 @@ type AdminGetUserIpsRequest = operations['admin___get-user-ips']['requestBody'][
 type AdminGetUserIpsResponse = operations['admin___get-user-ips']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminIndieAuthCreateRequest = operations['admin___indie-auth___create']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type AdminIndieAuthCreateResponse = operations['admin___indie-auth___create']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type AdminIndieAuthDeleteRequest = operations['admin___indie-auth___delete']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type AdminIndieAuthListRequest = operations['admin___indie-auth___list']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type AdminIndieAuthListResponse = operations['admin___indie-auth___list']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type AdminIndieAuthUpdateRequest = operations['admin___indie-auth___update']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
 type AdminInviteCreateRequest = operations['admin___invite___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
@@ -310,13 +273,43 @@ type AdminQueueDeliverDelayedResponse = operations['admin___queue___deliver-dela
 type AdminQueueInboxDelayedResponse = operations['admin___queue___inbox-delayed']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminQueuePromoteRequest = operations['admin___queue___promote']['requestBody']['content']['application/json'];
+type AdminQueueJobsRequest = operations['admin___queue___jobs']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type AdminQueueJobsResponse = operations['admin___queue___jobs']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type AdminQueuePromoteJobsRequest = operations['admin___queue___promote-jobs']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type AdminQueueQueuesResponse = operations['admin___queue___queues']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type AdminQueueQueueStatsRequest = operations['admin___queue___queue-stats']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type AdminQueueQueueStatsResponse = operations['admin___queue___queue-stats']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type AdminQueueRemoveJobRequest = operations['admin___queue___remove-job']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type AdminQueueRetryJobRequest = operations['admin___queue___retry-job']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type AdminQueueShowJobLogsRequest = operations['admin___queue___show-job-logs']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type AdminQueueShowJobLogsResponse = operations['admin___queue___show-job-logs']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type AdminQueueShowJobRequest = operations['admin___queue___show-job']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type AdminQueueShowJobResponse = operations['admin___queue___show-job']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 type AdminQueueStatsResponse = operations['admin___queue___stats']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type AdminRegenerateUserTokenRequest = operations['admin___regenerate-user-token']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 type AdminRelaysAddRequest = operations['admin___relays___add']['requestBody']['content']['application/json'];
@@ -388,12 +381,6 @@ type AdminShowModerationLogsRequest = operations['admin___show-moderation-logs']
 type AdminShowModerationLogsResponse = operations['admin___show-moderation-logs']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminShowUserAccountMoveLogsRequest = operations['admin___show-user-account-move-logs']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type AdminShowUserAccountMoveLogsResponse = operations['admin___show-user-account-move-logs']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
 type AdminShowUserRequest = operations['admin___show-user']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
@@ -404,24 +391,6 @@ type AdminShowUsersRequest = operations['admin___show-users']['requestBody']['co
 
 // @public (undocumented)
 type AdminShowUsersResponse = operations['admin___show-users']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type AdminSsoCreateRequest = operations['admin___sso___create']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type AdminSsoCreateResponse = operations['admin___sso___create']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type AdminSsoDeleteRequest = operations['admin___sso___delete']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type AdminSsoListRequest = operations['admin___sso___list']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type AdminSsoListResponse = operations['admin___sso___list']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type AdminSsoUpdateRequest = operations['admin___sso___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 type AdminSuspendUserRequest = operations['admin___suspend-user']['requestBody']['content']['application/json'];
@@ -463,9 +432,6 @@ type AdminUnsetUserAvatarRequest = operations['admin___unset-user-avatar']['requ
 type AdminUnsetUserBannerRequest = operations['admin___unset-user-banner']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type AdminUnsetUserMutualLinkRequest = operations['admin___unset-user-mutual-link']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
 type AdminUnsuspendUserRequest = operations['admin___unsuspend-user']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
@@ -481,9 +447,6 @@ type AdminUpdateProxyAccountRequest = operations['admin___update-proxy-account']
 type AdminUpdateProxyAccountResponse = operations['admin___update-proxy-account']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type AdminUpdateUserNameRequest = operations['admin___update-user-name']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
 type AdminUpdateUserNoteRequest = operations['admin___update-user-note']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
@@ -493,12 +456,6 @@ type Announcement = components['schemas']['Announcement'];
 type AnnouncementCreated = {
     announcement: Announcement;
 };
-
-// @public (undocumented)
-type AnnouncementRequest = operations['announcement']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type AnnouncementResponse = operations['announcement']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 type AnnouncementsRequest = operations['announcements']['requestBody']['content']['application/json'];
@@ -726,7 +683,6 @@ export type Channels = {
         params: {
             withRenotes?: boolean;
             withFiles?: boolean;
-            minimize?: boolean;
         };
         events: {
             note: (payload: Note) => void;
@@ -738,7 +694,6 @@ export type Channels = {
             withRenotes?: boolean;
             withReplies?: boolean;
             withFiles?: boolean;
-            minimize?: boolean;
         };
         events: {
             note: (payload: Note) => void;
@@ -750,7 +705,6 @@ export type Channels = {
             withRenotes?: boolean;
             withReplies?: boolean;
             withFiles?: boolean;
-            minimize?: boolean;
         };
         events: {
             note: (payload: Note) => void;
@@ -761,7 +715,6 @@ export type Channels = {
         params: {
             withRenotes?: boolean;
             withFiles?: boolean;
-            minimize?: boolean;
         };
         events: {
             note: (payload: Note) => void;
@@ -773,7 +726,6 @@ export type Channels = {
             listId: string;
             withFiles?: boolean;
             withRenotes?: boolean;
-            minimize?: boolean;
         };
         events: {
             note: (payload: Note) => void;
@@ -792,7 +744,6 @@ export type Channels = {
     roleTimeline: {
         params: {
             roleId: string;
-            minimize?: boolean;
         };
         events: {
             note: (payload: Note) => void;
@@ -802,7 +753,6 @@ export type Channels = {
     antenna: {
         params: {
             antennaId: string;
-            minimize?: boolean;
         };
         events: {
             note: (payload: Note) => void;
@@ -812,7 +762,6 @@ export type Channels = {
     channel: {
         params: {
             channelId: string;
-            minimize?: boolean;
         };
         events: {
             note: (payload: Note) => void;
@@ -866,6 +815,18 @@ export type Channels = {
                 reporterId: string;
                 comment: string;
             };
+        };
+        receives: null;
+    };
+    reversi: {
+        params: null;
+        events: {
+            matched: (payload: {
+                game: ReversiGameDetailed;
+            }) => void;
+            invited: (payload: {
+                user: User;
+            }) => void;
         };
         receives: null;
     };
@@ -966,9 +927,6 @@ type ChannelsCreateResponse = operations['channels___create']['responses']['200'
 type ChannelsFavoriteRequest = operations['channels___favorite']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type ChannelsFeaturedGamesResponse = operations['channels___featured-games']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
 type ChannelsFeaturedResponse = operations['channels___featured']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
@@ -979,6 +937,15 @@ type ChannelsFollowedResponse = operations['channels___followed']['responses']['
 
 // @public (undocumented)
 type ChannelsFollowRequest = operations['channels___follow']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChannelsMuteCreateRequest = operations['channels___mute___create']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChannelsMuteDeleteRequest = operations['channels___mute___delete']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChannelsMuteListResponse = operations['channels___mute___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 type ChannelsMyFavoritesResponse = operations['channels___my-favorites']['responses']['200']['content']['application/json'];
@@ -1092,6 +1059,12 @@ type ChartsUsersRequest = operations['charts___users']['requestBody']['content']
 type ChartsUsersResponse = operations['charts___users']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
+type ChatHistoryRequest = operations['chat___history']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatHistoryResponse = operations['chat___history']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
 type ChatMessage = components['schemas']['ChatMessage'];
 
 // @public (undocumented)
@@ -1104,6 +1077,51 @@ type ChatMessageLiteFor1on1 = components['schemas']['ChatMessageLiteFor1on1'];
 type ChatMessageLiteForRoom = components['schemas']['ChatMessageLiteForRoom'];
 
 // @public (undocumented)
+type ChatMessagesCreateToRoomRequest = operations['chat___messages___create-to-room']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatMessagesCreateToRoomResponse = operations['chat___messages___create-to-room']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type ChatMessagesCreateToUserRequest = operations['chat___messages___create-to-user']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatMessagesCreateToUserResponse = operations['chat___messages___create-to-user']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type ChatMessagesDeleteRequest = operations['chat___messages___delete']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatMessagesReactRequest = operations['chat___messages___react']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatMessagesRoomTimelineRequest = operations['chat___messages___room-timeline']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatMessagesRoomTimelineResponse = operations['chat___messages___room-timeline']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type ChatMessagesSearchRequest = operations['chat___messages___search']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatMessagesSearchResponse = operations['chat___messages___search']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type ChatMessagesShowRequest = operations['chat___messages___show']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatMessagesShowResponse = operations['chat___messages___show']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type ChatMessagesUnreactRequest = operations['chat___messages___unreact']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatMessagesUserTimelineRequest = operations['chat___messages___user-timeline']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatMessagesUserTimelineResponse = operations['chat___messages___user-timeline']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
 type ChatRoom = components['schemas']['ChatRoom'];
 
 // @public (undocumented)
@@ -1111,6 +1129,75 @@ type ChatRoomInvitation = components['schemas']['ChatRoomInvitation'];
 
 // @public (undocumented)
 type ChatRoomMembership = components['schemas']['ChatRoomMembership'];
+
+// @public (undocumented)
+type ChatRoomsCreateRequest = operations['chat___rooms___create']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsCreateResponse = operations['chat___rooms___create']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsDeleteRequest = operations['chat___rooms___delete']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsInvitationsCreateRequest = operations['chat___rooms___invitations___create']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsInvitationsCreateResponse = operations['chat___rooms___invitations___create']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsInvitationsIgnoreRequest = operations['chat___rooms___invitations___ignore']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsInvitationsInboxRequest = operations['chat___rooms___invitations___inbox']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsInvitationsInboxResponse = operations['chat___rooms___invitations___inbox']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsInvitationsOutboxRequest = operations['chat___rooms___invitations___outbox']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsInvitationsOutboxResponse = operations['chat___rooms___invitations___outbox']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsJoiningRequest = operations['chat___rooms___joining']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsJoiningResponse = operations['chat___rooms___joining']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsJoinRequest = operations['chat___rooms___join']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsLeaveRequest = operations['chat___rooms___leave']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsMembersRequest = operations['chat___rooms___members']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsMembersResponse = operations['chat___rooms___members']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsMuteRequest = operations['chat___rooms___mute']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsOwnedRequest = operations['chat___rooms___owned']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsOwnedResponse = operations['chat___rooms___owned']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsShowRequest = operations['chat___rooms___show']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsShowResponse = operations['chat___rooms___show']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsUpdateRequest = operations['chat___rooms___update']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ChatRoomsUpdateResponse = operations['chat___rooms___update']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 type Clip = components['schemas']['Clip'];
@@ -1129,6 +1216,9 @@ type ClipsDeleteRequest = operations['clips___delete']['requestBody']['content']
 
 // @public (undocumented)
 type ClipsFavoriteRequest = operations['clips___favorite']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type ClipsListRequest = operations['clips___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 type ClipsListResponse = operations['clips___list']['responses']['200']['content']['application/json'];
@@ -1167,6 +1257,12 @@ type DateString = string;
 type DriveFile = components['schemas']['DriveFile'];
 
 // @public (undocumented)
+type DriveFilesAttachedChatMessagesRequest = operations['drive___files___attached-chat-messages']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type DriveFilesAttachedChatMessagesResponse = operations['drive___files___attached-chat-messages']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
 type DriveFilesAttachedNotesRequest = operations['drive___files___attached-notes']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
@@ -1198,6 +1294,9 @@ type DriveFilesFindRequest = operations['drive___files___find']['requestBody']['
 
 // @public (undocumented)
 type DriveFilesFindResponse = operations['drive___files___find']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type DriveFilesMoveBulkRequest = operations['drive___files___move-bulk']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 type DriveFilesRequest = operations['drive___files']['requestBody']['content']['application/json'];
@@ -1371,6 +1470,10 @@ export type Endpoints = Overwrite<Endpoints_2, {
         }>;
         res: AdminRolesCreateResponse;
     };
+    'clear-browser-cache': {
+        req: EmptyRequest;
+        res: EmptyResponse;
+    };
 }>;
 
 // @public (undocumented)
@@ -1403,12 +1506,6 @@ declare namespace entities {
         PartialRolePolicyOverride,
         EmptyRequest,
         EmptyResponse,
-        AdminAbuseReportResolverCreateRequest,
-        AdminAbuseReportResolverCreateResponse,
-        AdminAbuseReportResolverDeleteRequest,
-        AdminAbuseReportResolverListRequest,
-        AdminAbuseReportResolverListResponse,
-        AdminAbuseReportResolverUpdateRequest,
         AdminAbuseReportNotificationRecipientCreateRequest,
         AdminAbuseReportNotificationRecipientCreateResponse,
         AdminAbuseReportNotificationRecipientDeleteRequest,
@@ -1425,9 +1522,6 @@ declare namespace entities {
         AdminAccountsDeleteRequest,
         AdminAccountsFindByEmailRequest,
         AdminAccountsFindByEmailResponse,
-        AdminAccountsPendingListRequest,
-        AdminAccountsPendingListResponse,
-        AdminAccountsPendingRevokeRequest,
         AdminAdCreateRequest,
         AdminAdCreateResponse,
         AdminAdDeleteRequest,
@@ -1448,7 +1542,8 @@ declare namespace entities {
         AdminAvatarDecorationsUpdateRequest,
         AdminCaptchaCurrentResponse,
         AdminCaptchaSaveRequest,
-        AdminDriveDeleteAllFilesOfAUserRequest,
+        AdminDeleteAccountRequest,
+        AdminDeleteAllFilesOfAUserRequest,
         AdminDriveFilesRequest,
         AdminDriveFilesResponse,
         AdminDriveShowFileRequest,
@@ -1479,12 +1574,6 @@ declare namespace entities {
         AdminGetTableStatsResponse,
         AdminGetUserIpsRequest,
         AdminGetUserIpsResponse,
-        AdminIndieAuthCreateRequest,
-        AdminIndieAuthCreateResponse,
-        AdminIndieAuthDeleteRequest,
-        AdminIndieAuthListRequest,
-        AdminIndieAuthListResponse,
-        AdminIndieAuthUpdateRequest,
         AdminInviteCreateRequest,
         AdminInviteCreateResponse,
         AdminInviteListRequest,
@@ -1494,9 +1583,19 @@ declare namespace entities {
         AdminQueueClearRequest,
         AdminQueueDeliverDelayedResponse,
         AdminQueueInboxDelayedResponse,
-        AdminQueuePromoteRequest,
+        AdminQueueJobsRequest,
+        AdminQueueJobsResponse,
+        AdminQueuePromoteJobsRequest,
+        AdminQueueQueueStatsRequest,
+        AdminQueueQueueStatsResponse,
+        AdminQueueQueuesResponse,
+        AdminQueueRemoveJobRequest,
+        AdminQueueRetryJobRequest,
+        AdminQueueShowJobRequest,
+        AdminQueueShowJobResponse,
+        AdminQueueShowJobLogsRequest,
+        AdminQueueShowJobLogsResponse,
         AdminQueueStatsResponse,
-        AdminRegenerateUserTokenRequest,
         AdminRelaysAddRequest,
         AdminRelaysAddResponse,
         AdminRelaysListResponse,
@@ -1522,16 +1621,8 @@ declare namespace entities {
         AdminShowModerationLogsResponse,
         AdminShowUserRequest,
         AdminShowUserResponse,
-        AdminShowUserAccountMoveLogsRequest,
-        AdminShowUserAccountMoveLogsResponse,
         AdminShowUsersRequest,
         AdminShowUsersResponse,
-        AdminSsoCreateRequest,
-        AdminSsoCreateResponse,
-        AdminSsoDeleteRequest,
-        AdminSsoListRequest,
-        AdminSsoListResponse,
-        AdminSsoUpdateRequest,
         AdminSuspendUserRequest,
         AdminSystemWebhookCreateRequest,
         AdminSystemWebhookCreateResponse,
@@ -1545,16 +1636,12 @@ declare namespace entities {
         AdminSystemWebhookUpdateResponse,
         AdminUnsetUserAvatarRequest,
         AdminUnsetUserBannerRequest,
-        AdminUnsetUserMutualLinkRequest,
         AdminUnsuspendUserRequest,
         AdminUpdateAbuseUserReportRequest,
         AdminUpdateMetaRequest,
         AdminUpdateProxyAccountRequest,
         AdminUpdateProxyAccountResponse,
-        AdminUpdateUserNameRequest,
         AdminUpdateUserNoteRequest,
-        AnnouncementRequest,
-        AnnouncementResponse,
         AnnouncementsRequest,
         AnnouncementsResponse,
         AnnouncementsShowRequest,
@@ -1597,10 +1684,12 @@ declare namespace entities {
         ChannelsCreateResponse,
         ChannelsFavoriteRequest,
         ChannelsFeaturedResponse,
-        ChannelsFeaturedGamesResponse,
         ChannelsFollowRequest,
         ChannelsFollowedRequest,
         ChannelsFollowedResponse,
+        ChannelsMuteCreateRequest,
+        ChannelsMuteDeleteRequest,
+        ChannelsMuteListResponse,
         ChannelsMyFavoritesResponse,
         ChannelsOwnedRequest,
         ChannelsOwnedResponse,
@@ -1638,11 +1727,52 @@ declare namespace entities {
         ChartsUserReactionsResponse,
         ChartsUsersRequest,
         ChartsUsersResponse,
+        ChatHistoryRequest,
+        ChatHistoryResponse,
+        ChatMessagesCreateToRoomRequest,
+        ChatMessagesCreateToRoomResponse,
+        ChatMessagesCreateToUserRequest,
+        ChatMessagesCreateToUserResponse,
+        ChatMessagesDeleteRequest,
+        ChatMessagesReactRequest,
+        ChatMessagesRoomTimelineRequest,
+        ChatMessagesRoomTimelineResponse,
+        ChatMessagesSearchRequest,
+        ChatMessagesSearchResponse,
+        ChatMessagesShowRequest,
+        ChatMessagesShowResponse,
+        ChatMessagesUnreactRequest,
+        ChatMessagesUserTimelineRequest,
+        ChatMessagesUserTimelineResponse,
+        ChatRoomsCreateRequest,
+        ChatRoomsCreateResponse,
+        ChatRoomsDeleteRequest,
+        ChatRoomsInvitationsCreateRequest,
+        ChatRoomsInvitationsCreateResponse,
+        ChatRoomsInvitationsIgnoreRequest,
+        ChatRoomsInvitationsInboxRequest,
+        ChatRoomsInvitationsInboxResponse,
+        ChatRoomsInvitationsOutboxRequest,
+        ChatRoomsInvitationsOutboxResponse,
+        ChatRoomsJoinRequest,
+        ChatRoomsJoiningRequest,
+        ChatRoomsJoiningResponse,
+        ChatRoomsLeaveRequest,
+        ChatRoomsMembersRequest,
+        ChatRoomsMembersResponse,
+        ChatRoomsMuteRequest,
+        ChatRoomsOwnedRequest,
+        ChatRoomsOwnedResponse,
+        ChatRoomsShowRequest,
+        ChatRoomsShowResponse,
+        ChatRoomsUpdateRequest,
+        ChatRoomsUpdateResponse,
         ClipsAddNoteRequest,
         ClipsCreateRequest,
         ClipsCreateResponse,
         ClipsDeleteRequest,
         ClipsFavoriteRequest,
+        ClipsListRequest,
         ClipsListResponse,
         ClipsMyFavoritesResponse,
         ClipsNotesRequest,
@@ -1656,6 +1786,8 @@ declare namespace entities {
         DriveResponse,
         DriveFilesRequest,
         DriveFilesResponse,
+        DriveFilesAttachedChatMessagesRequest,
+        DriveFilesAttachedChatMessagesResponse,
         DriveFilesAttachedNotesRequest,
         DriveFilesAttachedNotesResponse,
         DriveFilesCheckExistenceRequest,
@@ -1667,6 +1799,7 @@ declare namespace entities {
         DriveFilesFindResponse,
         DriveFilesFindByHashRequest,
         DriveFilesFindByHashResponse,
+        DriveFilesMoveBulkRequest,
         DriveFilesShowRequest,
         DriveFilesShowResponse,
         DriveFilesUpdateRequest,
@@ -1720,6 +1853,8 @@ declare namespace entities {
         FlashMyResponse,
         FlashMyLikesRequest,
         FlashMyLikesResponse,
+        FlashSearchRequest,
+        FlashSearchResponse,
         FlashShowRequest,
         FlashShowResponse,
         FlashUnlikeRequest,
@@ -1868,6 +2003,14 @@ declare namespace entities {
         NotesCreateRequest,
         NotesCreateResponse,
         NotesDeleteRequest,
+        NotesDraftsCountResponse,
+        NotesDraftsCreateRequest,
+        NotesDraftsCreateResponse,
+        NotesDraftsDeleteRequest,
+        NotesDraftsListRequest,
+        NotesDraftsListResponse,
+        NotesDraftsUpdateRequest,
+        NotesDraftsUpdateResponse,
         NotesFavoritesCreateRequest,
         NotesFavoritesDeleteRequest,
         NotesFeaturedRequest,
@@ -1891,15 +2034,14 @@ declare namespace entities {
         NotesRenotesResponse,
         NotesRepliesRequest,
         NotesRepliesResponse,
-        NotesScheduledCancelRequest,
-        NotesScheduledListRequest,
-        NotesScheduledListResponse,
         NotesSearchRequest,
         NotesSearchResponse,
         NotesSearchByTagRequest,
         NotesSearchByTagResponse,
         NotesShowRequest,
         NotesShowResponse,
+        NotesShowPartialBulkRequest,
+        NotesShowPartialBulkResponse,
         NotesStateRequest,
         NotesStateResponse,
         NotesThreadMutingCreateRequest,
@@ -1979,14 +2121,8 @@ declare namespace entities {
         UsersFollowingResponse,
         UsersGalleryPostsRequest,
         UsersGalleryPostsResponse,
-        UsersGetFollowingBirthdayUsersRequest,
-        UsersGetFollowingBirthdayUsersResponse,
         UsersGetFrequentlyRepliedUsersRequest,
         UsersGetFrequentlyRepliedUsersResponse,
-        UsersGetSecurityInfoRequest,
-        UsersGetSecurityInfoResponse,
-        UsersGetSkebStatusRequest,
-        UsersGetSkebStatusResponse,
         UsersListsCreateRequest,
         UsersListsCreateResponse,
         UsersListsCreateFromPublicRequest,
@@ -2022,11 +2158,10 @@ declare namespace entities {
         UsersSearchByUsernameAndHostResponse,
         UsersShowRequest,
         UsersShowResponse,
-        UsersStatsRequest,
-        UsersStatsResponse,
         UsersUpdateMemoRequest,
         V2AdminEmojiListRequest,
         V2AdminEmojiListResponse,
+        VerifyEmailRequest,
         Error_2 as Error,
         UserLite,
         UserDetailedNotMeOnly,
@@ -2036,20 +2171,20 @@ declare namespace entities {
         UserDetailed,
         User,
         UserList,
-        UserListMembership,
-        UserAccountMoveLog,
+        Achievement,
+        AchievementName,
         Ad,
         Announcement,
         App,
         Note,
         NoteDraft,
         NoteReaction,
+        NoteReactionWithNote,
         NoteFavorite,
         Notification_2 as Notification,
         DriveFile,
         DriveFolder,
         Following,
-        FollowRequest,
         Muting,
         RenoteMuting,
         Blocking,
@@ -2057,19 +2192,18 @@ declare namespace entities {
         InviteCode,
         Page,
         PageBlock,
-        PageLike,
         Channel,
         QueueCount,
+        QueueMetrics,
+        QueueJob,
         Antenna,
         Clip,
         FederationInstance,
         GalleryPost,
-        GalleryLike,
         EmojiSimple,
         EmojiDetailed,
         EmojiDetailedAdmin,
         Flash,
-        FlashLike,
         Signin,
         RoleCondFormulaLogics,
         RoleCondFormulaValueNot,
@@ -2087,7 +2221,7 @@ declare namespace entities {
         MetaLite,
         MetaDetailedOnly,
         MetaDetailed,
-        AbuseUserReport,
+        UserWebhook,
         SystemWebhook,
         AbuseReportNotificationRecipient,
         ChatMessage,
@@ -2191,9 +2325,6 @@ type FlashFeaturedRequest = operations['flash___featured']['requestBody']['conte
 type FlashFeaturedResponse = operations['flash___featured']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type FlashLike = components['schemas']['FlashLike'];
-
-// @public (undocumented)
 type FlashLikeRequest = operations['flash___like']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
@@ -2207,6 +2338,12 @@ type FlashMyRequest = operations['flash___my']['requestBody']['content']['applic
 
 // @public (undocumented)
 type FlashMyResponse = operations['flash___my']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type FlashSearchRequest = operations['flash___search']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type FlashSearchResponse = operations['flash___search']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 type FlashShowRequest = operations['flash___show']['requestBody']['content']['application/json'];
@@ -2281,16 +2418,10 @@ type FollowingUpdateResponse = operations['following___update']['responses']['20
 export const followingVisibilities: readonly ["public", "followers", "private"];
 
 // @public (undocumented)
-type FollowRequest = components['schemas']['FollowRequest'];
-
-// @public (undocumented)
 type GalleryFeaturedRequest = operations['gallery___featured']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 type GalleryFeaturedResponse = operations['gallery___featured']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type GalleryLike = components['schemas']['GalleryLike'];
 
 // @public (undocumented)
 type GalleryPopularResponse = operations['gallery___popular']['responses']['200']['content']['application/json'];
@@ -2706,7 +2837,7 @@ type ModerationLog = {
     id: ID;
     createdAt: DateString;
     userId: User['id'];
-    user: UserDetailedNotMe | null;
+    user: UserDetailedNotMe;
 } & ({
     type: 'updateServerSettings';
     info: ModerationLogPayloads['updateServerSettings'];
@@ -2716,9 +2847,6 @@ type ModerationLog = {
 } | {
     type: 'unsuspend';
     info: ModerationLogPayloads['unsuspend'];
-} | {
-    type: 'updateUserName';
-    info: ModerationLogPayloads['updateUserName'];
 } | {
     type: 'updateUserNote';
     info: ModerationLogPayloads['updateUserNote'];
@@ -2780,9 +2908,6 @@ type ModerationLog = {
     type: 'resetPassword';
     info: ModerationLogPayloads['resetPassword'];
 } | {
-    type: 'regenerateUserToken';
-    info: ModerationLogPayloads['regenerateUserToken'];
-} | {
     type: 'suspendRemoteInstance';
     info: ModerationLogPayloads['suspendRemoteInstance'];
 } | {
@@ -2809,15 +2934,6 @@ type ModerationLog = {
 } | {
     type: 'deleteAd';
     info: ModerationLogPayloads['deleteAd'];
-} | {
-    type: 'createIndieAuthClient';
-    info: ModerationLogPayloads['createIndieAuthClient'];
-} | {
-    type: 'updateIndieAuthClient';
-    info: ModerationLogPayloads['updateIndieAuthClient'];
-} | {
-    type: 'deleteIndieAuthClient';
-    info: ModerationLogPayloads['deleteIndieAuthClient'];
 } | {
     type: 'createAvatarDecoration';
     info: ModerationLogPayloads['createAvatarDecoration'];
@@ -2875,10 +2991,13 @@ type ModerationLog = {
 } | {
     type: 'deleteChatRoom';
     info: ModerationLogPayloads['deleteChatRoom'];
+} | {
+    type: 'updateProxyAccountDescription';
+    info: ModerationLogPayloads['updateProxyAccountDescription'];
 });
 
 // @public (undocumented)
-export const moderationLogTypes: readonly ["updateServerSettings", "suspend", "unsuspend", "updateUserName", "updateUserNote", "addCustomEmoji", "updateCustomEmoji", "deleteCustomEmoji", "assignRole", "unassignRole", "createRole", "updateRole", "deleteRole", "clearQueue", "promoteQueue", "deleteDriveFile", "deleteNote", "createGlobalAnnouncement", "createUserAnnouncement", "updateGlobalAnnouncement", "updateUserAnnouncement", "deleteGlobalAnnouncement", "deleteUserAnnouncement", "resetPassword", "regenerateUserToken", "suspendRemoteInstance", "unsuspendRemoteInstance", "updateRemoteInstanceNote", "markSensitiveDriveFile", "unmarkSensitiveDriveFile", "resolveAbuseReport", "forwardAbuseReport", "updateAbuseReportNote", "createInvitation", "createAd", "updateAd", "deleteAd", "createIndieAuthClient", "updateIndieAuthClient", "deleteIndieAuthClient", "createSSOServiceProvider", "updateSSOServiceProvider", "deleteSSOServiceProvider", "createAvatarDecoration", "updateAvatarDecoration", "deleteAvatarDecoration", "unsetUserAvatar", "unsetUserBanner", "unsetUserMutualBanner", "createSystemWebhook", "updateSystemWebhook", "deleteSystemWebhook", "createAbuseReportNotificationRecipient", "updateAbuseReportNotificationRecipient", "deleteAbuseReportNotificationRecipient", "deleteAccount", "deletePage", "deleteFlash", "deleteGalleryPost", "deleteChatRoom"];
+export const moderationLogTypes: readonly ["updateServerSettings", "suspend", "unsuspend", "updateUserNote", "addCustomEmoji", "updateCustomEmoji", "deleteCustomEmoji", "assignRole", "unassignRole", "createRole", "updateRole", "deleteRole", "clearQueue", "promoteQueue", "deleteDriveFile", "deleteNote", "createGlobalAnnouncement", "createUserAnnouncement", "updateGlobalAnnouncement", "updateUserAnnouncement", "deleteGlobalAnnouncement", "deleteUserAnnouncement", "resetPassword", "suspendRemoteInstance", "unsuspendRemoteInstance", "updateRemoteInstanceNote", "markSensitiveDriveFile", "unmarkSensitiveDriveFile", "resolveAbuseReport", "forwardAbuseReport", "updateAbuseReportNote", "createInvitation", "createAd", "updateAd", "deleteAd", "createAvatarDecoration", "updateAvatarDecoration", "deleteAvatarDecoration", "unsetUserAvatar", "unsetUserBanner", "createSystemWebhook", "updateSystemWebhook", "deleteSystemWebhook", "createAbuseReportNotificationRecipient", "updateAbuseReportNotificationRecipient", "deleteAbuseReportNotificationRecipient", "deleteAccount", "deletePage", "deleteFlash", "deleteGalleryPost", "deleteChatRoom", "updateProxyAccountDescription"];
 
 // @public (undocumented)
 type MuteCreateRequest = operations['mute___create']['requestBody']['content']['application/json'];
@@ -2924,6 +3043,9 @@ type NoteFavorite = components['schemas']['NoteFavorite'];
 type NoteReaction = components['schemas']['NoteReaction'];
 
 // @public (undocumented)
+type NoteReactionWithNote = components['schemas']['NoteReactionWithNote'];
+
+// @public (undocumented)
 type NotesChildrenRequest = operations['notes___children']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
@@ -2949,6 +3071,30 @@ type NotesCreateResponse = operations['notes___create']['responses']['200']['con
 
 // @public (undocumented)
 type NotesDeleteRequest = operations['notes___delete']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type NotesDraftsCountResponse = operations['notes___drafts___count']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type NotesDraftsCreateRequest = operations['notes___drafts___create']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type NotesDraftsCreateResponse = operations['notes___drafts___create']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type NotesDraftsDeleteRequest = operations['notes___drafts___delete']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type NotesDraftsListRequest = operations['notes___drafts___list']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type NotesDraftsListResponse = operations['notes___drafts___list']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type NotesDraftsUpdateRequest = operations['notes___drafts___update']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type NotesDraftsUpdateResponse = operations['notes___drafts___update']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 type NotesFavoritesCreateRequest = operations['notes___favorites___create']['requestBody']['content']['application/json'];
@@ -3026,15 +3172,6 @@ type NotesRequest = operations['notes']['requestBody']['content']['application/j
 type NotesResponse = operations['notes']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesScheduledCancelRequest = operations['notes___scheduled___cancel']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type NotesScheduledListRequest = operations['notes___scheduled___list']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type NotesScheduledListResponse = operations['notes___scheduled___list']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
 type NotesSearchByTagRequest = operations['notes___search-by-tag']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
@@ -3045,6 +3182,12 @@ type NotesSearchRequest = operations['notes___search']['requestBody']['content']
 
 // @public (undocumented)
 type NotesSearchResponse = operations['notes___search']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+type NotesShowPartialBulkRequest = operations['notes___show-partial-bulk']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type NotesShowPartialBulkResponse = operations['notes___show-partial-bulk']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 type NotesShowRequest = operations['notes___show']['requestBody']['content']['application/json'];
@@ -3095,7 +3238,7 @@ type Notification_2 = components['schemas']['Notification'];
 type NotificationsCreateRequest = operations['notifications___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-export const notificationTypes: readonly ["note", "follow", "mention", "reply", "renote", "quote", "reaction", "pollVote", "pollEnded", "receiveFollowRequest", "followRequestAccepted", "groupInvited", "app", "roleAssigned", "chatRoomInvitationReceived", "achievementEarned", "noteScheduled", "scheduledNotePosted", "scheduledNoteError"];
+export const notificationTypes: readonly ["note", "follow", "mention", "reply", "renote", "quote", "reaction", "pollEnded", "scheduledNotePosted", "scheduledNotePostFailed", "receiveFollowRequest", "followRequestAccepted", "app", "roleAssigned", "chatRoomInvitationReceived", "achievementEarned", "exportCompleted", "test", "login", "createToken"];
 
 // @public (undocumented)
 export function nyaize(text: string): string;
@@ -3114,9 +3257,6 @@ type PageEvent = {
     userId: User['id'];
     user: User;
 };
-
-// @public (undocumented)
-type PageLike = components['schemas']['PageLike'];
 
 // @public (undocumented)
 type PagePushRequest = operations['page-push']['requestBody']['content']['application/json'];
@@ -3161,7 +3301,7 @@ type PartialRolePolicyOverride = Partial<{
 }>;
 
 // @public (undocumented)
-export const permissions: readonly ["read:account", "write:account", "read:blocks", "write:blocks", "read:drive", "write:drive", "read:favorites", "write:favorites", "read:following", "write:following", "read:messaging", "write:messaging", "read:mutes", "write:mutes", "write:notes", "read:notifications", "write:notifications", "read:reactions", "write:reactions", "write:votes", "read:pages", "write:pages", "write:page-likes", "read:page-likes", "read:user-groups", "write:user-groups", "read:channels", "write:channels", "read:gallery", "write:gallery", "read:gallery-likes", "write:gallery-likes", "read:flash", "write:flash", "read:flash-likes", "write:flash-likes", "read:admin:abuse-user-reports", "read:admin:abuse-report-resolvers", "write:admin:abuse-report-resolvers", "read:admin:index-stats", "read:admin:table-stats", "read:admin:user-ips", "read:admin:meta", "write:admin:reset-password", "write:admin:regenerate-user-token", "write:admin:resolve-abuse-user-report", "write:admin:send-email", "read:admin:server-info", "read:admin:show-moderation-log", "read:admin:show-account-move-log", "read:admin:show-user", "write:admin:suspend-user", "write:admin:unsuspend-user", "write:admin:meta", "write:admin:user-name", "write:admin:user-note", "write:admin:user-avatar", "write:admin:user-banner", "write:admin:user-mutual-link", "write:admin:roles", "read:admin:roles", "write:admin:relays", "read:admin:relays", "write:admin:invite-codes", "read:admin:invite-codes", "write:admin:announcements", "read:admin:announcements", "write:admin:avatar-decorations", "read:admin:avatar-decorations", "write:admin:federation", "write:admin:indie-auth", "read:admin:indie-auth", "write:admin:account", "read:admin:account", "write:admin:emoji", "read:admin:emoji", "write:admin:queue", "read:admin:queue", "write:admin:promo", "write:admin:drive", "read:admin:drive", "write:admin:sso", "read:admin:sso", "write:admin:ad", "read:admin:ad", "write:invite-codes", "read:invite-codes", "write:clip-favorite", "read:clip-favorite", "read:federation", "write:report-abuse", "write:chat", "read:chat"];
+export const permissions: readonly ["read:account", "write:account", "read:blocks", "write:blocks", "read:drive", "write:drive", "read:favorites", "write:favorites", "read:following", "write:following", "read:messaging", "write:messaging", "read:mutes", "write:mutes", "write:notes", "read:notifications", "write:notifications", "read:reactions", "write:reactions", "write:votes", "read:pages", "write:pages", "write:page-likes", "read:page-likes", "read:user-groups", "write:user-groups", "read:channels", "write:channels", "read:gallery", "write:gallery", "read:gallery-likes", "write:gallery-likes", "read:flash", "write:flash", "read:flash-likes", "write:flash-likes", "read:admin:abuse-user-reports", "write:admin:delete-account", "write:admin:delete-all-files-of-a-user", "read:admin:index-stats", "read:admin:table-stats", "read:admin:user-ips", "read:admin:meta", "write:admin:reset-password", "write:admin:resolve-abuse-user-report", "write:admin:send-email", "read:admin:server-info", "read:admin:show-moderation-log", "read:admin:show-user", "write:admin:suspend-user", "write:admin:unset-user-avatar", "write:admin:unset-user-banner", "write:admin:unsuspend-user", "write:admin:meta", "write:admin:user-note", "write:admin:roles", "read:admin:roles", "write:admin:relays", "read:admin:relays", "write:admin:invite-codes", "read:admin:invite-codes", "write:admin:announcements", "read:admin:announcements", "write:admin:avatar-decorations", "read:admin:avatar-decorations", "write:admin:federation", "write:admin:account", "read:admin:account", "write:admin:emoji", "read:admin:emoji", "write:admin:queue", "read:admin:queue", "write:admin:promo", "write:admin:drive", "read:admin:drive", "write:admin:ad", "read:admin:ad", "write:invite-codes", "read:invite-codes", "write:clip-favorite", "read:clip-favorite", "read:federation", "write:report-abuse", "write:chat", "read:chat"];
 
 // @public (undocumented)
 type PingResponse = operations['ping']['responses']['200']['content']['application/json'];
@@ -3173,16 +3313,23 @@ type PinnedUsersResponse = operations['pinned-users']['responses']['200']['conte
 type PromoReadRequest = operations['promo___read']['requestBody']['content']['application/json'];
 
 // Warning: (ae-forgotten-export) The symbol "AllNullRecord" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "AllNullOrOptionalRecord" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "NonNullableRecord" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-type PureRenote = Omit<Note, 'renote' | 'renoteId' | 'reply' | 'replyId' | 'text' | 'cw' | 'files' | 'fileIds' | 'poll'> & AllNullRecord<Pick<Note, 'reply' | 'replyId' | 'text' | 'cw' | 'poll'>> & {
+type PureRenote = Omit<Note, 'renote' | 'renoteId' | 'reply' | 'replyId' | 'text' | 'cw' | 'files' | 'fileIds' | 'poll'> & AllNullRecord<Pick<Note, 'text'>> & AllNullOrOptionalRecord<Pick<Note, 'reply' | 'replyId' | 'cw' | 'poll'>> & {
     files: [];
     fileIds: [];
-} & NonNullableRecord<Pick<Note, 'renote' | 'renoteId'>>;
+} & NonNullableRecord<Pick<Note, 'renoteId'>> & Pick<Note, 'renote'>;
 
 // @public (undocumented)
 type QueueCount = components['schemas']['QueueCount'];
+
+// @public (undocumented)
+type QueueJob = components['schemas']['QueueJob'];
+
+// @public (undocumented)
+type QueueMetrics = components['schemas']['QueueMetrics'];
 
 // @public (undocumented)
 type QueueStats = {
@@ -3202,6 +3349,9 @@ type QueueStats = {
 
 // @public (undocumented)
 type QueueStatsLog = QueueStats[];
+
+// @public (undocumented)
+export const queueTypes: readonly ["system", "endedPollNotification", "postScheduledNote", "deliver", "inbox", "db", "relationship", "objectStorage", "userWebhookDeliver", "systemWebhookDeliver"];
 
 // @public (undocumented)
 type RenoteMuteCreateRequest = operations['renote-mute___create']['requestBody']['content']['application/json'];
@@ -3303,6 +3453,9 @@ type RoleLite = components['schemas']['RoleLite'];
 type RolePolicies = components['schemas']['RolePolicies'];
 
 // @public (undocumented)
+export const rolePolicies: readonly ["gtlAvailable", "ltlAvailable", "canPublicNote", "mentionLimit", "canInvite", "inviteLimit", "inviteLimitCycle", "inviteExpirationTime", "canManageCustomEmojis", "canManageAvatarDecorations", "canSearchNotes", "canSearchUsers", "canUseTranslator", "canHideAds", "driveCapacityMb", "maxFileSizeMb", "alwaysMarkNsfw", "canUpdateBioMedia", "pinLimit", "antennaLimit", "wordMuteLimit", "webhookLimit", "clipLimit", "noteEachClipsLimit", "userListLimit", "userEachUserListsLimit", "rateLimitFactor", "avatarDecorationLimit", "canImportAntennas", "canImportBlocking", "canImportFollowing", "canImportMuting", "canImportUserLists", "chatAvailability", "uploadableFileTypes", "noteDraftLimit", "scheduledNoteLimit", "watermarkAvailable"];
+
+// @public (undocumented)
 type RolesListResponse = operations['roles___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
@@ -3359,6 +3512,7 @@ type SigninFlowRequest = {
     'g-recaptcha-response'?: string | null;
     'turnstile-response'?: string | null;
     'm-captcha-response'?: string | null;
+    'testcaptcha-response'?: string | null;
 };
 
 // @public (undocumented)
@@ -3416,6 +3570,7 @@ type SignupRequest = {
     'g-recaptcha-response'?: string | null;
     'turnstile-response'?: string | null;
     'm-captcha-response'?: string | null;
+    'testcaptcha-response'?: string | null;
 };
 
 // @public (undocumented)
@@ -3510,9 +3665,6 @@ function toString_2(acct: Acct): string;
 type User = components['schemas']['User'];
 
 // @public (undocumented)
-type UserAccountMoveLog = components['schemas']['UserAccountMoveLog'];
-
-// @public (undocumented)
 type UserDetailed = components['schemas']['UserDetailed'];
 
 // @public (undocumented)
@@ -3523,9 +3675,6 @@ type UserDetailedNotMeOnly = components['schemas']['UserDetailedNotMeOnly'];
 
 // @public (undocumented)
 type UserList = components['schemas']['UserList'];
-
-// @public (undocumented)
-type UserListMembership = components['schemas']['UserListMembership'];
 
 // @public (undocumented)
 type UserLite = components['schemas']['UserLite'];
@@ -3579,28 +3728,10 @@ type UsersGalleryPostsRequest = operations['users___gallery___posts']['requestBo
 type UsersGalleryPostsResponse = operations['users___gallery___posts']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersGetFollowingBirthdayUsersRequest = operations['users___get-following-birthday-users']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type UsersGetFollowingBirthdayUsersResponse = operations['users___get-following-birthday-users']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
 type UsersGetFrequentlyRepliedUsersRequest = operations['users___get-frequently-replied-users']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 type UsersGetFrequentlyRepliedUsersResponse = operations['users___get-frequently-replied-users']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type UsersGetSecurityInfoRequest = operations['users___get-security-info']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type UsersGetSecurityInfoResponse = operations['users___get-security-info']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
-type UsersGetSkebStatusRequest = operations['users___get-skeb-status']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type UsersGetSkebStatusResponse = operations['users___get-skeb-status']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 type UsersListsCreateFromPublicRequest = operations['users___lists___create-from-public']['requestBody']['content']['application/json'];
@@ -3714,13 +3845,10 @@ type UsersShowRequest = operations['users___show']['requestBody']['content']['ap
 type UsersShowResponse = operations['users___show']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type UsersStatsRequest = operations['users___stats']['requestBody']['content']['application/json'];
-
-// @public (undocumented)
-type UsersStatsResponse = operations['users___stats']['responses']['200']['content']['application/json'];
-
-// @public (undocumented)
 type UsersUpdateMemoRequest = operations['users___update-memo']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+type UserWebhook = components['schemas']['UserWebhook'];
 
 // @public (undocumented)
 type V2AdminEmojiListRequest = operations['v2___admin___emoji___list']['requestBody']['content']['application/json'];
@@ -3728,11 +3856,13 @@ type V2AdminEmojiListRequest = operations['v2___admin___emoji___list']['requestB
 // @public (undocumented)
 type V2AdminEmojiListResponse = operations['v2___admin___emoji___list']['responses']['200']['content']['application/json'];
 
+// @public (undocumented)
+type VerifyEmailRequest = operations['verify-email']['requestBody']['content']['application/json'];
+
 // Warnings were encountered during analysis:
 //
-// src/entities.ts:50:2 - (ae-forgotten-export) The symbol "ModerationLogPayloads" needs to be exported by the entry point index.d.ts
-// src/streaming.ts:53:3 - (ae-forgotten-export) The symbol "Options" needs to be exported by the entry point index.d.ts
-// src/streaming.ts:54:3 - (ae-forgotten-export) The symbol "ReconnectingWebSocket" needs to be exported by the entry point index.d.ts
+// src/entities.ts:55:2 - (ae-forgotten-export) The symbol "ModerationLogPayloads" needs to be exported by the entry point index.d.ts
+// src/streaming.ts:57:3 - (ae-forgotten-export) The symbol "ReconnectingWebSocket" needs to be exported by the entry point index.d.ts
 // src/streaming.types.ts:226:4 - (ae-forgotten-export) The symbol "ReversiUpdateKey" needs to be exported by the entry point index.d.ts
 // src/streaming.types.ts:236:4 - (ae-forgotten-export) The symbol "ReversiUpdateSettings" needs to be exported by the entry point index.d.ts
 

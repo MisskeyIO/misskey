@@ -15,6 +15,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<div :class="$style.bannerStatus">
 						<div><i class="ti ti-users ti-fw"></i><I18n :src="i18n.ts._channel.usersCount" tag="span" style="margin-left: 4px;"><template #n><b>{{ channel.usersCount }}</b></template></I18n></div>
 						<div><i class="ti ti-pencil ti-fw"></i><I18n :src="i18n.ts._channel.notesCount" tag="span" style="margin-left: 4px;"><template #n><b>{{ channel.notesCount }}</b></template></I18n></div>
+						<div v-if="$i != null && channel != null && $i.id === channel.userId" style="color: var(--MI_THEME-warn)"><i class="ti ti-user-star ti-fw"></i><span style="margin-left: 4px;">{{ i18n.ts.youAreAdmin }}</span></div>
 					</div>
 					<div v-if="channel.isSensitive" :class="$style.sensitiveIndicator">{{ i18n.ts.sensitive }}</div>
 					<div :class="$style.bannerFade"></div>
@@ -37,10 +38,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<!-- スマホ・タブレットの場合、キーボードが表示されると投稿が見づらくなるので、デスクトップ場合のみ自動でフォーカスを当てる -->
 			<MkPostForm v-if="$i && prefer.r.showFixedPostFormInChannel.value" :channel="channel" class="post-form _panel" fixed :autofocus="deviceKind === 'desktop'"/>
 
-			<MkTimeline :key="channelId" src="channel" :channel="channelId" @before="before" @after="after" @note="miLocalStorage.setItemAsJson(`channelLastReadedAt:${channel.id}`, Date.now())"/>
+			<MkStreamingNotesTimeline :key="channelId" src="channel" :channel="channelId"/>
 		</div>
 		<div v-else-if="tab === 'featured'">
-			<MkNotes :pagination="featuredPagination"/>
+			<MkNotesTimeline :paginator="featuredPaginator"/>
 		</div>
 		<div v-else-if="tab === 'search'">
 			<div v-if="notesSearchAvailable" class="_gaps">
@@ -50,7 +51,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</MkInput>
 					<MkButton primary rounded style="margin-top: 8px;" @click="search()">{{ i18n.ts.search }}</MkButton>
 				</div>
-				<MkNotes v-if="searchPagination" :key="searchKey" :pagination="searchPagination"/>
+				<MkNotesTimeline v-if="searchPaginator" :key="searchKey" :paginator="searchPaginator"/>
 			</div>
 			<div v-else>
 				<MkInfo warn>{{ i18n.ts.notesSearchNotAvailable }}</MkInfo>
@@ -70,12 +71,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, watch, ref } from 'vue';
+import { computed, watch, ref, markRaw, shallowRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import { url } from '@@/js/config.js';
+import { useInterval } from '@@/js/use-interval.js';
 import type { PageHeaderItem } from '@/types/page-header.js';
 import MkPostForm from '@/components/MkPostForm.vue';
-import MkTimeline from '@/components/MkTimeline.vue';
+import MkStreamingNotesTimeline from '@/components/MkStreamingNotesTimeline.vue';
 import XChannelFollowButton from '@/components/MkChannelFollowButton.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
@@ -83,7 +85,7 @@ import { $i, iAmModerator } from '@/i.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import { deviceKind } from '@/utility/device-kind.js';
-import MkNotes from '@/components/MkNotes.vue';
+import MkNotesTimeline from '@/components/MkNotesTimeline.vue';
 import { favoritedChannelsCache } from '@/cache.js';
 import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
@@ -96,6 +98,7 @@ import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
 import { notesSearchAvailable } from '@/utility/check-permissions.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { useRouter } from '@/router.js';
+import { Paginator } from '@/utility/paginator.js';
 
 const router = useRouter();
 
@@ -108,37 +111,51 @@ const tab = ref('overview');
 const channel = ref<Misskey.entities.Channel | null>(null);
 const favorited = ref(false);
 const searchQuery = ref('');
-const searchPagination = ref();
+const searchPaginator = shallowRef();
 const searchKey = ref('');
-const featuredPagination = computed(() => ({
-	endpoint: 'notes/featured' as const,
+const featuredPaginator = markRaw(new Paginator('notes/featured', {
 	limit: 10,
-	params: {
+	computedParams: computed(() => ({
 		channelId: props.channelId,
-	},
+	})),
 }));
 
+useInterval(() => {
+	if (channel.value == null) return;
+	miLocalStorage.setItemAsJson(`channelLastReadedAt:${channel.value.id}`, Date.now());
+}, 3000, {
+	immediate: true,
+	afterMounted: true,
+});
+
 watch(() => props.channelId, async () => {
-	channel.value = await misskeyApi('channels/show', {
+	const _channel = await misskeyApi('channels/show', {
 		channelId: props.channelId,
 	});
-	favorited.value = channel.value.isFavorited ?? false;
-	if (favorited.value || channel.value.isFollowing) {
+
+	favorited.value = _channel.isFavorited ?? false;
+	if (favorited.value || _channel.isFollowing) {
 		tab.value = 'timeline';
 	}
 
-	if ((favorited.value || channel.value.isFollowing) && channel.value.lastNotedAt) {
-		const lastReadedAt: number = miLocalStorage.getItemAsJson(`channelLastReadedAt:${channel.value.id}`) ?? 0;
-		const lastNotedAt = Date.parse(channel.value.lastNotedAt);
+	if ((favorited.value || _channel.isFollowing) && _channel.lastNotedAt) {
+		const lastReadedAt: number = miLocalStorage.getItemAsJson(`channelLastReadedAt:${_channel.id}`) ?? 0;
+		const lastNotedAt = Date.parse(_channel.lastNotedAt);
 
 		if (lastNotedAt > lastReadedAt) {
-			miLocalStorage.setItemAsJson(`channelLastReadedAt:${channel.value.id}`, lastNotedAt);
+			miLocalStorage.setItemAsJson(`channelLastReadedAt:${_channel.id}`, lastNotedAt);
 		}
 	}
+
+	channel.value = _channel;
 }, { immediate: true });
 
 function edit() {
-	router.push(`/channels/${channel.value?.id}/edit`);
+	router.push('/channels/:channelId/edit', {
+		params: {
+			channelId: props.channelId,
+		},
+	});
 }
 
 function openPostForm() {
@@ -174,6 +191,53 @@ async function unfavorite() {
 	});
 }
 
+async function mute() {
+	if (!channel.value) return;
+	const _channel = channel.value;
+
+	const { canceled, result: period } = await os.select({
+		title: i18n.ts.mutePeriod,
+		items: [{
+			value: 'indefinitely', label: i18n.ts.indefinitely,
+		}, {
+			value: 'tenMinutes', label: i18n.ts.tenMinutes,
+		}, {
+			value: 'oneHour', label: i18n.ts.oneHour,
+		}, {
+			value: 'oneDay', label: i18n.ts.oneDay,
+		}, {
+			value: 'oneWeek', label: i18n.ts.oneWeek,
+		}],
+		default: 'indefinitely',
+	});
+	if (canceled) return;
+
+	const expiresAt = period === 'indefinitely' ? null
+		: period === 'tenMinutes' ? Date.now() + (1000 * 60 * 10)
+		: period === 'oneHour' ? Date.now() + (1000 * 60 * 60)
+		: period === 'oneDay' ? Date.now() + (1000 * 60 * 60 * 24)
+		: period === 'oneWeek' ? Date.now() + (1000 * 60 * 60 * 24 * 7)
+		: null;
+
+	os.apiWithDialog('channels/mute/create', {
+		channelId: _channel.id,
+		expiresAt,
+	}).then(() => {
+		_channel.isMuting = true;
+	});
+}
+
+async function unmute() {
+	if (!channel.value) return;
+	const _channel = channel.value;
+
+	os.apiWithDialog('channels/mute/delete', {
+		channelId: _channel.id,
+	}).then(() => {
+		_channel.isMuting = false;
+	});
+}
+
 async function search() {
 	if (!channel.value) return;
 
@@ -181,14 +245,13 @@ async function search() {
 
 	if (query == null) return;
 
-	searchPagination.value = {
-		endpoint: 'notes/search',
+	searchPaginator.value = markRaw(new Paginator('notes/search', {
 		limit: 10,
 		params: {
 			query: query,
 			channelId: channel.value.id,
 		},
-	};
+	}));
 
 	searchKey.value = query;
 }
@@ -224,6 +287,24 @@ const headerActions = computed(() => {
 						text: channel.value.description ?? undefined,
 						url: `${url}/channels/${channel.value.id}`,
 					});
+				},
+			});
+		}
+
+		if (!channel.value.isMuting) {
+			headerItems.push({
+				icon: 'ti ti-volume',
+				text: i18n.ts.mute,
+				handler: async (): Promise<void> => {
+					await mute();
+				},
+			});
+		} else {
+			headerItems.push({
+				icon: 'ti ti-volume-off',
+				text: i18n.ts.unmute,
+				handler: async (): Promise<void> => {
+					await unmute();
 				},
 			});
 		}

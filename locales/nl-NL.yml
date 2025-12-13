@@ -249,7 +249,6 @@ noUsers: "Er zijn geen gebruikers."
 editProfile: "Bewerk Profiel"
 noteDeleteConfirm: "Ben je zeker dat je dit bericht wil verwijderen?"
 pinLimitExceeded: "Je kunt geen berichten meer vastprikken"
-intro: "Installatie van Misskey geëindigd! Maak nu een beheerder aan."
 done: "Klaar"
 processing: "Bezig met verwerken"
 preview: "Voorbeeld"
@@ -783,7 +782,6 @@ thisIsExperimentalFeature: "Dit is een experimentele functie. De functionaliteit
 developer: "Ontwikkelaar"
 makeExplorable: "Gebruikersaccount zichtbaar maken in “Verkennen”"
 makeExplorableDescription: "Als deze optie is uitgeschakeld, is uw gebruikersaccount niet zichtbaar in het gedeelte “Verkennen”."
-showGapBetweenNotesInTimeline: "Een gat tussen noten op de tijdlijn weergeven"
 duplicate: "Dupliceren"
 left: "Links"
 center: "Center"
@@ -971,6 +969,9 @@ renotes: "Herdelen"
 followingOrFollower: "Gevolgd of volger"
 confirmShowRepliesAll: "Dit is een onomkeerbare operatie. Weet je zeker dat reacties op anderen van iedereen die je volgt, wil weergeven in je tijdlijn?"
 information: "Over"
+_imageEditing:
+  _vars:
+    filename: "Bestandsnaam"
 _chat:
   invitations: "Uitnodigen"
   noHistory: "Geen geschiedenis gevonden"
@@ -1020,6 +1021,11 @@ _cw:
 _visibility:
   home: "Startpagina"
   followers: "Volgers"
+  specified: "Directe notities"
+_postForm:
+  _howToUse:
+    visibility_title: "Zichtbaarheid"
+    menu_title: "Menu"
 _profile:
   name: "Naam"
   username: "Gebruikersnaam"
@@ -1062,6 +1068,7 @@ _deck:
     list: "Lijsten"
     channel: "Kanalen"
     mentions: "Vermeldingen"
+    direct: "Directe notities"
 _webhookSettings:
   name: "Naam"
   active: "Ingeschakeld"
@@ -1079,3 +1086,8 @@ _remoteLookupErrors:
     title: "Niet gevonden"
 _search:
   searchScopeAll: "Alle"
+_watermarkEditor:
+  image: "Afbeeldingen"
+  advanced: "Geavanceerd"
+_qr:
+  showTabTitle: "Weergave"

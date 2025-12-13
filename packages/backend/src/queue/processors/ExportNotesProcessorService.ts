@@ -38,6 +38,8 @@ class NoteStream extends ReadableStream<Record<string, unknown>> {
 		let exportedNotesCount = 0;
 		let cursor: MiNote['id'] | null = null;
 
+		const totalPromise = notesRepository.countBy({ userId });
+
 		const serialize = (
 			note: MiNote,
 			poll: MiPoll | null,
@@ -89,8 +91,8 @@ class NoteStream extends ReadableStream<Record<string, unknown>> {
 					exportedNotesCount++;
 				}
 
-				const total = await notesRepository.countBy({ userId: user.id });
-				job.updateProgress(exportedNotesCount / total);
+				const total = await totalPromise;
+				job.updateProgress(exportedNotesCount / total * 100);
 			},
 		});
 	}

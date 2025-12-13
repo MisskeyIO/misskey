@@ -300,31 +300,42 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private noteCreateService: NoteCreateService,
 		private notificationService: NotificationService,
 	) {
-		super(meta, paramDef, async (ps, me, _token, _file, _cleanup, ip, headers) => {
-			const logger = this.loggerService.getLogger('api:notes:create');
-			const hash = createHash('sha256').update(JSON.stringify(ps)).digest('base64');
-			logger.setContext({ userId: me.id, hash, ip, headers });
-			logger.info('Requested to create a note.');
+			super(meta, paramDef, async (ps, me, _token, _file, _cleanup, ip, headers) => {
+				const logger = this.loggerService.getLogger('api:notes:create');
+				const hash = createHash('sha256').update(JSON.stringify(ps)).digest('base64');
+				const idempotentKey = `note:idempotent:${me.id}:${hash}`;
+				logger.setContext({ userId: me.id, hash, ip, headers });
+				logger.info('Requested to create a note.');
 
-			const idempotent = process.env.FORCE_IGNORE_IDEMPOTENCY_FOR_TESTING !== 'true' ? await this.redisForTimelines.get(`note:idempotent:${me.id}:${hash}`) : null;
-			if (idempotent === '_') { // 他のサーバーで処理中
-				logger.warn('The request is being processed by another server.');
-				throw new ApiError(meta.errors.processing);
-			}
-
-			// すでに同じリクエストが処理されている場合、そのノートを返す
-			// ただし、記録されているノート見つからない場合は、新規として処理を続行
-			if (idempotent) {
-				const note = await this.notesRepository.findOneBy({ id: idempotent });
-				if (note) {
-					logger.info('The request has already been processed.', { noteId: note.id });
-					if (ps.noCreatedNote) return;
-					else return { createdNote: await this.noteEntityService.pack(note, me) };
+				const idempotent = process.env.FORCE_IGNORE_IDEMPOTENCY_FOR_TESTING !== 'true'
+					? await this.redisForTimelines.get(idempotentKey)
+					: null;
+				if (idempotent === '_') { // 他のサーバーで処理中
+					logger.warn('The request is being processed by another server.');
+					throw new ApiError(meta.errors.processing);
 				}
-			}
 
-			// 30秒の間、リクエストを処理中として記録
-			await this.redisForTimelines.set(`note:idempotent:${me.id}:${hash}`, '_', 'EX', 30);
+				// すでに同じリクエストが処理されている場合、そのノートを返す
+				// ただし、記録されているノート見つからない場合は、新規として処理を続行
+				if (idempotent) {
+					if (idempotent.startsWith('draft:')) {
+						return;
+					}
+
+					const noteId = idempotent.startsWith('note:')
+						? idempotent.slice('note:'.length)
+						: idempotent;
+
+					const note = await this.notesRepository.findOneBy({ id: noteId });
+					if (note) {
+						logger.info('The request has already been processed.', { noteId: note.id });
+						if (ps.noCreatedNote) return;
+						return { createdNote: await this.noteEntityService.pack(note, me) };
+					}
+				}
+
+				// 30秒の間、リクエストを処理中として記録
+				await this.redisForTimelines.set(idempotentKey, '_', 'EX', 30);
 
 			let visibleUsers: MiUser[] = [];
 			if (ps.visibleUserIds) {
@@ -472,64 +483,83 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				}
 			}
 
-			// 投稿を作成
-			try {
-				const note = await this.noteCreateService.create(me, {
-					createdAt: new Date(),
-					scheduledAt: ps.scheduledAt ? scheduledAt : null,
-					files: files,
-					poll: ps.poll ? {
-						choices: ps.poll.choices,
-						multiple: ps.poll.multiple ?? false,
-						expiresAt: ps.poll.expiresAt ? new Date(ps.poll.expiresAt) : null,
-					} : undefined,
-					text: ps.text ?? undefined,
-					reply,
-					renote,
-					cw: ps.cw,
-					localOnly: ps.localOnly,
-					reactionAcceptance: ps.reactionAcceptance,
-					visibility: ps.visibility,
-					visibleUsers,
-					channel,
-					apMentions: ps.noExtractMentions ? [] : undefined,
-					apHashtags: ps.noExtractHashtags ? [] : undefined,
-					apEmojis: ps.noExtractEmojis ? [] : undefined,
-				});
-
-				// 1分間、リクエストの処理結果を記録
-				await this.redisForTimelines.set(`note:idempotent:${me.id}:${hash}`, note.id, 'EX', 60);
-
-				if (!scheduledAt) {
-					logger.info('Successfully created a note.', { noteId: note.id });
-				} else {
-					this.notificationService.createNotification(me.id, 'noteScheduled', {
-						draftId: note.id,
+				// 投稿を作成
+				try {
+					const note = await this.noteCreateService.create(me, {
+						createdAt: new Date(),
+						scheduledAt,
+						reply,
+						renote,
+						files,
+						poll: ps.poll ? {
+							choices: ps.poll.choices,
+							multiple: ps.poll.multiple ?? false,
+							expiresAt: ps.poll.expiredAfter ? new Date(Date.now() + ps.poll.expiredAfter) : ps.poll.expiresAt ? new Date(ps.poll.expiresAt) : null,
+						} : null,
+						text: ps.text ?? null,
+						cw: ps.cw ?? null,
+						localOnly: ps.localOnly,
+						reactionAcceptance: ps.reactionAcceptance,
+						visibility: ps.visibility,
+						visibleUsers,
+						channel,
+						apMentions: ps.noExtractMentions ? [] : undefined,
+						apHashtags: ps.noExtractHashtags ? [] : undefined,
+						apEmojis: ps.noExtractEmojis ? [] : undefined,
 					});
-					logger.info('Successfully scheduled a note.', { draftId: note.id });
+
+					await this.redisForTimelines.set(
+						idempotentKey,
+						scheduledAt ? `draft:${note.id}` : `note:${note.id}`,
+						'EX',
+						60,
+					);
+
+					if (!scheduledAt) {
+						logger.info('Successfully created a note.', { noteId: note.id });
+						if (ps.noCreatedNote) return;
+						return {
+							createdNote: await this.noteEntityService.pack(note as MiNote, me),
+						};
+					} else {
+						this.notificationService.createNotification(me.id, 'noteScheduled', {
+							draftId: note.id,
+						});
+						logger.info('Successfully scheduled a note.', { draftId: note.id });
+						return;
+					}
+				} catch (err) {
+					await this.redisForTimelines.unlinkIf(idempotentKey, '_');
+
+					logger.error('Failed to create a note.', { error: err });
+
+					if (err instanceof IdentifiableError) {
+						if (err.id === '5b1c2b67-50a6-4a8a-a59c-0ede40890de3') throw new ApiError(meta.errors.rolePermissionDenied, { message: err.message });
+						if (err.id === '689ee33f-f97c-479a-ac49-1b9f8140af99') throw new ApiError(meta.errors.containsProhibitedWords, { message: err.message });
+						if (err.id === '9f466dab-c856-48cd-9e65-ff90ff750580') throw new ApiError(meta.errors.containsTooManyMentions, { message: err.message });
+						if (err.id === '801c046c-5bf5-4234-ad2b-e78fc20a2ac7') throw new ApiError(meta.errors.noSuchFile, { message: err.message });
+						if (err.id === '53983c56-e163-45a6-942f-4ddc485d4290') throw new ApiError(meta.errors.noSuchRenoteTarget, { message: err.message });
+						if (err.id === 'bde24c37-121f-4e7d-980d-cec52f599f02') throw new ApiError(meta.errors.cannotReRenote, { message: err.message });
+						if (err.id === '2b4fe776-4414-4a2d-ae39-f3418b8fd4d3') throw new ApiError(meta.errors.youHaveBeenBlocked, { message: err.message });
+						if (err.id === '90b9d6f0-893a-4fef-b0f1-e9a33989f71a') throw new ApiError(meta.errors.cannotRenoteDueToVisibility, { message: err.message });
+						if (err.id === '48d7a997-da5c-4716-b3c3-92db3f37bf7d') throw new ApiError(meta.errors.cannotRenoteDueToVisibility, { message: err.message });
+						if (err.id === 'b060f9a6-8909-4080-9e0b-94d9fa6f6a77') throw new ApiError(meta.errors.noSuchChannel, { message: err.message });
+						if (err.id === '7e435f4a-780d-4cfc-a15a-42519bd6fb67') throw new ApiError(meta.errors.cannotRenoteOutsideOfChannel, { message: err.message });
+						if (err.id === '60142edb-1519-408e-926d-4f108d27bee0') throw new ApiError(meta.errors.noSuchReplyTarget, { message: err.message });
+						if (err.id === 'f089e4e2-c0e7-4f60-8a23-e5a6bf786b36') throw new ApiError(meta.errors.cannotReplyToPureRenote, { message: err.message });
+						if (err.id === '11cd37b3-a411-4f77-8633-c580ce6a8dce') throw new ApiError(meta.errors.cannotReplyToInvisibleNote, { message: err.message });
+						if (err.id === 'ced780a1-2012-4caf-bc7e-a95a291294cb') throw new ApiError(meta.errors.cannotReplyToSpecifiedVisibilityNoteWithExtendedVisibility, { message: err.message });
+						if (err.id === 'b0df6025-f2e8-44b4-a26a-17ad99104612') throw new ApiError(meta.errors.youHaveBeenBlocked, { message: err.message });
+						if (err.id === '0c11c11e-0c8d-48e7-822c-76ccef660068') throw new ApiError(meta.errors.cannotCreateAlreadyExpiredPoll, { message: err.message });
+						if (err.id === 'bfa3905b-25f5-4894-b430-da331a490e4b') throw new ApiError(meta.errors.noSuchChannel, { message: err.message });
+						if (err.id === '5ea8e4f5-9d64-4e6c-92b8-9e2b5a4756bc') throw new ApiError(meta.errors.cannotScheduleSameTime, { message: err.message });
+						if (err.id === '7fc78d25-d947-45c1-9547-02257b98cab3') throw new ApiError(meta.errors.tooManyScheduledNotes, { message: err.message });
+						if (err.id === '506006cf-3092-4ae1-8145-b025001c591f') throw new ApiError(meta.errors.cannotScheduleToFarFuture, { message: err.message });
+						if (err.id === '7cc42034-f7ab-4f7c-87b4-e00854479080') throw new ApiError(meta.errors.rolePermissionDenied, { message: err.message });
+					}
+
+					throw err;
 				}
-
-				if (ps.noCreatedNote || scheduledAt) return;
-				else return {
-					createdNote: await this.noteEntityService.pack(note as MiNote, me),
-				};
-			} catch (err) {
-				// エラーが発生した場合、まだ処理中として記録されている場合はリクエストの処理結果を削除
-				await this.redisForTimelines.unlinkIf(`note:idempotent:${me.id}:${hash}`, '_');
-
-				logger.error('Failed to create a note.', { error: err });
-
-				if (err instanceof IdentifiableError) {
-					if (err.id === '689ee33f-f97c-479a-ac49-1b9f8140af99') throw new ApiError(meta.errors.containsProhibitedWords, { message: err.message });
-					if (err.id === '9f466dab-c856-48cd-9e65-ff90ff750580') throw new ApiError(meta.errors.containsTooManyMentions, { message: err.message });
-					if (err.id === '5ea8e4f5-9d64-4e6c-92b8-9e2b5a4756bc') throw new ApiError(meta.errors.cannotScheduleSameTime, { message: err.message });
-					if (err.id === '7fc78d25-d947-45c1-9547-02257b98cab3') throw new ApiError(meta.errors.tooManyScheduledNotes, { message: err.message });
-					if (err.id === '506006cf-3092-4ae1-8145-b025001c591f') throw new ApiError(meta.errors.cannotScheduleToFarFuture, { message: err.message });
-					if (err.id === '7cc42034-f7ab-4f7c-87b4-e00854479080') throw new ApiError(meta.errors.rolePermissionDenied, { message: err.message });
-				}
-
-				throw err;
-			}
-		});
+			});
 	}
 }

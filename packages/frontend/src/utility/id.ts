@@ -20,6 +20,6 @@ function getNoise(): string {
 }
 
 export function genId(): string {
-	counter = counter >= 9999 ? 0 : counter + 1;
+	counter++;
 	return getTime(Date.now()) + getNoise();
 }

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import * as fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 import { Injectable } from '@nestjs/common';
@@ -34,7 +35,9 @@ export class AiService {
 	}
 
 	@bindThis
-	public async detectSensitive(path: string, mime: string): Promise<PredictionType[] | null> {
+	public async detectSensitive(path: string, mime: string): Promise<PredictionType[] | null>;
+	public async detectSensitive(source: string | Buffer): Promise<PredictionType[] | null>;
+	public async detectSensitive(sourceOrPath: string | Buffer, mime?: string): Promise<PredictionType[] | null> {
 		try {
 			if (isSupportedCpu === undefined) {
 				isSupportedCpu = await this.computeIsSupportedCpu();
@@ -57,14 +60,21 @@ export class AiService {
 				});
 			}
 
-			const sharp = await sharpBmp(path, mime);
-			const { data, info } = await sharp
-				.resize(299, 299, { fit: 'inside' })
-				.removeAlpha()
-				.raw({ depth: 'uchar' })
-				.toBuffer({ resolveWithObject: true });
+			const image = await (async () => {
+				if (typeof sourceOrPath === 'string' && mime != null) {
+					const sharp = await sharpBmp(sourceOrPath, mime);
+					const { data, info } = await sharp
+						.resize(299, 299, { fit: 'inside' })
+						.removeAlpha()
+						.raw({ depth: 'uchar' })
+						.toBuffer({ resolveWithObject: true });
 
-			const image = tf.tensor3d(data, [info.height, info.width, info.channels], 'bool');
+					return tf.tensor3d(data, [info.height, info.width, info.channels], 'int32');
+				} else {
+					const buffer = sourceOrPath instanceof Buffer ? sourceOrPath : await fs.promises.readFile(sourceOrPath);
+					return await tf.node.decodeImage(buffer, 3) as any;
+				}
+			})();
 			try {
 				return await this.model.classify(image);
 			} finally {

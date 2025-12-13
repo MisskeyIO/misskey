@@ -15,7 +15,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	@contextmenu.stop
 	@keydown.stop
 >
-	<button v-if="hide" :class="$style.hidden" @click="showHiddenContent">
+	<button v-if="hide" :class="$style.hidden" @click="reveal">
 		<div :class="$style.hiddenTextWrapper">
 			<b v-if="audio.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ i18n.ts.sensitive }}{{ prefer.s.dataSaver.media ? ` (${i18n.ts.audio}${audio.size ? ' ' + bytes(audio.size) : ''})` : '' }}</b>
 			<b v-else style="display: block;"><i class="ti ti-music"></i> {{ prefer.s.dataSaver.media && audio.size ? bytes(audio.size) : i18n.ts.audio }}</b>
@@ -27,7 +27,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<audio
 			ref="audioEl"
 			preload="metadata"
-			crossorigin="anonymous"
 			controls
 			:class="$style.nativeAudio"
 			@keydown.prevent
@@ -36,51 +35,60 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</audio>
 	</div>
 
-	<div v-else>
-		<MkAudioVisualizer v-if="user" ref="audioVisualizer" :audioEl="audioEl" :analyser="analyserNode" :user="user" :profileImage="user.avatarUrl"/>
-		<div :class="$style.audioControls">
-			<audio
-				ref="audioEl"
-				preload="metadata"
-				crossorigin="anonymous"
-				@keydown.prevent="() => {}"
+	<div v-else :class="$style.audioControls">
+		<audio
+			ref="audioEl"
+			preload="metadata"
+			@keydown.prevent="() => {}"
+		>
+			<source :src="audio.url">
+		</audio>
+		<div :class="[$style.controlsChild, $style.controlsLeft]">
+			<button
+				:class="['_button', $style.controlButton]"
+				tabindex="-1"
+				@click.stop="togglePlayPause"
 			>
-				<source :src="audio.url">
-			</audio>
-			<div :class="[$style.controlsChild, $style.controlsLeft]">
-				<button class="_button" tabindex="-1" :class="['_button', $style.controlButton]" @click.prevent.stop="togglePlayPause">
-					<i v-if="isPlaying" class="ti-filled ti-filled-player-pause"></i>
-					<i v-else class="ti-filled ti-filled-player-play"></i>
-				</button>
-			</div>
-			<div :class="[$style.controlsChild, $style.controlsRight]">
-				<button class="_button" tabindex="-1" :class="['_button', $style.controlButton]" @click.prevent.stop="showMenu">
-					<i class="ti ti-settings"></i>
-				</button>
-			</div>
-			<div :class="[$style.controlsChild, $style.controlsTime]">{{ hms(elapsedTimeMs) }}</div>
-			<div :class="[$style.controlsChild, $style.controlsVolume]">
-				<button class="_button" tabindex="-1" :class="['_button', $style.controlButton]" @click.prevent.stop="toggleMute">
-					<i v-if="volume === 0" class="ti ti-volume-3"></i>
-					<i v-else class="ti ti-volume"></i>
-				</button>
-				<MkMediaRange
-					v-model="volume"
-					:class="$style.volumeSeekbar"
-				/>
-			</div>
+				<i v-if="isPlaying" class="ti ti-player-pause-filled"></i>
+				<i v-else class="ti ti-player-play-filled"></i>
+			</button>
+		</div>
+		<div :class="[$style.controlsChild, $style.controlsRight]">
+			<button
+				:class="['_button', $style.controlButton]"
+				tabindex="-1"
+				@click.stop="() => {}"
+				@mousedown.prevent.stop="showMenu"
+			>
+				<i class="ti ti-settings"></i>
+			</button>
+		</div>
+		<div :class="[$style.controlsChild, $style.controlsTime]">{{ hms(elapsedTimeMs) }}</div>
+		<div :class="[$style.controlsChild, $style.controlsVolume]">
+			<button
+				:class="['_button', $style.controlButton]"
+				tabindex="-1"
+				@click.stop="toggleMute"
+			>
+				<i v-if="volume === 0" class="ti ti-volume-3"></i>
+				<i v-else class="ti ti-volume"></i>
+			</button>
 			<MkMediaRange
-				v-model="rangePercent"
-				:class="$style.seekbarRoot"
-				:buffer="bufferedDataRatio"
+				v-model="volume"
+				:class="$style.volumeSeekbar"
 			/>
 		</div>
+		<MkMediaRange
+			v-model="rangePercent"
+			:class="$style.seekbarRoot"
+			:buffer="bufferedDataRatio"
+		/>
 	</div>
 </div>
 </template>
 
 <script lang="ts" setup>
-import { useTemplateRef, watch, computed, ref, onDeactivated, onActivated, onMounted, defineAsyncComponent } from 'vue';
+import { useTemplateRef, watch, computed, ref, onDeactivated, onActivated, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { MenuItem } from '@/types/menu.js';
 import type { Keymap } from '@/utility/hotkey.js';
@@ -90,14 +98,11 @@ import * as os from '@/os.js';
 import bytes from '@/filters/bytes.js';
 import { hms } from '@/filters/hms.js';
 import MkMediaRange from '@/components/MkMediaRange.vue';
-import { pleaseLogin } from '@/utility/please-login.js';
 import { $i, iAmModerator } from '@/i.js';
 import { prefer } from '@/preferences.js';
 
-const MkAudioVisualizer = defineAsyncComponent(() => import('@/components/MkAudioVisualizer.vue'));
 const props = defineProps<{
 	audio: Misskey.entities.DriveFile;
-	user?: Misskey.entities.UserLite;
 }>();
 
 const keymap = {
@@ -148,12 +153,11 @@ function hasFocus() {
 
 const playerEl = useTemplateRef('playerEl');
 const audioEl = useTemplateRef('audioEl');
-const audioVisualizer = ref<InstanceType<typeof MkAudioVisualizer>>();
 
 // eslint-disable-next-line vue/no-setup-props-reactivity-loss
 const hide = ref((prefer.s.nsfw === 'force' || prefer.s.dataSaver.media) ? true : (props.audio.isSensitive && prefer.s.nsfw !== 'ignore'));
 
-async function show() {
+async function reveal() {
 	if (props.audio.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
 		const { canceled } = await os.confirm({
 			type: 'question',
@@ -204,12 +208,6 @@ function showMenu(ev: MouseEvent) {
 		},
 	];
 
-	if ($i?.id === props.audio.userId || iAmModerator) {
-		menu.push({
-			type: 'divider',
-		});
-	}
-
 	if (iAmModerator) {
 		menu.push({
 			text: props.audio.isSensitive ? i18n.ts.unmarkAsSensitive : i18n.ts.markAsSensitive,
@@ -217,15 +215,6 @@ function showMenu(ev: MouseEvent) {
 			danger: true,
 			action: () => toggleSensitive(props.audio),
 		});
-
-		if ($i?.id !== props.audio.userId) {
-			menu.push({
-				type: 'link' as const,
-				text: i18n.ts._fileViewer.title,
-				icon: 'ti ti-info-circle',
-				to: `/admin/file/${props.audio.id}`,
-			});
-		}
 	}
 
 	const details: MenuItem[] = [];
@@ -270,21 +259,6 @@ function showMenu(ev: MouseEvent) {
 	});
 }
 
-async function showHiddenContent(ev: MouseEvent) {
-	if (props.audio.isSensitive && !$i) {
-		ev.preventDefault();
-		ev.stopPropagation();
-		await pleaseLogin();
-		return;
-	}
-
-	if (hide.value) {
-		ev.preventDefault();
-		ev.stopPropagation();
-		hide.value = false;
-	}
-}
-
 async function toggleSensitive(file: Misskey.entities.DriveFile) {
 	const { canceled } = await os.confirm({
 		type: 'warning',
@@ -306,11 +280,6 @@ const isPlaying = ref(false);
 const isActuallyPlaying = ref(false);
 const elapsedTimeMs = ref(0);
 const durationMs = ref(0);
-const audioContext = ref<AudioContext | null>(null);
-const sourceNode = ref<MediaElementAudioSourceNode | null>(null);
-const gainNode = ref<GainNode | null>(null);
-const analyserGainNode = ref<GainNode | null>(null);
-const analyserNode = ref<AnalyserNode | null>(null);
 const rangePercent = computed({
 	get: () => {
 		return (elapsedTimeMs.value / durationMs.value) || 0;
@@ -333,33 +302,11 @@ const bufferedDataRatio = computed(() => {
 function togglePlayPause() {
 	if (!isReady.value || !audioEl.value) return;
 
-	if (!sourceNode.value) {
-		audioContext.value = new (window.AudioContext || window.webkitAudioContext)();
-		sourceNode.value = audioContext.value.createMediaElementSource(audioEl.value);
-
-		analyserGainNode.value = audioContext.value.createGain();
-		gainNode.value = audioContext.value.createGain();
-		analyserNode.value = audioContext.value.createAnalyser();
-
-		sourceNode.value.connect(analyserGainNode.value);
-		analyserGainNode.value.connect(analyserNode.value);
-		analyserNode.value.connect(gainNode.value);
-		gainNode.value.connect(audioContext.value.destination);
-
-		analyserNode.value.fftSize = 2048;
-
-		analyserGainNode.value.gain.setValueAtTime(0.8, audioContext.value.currentTime);
-
-		gainNode.value.gain.setValueAtTime(volume.value, audioContext.value.currentTime);
-	}
-
 	if (isPlaying.value) {
 		audioEl.value.pause();
-		audioVisualizer.value?.pauseAnimation();
 		isPlaying.value = false;
 	} else {
 		audioEl.value.play();
-		audioVisualizer.value?.resumeAnimation();
 		isPlaying.value = true;
 		oncePlayed.value = true;
 	}
@@ -417,7 +364,6 @@ function init() {
 				oncePlayed.value = false;
 				isActuallyPlaying.value = false;
 				isPlaying.value = false;
-				audioVisualizer.value?.pauseAnimation();
 			});
 
 			durationMs.value = audioEl.value.duration * 1000;
@@ -426,7 +372,8 @@ function init() {
 					durationMs.value = audioEl.value.duration * 1000;
 				}
 			});
-			gainNode.value?.gain.setValueAtTime(volume.value, audioContext.value?.currentTime);
+
+			audioEl.value.volume = volume.value;
 		}
 	}, {
 		immediate: true,
@@ -434,7 +381,7 @@ function init() {
 }
 
 watch(volume, (to) => {
-	if (audioEl.value) gainNode.value?.gain.setValueAtTime(to, audioContext.value?.currentTime);
+	if (audioEl.value) audioEl.value.volume = to;
 });
 
 watch(speed, (to) => {

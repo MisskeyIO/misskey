@@ -15,7 +15,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { defineAsyncComponent, onMounted, ref, computed, shallowRef } from 'vue';
+import { onMounted, ref, computed, shallowRef } from 'vue';
 import MkNewPassword from '@/components/MkNewPassword.vue';
 import MkButton from '@/components/MkButton.vue';
 import * as os from '@/os.js';
@@ -35,19 +35,33 @@ const shouldDisableSubmitting = computed((): boolean => {
 });
 
 async function save() {
-	if (!newPassword.value?.isValid || submitting.value) return;
-	submitting.value = true;
+	if (props.token == null || submitting.value) return;
 
-	await os.apiWithDialog('reset-password', {
-		token: props.token,
-		password: newPassword.value.password,
-	});
-	mainRouter.push('/');
+	const password = newPassword.value?.password;
+	if (!password) return;
+
+	submitting.value = true;
+	try {
+		await os.apiWithDialog('reset-password', {
+			token: props.token,
+			password,
+		});
+		mainRouter.push('/');
+	} finally {
+		submitting.value = false;
+	}
 }
 
 onMounted(async () => {
 	if (props.token == null) {
-		await os.popup(defineAsyncComponent(() => import('@/components/MkForgotPassword.vue')), {}, {}, 'closed');
+		const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkForgotPassword.vue').then(x => x.default), {}, {
+			closed: () => dispose(),
+		});
+
+		await os.popupAsyncWithDialog(import('@/components/MkForgotPassword.vue').then(x => x.default), {}, {
+			initialPage: 1,
+		}, 'closed');
+
 		mainRouter.push('/');
 	}
 });

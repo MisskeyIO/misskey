@@ -111,6 +111,7 @@ export class MetaEntityService {
 			maxNoteTextLength: MAX_NOTE_TEXT_LENGTH,
 			defaultLightTheme,
 			defaultDarkTheme,
+			clientOptions: instance.clientOptions,
 			ads: ads.map(ad => ({
 				id: ad.id,
 				url: ad.url,
@@ -118,6 +119,7 @@ export class MetaEntityService {
 				ratio: ad.ratio,
 				imageUrl: ad.imageUrl,
 				dayOfWeek: ad.dayOfWeek,
+				isSensitive: ad.isSensitive ? true : undefined,
 			})),
 			wellKnownWebsites: instance.wellKnownWebsites,
 			notesPerOneAd: instance.notesPerOneAd,

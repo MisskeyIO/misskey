@@ -7,7 +7,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 <PageWithHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs">
 	<div class="_spacer" style="--MI_SPACER-w: 700px;">
 		<div class="jqqmcavi">
-			<MkButton v-if="pageId" class="button" inline link :to="`/@${ author?.username }/pages/${ currentName }`"><i class="ti ti-external-link"></i> {{ i18n.ts._pages.viewPage }}</MkButton>
+			<MkButton v-if="pageId && author != null" class="button" inline link :to="`/@${ author.username }/pages/${ currentName }`"><i class="ti ti-external-link"></i> {{ i18n.ts._pages.viewPage }}</MkButton>
+
 			<MkButton v-if="!readonly" inline primary class="button" @click="save"><i class="ti ti-device-floppy"></i> {{ i18n.ts.save }}</MkButton>
 			<MkButton v-if="pageId" inline class="button" @click="duplicate"><i class="ti ti-copy"></i> {{ i18n.ts.duplicate }}</MkButton>
 			<MkButton v-if="pageId && !readonly" inline class="button" danger @click="del"><i class="ti ti-trash"></i> {{ i18n.ts.delete }}</MkButton>
@@ -23,23 +24,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<template #label>{{ i18n.ts._pages.summary }}</template>
 				</MkInput>
 
-				<MkInput v-model="name" type="text" pattern="^[a-zA-Z0-9_-]+$" autocapitalize="off">
-					<template #prefix>{{ url }}/@{{ author?.username }}/pages/</template>
+				<MkInput v-model="name">
+					<template #prefix>{{ url }}/@{{ author?.username ?? '???' }}/pages/</template>
+
 					<template #label>{{ i18n.ts._pages.url }}</template>
 				</MkInput>
 
 				<MkSwitch v-model="alignCenter">{{ i18n.ts._pages.alignCenter }}</MkSwitch>
 
-				<MkSelect v-model="font">
+				<MkSelect v-model="font" :items="fontDef">
 					<template #label>{{ i18n.ts._pages.font }}</template>
-					<option value="serif">{{ i18n.ts._pages.fontSerif }}</option>
-					<option value="sans-serif">{{ i18n.ts._pages.fontSansSerif }}</option>
 				</MkSelect>
 
-				<MkSelect v-model="visibility">
+				<MkSelect v-model="visibility" :items="visibilityDef">
 					<template #label>{{ i18n.ts._pages.visibility }}</template>
-					<option value="public">{{ i18n.ts._pages.public }}</option>
-					<option value="private">{{ i18n.ts._pages.private }}</option>
 				</MkSelect>
 
 				<MkSwitch v-model="hideTitleWhenPinned">{{ i18n.ts._pages.hideTitleWhenPinned }}</MkSwitch>
@@ -68,20 +66,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, provide, watch, ref } from 'vue';
 import * as Misskey from 'misskey-js';
-import { v4 as uuid } from 'uuid';
 import { url } from '@@/js/config.js';
 import XBlocks from './page-editor.blocks.vue';
+import { genId } from '@/utility/id.js';
 import MkButton from '@/components/MkButton.vue';
 import MkSelect from '@/components/MkSelect.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import MkInput from '@/components/MkInput.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
-import { selectFile } from '@/utility/select-file.js';
+import { selectFile } from '@/utility/drive.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import { $i } from '@/i.js';
 import { mainRouter } from '@/router.js';
+import { useMkSelect } from '@/composables/use-mkselect.js';
 import { getPageBlockList } from '@/pages/page-editor/common.js';
 
 const props = defineProps<{
@@ -91,7 +90,7 @@ const props = defineProps<{
 }>();
 
 const tab = ref('settings');
-const author = ref($i);
+const author = ref<Misskey.entities.User | null>($i);
 const readonly = ref(false);
 const page = ref<Misskey.entities.Page | null>(null);
 const pageId = ref<string | null>(null);
@@ -101,8 +100,28 @@ const summary = ref<string | null>(null);
 const name = ref(Date.now().toString());
 const eyeCatchingImage = ref<Misskey.entities.DriveFile | null>(null);
 const eyeCatchingImageId = ref<string | null>(null);
-const font = ref<'sans-serif' | 'serif'>('sans-serif');
-const visibility = ref<'public' | 'private'>('public');
+const {
+	model: font,
+	def: fontDef,
+} = useMkSelect({
+	items: [
+		{ label: i18n.ts._pages.fontSansSerif, value: 'sans-serif' },
+		{ label: i18n.ts._pages.fontSerif, value: 'serif' },
+	],
+	initialValue: 'sans-serif',
+});
+
+const {
+	model: visibility,
+	def: visibilityDef,
+} = useMkSelect({
+	items: [
+		{ label: i18n.ts._pages.public, value: 'public' },
+		{ label: i18n.ts._pages.private, value: 'private' },
+	],
+	initialValue: 'public',
+});
+
 const content = ref<Misskey.entities.Page['content']>([]);
 const alignCenter = ref(false);
 const hideTitleWhenPinned = ref(false);
@@ -172,18 +191,21 @@ async function save() {
 			}
 		}
 	} else {
-		try {
-			const created = await os.apiWithDialog('pages/create', options);
-			pageId.value = created.id;
-			currentName.value = name.value.trim();
-			await os.alert({
-				type: 'success',
-				text: 'Page created successfully',
-			});
-			mainRouter.push(`/pages/edit/${pageId.value}`);
-		} catch (error) {
-			onError(error);
-		}
+		const created = await os.apiWithDialog('pages/create', options, undefined, {
+			'4650348e-301c-499a-83c9-6aa988c66bc1': {
+				title: i18n.ts.somethingHappened,
+				text: i18n.ts._pages.nameAlreadyExists,
+			},
+		});
+
+		pageId.value = created.id;
+		currentName.value = name.value.trim();
+		mainRouter.replace('/pages/edit/:initPageId', {
+			params: {
+				initPageId: pageId.value,
+			},
+		});
+
 	}
 }
 
@@ -214,17 +236,13 @@ async function duplicate() {
 		pageId.value = created.id;
 		currentName.value = name.value.trim();
 
-		mainRouter.push(`/pages/edit/${pageId.value}`);
+		mainRouter.push('/pages/edit/:initPageId', {
+			params: {
+				initPageId: pageId.value,
+			},
+		});
 	} catch (error) {
-		if (error && typeof error === 'object' && 'code' in error && error.code === '4650348e-301c-499a-83c9-6aa988c66bc1') {
-			await os.alert({
-				type: 'error',
-				title: i18n.ts.somethingHappened,
-				text: i18n.ts._pages.nameAlreadyExists,
-			});
-		} else {
-			onError(error);
-		}
+		onError(error);
 	}
 }
 
@@ -233,14 +251,46 @@ async function add() {
 		title: i18n.ts._pages.chooseBlock,
 		items: getPageBlockList(),
 	});
-	if (canceled) return;
+	if (canceled || type == null) return;
 
-	const id = uuid();
-	content.value.push({ id, type } as any);
+	const id = genId();
+
+	// TODO: page-editor.el.section.vueのと共通化
+	if (type === 'text') {
+		content.value.push({
+			id,
+			type,
+			text: '',
+		});
+	} else if (type === 'section') {
+		content.value.push({
+			id,
+			type,
+			title: '',
+			children: [],
+		});
+	} else if (type === 'image') {
+		content.value.push({
+			id,
+			type,
+			fileId: null,
+		});
+	} else if (type === 'note') {
+		content.value.push({
+			id,
+			type,
+			detailed: false,
+			note: null,
+		});
+	}
+
 }
 
 function setEyeCatchingImage(img: Event) {
-	selectFile(img.currentTarget ?? img.target, null).then(file => {
+	selectFile({
+		anchorElement: img.currentTarget ?? img.target,
+		multiple: false,
+	}).then(file => {
 		eyeCatchingImageId.value = file.id;
 	});
 }
@@ -276,7 +326,7 @@ async function init() {
 		eyeCatchingImageId.value = page.value.eyeCatchingImageId;
 		visibility.value = page.value.visibility;
 	} else {
-		const id = uuid();
+		const id = genId();
 		content.value = [{
 			id,
 			type: 'text',

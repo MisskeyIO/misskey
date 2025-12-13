@@ -240,6 +240,8 @@ export const paramDef = {
 				quote: notificationRecieveConfig,
 				reaction: notificationRecieveConfig,
 				pollEnded: notificationRecieveConfig,
+				scheduledNotePosted: notificationRecieveConfig,
+				scheduledNotePostFailed: notificationRecieveConfig,
 				receiveFollowRequest: notificationRecieveConfig,
 				followRequestAccepted: notificationRecieveConfig,
 				roleAssigned: notificationRecieveConfig,
@@ -343,10 +345,26 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (ps.birthday !== undefined) profileUpdates.birthday = ps.birthday;
 			if (ps.followingVisibility !== undefined) profileUpdates.followingVisibility = ps.followingVisibility;
 			if (ps.followersVisibility !== undefined) profileUpdates.followersVisibility = ps.followersVisibility;
-			// if (ps.chatScope !== undefined) updates.chatScope = ps.chatScope;
-			if (ps.mutedWords !== undefined) {
-				const length = ps.mutedWords.length;
-				if (length > policy.wordMuteLimit) {
+			if (ps.chatScope !== undefined) updates.chatScope = ps.chatScope;
+
+			function checkMuteWordCount(mutedWords: (string[] | string)[], limit: number) {
+				const count = (arr: (string[] | string)[]) => {
+					let length = 0;
+					for (const item of arr) {
+						if (typeof item === 'string') {
+							length += item.length;
+						} else if (Array.isArray(item)) {
+							for (const subItem of item) {
+								length += subItem.length;
+							}
+						}
+					}
+					return length;
+				};
+
+
+				const length = count(mutedWords);
+				if (length > limit) {
 					throw new ApiError(meta.errors.tooManyMutedWords);
 				}
 

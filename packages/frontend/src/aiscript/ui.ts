@@ -5,9 +5,9 @@
 
 import { utils, values } from '@syuilo/aiscript';
 import { ref } from 'vue';
-import type { Ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { assertStringAndIsIn } from './common.js';
+import type { Ref } from 'vue';
 import { genId } from '@/utility/id.js';
 
 const ALIGNS = ['left', 'center', 'right'] as const;

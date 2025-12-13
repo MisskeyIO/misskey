@@ -8,6 +8,7 @@ import { prefer } from '@/preferences.js';
 import { PREF_DEF } from '@/preferences/def.js';
 import { $i } from '@/i.js';
 import { RateLimiter } from '@/utility/rate-limiter.js';
+import { getInitialPrefValue } from '@/preferences/manager.js';
 
 let ctx: AudioContext;
 const cache = new Map<string, AudioBuffer>();
@@ -205,7 +206,8 @@ export function playMisskeySfx(operationType: OperationType) {
 	playMisskeySfxFile(sound).then((succeed) => {
 		if (!succeed && sound.type === '_driveFile_') {
 			// ドライブファイルが存在しない場合はデフォルトのサウンドを再生する
-			const soundName = PREF_DEF[`sound_${operationType}`].default.type as Exclude<SoundType, '_driveFile_'>;
+			const default_ = getInitialPrefValue(`sound.on.${operationType}`);
+			const soundName = default_.type as Exclude<SoundType, '_driveFile_'>;
 			if (_DEV_) console.log(`Failed to play sound: ${sound.fileUrl}, so play default sound: ${soundName}`);
 			playMisskeySfxFileInternal({
 				type: soundName,

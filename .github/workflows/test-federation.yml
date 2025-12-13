@@ -17,6 +17,13 @@ on:
       - packages/backend/**
       - packages/misskey-js/**
       - .github/workflows/test-federation.yml
+  workflow_dispatch:
+    inputs:
+      force_ffmpeg_cache_update:
+        description: 'Force update ffmpeg cache'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -27,42 +34,52 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version-file:
+          - .node-version
+          - .github/min.node-version
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4.3.0
         with:
           fetch-depth: 0
           submodules: true
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.2.0
+      - name: Get current date
+        id: current-date
+        run: echo "today=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+      - name: Setup and Restore ffmpeg/ffprobe Cache
+        id: cache-ffmpeg
+        uses: actions/cache@v4
         with:
-          run_install: false
-
-      - name: Restore FFmpeg binary cache
-        uses: actions/cache/restore@v4
-        with:
-          path: /opt/hostedtoolcache/ffmpeg
-          key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-latest
+          path: |
+            /usr/local/bin/ffmpeg
+            /usr/local/bin/ffprobe
+          # daily cache
+          key: ${{ runner.os }}-ffmpeg-${{ steps.current-date.outputs.today }}
           restore-keys: |
-            ffmpeg-${{ runner.os }}-${{ runner.arch }}-
+            ${{ runner.os }}-ffmpeg-${{ steps.current-date.outputs.today }}
       - name: Install FFmpeg
-        uses: FedericoCarboni/setup-ffmpeg@v3
-        id: setup-ffmpeg
+        if: steps.cache-ffmpeg.outputs.cache-hit != 'true' || github.event.inputs.force_ffmpeg_cache_update == true
+        run: |
+          for i in {1..3}; do
+            echo "Attempt $i: Installing FFmpeg..."
+            curl -s -L https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz -o ffmpeg.tar.xz && \
+            tar -xf ffmpeg.tar.xz && \
+            mv ffmpeg-*-static/ffmpeg /usr/local/bin/ && \
+            mv ffmpeg-*-static/ffprobe /usr/local/bin/ && \
+            rm -rf ffmpeg.tar.xz ffmpeg-*-static/ && \
+            break || sleep 10
+            if [ $i -eq 3 ]; then
+              echo "Failed to install FFmpeg after 3 attempts"
+              exit 1
+            fi
+          done
+      - name: Use Node.js
+        uses: actions/setup-node@v4.4.0
         with:
-          ffmpeg-version: 7.0.2
-      - name: Save FFmpeg binary cache
-        if: steps.setup-ffmpeg.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: /opt/hostedtoolcache/ffmpeg
-          key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ steps.setup-ffmpeg.outputs.ffmpeg-version }}
-
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ matrix.node-version }}
+          node-version-file: ${{ matrix.node-version-file }}
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -78,6 +95,7 @@ jobs:
 
       - name: Setup
         run: |
+          echo "NODE_VERSION=$(cat ${{ matrix.node-version-file }})" >> $GITHUB_ENV
           cd packages/backend/test-federation
           bash ./setup.sh
           sudo chmod 644 ./certificates/*.test.key

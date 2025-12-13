@@ -95,6 +95,8 @@ async function calcAspectRatio() {
 onMounted(() => {
 	calcAspectRatio();
 
+	if (gallery.value == null) return; // TSを黙らすため
+
 	lightbox = new PhotoSwipeLightbox({
 		dataSource: props.mediaList
 			.filter(media => {

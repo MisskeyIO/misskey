@@ -2,7 +2,9 @@ packages:
   - packages/backend
   - packages/frontend-shared
   - packages/frontend
+  - packages/frontend-builder
   - packages/frontend-embed
+  - packages/icons-subsetter
   - packages/sw
   - packages/misskey-js
   - packages/misskey-js/generator
@@ -357,14 +359,7 @@ catalog:
   ws: 8.18.3
   xev: 3.0.2
   xmlbuilder: 15.1.1
-
-catalogMode: strict
-
-ignorePatchFailures: false
-
-ignoredBuiltDependencies:
-  - '@sentry-internal/node-cpu-profiler'
-  - unrs-resolver
+  intersection-observer: 0.12.2
 
 onlyBuiltDependencies:
   - '@nestjs/core'
@@ -387,6 +382,27 @@ onlyBuiltDependencies:
   - utf-8-validate
   - v-code-diff
   - vue-demi
+overrides:
+  '@aiscript-dev/aiscript-languageserver': '-'
+  '@misskey-dev/summaly': github:MisskeyIO/summaly#5.2.5-io.1
+  '@tensorflow/tfjs': 4.22.0
+  '@tensorflow/tfjs-core': 4.22.0
+  '@tensorflow/tfjs-node': 4.22.0
+  '@types/jsdom': 21.1.7
+  '@types/punycode': 2.1.4
+  '@types/punycode.js': npm:@types/punycode@2.1.4
+  axios: 1.13.2
+  chokidar: 5.0.0
+  cookie: 1.1.0
+  cookie-signature: 1.2.2
+  debug: 4.4.3
+  jpeg-js: 0.4.4
+  jsdom: 26.1.0
+  lodash: 4.17.21
+  nsfwjs: 4.2.1
+  sharp: 0.34.5
+  tough-cookie: 6.0.0
+  web-streams-polyfill: 4.2.0
 
 overrides:
   '@aiscript-dev/aiscript-languageserver': '-'
@@ -413,3 +429,15 @@ overrides:
 patchedDependencies:
   nsfwjs@4.2.1: patches/nsfwjs@4.2.1.patch
   pg-pool@3.10.1: patches/pg-pool@3.10.1.patch
+
+ignorePatchFailures: false
+minimumReleaseAge: 10080 # delay 7days to mitigate supply-chain attack
+catalogMode: strict
+ignorePatchFailures: false
+
+ignoredBuiltDependencies:
+  - '@sentry-internal/node-cpu-profiler'
+  - unrs-resolver
+
+minimumReleaseAgeExclude:
+  - '@syuilo/aiscript'

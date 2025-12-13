@@ -1,9 +1,12 @@
 import assert from 'assert';
 import { mkdir, readFile, writeFile } from 'fs/promises';
-import { OpenAPIV3_1 } from 'openapi-types';
+import type { OpenAPIV3_1 } from 'openapi-types';
 import { toPascal } from 'ts-case-convert';
-import { parse as OpenAPIParser } from '@readme/openapi-parser';
-import openapiTS, { astToString, OpenAPI3, OperationObject, PathItemObject } from 'openapi-typescript';
+import { parse } from '@readme/openapi-parser';
+import openapiTS, { astToString } from 'openapi-typescript';
+import type { OpenAPI3, OperationObject, PathItemObject } from 'openapi-typescript';
+import ts from 'typescript';
+import { removeNeverPropertiesFromAST } from './ast-transformer.js';
 
 async function generateBaseTypes(
 	openApiDocs: OpenAPIV3_1.Document,
@@ -28,9 +31,6 @@ async function generateBaseTypes(
 		assert('post' in item);
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		openApi.paths![key] = {
-			...('get' in item ? {
-				get: item.get,
-			} : {}),
 			post: {
 				...item.post,
 				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -39,15 +39,26 @@ async function generateBaseTypes(
 		};
 	}
 
-	const generatedTypes = await openapiTS(openApi, {
+	const tsNullNode = ts.factory.createLiteralTypeNode(ts.factory.createNull());
+	const tsBlobNode = ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('Blob'));
+
+	const generatedTypesAst = await openapiTS(openApi, {
 		exportType: true,
 		transform(schemaObject) {
 			if ('format' in schemaObject && schemaObject.format === 'binary') {
-				return schemaObject.nullable ? 'Blob | null' : 'Blob';
+				if (schemaObject.nullable) {
+					return ts.factory.createUnionTypeNode([tsBlobNode, tsNullNode]);
+				} else {
+					return tsBlobNode;
+				}
 			}
 		},
-	});
-	lines.push(astToString(generatedTypes));
+		});
+
+	const filteredAst = removeNeverPropertiesFromAST(generatedTypesAst);
+
+	lines.push(astToString(filteredAst));
+
 	lines.push('');
 
 	await writeFile(typeFileName, lines.join('\n'));
@@ -390,7 +401,7 @@ async function main() {
 	await mkdir(generatePath, { recursive: true });
 
 	const openApiJsonPath = './api.json';
-	const openApiDocs = await OpenAPIParser(openApiJsonPath) as OpenAPIV3_1.Document;
+	const openApiDocs = await parse(openApiJsonPath) as OpenAPIV3_1.Document;
 
 	const typeFileName = './built/autogen/types.ts';
 	await generateBaseTypes(openApiDocs, openApiJsonPath, typeFileName);

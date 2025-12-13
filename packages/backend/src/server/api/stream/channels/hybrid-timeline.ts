@@ -53,17 +53,24 @@ class HybridTimelineChannel extends Channel {
 	private async onNote(note: Packed<'Note'>) {
 		const isMe = this.user!.id === note.userId;
 
-		// チャンネルの投稿ではなく、自分自身の投稿 または
-		// チャンネルの投稿ではなく、その投稿のユーザーをフォローしている または
-		// チャンネルの投稿ではなく、全体公開のローカルの投稿 または
-		// フォローしているチャンネルの投稿 の場合だけ
-		if (!(
-			(note.channelId == null && isMe) ||
-			(note.channelId == null && Object.hasOwn(this.following, note.userId)) ||
-			(note.channelId == null && (note.user.host == null && note.visibility === 'public')) ||
-			(note.channelId != null && this.followingChannels.has(note.channelId))
-		)) return;
-
+		// 以下の条件に該当するノートのみ後続処理に通す（ので、以下のif文は該当しないノートをすべて弾くようにする）
+		if (!note.channelId) {
+			// - 自分自身の投稿
+			// - その投稿のユーザーをフォローしている
+			// - 全体公開のローカルの投稿
+			if (!(
+				isMe ||
+				Object.hasOwn(this.following, note.userId) ||
+				(note.user.host == null && note.visibility === 'public')
+			)) {
+				return;
+			}
+		} else {
+			// - フォローしているチャンネルの投稿
+			if (!this.followingChannels.has(note.channelId)) {
+				return;
+			}
+		}
 		// ファイルを含まない投稿は除外
 		if (this.withFiles && (note.fileIds == null || note.fileIds.length === 0)) return;
 		if (this.withFiles && (note.files === undefined || note.files.length === 0)) return;
@@ -106,10 +113,6 @@ class HybridTimelineChannel extends Channel {
 			}
 		}
 
-		if (this.user && (note.visibleUserIds?.includes(this.user.id) ?? note.mentions?.includes(this.user.id))) {
-			this.connection.cacheNote(note);
-		}
-
 		if (this.minimize && ['public', 'home'].includes(note.visibility)) {
 			const badgeRoles = this.iAmModerator ? await this.roleService.getUserBadgeRoles(note.userId, false) : undefined;
 
@@ -120,10 +123,10 @@ class HybridTimelineChannel extends Channel {
 				renote: note.renote?.myReaction ? { myReaction: note.renote.myReaction } : undefined,
 				...(badgeRoles?.length ? { user: { badgeRoles } } : {}),
 			});
-		} else {
-			this.send('note', note);
+			} else {
+				this.send('note', note);
+			}
 		}
-	}
 
 	@bindThis
 	public dispose(): void {

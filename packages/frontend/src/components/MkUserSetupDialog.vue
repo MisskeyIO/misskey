@@ -174,8 +174,8 @@ function setupComplete() {
 
 function launchTutorial() {
 	setupComplete();
-	nextTick(() => {
-		os.popup(defineAsyncComponent(() => import('@/components/MkTutorialDialog.vue')), {
+	nextTick(async () => {
+		await os.popupAsyncWithDialog(import('@/components/MkTutorialDialog.vue').then(x => x.default), {
 			initialPage: 1,
 		}, {}, 'closed');
 	});

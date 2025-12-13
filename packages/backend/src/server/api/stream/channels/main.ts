@@ -40,10 +40,6 @@ class MainChannel extends Channel {
 							detail: true,
 						});
 
-						if (this.user && (note.visibleUserIds?.includes(this.user.id) ?? note.mentions?.includes(this.user.id))) {
-							this.connection.cacheNote(note);
-						}
-
 						data.body.note = note;
 					}
 					break;
@@ -56,10 +52,6 @@ class MainChannel extends Channel {
 						const note = await this.noteEntityService.pack(data.body.id, this.user, {
 							detail: true,
 						});
-
-						if (this.user && (note.visibleUserIds?.includes(this.user.id) ?? note.mentions?.includes(this.user.id))) {
-							this.connection.cacheNote(note);
-						}
 
 						data.body = note;
 					}

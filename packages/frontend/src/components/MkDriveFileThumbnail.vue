@@ -11,27 +11,24 @@ SPDX-License-Identifier: AGPL-3.0-only
 		[$style.large]: large,
 	}]"
 >
-	<!-- Primary: Try thumbnail with blurhash -->
-	<ImgWithBlurhash
-		v-if="showBlurhash"
+	<MkImgWithBlurhash
+		v-if="isThumbnailAvailable && prefer.s.enableHighQualityImagePlaceholders"
 		:hash="file.blurhash"
 		:src="file.thumbnailUrl"
 		:alt="file.name"
 		:title="file.name"
+		:class="$style.thumbnail"
 		:cover="fit !== 'contain'"
 		:forceBlurhash="forceBlurhash"
-		@error="onBlurhashError"
 	/>
-	<!-- Secondary: Try thumbnail without blurhash -->
 	<img
-		v-else-if="showPlainImage"
+		v-else-if="isThumbnailAvailable && file.thumbnailUrl != null"
 		:src="file.thumbnailUrl"
 		:alt="file.name"
 		:title="file.name"
-		:class="[$style.plainImage, { [$style.cover]: fit !== 'contain' }]"
-		@error="onImageError"
+		:class="$style.thumbnail"
+		:style="{ objectFit: fit }"
 	/>
-	<!-- Tertiary: Show file type icon -->
 	<i v-else-if="is === 'image'" class="ti ti-photo" :class="$style.icon"></i>
 	<i v-else-if="is === 'video'" class="ti ti-video" :class="$style.icon"></i>
 	<i v-else-if="is === 'audio' || is === 'midi'" class="ti ti-file-music" :class="$style.icon"></i>
@@ -41,14 +38,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<i v-else-if="is === 'archive'" class="ti ti-file-zip" :class="$style.icon"></i>
 	<i v-else class="ti ti-file" :class="$style.icon"></i>
 
-	<i v-if="showBlurhash && is === 'video'" class="ti ti-video" :class="$style.iconSub"></i>
+	<i v-if="isThumbnailAvailable && is === 'video'" class="ti ti-video" :class="$style.iconSub"></i>
 </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue';
+import { computed } from 'vue';
 import * as Misskey from 'misskey-js';
-import ImgWithBlurhash from '@/components/MkImgWithBlurhash.vue';
+import MkImgWithBlurhash from '@/components/MkImgWithBlurhash.vue';
+import { prefer } from '@/preferences.js';
 
 const props = defineProps<{
 	file: Misskey.entities.DriveFile;
@@ -57,17 +55,6 @@ const props = defineProps<{
 	forceBlurhash?: boolean;
 	large?: boolean;
 }>();
-
-const blurhashFailed = ref(false);
-const imageFailed = ref(false);
-
-function onBlurhashError() {
-	blurhashFailed.value = true;
-}
-
-function onImageError() {
-	imageFailed.value = true;
-}
 
 const is = computed(() => {
 	if (props.file.type.startsWith('image/')) return 'image';
@@ -95,15 +82,6 @@ const isThumbnailAvailable = computed(() => {
 	return props.file.thumbnailUrl
 		? (is.value === 'image' || is.value === 'video')
 		: false;
-});
-
-// Fallback strategy: ImgWithBlurhash -> plain img -> icon
-const showBlurhash = computed(() => {
-	return isThumbnailAvailable.value && !blurhashFailed.value;
-});
-
-const showPlainImage = computed(() => {
-	return isThumbnailAvailable.value && blurhashFailed.value && !imageFailed.value;
 });
 </script>
 
@@ -148,14 +126,7 @@ const showPlainImage = computed(() => {
 	font-size: 40px;
 }
 
-.plainImage {
-	display: block;
+.thumbnail {
 	width: 100%;
-	height: 100%;
-	object-fit: contain;
-
-	&.cover {
-		object-fit: cover;
-	}
 }
 </style>

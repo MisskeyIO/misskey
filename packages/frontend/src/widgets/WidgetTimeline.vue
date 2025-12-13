@@ -12,7 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</template>
 	<template #header>
 		<button class="_button" @click="choose">
-			<span>{{ selectedTimelineLabel }}</span>
+			<span>{{ headerTitle }}</span>
 			<i :class="menuOpened ? 'ti ti-chevron-up' : 'ti ti-chevron-down'" style="margin-left: 8px;"></i>
 		</button>
 	</template>
@@ -25,62 +25,62 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<p :class="$style.disabledDescription">{{ i18n.ts._disabledTimeline.description }}</p>
 	</div>
 	<div v-else>
-		<MkTimeline :key="timelineKey" :src="widgetProps.src" :list="listId" :antenna="antennaId"/>
+		<MkStreamingNotesTimeline
+			:key="widgetProps.src === 'list' ? `list:${widgetProps.list?.id}` : widgetProps.src === 'antenna' ? `antenna:${widgetProps.antenna?.id}` : widgetProps.src"
+			:src="widgetProps.src"
+			:list="widgetProps.list ? widgetProps.list.id : undefined"
+			:antenna="widgetProps.antenna ? widgetProps.antenna.id : undefined"
+		/>
 	</div>
 </MkContainer>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import { useWidgetPropsManager } from './widget.js';
 import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from './widget.js';
-import type { Form, GetFormResultType } from '@/utility/form.js';
-import type { MenuItem } from '@/types/menu.js';
-import type { AllTimelineType, BasicTimelineType } from '@/timelines.js';
+import type { FormWithDefault, GetFormResultType } from '@/utility/form.js';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import MkContainer from '@/components/MkContainer.vue';
-import MkTimeline from '@/components/MkTimeline.vue';
+import MkStreamingNotesTimeline from '@/components/MkStreamingNotesTimeline.vue';
 import { i18n } from '@/i18n.js';
-import { availableBasicTimelines, isAvailableBasicTimeline, isBasicTimeline, basicTimelineIconClass } from '@/timelines.js';
+import { availableBasicTimelines, isAvailableBasicTimeline, isBasicTimeline, basicTimelineIconClass, basicTimelineTypes } from '@/timelines.js';
+import type { MenuItem } from '@/types/menu.js';
 
 const name = 'timeline';
 
+type TlSrc = typeof basicTimelineTypes[number] | 'list' | 'antenna';
+
 const widgetPropsDef = {
 	showHeader: {
-		type: 'boolean' as const,
+		type: 'boolean',
 		default: true,
 	},
 	height: {
-		type: 'number' as const,
+		type: 'number',
 		default: 300,
 	},
 	src: {
-		type: 'string' as const,
-		default: 'home',
+		type: 'string',
+		default: 'home' as TlSrc,
 		hidden: true,
 	},
 	antenna: {
-		type: 'object' as const,
-		default: null,
+		type: 'object',
+		default: null as Misskey.entities.Antenna | null,
 		hidden: true,
 	},
 	list: {
-		type: 'object' as const,
-		default: null,
+		type: 'object',
+		default: null as Misskey.entities.UserList | null,
 		hidden: true,
 	},
-} satisfies Form;
+} satisfies FormWithDefault;
 
 type WidgetPropsFormResult = GetFormResultType<typeof widgetPropsDef>;
-type KnownAntenna = Misskey.entities.Antenna & Record<string, unknown>;
-type KnownUserList = Misskey.entities.UserList & Record<string, unknown>;
-type WidgetProps = Omit<WidgetPropsFormResult, 'antenna' | 'list' | 'src'> & {
-	src: AllTimelineType;
-	antenna: KnownAntenna | null;
-	list: KnownUserList | null;
-};
+type WidgetProps = WidgetPropsFormResult & { src: TlSrc };
 
 const props = defineProps<WidgetComponentProps<WidgetPropsFormResult>>();
 const emit = defineEmits<WidgetComponentEmits<WidgetPropsFormResult>>();
@@ -97,30 +97,17 @@ const { configure, save } = manager;
 
 const menuOpened = ref(false);
 
-const timelineKey = computed(() => {
-	if (widgetProps.src === 'list') {
-		return widgetProps.list ? `list:${widgetProps.list.id}` : 'list';
+const headerTitle = computed<string>(() => {
+	if (widgetProps.src === 'list' && widgetProps.list != null) {
+		return widgetProps.list.name;
+	} else if (widgetProps.src === 'antenna' && widgetProps.antenna != null) {
+		return widgetProps.antenna.name;
+	} else {
+		return i18n.ts._timelines[widgetProps.src];
 	}
-	if (widgetProps.src === 'antenna') {
-		return widgetProps.antenna ? `antenna:${widgetProps.antenna.id}` : 'antenna';
-	}
-	return widgetProps.src;
 });
 
-const listId = computed(() => widgetProps.list?.id ?? undefined);
-const antennaId = computed(() => widgetProps.antenna?.id ?? undefined);
-
-const selectedTimelineLabel = computed(() => {
-	if (widgetProps.src === 'list') {
-		return widgetProps.list?.name ?? i18n.ts.lists;
-	}
-	if (widgetProps.src === 'antenna') {
-		return widgetProps.antenna?.name ?? i18n.ts.antennas;
-	}
-	return i18n.ts._timelines[widgetProps.src as BasicTimelineType];
-});
-
-const setSrc = (src: AllTimelineType) => {
+const setSrc = (src: TlSrc) => {
 	widgetProps.src = src;
 	save();
 };
@@ -135,7 +122,7 @@ const choose = async (ev: MouseEvent) => {
 		text: antenna.name,
 		icon: 'ti ti-antenna',
 		action: () => {
-			widgetProps.antenna = antenna as KnownAntenna;
+			widgetProps.antenna = antenna;
 			setSrc('antenna');
 		},
 	}));
@@ -143,7 +130,7 @@ const choose = async (ev: MouseEvent) => {
 		text: list.name,
 		icon: 'ti ti-list',
 		action: () => {
-			widgetProps.list = list as KnownUserList;
+			widgetProps.list = list;
 			setSrc('list');
 		},
 	}));
@@ -153,7 +140,7 @@ const choose = async (ev: MouseEvent) => {
 	menuItems.push(...availableBasicTimelines().map(tl => ({
 		text: i18n.ts._timelines[tl],
 		icon: basicTimelineIconClass(tl),
-		action: () => { setSrc(tl); },
+		action: () => { setSrc(tl as TlSrc); },
 	})));
 
 	if (antennaItems.length > 0) {

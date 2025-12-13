@@ -5,12 +5,13 @@
 
 import ms from 'ms';
 import { Inject, Injectable } from '@nestjs/common';
-import type { DriveFilesRepository, PagesRepository } from '@/models/_.js';
-import { IdService } from '@/core/IdService.js';
-import { MiPage, pageNameSchema } from '@/models/Page.js';
+import type { DriveFilesRepository, MiDriveFile, PagesRepository } from '@/models/_.js';
+import { pageNameSchema } from '@/models/Page.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { PageEntityService } from '@/core/entities/PageEntityService.js';
 import { DI } from '@/di-symbols.js';
+import { PageService } from '@/core/PageService.js';
+import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { ApiError } from '../../error.js';
 
 export const meta = {
@@ -79,11 +80,11 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
 
+		private pageService: PageService,
 		private pageEntityService: PageEntityService,
-		private idService: IdService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
-			let eyeCatchingImage = null;
+			let eyeCatchingImage: MiDriveFile | null = null;
 			if (ps.eyeCatchingImageId != null) {
 				eyeCatchingImage = await this.driveFilesRepository.findOneBy({
 					id: ps.eyeCatchingImageId,
@@ -104,24 +105,21 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				}
 			});
 
-			const page = await this.pagesRepository.insertOne(new MiPage({
-				id: this.idService.gen(),
-				updatedAt: new Date(),
-				title: ps.title,
-				name: ps.name,
-				summary: ps.summary,
-				content: ps.content,
-				variables: ps.variables,
-				script: ps.script,
-				eyeCatchingImageId: eyeCatchingImage ? eyeCatchingImage.id : null,
-				userId: me.id,
-				visibility: ps.visibility,
-				alignCenter: ps.alignCenter,
-				hideTitleWhenPinned: ps.hideTitleWhenPinned,
-				font: ps.font,
-			}));
+				try {
+					const page = await this.pageService.create(me, {
+						...ps,
+						eyeCatchingImage,
+						summary: ps.summary ?? null,
+						visibility: ps.visibility ?? 'public'
+					});
 
-			return await this.pageEntityService.pack(page, me);
-		});
+					return await this.pageEntityService.pack(page, me);
+				} catch (err) {
+					if (err instanceof IdentifiableError && err.id === '1a79e38e-3d83-4423-845b-a9d83ff93b61') {
+						throw new ApiError(meta.errors.nameAlreadyExists);
+					}
+					throw err;
+				}
+			});
+		}
 	}
-}

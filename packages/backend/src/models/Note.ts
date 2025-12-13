@@ -4,13 +4,24 @@
  */
 
 import { Entity, Index, JoinColumn, Column, PrimaryColumn, ManyToOne } from 'typeorm';
-import { noteVisibilities } from '@/types.js';
+import { noteVisibilities, noteReactionAcceptances } from '@/types.js';
 import { id } from './util/id.js';
 import { MiUser } from './User.js';
 import { MiChannel } from './Channel.js';
 import type { MiDriveFile } from './DriveFile.js';
 
-@Index(['userId', 'id'])
+// Note: When you create a new index for existing column of this table,
+// it might be better to index concurrently under isConcurrentIndexMigrationEnabled flag
+// by editing generated migration file since this table is very large,
+// and it will make a long lock to create index in most cases.
+// Please note that `CREATE INDEX CONCURRENTLY` is not supported in transaction,
+// so you need to set `transaction = false` in migration if isConcurrentIndexMigrationEnabled() is true.
+// Please refer 1745378064470-composite-note-index.js for example.
+// You should not use `@Index({ concurrent: true })` decorator because database initialization for test will fail
+// because it will always run CREATE INDEX in transaction based on decorators.
+// Not appending `{ concurrent: true }` to `@Index` will not cause any problem in production,
+
+@Index(['userId', 'id']) // Note: this index is ("userId", "id" DESC) in production, but not in test.
 @Entity('note')
 @Index('IDX_NOTE_TAGS', { synchronize: false })
 @Index('IDX_NOTE_MENTIONS', { synchronize: false })
@@ -36,7 +47,7 @@ export class MiNote {
 	public replyId: MiNote['id'] | null;
 
 	@ManyToOne(type => MiNote, {
-		onDelete: 'CASCADE',
+		createForeignKeyConstraints: false,
 	})
 	@JoinColumn()
 	public reply: MiNote | null;
@@ -50,7 +61,7 @@ export class MiNote {
 	public renoteId: MiNote['id'] | null;
 
 	@ManyToOne(type => MiNote, {
-		onDelete: 'CASCADE',
+		createForeignKeyConstraints: false,
 	})
 	@JoinColumn()
 	public renote: MiNote | null;
@@ -97,7 +108,7 @@ export class MiNote {
 	@Column('varchar', {
 		length: 64, nullable: true,
 	})
-	public reactionAcceptance: 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote' | null;
+	public reactionAcceptance: typeof noteReactionAcceptances[number];
 
 	@Column('smallint', {
 		default: 0,
@@ -113,6 +124,13 @@ export class MiNote {
 		default: 0,
 	})
 	public clippedCount: number;
+
+	// The number of note page blocks referencing this note.
+	// This column is used by Remote Note Cleaning and manually updated rather than automatically with triggers.
+	@Column('smallint', {
+		default: 0,
+	})
+	public pageCount: number;
 
 	@Column('jsonb', {
 		default: {},
@@ -240,6 +258,13 @@ export class MiNote {
 		comment: '[Denormalized]',
 	})
 	public renoteUserHost: string | null;
+
+	@Column({
+		...id(),
+		nullable: true,
+		comment: '[Denormalized]',
+	})
+	public renoteChannelId: MiChannel['id'] | null;
 	//#endregion
 
 	constructor(data: Partial<MiNote>) {

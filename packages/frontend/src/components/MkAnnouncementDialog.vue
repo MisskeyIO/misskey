@@ -4,7 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<MkModal ref="modal" :zPriority="'middle'" @closed="$emit('closed')" @click="onBgClick">
+<MkModal ref="modal" :zPriority="'middle'" :preferType="'dialog'" @closed="$emit('closed')" @click="onBgClick">
 	<div ref="rootEl" :class="$style.root">
 		<div :class="$style.header">
 			<span :class="$style.icon">
@@ -19,16 +19,24 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<Mfm :text="announcement.text"/>
 			<img v-if="announcement.imageUrl" :src="announcement.imageUrl"/>
 		</div>
-		<MkButton :class="$style.gotIt" primary gradate full :disabled="gotItDisabled" @click="gotIt">
-			{{ !announcement.needEnrollmentTutorialToRead ? i18n.ts.gotIt : i18n.ts._initialAccountSetting.startTutorial }}
-			<span v-if="secVisible"> ({{ sec }})</span>
-		</MkButton>
+		<div ref="bottomEl"></div>
+		<div :class="$style.footer">
+			<MkButton
+				primary
+				full
+				:disabled="gotItDisabled || !hasReachedBottom"
+				@click="gotIt"
+			>
+				{{ !announcement.needEnrollmentTutorialToRead ? i18n.ts.gotIt : i18n.ts._initialAccountSetting.startTutorial }}
+				<span v-if="secVisible"> ({{ sec }})</span>
+			</MkButton>
+		</div>
 	</div>
 </MkModal>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, useTemplateRef, defineAsyncComponent, ref } from 'vue';
+import { onMounted, ref, useTemplateRef, defineAsyncComponent } from 'vue';
 import * as Misskey from 'misskey-js';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
@@ -38,12 +46,12 @@ import { i18n } from '@/i18n.js';
 import { $i } from '@/i.js';
 import { updateCurrentAccountPartial } from '@/accounts.js';
 
-const props = withDefaults(defineProps<{
+const props = defineProps<{
 	announcement: Misskey.entities.Announcement;
-}>(), {
-});
+}>();
 
 const rootEl = useTemplateRef('rootEl');
+const bottomEl = useTemplateRef('bottomEl');
 const modal = useTemplateRef('modal');
 const gotItDisabled = ref(true);
 const secVisible = ref(true);
@@ -93,22 +101,50 @@ function onBgClick() {
 	});
 }
 
+const hasReachedBottom = ref(false);
+
 onMounted(() => {
-	if (sec.value > 0) {
-		const waitTimer = window.setInterval(() => {
-			if (sec.value === 0) {
-				window.clearInterval(waitTimer);
-				gotItDisabled.value = false;
-				secVisible.value = false;
-			} else {
-				gotItDisabled.value = true;
-			}
-			sec.value = sec.value - 1;
-		}, 1000);
-	} else {
-		gotItDisabled.value = false;
-		secVisible.value = false;
-	}
+\tif (sec.value > 0) {
+\t\tconst waitTimer = window.setInterval(() => {
+\t\t\tif (sec.value === 0) {
+\t\t\t\twindow.clearInterval(waitTimer);
+\t\t\t\tgotItDisabled.value = false;
+\t\t\t\tsecVisible.value = false;
+\t\t\t} else {
+\t\t\t\tgotItDisabled.value = true;
+\t\t\t}
+\t\t\tsec.value = sec.value - 1;
+\t\t}, 1000);
+\t} else {
+\t\tgotItDisabled.value = false;
+\t\tsecVisible.value = false;
+\t}
+
+\tif (bottomEl.value && rootEl.value) {
+\t\tconst bottomElRect = bottomEl.value.getBoundingClientRect();
+\t\tconst rootElRect = rootEl.value.getBoundingClientRect();
+\t\tif (
+\t\t\tbottomElRect.top >= rootElRect.top &&
+\t\t\tbottomElRect.top <= (rootElRect.bottom - 66) // 66 ≒ 75 * 0.9 (modalのアニメーション分)
+\t\t) {
+\t\t\thasReachedBottom.value = true;
+\t\t\treturn;
+\t\t}
+
+\t\tconst observer = new IntersectionObserver(entries => {
+\t\t\tfor (const entry of entries) {
+\t\t\t\tif (entry.isIntersecting) {
+\t\t\t\t\thasReachedBottom.value = true;
+\t\t\t\t\tobserver.disconnect();
+\t\t\t\t}
+\t\t\t}
+\t\t}, {
+\t\t\troot: rootEl.value,
+\t\t\trootMargin: '0px 0px -75px 0px',
+\t\t});
+
+\t\tobserver.observe(bottomEl.value);
+\t}
 });
 </script>
 
@@ -116,9 +152,12 @@ onMounted(() => {
 .root {
 	margin: auto;
 	position: relative;
-	padding: 32px;
+	padding: 32px 32px 0;
 	min-width: 320px;
 	max-width: 480px;
+	max-height: 100%;
+	overflow-y: auto;
+	overflow-x: hidden;
 	box-sizing: border-box;
 	background: var(--MI_THEME-panel);
 	border-radius: var(--MI-radius);
@@ -140,5 +179,15 @@ onMounted(() => {
 		max-height: 300px;
 		max-width: 100%;
 	}
+}
+
+.footer {
+	position: sticky;
+	bottom: 0;
+	left: -32px;
+	backdrop-filter: var(--MI-blur, blur(15px));
+	background: color(from var(--MI_THEME-bg) srgb r g b / 0.5);
+	margin: 0 -32px;
+	padding: 24px 32px;
 }
 </style>

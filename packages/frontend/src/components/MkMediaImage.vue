@@ -4,10 +4,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<div :class="[hide ? $style.hidden : $style.visible, (image.isSensitive && prefer.s.highlightSensitiveMedia) && $style.sensitive]" @click="showHiddenContent">
+<div :class="[hide ? $style.hidden : $style.visible, (image.isSensitive && prefer.s.highlightSensitiveMedia) && $style.sensitive]" @click="reveal">
 	<component
-		:is="(image.isSensitive && !$i) || disableImageLink ? 'div' : 'a'"
-		v-bind="(image.isSensitive && !$i) || disableImageLink ? {
+		:is="disableImageLink ? 'div' : 'a'"
+		v-bind="disableImageLink ? {
 			title: image.name,
 			class: $style.imageContainer,
 		} : {
@@ -17,9 +17,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 			style: 'cursor: zoom-in;'
 		}"
 	>
-		<ImgWithBlurhash
+		<MkImgWithBlurhash
+			v-if="prefer.s.enableHighQualityImagePlaceholders"
 			:hash="image.blurhash"
-			:src="(image.isSensitive && !$i) || (prefer.s.dataSaver.media && hide) ? null : url"
+			:src="(prefer.s.dataSaver.media && hide) ? null : url"
 			:forceBlurhash="hide"
 			:cover="hide || cover"
 			:alt="image.comment || image.name"
@@ -27,6 +28,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 			:width="image.properties.width"
 			:height="image.properties.height"
 			:style="hide ? 'filter: brightness(0.7);' : null"
+			:class="$style.image"
+		/>
+		<div
+			v-else-if="prefer.s.dataSaver.media || hide"
+			:title="image.comment || image.name"
+			:style="hide ? 'background: #888;' : null"
+			:class="$style.image"
+		></div>
+		<img
+			v-else
+			:src="url"
+			:alt="image.comment || image.name"
+			:title="image.comment || image.name"
+			:class="$style.image"
 		/>
 	</component>
 	<template v-if="hide">
@@ -44,8 +59,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div v-if="image.comment" :class="$style.indicator">ALT</div>
 			<div v-if="image.isSensitive" :class="$style.indicator" style="color: var(--MI_THEME-warn);" :title="i18n.ts.sensitive"><i class="ti ti-eye-exclamation"></i></div>
 		</div>
-		<button :class="$style.menu" class="_button" @click.prevent.stop="showMenu"><i class="ti ti-dots" style="vertical-align: middle;"></i></button>
-		<i class="ti ti-eye-off" :class="$style.hide" @click.prevent.stop="hide = true"></i>
+		<button :class="$style.menu" class="_button" @click.stop="showMenu"><i class="ti ti-dots" style="vertical-align: middle;"></i></button>
+		<i class="ti ti-eye-off" :class="$style.hide" @click.stop="hide = true"></i>
 	</template>
 </div>
 </template>
@@ -57,13 +72,11 @@ import type { MenuItem } from '@/types/menu.js';
 import { copyToClipboard } from '@/utility/copy-to-clipboard';
 import { getStaticImageUrl } from '@/utility/media-proxy.js';
 import bytes from '@/filters/bytes.js';
-import ImgWithBlurhash from '@/components/MkImgWithBlurhash.vue';
+import MkImgWithBlurhash from '@/components/MkImgWithBlurhash.vue';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
-import { pleaseLogin } from '@/utility/please-login.js';
 import { $i, iAmModerator } from '@/i.js';
 import { prefer } from '@/preferences.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
 
 const props = withDefaults(defineProps<{
 	image: Misskey.entities.DriveFile;
@@ -83,8 +96,35 @@ const url = computed(() => (props.raw || prefer.s.loadRawImages)
 	? props.image.url
 	: prefer.s.disableShowingAnimatedImages
 		? getStaticImageUrl(props.image.url)
-		: props.image.thumbnailUrl,
+		: props.image.thumbnailUrl!,
 );
+
+async function reveal(ev: MouseEvent) {
+	if (!props.controls) {
+		return;
+	}
+
+	if (hide.value) {
+		ev.stopPropagation();
+		if (props.image.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
+			const { canceled } = await os.confirm({
+				type: 'question',
+				text: i18n.ts.sensitiveMediaRevealConfirm,
+			});
+			if (canceled) return;
+		}
+
+		hide.value = false;
+	}
+}
+
+// Plugin:register_note_view_interruptor を使って書き換えられる可能性があるためwatchする
+watch(() => props.image, () => {
+	hide.value = (prefer.s.nsfw === 'force' || prefer.s.dataSaver.media) ? true : (props.image.isSensitive && prefer.s.nsfw !== 'ignore');
+}, {
+	deep: true,
+	immediate: true,
+});
 
 function showMenu(ev: MouseEvent) {
 	const menuItems: MenuItem[] = [];
@@ -97,49 +137,31 @@ function showMenu(ev: MouseEvent) {
 		},
 	});
 
-	if ($i && $i.id !== props.image.userId) {
+	if (iAmModerator) {
 		menuItems.push({
-			text: i18n.ts.saveThisFile,
-			icon: 'ti ti-cloud-upload',
-			action: () => {
-				os.selectDriveFolder(false).then(async folder => {
-					misskeyApi('drive/files/upload-from-url', {
-						url: props.image.url,
-						folderId: folder[0]?.id,
-					});
+			text: props.image.isSensitive ? i18n.ts.unmarkAsSensitive : i18n.ts.markAsSensitive,
+			icon: 'ti ti-eye-exclamation',
+			danger: true,
+			action: async () => {
+				const { canceled } = await os.confirm({
+					type: 'warning',
+					text: props.image.isSensitive ? i18n.ts.unmarkAsSensitiveConfirm : i18n.ts.markAsSensitiveConfirm,
+				});
+
+				if (canceled) return;
+
+				os.apiWithDialog('drive/files/update', {
+					fileId: props.image.id,
+					isSensitive: !props.image.isSensitive,
 				});
 			},
 		});
 	}
 
-	if ($i?.id === props.image.userId || iAmModerator) {
-		menuItems.push({
-			type: 'divider',
-		});
-	}
-
-	if (iAmModerator) {
-		menuItems.push({
-			text: props.image.isSensitive ? i18n.ts.unmarkAsSensitive : i18n.ts.markAsSensitive,
-			icon: props.image.isSensitive ? 'ti ti-eye' : 'ti ti-eye-exclamation',
-			danger: true,
-			action: () => toggleSensitive(props.image),
-		});
-
-		if ($i?.id !== props.image.userId) {
-			menuItems.push({
-				type: 'link' as const,
-				text: i18n.ts._fileViewer.title,
-				icon: 'ti ti-info-circle',
-				to: `/admin/file/${props.image.id}`,
-			});
-		}
-	}
-
 	const details: MenuItem[] = [];
 	if ($i?.id === props.image.userId) {
 		details.push({
-			type: 'link' as const,
+			type: 'link',
 			text: i18n.ts._fileViewer.title,
 			icon: 'ti ti-info-circle',
 			to: `/my/drive/file/${props.image.id}`,
@@ -172,46 +194,6 @@ function showMenu(ev: MouseEvent) {
 	os.popupMenu(menuItems, ev.currentTarget ?? ev.target);
 }
 
-async function showHiddenContent(ev: MouseEvent) {
-	if (!props.controls) {
-		return;
-	}
-
-	if (props.image.isSensitive && !$i) {
-		ev.preventDefault();
-		ev.stopPropagation();
-		await pleaseLogin();
-		return;
-	}
-
-	if (hide.value) {
-		ev.stopPropagation();
-		if (props.image.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
-			const { canceled } = await os.confirm({
-				type: 'question',
-				text: i18n.ts.sensitiveMediaRevealConfirm,
-			});
-			if (canceled) return;
-		}
-
-		hide.value = false;
-	}
-}
-
-function toggleSensitive(file: Misskey.entities.DriveFile) {
-	os.apiWithDialog('drive/files/update', {
-		fileId: file.id,
-		isSensitive: !file.isSensitive,
-	});
-}
-
-// Plugin:register_note_view_interruptor を使って書き換えられる可能性があるためwatchする
-watch(() => props.image, () => {
-	hide.value = (prefer.s.nsfw === 'force' || prefer.s.dataSaver.media) ? true : (props.image.isSensitive && prefer.s.nsfw !== 'ignore');
-}, {
-	deep: true,
-	immediate: true,
-});
 </script>
 
 <style lang="scss" module>
@@ -332,5 +314,13 @@ html[data-color-scheme=light] .visible {
 	font-weight: bold;
 	font-size: 0.8em;
 	padding: 2px 5px;
+}
+
+.image {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	object-position: center;
 }
 </style>

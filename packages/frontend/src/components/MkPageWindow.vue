@@ -22,10 +22,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</template>
 	</template>
 
-	<div :key="reloadCount" :class="$style.root" class="_forceShrinkSpacer">
-		<StackingRouterView v-if="prefer.s['experimental.stackingRouterView']" :router="windowRouter"/>
-		<RouterView v-else :router="windowRouter"/>
-	</div>
+<div :key="reloadCount.toString()" :class="$style.root" class="_forceShrinkSpacer">
+	<StackingRouterView v-if="prefer.s['experimental.stackingRouterView']" :key="reloadCount.toString() + ':stacking'" :router="windowRouter"/>
+	<RouterView v-else :key="reloadCount.toString() + ':non-stacking'" :router="windowRouter"/>
+</div>
 </MkWindow>
 </template>
 
@@ -59,7 +59,7 @@ const windowRouter = createRouter(props.initialPath);
 
 const pageMetadata = ref<null | PageMetadata>(null);
 const windowEl = useTemplateRef('windowEl');
-const history = ref<{ path: string; }[]>([{
+const _history_ = ref<{ path: string; }[]>([{
 	path: windowRouter.getCurrentPath(),
 }]);
 
@@ -71,17 +71,17 @@ type WindowButton = {
 };
 
 const buttonsLeft = computed(() => {
-	const buttons: WindowButton[] = [];
+const buttons: WindowButton[] = [];
 
-	if (history.value.length > 1) {
-		buttons.push({
-			title: i18n.ts.goBack,
-			icon: 'ti ti-arrow-left',
-			onClick: back,
-		});
-	}
+if (history.value.length > 1) {
+	buttons.push({
+		title: i18n.ts.goBack,
+		icon: 'ti ti-arrow-left',
+		onClick: back,
+	});
+}
 
-	return buttons;
+return buttons;
 });
 const buttonsRight = computed(() => {
 	const buttons: WindowButton[] = [{
@@ -107,12 +107,12 @@ function getSearchMarker(path: string) {
 const searchMarkerId = ref<string | null>(getSearchMarker(props.initialPath));
 
 windowRouter.addListener('push', ctx => {
-	history.value.push({ path: ctx.path });
+	_history_.value.push({ path: ctx.path });
 });
 
 windowRouter.addListener('replace', ctx => {
-	history.value.pop();
-	history.value.push({ path: ctx.path });
+	_history_.value.pop();
+	_history_.value.push({ path: ctx.path });
 });
 
 windowRouter.addListener('change', ctx => {
@@ -165,8 +165,8 @@ const contextmenu = computed(() => ([{
 }]));
 
 function back() {
-	history.value.pop();
-	windowRouter.replace(history.value.at(-1)!.path);
+	_history_.value.pop();
+	windowRouter.replaceByPath(_history_.value.at(-1)!.path);
 }
 
 function reload() {
@@ -178,7 +178,7 @@ function close() {
 }
 
 function expand() {
-	mainRouter.push(windowRouter.getCurrentPath(), 'forcePage');
+	mainRouter.pushByPath(windowRouter.getCurrentPath(), 'forcePage');
 	windowEl.value?.close();
 }
 

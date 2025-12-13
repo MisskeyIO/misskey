@@ -70,7 +70,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, shallowRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkModalWindow from '@/components/MkModalWindow.vue';
 import MkButton from '@/components/MkButton.vue';
@@ -95,7 +94,7 @@ const emit = defineEmits<{
 	(ev: 'closed'): void
 }>();
 
-const dialog = ref<InstanceType<typeof MkModalWindow> | null>(null);
+const dialog = useTemplateRef('dialog');
 const title = ref<string>(props.announcement ? props.announcement.title : '');
 const text = ref<string>(props.announcement ? props.announcement.text : '');
 const icon = ref<string>(props.announcement ? props.announcement.icon : 'info');

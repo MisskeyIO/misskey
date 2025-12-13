@@ -449,9 +449,9 @@ describe('RoleService', () => {
 			await roleService.assign(user.id, badgeRole.id);
 			await roleService.assign(user.id, normalRole.id);
 
-			const roles = await roleService.getUserBadgeRoles(user.id);
-			expect(roles.some(r => r.id === badgeRole.id)).toBe(true);
-			expect(roles.some(r => r.id === normalRole.id)).toBe(false);
+			const roles = await roleService.getUserBadgeRoles(user.id, false);
+			expect(roles.some(r => r.name === badgeRole.name)).toBe(true);
+			expect(roles.some(r => r.name === normalRole.name)).toBe(false);
 		});
 
 		test('コンディショナルなバッジロールが条件一致で返る', async () => {
@@ -465,9 +465,9 @@ describe('RoleService', () => {
 				type: 'isBot',
 			}, { asBadge: false, name: 'cond-non-badge' });
 
-			const roles = await roleService.getUserBadgeRoles(user.id);
-			expect(roles.some(r => r.id === condBadgeRole.id)).toBe(true);
-			expect(roles.some(r => r.id === condNonBadgeRole.id)).toBe(false);
+			const roles = await roleService.getUserBadgeRoles(user.id, false);
+			expect(roles.some(r => r.name === condBadgeRole.name)).toBe(true);
+			expect(roles.some(r => r.name === condNonBadgeRole.name)).toBe(false);
 		});
 
 		test('roleAssignedTo 条件のバッジロール: アサイン有無で変化する', async () => {
@@ -482,11 +482,11 @@ describe('RoleService', () => {
 			await roleService.assign(user2.id, manualRole.id);
 
 			const [roles1, roles2] = await Promise.all([
-				roleService.getUserBadgeRoles(user1.id),
-				roleService.getUserBadgeRoles(user2.id),
+				roleService.getUserBadgeRoles(user1.id, false),
+				roleService.getUserBadgeRoles(user2.id, false),
 			]);
-			expect(roles1.some(r => r.id === condBadgeRole.id)).toBe(false);
-			expect(roles2.some(r => r.id === condBadgeRole.id)).toBe(true);
+			expect(roles1.some(r => r.name === condBadgeRole.name)).toBe(false);
+			expect(roles2.some(r => r.name === condBadgeRole.name)).toBe(true);
 		});
 
 		test('期限切れのバッジロールは除外される', async () => {
@@ -505,16 +505,16 @@ describe('RoleService', () => {
 			// expiresAt あり（期限切れ）
 			await assignRole({ userId: user.id, roleId: roleExpired.id, expiresAt: new Date(Date.now() - 1000) });
 
-			const rolesBefore = await roleService.getUserBadgeRoles(user.id);
-			expect(rolesBefore.some(r => r.id === roleNoExpiry.id)).toBe(true);
-			expect(rolesBefore.some(r => r.id === roleNotExpired.id)).toBe(true);
-			expect(rolesBefore.some(r => r.id === roleExpired.id)).toBe(false);
+			const rolesBefore = await roleService.getUserBadgeRoles(user.id, false);
+			expect(rolesBefore.some(r => r.name === roleNoExpiry.name)).toBe(true);
+			expect(rolesBefore.some(r => r.name === roleNotExpired.name)).toBe(true);
+			expect(rolesBefore.some(r => r.name === roleExpired.name)).toBe(false);
 
 			// 時間経過で roleNotExpired を失効させる
 			clock.tick('02:00:00');
-			const rolesAfter = await roleService.getUserBadgeRoles(user.id);
-			expect(rolesAfter.some(r => r.id === roleNoExpiry.id)).toBe(true);
-			expect(rolesAfter.some(r => r.id === roleNotExpired.id)).toBe(false);
+			const rolesAfter = await roleService.getUserBadgeRoles(user.id, false);
+			expect(rolesAfter.some(r => r.name === roleNoExpiry.name)).toBe(true);
+			expect(rolesAfter.some(r => r.name === roleNotExpired.name)).toBe(false);
 		});
 	});
 

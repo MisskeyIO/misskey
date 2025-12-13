@@ -146,7 +146,7 @@
     "seedrandom": "catalog:",
     "start-server-and-test": "catalog:",
     "storybook": "catalog:",
-    "storybook-addon-misskey-theme": "catalog:",
+
     "tsx": "catalog:",
     "vite-plugin-glsl": "1.5.4",
     "vite-plugin-turbosnap": "catalog:",

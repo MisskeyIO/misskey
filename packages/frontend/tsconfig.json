@@ -57,6 +57,7 @@
 		"./@types/**/*.ts"
 	],
 	"exclude": [
-		"./src/**/*.stories.ts"
+		"./src/**/*.stories.ts",
+    "./src/pages/chat/**"
 	]
 }

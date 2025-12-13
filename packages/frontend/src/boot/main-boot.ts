@@ -30,6 +30,7 @@ import { prefer } from '@/preferences.js';
 import { updateCurrentAccountPartial } from '@/accounts.js';
 import { migrateOldSettings } from '@/pref-migrate.js';
 import { unisonReload } from '@/utility/unison-reload.js';
+import { signout } from '@/signout.js';
 
 export async function mainBoot() {
 	//#region Detect language & fetch translations

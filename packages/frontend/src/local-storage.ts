@@ -16,6 +16,8 @@ export type Keys = (
 	'modifiedVersionMustProminentlyOfferInAgplV3Section13Read' |
 	'lastUsed' |
 	'lang' |
+	'locale' |
+	'localeVersion' |
 	'drafts' |
 	'hashtags' |
 	'colorScheme' |

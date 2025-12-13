@@ -162,9 +162,6 @@ catalogs:
     '@smithy/node-http-handler':
       specifier: 4.4.5
       version: 4.4.5
-    '@storybook/addon-actions':
-      specifier: 9.0.8
-      version: 9.0.8
     '@storybook/addon-links':
       specifier: 10.1.7
       version: 10.1.7
@@ -2049,9 +2046,6 @@ importers:
       '@misskey-dev/summaly':
         specifier: 'catalog:'
         version: https://codeload.github.com/MisskeyIO/summaly/tar.gz/5163ff6c2d449732728497a43f6ab426cdfe7158
-      '@storybook/addon-actions':
-        specifier: 'catalog:'
-        version: 9.0.8
       '@storybook/addon-links':
         specifier: 'catalog:'
         version: 10.1.7(react@19.2.3)(storybook@10.1.7(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.4)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(utf-8-validate@6.0.5))
@@ -6162,9 +6156,6 @@ packages:
 
   '@standard-schema/spec@1.0.0':
     resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
-
-  '@storybook/addon-actions@9.0.8':
-    resolution: {integrity: sha512-LFePu7PPnWN0Il/uoUpmA5T0J0C7d6haJIbg0pXrjxW2MQVSYXE4S4LSUz8fOImltBDV3xAl6tLPYHFj6VcrOA==}
 
   '@storybook/addon-links@10.1.7':
     resolution: {integrity: sha512-Tgfa4FN3id8AoxBk0JbdqtWqEF8ky1FQeC3bkl7TACib9pUQfyvyvtFZKBw4lfOS1LvmrhrGy5cVp7GHmQ1Kfg==}
@@ -17828,8 +17819,6 @@ snapshots:
   '@sqltools/formatter@1.2.5': {}
 
   '@standard-schema/spec@1.0.0': {}
-
-  '@storybook/addon-actions@9.0.8': {}
 
   '@storybook/addon-links@10.1.7(react@19.2.3)(storybook@10.1.7(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.7.4)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(utf-8-validate@6.0.5))':
     dependencies:

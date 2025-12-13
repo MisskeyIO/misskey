@@ -20,6 +20,7 @@ import { FastifyAdapter as BullBoardFastifyAdapter } from '@bull-board/fastify';
 import fastifyCookie from '@fastify/cookie';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { createBullBoard } from '@bull-board/api';
+import locales from '../../../../../locales/index.js';
 import type { Config } from '@/config.js';
 import { getNoteSummary } from '@/misc/get-note-summary.js';
 import { DI } from '@/di-symbols.js';
@@ -222,6 +223,7 @@ export class ClientServerService {
 				instanceUrl: this.config.url,
 				metaJson: htmlSafeJsonStringify(await this.metaEntityService.packDetailed(meta)),
 				now: Date.now(),
+				langs: Object.keys(locales),
 				extraHead: this.config.extraHead,
 				federationEnabled: meta.federation !== 'none',
 			};

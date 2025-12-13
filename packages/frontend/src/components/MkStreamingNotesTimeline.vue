@@ -180,6 +180,13 @@ if (props.src === 'antenna') {
 		})),
 		useShallowRef: true,
 	}));
+} else if (props.src === 'media') {
+	paginator = markRaw(new Paginator('notes/local-timeline', {
+		computedParams: computed(() => ({
+			withFiles: true,
+		})),
+		useShallowRef: true,
+	}));
 } else {
 	throw new Error('Unrecognized timeline type: ' + props.src);
 }

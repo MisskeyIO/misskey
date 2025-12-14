@@ -70,17 +70,27 @@ export const tooltipDirective = {
 			if (self.text == null) return;
 
 			const showing = ref(true);
-			await popup(defineAsyncComponent(() => import('@/components/MkTooltip.vue')), {
-				showing,
-				text: self.text,
-				asMfm: binding.modifiers.mfm,
-				direction: binding.modifiers.left ? 'left' : binding.modifiers.right ? 'right' : binding.modifiers.top ? 'top' : binding.modifiers.bottom ? 'bottom' : 'top',
-				anchorElement: el,
-			}, {}, 'closed');
 
 			self._close = () => {
-				showing.value = false;
+				try {
+					showing.value = false;
+				} catch (err) {
+				// Ignore errors when the component is already unmounted
+					console.debug('Tooltip close error (safe to ignore):', err);
+				}
 			};
+
+			try {
+				popup(defineAsyncComponent(() => import('@/components/MkTooltip.vue')), {
+					showing,
+					text: self.text,
+					asMfm: binding.modifiers.mfm,
+					direction: binding.modifiers.left ? 'left' : binding.modifiers.right ? 'right' : binding.modifiers.top ? 'top' : binding.modifiers.bottom ? 'bottom' : 'top',
+					anchorElement: el,
+				}, {}, 'closed');
+			} catch (err) {
+			// Ignore popup errors during unmount
+			}
 		};
 
 		el.addEventListener('selectstart', ev => {

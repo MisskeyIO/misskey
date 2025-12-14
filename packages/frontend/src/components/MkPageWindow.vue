@@ -22,10 +22,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</template>
 	</template>
 
-<div :key="reloadCount.toString()" :class="$style.root" class="_forceShrinkSpacer">
-	<StackingRouterView v-if="prefer.s['experimental.stackingRouterView']" :key="reloadCount.toString() + ':stacking'" :router="windowRouter"/>
-	<RouterView v-else :key="reloadCount.toString() + ':non-stacking'" :router="windowRouter"/>
-</div>
+	<div :key="reloadCount.toString()" :class="$style.root" class="_forceShrinkSpacer">
+		<StackingRouterView v-if="prefer.s['experimental.stackingRouterView']" :key="reloadCount.toString() + ':stacking'" :router="windowRouter"/>
+		<RouterView v-else :key="reloadCount.toString() + ':non-stacking'" :router="windowRouter"/>
+	</div>
 </MkWindow>
 </template>
 
@@ -71,17 +71,17 @@ type WindowButton = {
 };
 
 const buttonsLeft = computed(() => {
-const buttons: WindowButton[] = [];
+	const buttons: WindowButton[] = [];
 
-if (history.value.length > 1) {
-	buttons.push({
-		title: i18n.ts.goBack,
-		icon: 'ti ti-arrow-left',
-		onClick: back,
-	});
-}
+	if (_history_.value.length > 1) {
+		buttons.push({
+			title: i18n.ts.goBack,
+			icon: 'ti ti-arrow-left',
+			onClick: back,
+		});
+	}
 
-return buttons;
+	return buttons;
 });
 const buttonsRight = computed(() => {
 	const buttons: WindowButton[] = [{

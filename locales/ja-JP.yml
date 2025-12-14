@@ -16,6 +16,7 @@ forgotPassword: "パスワードを忘れた"
 fetchingAsApObject: "連合に照会中"
 ok: "OK"
 gotIt: "わかった"
+tip: "ヒント"
 cancel: "キャンセル"
 noThankYou: "やめておく"
 enterUsername: "ユーザー名を入力"
@@ -1451,6 +1452,8 @@ driveAboutTip: "ドライブでは、過去にアップロードしたファイ�
 forwardReport: "リモートサーバーに通報を転送する"
 forwardReportIsAnonymous: "リモートサーバーからはあなたの情報は見れず、匿名のシステムアカウントとして表示されます。"
 incorrectInput: "入力内容が正しくありません。"
+realtimeMode: "リアルタイムモード"
+widgets: "ウィジェット"
 
 _chat:
   messages: "メッセージ"
@@ -1747,6 +1750,7 @@ _timelineDescription:
   local: "ローカルタイムラインでは、このサーバーにいるユーザー全員の投稿を見られます。"
   social: "ソーシャルタイムラインには、ホームタイムラインとローカルタイムラインの投稿が両方表示されます。"
   global: "グローバルタイムラインでは、接続している他のすべてのサーバーからの投稿を見られます。"
+  media: "メディアタイムラインでは、このサーバーに投稿された画像や動画つきの投稿を見られます。"
 
 _serverRules:
   description: "新規登録前に表示する、サーバーの簡潔なルールを設定します。内容は利用規約の要約とすることを推奨します。"

@@ -83,6 +83,10 @@ export interface Locale extends ILocale {
      */
     "gotIt": string;
     /**
+     * ヒント
+     */
+    "tip": string;
+    /**
      * キャンセル
      */
     "cancel": string;
@@ -5836,6 +5840,14 @@ export interface Locale extends ILocale {
      * 入力内容が正しくありません。
      */
     "incorrectInput": string;
+    /**
+     * リアルタイムモード
+     */
+    "realtimeMode": string;
+    /**
+     * ウィジェット
+     */
+    "widgets": string;
     "_chat": {
         /**
          * メッセージ
@@ -6902,6 +6914,10 @@ export interface Locale extends ILocale {
          * グローバルタイムラインでは、接続している他のすべてのサーバーからの投稿を見られます。
          */
         "global": string;
+        /**
+         * メディアタイムラインでは、このサーバーに投稿された画像や動画つきの投稿を見られます。
+         */
+        "media": string;
     };
     "_serverRules": {
         /**

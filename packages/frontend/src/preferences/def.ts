@@ -263,7 +263,7 @@ export const PREF_DEF = {
 		default: false,
 	},
 	showSensitiveAds: {
-		default: false,
+		default: true,
 	},
 	alwaysShowSensitiveAds: {
 		default: false,

@@ -552,10 +552,6 @@ export interface Locale extends ILocale {
      */
     "alwaysShowSensitiveAds": string;
     /**
-     * オフにすると、成人向け広告はぼかし表示になり、クリックして表示できます。
-     */
-    "alwaysShowSensitiveAdsDescription": string;
-    /**
      * 成人向けの広告
      */
     "sensitiveAd": string;

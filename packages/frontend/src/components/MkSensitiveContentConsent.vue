@@ -42,7 +42,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</MkSwitch>
 					<MkSwitch v-model="alwaysShowSensitiveAds" :disabled="!showSensitiveAds">
 						{{ i18n.ts.alwaysShowSensitiveAds }}
-						<template #caption>{{ i18n.ts.alwaysShowSensitiveAdsDescription }}</template>
 					</MkSwitch>
 				</div>
 			</MkFolder>

@@ -5,8 +5,8 @@
     "watch": "nodemon -w ../../package.json -e json --exec \"node build.js watch\"",
     "build": "node build.js",
     "typecheck": "tsc --noEmit",
-    "eslint": "eslint --quiet src/**/*.ts",
-    "lint": "pnpm typecheck && pnpm eslint"
+    "format": "biome check --write",
+    "lint": "pnpm typecheck && biome check"
   },
   "dependencies": {
     "esbuild": "catalog:",
@@ -14,10 +14,8 @@
     "misskey-js": "workspace:*"
   },
   "devDependencies": {
-    "@typescript-eslint/parser": "catalog:",
+    "@biomejs/biome": "catalog:",
     "@types/serviceworker": "catalog:",
-    "eslint": "catalog:",
-    "eslint-plugin-import": "catalog:",
     "nodemon": "catalog:",
     "typescript": "catalog:"
   },

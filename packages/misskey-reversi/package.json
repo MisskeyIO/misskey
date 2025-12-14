@@ -17,16 +17,13 @@
     "build": "pnpm run build:tsc",
     "build:tsc": "tsc --outDir built --declaration true --declarationMap true",
     "watch": "nodemon -w src -e ts,js,cjs,mjs,json --exec \"pnpm run build:tsc\"",
-    "eslint": "eslint './**/*.{js,jsx,ts,tsx}'",
     "typecheck": "tsc --noEmit",
-    "lint": "pnpm typecheck && pnpm eslint"
+    "format": "biome check --write",
+    "lint": "pnpm typecheck && biome check"
   },
   "devDependencies": {
-    "@misskey-dev/eslint-plugin": "catalog:",
+    "@biomejs/biome": "catalog:",
     "@types/node": "catalog:",
-    "@typescript-eslint/eslint-plugin": "catalog:",
-    "@typescript-eslint/parser": "catalog:",
-    "eslint": "catalog:",
     "execa": "catalog:",
     "nodemon": "catalog:",
     "typescript": "catalog:"

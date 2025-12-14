@@ -49,6 +49,7 @@
     "enforce-catalog": "node ./scripts/enforce-catalog.mjs"
   },
   "dependencies": {
+    "@biomejs/biome": "catalog:",
     "@opentelemetry/api": "catalog:",
     "@opentelemetry/auto-instrumentations-node": "catalog:",
     "@opentelemetry/exporter-metrics-otlp-http": "catalog:",
@@ -70,13 +71,9 @@
     "typescript": "catalog:"
   },
   "devDependencies": {
-    "@misskey-dev/eslint-plugin": "catalog:",
     "@types/node": "catalog:",
-    "@typescript-eslint/eslint-plugin": "catalog:",
-    "@typescript-eslint/parser": "catalog:",
     "cross-env": "catalog:",
     "cypress": "catalog:",
-    "eslint": "catalog:",
     "globals": "catalog:",
     "ncp": "catalog:",
     "pnpm": "catalog:",

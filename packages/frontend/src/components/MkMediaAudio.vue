@@ -5,6 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div
+	v-if="!blocked"
 	ref="playerEl"
 	v-hotkey="keymap"
 	tabindex="0"
@@ -91,6 +92,7 @@ import bytes from '@/filters/bytes.js';
 import { hms } from '@/filters/hms.js';
 import MkMediaRange from '@/components/MkMediaRange.vue';
 import { pleaseLogin } from '@/utility/please-login.js';
+import { sensitiveContentConsent, requestSensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 import { $i, iAmModerator } from '@/i.js';
 import { prefer } from '@/preferences.js';
 
@@ -99,6 +101,8 @@ const props = defineProps<{
 	audio: Misskey.entities.DriveFile;
 	user?: Misskey.entities.UserLite;
 }>();
+
+const blocked = computed(() => props.audio.isSensitive && sensitiveContentConsent.value === false);
 
 const keymap = {
 	'up': {
@@ -150,20 +154,13 @@ const playerEl = useTemplateRef('playerEl');
 const audioEl = useTemplateRef('audioEl');
 const audioVisualizer = ref<InstanceType<typeof MkAudioVisualizer>>();
 
-// eslint-disable-next-line vue/no-setup-props-reactivity-loss
-const hide = ref((prefer.s.nsfw === 'force' || prefer.s.dataSaver.media) ? true : (props.audio.isSensitive && prefer.s.nsfw !== 'ignore'));
-
-async function show() {
-	if (props.audio.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
-		const { canceled } = await os.confirm({
-			type: 'question',
-			text: i18n.ts.sensitiveMediaRevealConfirm,
-		});
-		if (canceled) return;
-	}
-
-	hide.value = false;
+function calcHide(): boolean {
+	if (prefer.s.nsfw === 'force' || prefer.s.dataSaver.media) return true;
+	if (props.audio.isSensitive && sensitiveContentConsent.value !== true) return true;
+	return props.audio.isSensitive && prefer.s.nsfw !== 'ignore';
 }
+
+const hide = ref(calcHide());
 
 // Menu
 const menuShowing = ref(false);
@@ -271,18 +268,30 @@ function showMenu(ev: MouseEvent) {
 }
 
 async function showHiddenContent(ev: MouseEvent) {
+	if (!hide.value) return;
+
+	ev.preventDefault();
+	ev.stopPropagation();
+
 	if (props.audio.isSensitive && !$i) {
-		ev.preventDefault();
-		ev.stopPropagation();
 		await pleaseLogin();
 		return;
 	}
 
-	if (hide.value) {
-		ev.preventDefault();
-		ev.stopPropagation();
-		hide.value = false;
+	if (props.audio.isSensitive) {
+		const allowed = await requestSensitiveContentConsent('media');
+		if (!allowed) return;
 	}
+
+	if (props.audio.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
+		const { canceled } = await os.confirm({
+			type: 'question',
+			text: i18n.ts.sensitiveMediaRevealConfirm,
+		});
+		if (canceled) return;
+	}
+
+	hide.value = false;
 }
 
 async function toggleSensitive(file: Misskey.entities.DriveFile) {
@@ -460,7 +469,7 @@ onDeactivated(() => {
 	elapsedTimeMs.value = 0;
 	durationMs.value = 0;
 	bufferedEnd.value = 0;
-	hide.value = (prefer.s.nsfw === 'force' || prefer.s.dataSaver.media) ? true : (props.audio.isSensitive && prefer.s.nsfw !== 'ignore');
+	hide.value = calcHide();
 	stopAudioElWatch();
 	onceInit = false;
 	if (mediaTickFrameId) {

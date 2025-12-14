@@ -4,8 +4,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<div :class="$style.root">
-	<div v-if="media.isSensitive && hide" :class="$style.sensitive" @click="show">
+<div v-if="!blocked" :class="$style.root">
+	<div v-if="media.isSensitive && hide" :class="$style.sensitive" @click="showHiddenContent">
 		<span style="font-size: 1.6em;"><i class="ti ti-alert-triangle"></i></span>
 		<b>{{ i18n.ts.sensitive }}</b>
 		<span>{{ i18n.ts.clickToShow }}</span>
@@ -24,12 +24,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import MkMediaAudio from '@/components/MkMediaAudio.vue';
 import { pleaseLogin } from '@/utility/please-login.js';
+import { sensitiveContentConsent, requestSensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 import { $i } from '@/i.js';
 import { prefer } from '@/preferences.js';
 
@@ -38,14 +39,30 @@ const props = defineProps<{
 	user?: Misskey.entities.UserLite;
 }>();
 
-const hide = ref(true);
+const blocked = computed(() => props.media.isSensitive && sensitiveContentConsent.value === false);
 
-async function show(ev: MouseEvent) {
-	if (props.media.isSensitive && !$i && prefer.s.confirmWhenRevealingSensitiveMedia) {
-		ev.preventDefault();
-		ev.stopPropagation();
+function calcHide(): boolean {
+	if (prefer.s.nsfw === 'force' || prefer.s.dataSaver.media) return true;
+	if (props.media.isSensitive && sensitiveContentConsent.value !== true) return true;
+	return props.media.isSensitive && prefer.s.nsfw !== 'ignore';
+}
+
+const hide = ref(calcHide());
+
+async function showHiddenContent(ev: MouseEvent) {
+	if (!hide.value) return;
+
+	ev.preventDefault();
+	ev.stopPropagation();
+
+	if (props.media.isSensitive && !$i) {
 		await pleaseLogin();
 		return;
+	}
+
+	if (props.media.isSensitive) {
+		const allowed = await requestSensitiveContentConsent('media');
+		if (!allowed) return;
 	}
 
 	if (props.media.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
@@ -56,11 +73,7 @@ async function show(ev: MouseEvent) {
 		if (canceled) return;
 	}
 
-	if (hide.value) {
-		ev.preventDefault();
-		ev.stopPropagation();
-		hide.value = false;
-	}
+	hide.value = false;
 }
 </script>
 

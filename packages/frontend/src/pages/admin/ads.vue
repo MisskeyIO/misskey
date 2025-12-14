@@ -31,6 +31,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<option value="horizontal-big">horizontal-big</option>
 					<option value="vertical">vertical</option>
 				</MkRadios>
+				<MkSwitch v-model="ad.isSensitive">
+					<template #label>{{ i18n.ts.sensitive }}</template>
+				</MkSwitch>
 				<!--
 			<div style="margin: 32px 0;">
 				{{ i18n.ts.priority }}
@@ -92,6 +95,7 @@ import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
 import MkRadios from '@/components/MkRadios.vue';
+import MkSwitch from '@/components/MkSwitch.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import MkSelect from '@/components/MkSelect.vue';
 import FormSplit from '@/components/form/split.vue';
@@ -151,9 +155,11 @@ function add() {
 		ratio: 1,
 		url: '',
 		imageUrl: null,
+		imageBlurhash: null,
 		expiresAt: null,
 		startsAt: null,
 		dayOfWeek: 0,
+		isSensitive: false,
 	});
 }
 

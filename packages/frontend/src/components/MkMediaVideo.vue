@@ -5,6 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div
+	v-if="!blocked"
 	ref="playerEl"
 	v-hotkey="keymap"
 	tabindex="0"
@@ -125,6 +126,7 @@ import { exitFullscreen, requestFullscreen } from '@/utility/fullscreen.js';
 import hasAudio from '@/utility/media-has-audio.js';
 import MkMediaRange from '@/components/MkMediaRange.vue';
 import { pleaseLogin } from '@/utility/please-login.js';
+import { sensitiveContentConsent, requestSensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 import { $i, iAmModerator } from '@/i.js';
 import { prefer } from '@/preferences.js';
 
@@ -134,6 +136,8 @@ const props = withDefaults(defineProps<{
 }>(), {
 	videoControls: true,
 });
+
+const blocked = computed(() => props.video.isSensitive && sensitiveContentConsent.value === false);
 
 const keymap = {
 	'up': {
@@ -181,20 +185,13 @@ function hasFocus() {
 	return playerEl.value === window.document.activeElement || playerEl.value.contains(window.document.activeElement);
 }
 
-// eslint-disable-next-line vue/no-setup-props-reactivity-loss
-const hide = ref((prefer.s.nsfw === 'force' || prefer.s.dataSaver.media) ? true : (props.video.isSensitive && prefer.s.nsfw !== 'ignore'));
-
-async function show() {
-	if (props.video.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
-		const { canceled } = await os.confirm({
-			type: 'question',
-			text: i18n.ts.sensitiveMediaRevealConfirm,
-		});
-		if (canceled) return;
-	}
-
-	hide.value = false;
+function calcHide(): boolean {
+	if (prefer.s.nsfw === 'force' || prefer.s.dataSaver.media) return true;
+	if (props.video.isSensitive && sensitiveContentConsent.value !== true) return true;
+	return props.video.isSensitive && prefer.s.nsfw !== 'ignore';
 }
+
+const hide = ref(calcHide());
 
 // Menu
 const menuShowing = ref(false);
@@ -307,11 +304,19 @@ function showMenu(ev: MouseEvent) {
 }
 
 async function showHiddenContent(ev: MouseEvent) {
+	if (!hide.value) return;
+
+	ev.preventDefault();
+	ev.stopPropagation();
+
 	if (props.video.isSensitive && !$i) {
-		ev.preventDefault();
-		ev.stopPropagation();
 		await pleaseLogin();
 		return;
+	}
+
+	if (props.video.isSensitive) {
+		const allowed = await requestSensitiveContentConsent('media');
+		if (!allowed) return;
 	}
 
 	if (props.video.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
@@ -321,6 +326,7 @@ async function showHiddenContent(ev: MouseEvent) {
 		});
 		if (canceled) return;
 	}
+
 	hide.value = false;
 }
 
@@ -542,7 +548,7 @@ onDeactivated(() => {
 	elapsedTimeMs.value = 0;
 	durationMs.value = 0;
 	bufferedEnd.value = 0;
-	hide.value = (prefer.s.nsfw === 'force' || prefer.s.dataSaver.media) ? true : (props.video.isSensitive && prefer.s.nsfw !== 'ignore');
+	hide.value = calcHide();
 	stopVideoElWatch();
 	onceInit = false;
 	if (mediaTickFrameId) {

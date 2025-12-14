@@ -262,6 +262,12 @@ export const PREF_DEF = {
 	forceShowAds: {
 		default: false,
 	},
+	showSensitiveAds: {
+		default: false,
+	},
+	alwaysShowSensitiveAds: {
+		default: false,
+	},
 	aiChanMode: {
 		default: false,
 	},

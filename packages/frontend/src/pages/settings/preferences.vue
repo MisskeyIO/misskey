@@ -694,6 +694,24 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</MkPreferenceContainer>
 						</SearchMarker>
 
+						<SearchMarker :keywords="['ad', 'adult', 'sensitive', 'nsfw', '18']">
+							<MkPreferenceContainer k="showSensitiveAds">
+								<MkSwitch v-model="showSensitiveAds">
+									<template #label><SearchLabel>{{ i18n.ts.showSensitiveAds }}</SearchLabel></template>
+									<template #caption>{{ i18n.ts.showSensitiveAdsDescription }}</template>
+								</MkSwitch>
+							</MkPreferenceContainer>
+						</SearchMarker>
+
+						<SearchMarker :keywords="['ad', 'adult', 'sensitive', 'nsfw', '18', 'always']">
+							<MkPreferenceContainer k="alwaysShowSensitiveAds">
+								<MkSwitch v-model="alwaysShowSensitiveAds" :disabled="!showSensitiveAds">
+									<template #label><SearchLabel>{{ i18n.ts.alwaysShowSensitiveAds }}</SearchLabel></template>
+									<template #caption>{{ i18n.ts.alwaysShowSensitiveAdsDescription }}</template>
+								</MkSwitch>
+							</MkPreferenceContainer>
+						</SearchMarker>
+
 						<SearchMarker>
 							<MkPreferenceContainer k="hemisphere">
 								<MkRadios v-model="hemisphere">
@@ -754,6 +772,7 @@ import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { prefer } from '@/preferences.js';
+import { usageReport } from '@/utility/usage-report.js';
 import MkPreferenceContainer from '@/components/MkPreferenceContainer.vue';
 import MkFeatureBanner from '@/components/MkFeatureBanner.vue';
 import { globalEvents } from '@/events.js';
@@ -780,6 +799,8 @@ const showRenotesCount = prefer.model('showRenotesCount');
 const showReactionsCount = prefer.model('showReactionsCount');
 const enableQuickAddMfmFunction = prefer.model('enableQuickAddMfmFunction');
 const forceShowAds = prefer.model('forceShowAds');
+const showSensitiveAds = prefer.model('showSensitiveAds');
+const alwaysShowSensitiveAds = prefer.model('alwaysShowSensitiveAds');
 const loadRawImages = prefer.model('loadRawImages');
 const imageNewTab = prefer.model('imageNewTab');
 const showFixedPostForm = prefer.model('showFixedPostForm');
@@ -878,6 +899,30 @@ watch([
 	makeEveryTextElementsSelectable,
 ], async () => {
 	await reloadAsk({ reason: i18n.ts.reloadToApplySetting, unison: true });
+});
+
+watch(showSensitiveAds, (to) => {
+	if (!to) {
+		alwaysShowSensitiveAds.value = false;
+	}
+	usageReport({
+		t: Math.floor(Date.now() / 1000),
+		e: 'p',
+		i: 'showSensitiveAds',
+		a: to ? '1' : '0',
+	});
+});
+
+watch(alwaysShowSensitiveAds, (to) => {
+	if (to) {
+		showSensitiveAds.value = true;
+	}
+	usageReport({
+		t: Math.floor(Date.now() / 1000),
+		e: 'p',
+		i: 'alwaysShowSensitiveAds',
+		a: to ? '1' : '0',
+	});
 });
 
 const emojiIndexLangs = ['en-US', 'ja-JP', 'ja-JP_hira'] as const;

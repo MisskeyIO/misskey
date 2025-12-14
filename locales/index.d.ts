@@ -527,6 +527,39 @@ export interface Locale extends ILocale {
      */
     "sensitive": string;
     /**
+     * 成人向けの可能性があるコンテンツ
+     */
+    "sensitiveContentConsentTitle": string;
+    /**
+     * このコンテンツは成人向けのコンテンツである可能性があります。
+     * あなたは18歳以上ですか？
+     */
+    "sensitiveContentConsentAreYouOver18": string;
+    /**
+     * 表示するコンテンツ設定
+     */
+    "displayedContentSettings": string;
+    /**
+     * 成人向けの広告を表示する
+     */
+    "showSensitiveAds": string;
+    /**
+     * オフにすると、成人向けとして設定された広告は表示されません。
+     */
+    "showSensitiveAdsDescription": string;
+    /**
+     * 成人向けの広告を常に表示する
+     */
+    "alwaysShowSensitiveAds": string;
+    /**
+     * オフにすると、成人向け広告はぼかし表示になり、クリックして表示できます。
+     */
+    "alwaysShowSensitiveAdsDescription": string;
+    /**
+     * 成人向けの広告
+     */
+    "sensitiveAd": string;
+    /**
      * 追加
      */
     "add": string;

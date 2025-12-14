@@ -4,7 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<div :class="[hide ? $style.hidden : $style.visible, (image.isSensitive && prefer.s.highlightSensitiveMedia) && $style.sensitive]" @click="showHiddenContent">
+<div v-if="!blocked" :class="[hide ? $style.hidden : $style.visible, (image.isSensitive && prefer.s.highlightSensitiveMedia) && $style.sensitive]" @click="showHiddenContent">
 	<component
 		:is="(image.isSensitive && !$i) || disableImageLink ? 'div' : 'a'"
 		v-bind="(image.isSensitive && !$i) || disableImageLink ? {
@@ -61,6 +61,7 @@ import ImgWithBlurhash from '@/components/MkImgWithBlurhash.vue';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import { pleaseLogin } from '@/utility/please-login.js';
+import { sensitiveContentConsent, requestSensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 import { $i, iAmModerator } from '@/i.js';
 import { prefer } from '@/preferences.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
@@ -77,7 +78,15 @@ const props = withDefaults(defineProps<{
 	controls: true,
 });
 
-const hide = ref(true);
+function calcHide(): boolean {
+	if (prefer.s.nsfw === 'force' || prefer.s.dataSaver.media) return true;
+	if (props.image.isSensitive && sensitiveContentConsent.value !== true) return true;
+	return props.image.isSensitive && prefer.s.nsfw !== 'ignore';
+}
+
+const hide = ref(calcHide());
+
+const blocked = computed(() => props.image.isSensitive && sensitiveContentConsent.value === false);
 
 const url = computed(() => (props.raw || prefer.s.loadRawImages)
 	? props.image.url
@@ -173,29 +182,32 @@ function showMenu(ev: MouseEvent) {
 }
 
 async function showHiddenContent(ev: MouseEvent) {
-	if (!props.controls) {
+	if (!props.controls || !hide.value) {
 		return;
 	}
 
+	ev.preventDefault();
+	ev.stopPropagation();
+
 	if (props.image.isSensitive && !$i) {
-		ev.preventDefault();
-		ev.stopPropagation();
 		await pleaseLogin();
 		return;
 	}
 
-	if (hide.value) {
-		ev.stopPropagation();
-		if (props.image.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
-			const { canceled } = await os.confirm({
-				type: 'question',
-				text: i18n.ts.sensitiveMediaRevealConfirm,
-			});
-			if (canceled) return;
-		}
-
-		hide.value = false;
+	if (props.image.isSensitive) {
+		const allowed = await requestSensitiveContentConsent('media');
+		if (!allowed) return;
 	}
+
+	if (props.image.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
+		const { canceled } = await os.confirm({
+			type: 'question',
+			text: i18n.ts.sensitiveMediaRevealConfirm,
+		});
+		if (canceled) return;
+	}
+
+	hide.value = false;
 }
 
 function toggleSensitive(file: Misskey.entities.DriveFile) {
@@ -207,7 +219,7 @@ function toggleSensitive(file: Misskey.entities.DriveFile) {
 
 // Plugin:register_note_view_interruptor を使って書き換えられる可能性があるためwatchする
 watch(() => props.image, () => {
-	hide.value = (prefer.s.nsfw === 'force' || prefer.s.dataSaver.media) ? true : (props.image.isSensitive && prefer.s.nsfw !== 'ignore');
+	hide.value = calcHide();
 }, {
 	deep: true,
 	immediate: true,

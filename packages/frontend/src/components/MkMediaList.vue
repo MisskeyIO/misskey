@@ -5,8 +5,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div>
-	<XBanner v-for="media in mediaList.filter(media => !previewable(media))" :key="media.id" :media="media" :user="user"/>
-	<div v-if="mediaList.filter(media => previewable(media)).length > 0" :class="$style.container">
+	<XBanner v-for="media in bannerMediaList" :key="media.id" :media="media" :user="user"/>
+	<div v-if="count > 0" :class="$style.container">
 		<div
 			ref="gallery"
 			:class="[
@@ -18,7 +18,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				}] : count === 2 ? $style.n2 : count === 3 ? $style.n3 : count === 4 ? $style.n4 : $style.nMany,
 			]"
 		>
-			<template v-for="media in mediaList.filter(media => previewable(media))">
+			<template v-for="media in previewableMediaList">
 				<XVideo v-if="media.type.startsWith('video')" :key="`video:${media.id}`" :class="$style.media" :video="media"/>
 				<XImage v-else-if="media.type.startsWith('image')" :key="`image:${media.id}`" :class="$style.media" class="image" :data-id="media.id" :image="media" :raw="raw"/>
 			</template>
@@ -28,7 +28,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, useTemplateRef } from 'vue';
+import { computed, onMounted, onUnmounted, useTemplateRef, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import PhotoSwipeLightbox from 'photoswipe/lightbox';
 import PhotoSwipe from 'photoswipe';
@@ -39,6 +39,7 @@ import XImage from '@/components/MkMediaImage.vue';
 import XVideo from '@/components/MkMediaVideo.vue';
 import * as os from '@/os.js';
 import { focusParent } from '@/utility/focus.js';
+import { sensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 import { prefer } from '@/preferences.js';
 
 const props = defineProps<{
@@ -50,7 +51,16 @@ const props = defineProps<{
 const gallery = useTemplateRef('gallery');
 const pswpZIndex = os.claimZIndex('middle');
 window.document.documentElement.style.setProperty('--mk-pswp-root-z-index', pswpZIndex.toString());
-const count = computed(() => props.mediaList.filter(media => previewable(media)).length);
+const isBlocked = (media: Misskey.entities.DriveFile): boolean => media.isSensitive && sensitiveContentConsent.value === false;
+
+const bannerMediaList = computed(() => props.mediaList.filter(media => !previewable(media) && !isBlocked(media)));
+const previewableMediaList = computed(() => props.mediaList.filter(media => previewable(media) && !isBlocked(media)));
+const count = computed(() => previewableMediaList.value.length);
+
+const pswpFiles = computed(() => previewableMediaList.value.filter(media => {
+	if (media.type === 'image/svg+xml') return true; // svgのwebpublicはpngなのでtrue
+	return media.type.startsWith('image') && FILE_TYPE_BROWSERSAFE.includes(media.type);
+}));
 let lightbox: PhotoSwipeLightbox | null = null;
 
 let activeEl: HTMLElement | null = null;
@@ -64,9 +74,9 @@ const popstateHandler = (): void => {
 async function calcAspectRatio() {
 	if (!gallery.value) return;
 
-	const img = props.mediaList[0];
+	const img = previewableMediaList.value[0];
 
-	if (props.mediaList.length !== 1 || !(img.properties.width && img.properties.height)) {
+	if (count.value !== 1 || !img || !(img.properties.width && img.properties.height)) {
 		gallery.value.style.aspectRatio = '';
 		return;
 	}
@@ -92,28 +102,24 @@ async function calcAspectRatio() {
 	}
 }
 
-onMounted(() => {
-	calcAspectRatio();
+const buildLightbox = (): PhotoSwipeLightbox | null => {
+	if (!gallery.value) return null;
+	if (pswpFiles.value.length === 0) return null;
 
-	lightbox = new PhotoSwipeLightbox({
-		dataSource: props.mediaList
-			.filter(media => {
-				if (media.type === 'image/svg+xml') return true; // svgのwebpublicはpngなのでtrue
-				return media.type.startsWith('image') && FILE_TYPE_BROWSERSAFE.includes(media.type);
-			})
-			.map(media => {
-				const item = {
-					src: media.url,
-					w: media.properties.width,
-					h: media.properties.height,
-					alt: media.comment ?? media.name,
-					comment: media.comment ?? media.name,
-				};
-				if (media.properties.orientation != null && media.properties.orientation >= 5) {
-					[item.w, item.h] = [item.h, item.w];
-				}
-				return item;
-			}),
+	const lb = new PhotoSwipeLightbox({
+		dataSource: pswpFiles.value.map(media => {
+			const item = {
+				src: media.url,
+				w: media.properties.width,
+				h: media.properties.height,
+				alt: media.comment ?? media.name,
+				comment: media.comment ?? media.name,
+			};
+			if (media.properties.orientation != null && media.properties.orientation >= 5) {
+				[item.w, item.h] = [item.h, item.w];
+			}
+			return item;
+		}),
 		gallery: gallery.value,
 		mainClass: 'pswp',
 		children: '.image',
@@ -139,12 +145,12 @@ onMounted(() => {
 		pswpModule: PhotoSwipe,
 	});
 
-	lightbox.addFilter('itemData', (itemData) => {
+	lb.addFilter('itemData', (itemData) => {
 		// element is children
 		const { element } = itemData;
 
 		const id = element?.dataset.id;
-		const file = props.mediaList.find(media => media.id === id);
+		const file = id != null ? pswpFiles.value.find(media => media.id === id) : null;
 		if (!file) return itemData;
 
 		itemData.src = file.url;
@@ -161,8 +167,8 @@ onMounted(() => {
 		return itemData;
 	});
 
-	lightbox.on('uiRegister', () => {
-		lightbox?.pswp?.ui?.registerElement({
+	lb.on('uiRegister', () => {
+		lb.pswp?.ui?.registerElement({
 			name: 'altText',
 			className: 'pswp__alt-text-container',
 			appendTo: 'wrapper',
@@ -178,16 +184,16 @@ onMounted(() => {
 		});
 	});
 
-	lightbox.on('afterInit', () => {
+	lb.on('afterInit', () => {
 		activeEl = window.document.activeElement instanceof HTMLElement ? window.document.activeElement : null;
 		focusParent(activeEl, true, true);
-		lightbox?.pswp?.element?.focus({
+		lb.pswp?.element?.focus({
 			preventScroll: true,
 		});
 		window.history.pushState(null, '', '#pswp');
 	});
 
-	lightbox.on('destroy', () => {
+	lb.on('destroy', () => {
 		focusParent(activeEl, true, false);
 		activeEl = null;
 		if (window.location.hash === '#pswp') {
@@ -195,9 +201,16 @@ onMounted(() => {
 		}
 	});
 
+	return lb;
+};
+
+onMounted(() => {
+	calcAspectRatio();
+
 	window.addEventListener('popstate', popstateHandler);
 
-	lightbox.init();
+	lightbox = buildLightbox();
+	lightbox?.init();
 });
 
 onUnmounted(() => {
@@ -214,10 +227,26 @@ const previewable = (file: Misskey.entities.DriveFile): boolean => {
 };
 
 const openGallery = () => {
-	if (props.mediaList.filter(media => previewable(media)).length > 0) {
-		lightbox?.loadAndOpen(0);
+	if (pswpFiles.value.length === 0) return;
+	if (!lightbox) {
+		lightbox = buildLightbox();
+		lightbox?.init();
 	}
+	lightbox?.loadAndOpen(0);
 };
+
+watch(count, () => {
+	calcAspectRatio();
+}, { flush: 'post' });
+
+watch(pswpFiles, () => {
+	if (lightbox?.pswp && lightbox.pswp.isOpen === true) {
+		lightbox.pswp.close();
+	}
+	lightbox?.destroy();
+	lightbox = buildLightbox();
+	lightbox?.init();
+}, { flush: 'post' });
 
 defineExpose({
 	openGallery,

@@ -73,7 +73,7 @@ const emit = defineEmits<{
 
 const zIndex = os.claimZIndex('middle');
 
-const showSensitiveAds = ref(!!prefer.s.showSensitiveAds);
+const showSensitiveAds = ref(true);
 const alwaysShowSensitiveAds = ref(!!prefer.s.alwaysShowSensitiveAds);
 
 const nsfw = prefer.model('nsfw');
@@ -162,7 +162,7 @@ function deny() {
 .headerIcon {
 	margin-right: 10px;
 	font-size: 40px;
-	color: var(--MI_THEME-accent);
+	color: var(--MI_THEME-warn);
 }
 
 .headerTitle {

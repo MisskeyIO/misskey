@@ -7,7 +7,7 @@
 
 // TODO: Misskeyのドメイン知識があるのでutilityなどに移動する
 
-import { onUnmounted, ref, watch } from 'vue';
+import { onUnmounted, ref, shallowRef, watch } from 'vue';
 import { BroadcastChannel } from 'broadcast-channel';
 import type { Ref } from 'vue';
 import { $i } from '@/i.js';
@@ -83,7 +83,7 @@ export class Pizzax<T extends StateDef> {
 
 		for (const [k, v] of Object.entries(def) as [keyof T, T[keyof T]['default']][]) {
 			this.s[k] = v.default;
-			this.r[k] = ref(v.default);
+			this.r[k] = shallowRef(v.default);
 		}
 
 		this.ready = this.init();
@@ -284,3 +284,4 @@ export class Pizzax<T extends StateDef> {
 		}
 	}
 }
+

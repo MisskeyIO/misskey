@@ -5,9 +5,9 @@
 
 // NIRAX --- A lightweight router
 
-import { onBeforeUnmount, shallowRef } from 'vue';
+import {computed, onBeforeUnmount, shallowRef} from 'vue';
 import { EventEmitter } from 'eventemitter3';
-import type { Component, ShallowRef } from 'vue';
+import type { Component, ShallowRef, Ref } from 'vue';
 
 function safeURIDecode(str: string): string {
 	try {
@@ -219,7 +219,7 @@ function parsePath(path: string): ParsedPath {
 export interface IRouter<DEF extends RouteDef[] = RouteDef[]> extends EventEmitter<RouterEvent> {
 	current: Resolved;
 	currentRef: ShallowRef<Resolved>;
-	currentRoute: ShallowRef<RouteDef>;
+	currentRoute: Ref<RouteDef>;
 	navHook: ((path: string, flag?: RouterFlag | null) => boolean) | null;
 	afterHooks: Array<AfterNavigationHook | null>;
 
@@ -317,7 +317,7 @@ export interface IRouter<DEF extends RouteDef[] = RouteDef[]> extends EventEmitt
 export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvent> implements IRouter<DEF> {
 	public current: Resolved;
 	public currentRef: ShallowRef<Resolved>;
-	public currentRoute: ShallowRef<RouteDef>;
+	public currentRoute: Ref<RouteDef>;
 	public navHook: ((path: string, flag?: any) => boolean) | null = null;
 	public afterHooks: Array<AfterNavigationHook | null> = [];
 	private routes: DEF;
@@ -333,7 +333,7 @@ export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvent> imp
 		this.routes = routes;
 		this.current = this.resolve(currentPath)!;
 		this.currentRef = shallowRef(this.current);
-		this.currentRoute = shallowRef(this.current.route);
+		this.currentRoute = computed(() => this.currentRef.value.route);
 		this.currentPath = currentPath;
 		this.isLoggedIn = isLoggedIn;
 		this.notFoundPageComponent = notFoundPageComponent;

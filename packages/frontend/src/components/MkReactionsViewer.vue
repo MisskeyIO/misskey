@@ -67,7 +67,7 @@ if (props.myReaction && !Object.keys(_reactions.value).includes(props.myReaction
 
 function shouldDisplayReaction([reaction]: [string, number]): boolean {
 	if (!$i) return true; // 非ログイン状態なら全部のリアクションを見れるように
-	if (reaction === props.note.myReaction) return true; // 自分がつけたリアクションなら表示する
+	if (reaction === props.myReaction) return true; // 自分がつけたリアクションなら表示する
 	if (!store.s.mutedReactions.includes(reaction.replace('@.', ''))) return true; // ローカルの絵文字には @. というsuffixがつくのでそれを消してから比較してあげる
 	return false;
 }

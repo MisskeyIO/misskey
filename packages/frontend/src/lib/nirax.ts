@@ -5,7 +5,7 @@
 
 // NIRAX --- A lightweight router
 
-import {computed, onBeforeUnmount, shallowRef} from 'vue';
+import { computed, onBeforeUnmount, shallowRef } from 'vue';
 import { EventEmitter } from 'eventemitter3';
 import type { Component, ShallowRef, Ref } from 'vue';
 

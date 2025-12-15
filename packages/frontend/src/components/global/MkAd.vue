@@ -85,7 +85,7 @@ const toggleMenu = (): void => {
 	showMenu.value = !showMenu.value;
 };
 
-const excludeSensitive = computed(() => !prefer.s.showSensitiveAds || sensitiveContentConsent.value === false);
+const excludeSensitive = computed(() => prefer.s.displayOfSensitiveAds === 'filtered' || sensitiveContentConsent.value === false);
 
 const choseAd = (): Ad | null => {
 	if (props.specify) {
@@ -147,7 +147,7 @@ const shouldHide = computed(() => {
 
 	const ad = chosen.value;
 	if (!ad?.isSensitive) return false;
-	if (!prefer.s.showSensitiveAds) return true;
+	if (prefer.s.displayOfSensitiveAds === 'filtered') return true;
 	return sensitiveContentConsent.value === false;
 });
 
@@ -165,7 +165,7 @@ function calcHideSensitive(): boolean {
 	const ad = chosen.value;
 	if (!ad?.isSensitive) return false;
 	if (sensitiveContentConsent.value !== true) return true;
-	return !prefer.s.alwaysShowSensitiveAds;
+	return prefer.s.displayOfSensitiveAds !== 'always';
 }
 
 const hideSensitive = ref(calcHideSensitive());
@@ -174,7 +174,7 @@ watch(chosen, () => {
 	hideSensitive.value = calcHideSensitive();
 }, { immediate: true });
 
-watch([() => prefer.s.alwaysShowSensitiveAds, () => prefer.s.showSensitiveAds, () => sensitiveContentConsent.value], () => {
+watch([() => prefer.s.displayOfSensitiveAds, () => sensitiveContentConsent.value], () => {
 	if (!hideSensitive.value) return;
 	hideSensitive.value = calcHideSensitive();
 });
@@ -213,8 +213,8 @@ async function showHiddenSensitiveAd(ev: MouseEvent) {
 	ev.preventDefault();
 	ev.stopPropagation();
 
-	// `showSensitiveAds` is the "master" switch; when off, don't allow revealing.
-	if (!prefer.s.showSensitiveAds) return;
+	// `displayOfSensitiveAds` is the "master" switch; when filtered, don't allow revealing.
+	if (prefer.s.displayOfSensitiveAds === 'filtered') return;
 
 	if (sensitiveContentConsent.value !== true) {
 		const allowed = await requestSensitiveContentConsent('ad');

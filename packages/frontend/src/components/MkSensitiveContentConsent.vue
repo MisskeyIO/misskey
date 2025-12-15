@@ -12,16 +12,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 	@closed="emit('closed')"
 >
 	<div class="_panel _shadow" :class="$style.root">
-		<div :class="$style.main">
+		<div :class="$style.main" class="_gaps_s">
 			<div style="display: flex; align-items: center;">
 				<div :class="$style.headerIcon">
 					<i class="ti ti-rating-18-plus"></i>
 				</div>
 				<div :class="$style.headerTitle">{{ i18n.ts.sensitiveContentConsentTitle }}</div>
 			</div>
-			<div :class="$style.text">
-				{{ i18n.ts.sensitiveContentConsentAreYouOver18 }}
-			</div>
+			<Mfm :class="$style.text" :text="i18n.ts.sensitiveContentConsentAreYouOver18" />
 			<div class="_gaps_s">
 				<div class="_buttons" style="justify-content: right;">
 					<MkButton @click="deny">{{ i18n.ts.no }}</MkButton>
@@ -43,13 +41,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkSwitch v-model="highlightSensitiveMedia">
 							{{ i18n.ts.highlightSensitiveMedia }}
 						</MkSwitch>
-						<MkSwitch v-model="showSensitiveAds">
-							{{ i18n.ts.showSensitiveAds }}
-							<template #caption>{{ i18n.ts.showSensitiveAdsDescription }}</template>
-						</MkSwitch>
-						<MkSwitch v-model="alwaysShowSensitiveAds" :disabled="!showSensitiveAds">
-							{{ i18n.ts.alwaysShowSensitiveAds }}
-						</MkSwitch>
+						<MkSelect v-model="displayOfSensitiveAds">
+							<template #label>{{ i18n.ts.displayOfSensitiveAds }}</template>
+							<option value="hidden">{{ i18n.ts._displayOfSensitiveAds.hidden }}</option>
+							<option value="always">{{ i18n.ts._displayOfSensitiveAds.always }}</option>
+							<option value="filtered">{{ i18n.ts._displayOfSensitiveAds.filtered }}</option>
+						</MkSelect>
 					</div>
 				</MkFolder>
 			</div>
@@ -59,7 +56,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, useTemplateRef, watch } from 'vue';
+import { ref, useTemplateRef } from 'vue';
 import MkButton from '@/components/MkButton.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import MkModal from '@/components/MkModal.vue';
@@ -81,44 +78,20 @@ const emit = defineEmits<{
 
 const modal = useTemplateRef('modal');
 
-const showSensitiveAds = ref(true);
-const alwaysShowSensitiveAds = ref(!!prefer.s.alwaysShowSensitiveAds);
+const displayOfSensitiveAds = ref(prefer.s.displayOfSensitiveAds);
 
 const nsfw = prefer.model('nsfw');
 const confirmWhenRevealingSensitiveMedia = prefer.model('confirmWhenRevealingSensitiveMedia');
 const highlightSensitiveMedia = prefer.model('highlightSensitiveMedia');
 
-watch(showSensitiveAds, (v) => {
-	if (!v) {
-		alwaysShowSensitiveAds.value = false;
-	}
-});
-
-watch(alwaysShowSensitiveAds, (v) => {
-	if (v) {
-		showSensitiveAds.value = true;
-	}
-});
-
-function commitAdPrefs() {
-	prefer.commit('showSensitiveAds', !!showSensitiveAds.value);
-	prefer.commit('alwaysShowSensitiveAds', !!alwaysShowSensitiveAds.value);
-}
-
 function accept() {
 	setSensitiveContentConsent(true);
-	commitAdPrefs();
+	prefer.commit('displayOfSensitiveAds', displayOfSensitiveAds.value);
 	usageReport({
 		t: Math.floor(Date.now() / 1000),
 		e: 'p',
-		i: 'showSensitiveAds',
-		a: showSensitiveAds.value ? '1' : '0',
-	});
-	usageReport({
-		t: Math.floor(Date.now() / 1000),
-		e: 'p',
-		i: 'alwaysShowSensitiveAds',
-		a: alwaysShowSensitiveAds.value ? '1' : '0',
+		i: 'displayOfSensitiveAds',
+		a: displayOfSensitiveAds.value,
 	});
 
 	emit('decided', true);
@@ -127,19 +100,12 @@ function accept() {
 
 function deny() {
 	setSensitiveContentConsent(false);
-	prefer.commit('showSensitiveAds', false);
-	prefer.commit('alwaysShowSensitiveAds', false);
+	prefer.commit('displayOfSensitiveAds', 'filtered');
 	usageReport({
 		t: Math.floor(Date.now() / 1000),
 		e: 'p',
-		i: 'showSensitiveAds',
-		a: '0',
-	});
-	usageReport({
-		t: Math.floor(Date.now() / 1000),
-		e: 'p',
-		i: 'alwaysShowSensitiveAds',
-		a: '0',
+		i: 'displayOfSensitiveAds',
+		a: 'filtered',
 	});
 
 	emit('decided', false);
@@ -153,7 +119,6 @@ function deny() {
 	box-sizing: border-box;
 	width: 100%;
 	max-width: 560px;
-	height: 100%;
 	max-height: 600px;
 	overflow: auto;
 }

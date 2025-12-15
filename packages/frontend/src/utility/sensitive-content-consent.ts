@@ -25,19 +25,26 @@ export function setSensitiveContentConsent(value: boolean): void {
 	sensitiveContentConsent.value = value;
 }
 
+async function openSensitiveContentConsent(trigger: SensitiveContentConsentTrigger): Promise<boolean> {
+	return await new Promise<boolean>(async (resolve) => {
+		await os.popup(defineAsyncComponent(() => import('@/components/MkSensitiveContentConsent.vue')), {
+			trigger,
+		}, {
+			decided: (allowed: boolean) => {
+				sensitiveContentConsent.value = getSensitiveContentConsent();
+				resolve(allowed);
+			},
+		}, 'closed');
+	});
+}
+
 export async function requestSensitiveContentConsent(trigger: SensitiveContentConsentTrigger): Promise<boolean> {
 	const existing = getSensitiveContentConsent();
 	if (existing !== null) return existing;
 
-	return await new Promise<boolean>(async (resolve) => {
-		const { dispose } = await os.popup(defineAsyncComponent(() => import('@/components/MkSensitiveContentConsent.vue')), {
-			trigger,
-		}, {
-			decided: (allowed: boolean) => {
-				dispose();
-				sensitiveContentConsent.value = getSensitiveContentConsent();
-				resolve(allowed);
-			},
-		});
-	});
+	return await openSensitiveContentConsent(trigger);
+}
+
+export async function configureSensitiveContentConsent(trigger: SensitiveContentConsentTrigger = 'media'): Promise<boolean> {
+	return await openSensitiveContentConsent(trigger);
 }

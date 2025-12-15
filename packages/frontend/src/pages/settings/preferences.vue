@@ -112,6 +112,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</div>
 							</MkPreferenceContainer>
 						</SearchMarker>
+
+						<SearchMarker :keywords="['adult', 'sensitive', 'nsfw', '18', 'consent']">
+							<MkFolder>
+								<template #icon><i class="ti ti-rating-18-plus"></i></template>
+								<template #label><SearchLabel>{{ i18n.ts.sensitiveContentConsentTitle }}</SearchLabel></template>
+								<template #caption><SearchKeyword>{{ sensitiveContentConsentStatus }}</SearchKeyword></template>
+								<div class="_buttons">
+									<MkButton @click="configureSensitiveContentConsentFromSettings">{{ i18n.ts.configure }}</MkButton>
+								</div>
+							</MkFolder>
+						</SearchMarker>
 					</div>
 				</MkFolder>
 			</SearchMarker>
@@ -707,7 +718,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<MkPreferenceContainer k="alwaysShowSensitiveAds">
 								<MkSwitch v-model="alwaysShowSensitiveAds" :disabled="!showSensitiveAds">
 									<template #label><SearchLabel>{{ i18n.ts.alwaysShowSensitiveAds }}</SearchLabel></template>
-									<template #caption>{{ i18n.ts.alwaysShowSensitiveAdsDescription }}</template>
 								</MkSwitch>
 							</MkPreferenceContainer>
 						</SearchMarker>
@@ -779,6 +789,7 @@ import { globalEvents } from '@/events.js';
 import { claimAchievement } from '@/utility/achievements.js';
 import { instance } from '@/instance.js';
 import { ensureSignin } from '@/i.js';
+import { configureSensitiveContentConsent, sensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 
 const $i = ensureSignin();
 
@@ -845,6 +856,8 @@ const contextMenu = prefer.model('contextMenu');
 const menuStyle = prefer.model('menuStyle');
 const makeEveryTextElementsSelectable = prefer.model('makeEveryTextElementsSelectable');
 
+const sensitiveContentConsentStatus = computed(() => sensitiveContentConsent.value === null ? i18n.ts.notSet : sensitiveContentConsent.value ? i18n.ts.yes : i18n.ts.no);
+
 const fontSize = ref(miLocalStorage.getItem('fontSize'));
 const useSystemFont = ref(miLocalStorage.getItem('useSystemFont') != null);
 
@@ -869,6 +882,10 @@ watch(useSystemFont, () => {
 		miLocalStorage.removeItem('useSystemFont');
 	}
 });
+
+async function configureSensitiveContentConsentFromSettings() {
+	await configureSensitiveContentConsent('media');
+}
 
 watch([
 	hemisphere,

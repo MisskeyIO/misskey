@@ -49,7 +49,7 @@ catalog:
   '@opentelemetry/sdk-node': ^0.208.0
   '@opentelemetry/semantic-conventions': ^1.38.0
   '@peertube/http-signature': 1.7.0
-  '@readme/openapi-parser': 5.2.1
+  '@readme/openapi-parser': 5.3.1
   '@rollup/plugin-json': 6.1.0
   '@rollup/plugin-replace': 6.0.3
   '@rollup/plugin-typescript': 12.3.0

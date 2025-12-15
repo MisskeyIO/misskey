@@ -73,7 +73,7 @@ catalog:
   '@swc/core-linux-arm64-musl': 1.15.3
   '@swc/core-linux-x64-gnu': 1.15.3
   '@swc/core-linux-x64-musl': 1.15.3
-  '@swc/core-win32-arm64-msvc': 1.15.3
+  '@swc/core-win32-arm64-msvc': 1.15.4
   '@swc/core-win32-ia32-msvc': 1.15.3
   '@swc/core-win32-x64-msvc': 1.15.3
   '@swc/jest': 0.2.39

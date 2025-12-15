@@ -193,8 +193,8 @@ catalogs:
       specifier: 1.15.3
       version: 1.15.3
     '@swc/core-win32-arm64-msvc':
-      specifier: 1.15.3
-      version: 1.15.3
+      specifier: 1.15.4
+      version: 1.15.4
     '@swc/core-win32-ia32-msvc':
       specifier: 1.15.3
       version: 1.15.3
@@ -1706,7 +1706,7 @@ importers:
         version: 1.15.3
       '@swc/core-win32-arm64-msvc':
         specifier: 'catalog:'
-        version: 1.15.3
+        version: 1.15.4
       '@swc/core-win32-ia32-msvc':
         specifier: 'catalog:'
         version: 1.15.3
@@ -5833,6 +5833,12 @@ packages:
 
   '@swc/core-win32-arm64-msvc@1.15.3':
     resolution: {integrity: sha512-L9AjzP2ZQ/Xh58e0lTRMLvEDrcJpR7GwZqAtIeNLcTK7JVE+QineSyHp0kLkO1rttCHyCy0U74kDTj0dRz6raA==}
+    engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [win32]
+
+  '@swc/core-win32-arm64-msvc@1.15.4':
+    resolution: {integrity: sha512-VcPuUJw27YbGo1HcOaAriI50dpM3ZZeDW3x2cMnJW6vtkeyzUFk1TADmTwFax0Fn+yicCxhaWjnFE3eAzGAxIQ==}
     engines: {node: '>=10'}
     cpu: [arm64]
     os: [win32]
@@ -16978,6 +16984,9 @@ snapshots:
     optional: true
 
   '@swc/core-win32-arm64-msvc@1.15.3':
+    optional: true
+
+  '@swc/core-win32-arm64-msvc@1.15.4':
     optional: true
 
   '@swc/core-win32-ia32-msvc@1.15.3':

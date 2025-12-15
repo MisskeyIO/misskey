@@ -63,7 +63,7 @@ catalog:
   '@smithy/node-http-handler': 4.4.5
   '@storybook/addon-links': 10.1.7
   '@storybook/react-vite': 10.1.7
-  '@storybook/vue3-vite': 10.1.7
+  '@storybook/vue3-vite': 10.1.8
   '@swc/cli': 0.7.9
   '@swc/core': 1.15.3
   '@swc/core-darwin-arm64': 1.15.3

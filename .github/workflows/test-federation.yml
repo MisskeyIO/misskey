@@ -41,7 +41,7 @@ jobs:
           run_install: false
 
       - name: Restore FFmpeg binary cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: /opt/hostedtoolcache/ffmpeg
           key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-latest
@@ -54,7 +54,7 @@ jobs:
           ffmpeg-version: 7.0.2
       - name: Save FFmpeg binary cache
         if: steps.setup-ffmpeg.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: /opt/hostedtoolcache/ffmpeg
           key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ steps.setup-ffmpeg.outputs.ffmpeg-version }}

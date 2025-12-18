@@ -12,7 +12,7 @@ import packageInfo from './package.json' with { type: 'json' };
 import pluginJson5 from './vite.json5.js';
 import pluginCreateSearchIndex from './lib/vite-plugin-create-search-index.js';
 import type { Options as SearchIndexOptions } from './lib/vite-plugin-create-search-index.js';
-import {Features} from "lightningcss";
+import { Features } from "lightningcss";
 
 const url = process.env.NODE_ENV === 'development' ? yaml.load(await fsp.readFile('../../.config/default.yml', 'utf-8')).url : null;
 const host = url ? (new URL(url)).hostname : undefined;

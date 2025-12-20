@@ -214,6 +214,9 @@ export const PREF_DEF = {
 	showFixedPostFormInChannel: {
 		default: false,
 	},
+	autoloadDrafts: {
+		default: true,
+	},
 	enableInfiniteScroll: {
 		default: true,
 	},

@@ -91,6 +91,7 @@ export function migrateOldSettings() {
 		prefer.commit('useBlurEffect', store.s.useBlurEffect);
 		prefer.commit('showFixedPostForm', store.s.showFixedPostForm);
 		prefer.commit('showFixedPostFormInChannel', store.s.showFixedPostFormInChannel);
+		prefer.commit('autoloadDrafts', store.s.autoloadDrafts);
 		prefer.commit('enableInfiniteScroll', store.s.enableInfiniteScroll);
 		prefer.commit('useReactionPickerForContextMenu', store.s.useReactionPickerForContextMenu);
 		prefer.commit('showGapBetweenNotesInTimeline', store.s.showGapBetweenNotesInTimeline);

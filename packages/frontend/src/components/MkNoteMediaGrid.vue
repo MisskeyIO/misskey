@@ -73,7 +73,7 @@ async function showHiddenContent(file: Misskey.entities.DriveFile) {
 		return;
 	}
 
-	if (file.isSensitive) {
+	if (file.isSensitive && sensitiveContentConsent.value !== true) {
 		const allowed = await requestSensitiveContentConsent();
 		if (!allowed) return;
 	}

@@ -314,7 +314,7 @@ async function showHiddenContent(ev: MouseEvent) {
 		return;
 	}
 
-	if (props.video.isSensitive) {
+	if (props.video.isSensitive && sensitiveContentConsent.value !== true) {
 		const allowed = await requestSensitiveContentConsent();
 		if (!allowed) return;
 	}

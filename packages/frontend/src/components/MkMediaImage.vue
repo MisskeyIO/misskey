@@ -194,7 +194,7 @@ async function showHiddenContent(ev: MouseEvent) {
 		return;
 	}
 
-	if (props.image.isSensitive) {
+	if (props.image.isSensitive && sensitiveContentConsent.value !== true) {
 		const allowed = await requestSensitiveContentConsent();
 		if (!allowed) return;
 	}

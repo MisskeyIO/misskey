@@ -60,7 +60,7 @@ async function showHiddenContent(ev: MouseEvent) {
 		return;
 	}
 
-	if (props.media.isSensitive) {
+	if (props.media.isSensitive && sensitiveContentConsent.value !== true) {
 		const allowed = await requestSensitiveContentConsent();
 		if (!allowed) return;
 	}

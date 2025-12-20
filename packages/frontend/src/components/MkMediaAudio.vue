@@ -278,7 +278,7 @@ async function showHiddenContent(ev: MouseEvent) {
 		return;
 	}
 
-	if (props.audio.isSensitive) {
+	if (props.audio.isSensitive && sensitiveContentConsent.value !== true) {
 		const allowed = await requestSensitiveContentConsent();
 		if (!allowed) return;
 	}

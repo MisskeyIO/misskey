@@ -1220,7 +1220,7 @@ onMounted(() => {
 
 	nextTick(() => {
 		// 書きかけの投稿を復元
-		if (!props.instant && !props.mention && !props.specified && !props.mock && store.s.autoloadDrafts) {
+		if (!props.instant && !props.mention && !props.specified && !props.mock && prefer.s.autoloadDrafts) {
 			loadDraft();
 		}
 

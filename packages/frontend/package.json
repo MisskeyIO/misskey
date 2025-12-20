@@ -28,7 +28,6 @@
     "@simplewebauthn/browser": "catalog:",
     "@syuilo/aiscript": "catalog:",
     "@syuilo/aiscript-v0": "catalog:",
-    "@tabler/icons-webfont": "catalog:",
     "@twemoji/parser": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
     "@vue/compiler-core": "catalog:",

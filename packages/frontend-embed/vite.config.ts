@@ -89,7 +89,7 @@ export function getConfig(): UserConfig {
 				'@/': __dirname + '/src/',
 				'@@/': __dirname + '/../frontend-shared/',
 				'/client-assets/': __dirname + '/assets/',
-				'/static-assets/': __dirname + '/../backend/assets/'
+				'/static-assets/': __dirname + '/../backend/assets/',
 			},
 		},
 

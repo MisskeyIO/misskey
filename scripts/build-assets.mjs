@@ -21,7 +21,7 @@ async function copyFrontendFonts() {
 }
 
 async function copyFrontendTablerIcons() {
-  await fs.cp('./packages/frontend/node_modules/@tabler/icons-webfont', `./built/_frontend_dist_/tabler-icons.${meta.version}`, { dereference: true, recursive: true });
+  await fs.cp('./packages/frontend-shared/node_modules/@tabler/icons-webfont', `./built/_frontend_dist_/tabler-icons.${meta.version}`, { dereference: true, recursive: true });
   for (const file of [
     `./built/_frontend_dist_/tabler-icons.${meta.version}/dist/tabler-icons-filled.scss`,
     `./built/_frontend_dist_/tabler-icons.${meta.version}/dist/tabler-icons-filled.css`,

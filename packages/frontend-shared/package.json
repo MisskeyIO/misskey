@@ -34,6 +34,7 @@
     "js-built"
   ],
   "dependencies": {
+    "@tabler/icons-webfont": "catalog:",
     "misskey-js": "workspace:*",
     "vue": "catalog:"
   }

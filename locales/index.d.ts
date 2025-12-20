@@ -527,6 +527,60 @@ export interface Locale extends ILocale {
      */
     "sensitive": string;
     /**
+     * 成人向けの可能性があるコンテンツ
+     */
+    "sensitiveContentConsentTitle": string;
+    /**
+     * このコンテンツは成人向けのコンテンツである可能性があります。
+     *
+     * <center>$[x2 あなたは18歳以上ですか？]</center>
+     */
+    "sensitiveContentConsentAreYouOver18": string;
+    /**
+     * 表示するコンテンツ設定
+     */
+    "displayedContentSettings": string;
+    /**
+     * 成人向けの可能性があるコンテンツ
+     */
+    "displayOfSensitiveContentConsent": string;
+    "_displayOfSensitiveContentConsent": {
+        /**
+         * 表示する
+         */
+        "show": string;
+        /**
+         * 隠す
+         */
+        "hide": string;
+        /**
+         * 未設定
+         */
+        "notSet": string;
+    };
+    /**
+     * 成人向けの広告の表示
+     */
+    "displayOfSensitiveAds": string;
+    "_displayOfSensitiveAds": {
+        /**
+         * 隠す（クリックで表示）
+         */
+        "hidden": string;
+        /**
+         * 常に表示する
+         */
+        "always": string;
+        /**
+         * 表示しない
+         */
+        "filtered": string;
+    };
+    /**
+     * 成人向けの広告
+     */
+    "sensitiveAd": string;
+    /**
      * 追加
      */
     "add": string;

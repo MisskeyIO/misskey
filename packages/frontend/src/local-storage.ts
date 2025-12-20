@@ -44,7 +44,8 @@ export type Keys = (
 	`idbfallback::${string}` |
 	'kawaii' |
 	'gaConsent' |
-	'gtagConsent'
+	'gtagConsent' |
+	'sensitiveContentConsent'
 );
 
 // セッション毎に廃棄されるLocalStorage代替（セーフモードなどで使用できそう）

@@ -112,6 +112,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</div>
 							</MkPreferenceContainer>
 						</SearchMarker>
+
+						<SearchMarker :keywords="['adult', 'sensitive', 'nsfw', '18', 'consent']">
+							<MkFolder>
+								<template #icon><i class="ti ti-rating-18-plus"></i></template>
+								<template #label><SearchLabel>{{ i18n.ts.displayOfSensitiveContentConsent }}</SearchLabel></template>
+								<template #suffix>{{ i18n.ts._displayOfSensitiveContentConsent[sensitiveContentConsentSetting] }}</template>
+
+								<div class="_buttons">
+									<MkButton full @click="configureSensitiveContentConsentFromSettings">{{ i18n.ts.configure }}</MkButton>
+								</div>
+							</MkFolder>
+						</SearchMarker>
 					</div>
 				</MkFolder>
 			</SearchMarker>
@@ -702,6 +714,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</MkPreferenceContainer>
 						</SearchMarker>
 
+						<SearchMarker :keywords="['ad', 'adult', 'sensitive', 'nsfw', '18']">
+							<MkPreferenceContainer k="displayOfSensitiveAds">
+								<MkSelect v-model="displayOfSensitiveAds">
+									<template #label><SearchLabel>{{ i18n.ts.displayOfSensitiveAds }}</SearchLabel></template>
+									<option value="hidden">{{ i18n.ts._displayOfSensitiveAds.hidden }}</option>
+									<option value="always">{{ i18n.ts._displayOfSensitiveAds.always }}</option>
+									<option value="filtered">{{ i18n.ts._displayOfSensitiveAds.filtered }}</option>
+								</MkSelect>
+							</MkPreferenceContainer>
+						</SearchMarker>
+
 						<SearchMarker>
 							<MkPreferenceContainer k="hemisphere">
 								<MkRadios v-model="hemisphere">
@@ -762,12 +785,14 @@ import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { prefer } from '@/preferences.js';
+import { usageReport } from '@/utility/usage-report.js';
 import MkPreferenceContainer from '@/components/MkPreferenceContainer.vue';
 import MkFeatureBanner from '@/components/MkFeatureBanner.vue';
 import { globalEvents } from '@/events.js';
 import { claimAchievement } from '@/utility/achievements.js';
 import { instance } from '@/instance.js';
 import { ensureSignin } from '@/i.js';
+import { configureSensitiveContentConsent, sensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 
 const $i = ensureSignin();
 
@@ -788,6 +813,7 @@ const showRenotesCount = prefer.model('showRenotesCount');
 const showReactionsCount = prefer.model('showReactionsCount');
 const enableQuickAddMfmFunction = prefer.model('enableQuickAddMfmFunction');
 const forceShowAds = prefer.model('forceShowAds');
+const displayOfSensitiveAds = prefer.model('displayOfSensitiveAds');
 const loadRawImages = prefer.model('loadRawImages');
 const imageNewTab = prefer.model('imageNewTab');
 const showFixedPostForm = prefer.model('showFixedPostForm');
@@ -833,6 +859,9 @@ const contextMenu = prefer.model('contextMenu');
 const menuStyle = prefer.model('menuStyle');
 const makeEveryTextElementsSelectable = prefer.model('makeEveryTextElementsSelectable');
 
+type SensitiveContentConsentSetting = 'show' | 'hide' | 'notSet';
+const sensitiveContentConsentSetting = computed<SensitiveContentConsentSetting>(() => sensitiveContentConsent.value === null ? 'notSet' : sensitiveContentConsent.value ? 'show' : 'hide');
+
 const fontSize = ref(miLocalStorage.getItem('fontSize'));
 const useSystemFont = ref(miLocalStorage.getItem('useSystemFont') != null);
 
@@ -857,6 +886,10 @@ watch(useSystemFont, () => {
 		miLocalStorage.removeItem('useSystemFont');
 	}
 });
+
+async function configureSensitiveContentConsentFromSettings() {
+	await configureSensitiveContentConsent();
+}
 
 watch([
 	hemisphere,
@@ -887,6 +920,15 @@ watch([
 	makeEveryTextElementsSelectable,
 ], async () => {
 	await reloadAsk({ reason: i18n.ts.reloadToApplySetting, unison: true });
+});
+
+watch(displayOfSensitiveAds, (to) => {
+	usageReport({
+		t: Math.floor(Date.now() / 1000),
+		e: 'p',
+		i: 'displayOfSensitiveAds',
+		a: to,
+	});
 });
 
 const emojiIndexLangs = ['en-US', 'ja-JP', 'ja-JP_hira'] as const;

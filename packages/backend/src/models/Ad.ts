@@ -58,6 +58,16 @@ export class MiAd {
 	public imageUrl: string;
 
 	@Column('varchar', {
+		length: 128, nullable: true,
+	})
+	public imageBlurhash: string | null;
+
+	@Column('boolean', {
+		default: false, nullable: false,
+	})
+	public isSensitive: boolean;
+
+	@Column('varchar', {
 		length: 8192, nullable: false,
 	})
 	public memo: string;

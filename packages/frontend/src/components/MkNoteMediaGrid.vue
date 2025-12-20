@@ -46,6 +46,9 @@ import { i18n } from '@/i18n.js';
 import { prefer } from '@/preferences.js';
 import bytes from '@/filters/bytes.js';
 import { requestSensitiveContentConsent, sensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
+import { pleaseLogin } from '@/utility/please-login.js';
+import * as os from '@/os.js';
+import { $i } from '@/i.js';
 
 import MkDriveFileThumbnail from '@/components/MkDriveFileThumbnail.vue';
 
@@ -66,10 +69,24 @@ const shouldHide = (file: Misskey.entities.DriveFile): boolean => {
 };
 
 async function showHiddenContent(file: Misskey.entities.DriveFile) {
-	if (file.isSensitive && sensitiveContentConsent.value !== true) {
+	if (file.isSensitive && !$i) {
+		await pleaseLogin();
+		return;
+	}
+
+	if (file.isSensitive) {
 		const allowed = await requestSensitiveContentConsent();
 		if (!allowed) return;
 	}
+
+	if (file.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
+		const { canceled } = await os.confirm({
+			type: 'question',
+			text: i18n.ts.sensitiveMediaRevealConfirm,
+		});
+		if (canceled) return;
+	}
+
 	showingFiles.value.add(file.id);
 }
 </script>

@@ -172,7 +172,7 @@ const hideSensitive = ref(calcHideSensitive());
 
 watch(chosen, () => {
 	hideSensitive.value = calcHideSensitive();
-}, { immediate: true });
+});
 
 watch([() => prefer.s.displayOfSensitiveAds, () => sensitiveContentConsent.value], () => {
 	hideSensitive.value = calcHideSensitive();

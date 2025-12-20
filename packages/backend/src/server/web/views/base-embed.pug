@@ -19,6 +19,8 @@ html(class='embed')
 		meta(name='format-detection' content='telephone=no,date=no,address=no,email=no,url=no')
 		link(rel='icon' href= icon || '/favicon.ico')
 		link(rel='apple-touch-icon' href= appleTouchIcon || '/apple-touch-icon.png')
+		link(rel='stylesheet' href=`/assets/tabler-icons.${version}/dist/tabler-icons-outline.min.css`)
+		link(rel='stylesheet' href=`/assets/tabler-icons.${version}/dist/tabler-icons-filled.min.css`)
 		link(rel='modulepreload' href=`/embed_vite/${entry.file}`)
 
 		if !config.frontendEmbedManifestExists

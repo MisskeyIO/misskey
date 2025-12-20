@@ -14,7 +14,6 @@
     "@rollup/plugin-json": "catalog:",
     "@rollup/plugin-replace": "catalog:",
     "@rollup/pluginutils": "catalog:",
-    "@tabler/icons-webfont": "catalog:",
     "@twemoji/parser": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
     "@vue/compiler-sfc": "catalog:",

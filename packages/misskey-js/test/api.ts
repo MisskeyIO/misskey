@@ -189,7 +189,7 @@ describe('API', () => {
 			});
 
 			await cli.request('i', {}, null);
-		} catch (e: Error) {
+		} catch (e) {
 			expect(isAPIError(e)).toEqual(true);
 		}
 	});
@@ -217,7 +217,7 @@ describe('API', () => {
 			});
 
 			await cli.request('i');
-		} catch (e: Error) {
+		} catch (e) {
 			expect(isAPIError(e)).toEqual(true);
 			expect(e.id).toEqual('5d37dbcb-891e-41ca-a3d6-e690c97775ac');
 		}
@@ -234,7 +234,7 @@ describe('API', () => {
 			});
 
 			await cli.request('i');
-		} catch (e: Error) {
+		} catch (e) {
 			expect(isAPIError(e)).toEqual(false);
 		}
 	});
@@ -255,7 +255,7 @@ describe('API', () => {
 			});
 
 			await cli.request('i');
-		} catch (e: Error) {
+		} catch (e) {
 			expect(isAPIError(e)).toEqual(false);
 		}
 	});

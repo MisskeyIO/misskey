@@ -6,8 +6,8 @@
     "watch": "vite",
     "build": "vite build",
     "typecheck": "vue-tsc --noEmit",
-    "eslint": "eslint --quiet \"src/**/*.{ts,vue}\"",
-    "lint": "pnpm typecheck && pnpm eslint"
+    "format": "biome check --write",
+    "lint": "pnpm typecheck && biome check"
   },
   "dependencies": {
     "@discordapp/twemoji": "catalog:",
@@ -38,6 +38,7 @@
     "vue": "catalog:"
   },
   "devDependencies": {
+    "@biomejs/biome": "catalog:",
     "@misskey-dev/summaly": "catalog:",
     "@testing-library/vue": "catalog:",
     "@types/estree": "catalog:",
@@ -46,25 +47,19 @@
     "@types/punycode.js": "catalog:",
     "@types/tinycolor2": "catalog:",
     "@types/ws": "catalog:",
-    "@typescript-eslint/eslint-plugin": "catalog:",
-    "@typescript-eslint/parser": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "@vue/runtime-core": "catalog:",
     "acorn": "catalog:",
     "cross-env": "catalog:",
-    "eslint-plugin-import": "catalog:",
-    "eslint-plugin-vue": "catalog:",
     "fast-glob": "catalog:",
     "jsdom": "catalog:",
     "lightningcss": "catalog:",
     "micromatch": "catalog:",
     "msw": "catalog:",
     "nodemon": "catalog:",
-    "prettier": "catalog:",
     "start-server-and-test": "catalog:",
     "vite-plugin-turbosnap": "catalog:",
     "vue-component-type-helpers": "catalog:",
-    "vue-eslint-parser": "catalog:",
     "vue-tsc": "catalog:"
   }
 }

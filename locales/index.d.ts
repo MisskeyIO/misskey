@@ -5500,7 +5500,6 @@ export interface Locale extends ILocale {
     "willBePostedAt": ParameterizedString<"x">;
     /**
      * 管理者によって、ドライブのファイルがセンシティブとして設定されました。
-     * 詳細については、[NSFWガイドライン](https://go.misskey.io/media-guideline)を確認してください。
      */
     "sensitiveByModerator": string;
     /**
@@ -10048,12 +10047,11 @@ export interface Locale extends ILocale {
             "f": string;
         };
         /**
-         * 現在の支援プランで予約できる日数の上限は{max}日です。
-         * [ここ](https://go.misskey.io/donate)からプランをアップグレードできます。
+         * 予約できる日数の上限は{max}日です。
          */
         "policyScheduleNoteMaxDaysExceeded": ParameterizedString<"max">;
         /**
-         * 投稿する前に、[利用規約]({tosUrl})と[NSFWガイドライン](https://go.misskey.io/media-guideline)を必ずお読みください。
+         * 投稿する前に、[利用規約]({tosUrl})を必ずお読みください。
          */
         "tosAndGuidelinesInfo": ParameterizedString<"tosUrl">;
     };
@@ -10151,8 +10149,7 @@ export interface Locale extends ILocale {
          */
         "sectionNameNone": string;
         /**
-         * 現在の支援プランの表示上限({max}個)を超えているため、この項目は表示されません。
-         * [ここ](https://go.misskey.io/donate)からプランをアップグレードできます。
+         * 表示上限({max}個)を超えているため、この項目は表示されません。
          */
         "policyDisplayLimitExceeded": ParameterizedString<"max">;
         /**

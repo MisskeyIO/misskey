@@ -63,10 +63,12 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				dayOfWeek: ad.dayOfWeek,
 				url: ad.url,
 				imageUrl: ad.imageUrl,
+				imageBlurhash: ad.imageBlurhash,
 				memo: ad.memo,
 				place: ad.place,
 				priority: ad.priority,
 				ratio: ad.ratio,
+				isSensitive: ad.isSensitive,
 			}));
 		});
 	}

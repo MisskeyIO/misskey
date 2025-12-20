@@ -9718,8 +9718,10 @@ export type components = {
             ratio: number;
             url: string;
             imageUrl: string;
+            imageBlurhash: string | null;
             memo: string;
             dayOfWeek: number;
+            isSensitive: boolean;
         };
         Announcement: {
             /**
@@ -10869,7 +10871,9 @@ export type components = {
                 ratio: number;
                 /** Format: url */
                 imageUrl: string;
+                imageBlurhash: string | null;
                 dayOfWeek: number;
+                isSensitive: boolean;
             }[];
             wellKnownWebsites: string[];
             /** @default 0 */
@@ -12313,6 +12317,8 @@ export interface operations {
                     startsAt: number;
                     imageUrl: string;
                     dayOfWeek: number;
+                    /** @default false */
+                    isSensitive?: boolean;
                 };
             };
         };
@@ -12542,6 +12548,7 @@ export interface operations {
                     expiresAt?: number;
                     startsAt?: number;
                     dayOfWeek?: number;
+                    isSensitive?: boolean;
                 };
             };
         };

@@ -64,7 +64,7 @@ import * as os from '@/os.js';
 
 const emit = defineEmits<(ev: 'closed') => void>();
 
-const zIndex = os.claimZIndex('middle');
+const zIndex = os.claimZIndex('high');
 
 const gtagConsentAnalytics = ref(false);
 const gtagConsentFunctionality = ref(false);

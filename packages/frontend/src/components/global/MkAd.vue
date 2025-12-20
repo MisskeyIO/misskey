@@ -175,7 +175,6 @@ watch(chosen, () => {
 }, { immediate: true });
 
 watch([() => prefer.s.displayOfSensitiveAds, () => sensitiveContentConsent.value], () => {
-	if (!hideSensitive.value) return;
 	hideSensitive.value = calcHideSensitive();
 });
 

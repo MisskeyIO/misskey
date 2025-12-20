@@ -196,7 +196,7 @@ function submit() {
 		t: Math.floor(Date.now() / 1000),
 		e: 'p',
 		i: 'displayOfSensitiveAds',
-		a: effectiveDisplayOfSensitiveAds.value,
+		a: draftDisplayOfSensitiveAds.value,
 	});
 
 	emit('decided', iAmAdult.value);
@@ -410,10 +410,5 @@ function submit() {
 .ageCheckbox:checked + .toggle .handlerIconOver {
 	opacity: 1;
 	transform: scale(1);
-}
-
-.nextButtonRow {
-	justify-content: stretch;
-	width: 100%;
 }
 </style>

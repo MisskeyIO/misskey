@@ -181,22 +181,22 @@ const decoIcons = computed(() => {
 
 function submit() {
 	setSensitiveContentConsent(iAmAdult.value);
+	const effectiveDisplayOfSensitiveAds = iAmAdult.value ? draftDisplayOfSensitiveAds.value : 'filtered';
 
 	if (iAmAdult.value) {
 		prefer.commit('nsfw', draftNsfw.value);
 		prefer.commit('confirmWhenRevealingSensitiveMedia', draftConfirmWhenRevealingSensitiveMedia.value);
 		prefer.commit('highlightSensitiveMedia', draftHighlightSensitiveMedia.value);
-		prefer.commit('displayOfSensitiveAds', draftDisplayOfSensitiveAds.value);
 	} else {
 		prefer.commit('nsfw', 'force');
-		prefer.commit('displayOfSensitiveAds', 'filtered');
 	}
+	prefer.commit('displayOfSensitiveAds', effectiveDisplayOfSensitiveAds);
 
 	usageReport({
 		t: Math.floor(Date.now() / 1000),
 		e: 'p',
 		i: 'displayOfSensitiveAds',
-		a: draftDisplayOfSensitiveAds.value,
+		a: effectiveDisplayOfSensitiveAds,
 	});
 
 	emit('decided', iAmAdult.value);

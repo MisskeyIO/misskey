@@ -14,7 +14,7 @@
 				</div>
 				<div :class="$style.headerTitle">{{ i18n.ts.sensitiveContentConsentTitle }}</div>
 			</div>
-			<Mfm style="margin: 0.7em 0 1em 0;" :text="i18n.ts.sensitiveContentConsentAreYouOver18" />
+			<Mfm style="display: contents;" :text="i18n.ts.sensitiveContentConsentAreYouOver18" />
 			<div class="_gaps_s">
 				<div :class="$style.ageToggle">
 					<div :class="$style.toggleWrapper">
@@ -55,11 +55,11 @@
 							<option value="ignore">{{ i18n.ts._displayOfSensitiveMedia.ignore }}</option>
 							<option value="force">{{ i18n.ts._displayOfSensitiveMedia.force }}</option>
 						</MkSelect>
-						<MkSwitch v-model="draftConfirmWhenRevealingSensitiveMedia">
-							{{ i18n.ts.confirmWhenRevealingSensitiveMedia }}
-						</MkSwitch>
 						<MkSwitch v-model="draftHighlightSensitiveMedia">
 							{{ i18n.ts.highlightSensitiveMedia }}
+						</MkSwitch>
+						<MkSwitch v-model="draftConfirmWhenRevealingSensitiveMedia">
+							{{ i18n.ts.confirmWhenRevealingSensitiveMedia }}
 						</MkSwitch>
 						<MkSelect v-model="draftDisplayOfSensitiveAds">
 							<template #label>{{ i18n.ts.displayOfSensitiveAds }}</template>
@@ -92,10 +92,6 @@ import { prefer } from '@/preferences.js';
 import { usageReport } from '@/utility/usage-report.js';
 import { getSensitiveContentConsent, setSensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 
-defineProps<{
-	trigger: 'media' | 'ad';
-}>();
-
 const emit = defineEmits<{
 	(ev: 'decided', allowed: boolean): void;
 	(ev: 'closed'): void;
@@ -105,10 +101,10 @@ const modal = useTemplateRef('modal');
 
 const iAmAdult = ref<boolean>(getSensitiveContentConsent() ?? false);
 
-const draftNsfw = ref(prefer.s.nsfw);
-const draftConfirmWhenRevealingSensitiveMedia = ref(prefer.s.confirmWhenRevealingSensitiveMedia);
-const draftHighlightSensitiveMedia = ref(prefer.s.highlightSensitiveMedia);
-const draftDisplayOfSensitiveAds = ref(prefer.s.displayOfSensitiveAds);
+const draftNsfw = ref<'respect' | 'force' | 'ignore'>('respect');
+const draftHighlightSensitiveMedia = ref<boolean>(true);
+const draftConfirmWhenRevealingSensitiveMedia = ref<boolean>(false);
+const draftDisplayOfSensitiveAds = ref<'hidden' | 'always' | 'filtered'>('hidden');
 
 const DECO_CONFIG = {
 	tints: {
@@ -185,10 +181,12 @@ function submit() {
 
 	if (iAmAdult.value) {
 		prefer.commit('nsfw', draftNsfw.value);
-		prefer.commit('confirmWhenRevealingSensitiveMedia', draftConfirmWhenRevealingSensitiveMedia.value);
 		prefer.commit('highlightSensitiveMedia', draftHighlightSensitiveMedia.value);
+		prefer.commit('confirmWhenRevealingSensitiveMedia', draftConfirmWhenRevealingSensitiveMedia.value);
 	} else {
 		prefer.commit('nsfw', 'force');
+		prefer.commit('highlightSensitiveMedia', true);
+		prefer.commit('confirmWhenRevealingSensitiveMedia', true);
 	}
 	prefer.commit('displayOfSensitiveAds', effectiveDisplayOfSensitiveAds);
 

@@ -67,7 +67,7 @@ const shouldHide = (file: Misskey.entities.DriveFile): boolean => {
 
 async function showHiddenContent(file: Misskey.entities.DriveFile) {
 	if (file.isSensitive && sensitiveContentConsent.value !== true) {
-		const allowed = await requestSensitiveContentConsent('media');
+		const allowed = await requestSensitiveContentConsent();
 		if (!allowed) return;
 	}
 	showingFiles.value.add(file.id);

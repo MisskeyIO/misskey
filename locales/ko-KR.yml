@@ -128,7 +128,7 @@ you: "나"
 clickToShow: "클릭하여 보기"
 sensitive: "열람 주의"
 sensitiveContentConsentTitle: "민감한 콘텐츠일 수 있습니다"
-sensitiveContentConsentAreYouOver18: "이 콘텐츠는 민감할 수 있습니다.\n만 18세 이상인가요?"
+sensitiveContentConsentAreYouOver18: "이 콘텐츠는 민감할 수 있습니다.\n\n<center>$[x2 만 18세 이상인가요?]</center>"
 displayedContentSettings: "표시할 콘텐츠 설정"
 displayOfSensitiveContentConsent: "민감한 콘텐츠일 수 있습니다"
 _displayOfSensitiveContentConsent:

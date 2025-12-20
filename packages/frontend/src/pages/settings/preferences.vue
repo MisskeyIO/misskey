@@ -879,7 +879,7 @@ watch(useSystemFont, () => {
 });
 
 async function configureSensitiveContentConsentFromSettings() {
-	await configureSensitiveContentConsent('media');
+	await configureSensitiveContentConsent();
 }
 
 watch([

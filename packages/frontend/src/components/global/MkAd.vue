@@ -217,7 +217,7 @@ async function showHiddenSensitiveAd(ev: MouseEvent) {
 	if (prefer.s.displayOfSensitiveAds === 'filtered') return;
 
 	if (sensitiveContentConsent.value !== true) {
-		const allowed = await requestSensitiveContentConsent('ad');
+		const allowed = await requestSensitiveContentConsent();
 		if (!allowed) {
 			if (props.specify == null) {
 				chosen.value = choseAd();

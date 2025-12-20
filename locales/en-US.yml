@@ -128,7 +128,7 @@ you: "You"
 clickToShow: "Click to show"
 sensitive: "Sensitive"
 sensitiveContentConsentTitle: "This content may be sensitive"
-sensitiveContentConsentAreYouOver18: "This content may be sensitive.\nAre you 18 or older?"
+sensitiveContentConsentAreYouOver18: "This content may be sensitive.\n\n<center>$[x2 Are you 18 or older?]</center>"
 displayedContentSettings: "Displayed content settings"
 displayOfSensitiveContentConsent: "Potentially sensitive content"
 _displayOfSensitiveContentConsent:

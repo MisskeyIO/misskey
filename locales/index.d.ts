@@ -532,7 +532,8 @@ export interface Locale extends ILocale {
     "sensitiveContentConsentTitle": string;
     /**
      * このコンテンツは成人向けのコンテンツである可能性があります。
-     * あなたは18歳以上ですか？
+     *
+     * <center>$[x2 あなたは18歳以上ですか？]</center>
      */
     "sensitiveContentConsentAreYouOver18": string;
     /**

@@ -128,7 +128,7 @@ you: "あなた"
 clickToShow: "クリックして表示"
 sensitive: "センシティブ"
 sensitiveContentConsentTitle: "成人向けの可能性があるコンテンツ"
-sensitiveContentConsentAreYouOver18: "このコンテンツは成人向けのコンテンツである可能性があります。\nあなたは18歳以上ですか？"
+sensitiveContentConsentAreYouOver18: "このコンテンツは成人向けのコンテンツである可能性があります。\n\n<center>$[x2 あなたは18歳以上ですか？]</center>"
 displayedContentSettings: "表示するコンテンツ設定"
 displayOfSensitiveContentConsent: "成人向けの可能性があるコンテンツ"
 _displayOfSensitiveContentConsent:

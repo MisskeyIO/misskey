@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template v-for="file in files">
 	<div
 		v-if="shouldHide(file) && !showingFiles.has(file.id)"
-		:class="[$style.filePreview, { [$style.square]: square }]"
+		:class="[$style.filePreview, { [$style.square]: props.square }]"
 		@click="showHiddenContent(file)"
 	>
 		<MkDriveFileThumbnail
@@ -26,7 +26,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 		</div>
 	</div>
-	<MkA v-else :class="[$style.filePreview, { [$style.square]: square }]" :to="notePage(note)">
+	<MkA v-else :class="[$style.filePreview, { [$style.square]: props.square }]" :to="notePage(props.note)">
 		<MkDriveFileThumbnail
 			:file="file"
 			fit="cover"
@@ -52,14 +52,14 @@ import { $i } from '@/i.js';
 
 import MkDriveFileThumbnail from '@/components/MkDriveFileThumbnail.vue';
 
-defineProps<{
+const props = defineProps<{
 	note: Misskey.entities.Note;
 	square?: boolean;
 }>();
 
 const showingFiles = ref<Set<string>>(new Set());
 
-const files = computed(() => note.files.filter(file => !(file.isSensitive && sensitiveContentConsent.value === false)));
+const files = computed(() => props.note.files.filter(file => !(file.isSensitive && sensitiveContentConsent.value === false)));
 
 const shouldHide = (file: Misskey.entities.DriveFile): boolean => {
 	if (prefer.s.nsfw === 'force' || (prefer.s.dataSaver.media && file.type.startsWith('image/'))) return true;

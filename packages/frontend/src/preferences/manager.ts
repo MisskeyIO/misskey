@@ -276,7 +276,6 @@ export class PreferencesManager {
 
 	public static normalizeProfile(profileLike: any): PreferencesProfile {
 		const data = {} as PreferencesProfile['preferences'];
-
 		for (const key in PREF_DEF) {
 			const records = profileLike.preferences[key];
 			if (records == null || records.length === 0) {

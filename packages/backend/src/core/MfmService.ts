@@ -494,6 +494,10 @@ export class MfmService {
 
 		appendChildren(nodes, body);
 
+		for (const appender of additionalAppenders) {
+			appender(doc, body);
+		}
+
 		return body.outerHTML;
 	}
 }

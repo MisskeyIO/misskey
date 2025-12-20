@@ -50,6 +50,11 @@ export const packedAdSchema = {
 			optional: false,
 			nullable: false,
 		},
+		imageBlurhash: {
+			type: 'string',
+			optional: false,
+			nullable: true,
+		},
 		memo: {
 			type: 'string',
 			optional: false,
@@ -57,6 +62,11 @@ export const packedAdSchema = {
 		},
 		dayOfWeek: {
 			type: 'integer',
+			optional: false,
+			nullable: false,
+		},
+		isSensitive: {
+			type: 'boolean',
 			optional: false,
 			nullable: false,
 		},

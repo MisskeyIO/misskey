@@ -184,8 +184,16 @@ export const packedMetaLiteSchema = {
 						optional: false, nullable: false,
 						format: 'url',
 					},
+					imageBlurhash: {
+						type: 'string',
+						optional: false, nullable: true,
+					},
 					dayOfWeek: {
 						type: 'integer',
+						optional: false, nullable: false,
+					},
+					isSensitive: {
+						type: 'boolean',
 						optional: false, nullable: false,
 					},
 				},

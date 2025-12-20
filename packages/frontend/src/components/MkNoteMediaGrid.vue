@@ -4,16 +4,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<template v-for="file in note.files">
+<template v-for="file in files">
 	<div
-		v-if="(((
-			(prefer.s.nsfw === 'force' || file.isSensitive) &&
-			prefer.s.nsfw !== 'ignore'
-		) || (prefer.s.dataSaver.media && file.type.startsWith('image/'))) &&
-			!showingFiles.has(file.id)
-		)"
-		:class="[$style.filePreview, { [$style.square]: square }]"
-		@click="showingFiles.add(file.id)"
+		v-if="shouldHide(file) && !showingFiles.has(file.id)"
+		:class="[$style.filePreview, { [$style.square]: props.square }]"
+		@click="showHiddenContent(file)"
 	>
 		<MkDriveFileThumbnail
 			:file="file"
@@ -31,7 +26,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 		</div>
 	</div>
-	<MkA v-else :class="[$style.filePreview, { [$style.square]: square }]" :to="notePage(note)">
+	<MkA v-else :class="[$style.filePreview, { [$style.square]: props.square }]" :to="notePage(props.note)">
 		<MkDriveFileThumbnail
 			:file="file"
 			fit="cover"
@@ -44,21 +39,55 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { notePage } from '@/filters/note.js';
 import { i18n } from '@/i18n.js';
 import { prefer } from '@/preferences.js';
 import bytes from '@/filters/bytes.js';
+import { requestSensitiveContentConsent, sensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
+import { pleaseLogin } from '@/utility/please-login.js';
+import * as os from '@/os.js';
+import { $i } from '@/i.js';
 
 import MkDriveFileThumbnail from '@/components/MkDriveFileThumbnail.vue';
 
-defineProps<{
+const props = defineProps<{
 	note: Misskey.entities.Note;
 	square?: boolean;
 }>();
 
 const showingFiles = ref<Set<string>>(new Set());
+
+const files = computed(() => props.note.files.filter(file => !(file.isSensitive && sensitiveContentConsent.value === false)));
+
+const shouldHide = (file: Misskey.entities.DriveFile): boolean => {
+	if (prefer.s.nsfw === 'force' || (prefer.s.dataSaver.media && file.type.startsWith('image/'))) return true;
+	if (file.isSensitive && sensitiveContentConsent.value !== true) return true;
+	return file.isSensitive && prefer.s.nsfw !== 'ignore';
+};
+
+async function showHiddenContent(file: Misskey.entities.DriveFile) {
+	if (file.isSensitive && !$i) {
+		await pleaseLogin();
+		return;
+	}
+
+	if (file.isSensitive && sensitiveContentConsent.value !== true) {
+		const allowed = await requestSensitiveContentConsent();
+		if (!allowed) return;
+	}
+
+	if (file.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
+		const { canceled } = await os.confirm({
+			type: 'question',
+			text: i18n.ts.sensitiveMediaRevealConfirm,
+		});
+		if (canceled) return;
+	}
+
+	showingFiles.value.add(file.id);
+}
 </script>
 
 <style lang="scss" module>

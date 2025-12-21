@@ -283,11 +283,8 @@ function submit() {
 	> .before,
 	> .after {
 		transition: all 0.3s ease;
-		flex: 0 1 auto;
-		min-width: 0;
+		flex: 1 1 auto;
 		text-align: center;
-		white-space: nowrap;
-		overflow: hidden;
 		font-weight: bold;
 		font-size: 1.1em;
 		opacity: 0.5;

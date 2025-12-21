@@ -250,10 +250,10 @@ function submit() {
 .toggle {
 	cursor: pointer;
 	display: flex;
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
 	align-items: center;
 	justify-content: center;
-	gap: 8px 12px;
+	gap: 8px clamp(12px, 4vw, 32px);
 	position: relative;
 	margin: 4px; // focus outline space
 	padding: 6px 10px;
@@ -284,7 +284,6 @@ function submit() {
 	> .after {
 		transition: all 0.3s ease;
 		flex: 1 1 auto;
-		min-width: 3.5em;
 		text-align: center;
 		font-weight: bold;
 		font-size: 1.1em;

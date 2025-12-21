@@ -256,22 +256,34 @@ onActivated(() => {
 
 	&.form_square {
 		> .link { width: min(300px, 100%); }
-		> .link > .imgBox { aspect-ratio: 1 / 1; }
+		> .link > .imgBox {
+			max-width: min(300px, 100%);
+			aspect-ratio: 300 / 300;
+		}
 	}
 
 	&.form_horizontal {
 		> .link { width: min(600px, 100%); }
-		> .link > .imgBox { aspect-ratio: 600 / 80; }
+		> .link > .imgBox {
+			max-width: min(600px, 100%);
+			aspect-ratio: 600 / 80;
+		}
 	}
 
 	&.form_horizontalBig {
 		> .link { width: min(600px, 100%); }
-		> .link > .imgBox { aspect-ratio: 600 / 250; }
+		> .link > .imgBox {
+			max-width: min(600px, 100%);
+			aspect-ratio: 600 / 250;
+		}
 	}
 
 	&.form_vertical {
 		> .link { width: min(300px, 100%); }
-		> .link > .imgBox { aspect-ratio: 300 / 450; }
+		> .link > .imgBox {
+			max-width: min(300px, 100%);
+			aspect-ratio: 300 / 450;
+		}
 	}
 }
 

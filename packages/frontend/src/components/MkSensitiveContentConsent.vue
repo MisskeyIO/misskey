@@ -90,7 +90,7 @@ import MkSwitch from '@/components/MkSwitch.vue';
 import { i18n } from '@/i18n.js';
 import { prefer } from '@/preferences.js';
 import { usageReport } from '@/utility/usage-report.js';
-import { getSensitiveContentConsent, setSensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
+import { sensitiveContentConsent, setSensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 
 const emit = defineEmits<{
 	(ev: 'decided', allowed: boolean): void;
@@ -99,7 +99,7 @@ const emit = defineEmits<{
 
 const modal = useTemplateRef('modal');
 
-const iAmAdult = ref<boolean>(getSensitiveContentConsent() ?? false);
+const iAmAdult = ref<boolean>(sensitiveContentConsent.value ?? false);
 
 const draftNsfw = ref<'respect' | 'force' | 'ignore'>('respect');
 const draftHighlightSensitiveMedia = ref<boolean>(false);
@@ -184,9 +184,9 @@ function submit() {
 		prefer.commit('highlightSensitiveMedia', draftHighlightSensitiveMedia.value);
 		prefer.commit('confirmWhenRevealingSensitiveMedia', draftConfirmWhenRevealingSensitiveMedia.value);
 	} else {
-		prefer.commit('nsfw', 'force');
-		prefer.commit('highlightSensitiveMedia', true);
-		prefer.commit('confirmWhenRevealingSensitiveMedia', true);
+		prefer.commit('nsfw', 'respect');
+		prefer.commit('highlightSensitiveMedia', false);
+		prefer.commit('confirmWhenRevealingSensitiveMedia', false);
 	}
 	prefer.commit('displayOfSensitiveAds', effectiveDisplayOfSensitiveAds);
 

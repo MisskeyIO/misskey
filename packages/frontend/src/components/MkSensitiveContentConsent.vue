@@ -230,8 +230,11 @@ function submit() {
 }
 
 .toggleWrapper {
-	display: inline-block;
-	text-align: left;
+	display: flex;
+	justify-content: center;
+	width: 100%;
+	padding: 0 8px;
+	box-sizing: border-box;
 }
 
 .ageCheckbox {
@@ -246,11 +249,16 @@ function submit() {
 
 .toggle {
 	cursor: pointer;
-	display: inline-block;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 8px 12px;
 	position: relative;
-	width: 140px;
-	height: 64px;
 	margin: 4px; // focus outline space
+	padding: 6px 10px;
+	max-width: 100%;
+	box-sizing: border-box;
 	color: var(--MI_THEME-fg);
 	-webkit-tap-highlight-color: transparent;
 
@@ -274,10 +282,10 @@ function submit() {
 
 	> .before,
 	> .after {
-		position: absolute;
-		top: 22px;
 		transition: all 0.3s ease;
-		white-space: nowrap;
+		flex: 1 1 auto;
+		min-width: 3.5em;
+		text-align: center;
 		font-weight: bold;
 		font-size: 1.1em;
 		opacity: 0.5;
@@ -285,17 +293,20 @@ function submit() {
 	}
 
 	> .before {
-		left: -110px;
+		order: 1;
 	}
 
 	> .after {
-		right: -110px;
+		order: 3;
 	}
 }
 
 .toggleBg {
-	position: absolute;
-	inset: 0;
+	position: relative;
+	order: 2;
+	flex: 0 0 auto;
+	width: 140px;
+	height: 64px;
 	display: block;
 	background: var(--bg);
 	border: solid 1px var(--bg-border);

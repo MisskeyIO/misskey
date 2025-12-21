@@ -102,7 +102,7 @@ const modal = useTemplateRef('modal');
 const iAmAdult = ref<boolean>(getSensitiveContentConsent() ?? false);
 
 const draftNsfw = ref<'respect' | 'force' | 'ignore'>('respect');
-const draftHighlightSensitiveMedia = ref<boolean>(true);
+const draftHighlightSensitiveMedia = ref<boolean>(false);
 const draftConfirmWhenRevealingSensitiveMedia = ref<boolean>(false);
 const draftDisplayOfSensitiveAds = ref<'hidden' | 'always' | 'filtered'>('hidden');
 

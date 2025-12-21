@@ -255,34 +255,34 @@ onActivated(() => {
 	text-align: center;
 
 	&.form_square {
-		> .link { width: min(300px, 100%); }
+		> .link,
 		> .link > .imgBox {
 			max-width: min(300px, 100%);
-			aspect-ratio: 300 / 300;
+			max-height: 300px;
 		}
 	}
 
 	&.form_horizontal {
-		> .link { width: min(600px, 100%); }
+		> .link,
 		> .link > .imgBox {
 			max-width: min(600px, 100%);
-			aspect-ratio: 600 / 80;
+			max-height: 80px;
 		}
 	}
 
 	&.form_horizontalBig {
-		> .link { width: min(600px, 100%); }
+		> .link,
 		> .link > .imgBox {
 			max-width: min(600px, 100%);
-			aspect-ratio: 600 / 250;
+			max-height: 250px;
 		}
 	}
 
 	&.form_vertical {
-		> .link { width: min(300px, 100%); }
+		> .link,
 		> .link > .imgBox {
 			max-width: min(300px, 100%);
-			aspect-ratio: 300 / 450;
+			max-height: 450px;
 		}
 	}
 }

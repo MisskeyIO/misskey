@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "misskey-js",
-  "version": "2025.4.1-mhq.8d",
+  "version": "2025.4.1-host.8d",
   "description": "Misskey SDK for JavaScript",
   "license": "MIT",
   "types": "./built/index.d.ts",

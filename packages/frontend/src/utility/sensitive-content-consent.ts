@@ -13,10 +13,6 @@ function readSensitiveContentConsent(): boolean | null {
 
 export const sensitiveContentConsent = ref<boolean | null>(readSensitiveContentConsent());
 
-export function getSensitiveContentConsent(): boolean | null {
-	return sensitiveContentConsent.value;
-}
-
 export function setSensitiveContentConsent(value: boolean): void {
 	const v = value ? 'true' : 'false';
 	miLocalStorage.setItem(SENSITIVE_CONTENT_CONSENT_KEY, v);
@@ -27,7 +23,6 @@ async function openSensitiveContentConsent(): Promise<boolean> {
 	return await new Promise<boolean>(async (resolve) => {
 		await os.popup(defineAsyncComponent(() => import('@/components/MkSensitiveContentConsent.vue')), {}, {
 			decided: (allowed: boolean) => {
-				sensitiveContentConsent.value = getSensitiveContentConsent();
 				resolve(allowed);
 			},
 		}, 'closed');
@@ -35,8 +30,7 @@ async function openSensitiveContentConsent(): Promise<boolean> {
 }
 
 export async function requestSensitiveContentConsent(): Promise<boolean> {
-	const existing = getSensitiveContentConsent();
-	if (existing !== null) return existing;
+	if (sensitiveContentConsent.value !== null) return sensitiveContentConsent.value;
 
 	return await openSensitiveContentConsent();
 }

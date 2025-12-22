@@ -1994,7 +1994,7 @@ _achievements:
     _sensitiveContentConsentResponded:
       title: "Are you 18 years or older?"
       description: "Responded to the age confirmation"
-      flavor: "Please tap to confirm your age"
+      flavor: "Can you press yes there? Thanks."
     _bubbleGameExplodingHead:
       title: "🤯"
       description: "The biggest object in the bubble game"

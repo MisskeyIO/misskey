@@ -1986,7 +1986,7 @@ _achievements:
     _sensitiveContentConsentResponded:
       title: "18세 이상이신가요?"
       description: "연령 확인에 응답했다"
-      flavor: "연령 확인을 터치해 주세요"
+      flavor: "예? 아니... 제가 나이가..."
     _bubbleGameExplodingHead:
       title: "🤯"
       description: "버블 게임에서 가장 큰 물건을 내놓았다"

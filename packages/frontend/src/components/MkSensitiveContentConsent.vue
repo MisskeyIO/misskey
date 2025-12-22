@@ -7,14 +7,12 @@
 	@closed="emit('closed')"
 >
 	<div class="_panel _shadow" :class="$style.root">
-		<div class="_gaps_s" style="padding: 25px;">
-			<div style="display: flex; align-items: center;">
-				<div :class="$style.headerIcon">
-					<i class="ti ti-rating-18-plus"></i>
-				</div>
+		<div class="_gaps_s" :class="$style.content">
+			<div :class="$style.header">
+				<div :class="$style.headerIcon"><i class="ti ti-rating-18-plus"></i></div>
 				<div :class="$style.headerTitle">{{ i18n.ts.sensitiveContentConsentTitle }}</div>
 			</div>
-			<Mfm style="display: contents;" :text="i18n.ts.sensitiveContentConsentAreYouOver18" />
+			<Mfm :class="$style.question" :text="i18n.ts.sensitiveContentConsentAreYouOver18" />
 			<div class="_gaps_s">
 				<div :class="$style.ageToggle">
 					<div :class="$style.toggleWrapper">
@@ -51,33 +49,35 @@
 						<div
 							:class="[
 								$style.toggle,
-								iAmAdult === true ? $style.stateAdult : iAmAdult === false ? $style.stateTeen : $style.stateUnknown,
+								iAmAdult === true && $style.stateAdult,
+								iAmAdult === false && $style.stateTeen,
+								iAmAdult === null && $style.stateUnknown,
 							]"
 						>
 							<label for="acb-under" :class="$style.before">{{ i18n.ts.no }}</label>
-								<span :class="$style.toggleBg">
-									<span :class="$style.ageMarks" aria-hidden="true">
-										<span :class="$style.ageMarkAge">17↓</span>
-										<span :class="$style.ageMarkAnswer">{{ i18n.ts.no }}</span>
-										<span />
-										<span :class="$style.ageMarkAge">18+</span>
-										<span :class="$style.ageMarkAnswer">{{ i18n.ts.yes }}</span>
-									</span>
-									<span :class="$style.decoLayer" aria-hidden="true">
-										<i
-											v-for="deco in decoIcons"
+							<span :class="$style.toggleBg">
+								<span :class="$style.ageMarks" aria-hidden="true">
+									<span :class="$style.ageMarkAge">17↓</span>
+									<span :class="$style.ageMarkAnswer">{{ i18n.ts.no }}</span>
+									<span />
+									<span :class="$style.ageMarkAge">18+</span>
+									<span :class="$style.ageMarkAnswer">{{ i18n.ts.yes }}</span>
+								</span>
+								<span :class="$style.decoLayer" aria-hidden="true">
+									<i
+										v-for="deco in decoIcons"
 										:key="deco.key"
 										:class="['ti', deco.ti, $style.deco]"
 										:style="deco.style"
 									></i>
-									</span>
-									<span :class="$style.toggleHandler" aria-hidden="true">
-										<span :class="$style.handlerIconUnder">17↓</span>
-										<span :class="$style.handlerIconOver">18+</span>
-									</span>
-									<span :class="$style.hitAreas" aria-hidden="true">
-										<label for="acb-under" :class="$style.hitArea"></label>
-										<label for="acb-unknown" :class="$style.hitArea"></label>
+								</span>
+								<span :class="$style.toggleHandler" aria-hidden="true">
+									<span :class="$style.handlerIconUnder">17↓</span>
+									<span :class="$style.handlerIconOver">18+</span>
+								</span>
+								<span :class="$style.hitAreas" aria-hidden="true">
+									<label for="acb-under" :class="$style.hitArea"></label>
+									<label for="acb-unknown" :class="$style.hitArea"></label>
 									<label for="acb-over" :class="$style.hitArea"></label>
 								</span>
 							</span>
@@ -91,19 +91,19 @@
 					<template #label>{{ i18n.ts.displayedContentSettings }}</template>
 					<div class="_gaps_s">
 						<MkInfo>{{ i18n.ts._initialAccountSetting.theseSettingsCanEditLater }}</MkInfo>
-						<MkSelect v-model="draftNsfw">
+						<MkSelect v-model="draft.nsfw">
 							<template #label>{{ i18n.ts.displayOfSensitiveMedia }}</template>
 							<option value="respect">{{ i18n.ts._displayOfSensitiveMedia.respect }}</option>
 							<option value="ignore">{{ i18n.ts._displayOfSensitiveMedia.ignore }}</option>
 							<option value="force">{{ i18n.ts._displayOfSensitiveMedia.force }}</option>
 						</MkSelect>
-						<MkSwitch v-model="draftHighlightSensitiveMedia">
+						<MkSwitch v-model="draft.highlightSensitiveMedia">
 							{{ i18n.ts.highlightSensitiveMedia }}
 						</MkSwitch>
-						<MkSwitch v-model="draftConfirmWhenRevealingSensitiveMedia">
+						<MkSwitch v-model="draft.confirmWhenRevealingSensitiveMedia">
 							{{ i18n.ts.confirmWhenRevealingSensitiveMedia }}
 						</MkSwitch>
-						<MkSelect v-model="draftDisplayOfSensitiveAds">
+						<MkSelect v-model="draft.displayOfSensitiveAds">
 							<template #label>{{ i18n.ts.displayOfSensitiveAds }}</template>
 							<option value="hidden">{{ i18n.ts._displayOfSensitiveAds.hidden }}</option>
 							<option value="always">{{ i18n.ts._displayOfSensitiveAds.always }}</option>
@@ -122,7 +122,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, useTemplateRef } from 'vue';
+import { computed, reactive, ref, useTemplateRef } from 'vue';
 import MkButton from '@/components/MkButton.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import MkInfo from '@/components/MkInfo.vue';
@@ -131,6 +131,7 @@ import MkSelect from '@/components/MkSelect.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import { i18n } from '@/i18n.js';
 import { prefer } from '@/preferences.js';
+import { PREF_DEF } from '@/preferences/def.js';
 import { claimAchievement } from '@/utility/achievements.js';
 import { usageReport } from '@/utility/usage-report.js';
 import { sensitiveContentConsent, setSensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
@@ -144,10 +145,17 @@ const modal = useTemplateRef('modal');
 
 const iAmAdult = ref<boolean | null>(sensitiveContentConsent.value);
 
-const draftNsfw = ref<'respect' | 'force' | 'ignore'>('respect');
-const draftHighlightSensitiveMedia = ref<boolean>(false);
-const draftConfirmWhenRevealingSensitiveMedia = ref<boolean>(false);
-const draftDisplayOfSensitiveAds = ref<'hidden' | 'always' | 'filtered'>('hidden');
+const draft = reactive({
+	nsfw: PREF_DEF.nsfw.default,
+	highlightSensitiveMedia: PREF_DEF.highlightSensitiveMedia.default,
+	confirmWhenRevealingSensitiveMedia: PREF_DEF.confirmWhenRevealingSensitiveMedia.default,
+	displayOfSensitiveAds: PREF_DEF.displayOfSensitiveAds.default,
+} satisfies {
+	nsfw: (typeof PREF_DEF)['nsfw']['default'];
+	highlightSensitiveMedia: (typeof PREF_DEF)['highlightSensitiveMedia']['default'];
+	confirmWhenRevealingSensitiveMedia: (typeof PREF_DEF)['confirmWhenRevealingSensitiveMedia']['default'];
+	displayOfSensitiveAds: (typeof PREF_DEF)['displayOfSensitiveAds']['default'];
+});
 
 const DECO_CONFIG = {
 	tints: {
@@ -224,14 +232,14 @@ function submit() {
 	if (iAmAdult.value === null) return;
 
 	setSensitiveContentConsent(iAmAdult.value);
-	const effectiveDisplayOfSensitiveAds = iAmAdult.value ? draftDisplayOfSensitiveAds.value : 'filtered';
+	const effectiveDisplayOfSensitiveAds = iAmAdult.value ? draft.displayOfSensitiveAds : 'filtered';
 
 	claimAchievement('sensitiveContentConsentResponded');
 
 	if (iAmAdult.value) {
-		prefer.commit('nsfw', draftNsfw.value);
-		prefer.commit('highlightSensitiveMedia', draftHighlightSensitiveMedia.value);
-		prefer.commit('confirmWhenRevealingSensitiveMedia', draftConfirmWhenRevealingSensitiveMedia.value);
+		prefer.commit('nsfw', draft.nsfw);
+		prefer.commit('highlightSensitiveMedia', draft.highlightSensitiveMedia);
+		prefer.commit('confirmWhenRevealingSensitiveMedia', draft.confirmWhenRevealingSensitiveMedia);
 	} else {
 		prefer.commit('nsfw', 'respect');
 		prefer.commit('highlightSensitiveMedia', false);
@@ -260,8 +268,17 @@ function submit() {
 	overflow: visible;
 }
 
+.content {
+	padding: 25px;
+}
+
+.header {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
 .headerIcon {
-	margin-right: 10px;
 	font-size: 40px;
 	color: var(--MI_THEME-warn);
 }
@@ -290,6 +307,10 @@ function submit() {
 .toggleWrapper:focus-within .toggle {
 	outline: 2px solid var(--MI_THEME-focus);
 	outline-offset: 2px;
+}
+
+.question {
+	display: contents;
 }
 
 .ageRadio {
@@ -332,7 +353,7 @@ function submit() {
 
 	> .before,
 	> .after {
-		transition: all 0.3s ease;
+		transition: opacity 0.3s ease, color 0.3s ease;
 		flex: 1 1 auto;
 		min-width: 3.5em;
 		text-align: center;
@@ -467,7 +488,6 @@ function submit() {
 }
 
 .handlerIconUnder,
-.handlerIconMid,
 .handlerIconOver {
 	grid-area: 1 / 1;
 	display: inline-flex;
@@ -486,11 +506,6 @@ function submit() {
 .handlerIconUnder {
 	opacity: 0;
 	transform: scale(0.5);
-}
-
-.handlerIconMid {
-	opacity: 1;
-	transform: scale(1);
 }
 
 .handlerIconOver {
@@ -512,19 +527,9 @@ function submit() {
 	transform: scale(1);
 }
 
-.stateTeen .handlerIconMid {
-	opacity: 0;
-	transform: scale(0.5);
-}
-
 .stateAdult .handlerIconOver {
 	opacity: 1;
 	transform: scale(1);
-}
-
-.stateAdult .handlerIconMid {
-	opacity: 0;
-	transform: scale(0.5);
 }
 
 .hitAreas {

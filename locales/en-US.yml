@@ -1991,6 +1991,10 @@ _achievements:
     _tutorialCompleted:
       title: "Misskey Elementary Course Diploma"
       description: "Tutorial completed"
+    _sensitiveContentConsentResponded:
+      title: "Are you 18 years or older?"
+      description: "Responded to the age confirmation"
+      flavor: "Please tap to confirm your age"
     _bubbleGameExplodingHead:
       title: "🤯"
       description: "The biggest object in the bubble game"

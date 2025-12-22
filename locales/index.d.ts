@@ -7767,6 +7767,20 @@ export interface Locale extends ILocale {
                  */
                 "description": string;
             };
+            "_sensitiveContentConsentResponded": {
+                /**
+                 * あなたは18歳以上ですか？
+                 */
+                "title": string;
+                /**
+                 * 年齢確認に応答した
+                 */
+                "description": string;
+                /**
+                 * 年齢確認のタッチをお願いしまーす
+                 */
+                "flavor": string;
+            };
             "_bubbleGameExplodingHead": {
                 /**
                  * 🤯

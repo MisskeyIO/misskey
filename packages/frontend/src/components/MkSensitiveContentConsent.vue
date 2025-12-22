@@ -18,29 +18,71 @@
 			<div class="_gaps_s">
 				<div :class="$style.ageToggle">
 					<div :class="$style.toggleWrapper">
-						<input id="acb" v-model="iAmAdult" class="mk-input-checkbox" type="checkbox" :class="$style.ageCheckbox" />
-						<label for="acb" :class="$style.toggle">
-							<span :class="$style.before">{{ i18n.ts.no }}</span>
-							<span :class="$style.after">{{ i18n.ts.yes }}</span>
-							<span :class="$style.toggleBg">
-								<span :class="$style.decoLayer" aria-hidden="true">
-									<i
-										v-for="deco in decoIcons"
+						<input
+							id="acb-under"
+							v-model="iAmAdult"
+							class="mk-input-checkbox"
+							type="radio"
+							name="sensitiveContentConsentAge"
+							:value="false"
+							:class="$style.ageRadio"
+						/>
+						<input
+							id="acb-unknown"
+							v-model="iAmAdult"
+							class="mk-input-checkbox"
+							type="radio"
+							name="sensitiveContentConsentAge"
+							disabled
+							:value="null"
+							:aria-label="i18n.ts.none"
+							:class="$style.ageRadio"
+						/>
+						<input
+							id="acb-over"
+							v-model="iAmAdult"
+							class="mk-input-checkbox"
+							type="radio"
+							name="sensitiveContentConsentAge"
+							:value="true"
+							:class="$style.ageRadio"
+						/>
+
+						<div
+							:class="[
+								$style.toggle,
+								iAmAdult === true ? $style.stateAdult : iAmAdult === false ? $style.stateTeen : $style.stateUnknown,
+							]"
+						>
+							<label for="acb-under" :class="$style.before">{{ i18n.ts.no }}</label>
+								<span :class="$style.toggleBg">
+									<span :class="$style.ageMarks" aria-hidden="true">
+										<span :class="$style.ageMarkAge">17↓</span>
+										<span :class="$style.ageMarkAnswer">{{ i18n.ts.no }}</span>
+										<span />
+										<span :class="$style.ageMarkAge">18+</span>
+										<span :class="$style.ageMarkAnswer">{{ i18n.ts.yes }}</span>
+									</span>
+									<span :class="$style.decoLayer" aria-hidden="true">
+										<i
+											v-for="deco in decoIcons"
 										:key="deco.key"
 										:class="['ti', deco.ti, $style.deco]"
 										:style="deco.style"
 									></i>
-								</span>
-								<span :class="$style.toggleHandler">
-									<span :class="$style.handlerIconUnder">
-										17↓
 									</span>
-									<span :class="$style.handlerIconOver">
-										18+
+									<span :class="$style.toggleHandler" aria-hidden="true">
+										<span :class="$style.handlerIconUnder">17↓</span>
+										<span :class="$style.handlerIconOver">18+</span>
 									</span>
+									<span :class="$style.hitAreas" aria-hidden="true">
+										<label for="acb-under" :class="$style.hitArea"></label>
+										<label for="acb-unknown" :class="$style.hitArea"></label>
+									<label for="acb-over" :class="$style.hitArea"></label>
 								</span>
 							</span>
-						</label>
+							<label for="acb-over" :class="$style.after">{{ i18n.ts.yes }}</label>
+						</div>
 					</div>
 				</div>
 
@@ -71,7 +113,7 @@
 				</MkFolder>
 
 				<div class="_buttons">
-					<MkButton full large primary @click="submit">{{ i18n.ts.continue }}</MkButton>
+					<MkButton full large primary :disabled="iAmAdult === null" @click="submit">{{ i18n.ts.continue }}</MkButton>
 				</div>
 			</div>
 		</div>
@@ -89,6 +131,7 @@ import MkSelect from '@/components/MkSelect.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import { i18n } from '@/i18n.js';
 import { prefer } from '@/preferences.js';
+import { claimAchievement } from '@/utility/achievements.js';
 import { usageReport } from '@/utility/usage-report.js';
 import { sensitiveContentConsent, setSensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 
@@ -99,7 +142,7 @@ const emit = defineEmits<{
 
 const modal = useTemplateRef('modal');
 
-const iAmAdult = ref<boolean>(sensitiveContentConsent.value ?? false);
+const iAmAdult = ref<boolean | null>(sensitiveContentConsent.value);
 
 const draftNsfw = ref<'respect' | 'force' | 'ignore'>('respect');
 const draftHighlightSensitiveMedia = ref<boolean>(false);
@@ -154,6 +197,8 @@ const DECO_CONFIG = {
 } as const;
 
 const decoIcons = computed(() => {
+	if (iAmAdult.value === null) return [];
+
 	const mode = iAmAdult.value ? 'adult' : 'teen';
 	const fallbackTint = mode === 'adult' ? 'pink' : 'neutral';
 
@@ -176,8 +221,12 @@ const decoIcons = computed(() => {
 });
 
 function submit() {
+	if (iAmAdult.value === null) return;
+
 	setSensitiveContentConsent(iAmAdult.value);
 	const effectiveDisplayOfSensitiveAds = iAmAdult.value ? draftDisplayOfSensitiveAds.value : 'filtered';
+
+	claimAchievement('sensitiveContentConsentResponded');
 
 	if (iAmAdult.value) {
 		prefer.commit('nsfw', draftNsfw.value);
@@ -235,20 +284,20 @@ function submit() {
 	width: 100%;
 	padding: 0 8px;
 	box-sizing: border-box;
+	container-type: inline-size;
 }
 
-.ageCheckbox {
-	position: absolute;
-	left: -99em;
-}
-
-.ageCheckbox:focus-visible + .toggle {
+.toggleWrapper:focus-within .toggle {
 	outline: 2px solid var(--MI_THEME-focus);
 	outline-offset: 2px;
 }
 
+.ageRadio {
+	position: absolute;
+	left: -99em;
+}
+
 .toggle {
-	cursor: pointer;
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
@@ -262,14 +311,15 @@ function submit() {
 	color: var(--MI_THEME-fg);
 	-webkit-tap-highlight-color: transparent;
 
-	// Under 18 (unchecked): bright/kid-like (mint + sun yellow + sky blue)
-	--bg: #d6ffe0;
-	--bg-border: rgba(0, 0, 0, 0.06);
-	--handler-bg: #ffcf4a;
-	--handler-fg: rgba(32, 18, 0, 0.95);
-	--handler-border: rgba(0, 0, 0, 0.1);
-	--handler-text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
-	--handler-x: 0px;
+	// Unknown (center): neutral
+	--track-w: clamp(160px, 60vw, 220px);
+	--bg: rgba(127, 127, 127, 0.12);
+	--bg-border: rgba(0, 0, 0, 0.08);
+	--handler-bg: rgba(255, 255, 255, 0.6);
+	--handler-fg: var(--MI_THEME-fg);
+	--handler-border: rgba(0, 0, 0, 0.08);
+	--handler-text-shadow: none;
+	--handler-x: calc((var(--track-w) - 64px) / 2);
 
 	// Background icon colors (tinted via TS)
 	--deco-neutral: rgba(0, 140, 105, 0.82);
@@ -290,6 +340,7 @@ function submit() {
 		font-size: 1.1em;
 		opacity: 0.5;
 		color: var(--MI_THEME-fg);
+		cursor: pointer;
 	}
 
 	> .before {
@@ -301,11 +352,57 @@ function submit() {
 	}
 }
 
+.stateTeen {
+	// Under 18 (left): bright/kid-like (mint + sun yellow + sky blue)
+	--bg: #d6ffe0;
+	--bg-border: rgba(0, 0, 0, 0.06);
+	--handler-bg: #ffcf4a;
+	--handler-fg: rgba(32, 18, 0, 0.95);
+	--handler-border: rgba(0, 0, 0, 0.1);
+	--handler-text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+	--handler-x: 0px;
+
+	> .before {
+		opacity: 1;
+		color: var(--MI_THEME-accent);
+	}
+}
+
+.stateAdult {
+	// Over 18 (right): warm/alerting (red + orange + pink + purple)
+	--bg: #ffd0dc;
+	--bg-border: rgba(0, 0, 0, 0.08);
+	--handler-bg: #ff4d6d;
+	--handler-fg: #fff;
+	--handler-border: rgba(255, 255, 255, 0.32);
+	--handler-text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+	--handler-x: calc(var(--track-w) - 64px);
+
+	--deco-neutral: rgba(255, 163, 200, 0.45);
+	--deco-pink: rgba(255, 81, 181, 0.65);
+	--deco-orange: rgba(255, 140, 0, 0.65);
+	--deco-purple: rgba(178, 117, 255, 0.65);
+	--deco-red: rgba(255, 79, 79, 0.65);
+
+	> .after {
+		opacity: 1;
+		color: var(--MI_THEME-accent);
+	}
+}
+
+.stateUnknown {
+	> .before,
+	> .after {
+		opacity: 0.5;
+		color: inherit;
+	}
+}
+
 .toggleBg {
 	position: relative;
 	order: 2;
 	flex: 0 0 auto;
-	width: 140px;
+	width: var(--track-w);
 	height: 64px;
 	display: block;
 	background: var(--bg);
@@ -316,11 +413,37 @@ function submit() {
 	transition: background-color 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
+.ageMarks {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	align-items: center;
+	justify-items: center;
+	padding: 0 10px;
+	font-weight: bold;
+	font-size: 18px;
+	color: var(--MI_THEME-fg);
+	opacity: 0.55;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+	pointer-events: none;
+	z-index: 2;
+
+	> span:nth-child(2) {
+		opacity: 0.3;
+	}
+}
+
+.ageMarkAnswer {
+	display: none;
+}
+
 .decoLayer {
 	position: absolute;
 	inset: 0;
 	overflow: hidden;
 	pointer-events: none;
+	z-index: 1;
 }
 
 .toggleHandler {
@@ -340,9 +463,11 @@ function submit() {
 	transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.4s, border-color 0.4s, color 0.4s;
 	color: var(--handler-fg);
 	text-shadow: var(--handler-text-shadow);
+	pointer-events: none;
 }
 
 .handlerIconUnder,
+.handlerIconMid,
 .handlerIconOver {
 	grid-area: 1 / 1;
 	display: inline-flex;
@@ -359,6 +484,11 @@ function submit() {
 }
 
 .handlerIconUnder {
+	opacity: 0;
+	transform: scale(0.5);
+}
+
+.handlerIconMid {
 	opacity: 1;
 	transform: scale(1);
 }
@@ -377,47 +507,56 @@ function submit() {
 	filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.18)) drop-shadow(0 1px 0 rgba(0, 0, 0, 0.08));
 }
 
-.ageCheckbox:checked + .toggle {
-	// Over 18 (checked): warm/alerting (red + orange + pink + purple)
-	--bg: #ffd0dc;
-	--bg-border: rgba(0, 0, 0, 0.08);
-	--handler-bg: #ff4d6d;
-	--handler-fg: #fff;
-	--handler-border: rgba(255, 255, 255, 0.32);
-	--handler-text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
-	--handler-x: 76px;
-
-	--deco-neutral: rgba(255, 163, 200, 0.45);
-	--deco-pink: rgba(255, 81, 181, 0.65);
-	--deco-orange: rgba(255, 140, 0, 0.65);
-	--deco-purple: rgba(178, 117, 255, 0.65);
-	--deco-red: rgba(255, 79, 79, 0.65);
-
-	> .before {
-		opacity: 0.5;
-		color: inherit;
-	}
-
-	> .after {
-		opacity: 1;
-		color: var(--MI_THEME-accent);
-	}
+.stateTeen .handlerIconUnder {
+	opacity: 1;
+	transform: scale(1);
 }
 
-.ageCheckbox:not(:checked) + .toggle {
-	> .before {
-		opacity: 1;
-		color: var(--MI_THEME-accent);
-	}
-}
-
-.ageCheckbox:checked + .toggle .handlerIconUnder {
+.stateTeen .handlerIconMid {
 	opacity: 0;
 	transform: scale(0.5);
 }
 
-.ageCheckbox:checked + .toggle .handlerIconOver {
+.stateAdult .handlerIconOver {
 	opacity: 1;
 	transform: scale(1);
+}
+
+.stateAdult .handlerIconMid {
+	opacity: 0;
+	transform: scale(0.5);
+}
+
+.hitAreas {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	z-index: 4;
+}
+
+.hitArea {
+	cursor: pointer;
+	display: block;
+}
+
+@container (max-width: 360px) {
+	.toggle {
+		gap: 0;
+		padding: 6px 6px;
+	}
+
+	.toggle > .before,
+	.toggle > .after {
+		display: none;
+	}
+
+	.ageMarkAge {
+		display: none;
+	}
+
+	.ageMarkAnswer {
+		display: inline;
+	}
 }
 </style>

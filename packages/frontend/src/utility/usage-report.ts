@@ -35,21 +35,18 @@ export function sendUsageReport(data: UsageReport) {
 	}
 
 	const payload = [data];
-	const requestInit: RequestInit = {
-		method: 'POST',
-		body: JSON.stringify(payload),
-		cache: 'no-cache',
-		credentials: 'include' as const,
-		headers: {
-			'Content-Type': 'application/json',
-			'X-Client-Transaction-Id': generateClientTransactionId('misskey'),
-		},
-	};
 
 	const fallback = () => {
 		window.fetch('/api/usage', {
-			...requestInit,
+			method: 'POST',
+			body: JSON.stringify(payload),
+			cache: 'no-cache',
+			credentials: 'include' as const,
 			keepalive: true,
+			headers: {
+				'Content-Type': 'application/json',
+				'X-Client-Transaction-Id': generateClientTransactionId('misskey'),
+			},
 		});
 	};
 
@@ -57,7 +54,7 @@ export function sendUsageReport(data: UsageReport) {
 		if (navigator.serviceWorker.controller) {
 			navigator.serviceWorker.controller.postMessage({
 				type: 'usage-report',
-				request: requestInit,
+				payload,
 			});
 			return;
 		}
@@ -71,7 +68,7 @@ export function sendUsageReport(data: UsageReport) {
 
 				registration.active.postMessage({
 					type: 'usage-report',
-					request: requestInit,
+					payload,
 				});
 			})
 			.catch(() => {

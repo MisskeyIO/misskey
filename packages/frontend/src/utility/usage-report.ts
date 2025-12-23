@@ -27,7 +27,8 @@ export function usageReport(data: UsageReport) {
 }
 
 export function sendUsageReport(data: UsageReport) {
-	if ((miLocalStorage.getItemAsJson('gtagConsent') as GtagConsentParams).ad_user_data !== 'granted') {
+	const gtagConsent = miLocalStorage.getItemAsJson('gtagConsent') as GtagConsentParams | null;
+	if (!gtagConsent || gtagConsent.ad_user_data !== 'granted') {
 		console.log('Usage report is not sent because the user has not consented to sharing data about ad interactions.');
 		disableUsageReport = true;
 		return;

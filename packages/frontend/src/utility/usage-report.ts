@@ -54,7 +54,7 @@ export function sendUsageReport(data: UsageReport) {
 		if (navigator.serviceWorker.controller) {
 			navigator.serviceWorker.controller.postMessage({
 				type: 'usage-report',
-				body: JSON.stringify(payload),
+				payload,
 			});
 			return;
 		}
@@ -68,7 +68,7 @@ export function sendUsageReport(data: UsageReport) {
 
 				registration.active.postMessage({
 					type: 'usage-report',
-					body: JSON.stringify(payload),
+					payload,
 				});
 			})
 			.catch(() => {

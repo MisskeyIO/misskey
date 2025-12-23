@@ -43,15 +43,15 @@ globalThis.addEventListener('activate', ev => {
 globalThis.addEventListener('message', ev => {
 	const message = ev.data as {
 		type?: string;
-		body?: string;
+		payload?: unknown;
 	};
 
-	if (message.type !== 'usage-report' || !message.body) return;
+	if (message.type !== 'usage-report' || !message.payload) return;
 
 	ev.waitUntil(
 		fetch('/api/usage', {
 			method: 'POST',
-			body: message.body,
+			body: JSON.stringify(message.payload),
 			cache: 'no-cache',
 			credentials: 'include',
 			headers: {

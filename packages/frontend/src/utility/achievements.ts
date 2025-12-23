@@ -83,6 +83,7 @@ export const ACHIEVEMENT_TYPES = [
 	'brainDiver',
 	'smashTestNotificationButton',
 	'tutorialCompleted',
+	'sensitiveContentConsentResponded',
 	'bubbleGameExplodingHead',
 	'bubbleGameDoubleExplodingHead',
 ] as const;
@@ -466,6 +467,11 @@ export const ACHIEVEMENT_BADGES = {
 	'tutorialCompleted': {
 		img: '/fluent-emoji/1f393.png',
 		bg: 'linear-gradient(0deg, rgb(220 223 225), rgb(172 192 207))',
+		frame: 'bronze',
+	},
+	'sensitiveContentConsentResponded': {
+		img: '/fluent-emoji/1f51e.png',
+		bg: 'linear-gradient(0deg, rgb(255 144 144), rgb(255 232 168))',
 		frame: 'bronze',
 	},
 	'bubbleGameExplodingHead': {

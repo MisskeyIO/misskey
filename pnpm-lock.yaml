@@ -211,8 +211,8 @@ catalogs:
       specifier: npm:@syuilo/aiscript@~0
       version: 0.19.0
     '@tabler/icons-webfont':
-      specifier: 3.35.0
-      version: 3.35.0
+      specifier: 3.36.0
+      version: 3.36.0
     '@testing-library/vue':
       specifier: 8.1.0
       version: 8.1.0
@@ -2290,7 +2290,7 @@ importers:
     dependencies:
       '@tabler/icons-webfont':
         specifier: 'catalog:'
-        version: 3.35.0
+        version: 3.36.0
       misskey-js:
         specifier: workspace:*
         version: link:../misskey-js
@@ -5808,11 +5808,11 @@ packages:
     resolution: {integrity: sha512-+PmQX0PiAYPMeVYe237LJAYvOMYW1j2rH5YROyS3b4CTVJum34HfRvKvAzozHAQG0TnHNdUfY9nCeUyRAs//cw==}
     engines: {node: '>=14.16'}
 
-  '@tabler/icons-webfont@3.35.0':
-    resolution: {integrity: sha512-PRnv+lgj2Va6S1nTVcZoYDWZPXUaVNromQ9uxn0B1CbBOjqKXAzC/8yLc8XOXD2fH2DWT2XNw1XaNtlNpc0/Tw==}
+  '@tabler/icons-webfont@3.36.0':
+    resolution: {integrity: sha512-ZFF6S4ryLq4HKL9VVYLOkEzHyfjippAQhcVXQyz8d5t7pDSA7e+YeI547EEYXU9FgqdvJ7W7zf4LD3zUfLWKIg==}
 
-  '@tabler/icons@3.35.0':
-    resolution: {integrity: sha512-yYXe+gJ56xlZFiXwV9zVoe3FWCGuZ/D7/G4ZIlDtGxSx5CGQK110wrnT29gUj52kEZoxqF7oURTk97GQxELOFQ==}
+  '@tabler/icons@3.36.0':
+    resolution: {integrity: sha512-z9OfTEG6QbaQWM9KBOxxUdpgvMUn0atageXyiaSc2gmYm51ORO8Ua7eUcjlks+Dc0YMK4rrodAFdK9SfjJ4ZcA==}
 
   '@tensorflow/tfjs-backend-cpu@4.22.0':
     resolution: {integrity: sha512-1u0FmuLGuRAi8D2c3cocHTASGXOmHc/4OvoVDENJayjYkS119fcTcQf4iHrtLthWyDIPy3JiPhRrZQC9EwnhLw==}
@@ -5877,6 +5877,10 @@ packages:
     peerDependenciesMeta:
       '@vue/compiler-sfc':
         optional: true
+
+  '@thednp/dommatrix@2.0.12':
+    resolution: {integrity: sha512-eOshhlSShBXLfrMQqqhA450TppJXhKriaQdN43mmniOCMn9sD60QKF1Axsj7bKl339WH058LuGFS6H84njYH5w==}
+    engines: {node: '>=20', pnpm: '>=8.6.0'}
 
   '@tokenizer/inflate@0.2.7':
     resolution: {integrity: sha512-MADQgmZT1eKjp06jpI2yozxaU9uVs4GzzgSL+uEq7bVcJ9V1ZXQkeGNql1fsSI0gMy1vhvNTNbUqrx+pZfJVmg==}
@@ -11814,6 +11818,10 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
+  svg-path-commander@2.1.11:
+    resolution: {integrity: sha512-wmQ6QA3Od+HOcpIzLjPlbv59+x3yd3V5W6xitUOvAHmqZpP7wVrRM2CHqEm5viHUbZu6PjzFsjbTEFtIeUxaNA==}
+    engines: {node: '>=16', pnpm: '>=8.6.0'}
+
   svgo@4.0.0:
     resolution: {integrity: sha512-VvrHQ+9uniE+Mvx3+C9IEe/lWasXCU0nXMY2kZeLrHNICuRiC8uMPyM14UEaMOFA5mhyQqEkB02VoQ16n3DLaw==}
     engines: {node: '>=16'}
@@ -12447,6 +12455,9 @@ packages:
 
   vue-component-type-helpers@3.2.0:
     resolution: {integrity: sha512-6o41sHNIAzqSjmXz+5nXjBCCVfjVB3qTfUJQslH979mTnPw0TKl/j3PfArKOwyP/nJKT/QhppfQE7zUgrCeBWA==}
+
+  vue-component-type-helpers@3.2.1:
+    resolution: {integrity: sha512-gKV7XOkQl4urSuLHNY1tnVQf7wVgtb/mKbRyxSLWGZUY9RK7aDPhBenTjm+i8ZFe0zC2PZeHMPtOZXZfyaFOzQ==}
 
   vue-demi@0.14.10:
     resolution: {integrity: sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==}
@@ -16852,7 +16863,7 @@ snapshots:
       storybook: 10.1.10(@testing-library/dom@9.3.4)(bufferutil@4.1.0)(prettier@3.7.4)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(utf-8-validate@6.0.6)
       type-fest: 2.19.0
       vue: 3.5.26(typescript@5.9.3)
-      vue-component-type-helpers: 3.2.0
+      vue-component-type-helpers: 3.2.1
 
   '@stylistic/eslint-plugin@5.6.1(eslint@9.39.2)':
     dependencies:
@@ -16958,12 +16969,13 @@ snapshots:
     dependencies:
       defer-to-connect: 2.0.1
 
-  '@tabler/icons-webfont@3.35.0':
+  '@tabler/icons-webfont@3.36.0':
     dependencies:
-      '@tabler/icons': 3.35.0
+      '@tabler/icons': 3.36.0
       sharp: 0.34.5
+      svg-path-commander: 2.1.11
 
-  '@tabler/icons@3.35.0': {}
+  '@tabler/icons@3.36.0': {}
 
   '@tensorflow/tfjs-backend-cpu@4.22.0(@tensorflow/tfjs-core@4.22.0(encoding@0.1.13))':
     dependencies:
@@ -17074,6 +17086,8 @@ snapshots:
       vue: 3.5.26(typescript@5.9.3)
     optionalDependencies:
       '@vue/compiler-sfc': 3.5.26
+
+  '@thednp/dommatrix@2.0.12': {}
 
   '@tokenizer/inflate@0.2.7':
     dependencies:
@@ -24039,6 +24053,10 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
+  svg-path-commander@2.1.11:
+    dependencies:
+      '@thednp/dommatrix': 2.0.12
+
   svgo@4.0.0:
     dependencies:
       commander: 11.1.0
@@ -24626,6 +24644,8 @@ snapshots:
   vue-component-type-helpers@2.2.12: {}
 
   vue-component-type-helpers@3.2.0: {}
+
+  vue-component-type-helpers@3.2.1: {}
 
   vue-demi@0.14.10(vue@3.5.26(typescript@5.9.3)):
     dependencies:

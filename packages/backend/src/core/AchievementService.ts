@@ -87,6 +87,7 @@ export const ACHIEVEMENT_TYPES = [
 	'brainDiver',
 	'smashTestNotificationButton',
 	'tutorialCompleted',
+	'sensitiveContentConsentResponded',
 	'bubbleGameExplodingHead',
 	'bubbleGameDoubleExplodingHead',
 ] as const;

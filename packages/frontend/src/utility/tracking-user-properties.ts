@@ -13,7 +13,7 @@ export function getDeviceId(): string {
 export function setUserProperties(properties: TrackingUserProperties): void {
 	if (!instance.googleAnalyticsId && !instance.sentryForFrontend) return;
 
-	const gtagConsent = miLocalStorage.getItemAsJson('gtagConsent') as GtagConsentParams | null;
+	const gtagConsent = miLocalStorage.getItemAsJson('gtagConsent') as GtagConsentParams | undefined;
 	if (instance.googleAnalyticsId && gtagConsent?.ad_user_data === 'granted') {
 		gtagSet({
 			user_properties: properties,

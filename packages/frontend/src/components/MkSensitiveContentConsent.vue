@@ -133,7 +133,7 @@ import { i18n } from '@/i18n.js';
 import { prefer } from '@/preferences.js';
 import { PREF_DEF } from '@/preferences/def.js';
 import { claimAchievement } from '@/utility/achievements.js';
-import { usageReport } from '@/utility/usage-report.js';
+import { getDeviceId, setUserProperties } from '@/utility/tracking-user-properties.js';
 import { sensitiveContentConsent, setSensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 
 const emit = defineEmits<{
@@ -247,11 +247,11 @@ function submit() {
 	}
 	prefer.commit('displayOfSensitiveAds', effectiveDisplayOfSensitiveAds);
 
-	usageReport({
-		t: Math.floor(Date.now() / 1000),
-		e: 'p',
-		i: 'displayOfSensitiveAds',
-		a: effectiveDisplayOfSensitiveAds,
+	const consentValue = iAmAdult.value === null ? 'unset' : String(iAmAdult.value);
+	setUserProperties({
+		deviceId: getDeviceId(),
+		sensitiveContentConsent: consentValue,
+		displayOfSensitiveAds: effectiveDisplayOfSensitiveAds,
 	});
 
 	emit('decided', iAmAdult.value);

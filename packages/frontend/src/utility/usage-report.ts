@@ -1,5 +1,5 @@
 /* eslint-disable id-denylist */
-// buffering usage report data for 1 minute, then sending it to the server
+// send usage report data to the server
 // POST /api/usage [ { t: number, e: string, i: string, a: string } ]
 // t: timestamp
 // e: event type
@@ -19,44 +19,65 @@ export interface UsageReport {
 }
 
 let disableUsageReport = !instance.googleAnalyticsId;
-const usageReportBuffer: UsageReport[] = [];
-let usageReportBufferTimer: number | null = null;
 
 export function usageReport(data: UsageReport) {
 	if (disableUsageReport) return;
 
-	if (usageReportBuffer.length > 0) {
-		const last = usageReportBuffer[usageReportBuffer.length - 1];
-		if (last.t === data.t && last.e === data.e && last.i === data.i && last.a === data.a) return;
-	}
-
-	usageReportBuffer.push(data);
-	if (usageReportBufferTimer === null) {
-		usageReportBufferTimer = window.setTimeout(() => {
-			sendUsageReport();
-		}, 60 * 1000);
-	}
+	sendUsageReport(data);
 }
 
-export function sendUsageReport() {
-	if (usageReportBuffer.length === 0) return;
-	const data = usageReportBuffer.splice(0, usageReportBuffer.length);
-	usageReportBufferTimer = null;
-
+export function sendUsageReport(data: UsageReport) {
 	if ((miLocalStorage.getItemAsJson('gtagConsent') as GtagConsentParams).ad_user_data !== 'granted') {
 		console.log('Usage report is not sent because the user has not consented to sharing data about ad interactions.');
 		disableUsageReport = true;
 		return;
 	}
 
-	window.fetch('/api/usage', {
+	const payload = [data];
+	const requestInit: RequestInit = {
 		method: 'POST',
-		body: JSON.stringify(data),
+		body: JSON.stringify(payload),
 		cache: 'no-cache',
-		credentials: 'include',
+		credentials: 'include' as const,
 		headers: {
 			'Content-Type': 'application/json',
 			'X-Client-Transaction-Id': generateClientTransactionId('misskey'),
 		},
-	});
+	};
+
+	const fallback = () => {
+		window.fetch('/api/usage', {
+			...requestInit,
+			keepalive: true,
+		});
+	};
+
+	if ('serviceWorker' in navigator) {
+		if (navigator.serviceWorker.controller) {
+			navigator.serviceWorker.controller.postMessage({
+				type: 'usage-report',
+				request: requestInit,
+			});
+			return;
+		}
+
+		navigator.serviceWorker.ready
+			.then(registration => {
+				if (!registration.active) {
+					fallback();
+					return;
+				}
+
+				registration.active.postMessage({
+					type: 'usage-report',
+					request: requestInit,
+				});
+			})
+			.catch(() => {
+				fallback();
+			});
+		return;
+	}
+
+	fallback();
 }

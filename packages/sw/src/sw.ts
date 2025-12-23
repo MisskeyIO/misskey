@@ -40,6 +40,28 @@ globalThis.addEventListener('activate', ev => {
 	);
 });
 
+globalThis.addEventListener('message', ev => {
+	const message = ev.data as {
+		type?: string;
+		request?: RequestInit;
+	};
+
+	if (message.type !== 'usage-report' || !message.request) return;
+
+	const requestInit: RequestInit = {
+		...message.request,
+		headers: new Headers(message.request.headers ?? {}),
+	};
+
+	ev.waitUntil(
+		fetch('/api/usage', requestInit).catch(error => {
+			if (_DEV_) {
+				console.warn('usage report failed in service worker', error);
+			}
+		}),
+	);
+});
+
 async function offlineContentHTML() {
 	let i18n: Partial<I18n<Locale>>;
 	try {

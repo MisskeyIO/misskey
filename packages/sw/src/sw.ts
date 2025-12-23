@@ -43,18 +43,21 @@ globalThis.addEventListener('activate', ev => {
 globalThis.addEventListener('message', ev => {
 	const message = ev.data as {
 		type?: string;
-		request?: RequestInit;
+		body?: string;
 	};
 
-	if (message.type !== 'usage-report' || !message.request) return;
-
-	const requestInit: RequestInit = {
-		...message.request,
-		headers: new Headers(message.request.headers ?? {}),
-	};
+	if (message.type !== 'usage-report' || !message.body) return;
 
 	ev.waitUntil(
-		fetch('/api/usage', requestInit).catch(error => {
+		fetch('/api/usage', {
+			method: 'POST',
+			body: message.body,
+			cache: 'no-cache',
+			credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		}).catch(error => {
 			if (_DEV_) {
 				console.warn('usage report failed in service worker', error);
 			}

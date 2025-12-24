@@ -15,15 +15,15 @@ import { getUrlWithLoginId } from '@/scripts/login-id.js';
 
 let id: string | null | undefined = await get('id');
 export function generateClientTransactionId(initiator: string) {
-	if (id === null) {
+	if (!id) {
 		id = crypto.randomUUID().replaceAll('-', '');
-		set('id', id);
+		void set('id', id);
 	}
 
 	// ハイフンが含まれている場合は除去
 	if (id.includes('-')) {
 		id = id.replaceAll('-', '');
-		set('id', id);
+		void set('id', id);
 	}
 
 	return `${id}-${initiator}-${crypto.randomUUID().replaceAll('-', '')}`;

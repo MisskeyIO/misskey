@@ -13,7 +13,7 @@ import type { SwMessage, SwMessageOrderType } from '@/types.js';
 import { getAccountFromId } from '@/scripts/get-account-from-id.js';
 import { getUrlWithLoginId } from '@/scripts/login-id.js';
 
-let id: string | null = await get('id');
+let id: string | null | undefined = await get('id');
 export function generateClientTransactionId(initiator: string) {
 	if (id === null) {
 		id = crypto.randomUUID().replaceAll('-', '');

@@ -20,21 +20,32 @@ export interface UsageReport {
 
 let disableUsageReport = !instance.googleAnalyticsId;
 
+const USAGE_REPORT_BUFFER_MS = 1000;
+const usageReportBuffer: UsageReport[] = [];
+let usageReportBufferTimer: number | null = null;
+
 export function usageReport(data: UsageReport) {
 	if (disableUsageReport) return;
 
-	sendUsageReport(data);
+	usageReportBuffer.push(data);
+	if (usageReportBufferTimer === null) {
+		usageReportBufferTimer = window.setTimeout(() => {
+			sendUsageReport();
+		}, USAGE_REPORT_BUFFER_MS);
+	}
 }
 
-export function sendUsageReport(data: UsageReport) {
+export function sendUsageReport() {
+	if (usageReportBuffer.length === 0) return;
+	const payload = usageReportBuffer.splice(0, usageReportBuffer.length);
+	usageReportBufferTimer = null;
+
 	const gtagConsent = miLocalStorage.getItemAsJson('gtagConsent') as GtagConsentParams | undefined;
 	if (!gtagConsent || gtagConsent.ad_user_data !== 'granted') {
 		console.log('Usage report is not sent because the user has not consented to sharing data about ad interactions.');
 		disableUsageReport = true;
 		return;
 	}
-
-	const payload = [data];
 
 	const fallback = () => {
 		window.fetch('/api/usage', {

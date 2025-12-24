@@ -8,9 +8,26 @@
  * 各種操作
  */
 import * as Misskey from 'misskey-js';
+import { get, set } from 'idb-keyval';
 import type { SwMessage, SwMessageOrderType } from '@/types.js';
 import { getAccountFromId } from '@/scripts/get-account-from-id.js';
 import { getUrlWithLoginId } from '@/scripts/login-id.js';
+
+let id: string | null = await get('id');
+export function generateClientTransactionId(initiator: string) {
+	if (id === null) {
+		id = crypto.randomUUID().replaceAll('-', '');
+		set('id', id);
+	}
+
+	// ハイフンが含まれている場合は除去
+	if (id.includes('-')) {
+		id = id.replaceAll('-', '');
+		set('id', id);
+	}
+
+	return `${id}-${initiator}-${crypto.randomUUID().replaceAll('-', '')}`;
+}
 
 const fetchWithTuple = (
 	...args: Parameters<typeof fetch>

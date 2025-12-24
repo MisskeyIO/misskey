@@ -56,6 +56,7 @@ globalThis.addEventListener('message', ev => {
 			credentials: 'include',
 			headers: {
 				'Content-Type': 'application/json',
+				'X-Client-Transaction-Id': swos.generateClientTransactionId('misskey'),
 			},
 		}).catch(error => {
 			if (_DEV_) {

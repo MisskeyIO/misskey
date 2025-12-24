@@ -13,20 +13,37 @@ import type { SwMessage, SwMessageOrderType } from '@/types.js';
 import { getAccountFromId } from '@/scripts/get-account-from-id.js';
 import { getUrlWithLoginId } from '@/scripts/login-id.js';
 
-let id: string | null | undefined = await get('id');
+let clientId: string | null | undefined;
+
+const initClientId = (): void => {
+	void get('id').then((stored) => {
+		if (clientId) return;
+		if (stored) {
+			if (stored.includes('-')) {
+				clientId = stored.replaceAll('-', '');
+				void set('id', clientId);
+			} else {
+				clientId = stored;
+			}
+			return;
+		}
+		clientId = crypto.randomUUID().replaceAll('-', '');
+		void set('id', clientId);
+	});
+};
+
+initClientId();
+
 export function generateClientTransactionId(initiator: string) {
-	if (!id) {
-		id = crypto.randomUUID().replaceAll('-', '');
-		void set('id', id);
+	if (!clientId) {
+		clientId = crypto.randomUUID().replaceAll('-', '');
+		void set('id', clientId);
+	} else if (clientId.includes('-')) {
+		clientId = clientId.replaceAll('-', '');
+		void set('id', clientId);
 	}
 
-	// ハイフンが含まれている場合は除去
-	if (id.includes('-')) {
-		id = id.replaceAll('-', '');
-		void set('id', id);
-	}
-
-	return `${id}-${initiator}-${crypto.randomUUID().replaceAll('-', '')}`;
+	return `${clientId}-${initiator}-${crypto.randomUUID().replaceAll('-', '')}`;
 }
 
 const fetchWithTuple = (

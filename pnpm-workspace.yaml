@@ -122,7 +122,7 @@ catalog:
   '@types/sanitize-html': 2.16.0
   '@types/seedrandom': 3.0.8
   '@types/semver': 7.7.1
-  '@types/serviceworker': 0.0.170
+  '@types/serviceworker': 0.0.171
   '@types/simple-oauth2': 5.0.8
   '@types/sinonjs__fake-timers': 15.0.1
   '@types/supertest': 6.0.3

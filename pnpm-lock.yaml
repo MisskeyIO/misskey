@@ -325,8 +325,8 @@ catalogs:
       specifier: 7.7.1
       version: 7.7.1
     '@types/serviceworker':
-      specifier: 0.0.170
-      version: 0.0.170
+      specifier: 0.0.171
+      version: 0.0.171
     '@types/simple-oauth2':
       specifier: 5.0.8
       version: 5.0.8
@@ -874,8 +874,8 @@ catalogs:
       specifier: 7.1.4
       version: 7.1.4
     systeminformation:
-      specifier: 5.27.16
-      version: 5.27.16
+      specifier: 5.27.17
+      version: 5.27.17
     terser:
       specifier: 5.44.1
       version: 5.44.1
@@ -1476,7 +1476,7 @@ importers:
         version: 2.1.0
       systeminformation:
         specifier: 'catalog:'
-        version: 5.27.16
+        version: 5.27.17
       tinycolor2:
         specifier: 'catalog:'
         version: 1.6.0
@@ -2526,7 +2526,7 @@ importers:
     devDependencies:
       '@types/serviceworker':
         specifier: 'catalog:'
-        version: 0.0.170
+        version: 0.0.171
       '@typescript-eslint/parser':
         specifier: 'catalog:'
         version: 8.50.1(eslint@9.39.2)(typescript@5.9.3)
@@ -6164,8 +6164,8 @@ packages:
   '@types/serve-static@2.2.0':
     resolution: {integrity: sha512-8mam4H1NHLtu7nmtalF7eyBH14QyOASmcxHhSfEoRyr0nP/YdoesEtU+uSRvMe96TW/HPTtkoKqQLl53N7UXMQ==}
 
-  '@types/serviceworker@0.0.170':
-    resolution: {integrity: sha512-6kJo5obpwZ4W8HTh7A85PjWVqQDTi76U2y8gH1CNc/VEn+opHw7YFyaDhGrvaaTfpSk0uRwdw62k9PiUdAD5Rw==}
+  '@types/serviceworker@0.0.171':
+    resolution: {integrity: sha512-SrkZuXqhygIEZNzKk7u65BNMYdb+6e1NlEP0qwiA/e6VFMNz30Q1rKet0cs0DbJ645zQjGjlFBiopWAWzZl0bw==}
 
   '@types/simple-oauth2@5.0.8':
     resolution: {integrity: sha512-TehQqoOGdy3/rmFsCEGgnt1f4JhUCA0joWemGGCTbVYvoZvfBjkRsBFYmz8k0V/sn2XQZHe33L4lWxqMhIO3tQ==}
@@ -11828,6 +11828,12 @@ packages:
     os: [darwin, linux, win32, freebsd, openbsd, netbsd, sunos, android]
     hasBin: true
 
+  systeminformation@5.27.17:
+    resolution: {integrity: sha512-aWH+WoKHOGV5qBI9IPzFSwmLXrUSukF8aKXhWDZU990kKs65b+LSD69/1P0PKDweu9o8oCMW9QkJGG9R8FLi5A==}
+    engines: {node: '>=8.0.0'}
+    os: [darwin, linux, win32, freebsd, openbsd, netbsd, sunos, android]
+    hasBin: true
+
   tagged-tag@1.0.0:
     resolution: {integrity: sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng==}
     engines: {node: '>=20'}
@@ -17385,7 +17391,7 @@ snapshots:
       '@types/http-errors': 2.0.5
       '@types/node': 22.19.3
 
-  '@types/serviceworker@0.0.170': {}
+  '@types/serviceworker@0.0.171': {}
 
   '@types/simple-oauth2@5.0.8': {}
 
@@ -24041,6 +24047,8 @@ snapshots:
       '@pkgr/core': 0.2.9
 
   systeminformation@5.27.16: {}
+
+  systeminformation@5.27.17: {}
 
   tagged-tag@1.0.0: {}
 

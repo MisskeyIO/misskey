@@ -3,14 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { apiUrl } from '@@/js/config.js';
+import { apiUrl, host } from '@@/js/config.js';
 import { cloudBackup } from '@/preferences/utility.js';
 import { store } from '@/store.js';
 import { waiting } from '@/os.js';
 import { unisonReload } from '@/utility/unison-reload.js';
-import { clear } from '@/utility/idb-proxy.js';
 import { $i } from '@/i.js';
 import { generateClientTransactionId } from '@/utility/misskey-api.js';
+import { miLocalStorage } from '@/local-storage.js';
+import { getAccounts, login, removeAccount } from '@/accounts.js';
 
 export async function signout() {
 	if (!$i) return;
@@ -21,32 +22,17 @@ export async function signout() {
 		await cloudBackup();
 	}
 
-	localStorage.clear();
+	document.cookie.split(';').forEach((cookie) => {
+		const cookieName = cookie.split('=')[0].trim();
+		if (cookieName === 'token') {
+			document.cookie = `${cookieName}=; max-age=0; path=/`;
+		}
+	});
 
-	const idbAbortController = new AbortController();
-	const timeout = window.setTimeout(() => idbAbortController.abort(), 5000);
-
-	const idbPromises = ['MisskeyClient'].map((name, i, arr) => new Promise<void>((res, rej) => {
-		const delidb = indexedDB.deleteDatabase(name);
-		delidb.onsuccess = () => res();
-		delidb.onerror = e => rej(e);
-		delidb.onblocked = () => idbAbortController.signal.aborted && rej(new Error('Operation aborted'));
-	}));
-
-	try {
-		await Promise.race([
-			Promise.all([
-				...idbPromises,
-				// idb keyval-storeはidb-keyvalライブラリによる別管理
-				clear(),
-			]),
-			new Promise((_, rej) => idbAbortController.signal.addEventListener('abort', () => rej(new Error('Operation timed out')))),
-		]);
-	} catch {
-		// nothing
-	} finally {
-		window.clearTimeout(timeout);
-	}
+	miLocalStorage.removeItem('account');
+	await removeAccount(host, $i.id);
+	const accounts = await getAccounts();
+	const nextAccount = accounts.find(account => account.token != null);
 
 	//#region Remove service worker registration
 	try {
@@ -69,14 +55,20 @@ export async function signout() {
 			}
 		}
 
-		await navigator.serviceWorker.getRegistrations()
-			.then(registrations => {
-				return Promise.all(registrations.map(registration => registration.unregister()));
-			});
+		if (!nextAccount) {
+			await navigator.serviceWorker.getRegistrations()
+				.then(registrations => {
+					return Promise.all(registrations.map(registration => registration.unregister()));
+				});
+		}
 	} catch {
 		// nothing
 	}
 	//#endregion
 
-	unisonReload('/');
+	if (nextAccount?.token) {
+		await login(nextAccount.token);
+	} else {
+		unisonReload('/');
+	}
 }

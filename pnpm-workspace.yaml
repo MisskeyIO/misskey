@@ -191,7 +191,7 @@ catalog:
   fastify-http-errors-enhanced: 7.0.1
   fastify-raw-body: 5.0.0
   feed: 5.1.0
-  file-type: 21.1.1
+  file-type: 21.2.0
   fkill: 10.0.1
   fluent-ffmpeg: 2.1.3
   form-data: 4.0.5

@@ -6,17 +6,16 @@
 import { defineAsyncComponent, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { apiUrl, host } from '@@/js/config.js';
-import { generateClientTransactionId } from '@/utility/misskey-api.js';
-import type { MenuItem } from '@/types/menu.js';
+import { generateClientTransactionId, misskeyApi } from '@/utility/misskey-api.js';
+import type { MenuButton, MenuItem, MenuUser } from '@/types/menu.js';
 import { showSuspendedDialog } from '@/utility/show-suspended-dialog.js';
 import { i18n } from '@/i18n.js';
 import { miLocalStorage } from '@/local-storage.js';
-import { waiting, popup, popupMenu, success, alert } from '@/os.js';
+import { popup, popupMenu, success, alert } from '@/os.js';
 import { unisonReload, reloadChannel } from '@/utility/unison-reload.js';
 import { prefer } from '@/preferences.js';
 import { store } from '@/store.js';
 import { $i } from '@/i.js';
-import { signout } from '@/signout.js';
 
 type AccountWithToken = Misskey.entities.MeDetailed & { token: string };
 
@@ -40,9 +39,11 @@ export async function getAccounts(): Promise<{
 }
 
 async function addAccount(host: string, user: Misskey.entities.User, token: AccountWithToken['token']) {
+	const key = host + '/' + user.id;
+	store.set('accountTokens', { ...store.s.accountTokens, [key]: token });
+	store.set('accountInfos', { ...store.s.accountInfos, [key]: user });
+
 	if (!prefer.s.accounts.some(x => x[0] === host && x[1].id === user.id)) {
-		store.set('accountTokens', { ...store.s.accountTokens, [host + '/' + user.id]: token });
-		store.set('accountInfos', { ...store.s.accountInfos, [host + '/' + user.id]: user });
 		prefer.commit('accounts', [...prefer.s.accounts, [host, { id: user.id, username: user.username }]]);
 	}
 }
@@ -59,6 +60,17 @@ export async function removeAccount(host: string, id: AccountWithToken['id']) {
 }
 
 const isAccountDeleted = Symbol('isAccountDeleted');
+
+async function removeAccountByToken(token: string) {
+	const entry = Object.entries(store.s.accountTokens).find(([, value]) => value === token);
+	if (!entry) return;
+	const [key] = entry;
+	const separatorIndex = key.lastIndexOf('/');
+	if (separatorIndex === -1) return;
+	const accountHost = key.slice(0, separatorIndex);
+	const accountId = key.slice(separatorIndex + 1);
+	await removeAccount(accountHost, accountId);
+}
 
 function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Promise<Misskey.entities.MeDetailed> {
 	return new Promise((done, fail) => {
@@ -152,16 +164,14 @@ export function updateCurrentAccountPartial(accountData: Partial<Misskey.entitie
 
 export async function refreshCurrentAccount() {
 	if (!$i) return;
-	return fetchAccount($i.token, $i.id).then(updateCurrentAccount).catch(reason => {
-		if (reason === isAccountDeleted) {
-			removeAccount(host, $i!.id);
-			if (Object.keys(store.s.accountTokens).length > 0) {
-				login(Object.values(store.s.accountTokens)[0]);
-			} else {
-				signout();
+	return fetchAccount($i.token, $i.id)
+		.then(updateCurrentAccount)
+		.catch(async reason => {
+			if (reason === isAccountDeleted) {
+				const { signout } = await import('@/signout.js');
+				await signout();
 			}
-		}
-	});
+		});
 }
 
 export async function login(token: AccountWithToken['token'], redirect?: string) {
@@ -171,7 +181,10 @@ export async function login(token: AccountWithToken['token'], redirect?: string)
 		showing: showing,
 	}, {}, 'closed');
 
-	const me = await fetchAccount(token, undefined, true).catch(reason => {
+	const me = await fetchAccount(token, undefined, true).catch(async reason => {
+		if (reason === isAccountDeleted) {
+			await removeAccountByToken(token);
+		}
 		showing.value = false;
 		throw reason;
 	});
@@ -203,7 +216,6 @@ export async function switchAccount(host: string, id: string) {
 	} else {
 		await popup(defineAsyncComponent(() => import('@/components/MkSigninDialog.vue')), {}, {
 			done: async (res: Misskey.entities.SigninFlowResponse & { finished: true }) => {
-				store.set('accountTokens', { ...store.s.accountTokens, [host + '/' + res.id]: res.i });
 				login(res.i);
 			},
 		}, 'closed');
@@ -218,61 +230,72 @@ export async function openAccountMenu(opts: {
 }, ev: MouseEvent) {
 	if (!$i) return;
 
-	function createItem(host: string, id: Misskey.entities.User['id'], username: Misskey.entities.User['username'], account: Misskey.entities.User | null | undefined, token: string): MenuItem {
-		if (account) {
-			return {
-				type: 'user' as const,
-				user: account,
-				active: opts.active != null ? opts.active === id : false,
-				action: async () => {
-					if (opts.onChoose) {
-						opts.onChoose(account);
-					} else {
-						switchAccount(host, id);
-					}
-				},
-			};
-		} else {
-			return {
-				type: 'button' as const,
-				text: username,
-				active: opts.active != null ? opts.active === id : false,
-				action: async () => {
-					if (opts.onChoose) {
-						fetchAccount(token, id).then(account => {
-							opts.onChoose(account);
-						});
-					} else {
-						switchAccount(host, id);
-					}
-				},
-			};
+	async function switchAccountByUser(account: Misskey.entities.User) {
+		const storedAccounts = await getAccounts();
+		const found = storedAccounts.find(x => x.id === account.id);
+		if (found?.token) {
+			login(found.token);
+			return;
+		}
+		if (found) {
+			await switchAccount(found.host, found.id);
 		}
 	}
 
-	const menuItems: MenuItem[] = [];
+	function switchAccountWithToken(token: string) {
+		login(token);
+	}
 
-	// TODO: $iのホストも比較したいけど通常null
-	const accountItems = (await getAccounts().then(accounts => accounts.filter(x => x.id !== $i.id))).map(a => createItem(a.host, a.id, a.username, a.user, a.token));
+	const storedAccounts = await getAccounts().then(accounts => accounts.filter(x => x.id !== $i.id));
+	const accountsPromise = storedAccounts.length > 0
+		? misskeyApi('users/show', { userIds: storedAccounts.map(x => x.id) })
+		: Promise.resolve([] as Misskey.entities.User[]);
+
+	function createItem(account: Misskey.entities.User) {
+		return {
+			type: 'user' as const,
+			user: account,
+			active: opts.active != null ? opts.active === account.id : false,
+			action: () => {
+				if (opts.onChoose) {
+					opts.onChoose(account);
+				} else {
+					switchAccountByUser(account);
+				}
+			},
+		};
+	}
+
+	const accountItemPromises: MenuItem[] = storedAccounts.map(a => new Promise<MenuButton | MenuUser>(res => {
+		accountsPromise.then(accounts => {
+			const account = accounts.find(x => x.id === a.id);
+			if (account == null) {
+				return res({
+					type: 'button' as const,
+					text: a.username ?? a.id,
+					active: opts.active != null ? opts.active === a.id : false,
+					action: () => {
+						if (a.token) {
+							switchAccountWithToken(a.token);
+						} else {
+							switchAccount(a.host, a.id);
+						}
+					},
+				});
+			}
+
+			res(createItem(account));
+		});
+	}));
 
 	if (opts.withExtraOperation) {
-		menuItems.push({
-			type: 'link',
+		popupMenu([...[{
+			type: 'link' as const,
 			text: i18n.ts.profile,
 			to: `/@${$i.username}`,
 			avatar: $i,
-		}, {
-			type: 'divider',
-		});
-
-		if (opts.includeCurrentAccount) {
-			menuItems.push(createItem(host, $i.id, $i.username, $i, $i.token));
-		}
-
-		menuItems.push(...accountItems);
-
-		menuItems.push({
-			type: 'parent',
+		}, { type: 'divider' as const }, ...(opts.includeCurrentAccount ? [createItem($i)] : []), ...accountItemPromises, {
+			type: 'parent' as const,
 			icon: 'ti ti-plus',
 			text: i18n.ts.addAccount,
 			children: [{
@@ -289,28 +312,24 @@ export async function openAccountMenu(opts: {
 				action: () => {
 					getAccountWithSignupDialog().then(res => {
 						if (res != null) {
-							switchAccount(host, res.id);
+							switchAccountWithToken(res.token);
 						}
 					});
 				},
 			}],
 		}, {
-			type: 'link',
+			type: 'link' as const,
 			icon: 'ti ti-users',
 			text: i18n.ts.manageAccounts,
 			to: '/settings/accounts',
+		}]], ev.currentTarget ?? ev.target, {
+			align: 'left',
 		});
 	} else {
-		if (opts.includeCurrentAccount) {
-			menuItems.push(createItem(host, $i.id, $i.username, $i, $i.token));
-		}
-
-		menuItems.push(...accountItems);
+		popupMenu([...(opts.includeCurrentAccount ? [createItem($i)] : []), ...accountItemPromises], ev.currentTarget ?? ev.target, {
+			align: 'left',
+		});
 	}
-
-	popupMenu(menuItems, ev.currentTarget ?? ev.target, {
-		align: 'left',
-	});
 }
 
 export function getAccountWithSigninDialog(): Promise<{ id: string, token: string } | null> {

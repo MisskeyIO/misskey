@@ -15,7 +15,7 @@ catalog:
   '@aws-sdk/lib-storage': ~3
   '@bull-board/api': 6.15.0
   '@bull-board/fastify': 6.15.0
-  '@bull-board/ui': 6.15.0
+  '@bull-board/ui': 6.16.1
   '@discordapp/twemoji': 16.0.1
   '@fastify/accepts': 5.0.4
   '@fastify/cookie': 11.0.2

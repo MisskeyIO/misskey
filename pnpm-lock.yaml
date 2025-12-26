@@ -22,8 +22,8 @@ catalogs:
       specifier: 6.15.0
       version: 6.15.0
     '@bull-board/ui':
-      specifier: 6.15.0
-      version: 6.15.0
+      specifier: 6.16.1
+      version: 6.16.1
     '@discordapp/twemoji':
       specifier: 16.0.1
       version: 16.0.1
@@ -1122,13 +1122,13 @@ importers:
         version: 3.957.0(@aws-sdk/client-s3@3.957.0)
       '@bull-board/api':
         specifier: 'catalog:'
-        version: 6.15.0(@bull-board/ui@6.15.0)
+        version: 6.15.0(@bull-board/ui@6.16.1)
       '@bull-board/fastify':
         specifier: 'catalog:'
         version: 6.15.0
       '@bull-board/ui':
         specifier: 'catalog:'
-        version: 6.15.0
+        version: 6.16.1
       '@discordapp/twemoji':
         specifier: 'catalog:'
         version: 16.0.1
@@ -2926,11 +2926,19 @@ packages:
     peerDependencies:
       '@bull-board/ui': 6.15.0
 
+  '@bull-board/api@6.16.1':
+    resolution: {integrity: sha512-yL8sl/1nVk3IEDuHuMXuOUdC250UA0LCekbekvmr3js2ldg+HPCw0deuQvdp4CNDUnxlbxBk2/73AumBxGwp/g==}
+    peerDependencies:
+      '@bull-board/ui': 6.16.1
+
   '@bull-board/fastify@6.15.0':
     resolution: {integrity: sha512-AOriPUQw1FRnwrZKoC5A8DTfbQEqtxpn9npN32/RJWcbatCvPkVmBJWXojt7GTDVQg4P/u3n4taZY8EljHubjw==}
 
   '@bull-board/ui@6.15.0':
     resolution: {integrity: sha512-bb/j6VMq2cfPoE/ZiUO7AcYTL0IjtxvKxkYV0zu+i1pc+JEv3ct4BItCII57knJR/YjZKGmdfr079KJFvzXC5A==}
+
+  '@bull-board/ui@6.16.1':
+    resolution: {integrity: sha512-h7IPiAcNGNmBOv/7nKqAOvkZz3AlhMxHB9AQWB7MzlGRRP02eT1aRkX1h2AKydgAZn5JQJqDG4DcMpYV+rEE1g==}
 
   '@canvas/image-data@1.1.0':
     resolution: {integrity: sha512-QdObRRjRbcXGmM1tmJ+MrHcaz1MftF2+W7YI+MsphnsCrmtyfS0d5qJbk0MeSbUeyM/jCb0hmnkXPsy026L7dA==}
@@ -13548,6 +13556,16 @@ snapshots:
       '@bull-board/ui': 6.15.0
       redis-info: 3.1.0
 
+  '@bull-board/api@6.15.0(@bull-board/ui@6.16.1)':
+    dependencies:
+      '@bull-board/ui': 6.16.1
+      redis-info: 3.1.0
+
+  '@bull-board/api@6.16.1(@bull-board/ui@6.16.1)':
+    dependencies:
+      '@bull-board/ui': 6.16.1
+      redis-info: 3.1.0
+
   '@bull-board/fastify@6.15.0':
     dependencies:
       '@bull-board/api': 6.15.0(@bull-board/ui@6.15.0)
@@ -13559,6 +13577,10 @@ snapshots:
   '@bull-board/ui@6.15.0':
     dependencies:
       '@bull-board/api': 6.15.0(@bull-board/ui@6.15.0)
+
+  '@bull-board/ui@6.16.1':
+    dependencies:
+      '@bull-board/api': 6.16.1(@bull-board/ui@6.16.1)
 
   '@canvas/image-data@1.1.0': {}
 

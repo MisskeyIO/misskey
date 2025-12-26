@@ -81,6 +81,11 @@ const menuDef = computed<SuperMenuDef[]>(() => [{
 		to: '/settings/profile',
 		active: currentPage.value?.route.name === 'profile',
 	}, {
+		icon: 'ti ti-users',
+		text: i18n.ts.accounts,
+		to: '/settings/accounts',
+		active: currentPage.value?.route.name === 'accounts',
+	}, {
 		icon: 'ti ti-lock-open',
 		text: i18n.ts.privacy,
 		to: '/settings/privacy',
@@ -178,7 +183,6 @@ const menuDef = computed<SuperMenuDef[]>(() => [{
 			const { canceled } = await os.confirm({
 				type: 'warning',
 				title: i18n.ts.logoutConfirm,
-				text: i18n.ts.logoutWillClearClientData,
 			});
 			if (canceled) return;
 			signout();

@@ -325,8 +325,8 @@ catalogs:
       specifier: 7.7.1
       version: 7.7.1
     '@types/serviceworker':
-      specifier: 0.0.171
-      version: 0.0.171
+      specifier: 0.0.172
+      version: 0.0.172
     '@types/simple-oauth2':
       specifier: 5.0.8
       version: 5.0.8
@@ -2526,7 +2526,7 @@ importers:
     devDependencies:
       '@types/serviceworker':
         specifier: 'catalog:'
-        version: 0.0.171
+        version: 0.0.172
       '@typescript-eslint/parser':
         specifier: 'catalog:'
         version: 8.50.1(eslint@9.39.2)(typescript@5.9.3)
@@ -6164,8 +6164,8 @@ packages:
   '@types/serve-static@2.2.0':
     resolution: {integrity: sha512-8mam4H1NHLtu7nmtalF7eyBH14QyOASmcxHhSfEoRyr0nP/YdoesEtU+uSRvMe96TW/HPTtkoKqQLl53N7UXMQ==}
 
-  '@types/serviceworker@0.0.171':
-    resolution: {integrity: sha512-SrkZuXqhygIEZNzKk7u65BNMYdb+6e1NlEP0qwiA/e6VFMNz30Q1rKet0cs0DbJ645zQjGjlFBiopWAWzZl0bw==}
+  '@types/serviceworker@0.0.172':
+    resolution: {integrity: sha512-EOhGp6Y7GzmXT5cqKB2OqqZyktX3BReePu3rk1rkXCpchnb7O2CYcPpknpDiV6Jgr/eXdYMyOgSrfFH5/qoZSw==}
 
   '@types/simple-oauth2@5.0.8':
     resolution: {integrity: sha512-TehQqoOGdy3/rmFsCEGgnt1f4JhUCA0joWemGGCTbVYvoZvfBjkRsBFYmz8k0V/sn2XQZHe33L4lWxqMhIO3tQ==}
@@ -17391,7 +17391,7 @@ snapshots:
       '@types/http-errors': 2.0.5
       '@types/node': 22.19.3
 
-  '@types/serviceworker@0.0.171': {}
+  '@types/serviceworker@0.0.172': {}
 
   '@types/simple-oauth2@5.0.8': {}
 

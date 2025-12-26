@@ -22,10 +22,10 @@ export async function signout() {
 		await cloudBackup();
 	}
 
-	document.cookie.split(';').forEach((cookie) => {
+	window.document.cookie.split(';').forEach((cookie) => {
 		const cookieName = cookie.split('=')[0].trim();
 		if (cookieName === 'token') {
-			document.cookie = `${cookieName}=; max-age=0; path=/`;
+			window.document.cookie = `${cookieName}=; max-age=0; path=/`;
 		}
 	});
 

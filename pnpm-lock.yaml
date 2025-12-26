@@ -874,8 +874,8 @@ catalogs:
       specifier: 7.1.4
       version: 7.1.4
     systeminformation:
-      specifier: 5.27.17
-      version: 5.27.17
+      specifier: 5.28.0
+      version: 5.28.0
     terser:
       specifier: 5.44.1
       version: 5.44.1
@@ -1476,7 +1476,7 @@ importers:
         version: 2.1.0
       systeminformation:
         specifier: 'catalog:'
-        version: 5.27.17
+        version: 5.28.0
       tinycolor2:
         specifier: 'catalog:'
         version: 1.6.0
@@ -11822,14 +11822,14 @@ packages:
     resolution: {integrity: sha512-MeQTA1r0litLUf0Rp/iisCaL8761lKAZHaimlbGK4j0HysC4PLfqygQj9srcs0m2RdtDYnF8UuYyKpbjHYp7Jw==}
     engines: {node: ^14.18.0 || >=16.0.0}
 
-  systeminformation@5.27.16:
-    resolution: {integrity: sha512-aimHO/bE7QFtu3uB3vtpwn7V2DXXGX7NyTY7V1g+hPa7in2k10Bp3AL+Enmg3X71n7HbgLfwy/bbf+2cBSKURQ==}
+  systeminformation@5.27.17:
+    resolution: {integrity: sha512-aWH+WoKHOGV5qBI9IPzFSwmLXrUSukF8aKXhWDZU990kKs65b+LSD69/1P0PKDweu9o8oCMW9QkJGG9R8FLi5A==}
     engines: {node: '>=8.0.0'}
     os: [darwin, linux, win32, freebsd, openbsd, netbsd, sunos, android]
     hasBin: true
 
-  systeminformation@5.27.17:
-    resolution: {integrity: sha512-aWH+WoKHOGV5qBI9IPzFSwmLXrUSukF8aKXhWDZU990kKs65b+LSD69/1P0PKDweu9o8oCMW9QkJGG9R8FLi5A==}
+  systeminformation@5.28.0:
+    resolution: {integrity: sha512-TUgB+Si//7ojoKhqV3yhhHx9/pebPSAlHAK5o2IbpPax3+HA7PF0QyHeW9Yc7zm57xzYUmL1LLKa2AHIzZzaJw==}
     engines: {node: '>=8.0.0'}
     os: [darwin, linux, win32, freebsd, openbsd, netbsd, sunos, android]
     hasBin: true
@@ -19013,7 +19013,7 @@ snapshots:
       proxy-from-env: 1.0.0
       request-progress: 3.0.0
       supports-color: 8.1.1
-      systeminformation: 5.27.16
+      systeminformation: 5.27.17
       tmp: 0.2.5
       tree-kill: 1.2.2
       untildify: 4.0.0
@@ -24046,9 +24046,9 @@ snapshots:
     dependencies:
       '@pkgr/core': 0.2.9
 
-  systeminformation@5.27.16: {}
-
   systeminformation@5.27.17: {}
+
+  systeminformation@5.28.0: {}
 
   tagged-tag@1.0.0: {}
 

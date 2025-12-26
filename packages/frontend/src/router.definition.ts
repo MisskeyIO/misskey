@@ -176,7 +176,7 @@ export const ROUTE_DEF: RouteDef[] = [{
 		component: page(() => import('@/pages/settings/custom-css.vue')),
 	}, {
 		path: '/accounts',
-		name: 'profile',
+		name: 'accounts',
 		component: page(() => import('@/pages/settings/accounts.vue')),
 	}, {
 		path: '/account-stats',

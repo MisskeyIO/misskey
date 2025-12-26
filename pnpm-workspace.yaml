@@ -13,9 +13,9 @@ catalog:
   '@authenio/samlify-node-xmllint': 2.0.0
   '@aws-sdk/client-s3': ~3
   '@aws-sdk/lib-storage': ~3
-  '@bull-board/api': 6.15.0
-  '@bull-board/fastify': 6.15.0
-  '@bull-board/ui': 6.15.0
+  '@bull-board/api': 6.16.1
+  '@bull-board/fastify': 6.16.1
+  '@bull-board/ui': 6.16.1
   '@discordapp/twemoji': 16.0.1
   '@fastify/accepts': 5.0.4
   '@fastify/cookie': 11.0.2
@@ -24,7 +24,7 @@ catalog:
   '@fastify/formbody': 8.0.2
   '@fastify/http-proxy': 11.4.1
   '@fastify/multipart': 9.3.0
-  '@fastify/static': 8.3.0
+  '@fastify/static': 9.0.0
   '@fastify/view': 11.1.1
   '@isaacs/ttlcache': 2.1.3
   '@jest/globals': 30.2.0
@@ -34,7 +34,7 @@ catalog:
   '@misskey-dev/eslint-plugin': 2.2.0
   '@misskey-dev/sharp-read-bmp': 1.3.0
   '@misskey-dev/summaly': github:MisskeyIO/summaly#5.2.5-io.2
-  '@napi-rs/canvas': 0.1.86
+  '@napi-rs/canvas': 0.1.87
   '@nestjs/common': 11.1.10
   '@nestjs/core': 11.1.10
   '@nestjs/platform-express': 11.1.10
@@ -122,7 +122,7 @@ catalog:
   '@types/sanitize-html': 2.16.0
   '@types/seedrandom': 3.0.8
   '@types/semver': 7.7.1
-  '@types/serviceworker': 0.0.171
+  '@types/serviceworker': 0.0.172
   '@types/simple-oauth2': 5.0.8
   '@types/sinonjs__fake-timers': 15.0.1
   '@types/supertest': 6.0.3
@@ -153,7 +153,7 @@ catalog:
   body-parser: 2.2.1
   broadcast-channel: 7.2.0
   bufferutil: 4.1.0
-  bullmq: 5.66.2
+  bullmq: 5.66.3
   buraha: 0.0.1
   cacheable-lookup: 7.0.0
   canvas-confetti: 1.9.4
@@ -191,7 +191,7 @@ catalog:
   fastify-http-errors-enhanced: 7.0.1
   fastify-raw-body: 5.0.0
   feed: 5.1.0
-  file-type: 21.1.1
+  file-type: 21.2.0
   fkill: 10.0.1
   fluent-ffmpeg: 2.1.3
   form-data: 4.0.5
@@ -309,7 +309,7 @@ catalog:
   strict-event-emitter-types: 2.0.0
   stringz: 2.1.0
   supertest: 7.1.4
-  systeminformation: 5.27.17
+  systeminformation: 5.28.1
   terser: 5.44.1
   textarea-caret: 3.1.0
   three: 0.182.0

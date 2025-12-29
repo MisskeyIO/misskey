@@ -409,6 +409,7 @@ import type {
 	IPagesResponse,
 	IPinRequest,
 	IPinResponse,
+	IPurgeTimelineCacheRequest,
 	IReadAnnouncementRequest,
 	IRegenerateTokenRequest,
 	IRegistryGetRequest,
@@ -902,6 +903,7 @@ export type Endpoints = {
 	'i/page-likes': { req: IPageLikesRequest; res: IPageLikesResponse };
 	'i/pages': { req: IPagesRequest; res: IPagesResponse };
 	'i/pin': { req: IPinRequest; res: IPinResponse };
+	'i/purge-timeline-cache': { req: IPurgeTimelineCacheRequest; res: EmptyResponse };
 	'i/read-announcement': { req: IReadAnnouncementRequest; res: EmptyResponse };
 	'i/regenerate-token': { req: IRegenerateTokenRequest; res: EmptyResponse };
 	'i/registry/get': { req: IRegistryGetRequest; res: IRegistryGetResponse };

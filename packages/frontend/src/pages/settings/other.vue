@@ -67,7 +67,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 						<div class="_gaps_s">
 							<MkSelect v-model="selectedListId" :disabled="userLists?.length === 0">
-								<template #label>{{ i18n.ts.selectUserList }}</template>
+								<template #label>{{ i18n.ts.selectList }}</template>
 								<option v-for="list in userLists" :key="list.id" :value="list.id">{{ list.name }}</option>
 							</MkSelect>
 							<MkButton :disabled="!selectedListId" @click="clearFanoutTimeline('list', selectedListId)"><i class="ti ti-trash"></i> {{ i18n.ts.purgeUserListTimelineCache }}</MkButton>
@@ -247,12 +247,11 @@ async function clearFanoutTimeline(type: 'home' | 'user' | 'list' | 'antenna', t
 	});
 	if (canceled) return;
 
-	const promise = misskeyApi('i/purge-timeline-cache', {
+	await os.apiWithDialog('i/purge-timeline-cache', {
 		type,
 		listId: type === 'list' ? targetId : undefined,
 		antennaId: type === 'antenna' ? targetId : undefined,
 	});
-	await os.promiseDialog(promise, undefined, err => os.apiErrorHandler(err, 'i/purge-timeline-cache'));
 }
 
 function migrate() {

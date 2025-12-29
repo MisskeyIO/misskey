@@ -3345,17 +3345,9 @@ export interface Locale extends ILocale {
      */
     "purgeUserTimelineCache": string;
     /**
-     * リストを選択
-     */
-    "selectUserList": string;
-    /**
      * リストタイムラインのキャッシュを削除
      */
     "purgeUserListTimelineCache": string;
-    /**
-     * アンテナを選択
-     */
-    "selectAntenna": string;
     /**
      * アンテナタイムラインのキャッシュを削除
      */

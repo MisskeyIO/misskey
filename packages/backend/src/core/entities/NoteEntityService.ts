@@ -358,8 +358,9 @@ export class NoteEntityService implements OnModuleInit {
 
 	@bindThis
 	private async extractNoteDimension(note: MiNote | MiNoteWithDimension): Promise<number | undefined> {
-		if (typeof (note as MiNoteWithDimension).dimension === 'number')
+		if (typeof (note as MiNoteWithDimension).dimension === 'number') {
 			return (note as MiNoteWithDimension).dimension;
+		}
 
 		const cachedDimension = await this.cacheService.noteDimensionCache.get(note.id);
 		if (typeof cachedDimension === 'number') return cachedDimension;

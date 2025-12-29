@@ -357,6 +357,55 @@ export class NoteEntityService implements OnModuleInit {
 	}
 
 	@bindThis
+	private async extractNoteDimension(note: MiNote | MiNoteWithDimension): Promise<number | undefined> {
+		if (typeof (note as MiNoteWithDimension).dimension === 'number') {
+			return (note as MiNoteWithDimension).dimension;
+		}
+
+		const cachedDimension = await this.cacheService.noteDimensionCache.get(note.id);
+		if (typeof cachedDimension === 'number') {
+			return cachedDimension;
+		}
+
+		return undefined;
+	}
+
+	@bindThis
+	private async shouldDeliverByDimensionPreview(
+		note: MiNote | MiNoteWithDimension,
+		viewerDimension: number | null,
+		viewerId: MiUser['id'] | null,
+	): Promise<boolean> {
+		if (viewerDimension == null) return true;
+
+		if (viewerId) {
+			if (note.userId === viewerId) return true;
+			if (note.mentions?.includes(viewerId)) return true;
+			if (note.visibleUserIds?.includes(viewerId)) return true;
+			if (note.reply?.userId === viewerId) return true;
+			if (note.renote?.userId === viewerId) return true;
+		}
+
+		const isVisible = (targetDimension: number) => {
+			if (targetDimension === 0) return viewerDimension === 0;
+			if (viewerDimension === 0) return targetDimension < 1000;
+			return viewerDimension === targetDimension;
+		};
+
+		const dimension = await this.extractNoteDimension(note);
+		if (isVisible(typeof dimension === 'number' ? dimension : 0)) return true;
+
+		if (note.renoteId != null && note.renote == null) return true;
+
+		if (note.renote) {
+			const renoteDimension = await this.extractNoteDimension(note.renote);
+			if (isVisible(typeof renoteDimension === 'number' ? renoteDimension : 0)) return true;
+		}
+
+		return false;
+	}
+
+	@bindThis
 	public async pack(
 		src: MiNote['id'] | MiNote,
 		me: { id: MiUser['id'] } | null | undefined,
@@ -385,6 +434,12 @@ export class NoteEntityService implements OnModuleInit {
 		if (!opts.skipLanguageCheck && meId && !(await this.isLanguageVisibleToMe(note, meId))) {
 			throw new IdentifiableError('ab3e8c80-9d5b-4fb8-9ee0-089ed96d07e0', 'Note language is not visible for you.');
 		}
+		if (options?.viewerDimension != null) {
+			const viewerDimension = normalizeDimension(options.viewerDimension, this.meta.dimensions ?? 1);
+			if (!(await this.shouldDeliverByDimensionPreview(note, viewerDimension, meId))) {
+				throw new IdentifiableError('b74b13d0-49ee-4eac-a75a-48247c16d17a', 'Note is not visible in this dimension.');
+			}
+		}
 		const host = note.userHost;
 
 		const bufferedReactions = opts._hint_?.bufferedReactions != null
@@ -408,13 +463,7 @@ export class NoteEntityService implements OnModuleInit {
 				: await this.channelsRepository.findOneBy({ id: note.channelId })
 			: null;
 
-		let dimension: number | undefined;
-		if (typeof (note as MiNoteWithDimension).dimension === 'number') {
-			dimension = (note as MiNoteWithDimension).dimension;
-		} else {
-			const cachedDimension = await this.cacheService.noteDimensionCache.get(note.id);
-			if (typeof cachedDimension === 'number') dimension = cachedDimension;
-		}
+		const dimension = await this.extractNoteDimension(note);
 
 		const reactionEmojiNames = Object.keys(reactions)
 			.filter(x => x.startsWith(':') && x.includes('@') && !x.includes('@.')) // リモートカスタム絵文字のみ

@@ -1057,7 +1057,7 @@ watch(dimension, (value, previous) => {
 onMounted(() => {
 	if (initialViewingLangs.length === 0) {
 		const candidates = [
-			uiLanguageCode.value ?? null,
+			lang.value ?? null,
 			postingLang.value ?? null,
 		].filter((value): value is string => value != null);
 		viewingLangs.value = Array.from(new Set(candidates));

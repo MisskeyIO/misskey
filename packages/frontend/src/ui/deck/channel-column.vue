@@ -37,6 +37,7 @@ import { soundSettingsButton } from '@/ui/deck/tl-note-notification.js';
 import * as sound from '@/utility/sound.js';
 import { selectDimension } from '@/utility/dimension.js';
 import { claimAchievement } from '@/utility/achievements.js';
+import { prefer } from '@/preferences.js';
 
 const props = defineProps<{
 	column: Column;

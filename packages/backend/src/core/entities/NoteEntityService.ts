@@ -466,6 +466,8 @@ export class NoteEntityService implements OnModuleInit {
 				reply: note.replyId ? this.pack(note.reply ?? note.replyId, me, {
 					detail: false,
 					skipHide: opts.skipHide,
+					skipLanguageCheck: true,
+					viewerDimension: null,
 					withReactionAndUserPairCache: opts.withReactionAndUserPairCache,
 					_hint_: options?._hint_,
 				}) : undefined,
@@ -473,6 +475,8 @@ export class NoteEntityService implements OnModuleInit {
 				renote: note.renoteId ? this.pack(note.renote ?? note.renoteId, me, {
 					detail: true,
 					skipHide: opts.skipHide,
+					skipLanguageCheck: true,
+					viewerDimension: null,
 					withReactionAndUserPairCache: opts.withReactionAndUserPairCache,
 					_hint_: options?._hint_,
 				}) : undefined,

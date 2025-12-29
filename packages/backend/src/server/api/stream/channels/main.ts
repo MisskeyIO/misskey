@@ -38,6 +38,8 @@ class MainChannel extends Channel {
 					if (data.body.note && data.body.note.isHidden) {
 						const note = await this.noteEntityService.pack(data.body.note.id, this.user, {
 							detail: true,
+							skipLanguageCheck: true,
+							viewerDimension: null,
 						});
 
 						if (this.user && (note.visibleUserIds?.includes(this.user.id) ?? note.mentions?.includes(this.user.id))) {
@@ -55,6 +57,8 @@ class MainChannel extends Channel {
 					if (data.body.isHidden) {
 						const note = await this.noteEntityService.pack(data.body.id, this.user, {
 							detail: true,
+							skipLanguageCheck: true,
+							viewerDimension: null,
 						});
 
 						if (this.user && (note.visibleUserIds?.includes(this.user.id) ?? note.mentions?.includes(this.user.id))) {

@@ -877,6 +877,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 			const detailPackedNote = await this.noteEntityService.pack(note, u, {
 				detail: true,
+				skipLanguageCheck: true,
+				viewerDimension: null,
 			});
 
 			this.globalEventService.publishMainStream(u.id, 'mention', detailPackedNote);

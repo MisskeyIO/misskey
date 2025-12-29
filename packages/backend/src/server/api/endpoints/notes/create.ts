@@ -322,7 +322,12 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				if (note) {
 					logger.info('The request has already been processed.', { noteId: note.id });
 					if (ps.noCreatedNote) return;
-					else return { createdNote: await this.noteEntityService.pack(note, me) };
+					else return {
+						createdNote: await this.noteEntityService.pack(note, me, {
+							skipLanguageCheck: true,
+							viewerDimension: null,
+						}),
+					};
 				}
 			}
 
@@ -516,7 +521,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 				if (ps.noCreatedNote || scheduledAt) return;
 				else return {
-					createdNote: await this.noteEntityService.pack(note as MiNote, me),
+					createdNote: await this.noteEntityService.pack(note as MiNote, me, {
+						skipLanguageCheck: true,
+						viewerDimension: null,
+					}),
 				};
 			} catch (err) {
 				// エラーが発生した場合、まだ処理中として記録されている場合はリクエストの処理結果を削除

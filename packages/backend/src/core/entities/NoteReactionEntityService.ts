@@ -67,7 +67,10 @@ export class NoteReactionEntityService implements OnModuleInit {
 			user: hints?.packedUser ?? await this.userEntityService.pack(reaction.user ?? reaction.userId, me),
 			type: this.reactionService.convertLegacyReaction(reaction.reaction),
 			...(opts.withNote ? {
-				note: await this.noteEntityService.pack(reaction.note ?? reaction.noteId, me),
+				note: await this.noteEntityService.pack(reaction.note ?? reaction.noteId, me, {
+					skipLanguageCheck: true,
+					viewerDimension: null,
+				}),
 			} : {}),
 		};
 	}

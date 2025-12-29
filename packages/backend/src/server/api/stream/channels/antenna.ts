@@ -43,7 +43,11 @@ class AntennaChannel extends Channel {
 	@bindThis
 	private async onEvent(data: GlobalEvents['antenna']['payload']) {
 		if (data.type === 'note') {
-			const note = await this.noteEntityService.pack(data.body.id, this.user, { detail: true });
+			const note = await this.noteEntityService.pack(data.body.id, this.user, {
+				detail: true,
+				skipLanguageCheck: true,
+				viewerDimension: null,
+			});
 
 			if (note.reply) {
 				const reply = note.reply;

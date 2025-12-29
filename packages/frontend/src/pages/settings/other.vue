@@ -247,12 +247,11 @@ async function clearFanoutTimeline(type: 'home' | 'user' | 'list' | 'antenna', t
 	});
 	if (canceled) return;
 
-	const promise = misskeyApi('i/purge-timeline-cache', {
+	await os.apiWithDialog('i/purge-timeline-cache', {
 		type,
 		listId: type === 'list' ? targetId : undefined,
 		antennaId: type === 'antenna' ? targetId : undefined,
 	});
-	await os.promiseDialog(promise, undefined, err => os.apiErrorHandler(err, 'i/purge-timeline-cache'));
 }
 
 function migrate() {

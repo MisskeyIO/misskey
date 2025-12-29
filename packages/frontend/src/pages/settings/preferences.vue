@@ -921,9 +921,9 @@ const useNativeUiForVideoAudioPlayer = prefer.model('useNativeUiForVideoAudioPla
 const contextMenu = prefer.model('contextMenu');
 const menuStyle = prefer.model('menuStyle');
 const makeEveryTextElementsSelectable = prefer.model('makeEveryTextElementsSelectable');
-const postingLang = ref<string | null>($i.postingLang ?? lang);
+const postingLang = ref<string | null>($i.postingLang ?? lang.value);
 const languageCodes = Object.keys(langmap);
-const initialViewingLangs = $i.viewingLangs ?? [lang, 'unknown', 'remote'];
+const initialViewingLangs = $i.viewingLangs ?? [lang.value, 'unknown', 'remote'];
 const includeUnknown = ref(initialViewingLangs.includes('unknown'));
 const includeRemote = ref(initialViewingLangs.includes('remote'));
 const viewingLangs = ref<string[]>(initialViewingLangs.filter(code => code !== 'unknown' && code !== 'remote'));
@@ -1033,7 +1033,7 @@ async function saveLanguageConfig() {
 	} catch (err: any) {
 		const fallbackViewingLangs = $i.viewingLangs ?? [];
 		languageDirtyMuted = true;
-		postingLang.value = $i.postingLang ?? lang;
+		postingLang.value = $i.postingLang ?? lang.value;
 		includeUnknown.value = fallbackViewingLangs.includes('unknown');
 		includeRemote.value = fallbackViewingLangs.includes('remote');
 		viewingLangs.value = fallbackViewingLangs.filter(code => code !== 'unknown' && code !== 'remote');

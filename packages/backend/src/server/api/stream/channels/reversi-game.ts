@@ -27,7 +27,7 @@ class ReversiGameChannel extends Channel {
 		id: string,
 		connection: Channel['connection'],
 	) {
-		super(id, connection);
+		super(id, connection, null);
 	}
 
 	@bindThis
@@ -120,7 +120,7 @@ export class ReversiGameChannelService implements MiChannelService<false> {
 	}
 
 	@bindThis
-	public create(id: string, connection: Channel['connection']): ReversiGameChannel {
+	public create(id: string, connection: Channel['connection'], dimension?: number | null): ReversiGameChannel {
 		return new ReversiGameChannel(
 			this.reversiService,
 			this.reversiGameEntityService,

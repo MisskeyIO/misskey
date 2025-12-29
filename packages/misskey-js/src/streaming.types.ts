@@ -72,6 +72,7 @@ export type Channels = {
 			withRenotes?: boolean;
 			withFiles?: boolean;
 			minimize?: boolean,
+			dimension?: number | null,
 		};
 		events: {
 			note: (payload: Note) => void;
@@ -84,6 +85,7 @@ export type Channels = {
 			withReplies?: boolean;
 			withFiles?: boolean;
 			minimize?: boolean,
+			dimension?: number | null,
 		};
 		events: {
 			note: (payload: Note) => void;
@@ -96,6 +98,7 @@ export type Channels = {
 			withReplies?: boolean;
 			withFiles?: boolean;
 			minimize?: boolean,
+			dimension?: number | null,
 		};
 		events: {
 			note: (payload: Note) => void;
@@ -107,6 +110,7 @@ export type Channels = {
 			withRenotes?: boolean;
 			withFiles?: boolean;
 			minimize?: boolean,
+			dimension?: number | null,
 		};
 		events: {
 			note: (payload: Note) => void;
@@ -128,6 +132,7 @@ export type Channels = {
 	hashtag: {
 		params: {
 			q: string[][];
+			dimension?: number | null,
 		};
 		events: {
 			note: (payload: Note) => void;
@@ -138,6 +143,7 @@ export type Channels = {
 		params: {
 			roleId: string;
 			minimize?: boolean,
+			dimension?: number | null,
 		};
 		events: {
 			note: (payload: Note) => void;
@@ -158,6 +164,7 @@ export type Channels = {
 		params: {
 			channelId: string;
 			minimize?: boolean,
+			dimension?: number | null,
 		};
 		events: {
 			note: (payload: Note) => void;

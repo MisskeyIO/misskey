@@ -51,6 +51,7 @@ export async function getNoteClipMenu(props: {
 
 	// const appearNote = isRenote ? props.note.renote as Misskey.entities.Note : props.note;
 	const appearNote = getAppearNote(props.note);
+	const dimension = appearNote.dimension ?? prefer.s.dimension ?? 0;
 
 	const clips = await clipsCache.fetch();
 	const menu: MenuItem[] = [...clips.map(clip => ({
@@ -578,6 +579,7 @@ export function getRenoteMenu(props: {
 	//
 	// const appearNote = isRenote ? props.note.renote as Misskey.entities.Note : props.note;
 	const appearNote = getAppearNote(props.note);
+	const dimension = appearNote.dimension ?? prefer.s.dimension ?? 0;
 
 	const channelRenoteItems: MenuItem[] = [];
 	const normalRenoteItems: MenuItem[] = [];
@@ -600,6 +602,7 @@ export function getRenoteMenu(props: {
 					misskeyApi('notes/create', {
 						renoteId: appearNote.id,
 						channelId: appearNote.channelId,
+						dimension,
 						noCreatedNote: true,
 					}).then(() => {
 						os.toast(i18n.ts.renoted);
@@ -647,6 +650,7 @@ export function getRenoteMenu(props: {
 						localOnly,
 						visibility,
 						renoteId: appearNote.id,
+						dimension,
 						noCreatedNote: true,
 					}).then(() => {
 						os.toast(i18n.ts.renoted);
@@ -687,6 +691,7 @@ export function getRenoteMenu(props: {
 							misskeyApi('notes/create', {
 								renoteId: appearNote.id,
 								channelId: channel.id,
+								dimension,
 								noCreatedNote: true,
 							}).then(() => {
 								os.toast(i18n.tsx.renotedToX({ name: channel.name }));

@@ -34,10 +34,11 @@ export class DriveChannelService implements MiChannelService<true> {
 	}
 
 	@bindThis
-	public create(id: string, connection: Channel['connection']): DriveChannel {
+	public create(id: string, connection: Channel['connection'], dimension?: number | null): DriveChannel {
 		return new DriveChannel(
 			id,
 			connection,
+			null,
 		);
 	}
 }

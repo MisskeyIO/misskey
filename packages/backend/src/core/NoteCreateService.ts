@@ -11,7 +11,7 @@ import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import { extractMentions } from '@/misc/extract-mentions.js';
 import { extractCustomEmojisFromMfm } from '@/misc/extract-custom-emojis-from-mfm.js';
 import { extractHashtags } from '@/misc/extract-hashtags.js';
-import type { IMentionedRemoteUsers } from '@/models/Note.js';
+import type { IMentionedRemoteUsers, MiNoteWithDimension } from '@/models/Note.js';
 import { MiNote } from '@/models/Note.js';
 import { MiScheduledNote } from '@/models/ScheduledNote.js';
 import type {
@@ -22,6 +22,7 @@ import type {
 	MiFollowing,
 	MiMeta,
 	NotesRepository,
+	NoteLanguagesRepository,
 	NoteThreadMutingsRepository,
 	ScheduledNotesRepository,
 	UserListMembershipsRepository,
@@ -37,6 +38,7 @@ import { MiPoll } from '@/models/Poll.js';
 import type { MinimumUser, NoteCreateOption } from '@/types.js';
 import { isDuplicateKeyValueError } from '@/misc/is-duplicate-key-value-error.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
+import { normalizeDimension } from '@/misc/dimension.js';
 import { RelayService } from '@/core/RelayService.js';
 import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
 import { DI } from '@/di-symbols.js';
@@ -154,6 +156,9 @@ export class NoteCreateService implements OnApplicationShutdown {
 		@Inject(DI.notesRepository)
 		private notesRepository: NotesRepository,
 
+		@Inject(DI.noteLanguagesRepository)
+		private noteLanguagesRepository: NoteLanguagesRepository,
+
 		@Inject(DI.scheduledNotesRepository)
 		private scheduledNotesRepository: ScheduledNotesRepository,
 
@@ -240,6 +245,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 		if (data.channel != null) data.visibility = 'public';
 		if (data.channel != null) data.visibleUsers = [];
 		if (data.channel != null) data.localOnly = true;
+		data.dimension = normalizeDimension(data.dimension, this.meta.dimensions ?? 1);
+		if (data.dimension >= 1000) data.localOnly = true;
 
 		const meta = this.meta;
 		const policies = await this.roleService.getUserPolicies(user.id);
@@ -418,6 +425,14 @@ export class NoteCreateService implements OnApplicationShutdown {
 		if (!data.scheduledAt) {
 			const note = await this.insertNote(user, data, tags, emojis, mentionedUsers);
 
+			if (data.lang != null) {
+				await this.noteLanguagesRepository.insert({
+					noteId: note.id,
+					lang: data.lang,
+				});
+				this.cacheService.noteLanguageCache.set(note.id, data.lang);
+			}
+
 			setImmediate('post created', { signal: this.#shutdownController.signal }).then(
 				() => this.postNoteCreated(note, user, data, silent, tags!, mentionedUsers!),
 				() => { /* aborted, ignore this */ },
@@ -528,6 +543,11 @@ export class NoteCreateService implements OnApplicationShutdown {
 				});
 			} else {
 				await this.notesRepository.insert(insert);
+			}
+
+			if (typeof data.dimension === 'number') {
+				(insert as MiNoteWithDimension).dimension = data.dimension;
+				void this.cacheService.noteDimensionCache.set(insert.id, data.dimension);
 			}
 
 			return insert;

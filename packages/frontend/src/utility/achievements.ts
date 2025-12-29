@@ -84,6 +84,9 @@ export const ACHIEVEMENT_TYPES = [
 	'smashTestNotificationButton',
 	'tutorialCompleted',
 	'sensitiveContentConsentResponded',
+	'postingLanguageConfigured',
+	'viewingLanguagesConfigured',
+	'dimensionConfigured',
 	'bubbleGameExplodingHead',
 	'bubbleGameDoubleExplodingHead',
 ] as const;
@@ -472,6 +475,21 @@ export const ACHIEVEMENT_BADGES = {
 	'sensitiveContentConsentResponded': {
 		img: '/fluent-emoji/1f51e.png',
 		bg: 'linear-gradient(0deg, rgb(255 144 144), rgb(255 232 168))',
+		frame: 'bronze',
+	},
+	'postingLanguageConfigured': {
+		img: '/fluent-emoji/1f4ac.png',
+		bg: 'linear-gradient(0deg, rgb(144 224 255), rgb(255 168 252))',
+		frame: 'bronze',
+	},
+	'viewingLanguagesConfigured': {
+		img: '/fluent-emoji/1f4d6.png',
+		bg: 'linear-gradient(0deg, rgb(59 187 116), rgb(199 211 102))',
+		frame: 'bronze',
+	},
+	'dimensionConfigured': {
+		img: '/fluent-emoji/1f300.png',
+		bg: 'linear-gradient(0deg, rgb(220 223 225), rgb(172 192 207))',
 		frame: 'bronze',
 	},
 	'bubbleGameExplodingHead': {

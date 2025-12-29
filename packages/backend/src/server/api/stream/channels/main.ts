@@ -22,7 +22,7 @@ class MainChannel extends Channel {
 		id: string,
 		connection: Channel['connection'],
 	) {
-		super(id, connection);
+		super(id, connection, null);
 	}
 
 	@bindThis
@@ -84,7 +84,7 @@ export class MainChannelService implements MiChannelService<true> {
 	}
 
 	@bindThis
-	public create(id: string, connection: Channel['connection']): MainChannel {
+	public create(id: string, connection: Channel['connection'], dimension?: number | null): MainChannel {
 		return new MainChannel(
 			this.noteEntityService,
 			id,

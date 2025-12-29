@@ -26,7 +26,7 @@ class AntennaChannel extends Channel {
 		id: string,
 		connection: Channel['connection'],
 	) {
-		super(id, connection);
+		super(id, connection, null);
 		//this.onEvent = this.onEvent.bind(this);
 	}
 
@@ -52,6 +52,8 @@ class AntennaChannel extends Channel {
 				// 自分の見ることができないユーザーの visibility: specified な投稿への返信は弾く
 				if (reply.visibility === 'specified' && !reply.visibleUserIds!.includes(this.user!.id)) return;
 			}
+
+			if (!(await this.noteEntityService.isLanguageVisibleToMe(note, this.user?.id))) return;
 
 			if (this.isNoteMutedOrBlocked(note)) return;
 
@@ -97,7 +99,7 @@ export class AntennaChannelService implements MiChannelService<true> {
 	}
 
 	@bindThis
-	public create(id: string, connection: Channel['connection']): AntennaChannel {
+	public create(id: string, connection: Channel['connection'], dimension?: number | null): AntennaChannel {
 		return new AntennaChannel(
 			this.roleService,
 			this.noteEntityService,

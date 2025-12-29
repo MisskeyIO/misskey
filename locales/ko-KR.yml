@@ -539,6 +539,16 @@ signinFailed: "로그인할 수 없습니다. 유저 이름과 비밀번호를 �
 or: "혹은"
 language: "언어"
 uiLanguage: "UI 표시 언어"
+postingLanguage: "게시 언어"
+postingLanguageDescription: "선택한 언어가 표시 언어로 설정된 유저의 타임라인에 표시됩니다.\n게시 화면에서도 변경할 수 있습니다."
+postingAndViewingLanguage: "게시 및 표시 언어"
+viewingLanguages: "표시 언어"
+viewingLanguagesDescription: "선택한 언어와 일치하는 노트만 표시됩니다."
+viewingLanguagesIncludeUnknown: "분류되지 않은 노트 표시"
+viewingLanguagesIncludeUnknownDescription: "타사 클라이언트, 봇 등의 노트가 포함됩니다."
+viewingLanguagesIncludeRemote: "리모트 노트 포함"
+dimension: "차원"
+dimensionDescription: "0차원에서는 0~999차원의 노트가 표시됩니다."
 aboutX: "{x}에 대하여"
 emojiStyle: "이모지 스타일"
 native: "기본"
@@ -1987,6 +1997,18 @@ _achievements:
       title: "18세 이상이신가요?"
       description: "연령 확인에 응답했다"
       flavor: "예? 아니... 제가 나이가..."
+    _postingLanguageConfigured:
+      title: "여긴 Misskey어로 말해"
+      description: "게시 언어를 설정했다"
+      flavor: "한국어로 ㅇㅋ"
+    _viewingLanguagesConfigured:
+      title: "읽힌다… 읽힌다구!"
+      description: "표시할 언어를 설정했다"
+      flavor: "모르겠고 다음"
+    _dimensionConfigured:
+      title: "멀티버스 가즈아"
+      description: "타임라인 디멘션을 설정했다"
+      flavor: "0 = 본편, 1 = 외전(잡담)"
     _bubbleGameExplodingHead:
       title: "🤯"
       description: "버블 게임에서 가장 큰 물건을 내놓았다"
@@ -2573,6 +2595,7 @@ _postForm:
     f: "작성해주시길 기다리고 있어요..."
   policyScheduleNoteMaxDaysExceeded: "현재 지원 플랜의 예약 가능한 최대 일수는 {max}일입니다.\n[여기](https://go.misskey.io/donate)에서 플랜을 업그레이드할 수 있습니다."
   tosAndGuidelinesInfo: "노트를 게시하기 전에 [이용약관]({tosUrl})과 [NSFW 가이드라인](https://go.misskey.io/media-guideline)을 반드시 읽어 주세요."
+  dimensionPrivateNotice: "디멘션 {dimension}은 프라이빗(>=1000)입니다. 이 노트는 로컬 전용이며 연합에는 보내지 않습니다."
 _profile:
   name: "이름"
   username: "유저명"

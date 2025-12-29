@@ -119,16 +119,20 @@ export const packedNoteDraftSchema = {
 					type: 'string',
 					optional: false, nullable: true,
 				},
-				visibility: {
-					type: 'string',
-					optional: false, nullable: false,
-					enum: ['public', 'home', 'followers', 'specified'],
-				},
-				localOnly: {
-					type: 'boolean',
-					optional: false, nullable: false,
-				},
-				files: {
+			visibility: {
+				type: 'string',
+				optional: false, nullable: false,
+				enum: ['public', 'home', 'followers', 'specified'],
+			},
+			localOnly: {
+				type: 'boolean',
+				optional: false, nullable: false,
+			},
+			dimension: {
+				type: 'integer',
+				optional: true, nullable: false,
+			},
+			files: {
 					type: 'array',
 					optional: false, nullable: false,
 					items: {

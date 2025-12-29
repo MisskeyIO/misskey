@@ -184,6 +184,64 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</MkPreferenceContainer>
 							</SearchMarker>
 
+							<SearchMarker :keywords="['dimension']">
+								<MkPreferenceContainer k="dimension">
+									<MkInput v-model="dimension" type="number" min="0" :max="instance.dimensions" step="1" manualSave>
+										<template #label><SearchLabel>{{ i18n.ts.dimension }}</SearchLabel></template>
+										<template #caption>{{ i18n.ts.dimensionDescription }}</template>
+									</MkInput>
+								</MkPreferenceContainer>
+							</SearchMarker>
+
+							<SearchMarker :keywords="['language', 'posting', 'viewing']">
+								<MkFolder>
+									<template #label><SearchLabel>{{ i18n.ts.postingAndViewingLanguage }}</SearchLabel></template>
+									<div class="_gaps_s">
+										<MkSelect v-model="postingLang">
+											<template #label><SearchLabel>{{ i18n.ts.postingLanguage }}</SearchLabel></template>
+											<option v-for="code in languageCodes" :key="code" :value="code">{{ langmap[code].nativeName }}</option>
+											<template #caption>{{ i18n.ts.postingLanguageDescription }}</template>
+										</MkSelect>
+
+										<div :class="$style.viewingLangSelector">
+											<MkSelect v-model="viewingLangToAdd" style="flex: 1;">
+												<template #label><SearchLabel>{{ i18n.ts.viewingLanguages }}</SearchLabel></template>
+												<option v-for="code in addableViewingLangs" :key="code" :value="code">{{ getViewingLangLabel(code) }}</option>
+												<template #caption>{{ i18n.ts.viewingLanguagesDescription }}</template>
+											</MkSelect>
+											<MkButton :disabled="viewingLangToAdd == null" @click="addViewingLang">
+												<i class="ti ti-plus"></i> {{ i18n.ts.add }}
+											</MkButton>
+										</div>
+
+										<div :class="$style.langTags">
+											<MkTagItem
+												v-for="code in viewingLangs"
+												:key="code"
+												:content="getViewingLangLabel(code)"
+												:exButtonIconClass="'ti ti-x'"
+												:class="$style.langTag"
+												@exButtonClick="removeViewingLang(code)"
+											/>
+										</div>
+
+										<div class="_gaps_s">
+											<MkSwitch v-model="includeUnknown">
+												{{ i18n.ts.viewingLanguagesIncludeUnknown }}
+												<template #caption>{{ i18n.ts.viewingLanguagesIncludeUnknownDescription }}</template>
+											</MkSwitch>
+											<MkSwitch v-if="includeUnknown" v-model="includeRemote">
+												{{ i18n.ts.viewingLanguagesIncludeRemote }}
+											</MkSwitch>
+										</div>
+
+										<div v-if="languageDirty" class="_buttons">
+											<MkButton primary full :disabled="languageSaving" @click="saveLanguageConfig"><i class="ti ti-check"></i> {{ i18n.ts.save }}</MkButton>
+										</div>
+									</div>
+								</MkFolder>
+							</SearchMarker>
+
 							<SearchMarker :keywords="['pinned', 'list']">
 								<MkFolder>
 									<template #label><SearchLabel>{{ i18n.ts.pinnedList }}</SearchLabel></template>
@@ -765,11 +823,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { langs } from '@@/js/config.js';
 import * as Misskey from 'misskey-js';
 import MkSwitch from '@/components/MkSwitch.vue';
 import MkSelect from '@/components/MkSelect.vue';
+import MkInput from '@/components/MkInput.vue';
 import MkRadios from '@/components/MkRadios.vue';
 import MkRange from '@/components/MkRange.vue';
 import MkFolder from '@/components/MkFolder.vue';
@@ -793,6 +852,9 @@ import { claimAchievement } from '@/utility/achievements.js';
 import { instance } from '@/instance.js';
 import { ensureSignin } from '@/i.js';
 import { configureSensitiveContentConsent, sensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
+import MkTagItem from '@/components/MkTagItem.vue';
+import { langmap } from '@/utility/langmap.js';
+import { updateCurrentAccountPartial } from '@/accounts.js';
 
 const $i = ensureSignin();
 
@@ -823,6 +885,7 @@ const numberOfPageCache = prefer.model('numberOfPageCache');
 const enableInfiniteScroll = prefer.model('enableInfiniteScroll');
 const useReactionPickerForContextMenu = prefer.model('useReactionPickerForContextMenu');
 const disableStreamingTimeline = prefer.model('disableStreamingTimeline');
+const dimension = prefer.model('dimension');
 const useGroupedNotifications = prefer.model('useGroupedNotifications');
 const alwaysConfirmFollow = prefer.model('alwaysConfirmFollow');
 const confirmWhenRevealingSensitiveMedia = prefer.model('confirmWhenRevealingSensitiveMedia');
@@ -858,6 +921,19 @@ const useNativeUiForVideoAudioPlayer = prefer.model('useNativeUiForVideoAudioPla
 const contextMenu = prefer.model('contextMenu');
 const menuStyle = prefer.model('menuStyle');
 const makeEveryTextElementsSelectable = prefer.model('makeEveryTextElementsSelectable');
+const postingLang = ref<string | null>($i.postingLang ?? lang);
+const languageCodes = Object.keys(langmap);
+const initialViewingLangs = $i.viewingLangs ?? [lang, 'unknown', 'remote'];
+const includeUnknown = ref(initialViewingLangs.includes('unknown'));
+const includeRemote = ref(initialViewingLangs.includes('remote'));
+const viewingLangs = ref<string[]>(initialViewingLangs.filter(code => code !== 'unknown' && code !== 'remote'));
+const viewingLangToAdd = ref<string | null>(postingLang.value ?? languageCodes[0] ?? null);
+const addableViewingLangs = computed(() =>
+	languageCodes.filter(code => !viewingLangs.value.includes(code)),
+);
+const languageSaving = ref(false);
+const languageDirty = ref(false);
+let languageDirtyMuted = false;
 
 type SensitiveContentConsentSetting = 'show' | 'hide' | 'notSet';
 const sensitiveContentConsentSetting = computed<SensitiveContentConsentSetting>(() => sensitiveContentConsent.value === null ? 'notSet' : sensitiveContentConsent.value ? 'show' : 'hide');
@@ -884,6 +960,109 @@ watch(useSystemFont, () => {
 		miLocalStorage.setItem('useSystemFont', 't');
 	} else {
 		miLocalStorage.removeItem('useSystemFont');
+	}
+});
+
+function getViewingLangLabel(code: string): string {
+	if (code === 'unknown') return i18n.ts.unknown;
+	if (code === 'remote') return i18n.ts.remote;
+	return langmap[code]?.nativeName ?? code;
+}
+
+function removeViewingLang(code: string) {
+	viewingLangs.value = viewingLangs.value.filter(value => value !== code);
+}
+
+function addViewingLang() {
+	if (viewingLangToAdd.value == null) return;
+	if (!viewingLangs.value.includes(viewingLangToAdd.value)) {
+		viewingLangs.value = [...viewingLangs.value, viewingLangToAdd.value];
+	}
+	viewingLangToAdd.value = null;
+}
+
+watch([includeUnknown, includeRemote, viewingLangs], () => {
+	if (languageDirtyMuted) return;
+	languageDirty.value = true;
+}, { deep: true });
+
+watch(postingLang, (value) => {
+	if (languageDirtyMuted) return;
+	if (value != null && !viewingLangs.value.includes(value)) {
+		viewingLangs.value = [...viewingLangs.value, value];
+	}
+	languageDirty.value = true;
+});
+
+async function saveLanguageConfig() {
+	if (languageSaving.value) return;
+	languageSaving.value = true;
+	try {
+		const beforePostingLang = $i.postingLang ?? null;
+		const beforeViewingLangs = $i.viewingLangs ?? [];
+		const requestedViewingLangs = [
+			...viewingLangs.value,
+			...(includeUnknown.value ? ['unknown'] : []),
+			...(includeRemote.value ? ['remote'] : []),
+		];
+		const i = await misskeyApi('i/update', {
+			postingLang: postingLang.value ?? null,
+			viewingLangs: requestedViewingLangs,
+		});
+		const appliedViewingLangs = i.viewingLangs ?? requestedViewingLangs;
+		updateCurrentAccountPartial({
+			postingLang: i.postingLang,
+			viewingLangs: i.viewingLangs,
+		});
+		languageDirtyMuted = true;
+		postingLang.value = i.postingLang ?? null;
+		includeUnknown.value = appliedViewingLangs.includes('unknown');
+		includeRemote.value = appliedViewingLangs.includes('remote');
+		viewingLangs.value = appliedViewingLangs.filter(code => code !== 'unknown' && code !== 'remote');
+		languageDirty.value = false;
+		queueMicrotask(() => { languageDirtyMuted = false; });
+		if (beforePostingLang !== i.postingLang) {
+			claimAchievement('postingLanguageConfigured');
+		}
+		const nextViewingLangs = i.viewingLangs ?? [];
+		const viewingLangsChanged = beforeViewingLangs.length !== nextViewingLangs.length
+			|| beforeViewingLangs.some((value, index) => value !== nextViewingLangs[index]);
+		if (viewingLangsChanged) {
+			claimAchievement('viewingLanguagesConfigured');
+		}
+	} catch (err: any) {
+		const fallbackViewingLangs = $i.viewingLangs ?? [];
+		languageDirtyMuted = true;
+		postingLang.value = $i.postingLang ?? lang;
+		includeUnknown.value = fallbackViewingLangs.includes('unknown');
+		includeRemote.value = fallbackViewingLangs.includes('remote');
+		viewingLangs.value = fallbackViewingLangs.filter(code => code !== 'unknown' && code !== 'remote');
+		languageDirty.value = false;
+		queueMicrotask(() => { languageDirtyMuted = false; });
+		os.alert({
+			type: 'error',
+			title: i18n.ts.error,
+			text: err.message,
+		});
+	} finally {
+		languageSaving.value = false;
+	}
+}
+
+watch(dimension, (value, previous) => {
+	if (value === previous) return;
+	claimAchievement('dimensionConfigured');
+});
+
+onMounted(() => {
+	if (initialViewingLangs.length === 0) {
+		const candidates = [
+			uiLanguageCode.value ?? null,
+			postingLang.value ?? null,
+		].filter((value): value is string => value != null);
+		viewingLangs.value = Array.from(new Set(candidates));
+		includeUnknown.value = true;
+		includeRemote.value = true;
 	}
 });
 
@@ -1051,3 +1230,24 @@ definePage(() => ({
 	icon: 'ti ti-adjustments',
 }));
 </script>
+
+<style lang="scss" module>
+.viewingLangSelector {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+}
+
+.langTags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.langTag {
+	user-select: none;
+	> span {
+		padding-left: 4px;
+	}
+}
+</style>

@@ -48,6 +48,7 @@ import { userPage } from '@/filters/user.js';
 import { infoImageUrl } from '@/instance.js';
 import type { GetFormResultType } from '@/utility/form.js';
 import { useInterval } from '@@/js/use-interval.js';
+import MkContainer from '@/components/MkContainer.vue';
 import MkPagination from '@/components/MkPagination.vue';
 import MkDateSeparatedList from '@/components/MkDateSeparatedList.vue';
 import MkUserCardMini from '@/components/MkUserCardMini.vue';

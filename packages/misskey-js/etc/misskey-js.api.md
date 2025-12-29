@@ -1831,6 +1831,7 @@ declare namespace entities {
         IPagesResponse,
         IPinRequest,
         IPinResponse,
+        IPurgeTimelineCacheRequest,
         IReadAnnouncementRequest,
         IRegenerateTokenRequest,
         IRegistryGetRequest,
@@ -2563,6 +2564,9 @@ export type IPinRequest = operations['i___pin']['requestBody']['content']['appli
 
 // @public (undocumented)
 export type IPinResponse = operations['i___pin']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+export type IPurgeTimelineCacheRequest = operations['i___purge-timeline-cache']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 export type IReadAnnouncementRequest = operations['i___read-announcement']['requestBody']['content']['application/json'];

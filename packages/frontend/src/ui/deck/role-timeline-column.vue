@@ -29,6 +29,7 @@ import { soundSettingsButton } from '@/ui/deck/tl-note-notification.js';
 import * as sound from '@/utility/sound.js';
 import { selectDimension } from '@/utility/dimension.js';
 import { claimAchievement } from '@/utility/achievements.js';
+import { prefer } from '@/preferences.js';
 
 const props = defineProps<{
 	column: Column;
@@ -63,7 +64,6 @@ watch(dimension, (value, previous) => {
 		claimAchievement('dimensionConfigured');
 	}
 });
-
 
 async function pickDimension() {
 	const selected = await selectDimension(dimension.value);

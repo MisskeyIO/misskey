@@ -358,14 +358,11 @@ export class NoteEntityService implements OnModuleInit {
 
 	@bindThis
 	private async extractNoteDimension(note: MiNote | MiNoteWithDimension): Promise<number | undefined> {
-		if (typeof (note as MiNoteWithDimension).dimension === 'number') {
+		if (typeof (note as MiNoteWithDimension).dimension === 'number')
 			return (note as MiNoteWithDimension).dimension;
-		}
 
 		const cachedDimension = await this.cacheService.noteDimensionCache.get(note.id);
-		if (typeof cachedDimension === 'number') {
-			return cachedDimension;
-		}
+		if (typeof cachedDimension === 'number') return cachedDimension;
 
 		return undefined;
 	}
@@ -431,15 +428,18 @@ export class NoteEntityService implements OnModuleInit {
 
 		const meId = me ? me.id : null;
 		const note = typeof src === 'object' ? src : await this.noteLoader.load(src);
+
 		if (!opts.skipLanguageCheck && meId && !(await this.isLanguageVisibleToMe(note, meId))) {
 			throw new IdentifiableError('ab3e8c80-9d5b-4fb8-9ee0-089ed96d07e0', 'Note language is not visible for you.');
 		}
-		if (options?.viewerDimension != null) {
-			const viewerDimension = normalizeDimension(options.viewerDimension, this.meta.dimensions ?? 1);
+
+		if (opts?.viewerDimension != null) {
+			const viewerDimension = normalizeDimension(opts.viewerDimension, this.meta.dimensions ?? 1);
 			if (!(await this.shouldDeliverByDimensionPreview(note, viewerDimension, meId))) {
 				throw new IdentifiableError('b74b13d0-49ee-4eac-a75a-48247c16d17a', 'Note is not visible in this dimension.');
 			}
 		}
+
 		const host = note.userHost;
 
 		const bufferedReactions = opts._hint_?.bufferedReactions != null
@@ -542,8 +542,8 @@ export class NoteEntityService implements OnModuleInit {
 			} : {}),
 		});
 
-		if (options?.viewerDimension != null) {
-			const viewerDimension = normalizeDimension(options.viewerDimension, this.meta.dimensions ?? 1);
+		if (opts?.viewerDimension != null) {
+			const viewerDimension = normalizeDimension(opts.viewerDimension, this.meta.dimensions ?? 1);
 			if (!shouldDeliverByDimension(packed, viewerDimension, meId)) {
 				throw new IdentifiableError('b74b13d0-49ee-4eac-a75a-48247c16d17a', 'Note is not visible in this dimension.');
 			}

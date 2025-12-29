@@ -203,7 +203,7 @@ export const packedNoteSchema = {
 		},
 		dimension: {
 			type: 'integer',
-			optional: true, nullable: false,
+			optional: true, nullable: true,
 		},
 		reactionAcceptance: {
 			type: 'string',

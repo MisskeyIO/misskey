@@ -752,10 +752,11 @@ describe('Streaming', () => {
 			const application = await createAppToken(ayano, []);
 			const application2 = await createAppToken(ayano, ['read:account']);
 			const socket = new WebSocket(`ws://127.0.0.1:${port}/streaming?i=${application}`);
-			const established = await new Promise<boolean>((resolve, reject) => {
+			const established = await new Promise<boolean>(async (resolve, reject) => {
 				socket.on('error', () => resolve(false));
 				socket.on('unexpected-response', () => resolve(false));
-				globalThis.setTimeout(() => resolve(true), 3000);
+				await setTimeout(3000);
+				resolve(true);
 			});
 
 			socket.close();

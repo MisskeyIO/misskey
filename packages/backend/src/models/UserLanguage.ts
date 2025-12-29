@@ -20,6 +20,7 @@ export class MiUserLanguage {
 	public postingLang: string | null;
 
 	@Column('varchar', {
+		length: 32,
 		array: true,
 		default: '{}',
 	})

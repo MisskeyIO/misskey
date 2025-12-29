@@ -926,7 +926,7 @@ const languageCodes = Object.keys(langmap);
 const initialViewingLangs = $i.viewingLangs ?? [lang.value, 'unknown', 'remote'];
 const includeUnknown = ref(initialViewingLangs.includes('unknown'));
 const includeRemote = ref(initialViewingLangs.includes('remote'));
-const viewingLangs = ref<string[]>(initialViewingLangs.filter(code => code !== 'unknown' && code !== 'remote'));
+const viewingLangs = ref<string[]>(initialViewingLangs.filter((code): code is string => typeof code === 'string' && code !== 'unknown' && code !== 'remote'));
 const viewingLangToAdd = ref<string | null>(postingLang.value ?? languageCodes[0] ?? null);
 const addableViewingLangs = computed(() =>
 	languageCodes.filter(code => !viewingLangs.value.includes(code)),

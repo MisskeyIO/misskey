@@ -150,9 +150,8 @@ const menu = computed<MenuItem[]>(() => {
 	if (hasDimension(props.column.tl)) {
 		menuItems.push({
 			icon: 'ti ti-cube',
-			text: i18n.ts.dimension,
-			caption: dimension.value == null ? i18n.ts.default : dimension.value.toString(),
-			action: () => pickDimension,
+			text: i18n.tsx.dimensionWithNumber({ dimension: dimension.value }),
+			action: pickDimension,
 		});
 	}
 

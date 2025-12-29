@@ -662,16 +662,13 @@ function showOtherSettings() {
 		},
 	}, { type: 'divider' }, {
 		icon: 'ti ti-cube',
-		text: i18n.ts.dimension,
-		caption: dimension.value.toString(),
-		action: () => pickDimension,
+		text: i18n.tsx.dimensionWithNumber({ dimension: dimension.value }),
+		action: pickDimension,
 	}, {
 		icon: 'ti ti-language',
 		text: i18n.ts.postingLanguage,
 		caption: postingLangCaption,
-		action: () => {
-			pickPostingLanguage();
-		},
+		action: pickPostingLanguage,
 	}, { type: 'divider' }, {
 		icon: reactionAcceptanceIcon,
 		text: i18n.ts.reactionAcceptance,
@@ -910,6 +907,8 @@ function saveDraft() {
 			cw: cw.value,
 			visibility: visibility.value,
 			localOnly: localOnly.value,
+			lang: postingLang.value,
+			dimension: dimension.value,
 			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 			files: files.value.filter(f => f?.id && f.type && f.name),
 			poll: poll.value,
@@ -991,6 +990,8 @@ function loadDraft(exactMatch = false) {
 		cw.value = draft.value.data.cw;
 		visibility.value = draft.value.data.visibility;
 		localOnly.value = draft.value.data.localOnly;
+		postingLang.value = draftData.lang;
+		dimension.value = draft.value.data.dimension;
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		files.value = draft.value.data.files?.filter(f => f?.id && f.type && f.name) || [];
 		if (draft.value.data.poll) {

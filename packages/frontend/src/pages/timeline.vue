@@ -298,7 +298,7 @@ const headerActions = computed(() => {
 					menuItems.push({
 						icon: 'ti ti-cube',
 						text: i18n.tsx.dimensionWithNumber({ dimension: dimension.value }),
-						action: () => pickDimension,
+						action: pickDimension,
 					});
 				}
 
@@ -347,7 +347,7 @@ const headerActions = computed(() => {
 				icon: 'ti ti-cube',
 				text: i18n.tsx.dimensionWithNumber({ dimension: dimension.value }),
 				hideWhenNarrow: true,
-				handler: () => pickDimension,
+				handler: pickDimension,
 			});
 		}
 	}

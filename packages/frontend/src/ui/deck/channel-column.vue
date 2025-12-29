@@ -116,7 +116,7 @@ function onNote() {
 const menu: MenuItem[] = [{
 	icon: 'ti ti-cube',
 	text: i18n.tsx.dimensionWithNumber({ dimension: dimension.value }),
-	action: () => pickDimension,
+	action: pickDimension,
 }, {
 	icon: 'ti ti-pencil',
 	text: i18n.ts.selectChannel,

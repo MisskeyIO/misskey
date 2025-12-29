@@ -9821,7 +9821,7 @@ export type components = {
                 userId: string | null;
             } | null;
             localOnly?: boolean;
-            dimension?: number;
+            dimension?: number | null;
             /** @enum {string|null} */
             reactionAcceptance: 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote' | null;
             reactionEmojis: {
@@ -9881,7 +9881,8 @@ export type components = {
                 /** @enum {string} */
                 visibility: 'public' | 'home' | 'followers' | 'specified';
                 localOnly: boolean;
-                dimension?: number;
+                lang?: string | null;
+                dimension?: number | null;
                 files: components['schemas']['DriveFile'][];
                 poll: {
                     choices: string[];

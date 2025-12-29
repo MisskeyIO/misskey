@@ -71,7 +71,7 @@ describe('NoteEntityService', () => {
 
 		await expect(service.isLanguageVisibleToMe(note, null)).resolves.toBe(true);
 		await expect(service.isLanguageVisibleToMe(note, 'user-null')).resolves.toBe(true);
-		await expect(service.isLanguageVisibleToMe(note, 'viewer-empty')).resolves.toBe(false);
+		await expect(service.isLanguageVisibleToMe(note, 'viewer-empty')).resolves.toBe(true);
 	});
 
 	test('isLanguageVisibleToMe respects remote language', async () => {

@@ -755,7 +755,7 @@ describe('Streaming', () => {
 			const established = await new Promise<boolean>((resolve, reject) => {
 				socket.on('error', () => resolve(false));
 				socket.on('unexpected-response', () => resolve(false));
-				setTimeout(() => resolve(true), 3000);
+				globalThis.setTimeout(() => resolve(true), 3000);
 			});
 
 			socket.close();

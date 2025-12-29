@@ -114,7 +114,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				return await this.noteEntityService.packMany(
 					timeline,
 					me,
-					{viewerDimension: ps.dimension},
+					{ viewerDimension: ps.dimension },
 				);
 			}
 

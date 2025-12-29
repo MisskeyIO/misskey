@@ -3329,6 +3329,34 @@ export interface Locale extends ILocale {
      */
     "clearCache": string;
     /**
+     * タイムラインのキャッシュ
+     */
+    "timelineCache": string;
+    /**
+     * 自分のタイムライン、リスト、アンテナのキャッシュを削除します。
+     */
+    "timelineCacheDescription": string;
+    /**
+     * ホームタイムラインのキャッシュを削除
+     */
+    "purgeHomeTimelineCache": string;
+    /**
+     * ユーザータイムラインのキャッシュを削除
+     */
+    "purgeUserTimelineCache": string;
+    /**
+     * リストタイムラインのキャッシュを削除
+     */
+    "purgeUserListTimelineCache": string;
+    /**
+     * アンテナタイムラインのキャッシュを削除
+     */
+    "purgeAntennaTimelineCache": string;
+    /**
+     * 選択したタイムラインのキャッシュを削除しますか？
+     */
+    "purgeTimelineCacheConfirm": string;
+    /**
      * {n}人がオンライン
      */
     "onlineUsersCount": ParameterizedString<"n">;

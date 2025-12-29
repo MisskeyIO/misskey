@@ -52,6 +52,38 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 			</SearchMarker>
 
+			<SearchMarker :keywords="['timeline', 'cache']">
+				<MkFolder>
+					<template #icon><SearchIcon><i class="ti ti-database"></i></SearchIcon></template>
+					<template #label><SearchLabel>{{ i18n.ts.timelineCache }}</SearchLabel></template>
+
+					<div class="_gaps_m">
+						<div>{{ i18n.ts.timelineCacheDescription }}</div>
+
+						<div class="_gaps_s">
+							<MkButton @click="clearFanoutTimeline('home')"><i class="ti ti-trash"></i> {{ i18n.ts.purgeHomeTimelineCache }}</MkButton>
+							<MkButton @click="clearFanoutTimeline('user')"><i class="ti ti-trash"></i> {{ i18n.ts.purgeUserTimelineCache }}</MkButton>
+						</div>
+
+						<div class="_gaps_s">
+							<MkSelect v-model="selectedListId" :disabled="userLists?.length === 0">
+								<template #label>{{ i18n.ts.selectList }}</template>
+								<option v-for="list in userLists" :key="list.id" :value="list.id">{{ list.name }}</option>
+							</MkSelect>
+							<MkButton :disabled="!selectedListId" @click="clearFanoutTimeline('list', selectedListId)"><i class="ti ti-trash"></i> {{ i18n.ts.purgeUserListTimelineCache }}</MkButton>
+						</div>
+
+						<div class="_gaps_s">
+							<MkSelect v-model="selectedAntennaId" :disabled="antennas?.length === 0">
+								<template #label>{{ i18n.ts.selectAntenna }}</template>
+								<option v-for="antenna in antennas" :key="antenna.id" :value="antenna.id">{{ antenna.name }}</option>
+							</MkSelect>
+							<MkButton :disabled="!selectedAntennaId" @click="clearFanoutTimeline('antenna', selectedAntennaId)"><i class="ti ti-trash"></i> {{ i18n.ts.purgeAntennaTimelineCache }}</MkButton>
+						</div>
+					</div>
+				</MkFolder>
+			</SearchMarker>
+
 			<SearchMarker :keywords="['roles']">
 				<MkFolder>
 					<template #icon><SearchIcon><i class="ti ti-badges"></i></SearchIcon></template>
@@ -132,7 +164,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
+import * as Misskey from 'misskey-js';
 import XMigration from './migration.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import FormLink from '@/components/form/link.vue';
@@ -140,6 +173,7 @@ import MkFolder from '@/components/MkFolder.vue';
 import FormInfo from '@/components/MkInfo.vue';
 import MkKeyValue from '@/components/MkKeyValue.vue';
 import MkButton from '@/components/MkButton.vue';
+import MkSelect from '@/components/MkSelect.vue';
 import FormSlot from '@/components/form/slot.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
@@ -160,9 +194,22 @@ const enableCondensedLine = prefer.model('enableCondensedLine');
 const skipNoteRender = prefer.model('skipNoteRender');
 const devMode = prefer.model('devMode');
 const stackingRouterView = prefer.model('experimental.stackingRouterView');
+const userLists = ref<Misskey.entities.UserList[]>([]);
+const antennas = ref<Misskey.entities.Antenna[]>([]);
+const selectedListId = ref<string | null>(null);
+const selectedAntennaId = ref<string | null>(null);
 
 watch(skipNoteRender, async () => {
 	await reloadAsk({ reason: i18n.ts.reloadToApplySetting, unison: true });
+});
+
+onMounted(async () => {
+	try {
+		userLists.value = await misskeyApi('users/lists/list', {});
+		antennas.value = await misskeyApi('antennas/list', {});
+	} catch (error) {
+		console.error('Failed to load lists or antennas', error);
+	}
 });
 
 async function deleteAccount() {
@@ -190,6 +237,21 @@ async function deleteAccount() {
 	});
 
 	await signout();
+}
+
+async function clearFanoutTimeline(type: 'home' | 'user' | 'list' | 'antenna', targetId?: string | null) {
+	const { canceled } = await os.confirm({
+		type: 'warning',
+		title: i18n.ts.timelineCache,
+		text: i18n.ts.purgeTimelineCacheConfirm,
+	});
+	if (canceled) return;
+
+	await os.apiWithDialog('i/purge-timeline-cache', {
+		type,
+		listId: type === 'list' ? targetId : undefined,
+		antennaId: type === 'antenna' ? targetId : undefined,
+	});
 }
 
 function migrate() {

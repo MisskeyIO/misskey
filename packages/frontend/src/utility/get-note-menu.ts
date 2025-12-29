@@ -51,7 +51,6 @@ export async function getNoteClipMenu(props: {
 
 	// const appearNote = isRenote ? props.note.renote as Misskey.entities.Note : props.note;
 	const appearNote = getAppearNote(props.note);
-	const dimension = appearNote.dimension ?? prefer.s.dimension ?? 0;
 
 	const clips = await clipsCache.fetch();
 	const menu: MenuItem[] = [...clips.map(clip => ({

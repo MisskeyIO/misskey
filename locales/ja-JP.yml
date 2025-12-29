@@ -730,6 +730,7 @@ testEmail: "配信テスト"
 wordMute: "ワードミュート"
 wordMuteDescription: "指定した語句を含むノートを最小化します。最小化されたノートをクリックすることで表示することができます。"
 hardWordMute: "ハードワードミュート"
+hideMutedNotes: "ミュートされたノートを隠す"
 showMutedWord: "ミュートされたワードを表示"
 hardWordMuteDescription: "指定した語句を含むノートを隠します。ワードミュートとは異なり、ノートは完全に表示されなくなります。"
 regexpError: "正規表現エラー"
@@ -2309,7 +2310,6 @@ _wordMute:
   muteWords: "ミュートするワード"
   muteWordsDescription: "スペースで区切るとAND指定になり、改行で区切るとOR指定になります。"
   muteWordsDescription2: "キーワードをスラッシュで囲むと正規表現になります。"
-  hideMutedNotes: "ミュートされた単語を含むノートを非表示にする"
 
 _instanceMute:
   instanceMuteDescription: "ミュートしたサーバーのユーザーへの返信を含めて、設定したサーバーの全てのノートとRenoteをミュートします。"

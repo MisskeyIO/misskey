@@ -118,7 +118,6 @@ unblockConfirm: "Er du sikker på at du vil oppheve blokkeringen av denne kontoe
 suspendConfirm: "Er du sikker på at du vil suspendere denne kontoen?"
 selectList: "Velg en liste"
 selectChannel: "Velg en kanal"
-selectAntenna: "Velg en antenne"
 selectWidget: "Velg en widget"
 editWidgets: "Rediger widgeter"
 editWidgetsExit: "Ferdig"

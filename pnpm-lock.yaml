@@ -22,8 +22,8 @@ catalogs:
       specifier: 6.16.1
       version: 6.16.1
     '@bull-board/ui':
-      specifier: 6.16.1
-      version: 6.16.1
+      specifier: 6.16.2
+      version: 6.16.2
     '@discordapp/twemoji':
       specifier: 16.0.1
       version: 16.0.1
@@ -1122,13 +1122,13 @@ importers:
         version: 3.958.0(@aws-sdk/client-s3@3.958.0)
       '@bull-board/api':
         specifier: 'catalog:'
-        version: 6.16.1(@bull-board/ui@6.16.1)
+        version: 6.16.1(@bull-board/ui@6.16.2)
       '@bull-board/fastify':
         specifier: 'catalog:'
         version: 6.16.1
       '@bull-board/ui':
         specifier: 'catalog:'
-        version: 6.16.1
+        version: 6.16.2
       '@discordapp/twemoji':
         specifier: 'catalog:'
         version: 16.0.1
@@ -2926,11 +2926,19 @@ packages:
     peerDependencies:
       '@bull-board/ui': 6.16.1
 
+  '@bull-board/api@6.16.2':
+    resolution: {integrity: sha512-d3kDf91FeMw/wYp8FOZJjX4hVqZEmomXtYgNRdZc0a5gTR2bmomvpwJtNBinu2lyIRFoX/Rxilz+CZ6xyw3drQ==}
+    peerDependencies:
+      '@bull-board/ui': 6.16.2
+
   '@bull-board/fastify@6.16.1':
     resolution: {integrity: sha512-glAB48i/vppUFJJBACwdHImePYJcBJRIBGBkZvy53r/650r9ATyWhn4QREbDu1Y76kpRqntwMsrSmj1trTRmjw==}
 
   '@bull-board/ui@6.16.1':
     resolution: {integrity: sha512-h7IPiAcNGNmBOv/7nKqAOvkZz3AlhMxHB9AQWB7MzlGRRP02eT1aRkX1h2AKydgAZn5JQJqDG4DcMpYV+rEE1g==}
+
+  '@bull-board/ui@6.16.2':
+    resolution: {integrity: sha512-L8ylgyJqiCrngne9GvX6zqALXnSLhzGBRaPnmO5y7Ev6K9w84EkcfhzcNw4qNH4SJAdcOm3HVf15dBU2Wznbug==}
 
   '@canvas/image-data@1.1.0':
     resolution: {integrity: sha512-QdObRRjRbcXGmM1tmJ+MrHcaz1MftF2+W7YI+MsphnsCrmtyfS0d5qJbk0MeSbUeyM/jCb0hmnkXPsy026L7dA==}
@@ -12552,6 +12560,7 @@ packages:
   whatwg-encoding@3.1.1:
     resolution: {integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==}
     engines: {node: '>=18'}
+    deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
   whatwg-mimetype@4.0.0:
     resolution: {integrity: sha512-QaKxh0eNIi2mE9p2vEdzfagOKHCcj1pJ56EEHGQOVxp8r9/iszLUUV7v89x9O1p/T+NlTM5W7jW6+cz4Fq1YVg==}
@@ -13549,6 +13558,16 @@ snapshots:
       '@bull-board/ui': 6.16.1
       redis-info: 3.1.0
 
+  '@bull-board/api@6.16.1(@bull-board/ui@6.16.2)':
+    dependencies:
+      '@bull-board/ui': 6.16.2
+      redis-info: 3.1.0
+
+  '@bull-board/api@6.16.2(@bull-board/ui@6.16.2)':
+    dependencies:
+      '@bull-board/ui': 6.16.2
+      redis-info: 3.1.0
+
   '@bull-board/fastify@6.16.1':
     dependencies:
       '@bull-board/api': 6.16.1(@bull-board/ui@6.16.1)
@@ -13560,6 +13579,10 @@ snapshots:
   '@bull-board/ui@6.16.1':
     dependencies:
       '@bull-board/api': 6.16.1(@bull-board/ui@6.16.1)
+
+  '@bull-board/ui@6.16.2':
+    dependencies:
+      '@bull-board/api': 6.16.2(@bull-board/ui@6.16.2)
 
   '@canvas/image-data@1.1.0': {}
 

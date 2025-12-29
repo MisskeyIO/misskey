@@ -13,7 +13,7 @@ catalog:
   '@authenio/samlify-node-xmllint': 2.0.0
   '@aws-sdk/client-s3': ~3
   '@aws-sdk/lib-storage': ~3
-  '@bull-board/api': 6.16.1
+  '@bull-board/api': 6.16.2
   '@bull-board/fastify': 6.16.1
   '@bull-board/ui': 6.16.1
   '@discordapp/twemoji': 16.0.1

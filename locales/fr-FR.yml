@@ -154,6 +154,7 @@ unsuspendConfirm: "Êtes-vous sûr·e de vouloir annuler la suspension de ce com
 selectList: "Sélectionner une liste"
 editList: "Modifier la liste"
 selectChannel: "Sélectionner un canal"
+selectAntenna: "Sélectionner une antenne"
 editAntenna: "Modifier l'antenne"
 createAntenna: "Créer une antenne"
 selectWidget: "Sélectionner un widget"

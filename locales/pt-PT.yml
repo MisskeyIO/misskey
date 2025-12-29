@@ -158,6 +158,7 @@ unsuspendConfirm: "Tem certeza que gostaria de cancelar a suspensão desta conta
 selectList: "Selecione uma lista"
 editList: "Editar lista"
 selectChannel: "Selecionar canal"
+selectAntenna: "Selecione uma antena"
 editAntenna: "Editar antena"
 createAntenna: "Criar  uma antena"
 selectWidget: "Selecione um widget"

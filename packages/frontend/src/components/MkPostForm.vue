@@ -991,7 +991,7 @@ function loadDraft(exactMatch = false) {
 		visibility.value = draft.value.data.visibility;
 		localOnly.value = draft.value.data.localOnly;
 		postingLang.value = draft.value.data.lang;
-		dimension.value = draft.value.data.dimension;
+		dimension.value = draft.value.data.dimension ?? prefer.s.dimension;
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		files.value = draft.value.data.files?.filter(f => f?.id && f.type && f.name) || [];
 		if (draft.value.data.poll) {

@@ -46,6 +46,7 @@ describe('NoteEntityService', () => {
 		app = await Test.createTestingModule({
 			imports: [GlobalModule, CoreModule],
 		}).compile();
+		await app.init();
 		service = app.get(NoteEntityService);
 		cacheService = app.get(CacheService);
 	});

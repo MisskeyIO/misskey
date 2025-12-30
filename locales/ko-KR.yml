@@ -2853,6 +2853,7 @@ _dialog:
   charactersBelow: "최소 글자수 미만입니다! 현재 {current} / 최소 {min}"
   numberBelow: "최소값 미만입니다! 현재 {current} / 최소 {min}"
   numberAbove: "최대값을 초과하였습니다! 현재 {current} / 최대 {max}"
+  numberInvalid: "유효한 숫자가 아닙니다! 현재 {current}"
 _disabledTimeline:
   title: "비활성화된 타임라인"
   description: "현재 역할에서는 이 타임라인을 이용할 수 없습니다."

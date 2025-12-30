@@ -35,6 +35,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<span v-else-if="okButtonDisabledReason === 'charactersBelow'" v-text="i18n.tsx._dialog.charactersBelow({ current: (inputValue as string)?.length ?? 0, min: input.minLength ?? 'NaN' })"/>
 					<span v-else-if="okButtonDisabledReason === 'numberBelow'" v-text="i18n.tsx._dialog.numberBelow({ current: inputValue ?? 'NaN', min: input.min ?? 'NaN' })"/>
 					<span v-else-if="okButtonDisabledReason === 'numberAbove'" v-text="i18n.tsx._dialog.numberAbove({ current: inputValue ?? 'NaN', max: input.max ?? 'NaN' })"/>
+					<span v-else-if="okButtonDisabledReason === 'numberInvalid'" v-text="i18n.tsx._dialog.numberInvalid({ current: inputValue ?? 'NaN' })"/>
 				</template>
 			</MkInput>
 			<MkTextarea v-if="input.type === 'textarea'" v-model="inputValue" :placeholder="input.placeholder || undefined" :autocomplete="input.autocomplete">
@@ -44,6 +45,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<span v-else-if="okButtonDisabledReason === 'charactersBelow'" v-text="i18n.tsx._dialog.charactersBelow({ current: (inputValue as string)?.length ?? 0, min: input.minLength ?? 'NaN' })"/>
 					<span v-else-if="okButtonDisabledReason === 'numberBelow'" v-text="i18n.tsx._dialog.numberBelow({ current: inputValue ?? 'NaN', min: input.min ?? 'NaN' })"/>
 					<span v-else-if="okButtonDisabledReason === 'numberAbove'" v-text="i18n.tsx._dialog.numberAbove({ current: inputValue ?? 'NaN', max: input.max ?? 'NaN' })"/>
+					<span v-else-if="okButtonDisabledReason === 'numberInvalid'" v-text="i18n.tsx._dialog.numberInvalid({ current: inputValue ?? 'NaN' })"/>
 				</template>
 			</MkTextarea>
 		</template>
@@ -176,7 +178,7 @@ const okWaitInitiated = computed(() => {
 });
 const okDisabled = computed(() => sec.value > 0);
 
-const okButtonDisabledReason = computed<null | 'charactersExceeded' | 'charactersBelow' | 'numberBelow' | 'numberAbove'>(() => {
+const okButtonDisabledReason = computed<null | 'charactersExceeded' | 'charactersBelow' | 'numberBelow' | 'numberAbove' | 'numberInvalid'>(() => {
 	if (props.input) {
 		if (props.input.type === 'number') {
 			const rawValue = inputValue.value;
@@ -193,6 +195,8 @@ const okButtonDisabledReason = computed<null | 'charactersExceeded' | 'character
 				if (props.input.max != null && numericValue > props.input.max) {
 					return 'numberAbove';
 				}
+			} else if (numericValue != null) {
+				return 'numberInvalid';
 			}
 		}
 

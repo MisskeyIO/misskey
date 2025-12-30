@@ -4,7 +4,7 @@ import { instance } from '@/instance.js';
 import { prefer } from '@/preferences.js';
 
 export async function selectDimension(current?: number | null): Promise<number | undefined> {
-	const max = Math.max(instance.dimensions ?? 1, 1);
+	const max = Math.max(instance.dimensions ?? 1, 1) - 1;
 	const { canceled, result } = await os.inputNumber({
 		title: i18n.ts.dimension,
 		default: current ?? prefer.r.dimension.value,

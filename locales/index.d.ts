@@ -11159,6 +11159,10 @@ export interface Locale extends ILocale {
          * 最大値を超えています！ 現在 {current} / 制限 {max}
          */
         "numberAbove": ParameterizedString<"current" | "max">;
+        /**
+         * 無効な数値です！ 現在 {current}
+         */
+        "numberInvalid": ParameterizedString<"current">;
     };
     "_disabledTimeline": {
         /**

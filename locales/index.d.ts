@@ -11163,10 +11163,6 @@ export interface Locale extends ILocale {
          * 無効な数値です！ 現在 {current}
          */
         "numberInvalid": ParameterizedString<"current">;
-        /**
-         * 無効な数値です！ 現在 {current}
-         */
-        "numberInvalid": ParameterizedString<"current">;
     };
     "_disabledTimeline": {
         /**

@@ -29,7 +29,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</span>
 				</div>
 				<div :class="$style.description">{{ withDescription ? i18n.ts._achievements._types['_' + achievement.name].description : '???' }}</div>
-				<div v-if="i18n.ts._achievements._types['_' + achievement.name].flavor && withDescription" :class="$style.flavor">{{ i18n.ts._achievements._types['_' + achievement.name].flavor }}</div>
+				<Mfm
+					v-if="i18n.ts._achievements._types['_' + achievement.name].flavor && withDescription"
+					:text="i18n.ts._achievements._types['_' + achievement.name].flavor"
+					:class="$style.flavor"
+				/>
 			</div>
 		</div>
 		<template v-if="withLocked">

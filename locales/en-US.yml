@@ -2619,14 +2619,9 @@ _postForm:
     d: "What do you want to say?"
     e: "Start writing..."
     f: "Waiting for you to write..."
-<<<<<<< HEAD
-  policyScheduleNoteMaxDaysExceeded: "The maximum number of days you can schedule notes for with your current support plan is {max}.\nYou can upgrade your plan [here](https://go.misskey.io/donate)."
-  tosAndGuidelinesInfo: "Before posting, please read the [Terms of Service]({tosUrl}) and [NSFW Guidelines](https://go.misskey.io/media-guideline)."
-  dimensionPrivateNotice: "Dimension {dimension} is private (>=1000).\nThis note will be local-only and will not be federated."
-=======
   policyScheduleNoteMaxDaysExceeded: "The maximum number of days you can schedule notes is {max}."
   tosAndGuidelinesInfo: "Before posting, please read the [Terms of Service]({tosUrl})."
->>>>>>> host
+  dimensionPrivateNotice: "Dimension {dimension} is private (>=1000).\nThis note will be local-only and will not be federated."
 _profile:
   name: "Name"
   username: "Username"

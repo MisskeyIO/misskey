@@ -929,7 +929,7 @@ const contextMenu = prefer.model('contextMenu');
 const menuStyle = prefer.model('menuStyle');
 const makeEveryTextElementsSelectable = prefer.model('makeEveryTextElementsSelectable');
 
-const postingLang = ref<string | null>($i.postingLang ?? null);
+const postingLang = ref<string | null>($i.postingLang);
 const languageCodes = Object.keys(langmap);
 const initialViewingLangs = $i.viewingLangs ?? [];
 const showAllViewingLangs = ref(initialViewingLangs.length === 0);

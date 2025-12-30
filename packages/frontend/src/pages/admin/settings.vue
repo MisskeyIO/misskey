@@ -88,6 +88,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkFolder>
 
 			<MkFolder>
+<<<<<<< HEAD
 				<template #icon><i class="ti ti-cloud"></i></template>
 				<template #label>{{ i18n.ts.files }}</template>
 				<template v-if="filesForm.modified.value" #footer>
@@ -125,6 +126,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkFolder>
 
 			<MkFolder>
+=======
+>>>>>>> host
 				<template #icon><i class="ti ti-world-cog"></i></template>
 				<template #label>ServiceWorker</template>
 				<template v-if="serviceWorkerForm.modified.value" #footer>
@@ -336,17 +339,6 @@ const pinnedUsersForm = useForm({
 }, async (state) => {
 	await os.apiWithDialog('admin/update-meta', {
 		pinnedUsers: state.pinnedUsers.split('\n'),
-	});
-	fetchInstance(true);
-});
-
-const filesForm = useForm({
-	cacheRemoteFiles: meta.cacheRemoteFiles,
-	cacheRemoteSensitiveFiles: meta.cacheRemoteSensitiveFiles,
-}, async (state) => {
-	await os.apiWithDialog('admin/update-meta', {
-		cacheRemoteFiles: state.cacheRemoteFiles,
-		cacheRemoteSensitiveFiles: state.cacheRemoteSensitiveFiles,
 	});
 	fetchInstance(true);
 });

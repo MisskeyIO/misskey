@@ -4,7 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<PageWithHeader v-model:tab="tab" :tabs="headerTabs">
+<PageWithHeader v-model:tab="tab" :tabs="headerTabs" :actions="headerActions">
 	<div v-if="error != null" class="_spacer" style="--MI_SPACER-w: 1200px;">
 		<div :class="$style.root">
 			<img :class="$style.img" :src="serverErrorImageUrl" draggable="false"/>
@@ -25,7 +25,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 	</div>
 	<div v-else-if="tab === 'timeline'" class="_spacer" style="--MI_SPACER-w: 700px;">
-		<MkTimeline v-if="visible" ref="timeline" src="role" :role="props.roleId"/>
+		<MkTimeline
+			v-if="visible"
+			ref="timeline"
+			:key="`${props.roleId}:${dimension}`"
+			src="role"
+			:role="props.roleId"
+			:dimension="dimension"
+		/>
 		<div v-else-if="!visible" class="_fullinfo">
 			<img :src="infoImageUrl" draggable="false"/>
 			<div>{{ i18n.ts.nothing }}</div>
@@ -38,12 +45,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, watch, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { instanceName } from '@@/js/config.js';
+import type { PageHeaderItem } from '@/types/page-header.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import MkUserList from '@/components/MkUserList.vue';
 import { definePage } from '@/page.js';
 import { i18n } from '@/i18n.js';
 import MkTimeline from '@/components/MkTimeline.vue';
 import { serverErrorImageUrl, infoImageUrl } from '@/instance.js';
+import { $i } from '@/i.js';
+import { store } from '@/store.js';
+import { deepMerge } from '@/utility/merge.js';
+import { selectDimension } from '@/utility/dimension.js';
+import { claimAchievement } from '@/utility/achievements.js';
+import { prefer } from '@/preferences.js';
+import { hasDimension } from '@/timelines.js';
+import { deviceKind } from '@/utility/device-kind.js';
 
 const props = withDefaults(defineProps<{
 	roleId: string;
@@ -57,6 +73,11 @@ const tab = ref(props.initialTab);
 const role = ref<Misskey.entities.Role | null>(null);
 const error = ref<string | null>(null);
 const visible = ref(false);
+const dimensionKey = computed(() => `role:${props.roleId}`);
+const dimension = computed<number>({
+	get: () => store.r.tl.value?.dimensionBySrc?.[dimensionKey.value] ?? prefer.s.dimension,
+	set: (value) => saveTlDimension(value),
+});
 
 watch(() => props.roleId, () => {
 	misskeyApi('roles/show', {
@@ -73,6 +94,29 @@ watch(() => props.roleId, () => {
 		}
 	});
 }, { immediate: true });
+
+watch(dimension, (value, previous) => {
+	if (value == null || value === previous) return;
+	claimAchievement('dimensionConfigured');
+});
+
+async function pickDimension(): Promise<void> {
+	const selected = await selectDimension(dimension.value);
+	if (selected === undefined) return;
+	dimension.value = selected;
+}
+
+function saveTlDimension(value: number | null): void {
+	const dimensionBySrc = { ...(store.s.tl.dimensionBySrc ?? {}) };
+	if (value == null) {
+		delete dimensionBySrc[dimensionKey.value];
+	} else {
+		dimensionBySrc[dimensionKey.value] = value;
+	}
+
+	const out = deepMerge({ dimensionBySrc }, store.s.tl);
+	store.set('tl', out);
+}
 
 const users = computed(() => ({
 	endpoint: 'roles/users' as const,
@@ -91,6 +135,21 @@ const headerTabs = computed(() => [{
 	icon: 'ti ti-pencil',
 	title: i18n.ts.timeline,
 }]);
+
+const headerActions = computed(() => {
+	const headerItems: PageHeaderItem[] = [];
+
+	if (tab.value === 'timeline' && visible.value && $i) {
+		headerItems.push({
+			icon: 'ti ti-cube',
+			label: dimension.value,
+			text: i18n.tsx.dimensionWithNumber({ dimension: dimension.value }),
+			handler: pickDimension,
+		});
+	}
+
+	return headerItems.length > 0 ? headerItems : null;
+});
 
 definePage(() => ({
 	title: role.value ? role.value.name : (error.value ?? i18n.ts.role),
@@ -117,4 +176,3 @@ definePage(() => ({
 	border-radius: 16px;
 }
 </style>
-

@@ -28,6 +28,8 @@ import { deckStore } from '@/ui/deck/deck-store.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { fetchCustomEmojis } from '@/custom-emojis.js';
 import { prefer } from '@/preferences.js';
+import { sensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
+import { getDeviceId, setUserProperties } from '@/utility/tracking-user-properties.js';
 import { $i } from '@/i.js';
 import { mainRouter } from '@/router.js';
 
@@ -379,6 +381,15 @@ export async function common(createVue: () => Promise<App<Element>>) {
 			} : {}),
 
 			...instance.sentryForFrontend.options,
+		});
+	}
+
+	if (instance.sentryForFrontend || instance.googleAnalyticsId) {
+		const consentValue = sensitiveContentConsent.value === null ? 'unset' : String(sensitiveContentConsent.value);
+		setUserProperties({
+			deviceId: getDeviceId(),
+			sensitiveContentConsent: consentValue,
+			displayOfSensitiveAds: String(prefer.s.displayOfSensitiveAds),
 		});
 	}
 

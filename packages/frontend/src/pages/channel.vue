@@ -115,7 +115,6 @@ import { store } from '@/store.js';
 import { deepMerge } from '@/utility/merge.js';
 import { selectDimension } from '@/utility/dimension.js';
 import { claimAchievement } from '@/utility/achievements.js';
-import { hasDimension } from '@/timelines.js';
 
 const router = useRouter();
 

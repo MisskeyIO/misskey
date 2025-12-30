@@ -58,8 +58,6 @@ import { deepMerge } from '@/utility/merge.js';
 import { selectDimension } from '@/utility/dimension.js';
 import { claimAchievement } from '@/utility/achievements.js';
 import { prefer } from '@/preferences.js';
-import { hasDimension } from '@/timelines.js';
-import { deviceKind } from '@/utility/device-kind.js';
 
 const props = withDefaults(defineProps<{
 	roleId: string;

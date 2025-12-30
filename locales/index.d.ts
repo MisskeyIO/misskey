@@ -2938,6 +2938,10 @@ export interface Locale extends ILocale {
      */
     "hardWordMute": string;
     /**
+     * ミュートされたノートを隠す
+     */
+    "hideMutedNotes": string;
+    /**
      * ミュートされたワードを表示
      */
     "showMutedWord": string;
@@ -8845,10 +8849,6 @@ export interface Locale extends ILocale {
          * キーワードをスラッシュで囲むと正規表現になります。
          */
         "muteWordsDescription2": string;
-        /**
-         * ミュートされた単語を含むノートを非表示にする
-         */
-        "hideMutedNotes": string;
     };
     "_instanceMute": {
         /**

@@ -1389,7 +1389,7 @@ scheduled: "予約済み"
 unschedule: "予約を解除"
 setScheduledTime: "予約日時を設定"
 willBePostedAt: "{x}に投稿されます"
-sensitiveByModerator: "管理者によって、ドライブのファイルがセンシティブとして設定されました。\n詳細については、[NSFWガイドライン](https://go.misskey.io/media-guideline)を確認してください。"
+sensitiveByModerator: "管理者によって、ドライブのファイルがセンシティブとして設定されました。"
 thisInfoIsNotVisibleOtherUser: "この情報は他のユーザーには公開されません。"
 flushItAway: "水に流す"
 deleteNotWash: "削除をしても全てが水に流れるわけではありませんが…"
@@ -2671,9 +2671,14 @@ _postForm:
     d: "言いたいことは？"
     e: "ここに書いてください"
     f: "あなたが書くのを待っています..."
+<<<<<<< HEAD
   policyScheduleNoteMaxDaysExceeded: "現在の支援プランで予約できる日数の上限は{max}日です。\n[ここ](https://go.misskey.io/donate)からプランをアップグレードできます。"
   tosAndGuidelinesInfo: "投稿する前に、[利用規約]({tosUrl})と[NSFWガイドライン](https://go.misskey.io/media-guideline)を必ずお読みください。"
   dimensionPrivateNotice: "{dimension}次元はプライベート(>=1000)です。\nこの投稿はローカルのみになり、連合には流れません。"
+=======
+  policyScheduleNoteMaxDaysExceeded: "予約できる日数の上限は{max}日です。"
+  tosAndGuidelinesInfo: "投稿する前に、[利用規約]({tosUrl})を必ずお読みください。"
+>>>>>>> host
 
 _profile:
   name: "名前"
@@ -2699,7 +2704,7 @@ _profile:
   sectionName: "セクション名"
   sectionNameNoneDescription: "セクション名を表示しないようにする"
   sectionNameNone: "名前が表示されないセクション"
-  policyDisplayLimitExceeded: "現在の支援プランの表示上限({max}個)を超えているため、この項目は表示されません。\n[ここ](https://go.misskey.io/donate)からプランをアップグレードできます。"
+  policyDisplayLimitExceeded: "表示上限({max}個)を超えているため、この項目は表示されません。"
   followedMessage: "フォローされた時のメッセージ"
   followedMessageDescription: "フォローされた時に相手に表示する短いメッセージを設定できます。"
   followedMessageDescriptionForLockedAccount: "フォローを承認制にしている場合、フォローリクエストを許可した時に表示されます。"

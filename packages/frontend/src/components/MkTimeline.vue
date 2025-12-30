@@ -97,6 +97,7 @@ const emit = defineEmits<{
 
 provide('inTimeline', true);
 provide('tl_withSensitive', computed(() => props.withSensitive));
+provide('tl_dimension', computed(() => props.dimension ?? prefer.r.dimension.value));
 provide('inChannel', computed(() => props.src === 'channel'));
 
 type TimelineQueryType = {

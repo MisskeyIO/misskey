@@ -345,6 +345,7 @@ const headerActions = computed(() => {
 		if ($i && hasDimension(src.value)) {
 			tmp.unshift({
 				icon: 'ti ti-cube',
+				label: dimension.value,
 				text: i18n.tsx.dimensionWithNumber({ dimension: dimension.value }),
 				hideWhenNarrow: true,
 				handler: pickDimension,

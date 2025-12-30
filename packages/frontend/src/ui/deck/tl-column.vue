@@ -145,7 +145,11 @@ function onNote() {
 }
 
 const menu = computed<MenuItem[]>(() => {
-	const menuItems: MenuItem[] = [];
+	const menuItems: MenuItem[] = [{
+		icon: 'ti ti-pencil',
+		text: i18n.ts.timeline,
+		action: setType,
+	}];
 
 	if (hasDimension(props.column.tl)) {
 		menuItems.push({
@@ -156,10 +160,6 @@ const menu = computed<MenuItem[]>(() => {
 	}
 
 	menuItems.push({
-		icon: 'ti ti-pencil',
-		text: i18n.ts.timeline,
-		action: setType,
-	}, {
 		icon: 'ti ti-bell',
 		text: i18n.ts._deck.newNoteNotificationSettings,
 		action: () => soundSettingsButton(soundSetting),

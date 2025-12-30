@@ -113,7 +113,7 @@ export class NoteEntityService implements OnModuleInit {
 
 	@bindThis
 	public async isLanguageVisibleToMe(note: MiNote | Packed<'Note'>, meId: MiUser['id'] | null | undefined): Promise<boolean> {
-		if (!meId || note.userId === meId) return true;
+		if (!meId) return true;
 		if (note.mentions?.includes(meId)) return true;
 		if (note.visibleUserIds?.includes(meId)) return true;
 
@@ -377,7 +377,6 @@ export class NoteEntityService implements OnModuleInit {
 		if (viewerDimension == null) return true;
 
 		if (viewerId) {
-			if (note.userId === viewerId) return true;
 			if (note.mentions?.includes(viewerId)) return true;
 			if (note.visibleUserIds?.includes(viewerId)) return true;
 			if (note.reply?.userId === viewerId) return true;

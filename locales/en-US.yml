@@ -547,6 +547,8 @@ postingLanguageDescription: "Posts will appear in timelines of users who have th
 postingAndViewingLanguage: "Posting and viewing languages"
 viewingLanguages: "Viewing languages"
 viewingLanguagesDescription: "Only posts matching the selected languages will be shown."
+viewingLanguagesShowAll: "Show all languages"
+viewingLanguagesShowAllDescription: "Shows posts in all languages."
 viewingLanguagesIncludeUnknown: "Show unclassified posts"
 viewingLanguagesIncludeUnknownDescription: "Includes posts from third-party clients, bots, etc."
 viewingLanguagesIncludeRemote: "Include remote posts"
@@ -2617,7 +2619,7 @@ _postForm:
     f: "Waiting for you to write..."
   policyScheduleNoteMaxDaysExceeded: "The maximum number of days you can schedule notes for with your current support plan is {max}.\nYou can upgrade your plan [here](https://go.misskey.io/donate)."
   tosAndGuidelinesInfo: "Before posting, please read the [Terms of Service]({tosUrl}) and [NSFW Guidelines](https://go.misskey.io/media-guideline)."
-  dimensionPrivateNotice: "Dimension {dimension} is private (>=1000). This post will be local-only and will not be federated."
+  dimensionPrivateNotice: "Dimension {dimension} is private (>=1000).\nThis note will be local-only and will not be federated."
 _profile:
   name: "Name"
   username: "Username"

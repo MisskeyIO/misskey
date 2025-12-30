@@ -543,6 +543,8 @@ postingLanguageDescription: "選択した言語が表示する言語として設
 postingAndViewingLanguage: "投稿と表示する言語"
 viewingLanguages: "表示する言語"
 viewingLanguagesDescription: "選択した言語に一致する投稿だけが表示されます。"
+viewingLanguagesShowAll: "すべての言語を表示する"
+viewingLanguagesShowAllDescription: "すべての言語の投稿を表示します。"
 viewingLanguagesIncludeUnknown: "未分類の投稿を表示する"
 viewingLanguagesIncludeUnknownDescription: "サードパーティークライアント、ボットなどの投稿が含まれます"
 viewingLanguagesIncludeRemote: "リモートの投稿を含める"
@@ -2671,7 +2673,7 @@ _postForm:
     f: "あなたが書くのを待っています..."
   policyScheduleNoteMaxDaysExceeded: "現在の支援プランで予約できる日数の上限は{max}日です。\n[ここ](https://go.misskey.io/donate)からプランをアップグレードできます。"
   tosAndGuidelinesInfo: "投稿する前に、[利用規約]({tosUrl})と[NSFWガイドライン](https://go.misskey.io/media-guideline)を必ずお読みください。"
-  dimensionPrivateNotice: "ディメンション{dimension}はプライベート(>=1000)です。この投稿はローカルのみになり、連合には流れません。"
+  dimensionPrivateNotice: "{dimension}次元はプライベート(>=1000)です。\nこの投稿はローカルのみになり、連合には流れません。"
 
 _profile:
   name: "名前"

@@ -15,7 +15,6 @@ export function getNoteDimension(note: Packed<'Note'>): number {
 export function isCrossDimensionInteraction(note: Packed<'Note'>, viewerId: MiUser['id'] | null | undefined): boolean {
 	if (!viewerId) return false;
 
-	if (note.userId === viewerId) return true;
 	if (note.mentions?.includes(viewerId)) return true;
 	if (note.visibleUserIds?.includes(viewerId)) return true;
 	if (note.reply?.userId === viewerId) return true;

@@ -2190,6 +2190,14 @@ export interface Locale extends ILocale {
      */
     "viewingLanguagesDescription": string;
     /**
+     * すべての言語を表示する
+     */
+    "viewingLanguagesShowAll": string;
+    /**
+     * すべての言語の投稿を表示します。
+     */
+    "viewingLanguagesShowAllDescription": string;
+    /**
      * 未分類の投稿を表示する
      */
     "viewingLanguagesIncludeUnknown": string;
@@ -10186,7 +10194,8 @@ export interface Locale extends ILocale {
          */
         "tosAndGuidelinesInfo": ParameterizedString<"tosUrl">;
         /**
-         * ディメンション{dimension}はプライベート(>=1000)です。この投稿はローカルのみになり、連合には流れません。
+         * {dimension}次元はプライベート(>=1000)です。
+         * この投稿はローカルのみになり、連合には流れません。
          */
         "dimensionPrivateNotice": ParameterizedString<"dimension">;
     };

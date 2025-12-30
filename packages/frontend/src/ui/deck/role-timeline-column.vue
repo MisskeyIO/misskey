@@ -91,13 +91,13 @@ function onNote() {
 }
 
 const menu: MenuItem[] = [{
-	icon: 'ti ti-cube',
-	text: i18n.tsx.dimensionWithNumber({ dimension: dimension.value }),
-	action: pickDimension,
-}, {
 	icon: 'ti ti-pencil',
 	text: i18n.ts.role,
 	action: setRole,
+}, {
+	icon: 'ti ti-cube',
+	text: i18n.tsx.dimensionWithNumber({ dimension: dimension.value }),
+	action: pickDimension,
 }, {
 	icon: 'ti ti-bell',
 	text: i18n.ts._deck.newNoteNotificationSettings,

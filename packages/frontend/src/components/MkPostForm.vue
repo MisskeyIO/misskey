@@ -450,6 +450,8 @@ function watchForDraft() {
 	watch(files, () => saveDraft(), { deep: true });
 	watch(visibility, () => saveDraft());
 	watch(localOnly, () => saveDraft());
+	watch(postingLang, () => saveDraft());
+	watch(dimension, () => saveDraft());
 	watch(quoteId, () => saveDraft());
 	watch(reactionAcceptance, () => saveDraft());
 	watch(scheduledTime, () => saveDraft());
@@ -731,6 +733,7 @@ function clear() {
 	visibility.value = store.s.rememberNoteVisibility ? store.s.visibility : store.s.defaultNoteVisibility;
 	localOnly.value = store.s.rememberNoteVisibility ? store.s.localOnly : store.s.defaultNoteLocalOnly;
 	postingLang.value = null;
+	dimension.value = props.initialDimension ?? store.r.tl.value.dimensionBySrc?.[store.r.tl.value.src] ?? prefer.s.dimension;
 	files.value = [];
 	poll.value = null;
 	visibleUsers.value = [];
@@ -1216,6 +1219,7 @@ async function insertEmoji(ev: MouseEvent) {
 // 		},
 // 	);
 // }
+
 async function insertMfmFunction(ev: MouseEvent) {
 	if (textareaEl.value == null) return;
 	mfmFunctionPicker(
@@ -1290,6 +1294,8 @@ onMounted(() => {
 			cw.value = init.cw ?? null;
 			visibility.value = init.visibility;
 			localOnly.value = init.localOnly ?? false;
+			postingLang.value = init.lang ?? null;
+			dimension.value = init.dimension ?? props.initialDimension ?? store.r.tl.value.dimensionBySrc?.[store.r.tl.value.src] ?? prefer.s.dimension;
 			files.value = init.files ?? [];
 			if (init.poll) {
 				poll.value = {

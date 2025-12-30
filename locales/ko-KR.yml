@@ -544,6 +544,8 @@ postingLanguageDescription: "선택한 언어가 표시 언어로 설정된 유�
 postingAndViewingLanguage: "게시 및 표시 언어"
 viewingLanguages: "표시 언어"
 viewingLanguagesDescription: "선택한 언어와 일치하는 노트만 표시됩니다."
+viewingLanguagesShowAll: "모든 언어 표시"
+viewingLanguagesShowAllDescription: "모든 언어의 노트를 표시합니다."
 viewingLanguagesIncludeUnknown: "분류되지 않은 노트 표시"
 viewingLanguagesIncludeUnknownDescription: "타사 클라이언트, 봇 등의 노트가 포함됩니다."
 viewingLanguagesIncludeRemote: "리모트 노트 포함"
@@ -2602,7 +2604,7 @@ _postForm:
     f: "작성해주시길 기다리고 있어요..."
   policyScheduleNoteMaxDaysExceeded: "현재 지원 플랜의 예약 가능한 최대 일수는 {max}일입니다.\n[여기](https://go.misskey.io/donate)에서 플랜을 업그레이드할 수 있습니다."
   tosAndGuidelinesInfo: "노트를 게시하기 전에 [이용약관]({tosUrl})과 [NSFW 가이드라인](https://go.misskey.io/media-guideline)을 반드시 읽어 주세요."
-  dimensionPrivateNotice: "디멘션 {dimension}은 프라이빗(>=1000)입니다. 이 노트는 로컬 전용이며 연합에는 보내지 않습니다."
+  dimensionPrivateNotice: "{dimension}차원은 프라이빗(>=1000)입니다.\n이 노트는 로컬 전용이며 연합에는 보내지 않습니다."
 _profile:
   name: "이름"
   username: "유저명"

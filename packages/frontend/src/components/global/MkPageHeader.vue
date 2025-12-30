@@ -30,7 +30,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</template>
 		<div v-if="(!thin_ && narrow && !hideTitle) || hasActions" :class="$style.buttonsRight">
 			<template v-for="action in visibleActions">
-				<button v-tooltip.noDelay="action.text" class="_button" :class="[$style.button, { [$style.highlighted]: action.highlighted }]" @click.stop="action.handler" @touchstart="preventDrag"><i :class="action.icon"></i></button>
+				<button v-tooltip.noDelay="action.text" class="_button" :class="[$style.button, { [$style.highlighted]: action.highlighted }]" @click.stop="action.handler" @touchstart="preventDrag">
+					<span v-if="action.label">{{ action.label }}</span>
+					<i :class="action.icon"></i>
+				</button>
 			</template>
 		</div>
 	</div>
@@ -231,6 +234,7 @@ onUnmounted(() => {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	gap: 4px;
 	height: var(--height);
 	width: calc(var(--height) - (var(--margin)));
 	box-sizing: border-box;

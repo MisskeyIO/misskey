@@ -110,6 +110,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkFolder>
 
 			<MkFolder>
+				<template #icon><i class="ti ti-cube"></i></template>
+				<template #label>{{ i18n.ts.dimension }}</template>
+				<template v-if="dimensionForm.modified.value" #footer>
+					<MkFormFooter :form="dimensionForm"/>
+				</template>
+
+				<div class="_gaps">
+					<MkInput v-model="dimensionForm.state.dimensions" type="number" min="1" step="1">
+						<template #label>{{ i18n.ts._serverSettings.dimensions }}<span v-if="dimensionForm.modifiedStates.dimensions" class="_modified">{{ i18n.ts.modified }}</span></template>
+						<template #caption>{{ i18n.ts._serverSettings.dimensionsDescription }}</template>
+					</MkInput>
+				</div>
+			</MkFolder>
+
+			<MkFolder>
 				<template #icon><i class="ti ti-world-cog"></i></template>
 				<template #label>ServiceWorker</template>
 				<template v-if="serviceWorkerForm.modified.value" #footer>
@@ -303,6 +318,15 @@ const infoForm = useForm({
 		repositoryUrl: state.repositoryUrl,
 		impressumUrl: state.impressumUrl,
 		featuredGameChannels: state.featuredGameChannels.split('\n'),
+	});
+	fetchInstance(true);
+});
+
+const dimensionForm = useForm({
+	dimensions: meta.dimensions,
+}, async (state) => {
+	await os.apiWithDialog('admin/update-meta', {
+		dimensions: state.dimensions,
 	});
 	fetchInstance(true);
 });

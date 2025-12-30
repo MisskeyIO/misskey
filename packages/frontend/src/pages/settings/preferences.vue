@@ -1011,8 +1011,8 @@ watch([includeUnknown, includeRemote, viewingLangs, showAllViewingLangs], () => 
 }, { deep: true });
 
 watch(postingLang, (value) => {
-	if (languageSaving || showAllViewingLangs.value) return;
-	if (value != null && !viewingLangs.value.includes(value)) {
+	if (languageSaving) return;
+	if (!showAllViewingLangs.value && value != null && !viewingLangs.value.includes(value)) {
 		viewingLangs.value = [...viewingLangs.value, value];
 	}
 	languageUnsaved.value = true;

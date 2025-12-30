@@ -160,7 +160,7 @@ jobs:
             PR_URL="https://github.com/${{ github.repository }}/pull/$PR_NUMBER"
           fi
 
-          if git diff -U0 | grep -q '<<<<<<< HEAD'; then
+          if git diff origin/io HEAD -U0 | grep -q '<<<<<<< HEAD'; then
             echo "Conflict markers detected in diff. Manual resolution required; skipping auto merge."
             exit 1
           fi
@@ -229,7 +229,7 @@ jobs:
             PR_URL="https://github.com/${{ github.repository }}/pull/$PR_NUMBER"
           fi
 
-          if git diff -U0 | grep -q '<<<<<<< HEAD'; then
+          if git diff origin/host HEAD -U0 | grep -q '<<<<<<< HEAD'; then
             echo "Conflict markers detected in diff. Manual resolution required; skipping auto merge."
             exit 1
           fi

@@ -77,3 +77,9 @@ export function availableBasicTimelines(): BasicTimelineType[] {
 export function hasWithReplies(timeline: BasicTimelineType | undefined | null): boolean {
 	return timeline === 'local' || timeline === 'social';
 }
+
+export function hasDimension(timeline: string | undefined | null): boolean {
+	if (!timeline) return false;
+	if (basicTimelineTypes.includes(timeline as BasicTimelineType)) return true;
+	return timeline === 'channel' || timeline === 'role';
+}

@@ -257,3 +257,5 @@ export type IMentionedRemoteUsers = {
 	username: string;
 	host: string;
 }[];
+
+export type MiNoteWithDimension = MiNote & { dimension?: number };

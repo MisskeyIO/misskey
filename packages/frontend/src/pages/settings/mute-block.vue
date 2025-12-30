@@ -22,6 +22,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<div class="_gaps_m">
 						<MkInfo>{{ i18n.ts.wordMuteDescription }}</MkInfo>
 
+						<SearchMarker
+							:label="i18n.ts.hideMutedNotes"
+							:keywords="['show']"
+						>
+							<MkSwitch v-model="hideMutedNotes">{{ i18n.ts.hideMutedNotes }}</MkSwitch>
+						</SearchMarker>
+						<SearchMarker
+							:label="i18n.ts.showMutedWord"
+							:keywords="['show']"
+						>
+							<MkSwitch v-model="showSoftWordMutedWord">{{ i18n.ts.showMutedWord }}</MkSwitch>
+						</SearchMarker>
+
 						<XWordMute :muted="$i.mutedWords" @save="saveMutedWords"/>
 					</div>
 				</MkFolder>
@@ -194,7 +207,10 @@ import MkInfo from '@/components/MkInfo.vue';
 import MkFeatureBanner from '@/components/MkFeatureBanner.vue';
 import MkCustomEmoji from '@/components/global/MkCustomEmoji.vue';
 import MkEmoji from '@/components/global/MkEmoji.vue';
+import MkSwitch from '@/components/MkSwitch.vue';
 import { store } from '@/store';
+import { prefer } from '@/preferences';
+import { reloadAsk } from '@/utility/reload-ask';
 
 const $i = ensureSignin();
 
@@ -218,6 +234,16 @@ const expandedMuteItems = ref([]);
 const expandedBlockItems = ref([]);
 
 const mutedReactions = ref<string[]>(store.s.mutedReactions);
+
+const hideMutedNotes = prefer.model('hideMutedNotes');
+const showSoftWordMutedWord = prefer.model('showSoftWordMutedWord');
+
+watch([
+	hideMutedNotes,
+	showSoftWordMutedWord,
+], async () => {
+	await reloadAsk({ reason: i18n.ts.reloadToApplySetting, unison: true });
+});
 
 watch(mutedReactions, () => {
 	store.set('mutedReactions', mutedReactions.value);

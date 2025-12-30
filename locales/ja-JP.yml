@@ -538,6 +538,19 @@ signinFailed: "ログインできませんでした。ユーザー名とパス�
 or: "もしくは"
 language: "言語"
 uiLanguage: "UIの表示言語"
+postingLanguage: "投稿する言語"
+postingLanguageDescription: "選択した言語が表示する言語として設定されているユーザーのタイムラインに表示されます。\n投稿フォーム上でも変更できます。"
+postingAndViewingLanguage: "投稿と表示する言語"
+viewingLanguages: "表示する言語"
+viewingLanguagesDescription: "選択した言語に一致する投稿だけが表示されます。"
+viewingLanguagesShowAll: "すべての言語を表示する"
+viewingLanguagesShowAllDescription: "すべての言語の投稿を表示します。"
+viewingLanguagesIncludeUnknown: "未分類の投稿を表示する"
+viewingLanguagesIncludeUnknownDescription: "サードパーティークライアント、ボットなどの投稿が含まれます"
+viewingLanguagesIncludeRemote: "リモートの投稿を含める"
+dimension: "次元"
+dimensionWithNumber: "{dimension}次元"
+dimensionDescription: "0次元は0〜999次元の投稿が表示されます。"
 aboutX: "{x}について"
 emojiStyle: "絵文字のスタイル"
 native: "ネイティブ"
@@ -717,6 +730,7 @@ testEmail: "配信テスト"
 wordMute: "ワードミュート"
 wordMuteDescription: "指定した語句を含むノートを最小化します。最小化されたノートをクリックすることで表示することができます。"
 hardWordMute: "ハードワードミュート"
+hideMutedNotes: "ミュートされたノートを隠す"
 showMutedWord: "ミュートされたワードを表示"
 hardWordMuteDescription: "指定した語句を含むノートを隠します。ワードミュートとは異なり、ノートは完全に表示されなくなります。"
 regexpError: "正規表現エラー"
@@ -828,6 +842,13 @@ reloadToApplySetting: "設定はページリロード後に反映されます。
 needReloadToApply: "反映には再起動が必要です。"
 showTitlebar: "タイトルバーを表示する"
 clearCache: "キャッシュをクリア"
+timelineCache: "タイムラインのキャッシュ"
+timelineCacheDescription: "自分のタイムライン、リスト、アンテナのキャッシュを削除します。"
+purgeHomeTimelineCache: "ホームタイムラインのキャッシュを削除"
+purgeUserTimelineCache: "ユーザータイムラインのキャッシュを削除"
+purgeUserListTimelineCache: "リストタイムラインのキャッシュを削除"
+purgeAntennaTimelineCache: "アンテナタイムラインのキャッシュを削除"
+purgeTimelineCacheConfirm: "選択したタイムラインのキャッシュを削除しますか？"
 onlineUsersCount: "{n}人がオンライン"
 nUsers: "{n}ユーザー"
 nNotes: "{n}ノート"
@@ -2009,6 +2030,18 @@ _achievements:
       title: "あなたは18歳以上ですか？"
       description: "年齢確認に応答した"
       flavor: "年齢確認のタッチをお願いしまーす"
+    _postingLanguageConfigured:
+      title: "ここではMisskeyの言葉で話せ"
+      description: "投稿する言語を設定した"
+      flavor: "日本語でおk"
+    _viewingLanguagesConfigured:
+      title: "読める、読めるぞ…！"
+      description: "表示する言語を設定した"
+      flavor: "わからんもんは、わからん"
+    _dimensionConfigured:
+      title: "次元の狭間"
+      description: "タイムラインの次元を設定した"
+      flavor: "「0」が$[ruby 過去 全体]で 「1」が$[ruby 未来 雑談]"
     _bubbleGameExplodingHead:
       title: "🤯"
       description: "バブルゲームで最も大きいモノを出した"
@@ -2277,7 +2310,6 @@ _wordMute:
   muteWords: "ミュートするワード"
   muteWordsDescription: "スペースで区切るとAND指定になり、改行で区切るとOR指定になります。"
   muteWordsDescription2: "キーワードをスラッシュで囲むと正規表現になります。"
-  hideMutedNotes: "ミュートされた単語を含むノートを非表示にする"
 
 _instanceMute:
   instanceMuteDescription: "ミュートしたサーバーのユーザーへの返信を含めて、設定したサーバーの全てのノートとRenoteをミュートします。"
@@ -2639,8 +2671,14 @@ _postForm:
     d: "言いたいことは？"
     e: "ここに書いてください"
     f: "あなたが書くのを待っています..."
+<<<<<<< HEAD
+  policyScheduleNoteMaxDaysExceeded: "現在の支援プランで予約できる日数の上限は{max}日です。\n[ここ](https://go.misskey.io/donate)からプランをアップグレードできます。"
+  tosAndGuidelinesInfo: "投稿する前に、[利用規約]({tosUrl})と[NSFWガイドライン](https://go.misskey.io/media-guideline)を必ずお読みください。"
+  dimensionPrivateNotice: "{dimension}次元はプライベート(>=1000)です。\nこの投稿はローカルのみになり、連合には流れません。"
+=======
   policyScheduleNoteMaxDaysExceeded: "予約できる日数の上限は{max}日です。"
   tosAndGuidelinesInfo: "投稿する前に、[利用規約]({tosUrl})を必ずお読みください。"
+>>>>>>> host
 
 _profile:
   name: "名前"

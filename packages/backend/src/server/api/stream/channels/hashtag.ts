@@ -23,8 +23,9 @@ class HashtagChannel extends Channel {
 
 		id: string,
 		connection: Channel['connection'],
+		dimension?: number | null,
 	) {
-		super(id, connection);
+		super(id, connection, dimension);
 		//this.onNote = this.onNote.bind(this);
 	}
 
@@ -51,6 +52,10 @@ class HashtagChannel extends Channel {
 			// 自分の見ることができないユーザーの visibility: specified な投稿への返信は弾く
 			if (reply.visibility === 'specified' && !reply.visibleUserIds!.includes(this.user!.id)) return;
 		}
+
+		if (!this.shouldDeliverByDimension(note)) return;
+
+		if (!(await this.noteEntityService.isLanguageVisibleToMe(note, this.user?.id))) return;
 
 		if (this.isNoteMutedOrBlocked(note)) return;
 
@@ -87,11 +92,12 @@ export class HashtagChannelService implements MiChannelService<false> {
 	}
 
 	@bindThis
-	public create(id: string, connection: Channel['connection']): HashtagChannel {
+	public create(id: string, connection: Channel['connection'], dimension?: number | null): HashtagChannel {
 		return new HashtagChannel(
 			this.noteEntityService,
 			id,
 			connection,
+			dimension,
 		);
 	}
 }

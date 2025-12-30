@@ -8,6 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template #header>
 		<i v-if="column.tl != null" :class="basicTimelineIconClass(column.tl)"/>
 		<span style="margin-left: 8px;">{{ column.name || (column.tl ? i18n.ts._timelines[column.tl] : null) || i18n.ts._deck._columns.tl }}</span>
+		<span v-if="column.tl != null && hasDimension(column.tl) && dimension > 0" :class="$style.dimensionBadge"><i class="ti ti-cube"></i>{{ dimension }}</span>
 	</template>
 
 	<div v-if="!isAvailableBasicTimeline(column.tl)" :class="$style.disabled">
@@ -20,12 +21,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<MkTimeline
 		v-else-if="column.tl"
 		ref="timeline"
-		:key="column.tl + withRenotes + withReplies + onlyFiles"
+		:key="column.tl + withRenotes + withReplies + onlyFiles + dimension"
 		:src="column.tl"
 		:withRenotes="withRenotes"
 		:withReplies="withReplies"
 		:withSensitive="withSensitive"
 		:onlyFiles="onlyFiles"
+		:dimension="dimension"
 		@note="onNote"
 	/>
 </XColumn>
@@ -41,9 +43,12 @@ import { removeColumn, updateColumn } from '@/deck.js';
 import MkTimeline from '@/components/MkTimeline.vue';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
-import { hasWithReplies, isAvailableBasicTimeline, basicTimelineIconClass } from '@/timelines.js';
+import { hasWithReplies, hasDimension, isAvailableBasicTimeline, basicTimelineIconClass } from '@/timelines.js';
 import { soundSettingsButton } from '@/ui/deck/tl-note-notification.js';
 import * as sound from '@/utility/sound.js';
+import { selectDimension } from '@/utility/dimension.js';
+import { claimAchievement } from '@/utility/achievements.js';
+import { prefer } from '@/preferences.js';
 
 const props = defineProps<{
 	column: Column;
@@ -57,6 +62,7 @@ const withRenotes = ref(props.column.withRenotes ?? true);
 const withReplies = ref(props.column.withReplies ?? false);
 const withSensitive = ref(props.column.withSensitive ?? true);
 const onlyFiles = ref(props.column.onlyFiles ?? false);
+const dimension = ref<number>(props.column.dimension ?? prefer.s.dimension);
 
 watch(withRenotes, v => {
 	updateColumn(props.column.id, {
@@ -81,6 +87,21 @@ watch(onlyFiles, v => {
 		onlyFiles: v,
 	});
 });
+
+watch(dimension, (value, previous) => {
+	updateColumn(props.column.id, {
+		dimension: value,
+	});
+	if (value != null && value !== previous) {
+		claimAchievement('dimensionConfigured');
+	}
+});
+
+async function pickDimension() {
+	const selected = await selectDimension(dimension.value);
+	if (selected === undefined) return;
+	dimension.value = selected;
+}
 
 watch(soundSetting, v => {
 	updateColumn(props.column.id, { soundSetting: v });
@@ -124,13 +145,21 @@ function onNote() {
 }
 
 const menu = computed<MenuItem[]>(() => {
-	const menuItems: MenuItem[] = [];
-
-	menuItems.push({
+	const menuItems: MenuItem[] = [{
 		icon: 'ti ti-pencil',
 		text: i18n.ts.timeline,
 		action: setType,
-	}, {
+	}];
+
+	if (hasDimension(props.column.tl)) {
+		menuItems.push({
+			icon: 'ti ti-cube',
+			text: i18n.tsx.dimensionWithNumber({ dimension: dimension.value }),
+			action: pickDimension,
+		});
+	}
+
+	menuItems.push({
 		icon: 'ti ti-bell',
 		text: i18n.ts._deck.newNoteNotificationSettings,
 		action: () => soundSettingsButton(soundSetting),
@@ -167,6 +196,15 @@ const menu = computed<MenuItem[]>(() => {
 <style lang="scss" module>
 .disabled {
 	text-align: center;
+}
+
+.dimensionBadge {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	margin-left: 8px;
+	font-size: 0.8em;
+	opacity: 0.75;
 }
 
 .disabledTitle {

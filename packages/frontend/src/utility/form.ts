@@ -29,6 +29,8 @@ export type FormItem = {
 	required?: boolean;
 	hidden?: Hidden;
 	step?: number;
+	min?: number;
+	max?: number;
 } | {
 	label?: string;
 	type: 'boolean';

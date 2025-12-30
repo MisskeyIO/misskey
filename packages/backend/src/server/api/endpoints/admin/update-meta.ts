@@ -95,6 +95,7 @@ export const paramDef = {
 				type: 'string',
 			},
 		},
+		dimensions: { type: 'integer', minimum: 1 },
 		deeplAuthKey: { type: 'string', nullable: true },
 		deeplIsPro: { type: 'boolean' },
 		enableEmail: { type: 'boolean' },
@@ -410,6 +411,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (Array.isArray(ps.langs)) {
 				set.langs = ps.langs.filter(Boolean);
+			}
+
+			if (typeof ps.dimensions === 'number') {
+				set.dimensions = ps.dimensions;
 			}
 
 			if (ps.enableEmail !== undefined) {

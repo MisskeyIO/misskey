@@ -385,6 +385,11 @@ export const meta = {
 				type: 'string',
 				optional: false, nullable: true,
 			},
+			dimensions: {
+				type: 'number',
+				optional: false, nullable: false,
+				minimum: 1,
+			},
 			disableRegistration: {
 				type: 'boolean',
 				optional: false, nullable: false,
@@ -522,6 +527,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				uri: this.config.url,
 				description: instance.description,
 				langs: instance.langs,
+				dimensions: instance.dimensions,
 				tosUrl: instance.termsOfServiceUrl,
 				repositoryUrl: instance.repositoryUrl,
 				feedbackUrl: instance.feedbackUrl,

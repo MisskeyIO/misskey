@@ -18,6 +18,7 @@ import { misskeyApi } from '@/utility/misskey-api.js';
 import { definePage } from '@/page.js';
 import { useStream } from '@/stream.js';
 import { ensureSignin } from '@/i.js';
+import { prefer } from '@/preferences.js';
 import { useRouter } from '@/router.js';
 import * as os from '@/os.js';
 import { url } from '@@/js/config.js';
@@ -47,6 +48,7 @@ function start(_game: Misskey.entities.ReversiGameDetailed) {
 		misskeyApi('notes/create', {
 			text: `${i18n.ts._reversi.iStartedAGame}\n${url}/reversi/g/${props.gameId}`,
 			visibility: 'home',
+			dimension: prefer.s.dimension ?? undefined,
 			noCreatedNote: true,
 		});
 	}

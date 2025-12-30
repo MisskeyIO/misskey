@@ -88,6 +88,9 @@ export const ACHIEVEMENT_TYPES = [
 	'smashTestNotificationButton',
 	'tutorialCompleted',
 	'sensitiveContentConsentResponded',
+	'postingLanguageConfigured',
+	'viewingLanguagesConfigured',
+	'dimensionConfigured',
 	'bubbleGameExplodingHead',
 	'bubbleGameDoubleExplodingHead',
 ] as const;

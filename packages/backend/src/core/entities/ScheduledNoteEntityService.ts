@@ -57,6 +57,8 @@ export class ScheduledNoteEntityService {
 				cw: item.draft.cw ?? null,
 				visibility: item.draft.visibility as 'public' | 'followers' | 'home' | 'specified',
 				localOnly: item.draft.localOnly ?? false,
+				lang: item.draft.lang ?? null,
+				dimension: typeof item.draft.dimension === 'number' ? item.draft.dimension : null,
 				files: item.draft.files ? await this.driveFileEntityService.packMany(item.draft.files, me) : [],
 				poll: item.draft.poll ? { ...item.draft.poll, expiresAt: item.draft.poll.expiresAt?.getTime() ?? null, expiredAfter: null } : null,
 				visibleUserIds: item.draft.visibility === 'specified' ? item.draft.visibleUsers?.map(x => x.id) : undefined,

@@ -23,7 +23,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div v-if="Object.keys(form).filter(item => !form[item].hidden).length > 0" class="_gaps_m">
 			<template v-for="(v, k) in Object.fromEntries(Object.entries(form))">
 				<template v-if="typeof v.hidden == 'function' ? v.hidden(values) : v.hidden"></template>
-				<MkInput v-else-if="v.type === 'number'" v-model="values[k]" type="number" :step="v.step || 1">
+				<MkInput v-else-if="v.type === 'number'" v-model="values[k]" type="number" :min="v.min" :max="v.max" :step="v.step || 1">
 					<template #label><span v-text="v.label || k"></span><span v-if="v.required === false"> ({{ i18n.ts.optional }})</span></template>
 					<template v-if="v.description" #caption>{{ v.description }}</template>
 				</MkInput>

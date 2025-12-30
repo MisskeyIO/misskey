@@ -34,10 +34,11 @@ export class AdminChannelService implements MiChannelService<true> {
 	}
 
 	@bindThis
-	public create(id: string, connection: Channel['connection']): AdminChannel {
+	public create(id: string, connection: Channel['connection'], dimension?: number | null): AdminChannel {
 		return new AdminChannel(
 			id,
 			connection,
+			null,
 		);
 	}
 }

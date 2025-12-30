@@ -30,8 +30,9 @@ class HybridTimelineChannel extends Channel {
 
 		id: string,
 		connection: Channel['connection'],
+		dimension?: number | null,
 	) {
-		super(id, connection);
+		super(id, connection, dimension);
 		//this.onNote = this.onNote.bind(this);
 	}
 
@@ -97,6 +98,10 @@ class HybridTimelineChannel extends Channel {
 			}
 		}
 
+		if (!this.shouldDeliverByDimension(note)) return;
+
+		if (!(await this.noteEntityService.isLanguageVisibleToMe(note, this.user?.id))) return;
+
 		if (this.isNoteMutedOrBlocked(note)) return;
 
 		if (this.user && note.renoteId && !note.text) {
@@ -146,13 +151,14 @@ export class HybridTimelineChannelService implements MiChannelService<true> {
 	}
 
 	@bindThis
-	public create(id: string, connection: Channel['connection']): HybridTimelineChannel {
+	public create(id: string, connection: Channel['connection'], dimension?: number | null): HybridTimelineChannel {
 		return new HybridTimelineChannel(
 			this.metaService,
 			this.roleService,
 			this.noteEntityService,
 			id,
 			connection,
+			dimension,
 		);
 	}
 }

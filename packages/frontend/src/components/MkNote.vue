@@ -243,7 +243,7 @@ const emit = defineEmits<{
 
 const inTimeline = inject<boolean>('inTimeline', false);
 const tl_withSensitive = inject<Ref<boolean>>('tl_withSensitive', ref(true));
-const tlDimension = inject<Ref<number> | null>('tl_dimension', null);
+const tl_dimension = inject<Ref<number> | null>('tl_dimension', ref(null));
 const inChannel = inject('inChannel', null);
 const currentClip = inject<Ref<Misskey.entities.Clip> | null>('currentClip', null);
 
@@ -447,7 +447,7 @@ async function renote(viaKeyboard = false): Promise<void> {
 		note: note.value,
 		renoteButton,
 		mock: props.mock,
-		postFormDimension: tlDimension.value ?? undefined,
+		postFormDimension: tl_dimension.value ?? undefined,
 	});
 	os.popupMenu(menu, renoteButton.value, {
 		viaKeyboard,
@@ -465,7 +465,7 @@ async function reply(): Promise<void> {
 	os.post({
 		reply: appearNote.value,
 		channel: appearNote.value.channel,
-		initialDimension: tlDimension.value ?? undefined,
+		initialDimension: tl_dimension.value ?? undefined,
 	}).then(() => {
 		focus();
 	});
@@ -565,7 +565,7 @@ function onContextmenu(ev: MouseEvent): void {
 			translation,
 			isDeleted,
 			currentClip: currentClip?.value,
-			postFormDimension: tlDimension.value ?? undefined,
+			postFormDimension: tl_dimension.value ?? undefined,
 		});
 		os.contextMenu(menu, ev).then(focus).finally(cleanup);
 	}
@@ -582,7 +582,7 @@ function showMenu(): void {
 		translation,
 		isDeleted,
 		currentClip: currentClip?.value,
-		postFormDimension: tlDimension.value ?? undefined,
+		postFormDimension: tl_dimension.value ?? undefined,
 	});
 	os.popupMenu(menu, menuButton.value).then(focus).finally(cleanup);
 }

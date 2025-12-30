@@ -997,7 +997,7 @@ watch(showAllViewingLangs, (value) => {
 		includeUnknown.value = false;
 		includeRemote.value = false;
 	} else {
-		viewingLangs.value = [postingLang.value];
+		viewingLangs.value = [postingLang.value ?? lang];
 		viewingLangToAdd.value = null;
 		includeUnknown.value = true;
 		includeRemote.value = true;
@@ -1020,7 +1020,7 @@ watch(postingLang, (value) => {
 
 async function saveLanguageConfig() {
 	const requestedViewingLangs = new Set(showAllViewingLangs.value ? [] : [
-		...viewingLangs.value,
+		...viewingLangs.value.filter(Boolean),
 		...(includeUnknown.value ? [
 			'unknown',
 			...(includeRemote.value ? ['remote'] : []),

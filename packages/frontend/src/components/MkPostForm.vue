@@ -224,7 +224,7 @@ const showAddMfmFunction = ref(prefer.s.enableQuickAddMfmFunction);
 watch(showAddMfmFunction, () => prefer.commit('enableQuickAddMfmFunction', showAddMfmFunction.value));
 const cw = ref<string | null>(props.initialCw ?? null);
 const localOnly = ref(props.initialLocalOnly ?? (prefer.s.rememberNoteVisibility ? store.s.localOnly : prefer.s.defaultNoteLocalOnly));
-const dimension = ref<number>(props.initialDimension ?? store.r.tl.value.dimensionBySrc?.[store.r.tl.value.src] ?? prefer.s.dimension);
+const dimension = ref<number>(props.initialDimension ?? store.r.tl.value?.dimensionBySrc?.[store.r.tl.value.src] ?? prefer.s.dimension);
 const isPrivateDimension = computed(() => dimension.value >= 1000);
 const postingLang = ref<string | null>(null);
 const visibility = ref(props.initialVisibility ?? (prefer.s.rememberNoteVisibility ? store.s.visibility : prefer.s.defaultNoteVisibility));
@@ -359,7 +359,7 @@ watch(visibleUsers, () => {
 });
 
 watch(() => props.initialDimension, (value) => {
-	const resolved = value ?? store.r.tl.value.dimensionBySrc?.[store.r.tl.value.src] ?? prefer.s.dimension;
+	const resolved = value ?? store.r.tl.value?.dimensionBySrc?.[store.r.tl.value.src] ?? prefer.s.dimension;
 	if (dimension.value !== resolved) {
 		dimension.value = resolved;
 	}
@@ -733,7 +733,7 @@ function clear() {
 	visibility.value = store.s.rememberNoteVisibility ? store.s.visibility : store.s.defaultNoteVisibility;
 	localOnly.value = store.s.rememberNoteVisibility ? store.s.localOnly : store.s.defaultNoteLocalOnly;
 	postingLang.value = null;
-	dimension.value = props.initialDimension ?? store.r.tl.value.dimensionBySrc?.[store.r.tl.value.src] ?? prefer.s.dimension;
+	dimension.value = props.initialDimension ?? store.r.tl.value?.dimensionBySrc?.[store.r.tl.value.src] ?? prefer.s.dimension;
 	files.value = [];
 	poll.value = null;
 	visibleUsers.value = [];
@@ -1295,7 +1295,7 @@ onMounted(() => {
 			visibility.value = init.visibility;
 			localOnly.value = init.localOnly ?? false;
 			postingLang.value = init.lang ?? null;
-			dimension.value = init.dimension ?? props.initialDimension ?? store.r.tl.value.dimensionBySrc?.[store.r.tl.value.src] ?? prefer.s.dimension;
+			dimension.value = init.dimension ?? props.initialDimension ?? store.r.tl.value?.dimensionBySrc?.[store.r.tl.value.src] ?? prefer.s.dimension;
 			files.value = init.files ?? [];
 			if (init.poll) {
 				poll.value = {

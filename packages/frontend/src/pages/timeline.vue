@@ -83,7 +83,7 @@ const src = computed<TimelinePageSrc>({
 	set: (x) => saveSrc(x),
 });
 const dimension = computed<number>({
-	get: () => store.r.tl.value.dimensionBySrc?.[src.value] ?? prefer.s.dimension,
+	get: () => store.r.tl.value?.dimensionBySrc?.[src.value] ?? prefer.s.dimension,
 	set: (value) => saveTlDimension(value),
 });
 const withRenotes = computed<boolean>({

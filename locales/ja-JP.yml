@@ -2673,14 +2673,9 @@ _postForm:
     d: "言いたいことは？"
     e: "ここに書いてください"
     f: "あなたが書くのを待っています..."
-<<<<<<< HEAD
-  policyScheduleNoteMaxDaysExceeded: "現在の支援プランで予約できる日数の上限は{max}日です。\n[ここ](https://go.misskey.io/donate)からプランをアップグレードできます。"
-  tosAndGuidelinesInfo: "投稿する前に、[利用規約]({tosUrl})と[NSFWガイドライン](https://go.misskey.io/media-guideline)を必ずお読みください。"
-  dimensionPrivateNotice: "{dimension}次元はプライベート(>=1000)です。\nこの投稿はローカルのみになり、連合には流れません。"
-=======
   policyScheduleNoteMaxDaysExceeded: "予約できる日数の上限は{max}日です。"
   tosAndGuidelinesInfo: "投稿する前に、[利用規約]({tosUrl})を必ずお読みください。"
->>>>>>> host
+  dimensionPrivateNotice: "{dimension}次元はプライベート(>=1000)です。\nこの投稿はローカルのみになり、連合には流れません。"
 
 _profile:
   name: "名前"

@@ -2606,14 +2606,9 @@ _postForm:
     d: "말하고 싶은 게 있나요?"
     e: "여기에 적어 주세요"
     f: "작성해주시길 기다리고 있어요..."
-<<<<<<< HEAD
-  policyScheduleNoteMaxDaysExceeded: "현재 지원 플랜의 예약 가능한 최대 일수는 {max}일입니다.\n[여기](https://go.misskey.io/donate)에서 플랜을 업그레이드할 수 있습니다."
-  tosAndGuidelinesInfo: "노트를 게시하기 전에 [이용약관]({tosUrl})과 [NSFW 가이드라인](https://go.misskey.io/media-guideline)을 반드시 읽어 주세요."
-  dimensionPrivateNotice: "{dimension}차원은 프라이빗(>=1000)입니다.\n이 노트는 로컬 전용이며 연합에는 보내지 않습니다."
-=======
   policyScheduleNoteMaxDaysExceeded: "예약 가능한 최대 일수는 {max}일입니다."
   tosAndGuidelinesInfo: "노트를 게시하기 전에 [이용약관]({tosUrl})을 반드시 읽어 주세요."
->>>>>>> host
+  dimensionPrivateNotice: "{dimension}차원은 프라이빗(>=1000)입니다.\n이 노트는 로컬 전용이며 연합에는 보내지 않습니다."
 _profile:
   name: "이름"
   username: "유저명"

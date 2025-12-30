@@ -2937,6 +2937,7 @@ _dialog:
   charactersBelow: "最小文字数を下回っています！ 現在 {current} / 制限 {min}"
   numberBelow: "最小値を下回っています！ 現在 {current} / 制限 {min}"
   numberAbove: "最大値を超えています！ 現在 {current} / 制限 {max}"
+  numberInvalid: "無効な数値です！ 現在 {current}"
 
 _disabledTimeline:
   title: "無効化されたタイムライン"

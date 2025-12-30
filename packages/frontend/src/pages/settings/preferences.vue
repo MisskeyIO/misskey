@@ -830,7 +830,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { langs } from '@@/js/config.js';
 import * as Misskey from 'misskey-js';
 import MkSwitch from '@/components/MkSwitch.vue';
@@ -997,7 +997,7 @@ watch(showAllViewingLangs, (value) => {
 		includeUnknown.value = false;
 		includeRemote.value = false;
 	} else {
-		viewingLangs.value = [postingLang.value ?? lang];
+		viewingLangs.value = [postingLang.value ?? lang.value];
 		viewingLangToAdd.value = null;
 		includeUnknown.value = true;
 		includeRemote.value = true;
@@ -1029,7 +1029,6 @@ async function saveLanguageConfig() {
 
 	const isPostingLangChanged = $i.postingLang !== postingLang.value;
 	const isViewingLangsChanged = new Set($i.viewingLangs).symmetricDifference(requestedViewingLangs).size !== 0;
-	console.log({ isPostingLangChanged, isViewingLangsChanged });
 
 	const i = await os.apiWithDialog('i/update', {
 		postingLang: postingLang.value ?? null,

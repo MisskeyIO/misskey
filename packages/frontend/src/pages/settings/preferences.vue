@@ -929,7 +929,7 @@ const contextMenu = prefer.model('contextMenu');
 const menuStyle = prefer.model('menuStyle');
 const makeEveryTextElementsSelectable = prefer.model('makeEveryTextElementsSelectable');
 
-const postingLang = ref<string | null>($i.postingLang);
+const postingLang = ref<string | null>($i.postingLang ?? null);
 const languageCodes = Object.keys(langmap);
 const initialViewingLangs = $i.viewingLangs ?? [];
 const showAllViewingLangs = ref(initialViewingLangs.length === 0);
@@ -1011,8 +1011,8 @@ watch([includeUnknown, includeRemote, viewingLangs, showAllViewingLangs], () => 
 }, { deep: true });
 
 watch(postingLang, (value) => {
-	if (languageSaving || showAllViewingLangs.value) return;
-	if (value != null && !viewingLangs.value.includes(value)) {
+	if (languageSaving) return;
+	if (!showAllViewingLangs.value && value != null && !viewingLangs.value.includes(value)) {
 		viewingLangs.value = [...viewingLangs.value, value];
 	}
 	languageUnsaved.value = true;

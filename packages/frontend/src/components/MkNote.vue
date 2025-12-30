@@ -243,7 +243,7 @@ const emit = defineEmits<{
 
 const inTimeline = inject<boolean>('inTimeline', false);
 const tl_withSensitive = inject<Ref<boolean>>('tl_withSensitive', ref(true));
-const tl_dimension = inject<Ref<number> | null>('tl_dimension', ref(null));
+const tl_dimension = inject<Ref<number | null>>('tl_dimension', ref(null));
 const inChannel = inject('inChannel', null);
 const currentClip = inject<Ref<Misskey.entities.Clip> | null>('currentClip', null);
 

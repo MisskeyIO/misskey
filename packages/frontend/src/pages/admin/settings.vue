@@ -88,6 +88,46 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkFolder>
 
 			<MkFolder>
+<<<<<<< HEAD
+				<template #icon><i class="ti ti-cloud"></i></template>
+				<template #label>{{ i18n.ts.files }}</template>
+				<template v-if="filesForm.modified.value" #footer>
+					<MkFormFooter :form="filesForm"/>
+				</template>
+
+				<div class="_gaps">
+					<MkSwitch v-model="filesForm.state.cacheRemoteFiles">
+						<template #label>{{ i18n.ts.cacheRemoteFiles }}<span v-if="filesForm.modifiedStates.cacheRemoteFiles" class="_modified">{{ i18n.ts.modified }}</span></template>
+						<template #caption>{{ i18n.ts.cacheRemoteFilesDescription }}{{ i18n.ts.youCanCleanRemoteFilesCache }}</template>
+					</MkSwitch>
+
+					<template v-if="filesForm.state.cacheRemoteFiles">
+						<MkSwitch v-model="filesForm.state.cacheRemoteSensitiveFiles">
+							<template #label>{{ i18n.ts.cacheRemoteSensitiveFiles }}<span v-if="filesForm.modifiedStates.cacheRemoteSensitiveFiles" class="_modified">{{ i18n.ts.modified }}</span></template>
+							<template #caption>{{ i18n.ts.cacheRemoteSensitiveFilesDescription }}</template>
+						</MkSwitch>
+					</template>
+				</div>
+			</MkFolder>
+
+			<MkFolder>
+				<template #icon><i class="ti ti-cube"></i></template>
+				<template #label>{{ i18n.ts.dimension }}</template>
+				<template v-if="dimensionForm.modified.value" #footer>
+					<MkFormFooter :form="dimensionForm"/>
+				</template>
+
+				<div class="_gaps">
+					<MkInput v-model="dimensionForm.state.dimensions" type="number" min="1" step="1">
+						<template #label>{{ i18n.ts._serverSettings.dimensions }}<span v-if="dimensionForm.modifiedStates.dimensions" class="_modified">{{ i18n.ts.modified }}</span></template>
+						<template #caption>{{ i18n.ts._serverSettings.dimensionsDescription }}</template>
+					</MkInput>
+				</div>
+			</MkFolder>
+
+			<MkFolder>
+=======
+>>>>>>> host
 				<template #icon><i class="ti ti-world-cog"></i></template>
 				<template #label>ServiceWorker</template>
 				<template v-if="serviceWorkerForm.modified.value" #footer>
@@ -281,6 +321,15 @@ const infoForm = useForm({
 		repositoryUrl: state.repositoryUrl,
 		impressumUrl: state.impressumUrl,
 		featuredGameChannels: state.featuredGameChannels.split('\n'),
+	});
+	fetchInstance(true);
+});
+
+const dimensionForm = useForm({
+	dimensions: meta.dimensions,
+}, async (state) => {
+	await os.apiWithDialog('admin/update-meta', {
+		dimensions: state.dimensions,
 	});
 	fetchInstance(true);
 });

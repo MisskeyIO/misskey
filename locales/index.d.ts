@@ -6913,6 +6913,14 @@ export interface Locale extends ILocale {
          */
         "shortNameDescription": string;
         /**
+         * 次元数
+         */
+        "dimensions": string;
+        /**
+         * 利用可能な次元の数。1以上を指定してください。
+         */
+        "dimensionsDescription": string;
+        /**
          * 有効にすると、各種タイムラインを取得する際のパフォーマンスが大幅に向上し、データベースへの負荷を軽減することが可能です。ただし、Redisのメモリ使用量は増加します。サーバーのメモリ容量が少ない場合、または動作が不安定な場合は無効にすることができます。
          */
         "fanoutTimelineDescription": string;
@@ -11140,6 +11148,14 @@ export interface Locale extends ILocale {
          * 最小文字数を下回っています！ 現在 {current} / 制限 {min}
          */
         "charactersBelow": ParameterizedString<"current" | "min">;
+        /**
+         * 最小値を下回っています！ 現在 {current} / 制限 {min}
+         */
+        "numberBelow": ParameterizedString<"current" | "min">;
+        /**
+         * 最大値を超えています！ 現在 {current} / 制限 {max}
+         */
+        "numberAbove": ParameterizedString<"current" | "max">;
     };
     "_disabledTimeline": {
         /**

@@ -6,9 +6,10 @@
 process.env.NODE_ENV = 'test';
 
 import * as assert from 'assert';
+import { setTimeout } from 'node:timers/promises';
 import { WebSocket } from 'ws';
 import { MiFollowing } from '@/models/Following.js';
-import { api, createAppToken, initTestDb, port, post, sendEnvUpdateRequest, signup, waitFire } from '../utils.js';
+import { api, connectStream, createAppToken, initTestDb, port, post, sendEnvUpdateRequest, signup, waitFire } from '../utils.js';
 import type * as misskey from 'misskey-js';
 
 describe('Streaming', () => {
@@ -156,6 +157,30 @@ describe('Streaming', () => {
 				);
 
 				assert.strictEqual(fired, true);
+			});
+
+			test('dimension filtering applies to streaming timelines', async () => {
+				const [viewer, posterDim1, posterDim0] = await Promise.all([signup(), signup(), signup()]);
+
+				await api('following/create', { userId: posterDim1.id }, viewer);
+				await api('following/create', { userId: posterDim0.id }, viewer);
+				await setTimeout(1000);
+
+				const received: misskey.entities.Note[] = [];
+				const ws = await connectStream(viewer, 'homeTimeline', (msg) => {
+					if (msg.type === 'note') {
+						received.push(msg.body);
+					}
+				}, { minimize: false, dimension: 1 });
+
+				await api('notes/create', { text: 'dim1-note', dimension: 1 }, posterDim1);
+				await api('notes/create', { text: 'dim0-note', dimension: 0 }, posterDim0);
+
+				await setTimeout(1000);
+				ws.close();
+
+				assert.strictEqual(received.some(note => note.text === 'dim1-note'), true);
+				assert.strictEqual(received.some(note => note.text === 'dim0-note'), false);
 			});
 
 			test('フォローしているユーザーの visibility: followers な投稿が流れる', async () => {
@@ -727,10 +752,11 @@ describe('Streaming', () => {
 			const application = await createAppToken(ayano, []);
 			const application2 = await createAppToken(ayano, ['read:account']);
 			const socket = new WebSocket(`ws://127.0.0.1:${port}/streaming?i=${application}`);
-			const established = await new Promise<boolean>((resolve, reject) => {
+			const established = await new Promise<boolean>(async (resolve, reject) => {
 				socket.on('error', () => resolve(false));
 				socket.on('unexpected-response', () => resolve(false));
-				setTimeout(() => resolve(true), 3000);
+				await setTimeout(3000);
+				resolve(true);
 			});
 
 			socket.close();

@@ -243,6 +243,7 @@ const emit = defineEmits<{
 
 const inTimeline = inject<boolean>('inTimeline', false);
 const tl_withSensitive = inject<Ref<boolean>>('tl_withSensitive', ref(true));
+const tlDimension = inject<Ref<number> | null>('tl_dimension', null);
 const inChannel = inject('inChannel', null);
 const currentClip = inject<Ref<Misskey.entities.Clip> | null>('currentClip', null);
 
@@ -434,7 +435,12 @@ async function renote(viaKeyboard = false): Promise<void> {
 	await pleaseLogin({ openOnRemote: pleaseLoginContext.value });
 	showMovedDialog();
 
-	const { menu } = getRenoteMenu({ note: note.value, renoteButton, mock: props.mock });
+	const { menu } = getRenoteMenu({
+		note: note.value,
+		renoteButton,
+		mock: props.mock,
+		postFormDimension: tlDimension.value ?? undefined,
+	});
 	os.popupMenu(menu, renoteButton.value, {
 		viaKeyboard,
 	});
@@ -451,6 +457,7 @@ async function reply(): Promise<void> {
 	os.post({
 		reply: appearNote.value,
 		channel: appearNote.value.channel,
+		initialDimension: tlDimension.value ?? undefined,
 	}).then(() => {
 		focus();
 	});
@@ -544,7 +551,14 @@ function onContextmenu(ev: MouseEvent): void {
 		ev.preventDefault();
 		react();
 	} else {
-		const { menu, cleanup } = getNoteMenu({ note: note.value, translating, translation, isDeleted, currentClip: currentClip?.value });
+		const { menu, cleanup } = getNoteMenu({
+			note: note.value,
+			translating,
+			translation,
+			isDeleted,
+			currentClip: currentClip?.value,
+			postFormDimension: tlDimension.value ?? undefined,
+		});
 		os.contextMenu(menu, ev).then(focus).finally(cleanup);
 	}
 }
@@ -554,7 +568,14 @@ function showMenu(): void {
 		return;
 	}
 
-	const { menu, cleanup } = getNoteMenu({ note: note.value, translating, translation, isDeleted, currentClip: currentClip?.value });
+	const { menu, cleanup } = getNoteMenu({
+		note: note.value,
+		translating,
+		translation,
+		isDeleted,
+		currentClip: currentClip?.value,
+		postFormDimension: tlDimension.value ?? undefined,
+	});
 	os.popupMenu(menu, menuButton.value).then(focus).finally(cleanup);
 }
 

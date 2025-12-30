@@ -129,6 +129,8 @@ describe('ユーザー', () => {
 			preventAiLearning: user.preventAiLearning,
 			isExplorable: user.isExplorable,
 			isDeleted: user.isDeleted,
+			postingLang: user.postingLang,
+			viewingLangs: user.viewingLangs,
 			twoFactorBackupCodesStock: user.twoFactorBackupCodesStock,
 			hideOnlineStatus: user.hideOnlineStatus,
 			hasUnreadSpecifiedNotes: user.hasUnreadSpecifiedNotes,

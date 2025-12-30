@@ -68,6 +68,11 @@ export class MiMeta {
 	})
 	public langs: string[];
 
+	@Column('integer', {
+		default: 10000,
+	})
+	public dimensions: number;
+
 	@Column('varchar', {
 		length: 1024, array: true, default: '{}',
 	})

@@ -29,8 +29,9 @@ class LocalTimelineChannel extends Channel {
 
 		id: string,
 		connection: Channel['connection'],
+		dimension?: number | null,
 	) {
-		super(id, connection);
+		super(id, connection, dimension);
 		//this.onNote = this.onNote.bind(this);
 	}
 
@@ -85,6 +86,10 @@ class LocalTimelineChannel extends Channel {
 			}
 		}
 
+		if (!this.shouldDeliverByDimension(note)) return;
+
+		if (!(await this.noteEntityService.isLanguageVisibleToMe(note, this.user?.id))) return;
+
 		if (this.isNoteMutedOrBlocked(note)) return;
 
 		if (this.user && isRenotePacked(note) && !isQuotePacked(note)) {
@@ -134,13 +139,14 @@ export class LocalTimelineChannelService implements MiChannelService<false> {
 	}
 
 	@bindThis
-	public create(id: string, connection: Channel['connection']): LocalTimelineChannel {
+	public create(id: string, connection: Channel['connection'], dimension?: number | null): LocalTimelineChannel {
 		return new LocalTimelineChannel(
 			this.metaService,
 			this.roleService,
 			this.noteEntityService,
 			id,
 			connection,
+			dimension,
 		);
 	}
 }

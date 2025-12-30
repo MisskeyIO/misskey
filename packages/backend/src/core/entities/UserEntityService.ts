@@ -45,6 +45,7 @@ import { ApPersonService } from '@/core/activitypub/models/ApPersonService.js';
 import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { IdService } from '@/core/IdService.js';
+import { CacheService } from '@/core/CacheService.js';
 import type { AnnouncementService } from '@/core/AnnouncementService.js';
 import type { CustomEmojiService } from '@/core/CustomEmojiService.js';
 import { AvatarDecorationService } from '@/core/AvatarDecorationService.js';
@@ -95,6 +96,7 @@ export class UserEntityService implements OnModuleInit {
 	private idService: IdService;
 	private avatarDecorationService: AvatarDecorationService;
 	private chatService: ChatService;
+	private cacheService: CacheService;
 
 	constructor(
 		private moduleRef: ModuleRef,
@@ -151,6 +153,7 @@ export class UserEntityService implements OnModuleInit {
 		this.idService = this.moduleRef.get('IdService');
 		this.avatarDecorationService = this.moduleRef.get('AvatarDecorationService');
 		this.chatService = this.moduleRef.get('ChatService');
+		this.cacheService = this.moduleRef.get('CacheService');
 	}
 
 	//#region Validators
@@ -479,6 +482,7 @@ export class UserEntityService implements OnModuleInit {
 		const unreadAnnouncements = isMe && isDetailed ? await this.announcementService.getUnreadAnnouncements(user) : null;
 
 		const notificationsInfo = isMe && isDetailed ? await this.getNotificationsInfo(user.id) : null;
+		const languageConfig = isDetailed && (isMe || iAmModerator) ? await this.cacheService.userLanguageCache.fetch(user.id) : null;
 
 		const packed = {
 			id: user.id,
@@ -604,6 +608,8 @@ export class UserEntityService implements OnModuleInit {
 				hasUnreadNotification: notificationsInfo?.hasUnread, // 後方互換性のため
 				hasPendingReceivedFollowRequest: this.getHasPendingReceivedFollowRequest(user.id),
 				unreadNotificationsCount: notificationsInfo?.unreadCount,
+				postingLang: languageConfig?.postingLang ?? null,
+				viewingLangs: languageConfig?.viewingLangs ?? [],
 				mutedWords: profile!.mutedWords,
 				mutedInstances: profile!.mutedInstances,
 				mutingNotificationTypes: [], // 後方互換性のため

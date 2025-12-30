@@ -5,7 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
-import type { BlockingsRepository, FollowingsRepository, MutingsRepository, RenoteMutingsRepository, MiUserProfile, UserProfilesRepository, UsersRepository, MiFollowing } from '@/models/_.js';
+import type { BlockingsRepository, FollowingsRepository, MutingsRepository, RenoteMutingsRepository, MiUserProfile, MiUserLanguage, NoteLanguagesRepository, UserLanguagesRepository, UserProfilesRepository, UsersRepository, MiFollowing } from '@/models/_.js';
 import { MemoryKVCache, RedisKVCache } from '@/misc/cache.js';
 import type { MiLocalUser, MiUser } from '@/models/User.js';
 import { DI } from '@/di-symbols.js';
@@ -21,6 +21,9 @@ export class CacheService implements OnApplicationShutdown {
 	public localUserByIdCache: MemoryKVCache<MiLocalUser>;
 	public uriPersonCache: MemoryKVCache<MiUser | null>;
 	public userProfileCache: RedisKVCache<MiUserProfile>;
+	public userLanguageCache: RedisKVCache<MiUserLanguage | null>;
+	public noteLanguageCache: RedisKVCache<string | null>;
+	public noteDimensionCache: RedisKVCache<number | null>;
 	public userMutingsCache: RedisKVCache<Set<string>>;
 	public userBlockingCache: RedisKVCache<Set<string>>;
 	public userBlockedCache: RedisKVCache<Set<string>>; // NOTE: 「被」Blockキャッシュ
@@ -39,6 +42,12 @@ export class CacheService implements OnApplicationShutdown {
 
 		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
+
+		@Inject(DI.userLanguagesRepository)
+		private userLanguagesRepository: UserLanguagesRepository,
+
+		@Inject(DI.noteLanguagesRepository)
+		private noteLanguagesRepository: NoteLanguagesRepository,
 
 		@Inject(DI.mutingsRepository)
 		private mutingsRepository: MutingsRepository,
@@ -67,6 +76,30 @@ export class CacheService implements OnApplicationShutdown {
 			fetcher: (key) => this.userProfilesRepository.findOneByOrFail({ userId: key }),
 			toRedisConverter: (value) => JSON.stringify(value),
 			fromRedisConverter: (value) => JSON.parse(value), // TODO: date型の考慮
+		});
+
+		this.userLanguageCache = new RedisKVCache<MiUserLanguage | null>(this.redisClient, 'userLang', {
+			lifetime: 1000 * 60 * 60, // 1h
+			memoryCacheLifetime: 1000 * 60, // 1m
+			fetcher: (key) => this.userLanguagesRepository.findOneBy({ userId: key }),
+			toRedisConverter: (value) => JSON.stringify(value),
+			fromRedisConverter: (value) => JSON.parse(value),
+		});
+
+		this.noteLanguageCache = new RedisKVCache<string | null>(this.redisClient, 'noteLang', {
+			lifetime: 1000 * 60 * 30, // 30m
+			memoryCacheLifetime: 1000 * 10, // 10s
+			fetcher: (key) => this.noteLanguagesRepository.findOneBy({ noteId: key }).then(row => row?.lang ?? null),
+			toRedisConverter: (value) => JSON.stringify(value),
+			fromRedisConverter: (value) => JSON.parse(value),
+		});
+
+		this.noteDimensionCache = new RedisKVCache<number | null>(this.redisClient, 'noteDimension', {
+			lifetime: 1000 * 60 * 30, // 30m
+			memoryCacheLifetime: 1000 * 10, // 10s
+			fetcher: async () => null,
+			toRedisConverter: (value) => JSON.stringify(value),
+			fromRedisConverter: (value) => JSON.parse(value),
 		});
 
 		this.userMutingsCache = new RedisKVCache<Set<string>>(this.redisClient, 'userMutings', {
@@ -187,6 +220,9 @@ export class CacheService implements OnApplicationShutdown {
 		this.localUserByIdCache.dispose();
 		this.uriPersonCache.dispose();
 		this.userProfileCache.dispose();
+		this.userLanguageCache.dispose();
+		this.noteLanguageCache.dispose();
+		this.noteDimensionCache.dispose();
 		this.userMutingsCache.dispose();
 		this.userBlockingCache.dispose();
 		this.userBlockedCache.dispose();

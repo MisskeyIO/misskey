@@ -2169,6 +2169,59 @@ export interface Locale extends ILocale {
      */
     "uiLanguage": string;
     /**
+     * 投稿する言語
+     */
+    "postingLanguage": string;
+    /**
+     * 選択した言語が表示する言語として設定されているユーザーのタイムラインに表示されます。
+     * 投稿フォーム上でも変更できます。
+     */
+    "postingLanguageDescription": string;
+    /**
+     * 投稿と表示する言語
+     */
+    "postingAndViewingLanguage": string;
+    /**
+     * 表示する言語
+     */
+    "viewingLanguages": string;
+    /**
+     * 選択した言語に一致する投稿だけが表示されます。
+     */
+    "viewingLanguagesDescription": string;
+    /**
+     * すべての言語を表示する
+     */
+    "viewingLanguagesShowAll": string;
+    /**
+     * すべての言語の投稿を表示します。
+     */
+    "viewingLanguagesShowAllDescription": string;
+    /**
+     * 未分類の投稿を表示する
+     */
+    "viewingLanguagesIncludeUnknown": string;
+    /**
+     * サードパーティークライアント、ボットなどの投稿が含まれます
+     */
+    "viewingLanguagesIncludeUnknownDescription": string;
+    /**
+     * リモートの投稿を含める
+     */
+    "viewingLanguagesIncludeRemote": string;
+    /**
+     * 次元
+     */
+    "dimension": string;
+    /**
+     * {dimension}次元
+     */
+    "dimensionWithNumber": ParameterizedString<"dimension">;
+    /**
+     * 0次元は0〜999次元の投稿が表示されます。
+     */
+    "dimensionDescription": string;
+    /**
      * {x}について
      */
     "aboutX": ParameterizedString<"x">;
@@ -7809,6 +7862,48 @@ export interface Locale extends ILocale {
                  */
                 "flavor": string;
             };
+            "_postingLanguageConfigured": {
+                /**
+                 * ここではMisskeyの言葉で話せ
+                 */
+                "title": string;
+                /**
+                 * 投稿する言語を設定した
+                 */
+                "description": string;
+                /**
+                 * 日本語でおk
+                 */
+                "flavor": string;
+            };
+            "_viewingLanguagesConfigured": {
+                /**
+                 * 読める、読めるぞ…！
+                 */
+                "title": string;
+                /**
+                 * 表示する言語を設定した
+                 */
+                "description": string;
+                /**
+                 * わからんもんは、わからん
+                 */
+                "flavor": string;
+            };
+            "_dimensionConfigured": {
+                /**
+                 * 次元の狭間
+                 */
+                "title": string;
+                /**
+                 * タイムラインの次元を設定した
+                 */
+                "description": string;
+                /**
+                 * 「0」が$[ruby 過去 全体]で 「1」が$[ruby 未来 雑談]
+                 */
+                "flavor": string;
+            };
             "_bubbleGameExplodingHead": {
                 /**
                  * 🤯
@@ -10098,6 +10193,11 @@ export interface Locale extends ILocale {
          * 投稿する前に、[利用規約]({tosUrl})と[NSFWガイドライン](https://go.misskey.io/media-guideline)を必ずお読みください。
          */
         "tosAndGuidelinesInfo": ParameterizedString<"tosUrl">;
+        /**
+         * {dimension}次元はプライベート(>=1000)です。
+         * この投稿はローカルのみになり、連合には流れません。
+         */
+        "dimensionPrivateNotice": ParameterizedString<"dimension">;
     };
     "_profile": {
         /**

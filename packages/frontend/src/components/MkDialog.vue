@@ -28,7 +28,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<header v-if="title" :class="$style.title" class="_selectable"><Mfm :text="title"/></header>
 		<div v-if="text" :class="$style.text" class="_selectable"><Mfm :text="text"/></div>
 		<template v-if="input">
-			<MkInput v-if="input.type !== 'textarea'" v-model="inputValue" autofocus :type="input.type || 'text'" :placeholder="input.placeholder || undefined" :autocomplete="input.autocomplete" @keydown="onInputKeydown">
+			<MkInput v-if="input.type !== 'textarea'" v-model="inputValue" autofocus :type="input.type || 'text'" :placeholder="input.placeholder || undefined" :autocomplete="input.autocomplete" :min="input.min" :max="input.max" @keydown="onInputKeydown">
 				<template v-if="input.type === 'password'" #prefix><i class="ti ti-lock"></i></template>
 				<template #caption>
 					<span v-if="okButtonDisabledReason === 'charactersExceeded'" v-text="i18n.tsx._dialog.charactersExceeded({ current: (inputValue as string)?.length ?? 0, max: input.maxLength ?? 'NaN' })"/>
@@ -92,6 +92,8 @@ type Input = {
 	default: string | number | null;
 	minLength?: number;
 	maxLength?: number;
+	min?: number;
+	max?: number;
 };
 
 type SelectItem = {

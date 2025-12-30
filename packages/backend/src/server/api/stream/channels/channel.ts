@@ -25,8 +25,9 @@ class ChannelChannel extends Channel {
 
 		id: string,
 		connection: Channel['connection'],
+		dimension?: number | null,
 	) {
-		super(id, connection);
+		super(id, connection, dimension);
 		//this.onNote = this.onNote.bind(this);
 	}
 
@@ -51,6 +52,10 @@ class ChannelChannel extends Channel {
 			// 自分の見ることができないユーザーの visibility: specified な投稿への返信は弾く
 			if (reply.visibility === 'specified' && !reply.visibleUserIds!.includes(this.user!.id)) return;
 		}
+
+		if (!this.shouldDeliverByDimension(note)) return;
+
+		if (!(await this.noteEntityService.isLanguageVisibleToMe(note, this.user?.id))) return;
 
 		if (this.isNoteMutedOrBlocked(note)) return;
 
@@ -100,12 +105,13 @@ export class ChannelChannelService implements MiChannelService<false> {
 	}
 
 	@bindThis
-	public create(id: string, connection: Channel['connection']): ChannelChannel {
+	public create(id: string, connection: Channel['connection'], dimension?: number | null): ChannelChannel {
 		return new ChannelChannel(
 			this.roleService,
 			this.noteEntityService,
 			id,
 			connection,
+			dimension,
 		);
 	}
 }

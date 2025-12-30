@@ -10,13 +10,16 @@ import { DI } from '@/di-symbols.js';
 import type { Packed } from '@/misc/json-schema.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { MiUser } from '@/models/User.js';
-import type { MiNote } from '@/models/Note.js';
+import type { MiNote, MiNoteWithDimension } from '@/models/Note.js';
 import type { UsersRepository, NotesRepository, FollowingsRepository, PollsRepository, PollVotesRepository, NoteReactionsRepository, ChannelsRepository, MiMeta } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { DebounceLoader } from '@/misc/loader.js';
 import { IdService } from '@/core/IdService.js';
+import { normalizeDimension, shouldDeliverByDimension } from '@/misc/dimension.js';
 import { shouldHideNoteByTime } from '@/misc/should-hide-note-by-time.js';
 import { ReactionsBufferingService } from '@/core/ReactionsBufferingService.js';
+import { CacheService } from '@/core/CacheService.js';
+import { IdentifiableError } from '@/misc/identifiable-error.js';
 import type { OnModuleInit } from '@nestjs/common';
 import type { CustomEmojiService } from '../CustomEmojiService.js';
 import type { ReactionService } from '../ReactionService.js';
@@ -55,6 +58,7 @@ export class NoteEntityService implements OnModuleInit {
 	private reactionService: ReactionService;
 	private reactionsBufferingService: ReactionsBufferingService;
 	private idService: IdService;
+	private cacheService: CacheService;
 	private noteLoader = new DebounceLoader(this.findNoteOrFail);
 
 	constructor(
@@ -83,13 +87,6 @@ export class NoteEntityService implements OnModuleInit {
 
 		@Inject(DI.channelsRepository)
 		private channelsRepository: ChannelsRepository,
-
-		//private userEntityService: UserEntityService,
-		//private driveFileEntityService: DriveFileEntityService,
-		//private customEmojiService: CustomEmojiService,
-		//private reactionService: ReactionService,
-		//private reactionsBufferingService: ReactionsBufferingService,
-		//private idService: IdService,
 	) {
 	}
 
@@ -100,6 +97,7 @@ export class NoteEntityService implements OnModuleInit {
 		this.reactionService = this.moduleRef.get('ReactionService');
 		this.reactionsBufferingService = this.moduleRef.get('ReactionsBufferingService');
 		this.idService = this.moduleRef.get('IdService');
+		this.cacheService = this.moduleRef.get('CacheService');
 	}
 
 	@bindThis
@@ -111,6 +109,26 @@ export class NoteEntityService implements OnModuleInit {
 			}
 		}
 		return packedNote.visibility;
+	}
+
+	@bindThis
+	public async isLanguageVisibleToMe(note: MiNote | Packed<'Note'>, meId: MiUser['id'] | null | undefined): Promise<boolean> {
+		if (!meId) return true;
+		if (note.mentions?.includes(meId)) return true;
+		if (note.visibleUserIds?.includes(meId)) return true;
+
+		const viewingLangs = await this.cacheService.userLanguageCache.fetch(meId).then(c => c?.viewingLangs ?? null);
+		if (viewingLangs == null) return true;
+		if (viewingLangs.length === 0) return true;
+
+		let noteLang: string | null = null;
+		if (((note as MiNote).userHost ?? note.user?.host ?? null) != null) noteLang = 'remote';
+
+		noteLang ??= await this.cacheService.noteLanguageCache.fetch(note.id);
+		noteLang ??= await this.cacheService.userLanguageCache.fetch(note.userId).then(c => c?.postingLang ?? null);
+		noteLang ??= 'unknown';
+
+		return viewingLangs.includes(noteLang) || viewingLangs.some(l => l.startsWith(`${noteLang}-`) || noteLang.startsWith(`${l}-`));
 	}
 
 	@bindThis
@@ -339,13 +357,61 @@ export class NoteEntityService implements OnModuleInit {
 	}
 
 	@bindThis
+	private async extractNoteDimension(note: MiNote | MiNoteWithDimension): Promise<number | undefined> {
+		if (typeof (note as MiNoteWithDimension).dimension === 'number') {
+			return (note as MiNoteWithDimension).dimension;
+		}
+
+		const cachedDimension = await this.cacheService.noteDimensionCache.get(note.id);
+		if (typeof cachedDimension === 'number') return cachedDimension;
+
+		return undefined;
+	}
+
+	@bindThis
+	private async shouldDeliverByDimensionPreview(
+		note: MiNote | MiNoteWithDimension,
+		viewerDimension: number | null,
+		viewerId: MiUser['id'] | null,
+	): Promise<boolean> {
+		if (viewerDimension == null) return true;
+
+		if (viewerId) {
+			if (note.mentions?.includes(viewerId)) return true;
+			if (note.visibleUserIds?.includes(viewerId)) return true;
+			if (note.reply?.userId === viewerId) return true;
+			if (note.renote?.userId === viewerId) return true;
+		}
+
+		const isVisible = (targetDimension: number) => {
+			if (targetDimension === 0) return viewerDimension === 0;
+			if (viewerDimension === 0) return targetDimension < 1000;
+			return viewerDimension === targetDimension;
+		};
+
+		const dimension = await this.extractNoteDimension(note);
+		if (isVisible(typeof dimension === 'number' ? dimension : 0)) return true;
+
+		if (note.renoteId != null && note.renote == null) return true;
+
+		if (note.renote) {
+			const renoteDimension = await this.extractNoteDimension(note.renote);
+			if (isVisible(typeof renoteDimension === 'number' ? renoteDimension : 0)) return true;
+		}
+
+		return false;
+	}
+
+	@bindThis
 	public async pack(
 		src: MiNote['id'] | MiNote,
 		me: { id: MiUser['id'] } | null | undefined,
 		options?: {
 			detail?: boolean;
 			skipHide?: boolean;
+			skipLanguageCheck?: boolean;
 			withReactionAndUserPairCache?: boolean;
+			viewerDimension?: number | null;
 			_hint_?: {
 				bufferedReactions: Map<MiNote['id'], { deltas: Record<string, number>; pairs: ([MiUser['id'], string])[] }> | null;
 				myReactions: Map<MiNote['id'], string | null>;
@@ -362,6 +428,18 @@ export class NoteEntityService implements OnModuleInit {
 
 		const meId = me ? me.id : null;
 		const note = typeof src === 'object' ? src : await this.noteLoader.load(src);
+
+		if (!opts.skipLanguageCheck && meId && !(await this.isLanguageVisibleToMe(note, meId))) {
+			throw new IdentifiableError('ab3e8c80-9d5b-4fb8-9ee0-089ed96d07e0', 'Note language is not visible for you.');
+		}
+
+		if (opts?.viewerDimension != null) {
+			const viewerDimension = normalizeDimension(opts.viewerDimension, this.meta.dimensions ?? 1);
+			if (!(await this.shouldDeliverByDimensionPreview(note, viewerDimension, meId))) {
+				throw new IdentifiableError('b74b13d0-49ee-4eac-a75a-48247c16d17a', 'Note is not visible in this dimension.');
+			}
+		}
+
 		const host = note.userHost;
 
 		const bufferedReactions = opts._hint_?.bufferedReactions != null
@@ -385,6 +463,8 @@ export class NoteEntityService implements OnModuleInit {
 				: await this.channelsRepository.findOneBy({ id: note.channelId })
 			: null;
 
+		const dimension = await this.extractNoteDimension(note);
+
 		const reactionEmojiNames = Object.keys(reactions)
 			.filter(x => x.startsWith(':') && x.includes('@') && !x.includes('@.')) // リモートカスタム絵文字のみ
 			.map(x => this.reactionService.decodeReaction(x).reaction.replaceAll(':', ''));
@@ -401,6 +481,7 @@ export class NoteEntityService implements OnModuleInit {
 			cw: note.cw,
 			visibility: note.visibility,
 			localOnly: note.localOnly,
+			dimension: dimension,
 			reactionAcceptance: note.reactionAcceptance,
 			visibleUserIds: note.visibility === 'specified' ? note.visibleUserIds : undefined,
 			renoteCount: note.renoteCount,
@@ -434,6 +515,8 @@ export class NoteEntityService implements OnModuleInit {
 				reply: note.replyId ? this.pack(note.reply ?? note.replyId, me, {
 					detail: false,
 					skipHide: opts.skipHide,
+					skipLanguageCheck: true,
+					viewerDimension: null,
 					withReactionAndUserPairCache: opts.withReactionAndUserPairCache,
 					_hint_: options?._hint_,
 				}) : undefined,
@@ -441,6 +524,8 @@ export class NoteEntityService implements OnModuleInit {
 				renote: note.renoteId ? this.pack(note.renote ?? note.renoteId, me, {
 					detail: true,
 					skipHide: opts.skipHide,
+					skipLanguageCheck: true,
+					viewerDimension: null,
 					withReactionAndUserPairCache: opts.withReactionAndUserPairCache,
 					_hint_: options?._hint_,
 				}) : undefined,
@@ -456,6 +541,13 @@ export class NoteEntityService implements OnModuleInit {
 				} : {}),
 			} : {}),
 		});
+
+		if (opts?.viewerDimension != null) {
+			const viewerDimension = normalizeDimension(opts.viewerDimension, this.meta.dimensions ?? 1);
+			if (!shouldDeliverByDimension(packed, viewerDimension, meId)) {
+				throw new IdentifiableError('b74b13d0-49ee-4eac-a75a-48247c16d17a', 'Note is not visible in this dimension.');
+			}
+		}
 
 		this.treatVisibility(packed);
 
@@ -473,6 +565,7 @@ export class NoteEntityService implements OnModuleInit {
 		options?: {
 			detail?: boolean;
 			skipHide?: boolean;
+			viewerDimension?: number | null;
 		},
 	) : Promise<Packed<'Note'>[]> {
 		if (notes.length === 0) return [];

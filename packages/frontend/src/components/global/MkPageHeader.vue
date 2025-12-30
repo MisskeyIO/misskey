@@ -28,9 +28,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 			<XTabs v-if="!narrow || hideTitle" :class="$style.tabs" :tab="tab" :tabs="tabs" :rootEl="el" @update:tab="key => emit('update:tab', key)" @tabClick="onTabClick"/>
 		</template>
-		<div v-if="(!thin_ && narrow && !hideTitle) || (actions && actions.length > 0)" :class="$style.buttonsRight">
-			<template v-for="action in actions">
-				<button v-tooltip.noDelay="action.text" class="_button" :class="[$style.button, { [$style.highlighted]: action.highlighted }]" @click.stop="action.handler" @touchstart="preventDrag"><i :class="action.icon"></i></button>
+		<div v-if="(!thin_ && narrow && !hideTitle) || hasActions" :class="$style.buttonsRight">
+			<template v-for="action in visibleActions">
+				<button v-tooltip.noDelay="action.text" class="_button" :class="[$style.button, { [$style.highlighted]: action.highlighted }]" @click.stop="action.handler" @touchstart="preventDrag">
+					<span v-if="action.label">{{ action.label }}</span>
+					<i :class="action.icon"></i>
+				</button>
 			</template>
 		</div>
 	</div>
@@ -83,7 +86,12 @@ const thin_ = props.thin || inject('shouldHeaderThin', false);
 const el = useTemplateRef('el');
 const narrow = ref(false);
 const hasTabs = computed(() => props.tabs.length > 0);
-const hasActions = computed(() => props.actions && props.actions.length > 0);
+const visibleActions = computed(() => {
+	if (!props.actions) return [];
+	if (!narrow.value) return props.actions;
+	return props.actions.filter(action => !action.hideWhenNarrow);
+});
+const hasActions = computed(() => visibleActions.value.length > 0);
 const show = computed(() => {
 	return !hideTitle.value || hasTabs.value || hasActions.value;
 });
@@ -226,6 +234,7 @@ onUnmounted(() => {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	gap: 4px;
 	height: var(--height);
 	width: calc(var(--height) - (var(--margin)));
 	box-sizing: border-box;

@@ -214,7 +214,11 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			}
 		} else if (note != null) {
 			try {
-				const object = await this.noteEntityService.pack(note, me, { detail: true });
+				const object = await this.noteEntityService.pack(note, me, {
+					detail: true,
+					skipLanguageCheck: true,
+					viewerDimension: null,
+				});
 
 				return {
 					type: 'Note',

@@ -23,7 +23,7 @@ class ChatUserChannel extends Channel {
 		id: string,
 		connection: Channel['connection'],
 	) {
-		super(id, connection);
+		super(id, connection, null);
 	}
 
 	@bindThis
@@ -68,7 +68,7 @@ export class ChatUserChannelService implements MiChannelService<true> {
 	}
 
 	@bindThis
-	public create(id: string, connection: Channel['connection']): ChatUserChannel {
+	public create(id: string, connection: Channel['connection'], dimension?: number | null): ChatUserChannel {
 		return new ChatUserChannel(
 			this.chatService,
 			id,

@@ -22,7 +22,7 @@ class MainChannel extends Channel {
 		id: string,
 		connection: Channel['connection'],
 	) {
-		super(id, connection);
+		super(id, connection, null);
 	}
 
 	@bindThis
@@ -38,6 +38,8 @@ class MainChannel extends Channel {
 					if (data.body.note && data.body.note.isHidden) {
 						const note = await this.noteEntityService.pack(data.body.note.id, this.user, {
 							detail: true,
+							skipLanguageCheck: true,
+							viewerDimension: null,
 						});
 
 						if (this.user && (note.visibleUserIds?.includes(this.user.id) ?? note.mentions?.includes(this.user.id))) {
@@ -55,6 +57,8 @@ class MainChannel extends Channel {
 					if (data.body.isHidden) {
 						const note = await this.noteEntityService.pack(data.body.id, this.user, {
 							detail: true,
+							skipLanguageCheck: true,
+							viewerDimension: null,
 						});
 
 						if (this.user && (note.visibleUserIds?.includes(this.user.id) ?? note.mentions?.includes(this.user.id))) {
@@ -84,7 +88,7 @@ export class MainChannelService implements MiChannelService<true> {
 	}
 
 	@bindThis
-	public create(id: string, connection: Channel['connection']): MainChannel {
+	public create(id: string, connection: Channel['connection'], dimension?: number | null): MainChannel {
 		return new MainChannel(
 			this.noteEntityService,
 			id,

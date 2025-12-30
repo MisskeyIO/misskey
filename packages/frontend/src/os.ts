@@ -409,6 +409,8 @@ export function inputNumber(props: {
 	placeholder?: string | null;
 	autocomplete?: string;
 	default: number;
+	min?: number;
+	max?: number;
 }): Promise<{
 	canceled: true; result: undefined;
 } | {
@@ -420,6 +422,8 @@ export function inputNumber(props: {
 	placeholder?: string | null;
 	autocomplete?: string;
 	default?: number | null;
+	min?: number;
+	max?: number;
 }): Promise<{
 	canceled: true; result: undefined;
 } | {
@@ -431,6 +435,8 @@ export function inputNumber(props: {
 	placeholder?: string | null;
 	autocomplete?: string;
 	default?: number | null;
+	min?: number;
+	max?: number;
 }): Promise<{
 	canceled: true; result: undefined;
 } | {
@@ -445,6 +451,8 @@ export function inputNumber(props: {
 				placeholder: props.placeholder,
 				autocomplete: props.autocomplete,
 				default: props.default ?? null,
+				min: props.min,
+				max: props.max,
 			},
 		}, {
 			done: result => {

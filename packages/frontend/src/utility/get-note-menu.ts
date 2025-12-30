@@ -189,6 +189,7 @@ export function getNoteMenu(props: {
 	translating: Ref<boolean>;
 	isDeleted: Ref<boolean>;
 	currentClip?: Misskey.entities.Clip;
+	postFormDimension?: number | null;
 }) {
 	// const isRenote = (
 	// 	props.note.renote != null &&
@@ -225,7 +226,7 @@ export function getNoteMenu(props: {
 		});
 	}
 
-	function delEdit(): void {
+function delEdit(): void {
 		os.confirm({
 			type: 'warning',
 			text: i18n.ts.deleteAndEditConfirm,
@@ -236,7 +237,13 @@ export function getNoteMenu(props: {
 				noteId: appearNote.id,
 			});
 
-			os.post({ initialNote: appearNote, renote: appearNote.renote, reply: appearNote.reply, channel: appearNote.channel });
+			os.post({
+				initialNote: appearNote,
+				renote: appearNote.renote,
+				reply: appearNote.reply,
+				channel: appearNote.channel,
+				initialDimension: props.postFormDimension ?? undefined,
+			});
 
 			if (Date.now() - new Date(appearNote.createdAt).getTime() < 1000 * 60 && appearNote.userId === $i.id) {
 				claimAchievement('noteDeletedWithin1min');
@@ -566,6 +573,7 @@ export function getRenoteMenu(props: {
 	note: Misskey.entities.Note;
 	renoteButton: ShallowRef<HTMLElement | undefined>;
 	mock?: boolean;
+	postFormDimension?: number | null;
 }) {
 	// const isRenote = (
 	// 	props.note.renote != null &&
@@ -578,6 +586,8 @@ export function getRenoteMenu(props: {
 	//
 	// const appearNote = isRenote ? props.note.renote as Misskey.entities.Note : props.note;
 	const appearNote = getAppearNote(props.note);
+	const dimension = appearNote.dimension ?? prefer.s.dimension ?? 0;
+	const postFormDimension = props.postFormDimension ?? undefined;
 
 	const channelRenoteItems: MenuItem[] = [];
 	const normalRenoteItems: MenuItem[] = [];
@@ -600,6 +610,7 @@ export function getRenoteMenu(props: {
 					misskeyApi('notes/create', {
 						renoteId: appearNote.id,
 						channelId: appearNote.channelId,
+						dimension,
 						noCreatedNote: true,
 					}).then(() => {
 						os.toast(i18n.ts.renoted);
@@ -614,6 +625,7 @@ export function getRenoteMenu(props: {
 					os.post({
 						renote: appearNote,
 						channel: appearNote.channel,
+						initialDimension: postFormDimension,
 					});
 				}
 			},
@@ -647,6 +659,7 @@ export function getRenoteMenu(props: {
 						localOnly,
 						visibility,
 						renoteId: appearNote.id,
+						dimension,
 						noCreatedNote: true,
 					}).then(() => {
 						os.toast(i18n.ts.renoted);
@@ -659,6 +672,7 @@ export function getRenoteMenu(props: {
 			action: () => {
 				os.post({
 					renote: appearNote,
+					initialDimension: postFormDimension,
 				});
 			},
 		}]);
@@ -687,6 +701,7 @@ export function getRenoteMenu(props: {
 							misskeyApi('notes/create', {
 								renoteId: appearNote.id,
 								channelId: channel.id,
+								dimension,
 								noCreatedNote: true,
 							}).then(() => {
 								os.toast(i18n.tsx.renotedToX({ name: channel.name }));

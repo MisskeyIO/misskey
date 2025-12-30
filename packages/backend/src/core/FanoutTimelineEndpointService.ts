@@ -26,6 +26,7 @@ type TimelineOptions = {
 	limit: number,
 	allowPartial: boolean,
 	me?: { id: MiUser['id'] } | undefined | null,
+	viewerDimension?: number | null,
 	useDbFallback: boolean,
 	redisTimelines: FanoutTimelineName[],
 	noteFilter?: (note: MiNote) => boolean,
@@ -57,7 +58,11 @@ export class FanoutTimelineEndpointService {
 
 	@bindThis
 	async timeline(ps: TimelineOptions): Promise<Packed<'Note'>[]> {
-		return await this.noteEntityService.packMany(await this.getMiNotes(ps), ps.me);
+		return await this.noteEntityService.packMany(
+			await this.getMiNotes(ps),
+			ps.me,
+			{ viewerDimension: ps.viewerDimension },
+		);
 	}
 
 	@bindThis

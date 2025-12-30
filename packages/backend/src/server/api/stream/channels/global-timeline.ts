@@ -28,8 +28,9 @@ class GlobalTimelineChannel extends Channel {
 
 		id: string,
 		connection: Channel['connection'],
+		dimension?: number | null,
 	) {
-		super(id, connection);
+		super(id, connection, dimension);
 		//this.onNote = this.onNote.bind(this);
 	}
 
@@ -82,6 +83,10 @@ class GlobalTimelineChannel extends Channel {
 			}
 		}
 
+		if (!this.shouldDeliverByDimension(note)) return;
+
+		if (!(await this.noteEntityService.isLanguageVisibleToMe(note, this.user?.id))) return;
+
 		if (this.isNoteMutedOrBlocked(note)) return;
 
 		if (this.user && isRenotePacked(note) && !isQuotePacked(note)) {
@@ -131,13 +136,14 @@ export class GlobalTimelineChannelService implements MiChannelService<false> {
 	}
 
 	@bindThis
-	public create(id: string, connection: Channel['connection']): GlobalTimelineChannel {
+	public create(id: string, connection: Channel['connection'], dimension?: number | null): GlobalTimelineChannel {
 		return new GlobalTimelineChannel(
 			this.metaService,
 			this.roleService,
 			this.noteEntityService,
 			id,
 			connection,
+			dimension,
 		);
 	}
 }

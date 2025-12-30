@@ -57,6 +57,44 @@ describe('Timelines', () => {
 			assert.strictEqual(res.body.some(note => note.id === carolNote.id), false);
 		});
 
+		describe('Language filter', () => {
+			test.concurrent('viewingLangs filters notes by per-note language', async () => {
+				const [alice, bob] = await Promise.all([signup(), signup()]);
+
+				await api('following/create', { userId: bob.id }, alice);
+				await setTimeout(1000);
+				await api('i/update', { viewingLangs: ['ja'] }, alice);
+				const bobNote = await post(bob, { text: 'こんにちは', lang: 'ja' });
+
+				await waitForPushToTl();
+
+				let res = await api('notes/timeline', { limit: 100 }, alice);
+				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+
+				await api('i/update', { viewingLangs: ['en'] }, alice);
+				res = await api('notes/timeline', { limit: 100 }, alice);
+				assert.strictEqual(res.body.some(note => note.id === bobNote.id), false);
+			});
+
+			test.concurrent('unknown language notes require unknown in viewingLangs', async () => {
+				const [alice, bob] = await Promise.all([signup(), signup()]);
+
+				await api('following/create', { userId: bob.id }, alice);
+				await setTimeout(1000);
+				await api('i/update', { viewingLangs: ['en'] }, alice);
+				const bobNote = await post(bob, { text: 'no-lang' });
+
+				await waitForPushToTl();
+
+				let res = await api('notes/timeline', { limit: 100 }, alice);
+				assert.strictEqual(res.body.some(note => note.id === bobNote.id), false);
+
+				await api('i/update', { viewingLangs: ['en', 'unknown'] }, alice);
+				res = await api('notes/timeline', { limit: 100 }, alice);
+				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+			});
+		});
+
 		test.concurrent('フォローしているユーザーの visibility: followers なノートが含まれる', async () => {
 			const [alice, bob, carol] = await Promise.all([signup(), signup(), signup()]);
 

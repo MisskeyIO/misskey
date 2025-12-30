@@ -61,6 +61,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			return await this.noteEntityService.pack(note, me, {
 				detail: true,
+				skipLanguageCheck: true,
+				viewerDimension: null,
 			});
 		});
 	}

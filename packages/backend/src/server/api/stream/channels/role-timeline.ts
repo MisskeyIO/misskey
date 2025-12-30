@@ -25,8 +25,9 @@ class RoleTimelineChannel extends Channel {
 
 		id: string,
 		connection: Channel['connection'],
+		dimension?: number | null,
 	) {
-		super(id, connection);
+		super(id, connection, dimension);
 		//this.onNote = this.onNote.bind(this);
 	}
 
@@ -65,6 +66,10 @@ class RoleTimelineChannel extends Channel {
 					if (reply.visibility === 'followers' && !Object.hasOwn(this.following, reply.userId)) return;
 				}
 			}
+
+			if (!this.shouldDeliverByDimension(note)) return;
+
+			if (!(await this.noteEntityService.isLanguageVisibleToMe(note, this.user?.id))) return;
 
 			if (this.isNoteMutedOrBlocked(note)) return;
 
@@ -117,12 +122,13 @@ export class RoleTimelineChannelService implements MiChannelService<false> {
 	}
 
 	@bindThis
-	public create(id: string, connection: Channel['connection']): RoleTimelineChannel {
+	public create(id: string, connection: Channel['connection'], dimension?: number | null): RoleTimelineChannel {
 		return new RoleTimelineChannel(
 			this.roleService,
 			this.noteEntityService,
 			id,
 			connection,
+			dimension,
 		);
 	}
 }

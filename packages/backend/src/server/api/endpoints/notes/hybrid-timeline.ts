@@ -60,6 +60,7 @@ export const paramDef = {
 		withFiles: { type: 'boolean', default: false },
 		withRenotes: { type: 'boolean', default: true },
 		withReplies: { type: 'boolean', default: false },
+		dimension: { type: 'integer', minimum: 0, nullable: true },
 	},
 	required: [],
 } as const;
@@ -110,7 +111,11 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					this.activeUsersChart.read(me);
 				});
 
-				return await this.noteEntityService.packMany(timeline, me);
+				return await this.noteEntityService.packMany(
+					timeline,
+					me,
+					{ viewerDimension: ps.dimension },
+				);
 			}
 
 			let timelineConfig: FanoutTimelineName[];
@@ -138,6 +143,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				limit: ps.limit,
 				allowPartial: ps.allowPartial,
 				me,
+				viewerDimension: ps.dimension,
 				redisTimelines: timelineConfig,
 				useDbFallback: this.serverSettings.enableFanoutTimelineDbFallback,
 				alwaysIncludeMyNotes: true,

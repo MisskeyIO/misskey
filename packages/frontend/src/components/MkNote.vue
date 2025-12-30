@@ -243,6 +243,7 @@ const emit = defineEmits<{
 
 const inTimeline = inject<boolean>('inTimeline', false);
 const tl_withSensitive = inject<Ref<boolean>>('tl_withSensitive', ref(true));
+const tlDimension = inject<Ref<number> | null>('tl_dimension', null);
 const inChannel = inject('inChannel', null);
 const currentClip = inject<Ref<Misskey.entities.Clip> | null>('currentClip', null);
 
@@ -298,23 +299,31 @@ const renoteCollapsed = ref(
 		(appearNote.value.myReaction != null)
 	),
 );
-const hideMutedNotes = $i ? store.s.hideMutedNotes : true;
+const hideMutedNotes = prefer.s.hideMutedNotes;
 
 const pleaseLoginContext = computed<OpenOnRemoteOptions>(() => ({
 	type: 'lookup',
 	url: `https://${host}/notes/${appearNote.value.id}`,
 }));
 
-function checkMute(noteToCheck: Misskey.entities.Note, mutedWords: Array<string | string[]>): boolean | 'sensitiveMute' {
+function checkMute(noteToCheck: Misskey.entities.Note, mutedWords: Array<string | string[]> | undefined | null, checkOnly = false): Array<string | string[]> | false | 'sensitiveMute' {
 	if (mutedWords == null) return false;
 
-	if (checkWordMute(noteToCheck, $i, mutedWords)) return true;
-	if (noteToCheck.reply && checkWordMute(noteToCheck.reply, $i, mutedWords)) return true;
-	if (noteToCheck.renote && checkWordMute(noteToCheck.renote, $i, mutedWords)) return true;
+	const result = checkWordMute(noteToCheck, $i, mutedWords);
+	if (Array.isArray(result)) return result;
+
+	const replyResult = noteToCheck.reply && checkWordMute(noteToCheck.reply, $i, mutedWords);
+	if (Array.isArray(replyResult)) return replyResult;
+
+	const renoteResult = noteToCheck.renote && checkWordMute(noteToCheck.renote, $i, mutedWords);
+	if (Array.isArray(renoteResult)) return renoteResult;
+
+	if (checkOnly) return false;
 
 	if (inTimeline && tl_withSensitive.value === false && noteToCheck.files?.some((v) => v.isSensitive)) {
 		return 'sensitiveMute';
 	}
+
 	return false;
 }
 
@@ -434,7 +443,12 @@ async function renote(viaKeyboard = false): Promise<void> {
 	await pleaseLogin({ openOnRemote: pleaseLoginContext.value });
 	showMovedDialog();
 
-	const { menu } = getRenoteMenu({ note: note.value, renoteButton, mock: props.mock });
+	const { menu } = getRenoteMenu({
+		note: note.value,
+		renoteButton,
+		mock: props.mock,
+		postFormDimension: tlDimension.value ?? undefined,
+	});
 	os.popupMenu(menu, renoteButton.value, {
 		viaKeyboard,
 	});
@@ -451,6 +465,7 @@ async function reply(): Promise<void> {
 	os.post({
 		reply: appearNote.value,
 		channel: appearNote.value.channel,
+		initialDimension: tlDimension.value ?? undefined,
 	}).then(() => {
 		focus();
 	});
@@ -544,7 +559,14 @@ function onContextmenu(ev: MouseEvent): void {
 		ev.preventDefault();
 		react();
 	} else {
-		const { menu, cleanup } = getNoteMenu({ note: note.value, translating, translation, isDeleted, currentClip: currentClip?.value });
+		const { menu, cleanup } = getNoteMenu({
+			note: note.value,
+			translating,
+			translation,
+			isDeleted,
+			currentClip: currentClip?.value,
+			postFormDimension: tlDimension.value ?? undefined,
+		});
 		os.contextMenu(menu, ev).then(focus).finally(cleanup);
 	}
 }
@@ -554,7 +576,14 @@ function showMenu(): void {
 		return;
 	}
 
-	const { menu, cleanup } = getNoteMenu({ note: note.value, translating, translation, isDeleted, currentClip: currentClip?.value });
+	const { menu, cleanup } = getNoteMenu({
+		note: note.value,
+		translating,
+		translation,
+		isDeleted,
+		currentClip: currentClip?.value,
+		postFormDimension: tlDimension.value ?? undefined,
+	});
 	os.popupMenu(menu, menuButton.value).then(focus).finally(cleanup);
 }
 

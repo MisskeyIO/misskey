@@ -34,7 +34,7 @@ class UserListChannel extends Channel {
 		id: string,
 		connection: Channel['connection'],
 	) {
-		super(id, connection);
+		super(id, connection, null);
 		//this.updateListUsers = this.updateListUsers.bind(this);
 		//this.onNote = this.onNote.bind(this);
 	}
@@ -125,6 +125,8 @@ class UserListChannel extends Channel {
 			}
 		}
 
+		if (!(await this.noteEntityService.isLanguageVisibleToMe(note, this.user?.id))) return;
+
 		if (this.isNoteMutedOrBlocked(note)) return;
 
 		if (this.user && isRenotePacked(note) && !isQuotePacked(note)) {
@@ -182,7 +184,7 @@ export class UserListChannelService implements MiChannelService<false> {
 	}
 
 	@bindThis
-	public create(id: string, connection: Channel['connection']): UserListChannel {
+	public create(id: string, connection: Channel['connection'], dimension?: number | null): UserListChannel {
 		return new UserListChannel(
 			this.userListsRepository,
 			this.userListMembershipsRepository,

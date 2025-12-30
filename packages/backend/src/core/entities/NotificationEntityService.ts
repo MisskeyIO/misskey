@@ -82,6 +82,8 @@ export class NotificationEntityService implements OnModuleInit {
 				? hint.packedNotes.get(notification.noteId)
 				: this.noteEntityService.pack(notification.noteId, { id: meId }, {
 					detail: true,
+					skipLanguageCheck: true,
+					viewerDimension: null,
 				})
 		) : undefined;
 		// if the note has been deleted, don't show this notification

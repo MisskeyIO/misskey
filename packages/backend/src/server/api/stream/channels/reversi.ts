@@ -33,10 +33,11 @@ export class ReversiChannelService implements MiChannelService<true> {
 	public readonly kind = ReversiChannel.kind;
 
 	@bindThis
-	public create(id: string, connection: Channel['connection']): ReversiChannel {
+	public create(id: string, connection: Channel['connection'], dimension?: number | null): ReversiChannel {
 		return new ReversiChannel(
 			id,
 			connection,
+			null,
 		);
 	}
 }

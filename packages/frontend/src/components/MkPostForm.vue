@@ -32,7 +32,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<span :class="$style.headerRightButtonText">{{ channel.name }}</span>
 				</button>
 			</template>
-			<button v-tooltip="i18n.ts._visibility.disableFederation" class="_button" :class="[$style.headerRightItem, { [$style.danger]: localOnly }]" :disabled="channel != null || visibility === 'specified'" @click="toggleLocalOnly">
+			<button v-tooltip="i18n.ts._visibility.disableFederation" class="_button" :class="[$style.headerRightItem, { [$style.danger]: localOnly }]" :disabled="channel != null || visibility === 'specified' || isPrivateDimension" @click="toggleLocalOnly">
 				<span v-if="!localOnly"><i class="ti ti-rocket"></i></span>
 				<span v-else><i class="ti ti-rocket-off"></i></span>
 			</button>
@@ -56,6 +56,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</button>
 		</div>
 	</header>
+	<MkInfo v-if="isPrivateDimension" warn style="margin-top: 8px;">
+		<Mfm :text="i18n.tsx._postForm.dimensionPrivateNotice({ dimension })"/>
+	</MkInfo>
 	<MkNoteSimple v-if="reply" :class="$style.targetNote" :note="reply"/>
 	<MkNoteSimple v-if="renoteTargetNote" :class="$style.targetNote" :note="renoteTargetNote"/>
 	<div v-if="quoteId" :class="$style.withQuote"><i class="ti ti-quote"></i> {{ i18n.ts.quoteAttached }}<button @click="quoteId = null; renoteTargetNote = null;"><i class="ti ti-x"></i></button></div>
@@ -163,6 +166,9 @@ import { miLocalStorage } from '@/local-storage.js';
 import { dateTimeFormat } from '@/utility/intl-const.js';
 import { claimAchievement } from '@/utility/achievements.js';
 import { mfmFunctionPicker } from '@/utility/mfm-function-picker.js';
+import { langmap } from '@/utility/langmap.js';
+import { selectDimension } from '@/utility/dimension.js';
+import { selectPostingLanguage } from '@/utility/posting-language.js';
 import { prefer } from '@/preferences.js';
 import { getPluginHandlers } from '@/plugin.js';
 import { DI } from '@/di.js';
@@ -218,6 +224,9 @@ const showAddMfmFunction = ref(prefer.s.enableQuickAddMfmFunction);
 watch(showAddMfmFunction, () => prefer.commit('enableQuickAddMfmFunction', showAddMfmFunction.value));
 const cw = ref<string | null>(props.initialCw ?? null);
 const localOnly = ref(props.initialLocalOnly ?? (prefer.s.rememberNoteVisibility ? store.s.localOnly : prefer.s.defaultNoteLocalOnly));
+const dimension = ref<number>(props.initialDimension ?? store.r.tl.value?.dimensionBySrc?.[store.r.tl.value.src] ?? prefer.s.dimension);
+const isPrivateDimension = computed(() => dimension.value >= 1000);
+const postingLang = ref<string | null>(null);
 const visibility = ref(props.initialVisibility ?? (prefer.s.rememberNoteVisibility ? store.s.visibility : prefer.s.defaultNoteVisibility));
 const visibleUsers = ref<Misskey.entities.UserDetailed[]>([]);
 if (props.initialVisibleUsers) {
@@ -333,6 +342,12 @@ watch(text, () => {
 	checkMissingMention();
 }, { immediate: true });
 
+watch([isPrivateDimension, localOnly], ([privateDimension, localOnlyValue]) => {
+	if (privateDimension && !localOnlyValue) {
+		localOnly.value = true;
+	}
+}, { immediate: true });
+
 watch(visibility, () => {
 	checkMissingMention();
 }, { immediate: true });
@@ -342,6 +357,13 @@ watch(visibleUsers, () => {
 }, {
 	deep: true,
 });
+
+watch(() => props.initialDimension, (value) => {
+	const resolved = value ?? store.r.tl.value?.dimensionBySrc?.[store.r.tl.value.src] ?? prefer.s.dimension;
+	if (dimension.value !== resolved) {
+		dimension.value = resolved;
+	}
+}, { immediate: true });
 
 if (props.mention) {
 	text.value = props.mention.host ? `@${props.mention.username}@${toASCII(props.mention.host)}` : `@${props.mention.username}`;
@@ -428,6 +450,8 @@ function watchForDraft() {
 	watch(files, () => saveDraft(), { deep: true });
 	watch(visibility, () => saveDraft());
 	watch(localOnly, () => saveDraft());
+	watch(postingLang, () => saveDraft());
+	watch(dimension, () => saveDraft());
 	watch(quoteId, () => saveDraft());
 	watch(reactionAcceptance, () => saveDraft());
 	watch(scheduledTime, () => saveDraft());
@@ -550,6 +574,7 @@ async function toggleLocalOnly() {
 		localOnly.value = true; // TODO: チャンネルが連合するようになった折には消す
 		return;
 	}
+	if (isPrivateDimension.value) return;
 
 	const neverShowInfo = miLocalStorage.getItem('neverShowLocalOnlyInfo');
 
@@ -605,6 +630,18 @@ async function toggleReactionAcceptance() {
 	reactionAcceptance.value = select.result;
 }
 
+async function pickPostingLanguage() {
+	const selected = await selectPostingLanguage(postingLang.value ?? null);
+	if (selected === undefined) return;
+	postingLang.value = selected;
+}
+
+async function pickDimension() {
+	const selected = await selectDimension(dimension.value);
+	if (selected === undefined) return;
+	dimension.value = selected;
+}
+
 //#region その他の設定メニューpopup
 function showOtherSettings() {
 	let reactionAcceptanceIcon = 'ti ti-icons';
@@ -615,12 +652,25 @@ function showOtherSettings() {
 		reactionAcceptanceIcon = 'ti ti-heart-plus';
 	}
 
+	const postingLangCaption = postingLang.value != null
+		? (langmap[postingLang.value]?.nativeName ?? postingLang.value)
+		: i18n.ts.default;
+
 	const menuItems = [{
 		type: 'component',
 		component: XTextCounter,
 		props: {
 			textLength: textLength,
 		},
+	}, { type: 'divider' }, {
+		icon: 'ti ti-cube',
+		text: i18n.tsx.dimensionWithNumber({ dimension: dimension.value }),
+		action: pickDimension,
+	}, {
+		icon: 'ti ti-language',
+		text: i18n.ts.postingLanguage,
+		caption: postingLangCaption,
+		action: pickPostingLanguage,
 	}, { type: 'divider' }, {
 		icon: reactionAcceptanceIcon,
 		text: i18n.ts.reactionAcceptance,
@@ -682,6 +732,8 @@ function clear() {
 	cw.value = null;
 	visibility.value = store.s.rememberNoteVisibility ? store.s.visibility : store.s.defaultNoteVisibility;
 	localOnly.value = store.s.rememberNoteVisibility ? store.s.localOnly : store.s.defaultNoteLocalOnly;
+	postingLang.value = null;
+	dimension.value = props.initialDimension ?? store.r.tl.value?.dimensionBySrc?.[store.r.tl.value.src] ?? prefer.s.dimension;
 	files.value = [];
 	poll.value = null;
 	visibleUsers.value = [];
@@ -858,6 +910,8 @@ function saveDraft() {
 			cw: cw.value,
 			visibility: visibility.value,
 			localOnly: localOnly.value,
+			lang: postingLang.value,
+			dimension: dimension.value,
 			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 			files: files.value.filter(f => f?.id && f.type && f.name),
 			poll: poll.value,
@@ -939,6 +993,8 @@ function loadDraft(exactMatch = false) {
 		cw.value = draft.value.data.cw;
 		visibility.value = draft.value.data.visibility;
 		localOnly.value = draft.value.data.localOnly;
+		postingLang.value = draft.value.data.lang;
+		dimension.value = draft.value.data.dimension ?? prefer.s.dimension;
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		files.value = draft.value.data.files?.filter(f => f?.id && f.type && f.name) || [];
 		if (draft.value.data.poll) {
@@ -1003,10 +1059,12 @@ async function post(ev?: MouseEvent) {
 		poll: poll.value,
 		cw: useCw.value ? cw.value ?? '' : null,
 		localOnly: localOnly.value,
+		dimension: dimension.value,
 		visibility: visibility.value,
 		visibleUserIds: visibility.value === 'specified' ? visibleUsers.value.map(u => u.id) : undefined,
 		reactionAcceptance: reactionAcceptance.value,
 		scheduledAt: scheduledTime.value?.getTime() ?? undefined,
+		lang: postingLang.value ?? undefined,
 		noCreatedNote: true,
 	};
 
@@ -1161,6 +1219,7 @@ async function insertEmoji(ev: MouseEvent) {
 // 		},
 // 	);
 // }
+
 async function insertMfmFunction(ev: MouseEvent) {
 	if (textareaEl.value == null) return;
 	mfmFunctionPicker(
@@ -1235,6 +1294,8 @@ onMounted(() => {
 			cw.value = init.cw ?? null;
 			visibility.value = init.visibility;
 			localOnly.value = init.localOnly ?? false;
+			postingLang.value = init.lang ?? null;
+			dimension.value = init.dimension ?? props.initialDimension ?? store.r.tl.value?.dimensionBySrc?.[store.r.tl.value.src] ?? prefer.s.dimension;
 			files.value = init.files ?? [];
 			if (init.poll) {
 				poll.value = {

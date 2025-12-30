@@ -740,6 +740,7 @@ export type Channels = {
             withRenotes?: boolean;
             withFiles?: boolean;
             minimize?: boolean;
+            dimension?: number | null;
         };
         events: {
             note: (payload: Note) => void;
@@ -752,6 +753,7 @@ export type Channels = {
             withReplies?: boolean;
             withFiles?: boolean;
             minimize?: boolean;
+            dimension?: number | null;
         };
         events: {
             note: (payload: Note) => void;
@@ -764,6 +766,7 @@ export type Channels = {
             withReplies?: boolean;
             withFiles?: boolean;
             minimize?: boolean;
+            dimension?: number | null;
         };
         events: {
             note: (payload: Note) => void;
@@ -775,6 +778,7 @@ export type Channels = {
             withRenotes?: boolean;
             withFiles?: boolean;
             minimize?: boolean;
+            dimension?: number | null;
         };
         events: {
             note: (payload: Note) => void;
@@ -796,6 +800,7 @@ export type Channels = {
     hashtag: {
         params: {
             q: string[][];
+            dimension?: number | null;
         };
         events: {
             note: (payload: Note) => void;
@@ -806,6 +811,7 @@ export type Channels = {
         params: {
             roleId: string;
             minimize?: boolean;
+            dimension?: number | null;
         };
         events: {
             note: (payload: Note) => void;
@@ -826,6 +832,7 @@ export type Channels = {
         params: {
             channelId: string;
             minimize?: boolean;
+            dimension?: number | null;
         };
         events: {
             note: (payload: Note) => void;
@@ -1824,6 +1831,7 @@ declare namespace entities {
         IPagesResponse,
         IPinRequest,
         IPinResponse,
+        IPurgeTimelineCacheRequest,
         IReadAnnouncementRequest,
         IRegenerateTokenRequest,
         IRegistryGetRequest,
@@ -2556,6 +2564,9 @@ export type IPinRequest = operations['i___pin']['requestBody']['content']['appli
 
 // @public (undocumented)
 export type IPinResponse = operations['i___pin']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+export type IPurgeTimelineCacheRequest = operations['i___purge-timeline-cache']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 export type IReadAnnouncementRequest = operations['i___read-announcement']['requestBody']['content']['application/json'];

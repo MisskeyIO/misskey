@@ -292,6 +292,10 @@ export const PREF_DEF = {
 	disableStreamingTimeline: {
 		default: false,
 	},
+	dimension: {
+		accountDependent: true,
+		default: 0,
+	},
 	useGroupedNotifications: {
 		default: true,
 	},
@@ -329,6 +333,9 @@ export const PREF_DEF = {
 	},
 	skipNoteRender: {
 		default: true,
+	},
+	hideMutedNotes: {
+		default: false,
 	},
 	showSoftWordMutedWord: {
 		default: false,

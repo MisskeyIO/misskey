@@ -5,6 +5,7 @@
 
 import * as WebSocket from 'ws';
 import type { MiUser } from '@/models/User.js';
+import type { MiMeta } from '@/models/_.js';
 import type { MiAccessToken } from '@/models/AccessToken.js';
 import type { Packed } from '@/misc/json-schema.js';
 import type { NotificationService } from '@/core/NotificationService.js';
@@ -16,6 +17,7 @@ import { ChannelFollowingService } from '@/core/ChannelFollowingService.js';
 import { isJsonObject } from '@/misc/json-value.js';
 import type { JsonObject, JsonValue } from '@/misc/json-value.js';
 import { RoleService } from '@/core/RoleService.js';
+import { normalizeDimension } from '@/misc/dimension.js';
 import type { ChannelsService } from './ChannelsService.js';
 import type { EventEmitter } from 'events';
 import type Channel from './channel.js';
@@ -50,12 +52,17 @@ export default class Connection {
 		private cacheService: CacheService,
 		private roleService: RoleService,
 		private channelFollowingService: ChannelFollowingService,
+		private meta: MiMeta,
 
 		user: MiUser | null | undefined,
 		token: MiAccessToken | null | undefined,
 	) {
 		if (user) this.user = user;
 		if (token) this.token = token;
+	}
+
+	public normalizeDimension(value: number | null | undefined): number {
+		return normalizeDimension(value, this.meta.dimensions ?? 1);
 	}
 
 	@bindThis
@@ -266,7 +273,8 @@ export default class Connection {
 			return;
 		}
 
-		const ch: Channel = channelService.create(id, this);
+		const dimension = params && Object.hasOwn(params, 'dimension') ? params.dimension : null;
+		const ch: Channel = channelService.create(id, this, this.normalizeDimension(typeof dimension === 'number' ? dimension : null));
 		this.channels.push(ch);
 		ch.init(params ?? {});
 

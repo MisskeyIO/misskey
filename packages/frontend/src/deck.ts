@@ -61,6 +61,7 @@ export type Column = {
 	withSensitive?: boolean;
 	onlyFiles?: boolean;
 	soundSetting?: SoundStore;
+	dimension?: number | null;
 };
 
 const _currentProfile = prefer.s['deck.profiles'].find(p => p.name === prefer.s['deck.profile']);

@@ -18,7 +18,7 @@ class QueueStatsChannel extends Channel {
 	public static readonly requireCredential = false as const;
 
 	constructor(id: string, connection: Channel['connection']) {
-		super(id, connection);
+		super(id, connection, null);
 		//this.onStats = this.onStats.bind(this);
 		//this.onMessage = this.onMessage.bind(this);
 	}
@@ -68,7 +68,7 @@ export class QueueStatsChannelService implements MiChannelService<false> {
 	}
 
 	@bindThis
-	public create(id: string, connection: Channel['connection']): QueueStatsChannel {
+	public create(id: string, connection: Channel['connection'], dimension?: number | null): QueueStatsChannel {
 		return new QueueStatsChannel(
 			id,
 			connection,

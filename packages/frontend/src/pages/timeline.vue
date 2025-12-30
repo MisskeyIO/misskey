@@ -17,6 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</MkInfo>
 		<MkPostForm
 			v-if="prefer.r.showFixedPostForm.value" :class="$style.postForm" class="_panel" fixed
+			:initialDimension="dimension"
 			style="margin-bottom: var(--MI-margin);"
 		/>
 		<div v-if="queue > 0" :class="$style.new">
@@ -24,7 +25,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 		<MkTimeline
 			ref="tlComponent"
-			:key="src + withRenotes + withReplies + onlyFiles + withSensitive"
+			:key="src + withRenotes + withReplies + onlyFiles + withSensitive + dimension"
 			:class="$style.tl"
 			:src="src.split(':')[0] "
 			:list="src.split(':')[1]"
@@ -32,6 +33,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			:withReplies="withReplies"
 			:withSensitive="withSensitive"
 			:onlyFiles="onlyFiles"
+			:dimension="dimension"
 			:sound="true"
 			@queue="queueUpdated"
 		/>
@@ -58,9 +60,12 @@ import { antennasCache, userListsCache, favoritedChannelsCache } from '@/cache.j
 import { deviceKind } from '@/utility/device-kind.js';
 import { deepMerge } from '@/utility/merge.js';
 import { miLocalStorage } from '@/local-storage.js';
+import { claimAchievement } from '@/utility/achievements.js';
+import { selectDimension } from '@/utility/dimension.js';
 import {
 	availableBasicTimelines,
 	hasWithReplies,
+	hasDimension,
 	isAvailableBasicTimeline,
 	isBasicTimeline,
 	basicTimelineIconClass,
@@ -76,6 +81,10 @@ const srcWhenNotSignin = ref<'local' | 'global'>(isAvailableBasicTimeline('local
 const src = computed<TimelinePageSrc>({
 	get: () => ($i ? store.r.tl.value.src : srcWhenNotSignin.value),
 	set: (x) => saveSrc(x),
+});
+const dimension = computed<number>({
+	get: () => store.r.tl.value?.dimensionBySrc?.[src.value] ?? prefer.s.dimension,
+	set: (value) => saveTlDimension(value),
 });
 const withRenotes = computed<boolean>({
 	get: () => store.r.tl.value.filter.withRenotes,
@@ -129,6 +138,17 @@ const withSensitive = computed<boolean>({
 watch(src, () => {
 	queue.value = 0;
 });
+
+watch(dimension, (value, previous) => {
+	if (value == null || value === previous) return;
+	claimAchievement('dimensionConfigured');
+});
+
+async function pickDimension(): Promise<void> {
+	const selected = await selectDimension(dimension.value);
+	if (selected === undefined) return;
+	dimension.value = selected;
+}
 
 function queueUpdated(q: number): void {
 	queue.value = q;
@@ -223,6 +243,18 @@ function saveTlFilter(key: keyof typeof store.s.tl.filter, newValue: boolean) {
 	}
 }
 
+function saveTlDimension(value: number | null): void {
+	const dimensionBySrc = { ...(store.s.tl.dimensionBySrc ?? {}) };
+	if (value == null) {
+		delete dimensionBySrc[src.value];
+	} else {
+		dimensionBySrc[src.value] = value;
+	}
+
+	const out = deepMerge({ dimensionBySrc }, store.s.tl);
+	store.set('tl', out);
+}
+
 // 使用されていない機能
 
 // async function timetravel(): Promise<void> {
@@ -262,6 +294,14 @@ const headerActions = computed(() => {
 			handler: (ev) => {
 				const menuItems: MenuItem[] = [];
 
+				if ($i && hasDimension(src.value)) {
+					menuItems.push({
+						icon: 'ti ti-cube',
+						text: i18n.tsx.dimensionWithNumber({ dimension: dimension.value }),
+						action: pickDimension,
+					});
+				}
+
 				menuItems.push({
 					type: 'switch',
 					text: i18n.ts.showRenotes,
@@ -292,6 +332,7 @@ const headerActions = computed(() => {
 			},
 		},
 	];
+
 	if (deviceKind === 'desktop') {
 		tmp.unshift({
 			icon: 'ti ti-refresh',
@@ -300,6 +341,16 @@ const headerActions = computed(() => {
 				tlComponent.value?.reloadTimeline();
 			},
 		});
+
+		if ($i && hasDimension(src.value)) {
+			tmp.unshift({
+				icon: 'ti ti-cube',
+				label: dimension.value,
+				text: i18n.tsx.dimensionWithNumber({ dimension: dimension.value }),
+				hideWhenNarrow: true,
+				handler: pickDimension,
+			});
+		}
 	}
 	return tmp;
 });

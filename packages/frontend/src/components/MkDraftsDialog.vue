@@ -46,6 +46,14 @@
 							</div>
 							<MkTime :time="draft.createdAt" colored/>
 						</div>
+						<span v-if="typeof draft.dimension === 'number' && draft.dimension > 0" :class="$style.draftNoteMeta" :title="i18n.tsx.dimensionWithNumber({ dimension: draft.dimension })">
+							<i class="ti ti-cube"></i>
+							<span>{{ draft.dimension }}</span>
+						</span>
+						<span v-if="draft.lang" :class="$style.draftNoteMeta" :title="getLangTitle(draft.lang)">
+							<i class="ti ti-language"></i>
+							<span>{{ draft.lang }}</span>
+						</span>
 						<span v-if="draft.visibility !== 'public'" :title="i18n.ts._visibility[draft.visibility]">
 							<i v-if="draft.visibility === 'home'" class="ti ti-home"></i>
 							<i v-else-if="draft.visibility === 'followers'" class="ti ti-lock"></i>
@@ -102,15 +110,23 @@
 									<span><i class="ti ti-calendar-clock" style="margin-right: 4px;"/></span>
 									<MkTime :time="draft.scheduledAt"/>
 								</div>
-								<div v-else style="display: flex; opacity: 0.6">
-									<span><i class="ti ti-exclamation-circle"/></span>
-								</div>
-								<MkTime :time="draft.createdAt" colored/>
+							<div v-else style="display: flex; opacity: 0.6">
+								<span><i class="ti ti-exclamation-circle"/></span>
 							</div>
-							<span v-if="draft.visibility !== 'public'" :title="i18n.ts._visibility[draft.visibility]">
-								<i v-if="draft.visibility === 'home'" class="ti ti-home"></i>
-								<i v-else-if="draft.visibility === 'followers'" class="ti ti-lock"></i>
-								<i v-else-if="draft.visibility === 'specified'" ref="specified" class="ti ti-mail"></i>
+							<MkTime :time="draft.createdAt" colored/>
+						</div>
+						<span v-if="typeof draft.dimension === 'number' && draft.dimension > 0" :class="$style.draftNoteMeta" :title="i18n.tsx.dimensionWithNumber({ dimension: draft.dimension })">
+							<i class="ti ti-cube"></i>
+							<span>{{ draft.dimension }}</span>
+						</span>
+						<span v-if="draft.lang" :class="$style.draftNoteMeta" :title="getLangTitle(draft.lang)">
+							<i class="ti ti-language"></i>
+							<span>{{ draft.lang }}</span>
+						</span>
+						<span v-if="draft.visibility !== 'public'" :title="i18n.ts._visibility[draft.visibility]">
+							<i v-if="draft.visibility === 'home'" class="ti ti-home"></i>
+							<i v-else-if="draft.visibility === 'followers'" class="ti ti-lock"></i>
+							<i v-else-if="draft.visibility === 'specified'" ref="specified" class="ti ti-mail"></i>
 							</span>
 							<span v-if="draft.localOnly" :title="i18n.ts._visibility['disableFederation']">
 								<i class="ti ti-rocket-off"></i>
@@ -154,6 +170,7 @@ import MkSubNoteContent from '@/components/MkSubNoteContent.vue';
 import MkModalWindow from '@/components/MkModalWindow.vue';
 import MkPagination from '@/components/MkPagination.vue';
 import MkTab from '@/components/MkTab.vue';
+import { langmap } from '@/utility/langmap.js';
 
 const emit = defineEmits<{
 	(ev: 'done', v: { canceled: true } | { canceled: false; selected: string | undefined }): void;
@@ -185,6 +202,16 @@ function convertNoteDraftToNoteCompat(draft: Misskey.entities.NoteDraft, key?: s
 function loadDrafts() {
 	const stored = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}') as Record<string, Misskey.entities.NoteDraft>;
 	drafts.value = Object.keys(stored).map((key) => convertNoteDraftToNoteCompat(stored[key], key));
+}
+
+function getLangLabel(lang: string | null | undefined): string {
+	if (!lang) return '';
+	return langmap[lang]?.nativeName ?? lang;
+}
+
+function getLangTitle(lang: string | null | undefined): string {
+	if (!lang) return '';
+	return `${i18n.ts.postingLanguage}: ${getLangLabel(lang)}`;
 }
 
 function selectDraft(draft: string) {
@@ -289,6 +316,14 @@ const scheduledPagination = {
 	flex-shrink: 0;
 	margin-left: auto;
 	gap: 4px;
+}
+
+.draftNoteMeta {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	opacity: 0.7;
+	font-size: 0.9em;
 }
 
 .draftNoteCw {

@@ -18,6 +18,7 @@ export const DI = {
 	//#region Repositories
 	usersRepository: Symbol('usersRepository'),
 	notesRepository: Symbol('notesRepository'),
+	noteLanguagesRepository: Symbol('noteLanguagesRepository'),
 	abuseReportResolversRepository: Symbol('abuseReportResolversRepository'),
 	announcementsRepository: Symbol('announcementsRepository'),
 	announcementReadsRepository: Symbol('announcementReadsRepository'),
@@ -30,6 +31,7 @@ export const DI = {
 	pollsRepository: Symbol('pollsRepository'),
 	pollVotesRepository: Symbol('pollVotesRepository'),
 	userProfilesRepository: Symbol('userProfilesRepository'),
+	userLanguagesRepository: Symbol('userLanguagesRepository'),
 	userKeypairsRepository: Symbol('userKeypairsRepository'),
 	userPendingsRepository: Symbol('userPendingsRepository'),
 	userSecurityKeysRepository: Symbol('userSecurityKeysRepository'),

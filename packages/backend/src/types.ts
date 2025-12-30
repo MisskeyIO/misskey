@@ -482,6 +482,7 @@ export type NoteCreateOption = {
 	files?: MiDriveFile[] | null;
 	poll?: IPoll | null;
 	localOnly?: boolean | null;
+	dimension?: number | null;
 	reactionAcceptance?: MiNote['reactionAcceptance'];
 	cw?: string | null;
 	visibility?: string;
@@ -493,6 +494,7 @@ export type NoteCreateOption = {
 	uri?: string | null;
 	url?: string | null;
 	app?: MiApp | null;
+	lang?: string | null;
 };
 
 export type Serialized<T> = {

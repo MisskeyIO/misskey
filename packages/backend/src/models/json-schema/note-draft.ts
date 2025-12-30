@@ -128,6 +128,14 @@ export const packedNoteDraftSchema = {
 					type: 'boolean',
 					optional: false, nullable: false,
 				},
+				lang: {
+					type: 'string',
+					optional: true, nullable: true,
+				},
+				dimension: {
+					type: 'integer',
+					optional: true, nullable: true,
+				},
 				files: {
 					type: 'array',
 					optional: false, nullable: false,

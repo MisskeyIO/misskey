@@ -35,9 +35,24 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkInfo v-if="channel.isArchived" warn>{{ i18n.ts.thisChannelArchived }}</MkInfo>
 
 			<!-- スマホ・タブレットの場合、キーボードが表示されると投稿が見づらくなるので、デスクトップ場合のみ自動でフォーカスを当てる -->
-			<MkPostForm v-if="$i && prefer.r.showFixedPostFormInChannel.value" :channel="channel" class="post-form _panel" fixed :autofocus="deviceKind === 'desktop'"/>
+			<MkPostForm
+				v-if="$i && prefer.r.showFixedPostFormInChannel.value"
+				:channel="channel"
+				:initialDimension="dimension"
+				class="post-form _panel"
+				fixed
+				:autofocus="deviceKind === 'desktop'"
+			/>
 
-			<MkTimeline :key="channelId" src="channel" :channel="channelId" @before="before" @after="after" @note="miLocalStorage.setItemAsJson(`channelLastReadedAt:${channel.id}`, Date.now())"/>
+			<MkTimeline
+				:key="`${channelId}:${dimension}`"
+				src="channel"
+				:channel="channelId"
+				:dimension="dimension"
+				@before="before"
+				@after="after"
+				@note="miLocalStorage.setItemAsJson(`channelLastReadedAt:${channel.id}`, Date.now())"
+			/>
 		</div>
 		<div v-else-if="tab === 'featured'">
 			<MkNotes :pagination="featuredPagination"/>
@@ -96,6 +111,10 @@ import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
 import { notesSearchAvailable } from '@/utility/check-permissions.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { useRouter } from '@/router.js';
+import { store } from '@/store.js';
+import { deepMerge } from '@/utility/merge.js';
+import { selectDimension } from '@/utility/dimension.js';
+import { claimAchievement } from '@/utility/achievements.js';
 
 const router = useRouter();
 
@@ -117,6 +136,11 @@ const featuredPagination = computed(() => ({
 		channelId: props.channelId,
 	},
 }));
+const dimensionKey = computed(() => `channel:${props.channelId}`);
+const dimension = computed<number>({
+	get: () => store.r.tl.value?.dimensionBySrc?.[dimensionKey.value] ?? prefer.s.dimension,
+	set: (value) => saveTlDimension(value),
+});
 
 watch(() => props.channelId, async () => {
 	channel.value = await misskeyApi('channels/show', {
@@ -137,6 +161,11 @@ watch(() => props.channelId, async () => {
 	}
 }, { immediate: true });
 
+watch(dimension, (value, previous) => {
+	if (value == null || value === previous) return;
+	claimAchievement('dimensionConfigured');
+});
+
 function edit() {
 	router.push(`/channels/${channel.value?.id}/edit`);
 }
@@ -144,6 +173,7 @@ function edit() {
 function openPostForm() {
 	os.post({
 		channel: channel.value,
+		initialDimension: dimension.value,
 	});
 }
 
@@ -193,53 +223,68 @@ async function search() {
 	searchKey.value = query;
 }
 
-const headerActions = computed(() => {
-	if (channel.value && channel.value.userId) {
-		const headerItems: PageHeaderItem[] = [];
+async function pickDimension(): Promise<void> {
+	const selected = await selectDimension(dimension.value);
+	if (selected === undefined) return;
+	dimension.value = selected;
+}
 
+function saveTlDimension(value: number | null): void {
+	const dimensionBySrc = { ...(store.s.tl.dimensionBySrc ?? {}) };
+	if (value == null) {
+		delete dimensionBySrc[dimensionKey.value];
+	} else {
+		dimensionBySrc[dimensionKey.value] = value;
+	}
+
+	const out = deepMerge({ dimensionBySrc }, store.s.tl);
+	store.set('tl', out);
+}
+
+const headerActions = computed(() => {
+	if (!channel.value) return null;
+	const headerItems: PageHeaderItem[] = [];
+
+	headerItems.push({
+		icon: 'ti ti-link',
+		text: i18n.ts.copyUrl,
+		handler: async (): Promise<void> => {
+			copyToClipboard(`${url}/channels/${channel.value.id}`);
+		},
+	});
+
+	if (isSupportShare()) {
 		headerItems.push({
-			icon: 'ti ti-link',
-			text: i18n.ts.copyUrl,
+			icon: 'ti ti-share',
+			text: i18n.ts.share,
 			handler: async (): Promise<void> => {
-				if (!channel.value) {
-					console.warn('failed to copy channel URL. channel.value is null.');
-					return;
-				}
-				copyToClipboard(`${url}/channels/${channel.value.id}`);
+				navigator.share({
+					title: channel.value.name,
+					text: channel.value.description ?? undefined,
+					url: `${url}/channels/${channel.value.id}`,
+				});
 			},
 		});
-
-		if (isSupportShare()) {
-			headerItems.push({
-				icon: 'ti ti-share',
-				text: i18n.ts.share,
-				handler: async (): Promise<void> => {
-					if (!channel.value) {
-						console.warn('failed to share channel. channel.value is null.');
-						return;
-					}
-
-					navigator.share({
-						title: channel.value.name,
-						text: channel.value.description ?? undefined,
-						url: `${url}/channels/${channel.value.id}`,
-					});
-				},
-			});
-		}
-
-		if (($i && $i.id === channel.value.userId) || iAmModerator) {
-			headerItems.push({
-				icon: 'ti ti-settings',
-				text: i18n.ts.edit,
-				handler: edit,
-			});
-		}
-
-		return headerItems.length > 0 ? headerItems : null;
-	} else {
-		return null;
 	}
+
+	if (tab.value === 'timeline' && $i) {
+		headerItems.push({
+			icon: 'ti ti-cube',
+			label: dimension.value,
+			text: i18n.tsx.dimensionWithNumber({ dimension: dimension.value }),
+			handler: pickDimension,
+		});
+	}
+
+	if (($i && $i.id === channel.value.userId) || iAmModerator) {
+		headerItems.push({
+			icon: 'ti ti-settings',
+			text: i18n.ts.edit,
+			handler: edit,
+		});
+	}
+
+	return headerItems;
 });
 
 const headerTabs = computed(() => [{

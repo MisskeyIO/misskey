@@ -195,7 +195,7 @@ const okButtonDisabledReason = computed<null | 'charactersExceeded' | 'character
 				if (props.input.max != null && numericValue > props.input.max) {
 					return 'numberAbove';
 				}
-			} else {
+			} else if (numericValue != null) {
 				return 'numberInvalid';
 			}
 		}

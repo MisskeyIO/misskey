@@ -38,7 +38,7 @@ import { MiPoll } from '@/models/Poll.js';
 import type { MinimumUser, NoteCreateOption } from '@/types.js';
 import { isDuplicateKeyValueError } from '@/misc/is-duplicate-key-value-error.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
-import { normalizeDimension } from '@/misc/dimension.js';
+import { getDeliverTargetDimensions, normalizeDimension } from '@/misc/dimension.js';
 import { RelayService } from '@/core/RelayService.js';
 import { FederatedInstanceService } from '@/core/FederatedInstanceService.js';
 import { DI } from '@/di-symbols.js';
@@ -65,7 +65,7 @@ import { DB_MAX_NOTE_TEXT_LENGTH } from '@/const.js';
 import { RoleService } from '@/core/RoleService.js';
 import { SearchService } from '@/core/SearchService.js';
 import { FeaturedService } from '@/core/FeaturedService.js';
-import { FanoutTimelineService } from '@/core/FanoutTimelineService.js';
+import { FanoutTimelineName, FanoutTimelineService } from '@/core/FanoutTimelineService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { UserBlockingService } from '@/core/UserBlockingService.js';
 import { isReply } from '@/misc/is-reply.js';
@@ -947,6 +947,16 @@ export class NoteCreateService implements OnApplicationShutdown {
 		if (!meta.enableFanoutTimeline) return;
 
 		const r = this.redisForTimelines.pipeline();
+		const noteDimension = typeof (note as MiNoteWithDimension).dimension === 'number'
+			? (note as MiNoteWithDimension).dimension
+			: 0;
+		const dimensionTargets = getDeliverTargetDimensions(noteDimension);
+		const pushToDimension = (name: FanoutTimelineName, id: string, maxlen: number) => {
+			this.fanoutTimelineService.push(name, id, maxlen, r);
+			for (const dimension of dimensionTargets) {
+				this.fanoutTimelineService.pushDimension(name, id, dimension, r);
+			}
+		};
 
 		// TODO: キャッシュ？
 		// eslint-disable-next-line prefer-const
@@ -992,11 +1002,11 @@ export class NoteCreateService implements OnApplicationShutdown {
 		}
 
 		if (note.channelId) {
-			this.fanoutTimelineService.push(`channelTimeline:${note.channelId}`, note.id, this.config.perChannelMaxNoteCacheCount, r);
+			pushToDimension(`channelTimeline:${note.channelId}`, note.id, this.config.perChannelMaxNoteCacheCount);
 
-			this.fanoutTimelineService.push(`userTimelineWithChannel:${user.id}`, note.id, note.userHost == null ? meta.perLocalUserUserTimelineCacheMax : meta.perRemoteUserUserTimelineCacheMax, r);
+			pushToDimension(`userTimelineWithChannel:${user.id}`, note.id, note.userHost == null ? meta.perLocalUserUserTimelineCacheMax : meta.perRemoteUserUserTimelineCacheMax);
 			if (note.fileIds.length > 0) {
-				this.fanoutTimelineService.push(`userTimelineWithChannelWithFiles:${user.id}`, note.id, note.userHost == null ? meta.perLocalUserUserTimelineCacheMax / 2 : meta.perRemoteUserUserTimelineCacheMax / 2, r);
+				pushToDimension(`userTimelineWithChannelWithFiles:${user.id}`, note.id, note.userHost == null ? meta.perLocalUserUserTimelineCacheMax / 2 : meta.perRemoteUserUserTimelineCacheMax / 2);
 			}
 
 			const channelFollowings = await this.channelFollowingsRepository.find({
@@ -1007,9 +1017,9 @@ export class NoteCreateService implements OnApplicationShutdown {
 			});
 
 			for (const channelFollowing of channelFollowings) {
-				this.fanoutTimelineService.push(`homeTimeline:${channelFollowing.followerId}`, note.id, meta.perUserHomeTimelineCacheMax, r);
+				pushToDimension(`homeTimeline:${channelFollowing.followerId}`, note.id, meta.perUserHomeTimelineCacheMax);
 				if (note.fileIds.length > 0) {
-					this.fanoutTimelineService.push(`homeTimelineWithFiles:${channelFollowing.followerId}`, note.id, meta.perUserHomeTimelineCacheMax / 2, r);
+					pushToDimension(`homeTimelineWithFiles:${channelFollowing.followerId}`, note.id, meta.perUserHomeTimelineCacheMax / 2);
 				}
 			}
 		} else {
@@ -1023,42 +1033,42 @@ export class NoteCreateService implements OnApplicationShutdown {
 					if (!following.withReplies) continue;
 				}
 
-				this.fanoutTimelineService.push(`homeTimeline:${following.followerId}`, note.id, meta.perUserHomeTimelineCacheMax, r);
+				pushToDimension(`homeTimeline:${following.followerId}`, note.id, meta.perUserHomeTimelineCacheMax);
 				if (note.fileIds.length > 0) {
-					this.fanoutTimelineService.push(`homeTimelineWithFiles:${following.followerId}`, note.id, meta.perUserHomeTimelineCacheMax / 2, r);
+					pushToDimension(`homeTimelineWithFiles:${following.followerId}`, note.id, meta.perUserHomeTimelineCacheMax / 2);
 				}
 			}
 			if (note.userHost === null) {
 				if ((note.visibility !== 'specified' || !note.visibleUserIds.some(v => v === user.id))) { // 自分自身のHTL
-					this.fanoutTimelineService.push(`homeTimeline:${user.id}`, note.id, meta.perUserHomeTimelineCacheMax, r);
+					pushToDimension(`homeTimeline:${user.id}`, note.id, meta.perUserHomeTimelineCacheMax);
 					if (note.fileIds.length > 0) {
-						this.fanoutTimelineService.push(`homeTimelineWithFiles:${user.id}`, note.id, meta.perUserHomeTimelineCacheMax / 2, r);
+						pushToDimension(`homeTimelineWithFiles:${user.id}`, note.id, meta.perUserHomeTimelineCacheMax / 2);
 					}
 				}
 			}
 			// 自分自身以外への返信
 			if (isReply(note)) {
-				this.fanoutTimelineService.push(`userTimelineWithReplies:${user.id}`, note.id, note.userHost == null ? meta.perLocalUserUserTimelineCacheMax : meta.perRemoteUserUserTimelineCacheMax, r);
+				pushToDimension(`userTimelineWithReplies:${user.id}`, note.id, note.userHost == null ? meta.perLocalUserUserTimelineCacheMax : meta.perRemoteUserUserTimelineCacheMax);
 				if (note.fileIds.length > 0) {
-					this.fanoutTimelineService.push(`userTimelineWithRepliesWithFiles:${user.id}`, note.id, note.userHost == null ? meta.perLocalUserUserTimelineCacheMax / 2 : meta.perRemoteUserUserTimelineCacheMax / 2, r);
+					pushToDimension(`userTimelineWithRepliesWithFiles:${user.id}`, note.id, note.userHost == null ? meta.perLocalUserUserTimelineCacheMax / 2 : meta.perRemoteUserUserTimelineCacheMax / 2);
 				}
 
 				if (note.visibility === 'public' && note.userHost == null) {
-					this.fanoutTimelineService.push('localTimelineWithReplies', note.id, 300, r);
+					pushToDimension('localTimelineWithReplies', note.id, 300);
 					if (note.replyUserHost == null) {
-						this.fanoutTimelineService.push(`localTimelineWithReplyTo:${note.replyUserId}`, note.id, 300 / 10, r);
+						pushToDimension(`localTimelineWithReplyTo:${note.replyUserId}`, note.id, 300 / 10);
 					}
 				}
 			} else {
-				this.fanoutTimelineService.push(`userTimeline:${user.id}`, note.id, note.userHost == null ? meta.perLocalUserUserTimelineCacheMax : meta.perRemoteUserUserTimelineCacheMax, r);
+				pushToDimension(`userTimeline:${user.id}`, note.id, note.userHost == null ? meta.perLocalUserUserTimelineCacheMax : meta.perRemoteUserUserTimelineCacheMax);
 				if (note.fileIds.length > 0) {
-					this.fanoutTimelineService.push(`userTimelineWithFiles:${user.id}`, note.id, note.userHost == null ? meta.perLocalUserUserTimelineCacheMax / 2 : meta.perRemoteUserUserTimelineCacheMax / 2, r);
+					pushToDimension(`userTimelineWithFiles:${user.id}`, note.id, note.userHost == null ? meta.perLocalUserUserTimelineCacheMax / 2 : meta.perRemoteUserUserTimelineCacheMax / 2);
 				}
 
 				if (note.visibility === 'public' && note.userHost == null) {
-					this.fanoutTimelineService.push('localTimeline', note.id, 1000, r);
+					pushToDimension('localTimeline', note.id, 1000);
 					if (note.fileIds.length > 0) {
-						this.fanoutTimelineService.push('localTimelineWithFiles', note.id, 500, r);
+						pushToDimension('localTimelineWithFiles', note.id, 500);
 					}
 				}
 			}

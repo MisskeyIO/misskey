@@ -61,7 +61,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private redisForTimelines: Redis.Redis,
 
 		@Inject(DI.meta)
-		private meta: MiMeta,
+		private instanceMeta: MiMeta,
 
 		@Inject(DI.notesRepository)
 		private notesRepository: NotesRepository,
@@ -78,7 +78,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
 			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
 			const viewerDimension = typeof ps.dimension === 'number'
-				? normalizeDimension(ps.dimension, this.meta.dimensions ?? 1)
+				? normalizeDimension(ps.dimension, this.instanceMeta.dimensions ?? 1)
 				: null;
 
 			const role = await this.rolesRepository.findOneBy({

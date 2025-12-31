@@ -40,8 +40,8 @@ export function shouldDeliverByDimension(note: Packed<'Note'>, viewerDimension: 
 	return false;
 }
 
-export function getDeliverTargetDimensions(noteDimension: number): number[] {
-	if (noteDimension <= 0) return [0];
+export function getDeliverTargetDimensions(noteDimension: number | null | undefined): number[] {
+	if (noteDimension == null || noteDimension <= 0) return [0];
 	if (noteDimension < 1000) return [noteDimension, 0];
 	return [noteDimension];
 }

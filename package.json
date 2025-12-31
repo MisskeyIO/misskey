@@ -10,6 +10,7 @@
   "workspaces": [
     "packages/frontend-shared",
     "packages/frontend",
+    "packages/frontend-app",
     "packages/frontend-embed",
     "packages/backend",
     "packages/sw",

@@ -547,8 +547,8 @@ catalogs:
       specifier: 16.5.0
       version: 16.5.0
     got:
-      specifier: 14.6.5
-      version: 14.6.5
+      specifier: 14.6.6
+      version: 14.6.6
     hpagent:
       specifier: 1.2.0
       version: 1.2.0
@@ -733,8 +733,8 @@ catalogs:
       specifier: 5.0.1
       version: 5.0.1
     pnpm:
-      specifier: 10.26.2
-      version: 10.26.2
+      specifier: 10.27.0
+      version: 10.27.0
     postcss:
       specifier: 8.5.6
       version: 8.5.6
@@ -874,8 +874,8 @@ catalogs:
       specifier: 7.1.4
       version: 7.1.4
     systeminformation:
-      specifier: 5.28.5
-      version: 5.28.5
+      specifier: 5.28.7
+      version: 5.28.7
     terser:
       specifier: 5.44.1
       version: 5.44.1
@@ -981,7 +981,7 @@ catalogs:
 
 overrides:
   '@aiscript-dev/aiscript-languageserver': '-'
-  '@misskey-dev/summaly': github:MisskeyIO/summaly#5.2.5-io.2
+  '@misskey-dev/summaly': github:MisskeyIO/summaly#5.2.5-io.3
   '@tensorflow/tfjs': 4.22.0
   '@tensorflow/tfjs-core': 4.22.0
   '@tensorflow/tfjs-node': 4.22.0
@@ -1100,7 +1100,7 @@ importers:
         version: 2.0.0
       pnpm:
         specifier: 'catalog:'
-        version: 10.26.2
+        version: 10.27.0
       start-server-and-test:
         specifier: 'catalog:'
         version: 2.1.3
@@ -1163,8 +1163,8 @@ importers:
         specifier: 'catalog:'
         version: 1.3.0
       '@misskey-dev/summaly':
-        specifier: github:MisskeyIO/summaly#5.2.5-io.2
-        version: https://codeload.github.com/MisskeyIO/summaly/tar.gz/5163ff6c2d449732728497a43f6ab426cdfe7158
+        specifier: github:MisskeyIO/summaly#5.2.5-io.3
+        version: https://codeload.github.com/MisskeyIO/summaly/tar.gz/c81c026212f4ee8ca7aa00cf66a128c21fc5d968
       '@napi-rs/canvas':
         specifier: 'catalog:'
         version: 0.1.88
@@ -1284,7 +1284,7 @@ importers:
         version: 4.0.5
       got:
         specifier: 'catalog:'
-        version: 14.6.5
+        version: 14.6.6
       hpagent:
         specifier: 'catalog:'
         version: 1.2.0
@@ -1476,7 +1476,7 @@ importers:
         version: 2.1.0
       systeminformation:
         specifier: 'catalog:'
-        version: 5.28.5
+        version: 5.28.7
       tinycolor2:
         specifier: 'catalog:'
         version: 1.6.0
@@ -1973,8 +1973,8 @@ importers:
         specifier: 'catalog:'
         version: 2.2.0(@eslint/compat@2.0.0(eslint@9.39.2))(@eslint/js@9.39.2)(@stylistic/eslint-plugin@5.6.1(eslint@9.39.2))(@typescript-eslint/eslint-plugin@8.51.0(@typescript-eslint/parser@8.51.0(eslint@9.39.2)(typescript@5.9.3))(eslint@9.39.2)(typescript@5.9.3))(@typescript-eslint/parser@8.51.0(eslint@9.39.2)(typescript@5.9.3))(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.51.0(eslint@9.39.2)(typescript@5.9.3))(eslint@9.39.2))(eslint@9.39.2)(globals@16.5.0)
       '@misskey-dev/summaly':
-        specifier: github:MisskeyIO/summaly#5.2.5-io.2
-        version: https://codeload.github.com/MisskeyIO/summaly/tar.gz/5163ff6c2d449732728497a43f6ab426cdfe7158
+        specifier: github:MisskeyIO/summaly#5.2.5-io.3
+        version: https://codeload.github.com/MisskeyIO/summaly/tar.gz/c81c026212f4ee8ca7aa00cf66a128c21fc5d968
       '@storybook/addon-links':
         specifier: 'catalog:'
         version: 10.1.11(react@19.2.3)(storybook@10.1.11(@testing-library/dom@9.3.4)(bufferutil@4.1.0)(prettier@3.7.4)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(utf-8-validate@6.0.6))
@@ -2202,8 +2202,8 @@ importers:
         version: 3.5.26(typescript@5.9.3)
     devDependencies:
       '@misskey-dev/summaly':
-        specifier: github:MisskeyIO/summaly#5.2.5-io.2
-        version: https://codeload.github.com/MisskeyIO/summaly/tar.gz/5163ff6c2d449732728497a43f6ab426cdfe7158
+        specifier: github:MisskeyIO/summaly#5.2.5-io.3
+        version: https://codeload.github.com/MisskeyIO/summaly/tar.gz/c81c026212f4ee8ca7aa00cf66a128c21fc5d968
       '@testing-library/vue':
         specifier: 'catalog:'
         version: 8.1.0(@vue/compiler-sfc@3.5.26)(vue@3.5.26(typescript@5.9.3))
@@ -3456,8 +3456,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@eslint-community/eslint-utils@4.9.0':
-    resolution: {integrity: sha512-ayVFHdtZ+hsq1t2Dy24wCmGXGe4q9Gu3smhLYALJrr473ZH27MsnSL+LKUlimp4BWJqMDMLmPpx/Q9R3OAlL4g==}
+  '@eslint-community/eslint-utils@4.9.1':
+    resolution: {integrity: sha512-phrYmNiYppR7znFEdqgfWHXR6NCkZEK7hwWDHZUjit/2/U0r6XvkDl0SYnoM51Hq7FhCGdLDT6zxCCOY1hexsQ==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
       eslint: ^6.0.0 || ^7.0.0 || >=8.0.0
@@ -4022,9 +4022,9 @@ packages:
   '@misskey-dev/sharp-read-bmp@1.3.0':
     resolution: {integrity: sha512-18K95y0tXTtwl4BVfQb0JCr/9KHoHOfTKUUmZ7ibjzbS4bR/kGKoRkADsrdqBllF3nvu7PQN8zjUoM4SWoBLBg==}
 
-  '@misskey-dev/summaly@https://codeload.github.com/MisskeyIO/summaly/tar.gz/5163ff6c2d449732728497a43f6ab426cdfe7158':
-    resolution: {tarball: https://codeload.github.com/MisskeyIO/summaly/tar.gz/5163ff6c2d449732728497a43f6ab426cdfe7158}
-    version: 5.2.5-io.2
+  '@misskey-dev/summaly@https://codeload.github.com/MisskeyIO/summaly/tar.gz/c81c026212f4ee8ca7aa00cf66a128c21fc5d968':
+    resolution: {tarball: https://codeload.github.com/MisskeyIO/summaly/tar.gz/c81c026212f4ee8ca7aa00cf66a128c21fc5d968}
+    version: 5.2.5-io.3
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
     resolution: {integrity: sha512-QZHtlVgbAdy2zAqNA9Gu1UpIuI8Xvsd1v8ic6B2pZmeFnFcMWiPLfWXh7TVw4eGEZ/C9TH281KwhVoeQUKbyjw==}
@@ -8050,8 +8050,8 @@ packages:
     engines: {node: '>=4'}
     hasBin: true
 
-  esquery@1.6.0:
-    resolution: {integrity: sha512-ca9pw9fomFcKPvFLXhBKUK90ZvGibiGOvRJNbjljY7s7uq/5YO4BOzcYtJqExdx99rF6aAcnRxHmcUHcz6sQsg==}
+  esquery@1.7.0:
+    resolution: {integrity: sha512-Ap6G0WQwcU/LHsvLwON1fAQX9Zp0A2Y6Y/cJBl9r/JbW90Zyg4/zbG6zzKa2OTALELarYHmKu0GhpM5EO+7T0g==}
     engines: {node: '>=0.10'}
 
   esrecurse@4.3.0:
@@ -8542,8 +8542,8 @@ packages:
     resolution: {integrity: sha512-XfBk1CxOOScDcMr9O1yKkNaQyy865NbYs+F7dr4H0LZMVgCj2Le59k6PqbNHoL5ToeaEQUYh6c6yMfVcc6SJxA==}
     engines: {node: '>=16'}
 
-  got@14.6.5:
-    resolution: {integrity: sha512-Su87c0NNeg97de1sO02gy9I8EmE7DCJ1gzcFLcgGpYeq2PnLg4xz73MWrp6HjqbSsjb6Glf4UBDW6JNyZA6uSg==}
+  got@14.6.6:
+    resolution: {integrity: sha512-QLV1qeYSo5l13mQzWgP/y0LbMr5Plr5fJilgAIwgnwseproEbtNym8xpLsDzeZ6MWXgNE6kdWGBjdh3zT/Qerg==}
     engines: {node: '>=20'}
 
   graceful-fs@4.2.11:
@@ -10469,8 +10469,8 @@ packages:
     resolution: {integrity: sha512-40QW5YalBNfQo5yRYmiw7Yz6TKKVr3h6970B2YE+3fQpsWcrbj1PzJgxeJ19DRQjhMbKPIuMY8rFaXc8moolVw==}
     engines: {node: '>=10.13.0'}
 
-  pnpm@10.26.2:
-    resolution: {integrity: sha512-DjCP8gBfx0EDZvFU9iX2YxqysWsdLnAjhETdaunWMKhILZKkURRN68SSQWiW7Rb3sRSobsaLhASyRDhp5o/9pg==}
+  pnpm@10.27.0:
+    resolution: {integrity: sha512-ctaZ2haxF5wUup5k3HHJpAmIy9xlwmTLDkidt96RfyDc9NZNhyNiXylpulLUt+KhFwaC2awqXcrqq3MrfhbwSg==}
     engines: {node: '>=18.12'}
     hasBin: true
 
@@ -11841,8 +11841,8 @@ packages:
     resolution: {integrity: sha512-MeQTA1r0litLUf0Rp/iisCaL8761lKAZHaimlbGK4j0HysC4PLfqygQj9srcs0m2RdtDYnF8UuYyKpbjHYp7Jw==}
     engines: {node: ^14.18.0 || >=16.0.0}
 
-  systeminformation@5.28.5:
-    resolution: {integrity: sha512-tmeFgL7UceTaRi8uGBs2kxL7L70G07vqYnigSn2P3+elPQ+6q5YlD/c67ZV2PIxixZYw2RCURSNK1JH+zGJ0Hg==}
+  systeminformation@5.28.7:
+    resolution: {integrity: sha512-9WLwVJm2vs1m05CjSjJb0Ia9EeAVpVulWdCOVwmqcUtyW8rlujT3qDp7pCEvx1e/kfbYufMJPkcjb1E9fTo8xg==}
     engines: {node: '>=8.0.0'}
     os: [darwin, linux, win32, freebsd, openbsd, netbsd, sunos, android]
     hasBin: true
@@ -14091,7 +14091,7 @@ snapshots:
   '@esbuild/win32-x64@0.27.2':
     optional: true
 
-  '@eslint-community/eslint-utils@4.9.0(eslint@9.39.2)':
+  '@eslint-community/eslint-utils@4.9.1(eslint@9.39.2)':
     dependencies:
       eslint: 9.39.2
       eslint-visitor-keys: 3.4.3
@@ -14793,11 +14793,11 @@ snapshots:
       decode-ico: 0.4.1
       sharp: 0.34.5
 
-  '@misskey-dev/summaly@https://codeload.github.com/MisskeyIO/summaly/tar.gz/5163ff6c2d449732728497a43f6ab426cdfe7158':
+  '@misskey-dev/summaly@https://codeload.github.com/MisskeyIO/summaly/tar.gz/c81c026212f4ee8ca7aa00cf66a128c21fc5d968':
     dependencies:
       cheerio: 1.1.2
       escape-regexp: 0.0.1
-      got: 14.6.5
+      got: 14.6.6
       html-entities: 2.6.0
       iconv-lite: 0.7.0
       private-ip: 3.0.2
@@ -16898,7 +16898,7 @@ snapshots:
 
   '@stylistic/eslint-plugin@5.6.1(eslint@9.39.2)':
     dependencies:
-      '@eslint-community/eslint-utils': 4.9.0(eslint@9.39.2)
+      '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.2)
       '@typescript-eslint/types': 8.51.0
       eslint: 9.39.2
       eslint-visitor-keys: 4.2.1
@@ -17583,7 +17583,7 @@ snapshots:
 
   '@typescript-eslint/utils@8.51.0(eslint@9.39.2)(typescript@5.9.3)':
     dependencies:
-      '@eslint-community/eslint-utils': 4.9.0(eslint@9.39.2)
+      '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.2)
       '@typescript-eslint/scope-manager': 8.51.0
       '@typescript-eslint/types': 8.51.0
       '@typescript-eslint/typescript-estree': 8.51.0(typescript@5.9.3)
@@ -19047,7 +19047,7 @@ snapshots:
       proxy-from-env: 1.0.0
       request-progress: 3.0.0
       supports-color: 8.1.1
-      systeminformation: 5.28.5
+      systeminformation: 5.28.7
       tmp: 0.2.5
       tree-kill: 1.2.2
       untildify: 4.0.0
@@ -19593,7 +19593,7 @@ snapshots:
 
   eslint-plugin-vue@10.6.2(@stylistic/eslint-plugin@5.6.1(eslint@9.39.2))(@typescript-eslint/parser@8.51.0(eslint@9.39.2)(typescript@5.9.3))(eslint@9.39.2)(vue-eslint-parser@10.2.0(eslint@9.39.2)):
     dependencies:
-      '@eslint-community/eslint-utils': 4.9.0(eslint@9.39.2)
+      '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.2)
       eslint: 9.39.2
       natural-compare: 1.4.0
       nth-check: 2.1.1
@@ -19618,7 +19618,7 @@ snapshots:
 
   eslint@9.39.2:
     dependencies:
-      '@eslint-community/eslint-utils': 4.9.0(eslint@9.39.2)
+      '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.2)
       '@eslint-community/regexpp': 4.12.2
       '@eslint/config-array': 0.21.1
       '@eslint/config-helpers': 0.4.2
@@ -19638,7 +19638,7 @@ snapshots:
       eslint-scope: 8.4.0
       eslint-visitor-keys: 4.2.1
       espree: 10.4.0
-      esquery: 1.6.0
+      esquery: 1.7.0
       esutils: 2.0.3
       fast-deep-equal: 3.1.3
       file-entry-cache: 8.0.0
@@ -19665,7 +19665,7 @@ snapshots:
 
   esprima@4.0.1: {}
 
-  esquery@1.6.0:
+  esquery@1.7.0:
     dependencies:
       estraverse: 5.3.0
 
@@ -20348,7 +20348,7 @@ snapshots:
       p-cancelable: 3.0.0
       responselike: 3.0.0
 
-  got@14.6.5:
+  got@14.6.6:
     dependencies:
       '@sindresorhus/is': 7.2.0
       byte-counter: 0.1.0
@@ -22465,7 +22465,7 @@ snapshots:
 
   pngjs@5.0.0: {}
 
-  pnpm@10.26.2: {}
+  pnpm@10.27.0: {}
 
   possible-typed-array-names@1.1.0: {}
 
@@ -24086,7 +24086,7 @@ snapshots:
     dependencies:
       '@pkgr/core': 0.2.9
 
-  systeminformation@5.28.5: {}
+  systeminformation@5.28.7: {}
 
   tagged-tag@1.0.0: {}
 
@@ -24685,7 +24685,7 @@ snapshots:
       eslint-scope: 8.4.0
       eslint-visitor-keys: 4.2.1
       espree: 10.4.0
-      esquery: 1.6.0
+      esquery: 1.7.0
       semver: 7.7.3
     transitivePeerDependencies:
       - supports-color

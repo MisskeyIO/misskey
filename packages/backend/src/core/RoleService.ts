@@ -33,6 +33,7 @@ import type { Packed } from '@/misc/json-schema.js';
 import { FanoutTimelineService } from '@/core/FanoutTimelineService.js';
 import { NotificationService } from '@/core/NotificationService.js';
 import type { OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
+import { getDeliverTargetDimensions, getNoteDimension } from '@/misc/dimension.js';
 
 export type RolePolicies = {
 	gtlAvailable: boolean;
@@ -736,9 +737,13 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		const roles = await this.getUserRoles(note.userId);
 
 		const redisPipeline = this.redisForTimelines.pipeline();
+		const dimensionTargets = getDeliverTargetDimensions(getNoteDimension(note));
 
 		for (const role of roles) {
 			this.fanoutTimelineService.push(`roleTimeline:${role.id}`, note.id, 1000, redisPipeline);
+			for (const dimension of dimensionTargets) {
+				this.fanoutTimelineService.pushDimension(`roleTimeline:${role.id}`, note.id, dimension, redisPipeline);
+			}
 			this.globalEventService.publishRoleTimelineStream(role.id, 'note', note);
 		}
 

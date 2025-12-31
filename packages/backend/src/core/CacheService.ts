@@ -95,7 +95,7 @@ export class CacheService implements OnApplicationShutdown {
 		});
 
 		this.noteDimensionCache = new RedisKVCache<number | null>(this.redisClient, 'noteDimension', {
-			lifetime: 1000 * 60 * 30, // 30m
+			lifetime: 1000 * 60 * 60, // 1h
 			memoryCacheLifetime: 1000 * 10, // 10s
 			fetcher: async () => null,
 			toRedisConverter: (value) => JSON.stringify(value),

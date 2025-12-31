@@ -73,7 +73,10 @@ export class FanoutTimelineEndpointService {
 		const ascending = ps.sinceId && !ps.untilId;
 		const idCompare: (a: string, b: string) => number = ascending ? (a, b) => a < b ? -1 : 1 : (a, b) => a > b ? -1 : 1;
 
-		const redisResult = await this.fanoutTimelineService.getMulti(ps.redisTimelines, ps.untilId, ps.sinceId);
+		const dimension = typeof ps.viewerDimension === 'number' ? ps.viewerDimension : null;
+		const redisResult = dimension == null
+			? await this.fanoutTimelineService.getMulti(ps.redisTimelines, ps.untilId, ps.sinceId)
+			: await this.fanoutTimelineService.getMultiDimension(ps.redisTimelines, dimension, ps.untilId, ps.sinceId);
 
 		// TODO: いい感じにgetMulti内でソート済だからuniqするときにredisResultが全てソート済なのを利用して再ソートを避けたい
 		const redisResultIds = Array.from(new Set(redisResult.flat(1))).sort(idCompare);

@@ -41,6 +41,11 @@ export type FanoutTimelineName = (
 	| `roleTimeline:${string}` // any notes are included
 );
 
+export type FanoutTimelineDimensionName = `${FanoutTimelineName}:${number}`;
+
+// Dimension fanout timelines are time-windowed rather than size-limited.
+const DIMENSION_TIMELINE_RETENTION_MS = 1000 * 60 * 60;
+
 @Injectable()
 export class FanoutTimelineService {
 	constructor(
@@ -73,20 +78,22 @@ export class FanoutTimelineService {
 	}
 
 	@bindThis
-	public get(name: FanoutTimelineName, untilId?: string | null, sinceId?: string | null) {
-		if (untilId && sinceId) {
-			return this.redisForTimelines.lrange('list:' + name, 0, -1)
-				.then(ids => ids.filter(id => id < untilId && id > sinceId).sort((a, b) => a > b ? -1 : 1));
-		} else if (untilId) {
-			return this.redisForTimelines.lrange('list:' + name, 0, -1)
-				.then(ids => ids.filter(id => id < untilId).sort((a, b) => a > b ? -1 : 1));
-		} else if (sinceId) {
-			return this.redisForTimelines.lrange('list:' + name, 0, -1)
-				.then(ids => ids.filter(id => id > sinceId).sort((a, b) => a < b ? -1 : 1));
-		} else {
-			return this.redisForTimelines.lrange('list:' + name, 0, -1)
-				.then(ids => ids.sort((a, b) => a > b ? -1 : 1));
+	public pushDimension(tl: FanoutTimelineName, id: string, dimension: number, pipeline: Redis.ChainableCommander) {
+		const noteTimestamp = this.idService.parse(id).date.getTime();
+		const cutoff = Date.now() - DIMENSION_TIMELINE_RETENTION_MS;
+		if (noteTimestamp <= cutoff) return;
+
+		const name = this.buildDimensionTimelineName(tl, dimension);
+		pipeline.zadd('list:' + name, noteTimestamp, id);
+		if (Math.random() < 0.1) { // 10%の確率でトリム
+			pipeline.zremrangebyscore('list:' + name, '-inf', cutoff);
 		}
+	}
+
+	@bindThis
+	public get(name: FanoutTimelineName, untilId?: string | null, sinceId?: string | null) {
+		return this.redisForTimelines.lrange('list:' + name, 0, -1)
+			.then(ids => this.filterIds(ids, untilId, sinceId));
 	}
 
 	@bindThis
@@ -98,20 +105,51 @@ export class FanoutTimelineService {
 		return pipeline.exec().then(res => {
 			if (res == null) return [];
 			const tls = res.map(r => r[1] as string[]);
-			return tls.map(ids =>
-				(untilId && sinceId)
-					? ids.filter(id => id < untilId && id > sinceId).sort((a, b) => a > b ? -1 : 1)
-					: untilId
-						? ids.filter(id => id < untilId).sort((a, b) => a > b ? -1 : 1)
-						: sinceId
-							? ids.filter(id => id > sinceId).sort((a, b) => a < b ? -1 : 1)
-							: ids.sort((a, b) => a > b ? -1 : 1),
-			);
+			return tls.map(ids => this.filterIds(ids, untilId, sinceId));
+		});
+	}
+
+	@bindThis
+	public async getDimension(name: FanoutTimelineName, dimension: number, untilId?: string | null, sinceId?: string | null) {
+		const key = 'list:' + this.buildDimensionTimelineName(name, dimension);
+		const ids = await this.redisForTimelines.zrevrange(key, 0, -1);
+		return this.filterIds(ids, untilId, sinceId);
+	}
+
+	@bindThis
+	public getMultiDimension(names: FanoutTimelineName[], dimension: number, untilId?: string | null, sinceId?: string | null): Promise<string[][]> {
+		const pipeline = this.redisForTimelines.pipeline();
+		for (const name of names) {
+			const key = 'list:' + this.buildDimensionTimelineName(name, dimension);
+			pipeline.zrevrange(key, 0, -1);
+		}
+		return pipeline.exec().then(res => {
+			if (res == null) return [];
+			const tls = res.map(r => (r?.[1] ?? []) as string[]);
+			return tls.map(ids => this.filterIds(ids, untilId, sinceId));
 		});
 	}
 
 	@bindThis
 	public purge(name: FanoutTimelineName) {
 		return this.redisForTimelines.del('list:' + name);
+	}
+
+	@bindThis
+	public buildDimensionTimelineName(name: FanoutTimelineName, dimension: number): FanoutTimelineDimensionName {
+		return `${name}:${dimension}` as FanoutTimelineDimensionName;
+	}
+
+	private filterIds(ids: string[], untilId?: string | null, sinceId?: string | null): string[] {
+		if (untilId && sinceId) {
+			return ids.filter(id => id < untilId && id > sinceId).sort((a, b) => a > b ? -1 : 1);
+		}
+		if (untilId) {
+			return ids.filter(id => id < untilId).sort((a, b) => a > b ? -1 : 1);
+		}
+		if (sinceId) {
+			return ids.filter(id => id > sinceId).sort((a, b) => a < b ? -1 : 1);
+		}
+		return ids.sort((a, b) => a > b ? -1 : 1);
 	}
 }

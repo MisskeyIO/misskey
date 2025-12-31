@@ -14,6 +14,7 @@ import { IdService } from '@/core/IdService.js';
 import { FanoutTimelineEndpointService } from '@/core/FanoutTimelineEndpointService.js';
 import { MiLocalUser } from '@/models/User.js';
 import { ApiError } from '../../error.js';
+import { normalizeDimension } from '@/misc/dimension.js';
 
 export const meta = {
 	tags: ['notes', 'channels'],
@@ -75,6 +76,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		super(meta, paramDef, async (ps, me) => {
 			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
 			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
+			const viewerDimension = typeof ps.dimension === 'number'
+				? normalizeDimension(ps.dimension, this.serverSettings.dimensions ?? 1)
+				: null;
 			const channel = await this.channelsRepository.findOneBy({
 				id: ps.channelId,
 			});
@@ -89,7 +93,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				return await this.noteEntityService.packMany(
 					await this.getFromDb({ untilId, sinceId, limit: ps.limit, channelId: channel.id }, me),
 					me,
-					{ viewerDimension: ps.dimension },
+					{ viewerDimension },
 				);
 			}
 
@@ -99,7 +103,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				limit: ps.limit,
 				allowPartial: ps.allowPartial,
 				me,
-				viewerDimension: ps.dimension,
+				viewerDimension,
 				useDbFallback: true,
 				redisTimelines: [`channelTimeline:${channel.id}`],
 				excludePureRenotes: false,

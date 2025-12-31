@@ -191,6 +191,7 @@ onUnmounted(() => {
 
 defineExpose({
 	focus,
+	inputEl,
 });
 </script>
 

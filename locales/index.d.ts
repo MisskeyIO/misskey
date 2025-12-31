@@ -11157,9 +11157,9 @@ export interface Locale extends ILocale {
          */
         "numberAbove": ParameterizedString<"current" | "max">;
         /**
-         * 無効な数値です！ 現在 {current}
+         * 無効な入力です！ 現在 {current}
          */
-        "numberInvalid": ParameterizedString<"current">;
+        "invalid": ParameterizedString<"current">;
     };
     "_disabledTimeline": {
         /**

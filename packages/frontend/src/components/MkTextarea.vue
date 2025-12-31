@@ -144,6 +144,11 @@ onUnmounted(() => {
 		autocompleteWorker.detach();
 	}
 });
+
+defineExpose({
+	focus,
+	inputEl,
+});
 </script>
 
 <style lang="scss" module>

@@ -2867,7 +2867,7 @@ _dialog:
   charactersBelow: "You're below the minimum character limit! Currently at {current} of {min}."
   numberBelow: "The value is below the minimum. Currently at {current} of {min}."
   numberAbove: "The value exceeds the maximum. Currently at {current} of {max}."
-  numberInvalid: "The value is not a valid number. Currently {current}."
+  invalid: "The input is invalid. Currently {current}."
 _disabledTimeline:
   title: "Timeline disabled"
   description: "You cannot use this timeline under your current roles."

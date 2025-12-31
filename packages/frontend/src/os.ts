@@ -9,7 +9,7 @@ import { computed, defineAsyncComponent, markRaw, nextTick, ref } from 'vue';
 import { EventEmitter } from 'eventemitter3';
 import insertTextAtCursor from 'insert-text-at-cursor';
 import * as Misskey from 'misskey-js';
-import type { Component, Ref } from 'vue';
+import type { Component, InputHTMLAttributes, Ref } from 'vue';
 import type { ComponentProps as CP } from 'vue-component-type-helpers';
 import type { Form, GetFormResultType } from '@/utility/form.js';
 import type { MenuItem } from '@/types/menu.js';
@@ -411,6 +411,7 @@ export function inputNumber(props: {
 	default: number;
 	min?: number;
 	max?: number;
+	step?: InputHTMLAttributes['step'];
 }): Promise<{
 	canceled: true; result: undefined;
 } | {
@@ -424,6 +425,7 @@ export function inputNumber(props: {
 	default?: number | null;
 	min?: number;
 	max?: number;
+	step?: InputHTMLAttributes['step'];
 }): Promise<{
 	canceled: true; result: undefined;
 } | {
@@ -437,6 +439,7 @@ export function inputNumber(props: {
 	default?: number | null;
 	min?: number;
 	max?: number;
+	step?: InputHTMLAttributes['step'];
 }): Promise<{
 	canceled: true; result: undefined;
 } | {
@@ -453,6 +456,7 @@ export function inputNumber(props: {
 				default: props.default ?? null,
 				min: props.min,
 				max: props.max,
+				step: props.step,
 			},
 		}, {
 			done: result => {

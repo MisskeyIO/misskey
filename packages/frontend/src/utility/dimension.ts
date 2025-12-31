@@ -10,6 +10,7 @@ export async function selectDimension(current?: number | null): Promise<number |
 		default: current ?? prefer.r.dimension.value,
 		min: 0,
 		max,
+		step: 1,
 	});
 	if (canceled || result == null) return undefined;
 	return result;

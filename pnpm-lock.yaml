@@ -547,8 +547,8 @@ catalogs:
       specifier: 16.5.0
       version: 16.5.0
     got:
-      specifier: 14.6.5
-      version: 14.6.5
+      specifier: 14.6.6
+      version: 14.6.6
     hpagent:
       specifier: 1.2.0
       version: 1.2.0
@@ -1284,7 +1284,7 @@ importers:
         version: 4.0.5
       got:
         specifier: 'catalog:'
-        version: 14.6.5
+        version: 14.6.6
       hpagent:
         specifier: 'catalog:'
         version: 1.2.0
@@ -8544,6 +8544,10 @@ packages:
 
   got@14.6.5:
     resolution: {integrity: sha512-Su87c0NNeg97de1sO02gy9I8EmE7DCJ1gzcFLcgGpYeq2PnLg4xz73MWrp6HjqbSsjb6Glf4UBDW6JNyZA6uSg==}
+    engines: {node: '>=20'}
+
+  got@14.6.6:
+    resolution: {integrity: sha512-QLV1qeYSo5l13mQzWgP/y0LbMr5Plr5fJilgAIwgnwseproEbtNym8xpLsDzeZ6MWXgNE6kdWGBjdh3zT/Qerg==}
     engines: {node: '>=20'}
 
   graceful-fs@4.2.11:
@@ -20349,6 +20353,21 @@ snapshots:
       responselike: 3.0.0
 
   got@14.6.5:
+    dependencies:
+      '@sindresorhus/is': 7.2.0
+      byte-counter: 0.1.0
+      cacheable-lookup: 7.0.0
+      cacheable-request: 13.0.17
+      decompress-response: 10.0.0
+      form-data-encoder: 4.1.0
+      http2-wrapper: 2.2.1
+      keyv: 5.5.5
+      lowercase-keys: 3.0.0
+      p-cancelable: 4.0.1
+      responselike: 4.0.2
+      type-fest: 4.41.0
+
+  got@14.6.6:
     dependencies:
       '@sindresorhus/is': 7.2.0
       byte-counter: 0.1.0

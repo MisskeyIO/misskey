@@ -38,7 +38,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<span v-else-if="okButtonDisabledReason === 'invalid'" v-text="i18n.tsx._dialog.invalid({ current: inputValue ?? 'NaN' })"/>
 				</template>
 			</MkInput>
-			<MkTextarea v-if="input.type === 'textarea'" ref="textareaComponent" v-model="inputValue" :placeholder="input.placeholder || undefined" :autocomplete="input.autocomplete">
+			<MkTextarea v-if="input.type === 'textarea'" v-model="inputValue" :placeholder="input.placeholder || undefined" :autocomplete="input.autocomplete">
 				<template #label>{{ input.placeholder }}</template>
 				<template #caption>
 					<span v-if="okButtonDisabledReason === 'charactersExceeded'" v-text="i18n.tsx._dialog.charactersExceeded({ current: (inputValue as string)?.length ?? 0, max: input.maxLength ?? 'NaN' })"/>
@@ -167,7 +167,6 @@ const emit = defineEmits<{
 
 const modal = useTemplateRef('modal');
 const inputComponent = useTemplateRef<InstanceType<typeof MkInput>>('inputComponent');
-const textareaComponent = useTemplateRef<InstanceType<typeof MkTextarea>>('textareaComponent');
 
 const inputValue = ref<string | number | null>(props.input?.default ?? null);
 const selectedValue = ref(props.select?.default ?? null);
@@ -181,10 +180,6 @@ const okWaitInitiated = computed(() => {
 	return false;
 });
 const okDisabled = computed(() => sec.value > 0);
-
-const inputElement = computed(() => {
-	return inputComponent.value?.inputEl ?? textareaComponent.value?.inputEl ?? null;
-});
 
 const okButtonDisabledReason = computed<null | 'charactersExceeded' | 'charactersBelow' | 'numberBelow' | 'numberAbove' | 'invalid'>(() => {
 	if (props.input) {
@@ -206,6 +201,10 @@ const okButtonDisabledReason = computed<null | 'charactersExceeded' | 'character
 			} else if (numericValue != null) {
 				return 'invalid';
 			}
+
+			if (!inputComponent.value?.inputEl.validity.valid) {
+				return 'invalid';
+			}
 		}
 
 		if (props.input.minLength) {
@@ -217,11 +216,6 @@ const okButtonDisabledReason = computed<null | 'charactersExceeded' | 'character
 			if (inputValue.value && (inputValue.value as string).length > props.input.maxLength) {
 				return 'charactersExceeded';
 			}
-		}
-
-		const inputEl = inputElement.value;
-		if (inputEl && !inputEl.validity.valid) {
-			return 'invalid';
 		}
 	}
 

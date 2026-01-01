@@ -202,7 +202,7 @@ const okButtonDisabledReason = computed<null | 'charactersExceeded' | 'character
 				return 'invalid';
 			}
 
-			if (!inputComponent.value?.inputEl.validity.valid) {
+			if (inputComponent.value && !inputComponent.value.inputEl.validity.valid) {
 				return 'invalid';
 			}
 		}

@@ -687,9 +687,6 @@ catalogs:
     openapi-typescript:
       specifier: 7.10.1
       version: 7.10.1
-    os-utils:
-      specifier: 0.0.14
-      version: 0.0.14
     otpauth:
       specifier: 9.4.1
       version: 9.4.1
@@ -873,9 +870,6 @@ catalogs:
     supertest:
       specifier: 7.1.4
       version: 7.1.4
-    systeminformation:
-      specifier: 5.28.7
-      version: 5.28.7
     terser:
       specifier: 5.44.1
       version: 5.44.1
@@ -1376,9 +1370,6 @@ importers:
       oauth2orize-pkce:
         specifier: 'catalog:'
         version: 0.1.2
-      os-utils:
-        specifier: 'catalog:'
-        version: 0.0.14
       otpauth:
         specifier: 'catalog:'
         version: 9.4.1
@@ -1475,9 +1466,6 @@ importers:
       stringz:
         specifier: 'catalog:'
         version: 2.1.0
-      systeminformation:
-        specifier: 'catalog:'
-        version: 5.28.7
       tinycolor2:
         specifier: 'catalog:'
         version: 1.6.0
@@ -10179,9 +10167,6 @@ packages:
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
     engines: {node: '>= 0.8.0'}
-
-  os-utils@0.0.14:
-    resolution: {integrity: sha512-ajB8csaHLBvJOYsHJkp8YdO2FvlBbf/ZxaYQwXXRDyQ84UoE+uTuLXxqd0shekXMX6Qr/pt/DDyLMRAMsgfWzg==}
 
   ospath@1.2.2:
     resolution: {integrity: sha512-o6E5qJV5zkAbIDNhGSIlyOhScKXgQrSRMilfph0clDfM0nEnBOlKlH4sWDmG95BW/CvwNz0vmm7dJVtU2KlMiA==}
@@ -22179,8 +22164,6 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
       word-wrap: 1.2.5
-
-  os-utils@0.0.14: {}
 
   ospath@1.2.2: {}
 

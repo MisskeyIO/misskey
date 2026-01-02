@@ -5,7 +5,11 @@
 
 import { execa } from 'execa';
 import { writeFileSync, existsSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { resolve, dirname } from 'node:path';
+
+const _filename = fileURLToPath(import.meta.url);
+const _dirname = dirname(_filename);
 
 async function main() {
 	if (!process.argv.includes('--no-build')) {
@@ -15,12 +19,12 @@ async function main() {
 		});
 	}
 
-	if (!existsSync('./built')) {
+	if (!existsSync(resolve(_dirname, '..', 'built'))) {
 		throw new Error('`built` directory does not exist.');
 	}
 
 	if (!process.env.MISSKEY_CONFIG_YML) {
-		const configDir = resolve(process.cwd(), '..', '..', '.config');
+		const configDir = resolve(_dirname, '..', '..', '..', '.config');
 		const defaultConfig = resolve(configDir, 'default.yml');
 		const exampleConfig = resolve(configDir, 'example.yml');
 		if (!existsSync(defaultConfig) && existsSync(exampleConfig)) {
@@ -37,7 +41,7 @@ async function main() {
 	const config = loadConfig();
 	const spec = genOpenapiSpec(config, true);
 
-	writeFileSync('./built/api.json', JSON.stringify(spec), 'utf-8');
+	writeFileSync(resolve(_dirname, '..', 'built', 'api.json'), JSON.stringify(spec), 'utf-8');
 }
 
 main().catch(e => {

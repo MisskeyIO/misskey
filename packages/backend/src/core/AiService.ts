@@ -95,13 +95,16 @@ export class AiService {
 	@bindThis
 	private async getCpuFlags(): Promise<string[]> {
 		try {
-			const cpuinfo = await readFile('/proc/cpuinfo', 'utf8');
-			const match = cpuinfo.match(/^(?:flags|Features)\s*:\s*(.+)$/m);
-			if (!match) {
+			const cpuinfo = await readFile('/proc/cpuinfo', 'utf-8');
+			const flagsLine = cpuinfo.split('\n').find(line => line.startsWith('flags'));
+			if (!flagsLine) {
 				return [];
 			}
-			return match[1].trim().split(/\s+/);
-		} catch {
+
+			const flags = flagsLine.split(':')[1]?.trim() || '';
+			return flags.split(/\s+/);
+		} catch (err) {
+			this.logger.warn('Failed to read CPU flags from /proc/cpuinfo', { error: err });
 			return [];
 		}
 	}

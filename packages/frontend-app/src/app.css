@@ -1,0 +1,48 @@
+@import '~@nativescript/core/css/core.css';
+@import '~@nativescript/core/css/default.css';
+
+Page {
+  background-color: #101214;
+  color: #e9eef3;
+}
+
+ActionBar {
+  background-color: #14181e;
+  color: #e9eef3;
+}
+
+TextField {
+  background-color: #1b2129;
+  color: #e9eef3;
+  padding: 10;
+  border-width: 1;
+  border-color: #2a3340;
+  border-radius: 8;
+}
+
+Button {
+  background-color: #3b82f6;
+  color: #ffffff;
+  border-radius: 8;
+  padding: 10 12;
+}
+
+Button.secondary {
+  background-color: #2a3340;
+}
+
+Label.muted {
+  color: #98a2b3;
+}
+
+Label.error {
+  color: #f97066;
+}
+
+.section {
+  margin: 16 20;
+}
+
+.form-field {
+  margin-bottom: 12;
+}

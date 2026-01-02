@@ -1,0 +1,59 @@
+name: frontend-app
+
+on:
+  push:
+    paths:
+      - 'packages/frontend-app/**'
+      - 'pnpm-workspace.yaml'
+      - 'package.json'
+      - '.github/workflows/frontend-app.yml'
+  pull_request:
+    paths:
+      - 'packages/frontend-app/**'
+      - 'pnpm-workspace.yaml'
+      - 'package.json'
+      - '.github/workflows/frontend-app.yml'
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    env:
+      MISSKEY_INSTANCE_URL: https://example.com
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.node-version'
+          cache: 'pnpm'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build Android
+        run: pnpm --filter frontend-app exec ns build android
+
+  build-ios:
+    runs-on: macos-latest
+    env:
+      MISSKEY_INSTANCE_URL: https://example.com
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.node-version'
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build iOS (simulator)
+        run: pnpm --filter frontend-app exec ns build ios --simulator

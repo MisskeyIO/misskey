@@ -874,8 +874,8 @@ catalogs:
       specifier: 7.1.4
       version: 7.1.4
     systeminformation:
-      specifier: 5.28.7
-      version: 5.28.7
+      specifier: 5.28.8
+      version: 5.28.8
     terser:
       specifier: 5.44.1
       version: 5.44.1
@@ -1477,7 +1477,7 @@ importers:
         version: 2.1.0
       systeminformation:
         specifier: 'catalog:'
-        version: 5.28.7
+        version: 5.28.8
       tinycolor2:
         specifier: 'catalog:'
         version: 1.6.0
@@ -11840,6 +11840,12 @@ packages:
 
   systeminformation@5.28.7:
     resolution: {integrity: sha512-9WLwVJm2vs1m05CjSjJb0Ia9EeAVpVulWdCOVwmqcUtyW8rlujT3qDp7pCEvx1e/kfbYufMJPkcjb1E9fTo8xg==}
+    engines: {node: '>=8.0.0'}
+    os: [darwin, linux, win32, freebsd, openbsd, netbsd, sunos, android]
+    hasBin: true
+
+  systeminformation@5.28.8:
+    resolution: {integrity: sha512-W2rXK+tTIoa1svfOEfhKPzJTw2OnoJ2XS57CftQkzvwt9Hj7RC2pfHKFAk8cHH+UkDAlGMW9Sf31kdOu5PZNIA==}
     engines: {node: '>=8.0.0'}
     os: [darwin, linux, win32, freebsd, openbsd, netbsd, sunos, android]
     hasBin: true
@@ -24080,6 +24086,8 @@ snapshots:
       '@pkgr/core': 0.2.9
 
   systeminformation@5.28.7: {}
+
+  systeminformation@5.28.8: {}
 
   tagged-tag@1.0.0: {}
 

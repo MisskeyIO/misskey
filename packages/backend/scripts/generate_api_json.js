@@ -4,7 +4,8 @@
  */
 
 import { execa } from 'execa';
-import { writeFileSync, existsSync } from "node:fs";
+import { writeFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 async function main() {
 	if (!process.argv.includes('--no-build')) {
@@ -16,6 +17,15 @@ async function main() {
 
 	if (!existsSync('./built')) {
 		throw new Error('`built` directory does not exist.');
+	}
+
+	if (!process.env.MISSKEY_CONFIG_YML) {
+		const configDir = resolve(process.cwd(), '..', '..', '.config');
+		const defaultConfig = resolve(configDir, 'default.yml');
+		const exampleConfig = resolve(configDir, 'example.yml');
+		if (!existsSync(defaultConfig) && existsSync(exampleConfig)) {
+			process.env.MISSKEY_CONFIG_YML = 'example.yml';
+		}
 	}
 
 	/** @type {import('../src/config.js')} */

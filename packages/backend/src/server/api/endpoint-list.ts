@@ -82,7 +82,6 @@ export * as 'admin/roles/update-default-policies' from './endpoints/admin/roles/
 export * as 'admin/roles/update-inline-policies' from './endpoints/admin/roles/update-inline-policies.js';
 export * as 'admin/roles/users' from './endpoints/admin/roles/users.js';
 export * as 'admin/send-email' from './endpoints/admin/send-email.js';
-export * as 'admin/server-info' from './endpoints/admin/server-info.js';
 export * as 'admin/show-moderation-logs' from './endpoints/admin/show-moderation-logs.js';
 export * as 'admin/show-user' from './endpoints/admin/show-user.js';
 export * as 'admin/show-users' from './endpoints/admin/show-users.js';
@@ -355,8 +354,6 @@ export * as 'reversi/verify' from './endpoints/reversi/verify.js';
 export * as 'roles/list' from './endpoints/roles/list.js';
 export * as 'roles/notes' from './endpoints/roles/notes.js';
 export * as 'roles/show' from './endpoints/roles/show.js';
-export * as 'roles/users' from './endpoints/roles/users.js';
-export * as 'server-info' from './endpoints/server-info.js';
 export * as 'stats' from './endpoints/stats.js';
 export * as 'sw/register' from './endpoints/sw/register.js';
 export * as 'sw/show-registration' from './endpoints/sw/show-registration.js';

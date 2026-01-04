@@ -103,6 +103,12 @@ export class FederatedInstanceService implements OnApplicationShutdown {
 	}
 
 	@bindThis
+	public async invalidate(host: string): Promise<void> {
+		const normalizedHost = this.utilityService.normalizeHost(host);
+		await this.federatedInstanceCache.delete(normalizedHost);
+	}
+
+	@bindThis
 	public dispose(): void {
 		this.federatedInstanceCache.dispose();
 	}

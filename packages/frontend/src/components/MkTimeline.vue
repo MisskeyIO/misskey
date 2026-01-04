@@ -70,6 +70,7 @@ import MkPagination from '@/components/MkPagination.vue';
 import { i18n } from '@/i18n.js';
 import { infoImageUrl } from '@/instance.js';
 import { generateClientTransactionId } from '@/utility/misskey-api.js';
+import { retryWithFibonacciBackoff } from '@/utility/retry.js';
 
 const props = withDefaults(defineProps<{
 	src: TimelinePageSrc | AllTimelineType;
@@ -118,20 +119,53 @@ const pagingComponent = useTemplateRef('pagingComponent');
 let tlNotesCount = 0;
 const notVisibleNoteData = new Array<object>();
 
+const pendingNoteFetches = new Map<string, Promise<void>>();
+
+const fetchNoteJson = async (id: string) => {
+	const res = await window.fetch(`/notes/${id}.json`, {
+		method: 'GET',
+		credentials: 'include',
+		headers: {
+			'Authorization': 'anonymous',
+			'X-Client-Transaction-Id': generateClientTransactionId('misskey'),
+		},
+	});
+	if (!res.ok) {
+		throw new Error(`Failed to fetch note: ${res.status}`);
+	}
+	return res.json();
+};
+
+const scheduleMinimizedNoteRetry = (data: { id: string }) => {
+	if (pendingNoteFetches.has(data.id)) return;
+
+	const retryPromise = retryWithFibonacciBackoff(() => fetchNoteJson(data.id), {
+		maxAttempts: 3,
+		initialDelayMs: 100,
+	}).then((noteData) => {
+		void prepend(deepMerge(data, noteData));
+	}).catch(() => {
+		// ignore
+	}).finally(() => {
+		pendingNoteFetches.delete(data.id);
+	});
+
+	pendingNoteFetches.set(data.id, retryPromise);
+};
+
 async function fulfillNoteData(data) {
 	// チェックするプロパティはなんでも良い
 	// minimizeが有効でid以外が存在しない場合は取得する
 	if (!data.visibility) {
-		const res = await window.fetch(`/notes/${data.id}.json`, {
-			method: 'GET',
-			credentials: 'include',
-			headers: {
-				'Authorization': 'anonymous',
-				'X-Client-Transaction-Id': generateClientTransactionId('misskey'),
-			},
-		});
-		if (!res.ok) return null;
-		return deepMerge(data, await res.json());
+		if (pendingNoteFetches.has(data.id)) return null;
+
+		try {
+			const noteData = await fetchNoteJson(data.id);
+			return deepMerge(data, noteData);
+		} catch {
+			scheduleMinimizedNoteRetry(data);
+			return null;
+		}
 	}
 
 	return data;

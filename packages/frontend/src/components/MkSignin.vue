@@ -122,10 +122,7 @@ function onPasskeyLogin(): void {
 		misskeyApi('signin-with-passkey', {})
 			.then((res) => {
 				passkeyContext.value = res.context ?? '';
-				credentialRequest.value = parseRequestOptionsFromJSON({
-					// @ts-expect-error TODO: misskey-js由来の型（@simplewebauthn/types）とフロントエンド由来の型（@github/webauthn-json）が合わない
-					publicKey: res.option,
-				});
+				credentialRequest.value = res.option;
 
 				page.value = 'passkey';
 				waiting.value = false;
@@ -138,7 +135,7 @@ function onPasskeyDone(credential: AuthenticationResponseJSON): void {
 	waiting.value = true;
 
 	if (doingPasskeyFromInputPage.value) {
-		misskeyApi<Misskey.entities.SigninWithPasskeyResponse>('signin-with-passkey', {
+		misskeyApi('signin-with-passkey', {
 			credential,
 			context: passkeyContext.value,
 		}).then((res) => {
@@ -153,7 +150,6 @@ function onPasskeyDone(credential: AuthenticationResponseJSON): void {
 		tryLogin({
 			username: username,
 			password: password.value,
-			// @ts-expect-error TODO: misskey-js由来の型（@simplewebauthn/types）とフロントエンド由来の型（@github/webauthn-json）が合わない
 			credential,
 		});
 	}
@@ -261,10 +257,7 @@ async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>): Promi
 				}
 				case 'passkey': {
 					if (webAuthnSupported()) {
-						credentialRequest.value = parseRequestOptionsFromJSON({
-							// @ts-expect-error TODO: misskey-js由来の型（@simplewebauthn/types）とフロントエンド由来の型（@github/webauthn-json）が合わない
-							publicKey: res.authRequest,
-						});
+						credentialRequest.value = res.authRequest;
 						page.value = 'passkey';
 					} else {
 						page.value = 'totp';

@@ -697,12 +697,6 @@ export class MiMeta {
 	})
 	public ugcVisibilityForVisitor: 'all' | 'local' | 'none';
 
-	@Column('varchar', {
-		length: 64,
-		nullable: true,
-	})
-	public googleAnalyticsMeasurementId: string | null;
-
 	@Column('jsonb', {
 		default: [],
 	})

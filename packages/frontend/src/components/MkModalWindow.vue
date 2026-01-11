@@ -66,31 +66,6 @@ function onBgClick() {
 	emit('click');
 }
 
-const onKeydown = (evt) => {
-	if (evt.which === 27) { // Esc
-		if (props.escKeyDisabled) return;
-		evt.preventDefault();
-		evt.stopPropagation();
-		close();
-	}
-};
-
-const ro = new ResizeObserver((entries, observer) => {
-	if (rootEl.value == null || headerEl.value == null) return;
-	bodyWidth.value = rootEl.value.offsetWidth;
-	bodyHeight.value = rootEl.value.offsetHeight - headerEl.value.offsetHeight;
-});
-
-onMounted(() => {
-	if (rootEl.value == null || headerEl.value == null) return;
-	bodyWidth.value = rootEl.value.offsetWidth;
-	bodyHeight.value = rootEl.value.offsetHeight - headerEl.value.offsetHeight;
-	ro.observe(rootEl.value);
-});
-
-onUnmounted(() => {
-	ro.disconnect();
-});
 defineExpose({
 	close,
 });

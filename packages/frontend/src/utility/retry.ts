@@ -3,7 +3,7 @@ export type RetryOptions = {
 	initialDelayMs: number;
 };
 
-const sleep = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
+const sleep = (ms: number) => new Promise<void>(resolve => window.setTimeout(resolve, ms));
 
 export async function retryWithFibonacciBackoff<T>(
 	task: () => Promise<T>,

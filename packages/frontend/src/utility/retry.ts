@@ -28,4 +28,6 @@ export async function retryWithFibonacciBackoff<T>(
 			];
 		}
 	}
+
+	throw new Error('Retry attempts exhausted.');
 }

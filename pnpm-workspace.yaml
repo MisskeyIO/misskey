@@ -79,7 +79,7 @@ catalog:
   '@swc/jest': 0.2.39
   '@syuilo/aiscript': 1.2.1
   '@syuilo/aiscript-v0': npm:@syuilo/aiscript@~0
-  '@tabler/icons-webfont': 3.35.0
+  '@tabler/icons-webfont': 3.36.1
   '@tensorflow/tfjs': 4.22.0
   '@tensorflow/tfjs-core': 4.22.0
   '@tensorflow/tfjs-node': 4.22.0

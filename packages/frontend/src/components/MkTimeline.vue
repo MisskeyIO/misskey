@@ -144,8 +144,8 @@ const scheduleMinimizedNoteRetry = (data: { id: string }) => {
 		initialDelayMs: 100,
 	}).then((noteData) => {
 		void prepend(deepMerge(data, noteData));
-	}).catch(() => {
-		// ignore
+	}).catch((error) => {
+		console.error('Failed to fetch minimized note after retries:', data.id, error);
 	}).finally(() => {
 		pendingNoteFetches.delete(data.id);
 	});

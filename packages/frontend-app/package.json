@@ -1,0 +1,32 @@
+{
+  "name": "frontend-app",
+  "private": true,
+  "main": "src/app.ts",
+  "scripts": {
+    "prepare:instance": "node scripts/configure-instance.mjs",
+    "dev:ios": "npm run prepare:instance && concurrently -k -n vite,ns \"npm run dev:server:ios\" \"wait-on tcp:5173 && npm run ios\"",
+    "dev:android": "npm run prepare:instance && concurrently -k -n vite,ns \"npm run dev:server:android\" \"wait-on tcp:5173 && npm run android\"",
+    "dev:server:ios": "vite serve -- --env.ios --env.hmr",
+    "dev:server:android": "vite serve -- --env.android --env.hmr",
+    "ios": "npm run prepare:instance && ns debug ios --no-hmr",
+    "android": "npm run prepare:instance && ns debug android --no-hmr",
+    "build:android": "npm run prepare:instance && ns build android",
+    "build:ios": "npm run prepare:instance && ns build ios",
+    "clean": "ns clean"
+  },
+  "dependencies": {
+    "@nativescript/core": "catalog:",
+    "@valor/nativescript-websockets": "catalog:",
+    "misskey-js": "workspace:*",
+    "nativescript-vue": "catalog:"
+  },
+  "devDependencies": {
+    "@nativescript/cli": "catalog:",
+    "@nativescript/types": "catalog:",
+    "@types/node": "catalog:",
+    "@nativescript/vite": "catalog:",
+    "concurrently": "catalog:",
+    "typescript": "catalog:",
+    "wait-on": "catalog:"
+  }
+}

@@ -709,8 +709,8 @@ catalogs:
       specifier: 1.10.3
       version: 1.10.3
     pg-query-stream:
-      specifier: 4.10.3
-      version: 4.10.3
+      specifier: 4.11.1
+      version: 4.11.1
     pg-types:
       specifier: 4.1.0
       version: 4.1.0
@@ -1390,7 +1390,7 @@ importers:
         version: 1.10.3
       pg-query-stream:
         specifier: 'catalog:'
-        version: 4.10.3(pg@8.16.3(pg-native@3.5.2))
+        version: 4.11.1(pg@8.16.3(pg-native@3.5.2))
       pg-types:
         specifier: 'catalog:'
         version: 4.1.0
@@ -1480,7 +1480,7 @@ importers:
         version: 4.2.0
       typeorm:
         specifier: 'catalog:'
-        version: 0.3.28(ioredis@5.9.1)(pg-native@3.5.2)(pg-query-stream@4.10.3(pg@8.16.3(pg-native@3.5.2)))(pg@8.16.3(pg-native@3.5.2))
+        version: 0.3.28(ioredis@5.9.1)(pg-native@3.5.2)(pg-query-stream@4.11.1(pg@8.16.3(pg-native@3.5.2)))(pg@8.16.3(pg-native@3.5.2))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -10529,8 +10529,8 @@ packages:
   pg-connection-string@2.9.1:
     resolution: {integrity: sha512-nkc6NpDcvPVpZXxrreI/FOtX3XemeLl8E0qFr6F2Lrm/I8WOnaWNhIPK2Z7OHpw7gh5XJThi6j6ppgNoaT1w4w==}
 
-  pg-cursor@2.15.3:
-    resolution: {integrity: sha512-eHw63TsiGtFEfAd7tOTZ+TLy+i/2ePKS20H84qCQ+aQ60pve05Okon9tKMC+YN3j6XyeFoHnaim7Lt9WVafQsA==}
+  pg-cursor@2.16.1:
+    resolution: {integrity: sha512-ixa4eoGi2nAc3ZHn0xknrN5M9W4LHmzx+h+6J35aaU/lFAtNNqeldCfWTlxJFo2AUVbw0Wtse9SGZZ2OUes0Bg==}
     peerDependencies:
       pg: ^8
 
@@ -10553,8 +10553,8 @@ packages:
   pg-protocol@1.10.3:
     resolution: {integrity: sha512-6DIBgBQaTKDJyxnXaLiLR8wBpQQcGWuAESkRBX/t6OwA8YsqP+iVSiond2EDy6Y/dsGk8rh/jtax3js5NeV7JQ==}
 
-  pg-query-stream@4.10.3:
-    resolution: {integrity: sha512-h2utrzpOIzeT9JfaqfvBbVuvCfBjH86jNfVrGGTbyepKAIOyTfDew0lAt8bbJjs9n/I5bGDl7S2sx6h5hPyJxw==}
+  pg-query-stream@4.11.1:
+    resolution: {integrity: sha512-JF8xvSq/F+0u39Axw7BwlpNiDLkAb26bkDI6t8lMRL1/q7QE6oHoi969hu4v6QAqNZnBKjb40038As5k7xhSMw==}
     peerDependencies:
       pg: ^8
 
@@ -22756,7 +22756,7 @@ snapshots:
 
   pg-connection-string@2.9.1: {}
 
-  pg-cursor@2.15.3(pg@8.16.3(pg-native@3.5.2)):
+  pg-cursor@2.16.1(pg@8.16.3(pg-native@3.5.2)):
     dependencies:
       pg: 8.16.3(pg-native@3.5.2)
 
@@ -22776,10 +22776,10 @@ snapshots:
 
   pg-protocol@1.10.3: {}
 
-  pg-query-stream@4.10.3(pg@8.16.3(pg-native@3.5.2)):
+  pg-query-stream@4.11.1(pg@8.16.3(pg-native@3.5.2)):
     dependencies:
       pg: 8.16.3(pg-native@3.5.2)
-      pg-cursor: 2.15.3(pg@8.16.3(pg-native@3.5.2))
+      pg-cursor: 2.16.1(pg@8.16.3(pg-native@3.5.2))
 
   pg-types@2.2.0:
     dependencies:
@@ -24797,7 +24797,7 @@ snapshots:
 
   typedarray@0.0.6: {}
 
-  typeorm@0.3.28(ioredis@5.9.1)(pg-native@3.5.2)(pg-query-stream@4.10.3(pg@8.16.3(pg-native@3.5.2)))(pg@8.16.3(pg-native@3.5.2)):
+  typeorm@0.3.28(ioredis@5.9.1)(pg-native@3.5.2)(pg-query-stream@4.11.1(pg@8.16.3(pg-native@3.5.2)))(pg@8.16.3(pg-native@3.5.2)):
     dependencies:
       '@sqltools/formatter': 1.2.5
       ansis: 4.2.0
@@ -24818,7 +24818,7 @@ snapshots:
       ioredis: 5.9.1
       pg: 8.16.3(pg-native@3.5.2)
       pg-native: 3.5.2
-      pg-query-stream: 4.10.3(pg@8.16.3(pg-native@3.5.2))
+      pg-query-stream: 4.11.1(pg@8.16.3(pg-native@3.5.2))
     transitivePeerDependencies:
       - babel-plugin-macros
       - supports-color

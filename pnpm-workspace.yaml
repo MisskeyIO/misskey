@@ -253,7 +253,7 @@ catalog:
   pg-native: 3.5.2
   pg-pool: 3.10.1
   pg-protocol: 1.10.3
-  pg-query-stream: 4.10.3
+  pg-query-stream: 4.11.1
   pg-types: 4.1.0
   photoswipe: 5.4.4
   pid-port: 2.0.1

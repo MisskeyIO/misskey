@@ -697,8 +697,8 @@ catalogs:
       specifier: 8.16.3
       version: 8.16.3
     pg-connection-string:
-      specifier: 2.9.1
-      version: 2.9.1
+      specifier: 2.10.0
+      version: 2.10.0
     pg-native:
       specifier: 3.5.2
       version: 3.5.2
@@ -1381,7 +1381,7 @@ importers:
         version: 8.16.3(pg-native@3.5.2)
       pg-connection-string:
         specifier: 'catalog:'
-        version: 2.9.1
+        version: 2.10.0
       pg-pool:
         specifier: 'catalog:'
         version: 3.10.1(patch_hash=8953dbbb66b2e1185925c17e8f6c9244912ba24ad4dc2d1a45fca6a6086a9a84)(pg@8.16.3(pg-native@3.5.2))
@@ -10526,8 +10526,8 @@ packages:
   pg-cloudflare@1.2.7:
     resolution: {integrity: sha512-YgCtzMH0ptvZJslLM1ffsY4EuGaU0cx4XSdXLRFae8bPP4dS5xL1tNB3k2o/N64cHJpwU7dxKli/nZ2lUa5fLg==}
 
-  pg-connection-string@2.9.1:
-    resolution: {integrity: sha512-nkc6NpDcvPVpZXxrreI/FOtX3XemeLl8E0qFr6F2Lrm/I8WOnaWNhIPK2Z7OHpw7gh5XJThi6j6ppgNoaT1w4w==}
+  pg-connection-string@2.10.0:
+    resolution: {integrity: sha512-ur/eoPKzDx2IjPaYyXS6Y8NSblxM7X64deV2ObV57vhjsWiwLvUD6meukAzogiOsu60GO8m/3Cb6FdJsWNjwXg==}
 
   pg-cursor@2.15.3:
     resolution: {integrity: sha512-eHw63TsiGtFEfAd7tOTZ+TLy+i/2ePKS20H84qCQ+aQ60pve05Okon9tKMC+YN3j6XyeFoHnaim7Lt9WVafQsA==}
@@ -22754,7 +22754,7 @@ snapshots:
   pg-cloudflare@1.2.7:
     optional: true
 
-  pg-connection-string@2.9.1: {}
+  pg-connection-string@2.10.0: {}
 
   pg-cursor@2.15.3(pg@8.16.3(pg-native@3.5.2)):
     dependencies:
@@ -22801,7 +22801,7 @@ snapshots:
 
   pg@8.16.3(pg-native@3.5.2):
     dependencies:
-      pg-connection-string: 2.9.1
+      pg-connection-string: 2.10.0
       pg-pool: 3.10.1(patch_hash=8953dbbb66b2e1185925c17e8f6c9244912ba24ad4dc2d1a45fca6a6086a9a84)(pg@8.16.3(pg-native@3.5.2))
       pg-protocol: 1.10.3
       pg-types: 2.2.0

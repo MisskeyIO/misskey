@@ -9608,10 +9608,6 @@ export interface Locale extends ILocale {
          */
         "write:admin:send-email": string;
         /**
-         * サーバーの情報を見る
-         */
-        "read:admin:server-info": string;
-        /**
          * モデレーションログを見る
          */
         "read:admin:show-moderation-log": string;
@@ -9963,10 +9959,6 @@ export interface Locale extends ILocale {
          * ジョブキュー
          */
         "jobQueue": string;
-        /**
-         * サーバーメトリクス
-         */
-        "serverMetric": string;
         /**
          * AiScriptコンソール
          */

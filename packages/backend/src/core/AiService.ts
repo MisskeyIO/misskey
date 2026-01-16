@@ -5,9 +5,9 @@
 
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
+import { readFile } from 'node:fs/promises';
 import { Injectable } from '@nestjs/common';
 import type { NSFWJS, PredictionType } from 'nsfwjs';
-import si from 'systeminformation';
 import { Mutex } from 'async-mutex';
 import { sharpBmp } from '@misskey-dev/sharp-read-bmp';
 import fetch from 'node-fetch';
@@ -94,7 +94,18 @@ export class AiService {
 
 	@bindThis
 	private async getCpuFlags(): Promise<string[]> {
-		const str = await si.cpuFlags();
-		return str.split(/\s+/);
+		try {
+			const cpuinfo = await readFile('/proc/cpuinfo', 'utf-8');
+			const flagsLine = cpuinfo.split('\n').find(line => line.startsWith('flags'));
+			if (!flagsLine) {
+				return [];
+			}
+
+			const flags = flagsLine.split(':')[1]?.trim() || '';
+			return flags.split(/\s+/);
+		} catch (err) {
+			this.logger.warn('Failed to read CPU flags from /proc/cpuinfo', { error: err });
+			return [];
+		}
 	}
 }

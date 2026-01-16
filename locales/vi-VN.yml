@@ -1793,7 +1793,6 @@ _widgets:
   button: "Nút"
   onlineUsers: "Ai đang online"
   jobQueue: "Công việc chờ xử lý"
-  serverMetric: "Thống kê máy chủ"
   aiscript: "AiScript console"
   aiscriptApp: "AiScript App"
   aichan: "Ai"

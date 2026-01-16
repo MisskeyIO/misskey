@@ -35,13 +35,13 @@ catalog:
   '@misskey-dev/sharp-read-bmp': 1.3.0
   '@misskey-dev/summaly': github:MisskeyIO/summaly#5.2.5-io.3
   '@napi-rs/canvas': 0.1.88
-  '@nestjs/common': 11.1.11
-  '@nestjs/core': 11.1.11
-  '@nestjs/platform-express': 11.1.11
-  '@nestjs/testing': 11.1.11
+  '@nestjs/common': 11.1.12
+  '@nestjs/core': 11.1.12
+  '@nestjs/platform-express': 11.1.12
+  '@nestjs/testing': 11.1.12
   '@opensearch-project/opensearch': 3.5.1
   '@opentelemetry/api': ^1.9.0
-  '@opentelemetry/auto-instrumentations-node': ^0.67.3
+  '@opentelemetry/auto-instrumentations-node': ^0.68.0
   '@opentelemetry/exporter-metrics-otlp-http': ^0.210.0
   '@opentelemetry/exporter-trace-otlp-http': ^0.210.0
   '@opentelemetry/resources': ^2.2.0
@@ -182,12 +182,12 @@ catalog:
   eslint: 9.39.2
   eslint-plugin-import: 2.32.0
   eslint-plugin-storybook: 10.1.11
-  eslint-plugin-vue: 10.6.2
+  eslint-plugin-vue: 10.7.0
   estree-walker: 3.0.3
   eventemitter3: 5.0.1
   execa: 9.6.1
   fast-glob: 3.3.3
-  fastify: 5.6.2
+  fastify: 5.7.1
   fastify-http-errors-enhanced: 7.0.1
   fastify-raw-body: 5.0.0
   feed: 5.2.0
@@ -204,7 +204,7 @@ catalog:
   idb-keyval: 6.2.2
   ignore-walk: 8.0.0
   insert-text-at-cursor: 0.3.0
-  ioredis: 5.9.1
+  ioredis: 5.9.2
   ip-cidr: 4.0.2
   ipaddr.js: 2.3.0
   is-file-animated: 1.0.2
@@ -248,22 +248,22 @@ catalog:
   openapi-typescript: 7.10.1
   otpauth: 9.4.1
   parse5: 8.0.0
-  pg: 8.16.3
-  pg-connection-string: 2.9.1
+  pg: 8.17.1
+  pg-connection-string: 2.10.0
   pg-native: 3.5.2
-  pg-pool: 3.10.1
-  pg-protocol: 1.10.3
-  pg-query-stream: 4.10.3
+  pg-pool: 3.11.0
+  pg-protocol: 1.11.0
+  pg-query-stream: 4.11.1
   pg-types: 4.1.0
   photoswipe: 5.4.4
   pid-port: 2.0.1
-  pino: 10.1.1
+  pino: 10.2.0
   pino-pretty: 13.1.3
   pkce-challenge: 5.0.1
   pnpm: 10.28.0
   postcss: 8.5.6
-  postcss-preset-env: 11.0.1
-  prettier: 3.7.4
+  postcss-preset-env: 11.1.1
+  prettier: 3.8.0
   probe-image-size: 7.2.3
   promise-limit: 2.7.0
   psl: 1.15.0
@@ -308,7 +308,7 @@ catalog:
   strict-event-emitter-types: 2.0.0
   stringz: 2.1.0
   supertest: 7.2.2
-  terser: 5.44.1
+  terser: 5.46.0
   textarea-caret: 3.1.0
   three: 0.182.0
   throttle-debounce: 5.0.2
@@ -400,4 +400,4 @@ overrides:
 
 patchedDependencies:
   nsfwjs@4.2.1: patches/nsfwjs@4.2.1.patch
-  pg-pool@3.10.1: patches/pg-pool@3.10.1.patch
+  pg-pool@3.11.0: patches/pg-pool@3.11.0.patch

@@ -72,7 +72,7 @@ export class FederatedInstanceService implements OnApplicationShutdown {
 
 	@bindThis
 	public async fetch(host: string): Promise<MiInstance | null> {
-		host = this.utilityService.toPuny(host);
+		host = this.utilityService.normalizeHost(host);
 
 		const cached = await this.federatedInstanceCache.get(host);
 		if (cached !== undefined) return cached;

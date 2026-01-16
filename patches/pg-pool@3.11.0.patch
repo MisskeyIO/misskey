@@ -1,5 +1,5 @@
 diff --git a/index.js b/index.js
-index b3d9ada966db042d53e1b782230ccd1bc16ad33d..ef5d5a11b1877c87ff19d0c0a1531d8cf0ec8bc4 100644
+index 3e505f797b5c52b90514001327604b24c738cc03..59c258c61833a427ab85aa6b45abee55aff3b123 100644
 --- a/index.js
 +++ b/index.js
 @@ -244,7 +244,7 @@ class Pool extends EventEmitter {

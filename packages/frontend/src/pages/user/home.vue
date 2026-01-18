@@ -4,228 +4,165 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<div class="_spacer" :style="{ '--MI_SPACER-w': narrow ? '800px' : '1100px' }">
-	<div ref="rootEl" class="ftskorzw" :class="{ wide: !narrow }" style="container-type: inline-size;">
-		<div class="main _gaps">
-			<div v-if="user.isSuspended" class="punished"><i class="ti ti-alert-triangle" style="margin-right: 8px;"></i> {{ i18n.ts.userSuspended }}</div>
-			<div v-if="user.isLimited" class="punished"><i class="ti ti-alert-triangle" style="margin-right: 8px;"></i> {{ i18n.ts.userLimited }}</div>
-			<div v-if="user.isSilenced" class="punished"><i class="ti ti-alert-triangle" style="margin-right: 8px;"></i> {{ i18n.ts.userSilenced }}</div>
+<component :is="prefer.s.enablePullToRefresh ? MkPullToRefresh : 'div'" :refresher="() => reload()">
+	<div class="_spacer" :style="{ '--MI_SPACER-w': narrow ? '800px' : '1100px' }">
+		<div ref="rootEl" class="ftskorzw" :class="{ wide: !narrow }" style="container-type: inline-size;">
+			<div class="main _gaps">
+				<div v-if="user.isSuspended" class="punished"><i class="ti ti-alert-triangle" style="margin-right: 8px;"></i> {{ i18n.ts.userSuspended }}</div>
+				<div v-if="user.isLimited" class="punished"><i class="ti ti-alert-triangle" style="margin-right: 8px;"></i> {{ i18n.ts.userLimited }}</div>
+				<div v-if="user.isSilenced" class="punished"><i class="ti ti-alert-triangle" style="margin-right: 8px;"></i> {{ i18n.ts.userSilenced }}</div>
 
-			<div class="profile _gaps">
-				<MkAccountMoved v-if="user.movedTo" :movedTo="user.movedTo"/>
-				<MkAccountMoved v-if="movedFromLog" :movedFrom="movedFromLog[0]?.movedFromId"/>
-				<MkRemoteCaution v-if="user.host != null" :href="user.url ?? user.uri!"/>
-				<MkInfo v-if="user.host == null && user.username.includes('.')">{{ i18n.ts.isSystemAccount }}</MkInfo>
+				<div class="profile _gaps">
+					<MkAccountMoved v-if="user.movedTo" :movedTo="user.movedTo"/>
+					<MkRemoteCaution v-if="user.host != null" :href="user.url ?? user.uri!"/>
+					<MkInfo v-if="user.host == null && user.username.includes('.')">{{ i18n.ts.isSystemAccount }}</MkInfo>
 
-				<div :key="user.id" class="main _panel">
-					<div class="banner-container" :style="style">
-						<div ref="bannerEl" class="banner" :style="style"></div>
-						<div class="fade"></div>
+					<div :key="user.id" class="main _panel">
+						<div ref="bannerEl" class="banner-container">
+							<div class="banner" :style="style"></div>
+							<div class="fade"></div>
+							<div class="title">
+								<MkUserName class="name" :user="user" :nowrap="true"/>
+								<div class="bottom">
+									<span class="username"><MkAcct :user="user" :detail="true"/></span>
+									<span v-if="user.isLocked"><i class="ti ti-lock"></i></span>
+									<span v-if="user.isBot"><i class="ti ti-robot"></i></span>
+									<button v-if="$i && !isEditingMemo && !memoDraft" class="_button add-note-button" @click="showMemoTextarea">
+										<i class="ti ti-edit"/> {{ i18n.ts.addMemo }}
+									</button>
+								</div>
+							</div>
+							<span v-if="$i && $i.id != user.id && user.isFollowed" class="followed">{{ i18n.ts.followsYou }}</span>
+							<div class="actions">
+								<button class="menu _button" @click="menu"><i class="ti ti-dots"></i></button>
+								<MkFollowButton v-if="$i?.id != user.id" v-model:user="user" :inline="true" :transparent="false" :full="true" class="koudoku"/>
+							</div>
+						</div>
+						<MkAvatar class="avatar" :user="user" indicator/>
 						<div class="title">
-							<MkUserName class="name" :user="user" :nowrap="true"/>
+							<MkUserName :user="user" :nowrap="false" class="name"/>
 							<div class="bottom">
 								<span class="username"><MkAcct :user="user" :detail="true"/></span>
-								<span v-if="user.isAdmin" :title="i18n.ts.isAdmin" style="color: var(--MI_THEME-badge);"><i class="ti ti-shield"></i></span>
-								<span v-if="user.isLocked" :title="i18n.ts.isLocked"><i class="ti ti-lock"></i></span>
-								<span v-if="user.isBot" :title="i18n.ts.isBot"><i class="ti ti-robot"></i></span>
-								<button v-if="$i && !isEditingMemo && !memoDraft" class="_button add-note-button" @click="showMemoTextarea">
-									<i class="ti ti-edit"/> {{ i18n.ts.addMemo }}
-								</button>
+								<span v-if="user.isLocked"><i class="ti ti-lock"></i></span>
+								<span v-if="user.isBot"><i class="ti ti-robot"></i></span>
 							</div>
 						</div>
-						<span v-if="$i && $i.id != user.id && user.isFollowed" class="followed">{{ i18n.ts.followsYou }}</span>
-						<div class="actions">
-							<button class="menu _button" @click="menu"><i class="ti ti-dots"></i></button>
-							<MkFollowButton v-if="$i?.id != user.id" v-model:user="user" :inline="true" :transparent="false" :full="true" class="koudoku"/>
+						<div v-if="user.followedMessage != null" class="followedMessage">
+							<MkFukidashi class="fukidashi" :tail="narrow ? 'none' : 'left'" negativeMargin>
+								<div class="messageHeader">{{ i18n.ts.messageToFollower }}</div>
+								<div><MkSparkle><Mfm :plain="true" :text="user.followedMessage" :author="user" class="_selectable"/></MkSparkle></div>
+							</MkFukidashi>
 						</div>
-					</div>
-					<MkAvatar class="avatar" :user="user" indicator/>
-					<div class="title">
-						<MkUserName :user="user" :nowrap="false" class="name"/>
-						<div class="bottom">
-							<span class="username"><MkAcct :user="user" :detail="true"/></span>
-							<span v-if="user.isAdmin" :title="i18n.ts.isAdmin" style="color: var(--MI_THEME-badge);"><i class="ti ti-shield"></i></span>
-							<span v-if="user.isLocked" :title="i18n.ts.isLocked"><i class="ti ti-lock"></i></span>
-							<span v-if="user.isBot" :title="i18n.ts.isBot"><i class="ti ti-robot"></i></span>
+						<div v-if="user.roles.length > 0" class="roles">
+							<span v-for="role in user.roles" :key="role.id" v-tooltip="role.description" class="role" :style="{ '--color': role.color ?? '' }">
+								<MkA v-adaptive-bg :to="`/roles/${role.id}`">
+									<img v-if="role.iconUrl" style="height: 1.3em; vertical-align: -22%;" :src="role.iconUrl"/>
+									{{ role.name }}
+								</MkA>
+							</span>
 						</div>
-					</div>
-					<div v-if="user.followedMessage != null" class="followedMessage">
-						<MkFukidashi class="fukidashi" :tail="narrow ? 'none' : 'left'" negativeMargin>
-							<div class="messageHeader">{{ i18n.ts.messageToFollower }}</div>
-							<div><MkSparkle><Mfm :plain="true" :text="user.followedMessage" :author="user" class="_selectable"/></MkSparkle></div>
-						</MkFukidashi>
-					</div>
-					<div v-if="user.roles.length > 0" class="roles">
-						<span v-for="role in user.roles" :key="role.id" v-tooltip="role.description" class="role" :style="{ '--color': role.color }">
-							<MkA v-adaptive-bg :to="`/roles/${role.id}`">
-								<img v-if="role.iconUrl" style="height: 1.3em; vertical-align: -22%;" :src="role.iconUrl"/>
-								{{ role.name }}
+						<div v-if="iAmModerator" class="moderationNote">
+							<MkTextarea v-if="editModerationNote || (moderationNote != null && moderationNote !== '')" v-model="moderationNote" manualSave>
+								<template #label>{{ i18n.ts.moderationNote }}</template>
+								<template #caption>{{ i18n.ts.moderationNoteDescription }}</template>
+							</MkTextarea>
+							<div v-else>
+								<MkButton small @click="editModerationNote = true">{{ i18n.ts.addModerationNote }}</MkButton>
+							</div>
+						</div>
+						<div v-if="isEditingMemo || memoDraft" class="memo" :class="{'no-memo': !memoDraft}">
+							<div class="heading" v-text="i18n.ts.memo"/>
+							<textarea
+								ref="memoTextareaEl"
+								v-model="memoDraft"
+								rows="1"
+								@focus="isEditingMemo = true"
+								@blur="updateMemo"
+								@input="adjustMemoTextarea"
+							/>
+						</div>
+						<div class="description">
+							<MkOmit>
+								<Mfm v-if="user.description" :text="user.description" :isNote="false" :author="user" class="_selectable"/>
+								<p v-else class="empty">{{ i18n.ts.noAccountDescription }}</p>
+							</MkOmit>
+						</div>
+						<div class="fields system">
+							<dl v-if="user.location" class="field">
+								<dt class="name"><i class="ti ti-map-pin ti-fw"></i> {{ i18n.ts.location }}</dt>
+								<dd class="value">{{ user.location }}</dd>
+							</dl>
+							<dl v-if="user.birthday" class="field">
+								<dt class="name"><i class="ti ti-cake ti-fw"></i> {{ i18n.ts.birthday }}</dt>
+								<dd class="value">{{ user.birthday.replace('-', '/').replace('-', '/') }} ({{ i18n.tsx.yearsOld({ age }) }})</dd>
+							</dl>
+							<dl class="field">
+								<dt class="name"><i class="ti ti-calendar ti-fw"></i> {{ i18n.ts.registeredDate }}</dt>
+								<dd class="value">{{ dateString(user.createdAt) }} (<MkTime :time="user.createdAt"/>)</dd>
+							</dl>
+						</div>
+						<div v-if="user.fields.length > 0" class="fields">
+							<dl v-for="(field, i) in user.fields" :key="i" class="field">
+								<dt class="name">
+									<Mfm :text="field.name" :author="user" :plain="true" :colored="false" class="_selectable"/>
+								</dt>
+								<dd class="value">
+									<Mfm :text="field.value" :author="user" :colored="false" class="_selectable"/>
+									<i v-if="user.verifiedLinks.includes(field.value)" v-tooltip:dialog="i18n.ts.verifiedLink" class="ti ti-circle-check" :class="$style.verifiedLink"></i>
+								</dd>
+							</dl>
+						</div>
+						<div class="status">
+							<MkA :to="userPage(user, 'notes')">
+								<b>{{ number(user.notesCount) }}</b>
+								<span>{{ i18n.ts.notes }}</span>
 							</MkA>
-						</span>
-					</div>
-					<div v-if="iAmModerator" class="moderationNote">
-						<MkTextarea v-if="editModerationNote || (moderationNote != null && moderationNote !== '')" v-model="moderationNote" manualSave>
-							<template #label>{{ i18n.ts.moderationNote }}</template>
-							<template #caption>{{ i18n.ts.moderationNoteDescription }}</template>
-						</MkTextarea>
-						<div v-else>
-							<MkButton small @click="editModerationNote = true">{{ i18n.ts.addModerationNote }}</MkButton>
+							<MkA v-if="isFollowingVisibleForMe(user)" :to="userPage(user, 'following')">
+								<b>{{ number(user.followingCount) }}</b>
+								<span>{{ i18n.ts.following }}</span>
+							</MkA>
+							<MkA v-if="isFollowersVisibleForMe(user)" :to="userPage(user, 'followers')">
+								<b>{{ number(user.followersCount) }}</b>
+								<span>{{ i18n.ts.followers }}</span>
+							</MkA>
 						</div>
-					</div>
-					<div v-if="isEditingMemo || memoDraft" class="memo" :class="{'no-memo': !memoDraft}">
-						<div class="heading" v-text="i18n.ts.memo"/>
-						<textarea
-							ref="memoTextareaEl"
-							v-model="memoDraft"
-							rows="1"
-							@focus="isEditingMemo = true"
-							@blur="updateMemo"
-							@input="adjustMemoTextarea"
-						/>
-					</div>
-					<div class="description">
-						<MkOmit>
-							<Mfm v-if="user.description" :text="user.description" :isNote="false" :author="user" class="_selectable"/>
-							<p v-else class="empty">{{ i18n.ts.noAccountDescription }}</p>
-						</MkOmit>
-					</div>
-					<MkContainer v-if="$i && $i.id == user.id && user?.mutualLinkSections?.slice(0, $i.policies.mutualLinkSectionLimit).length > 0" :showHeader="false" :max-height="200" class="fields" :style="{borderRadius: 0}">
-						<div v-for="(section, index) in user?.mutualLinkSections.slice(0, $i.policies.mutualLinkSectionLimit)" :key="index" :class="$style.mutualLinkSections">
-							<span v-if="section.name">{{ section.name }}</span>
-							<div :class="$style.mutualLinks">
-								<div v-for="mutualLink in section.mutualLinks.slice(0, $i.policies.mutualLinkLimit)" :key="mutualLink.id">
-									<MkLink :hideIcon="true" :url="mutualLink.url">
-										<img :class="$style.mutualLinkImg" :src="mutualLink.imgSrc" :alt="mutualLink.description"/>
-									</MkLink>
-								</div>
-							</div>
-						</div>
-					</MkContainer>
-					<MkContainer v-else-if="user?.mutualLinkSections?.length > 0" :showHeader="false" :max-height="200" class="fields" :style="{borderRadius: 0}">
-						<div v-for="(section, index) in user?.mutualLinkSections" :key="index" :class="$style.mutualLinkSections">
-							<span v-if="section.name">{{ section.name }}</span>
-							<div :class="$style.mutualLinks">
-								<div v-for="mutualLink in section.mutualLinks" :key="mutualLink.id">
-									<MkLink :hideIcon="true" :url="mutualLink.url">
-										<img :class="$style.mutualLinkImg" :src="mutualLink.imgSrc" :alt="mutualLink.description"/>
-									</MkLink>
-								</div>
-							</div>
-						</div>
-					</MkContainer>
-					<div class="fields system">
-						<dl v-if="user.location" class="field">
-							<dt class="name"><i class="ti ti-map-pin ti-fw"></i> {{ i18n.ts.location }}</dt>
-							<dd class="value">{{ user.location }}</dd>
-						</dl>
-						<dl v-if="user.birthday" class="field">
-							<dt class="name"><i class="ti ti-cake ti-fw"></i> {{ i18n.ts.birthday }}</dt>
-							<dd class="value">{{ user.birthday.replace('-', '/').replace('-', '/') }} ({{ i18n.tsx.yearsOld({ age }) }})</dd>
-						</dl>
-						<dl class="field">
-							<dt class="name"><i class="ti ti-calendar ti-fw"></i> {{ i18n.ts.registeredDate }}</dt>
-							<dd class="value">{{ dateString(user.createdAt) }} (<MkTime :time="user.createdAt"/>)</dd>
-						</dl>
-					</div>
-					<div v-if="user.fields.length > 0 || userSkebStatus" class="fields">
-						<dl v-for="(field, i) in user.fields" :key="i" class="field">
-							<dt class="name">
-								<Mfm :text="field.name" :author="user" :plain="true" :colored="false" class="_selectable"/>
-							</dt>
-							<dd class="value">
-								<Mfm :text="field.value" :author="user" :colored="false" class="_selectable"/>
-								<i v-if="user.verifiedLinks.includes(field.value)" v-tooltip:dialog="i18n.ts.verifiedLink" class="ti ti-circle-check" :class="$style.verifiedLink"></i>
-							</dd>
-						</dl>
-						<dl v-if="userSkebStatus" class="field">
-							<dt class="name">
-								<a href="https://skeb.jp/" target="_blank" rel="noopener" style="display: flex; gap: 2px; align-items: center; justify-content: center;">
-									<!--
-										*** LICENSE NOTICE ***
-										* This SVG is derived from the https://skeb.jp/ website, All rights reserved to *Skeb Inc.* https://skeb.co.jp/
-										* This resource SHOULD NOT be considered as a part of this project that has licensed under AGPL-3.0-only
-									-->
-									<svg class="ti ti-fw" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-										<linearGradient id="a" x1="14.645309%" x2="85.354691%" y1="14.645309%" y2="85.363492%">
-											<stop offset=".2" stop-color="#30b396"/>
-											<stop offset="1" stop-color="#1e5e71"/>
-										</linearGradient>
-										<g fill="none">
-											<circle cx="19.99375" cy="19.98125" fill="url(#a)" r="17.753125"/>
-											<path d="m18.784375 13.9875-7.35625 21.546875c-.8125-.446875-1.58125-.959375-2.309375-1.525l1.134375-3.26875-2.528125-.86875.859375-2.56875 2.528125.86875 1.728125-5.05625-2.528125-.86875.86875-2.5375 2.528125.86875 1.728125-5.05625-2.528125-.86875.86875-2.5375 2.528125.86875 1.6875-4.99375-2.496875-.909375.440625-1.26875 5.05625 1.728125-.378125 1.1-1.76875 5.184375-.059375.159375zm-12.996875 16.640625c.6625.884375 1.40625 1.703125 2.21875 2.446875l.51875-1.515625zm3.29375-13.01875 3.8 1.296875.865625-2.534375-3.8-1.296875zm-2.590625 7.590625 3.8 1.296875.865625-2.534375-3.8-1.296875zm31.259375-5.21875c0-2.534375-.534375-4.940625-1.490625-7.11875l-13.325-4.559375-9.603125 28.134375c2.059375.834375 4.30625 1.3 6.665625 1.3 9.80625 0 17.753125-7.946875 17.753125-17.753125zm-26.071875-9.971875 3.8 1.296875.865625-2.534375-3.8-1.296875z" fill="#fff"/><path d="m19.99375 2.23125c9.80625 0 17.753125 7.946875 17.753125 17.753125s-7.946875 17.753125-17.753125 17.753125-17.753125-7.946875-17.753125-17.753125 7.946875-17.753125 17.753125-17.753125m0-2.228125c-11.034375 0-19.98125 8.946875-19.98125 19.98125s8.946875 19.98125 19.98125 19.98125 19.98125-8.946875 19.98125-19.98125-8.946875-19.98125-19.98125-19.98125z" fill="#1e5e71"/>
-										</g>
-									</svg>
-									<span>Skeb</span>
-									<i class="ti ti-external-link" style="font-size: .9em;"></i>
-								</a>
-							</dt>
-							<dd class="value">
-								<a :href="`https://skeb.jp/@${userSkebStatus.screenName}`" target="_blank" rel="noopener" style="display: flex; gap: 2px; align-items: center;">
-									<span v-if="userSkebStatus.isAcceptable" :class="$style.skebAcceptable">
-										{{ i18n.ts._skebStatus.seeking }}
-									</span>
-									<span v-else-if="userSkebStatus.isCreator" :class="$style.skebStopped">
-										{{ i18n.ts._skebStatus.stopped }}
-									</span>
-									<span v-else :class="$style.skebClient">
-										{{ i18n.ts._skebStatus.client }}
-									</span>
-									<Mfm :text="buildSkebStatus()" :author="user" :nyaize="false" :colored="false"/>
-									<i class="ti ti-external-link" style="font-size: .9em;"></i>
-								</a>
-							</dd>
-						</dl>
 					</div>
 
-					<div class="status">
-						<MkA :to="userPage(user)">
-							<b>{{ number(user.notesCount) }}</b>
-							<span>{{ i18n.ts.notes }}</span>
-						</MkA>
-						<MkA v-if="isFollowingVisibleForMe(user)" :to="userPage(user, 'following')">
-							<b>{{ number(user.followingCount) }}</b>
-							<span>{{ i18n.ts.following }}</span>
-						</MkA>
-						<MkA v-if="isFollowersVisibleForMe(user)" :to="userPage(user, 'followers')">
-							<b>{{ number(user.followersCount) }}</b>
-							<span>{{ i18n.ts.followers }}</span>
-						</MkA>
+				</div>
+
+				<div class="contents _gaps">
+					<div v-if="user.pinnedNotes.length > 0" class="_gaps">
+						<MkNote v-for="note in user.pinnedNotes" :key="note.id" class="note _panel" :note="note" :pinned="true"/>
+					</div>
+					<MkInfo v-else-if="$i && $i.id === user.id">{{ i18n.ts.userPagePinTip }}</MkInfo>
+					<template v-if="narrow">
+						<MkLazy>
+							<XFiles :key="user.id" :user="user" @showMore="emit('showMoreFiles')"/>
+						</MkLazy>
+						<MkLazy>
+							<XActivity :key="user.id" :user="user"/>
+						</MkLazy>
+					</template>
+					<div v-if="!disableNotes">
+						<MkLazy>
+							<XTimeline :user="user"/>
+						</MkLazy>
 					</div>
 				</div>
 			</div>
-
-			<div class="contents _gaps">
-				<div v-if="user.pinnedNotes.length > 0" class="_gaps">
-					<MkNote v-for="note in user.pinnedNotes" :key="note.id" class="note _panel" :note="note" :pinned="true"/>
-				</div>
-				<MkInfo v-else-if="$i && $i.id === user.id">{{ i18n.ts.userPagePinTip }}</MkInfo>
-				<template v-if="narrow">
-					<MkLazy>
-						<XFiles :key="user.id" :user="user" @unfold="emit('unfoldFiles')"/>
-					</MkLazy>
-					<MkLazy>
-						<XActivity :key="user.id" :user="user"/>
-					</MkLazy>
-				</template>
-				<div v-if="!disableNotes">
-					<MkLazy>
-						<XTimeline :user="user"/>
-					</MkLazy>
-				</div>
+			<div v-if="!narrow" class="sub _gaps" style="container-type: inline-size;">
+				<XFiles :key="user.id" :user="user" @showMore="emit('showMoreFiles')"/>
+				<XActivity :key="user.id" :user="user"/>
 			</div>
-		</div>
-		<div v-if="!narrow" class="sub _gaps" style="container-type: inline-size;">
-			<XFiles :key="user.id" :user="user" @unfold="emit('unfoldFiles')"/>
-			<XActivity :key="user.id" :user="user"/>
 		</div>
 	</div>
-</div>
+</component>
 </template>
 
 <script lang="ts" setup>
-import { defineAsyncComponent, computed, onMounted, onUnmounted, nextTick, watch, ref } from 'vue';
+import { defineAsyncComponent, computed, onMounted, onUnmounted, onActivated, onDeactivated, nextTick, watch, ref, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
-import { getScrollPosition } from '@@/js/scroll.js';
+import { getScrollContainer } from '@@/js/scroll.js';
 import MkNote from '@/components/MkNote.vue';
 import MkFollowButton from '@/components/MkFollowButton.vue';
 import MkAccountMoved from '@/components/MkAccountMoved.vue';
@@ -250,8 +187,7 @@ import { useRouter } from '@/router.js';
 import { getStaticImageUrl } from '@/utility/media-proxy.js';
 import MkSparkle from '@/components/MkSparkle.vue';
 import { prefer } from '@/preferences.js';
-import MkLink from '@/components/MkLink.vue';
-import MkContainer from '@/components/MkContainer.vue';
+import MkPullToRefresh from '@/components/MkPullToRefresh.vue';
 
 function calcAge(birthdate: string): number {
 	const date = new Date(birthdate);
@@ -274,32 +210,32 @@ const XTimeline = defineAsyncComponent(() => import('./index.timeline.vue'));
 
 const props = withDefaults(defineProps<{
 	user: Misskey.entities.UserDetailed;
-	/** Test only; MkNotes currently causes problems in vitest */
-	disableNotes: boolean;
+	/** Test only; MkNotesTimeline currently causes problems in vitest */
+	disableNotes?: boolean;
 }>(), {
 	disableNotes: false,
 });
 
 const emit = defineEmits<{
-	(ev: 'unfoldFiles'): void;
+	(ev: 'showMoreFiles'): void;
 }>();
 
 const router = useRouter();
 
 const user = ref(props.user);
-const userSkebStatus = ref<Misskey.Endpoints['users/get-skeb-status']['res'] | null>(null);
-const parallaxAnimationId = ref<null | number>(null);
+
 const narrow = ref<null | boolean>(null);
-const rootEl = ref<null | HTMLElement>(null);
-const bannerEl = ref<null | HTMLElement>(null);
-const memoTextareaEl = ref<null | HTMLElement>(null);
+const rootEl = useTemplateRef('rootEl');
+const bannerEl = useTemplateRef('bannerEl');
+const memoTextareaEl = useTemplateRef('memoTextareaEl');
 const memoDraft = ref(props.user.memo);
 const isEditingMemo = ref(false);
-const moderationNote = ref(props.user.moderationNote);
+const moderationNote = ref(props.user.moderationNote ?? '');
 const editModerationNote = ref(false);
-const movedFromLog = ref<null | { movedFromId: string; }[]>(null);
+const userSkebStatus = ref<any | null>(null);
 
 watch(moderationNote, async () => {
+	if (!iAmModerator) return;
 	await misskeyApi('admin/update-user-note', { userId: props.user.id, text: moderationNote.value });
 });
 
@@ -317,39 +253,12 @@ const style = computed(() => {
 });
 
 const age = computed(() => {
-	return calcAge(props.user.birthday);
+	return props.user.birthday ? calcAge(props.user.birthday) : NaN;
 });
 
 function menu(ev: MouseEvent) {
 	const { menu, cleanup } = getUserMenu(user.value, router);
 	os.popupMenu(menu, ev.currentTarget ?? ev.target).finally(cleanup);
-}
-
-async function fetchMovedFromLog() {
-	if (!props.user.id) {
-		movedFromLog.value = null;
-		return;
-	}
-
-	movedFromLog.value = await misskeyApi('admin/show-user-account-move-logs', { movedToId: props.user.id });
-}
-
-function parallaxLoop() {
-	parallaxAnimationId.value = window.requestAnimationFrame(parallaxLoop);
-	parallax();
-}
-
-function parallax() {
-	const banner = bannerEl.value;
-	if (banner == null) return;
-
-	const top = getScrollPosition(rootEl.value);
-
-	if (top < 0) return;
-
-	const z = 1.75; // 奥行き(小さいほど奥)
-	const pos = -(top / z);
-	banner.style.backgroundPosition = `center calc(50% - ${pos}px)`;
 }
 
 function showMemoTextarea() {
@@ -411,16 +320,49 @@ function buildSkebStatus(): string {
 	return '';
 }
 
-watch([props.user], () => {
-	memoDraft.value = props.user.memo;
+watch(() => props.user, (newUser) => {
+	user.value = newUser;
+	memoDraft.value = newUser.memo;
+	moderationNote.value = newUser.moderationNote ?? '';
 	fetchSkebStatus();
-	if ($i?.isModerator) {
-		fetchMovedFromLog();
+}, { immediate: true });
+
+async function reload() {
+	// TODO
+}
+
+let bannerParallaxResizeObserver: ResizeObserver | null = null;
+
+function calcBannerParallax() {
+	if (!bannerEl.value || !CSS.supports('view-timeline-inset', 'auto 100px')) return;
+	const elRect = bannerEl.value.getBoundingClientRect();
+	const scrollEl = getScrollContainer(bannerEl.value);
+	const scrollPosition = scrollEl?.scrollTop ?? window.scrollY;
+	const scrollContainerHeight = scrollEl?.clientHeight ?? window.innerHeight;
+	const scrollContainerTop = scrollEl?.getBoundingClientRect().top ?? 0;
+	const top = scrollPosition + elRect.top - scrollContainerTop;
+	const bottom = scrollContainerHeight - top;
+	bannerEl.value.style.setProperty('--bannerParallaxInset', `auto ${bottom}px`);
+}
+
+function initCalcBannerParallax() {
+	const scrollEl = bannerEl.value ? getScrollContainer(bannerEl.value) : null;
+	if (scrollEl != null && CSS.supports('view-timeline-inset', 'auto 100px')) {
+		bannerParallaxResizeObserver = new ResizeObserver(() => {
+			calcBannerParallax();
+		});
+		bannerParallaxResizeObserver.observe(scrollEl);
 	}
-});
+}
+
+function disposeBannerParallaxResizeObserver() {
+	if (bannerParallaxResizeObserver) {
+		bannerParallaxResizeObserver.disconnect();
+		bannerParallaxResizeObserver = null;
+	}
+}
 
 onMounted(() => {
-	window.requestAnimationFrame(parallaxLoop);
 	narrow.value = rootEl.value!.clientWidth < 1000;
 
 	if (props.user.birthday) {
@@ -434,20 +376,24 @@ onMounted(() => {
 			});
 		}
 	}
-	fetchSkebStatus();
-	if ($i?.isModerator) {
-		fetchMovedFromLog();
-	}
+
 	nextTick(() => {
+		calcBannerParallax();
 		adjustMemoTextarea();
 	});
+
+	initCalcBannerParallax();
 });
 
-onUnmounted(() => {
-	if (parallaxAnimationId.value) {
-		window.cancelAnimationFrame(parallaxAnimationId.value);
+onActivated(() => {
+	if (bannerEl.value) {
+		calcBannerParallax();
+		initCalcBannerParallax();
 	}
 });
+
+onUnmounted(disposeBannerParallaxResizeObserver);
+onDeactivated(disposeBannerParallaxResizeObserver);
 </script>
 
 <style lang="scss" scoped>
@@ -472,18 +418,19 @@ onUnmounted(() => {
 
 				> .banner-container {
 					position: relative;
-					height: 250px;
+					--bannerHeight: 250px;
+					height: var(--bannerHeight);
 					overflow: clip;
-					background-size: cover;
-					background-position: center;
 
 					> .banner {
+						width: 100%;
 						height: 100%;
-						background-color: #4c5e6d;
 						background-size: cover;
-						background-position: center;
-						box-shadow: 0 0 128px rgba(0, 0, 0, 0.5) inset;
-						will-change: background-position;
+						background-color: #4c5e6d;
+						background-repeat: repeat-y;
+						background-position-x: center;
+						background-position-y: 50%;
+						will-change: background-position-y;
 					}
 
 					> .fade {
@@ -777,7 +724,8 @@ onUnmounted(() => {
 		> .main {
 			> .profile > .main {
 				> .banner-container {
-					height: 140px;
+					--bannerHeight: 140px;
+					height: var(--bannerHeight);
 
 					> .fade {
 						display: none;
@@ -838,6 +786,35 @@ onUnmounted(() => {
 				}
 			}
 		}
+	}
+}
+
+@supports (view-timeline-name: --name) {
+	.ftskorzw {
+		> .main {
+			> .profile > .main {
+				> .banner-container {
+					view-timeline-name: --bannerParallax;
+					view-timeline-inset: var(--bannerParallaxInset, auto);
+					view-timeline-axis: block;
+
+					> .banner {
+						animation: bannerParallaxKeyframes linear both;
+						animation-timeline: --bannerParallax;
+						animation-range: cover;
+					}
+				}
+			}
+		}
+	}
+}
+
+@keyframes bannerParallaxKeyframes {
+	from {
+		background-position-y: 50%;
+	}
+	to {
+		background-position-y: calc(50% + var(--bannerHeight, 250px) / 3);
 	}
 }
 </style>

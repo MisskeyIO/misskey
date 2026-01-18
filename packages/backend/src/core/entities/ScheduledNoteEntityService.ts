@@ -1,11 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
-import type { ScheduledNotesRepository } from '@/models/_.js';
+import type { ScheduledNotesRepository, ChannelsRepository } from '@/models/_.js';
 import type { MiUser } from '@/models/User.js';
 import type { MiScheduledNote } from '@/models/ScheduledNote.js';
 import { bindThis } from '@/decorators.js';
 import { Packed } from '@/misc/json-schema.js';
+import { IdService } from '@/core/IdService.js';
 import { DriveFileEntityService } from './DriveFileEntityService.js';
+import { UserEntityService } from './UserEntityService.js';
+import { NoteEntityService } from './NoteEntityService.js';
 
 @Injectable()
 export class ScheduledNoteEntityService {
@@ -14,6 +17,9 @@ export class ScheduledNoteEntityService {
 		private scheduledNotesRepository: ScheduledNotesRepository,
 
 		private driveFileEntityService: DriveFileEntityService,
+		private userEntityService: UserEntityService,
+		private noteEntityService: NoteEntityService,
+		private idService: IdService
 	) {
 	}
 
@@ -24,10 +30,13 @@ export class ScheduledNoteEntityService {
 	) : Promise<Packed<'NoteDraft'>> {
 		const item = typeof src === 'object' ? src : await this.scheduledNotesRepository.findOneByOrFail({ id: src, userId: me.id });
 
+		const channel = item.draft.channel ?? null;
+
 		return {
 			id: item.id,
-			updatedAt: item.createdAt.toISOString(),
-			scheduledAt: item.scheduledAt?.toISOString() ?? null,
+			createdAt: this.idService.parse(item.id).date.toISOString(),
+			scheduledAt: item.scheduledAt?.getTime() ?? null,
+			isActuallyScheduled: item.scheduledAt != null,
 			reason: item.reason ?? undefined,
 			channel: item.draft.channel ? {
 				id: item.draft.channel.id,

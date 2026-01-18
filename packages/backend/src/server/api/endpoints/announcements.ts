@@ -42,7 +42,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			return this.announcementService.getAnnouncements(me, ps.limit, ps.offset, ps.isActive);
-		//TODO: sinceIdとかを対応させる
 		});
 	}
 }

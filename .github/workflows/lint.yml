@@ -12,7 +12,9 @@ on:
       - packages/backend/**
       - packages/frontend/**
       - packages/frontend-shared/**
+      - packages/frontend-builder/**
       - packages/frontend-embed/**
+      - packages/icons-subsetter/**
       - packages/sw/**
       - packages/misskey-js/**
       - packages/misskey-bubble-game/**
@@ -24,7 +26,9 @@ on:
       - packages/backend/**
       - packages/frontend/**
       - packages/frontend-shared/**
+      - packages/frontend-builder/**
       - packages/frontend-embed/**
+      - packages/icons-subsetter/**
       - packages/sw/**
       - packages/misskey-js/**
       - packages/shared/.eslintrc.js
@@ -40,19 +44,17 @@ jobs:
   pnpm_install:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
-      with:
-        fetch-depth: 0
-        submodules: true
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v4
-      with:
-        run_install: false
-    - uses: actions/setup-node@v6
-      with:
-        node-version-file: '.node-version'
-        cache: 'pnpm'
-    - run: pnpm i --frozen-lockfile
+      - uses: actions/checkout@v4.3.0
+        with:
+          fetch-depth: 0
+          submodules: true
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.2.0
+      - uses: actions/setup-node@v4.4.0
+        with:
+          node-version-file: '.node-version'
+          cache: 'pnpm'
+      - run: pnpm i --frozen-lockfile
 
   lint:
     needs: [pnpm_install]
@@ -64,7 +66,9 @@ jobs:
         - backend
         - frontend
         - frontend-shared
+        - frontend-builder
         - frontend-embed
+        - icons-subsetter
         - sw
         - misskey-js
         - misskey-bubble-game
@@ -102,21 +106,25 @@ jobs:
       matrix:
         workspace:
         - backend
+        - frontend
         - sw
         - misskey-js
     steps:
-    - uses: actions/checkout@v6
-      with:
-        fetch-depth: 0
-        submodules: true
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v4
-      with:
-        run_install: false
-    - uses: actions/setup-node@v6
-      with:
-        node-version-file: '.node-version'
-        cache: 'pnpm'
-    - run: pnpm i --frozen-lockfile
-    - run: pnpm --filter misskey-reversi --filter misskey-bubble-game --filter misskey-js run build
-    - run: pnpm --filter ${{ matrix.workspace }} run typecheck
+      - uses: actions/checkout@v4.3.0
+        with:
+          fetch-depth: 0
+          submodules: true
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.2.0
+      - uses: actions/setup-node@v4.4.0
+        with:
+          node-version-file: '.node-version'
+          cache: 'pnpm'
+      - run: pnpm i --frozen-lockfile
+      - run: pnpm --filter misskey-js run build
+        if: ${{ matrix.workspace == 'backend' || matrix.workspace == 'frontend' || matrix.workspace == 'sw' }}
+      - run: pnpm --filter misskey-reversi run build
+        if: ${{ matrix.workspace == 'backend' || matrix.workspace == 'frontend' }}
+      - run: pnpm --filter misskey-bubble-game run build
+        if: ${{ matrix.workspace == 'frontend' }}
+      - run: pnpm --filter ${{ matrix.workspace }} run typecheck

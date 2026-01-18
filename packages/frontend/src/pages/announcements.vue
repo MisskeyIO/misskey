@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div class="_spacer" style="--MI_SPACER-w: 800px;">
 		<div class="_gaps">
 			<MkInfo v-if="$i && $i.hasUnreadAnnouncement && tab === 'current'" warn>{{ i18n.ts.youHaveUnreadAnnouncements }}</MkInfo>
-			<MkPagination ref="paginationEl" :key="tab" v-slot="{items}" :pagination="tab === 'current' ? paginationCurrent : paginationPast" class="_gaps">
+			<MkPagination ref="paginationEl" v-slot="{items}" :paginator="paginator" class="_gaps">
 				<section v-for="announcement in items" :key="announcement.id" class="_panel" :class="$style.announcement">
 					<div v-if="announcement.forYou" :class="$style.forYou"><i class="ti ti-pin"></i> {{ i18n.ts.forYou }}</div>
 					<div :class="$style.header">
@@ -47,7 +47,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch, defineAsyncComponent } from 'vue';
+import { ref, computed, markRaw, defineAsyncComponent, watch, useTemplateRef } from 'vue';
+
 import MkPagination from '@/components/MkPagination.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkInfo from '@/components/MkInfo.vue';
@@ -57,28 +58,17 @@ import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import { $i } from '@/i.js';
 import { updateCurrentAccountPartial } from '@/accounts.js';
+import { Paginator } from '@/utility/paginator.js';
 
-const paginationCurrent = {
-	endpoint: 'announcements' as const,
-	offsetMode: true,
+const paginator = markRaw(new Paginator('announcements', {
 	limit: 10,
-	params: {
-		isActive: true,
-	},
-};
-
-const paginationPast = {
-	endpoint: 'announcements' as const,
-	offsetMode: true,
-	limit: 10,
-	params: {
-		isActive: false,
-	},
-};
-
-const paginationEl = ref<InstanceType<typeof MkPagination>>();
+	computedParams: computed(() => ({
+		isActive: tab.value === 'current',
+	})),
+}));
 
 const tab = ref('current');
+const paginationEl = useTemplateRef('paginationEl');
 
 async function read(target): Promise<void> {
 	if (target.needEnrollmentTutorialToRead) {
@@ -101,17 +91,15 @@ async function read(target): Promise<void> {
 		if (confirm.canceled) return;
 	}
 
-	if (!paginationEl.value) return;
-	paginationEl.value.updateItem(target.id, a => {
-		a.isRead = true;
-		return a;
+	paginator.updateItem(target.id, a => ({
+		...a,
+		isRead: true,
+	}));
+	misskeyApi('i/read-announcement', { announcementId: target.id });
+	updateCurrentAccountPartial({
+		unreadAnnouncements: $i!.unreadAnnouncements.filter(a => a.id !== target.id),
 	});
-	await misskeyApi('i/read-announcement', { announcementId: target.id });
-	if ($i) {
-		updateCurrentAccountPartial({
-			unreadAnnouncements: $i.unreadAnnouncements.filter((a: { id: string; }) => a.id !== target.id),
-		});
-	}
+
 }
 
 const headerActions = computed(() => []);

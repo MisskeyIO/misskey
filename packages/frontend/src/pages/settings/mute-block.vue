@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <SearchMarker path="/settings/mute-block" :label="i18n.ts.muteAndBlock" icon="ti ti-ban" :keywords="['mute', 'block']">
 	<div class="_gaps_m">
 		<MkFeatureBanner icon="/client-assets/prohibited_3d.png" color="#ff2600">
-			<SearchKeyword>{{ i18n.ts._settings.muteAndBlockBanner }}</SearchKeyword>
+			<SearchText>{{ i18n.ts._settings.muteAndBlockBanner }}</SearchText>
 		</MkFeatureBanner>
 
 		<div class="_gaps_s">
@@ -63,6 +63,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</SearchMarker>
 
 			<SearchMarker
+				:label="i18n.ts.emojiMute"
+				:keywords="['emoji', 'mute', 'hide']"
+			>
+				<MkFolder>
+					<template #icon><i class="ti ti-mood-off"></i></template>
+					<template #label>{{ i18n.ts.emojiMute }}</template>
+
+					<XEmojiMute/>
+				</MkFolder>
+			</SearchMarker>
+
+			<SearchMarker
 				:label="i18n.ts.instanceMute"
 				:keywords="['note', 'server', 'instance', 'host', 'federation', 'mute', 'hide']"
 			>
@@ -81,13 +93,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<template #icon><i class="ti ti-repeat-off"></i></template>
 					<template #label><SearchLabel>{{ i18n.ts.mutedUsers }} ({{ i18n.ts.renote }})</SearchLabel></template>
 
-					<MkPagination :pagination="renoteMutingPagination">
-						<template #empty>
-							<div class="_fullinfo">
-								<img :src="infoImageUrl" draggable="false"/>
-								<div>{{ i18n.ts.noUsers }}</div>
-							</div>
-						</template>
+					<MkPagination :paginator="renoteMutingPaginator" withControl>
+						<template #empty><MkResult type="empty" :text="i18n.ts.noUsers"/></template>
 
 						<template #default="{ items }">
 							<div class="_gaps_s">
@@ -117,13 +124,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<template #icon><i class="ti ti-eye-off"></i></template>
 					<template #label>{{ i18n.ts.mutedUsers }}</template>
 
-					<MkPagination :pagination="mutingPagination">
-						<template #empty>
-							<div class="_fullinfo">
-								<img :src="infoImageUrl" draggable="false"/>
-								<div>{{ i18n.ts.noUsers }}</div>
-							</div>
-						</template>
+					<MkPagination :paginator="mutingPaginator" withControl>
+						<template #empty><MkResult type="empty" :text="i18n.ts.noUsers"/></template>
 
 						<template #default="{ items }">
 							<div class="_gaps_s">
@@ -155,13 +157,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<template #icon><i class="ti ti-ban"></i></template>
 					<template #label>{{ i18n.ts.blockedUsers }}</template>
 
-					<MkPagination :pagination="blockingPagination">
-						<template #empty>
-							<div class="_fullinfo">
-								<img :src="infoImageUrl" draggable="false"/>
-								<div>{{ i18n.ts.noUsers }}</div>
-							</div>
-						</template>
+					<MkPagination :paginator="blockingPaginator" withControl>
+						<template #empty><MkResult type="empty" :text="i18n.ts.noUsers"/></template>
 
 						<template #default="{ items }">
 							<div class="_gaps_s">
@@ -175,8 +172,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 									</div>
 									<div v-if="expandedBlockItems.includes(item.id)" :class="$style.userItemSub">
 										<div>Blocked at: <MkTime :time="item.createdAt" mode="detail"/></div>
-										<div v-if="item.expiresAt">Period: {{ new Date(item.expiresAt).toLocaleString() }}</div>
-										<div v-else>Period: {{ i18n.ts.indefinitely }}</div>
 									</div>
 								</div>
 							</div>
@@ -190,7 +185,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, markRaw } from 'vue';
+import XEmojiMute from './mute-block.emoji-mute.vue';
 import XInstanceMute from './mute-block.instance-mute.vue';
 import XWordMute from './mute-block.word-mute.vue';
 import type { Ref } from 'vue';
@@ -200,10 +196,9 @@ import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import MkUserCardMini from '@/components/MkUserCardMini.vue';
 import * as os from '@/os.js';
-import { instance, infoImageUrl } from '@/instance.js';
+import { instance } from '@/instance.js';
 import { ensureSignin } from '@/i.js';
 import MkFolder from '@/components/MkFolder.vue';
-import MkInfo from '@/components/MkInfo.vue';
 import MkFeatureBanner from '@/components/MkFeatureBanner.vue';
 import MkCustomEmoji from '@/components/global/MkCustomEmoji.vue';
 import MkEmoji from '@/components/global/MkEmoji.vue';
@@ -211,29 +206,29 @@ import MkSwitch from '@/components/MkSwitch.vue';
 import { store } from '@/store';
 import { prefer } from '@/preferences';
 import { reloadAsk } from '@/utility/reload-ask';
+import { Paginator } from '@/utility/paginator.js';
+
+import { suggestReload } from '@/utility/reload-suggest.js';
 
 const $i = ensureSignin();
 
-const renoteMutingPagination = {
-	endpoint: 'renote-mute/list' as const,
+const renoteMutingPaginator = markRaw(new Paginator('renote-mute/list', {
 	limit: 10,
-};
+}));
 
-const mutingPagination = {
-	endpoint: 'mute/list' as const,
+const mutingPaginator = markRaw(new Paginator('mute/list', {
 	limit: 10,
-};
+}));
 
-const blockingPagination = {
-	endpoint: 'blocking/list' as const,
+const blockingPaginator = markRaw(new Paginator('blocking/list', {
 	limit: 10,
-};
+}));
 
-const expandedRenoteMuteItems = ref([]);
-const expandedMuteItems = ref([]);
-const expandedBlockItems = ref([]);
+const expandedRenoteMuteItems = ref<string[]>([]);
+const expandedMuteItems = ref<string[]>([]);
+const expandedBlockItems = ref<string[]>([]);
 
-const mutedReactions = ref<string[]>(store.s.mutedReactions);
+const mutedReactions = ref<string[]>([...store.s.mutedReactions]);
 
 const hideMutedNotes = prefer.model('hideMutedNotes');
 const showSoftWordMutedWord = prefer.model('showSoftWordMutedWord');
@@ -245,11 +240,10 @@ watch([
 	await reloadAsk({ reason: i18n.ts.reloadToApplySetting, unison: true });
 });
 
-watch(mutedReactions, () => {
+watch(() => mutedReactions.value, () => {
 	store.set('mutedReactions', mutedReactions.value);
-}, {
-	deep: true,
-});
+	suggestReload();
+}, { deep: true });
 
 const chooseReaction = (ev: MouseEvent) => pickEmoji(mutedReactions, ev);
 const removeReaction = (reaction: string, ev: MouseEvent) => remove(mutedReactions, reaction, ev);
@@ -307,7 +301,7 @@ async function unblock(user, ev) {
 	}], (ev.currentTarget ?? ev.target) as HTMLElement);
 }
 
-async function toggleRenoteMuteItem(item) {
+async function toggleRenoteMuteItem(item: { id: string }) {
 	if (expandedRenoteMuteItems.value.includes(item.id)) {
 		expandedRenoteMuteItems.value = expandedRenoteMuteItems.value.filter(x => x !== item.id);
 	} else {
@@ -315,7 +309,7 @@ async function toggleRenoteMuteItem(item) {
 	}
 }
 
-async function toggleMuteItem(item) {
+async function toggleMuteItem(item: { id: string }) {
 	if (expandedMuteItems.value.includes(item.id)) {
 		expandedMuteItems.value = expandedMuteItems.value.filter(x => x !== item.id);
 	} else {
@@ -323,7 +317,7 @@ async function toggleMuteItem(item) {
 	}
 }
 
-async function toggleBlockItem(item) {
+async function toggleBlockItem(item: { id: string }) {
 	if (expandedBlockItems.value.includes(item.id)) {
 		expandedBlockItems.value = expandedBlockItems.value.filter(x => x !== item.id);
 	} else {

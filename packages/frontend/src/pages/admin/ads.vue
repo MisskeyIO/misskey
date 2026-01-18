@@ -6,12 +6,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <PageWithHeader :actions="headerActions" :tabs="headerTabs">
 	<div class="_spacer" style="--MI_SPACER-w: 900px;">
-		<MkSelect v-model="filterType" :class="$style.input" @update:modelValue="filterItems">
+		<MkSelect v-model="filterType" :items="filterTypeDef" :class="$style.input" @update:modelValue="filterItems">
 			<template #label>{{ i18n.ts.state }}</template>
-			<option value="all">{{ i18n.ts.all }}</option>
-			<option value="publishing">{{ i18n.ts.publishing }}</option>
-			<option value="expired">{{ i18n.ts.expired }}</option>
 		</MkSelect>
+
 		<div>
 			<div v-for="ad in ads" class="_panel _gaps_m" :class="$style.ad">
 				<MkAd v-if="ad.url" :key="ad.id" :specify="ad"/>
@@ -21,9 +19,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<MkInput v-model="ad.url" type="url">
 					<template #label>URL</template>
 				</MkInput>
+
 				<MkInput v-model="ad.imageUrl" type="url">
 					<template #label>{{ i18n.ts.imageUrl }}</template>
 				</MkInput>
+
 				<MkRadios v-model="ad.place">
 					<template #label>Form</template>
 					<option value="square">square</option>
@@ -42,6 +42,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<MkRadio v-model="ad.priority" value="low">{{ i18n.ts.low }}</MkRadio>
 			</div>
 			-->
+
 				<FormSplit>
 					<MkInput v-model="ad.ratio" type="number">
 						<template #label>{{ i18n.ts.ratio }}</template>
@@ -53,6 +54,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<template #label>{{ i18n.ts.expiration }}</template>
 					</MkInput>
 				</FormSplit>
+
+				<MkSwitch v-model="ad.isSensitive">
+					<template #label>{{ i18n.ts.sensitive }}</template>
+				</MkSwitch>
+
 				<MkFolder>
 					<template #label>{{ i18n.ts.advancedSettings }}</template>
 					<span>
@@ -66,9 +72,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</div>
 					</span>
 				</MkFolder>
+
 				<MkTextarea v-model="ad.memo">
 					<template #label>{{ i18n.ts.memo }}</template>
 				</MkTextarea>
+
 				<div class="_buttons">
 					<MkButton inline primary style="margin-right: 12px;" @click="save(ad)">
 						<i
@@ -80,6 +88,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</MkButton>
 				</div>
 			</div>
+
 			<MkButton @click="more()">
 				<i class="ti ti-reload"></i>{{ i18n.ts.more }}
 			</MkButton>
@@ -99,10 +108,12 @@ import MkSwitch from '@/components/MkSwitch.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import MkSelect from '@/components/MkSelect.vue';
 import FormSplit from '@/components/form/split.vue';
+import MkSwitch from '@/components/MkSwitch.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
+import { useMkSelect } from '@/composables/use-mkselect.js';
 
 const ads = ref<Misskey.entities.Ad[]>([]);
 
@@ -110,7 +121,17 @@ const ads = ref<Misskey.entities.Ad[]>([]);
 const localTime = new Date();
 const localTimeDiff = localTime.getTimezoneOffset() * 60 * 1000;
 const daysOfWeek: string[] = [i18n.ts._weekday.sunday, i18n.ts._weekday.monday, i18n.ts._weekday.tuesday, i18n.ts._weekday.wednesday, i18n.ts._weekday.thursday, i18n.ts._weekday.friday, i18n.ts._weekday.saturday];
-const filterType = ref('all');
+const {
+	model: filterType,
+	def: filterTypeDef,
+} = useMkSelect({
+	items: [
+		{ label: i18n.ts.all, value: 'all' },
+		{ label: i18n.ts.publishing, value: 'publishing' },
+		{ label: i18n.ts.expired, value: 'expired' },
+	],
+	initialValue: 'all',
+});
 let publishing: boolean | null = null;
 
 misskeyApi('admin/ad/list', { publishing: publishing }).then(adsResponse => {
@@ -129,7 +150,7 @@ misskeyApi('admin/ad/list', { publishing: publishing }).then(adsResponse => {
 	}
 });
 
-const filterItems = (v) => {
+const filterItems = (v: typeof filterType.value) => {
 	if (v === 'publishing') {
 		publishing = true;
 	} else if (v === 'expired') {
@@ -142,35 +163,35 @@ const filterItems = (v) => {
 };
 
 // 選択された曜日(index)のビットフラグを操作する
-function toggleDayOfWeek(ad, index) {
+function toggleDayOfWeek(ad: Misskey.entities.Ad, index: number) {
 	ad.dayOfWeek ^= 1 << index;
 }
 
 function add() {
 	ads.value.unshift({
-		id: null,
+		id: '',
 		memo: '',
 		place: 'square',
 		priority: 'middle',
 		ratio: 1,
 		url: '',
-		imageUrl: null,
+		imageUrl: '',
 		imageBlurhash: null,
-		expiresAt: null,
-		startsAt: null,
+		expiresAt: new Date().toISOString(),
+		startsAt: new Date().toISOString(),
 		dayOfWeek: 0,
 		isSensitive: false,
 	});
 }
 
-function remove(ad) {
+function remove(ad: Misskey.entities.Ad) {
 	os.confirm({
 		type: 'warning',
 		text: i18n.tsx.removeAreYouSure({ x: ad.url }),
 	}).then(({ canceled }) => {
 		if (canceled) return;
 		ads.value = ads.value.filter(x => x !== ad);
-		if (ad.id == null) return;
+		if (ad.id === '') return;
 		os.apiWithDialog('admin/ad/delete', {
 			id: ad.id,
 		}).then(() => {
@@ -179,8 +200,8 @@ function remove(ad) {
 	});
 }
 
-function save(ad) {
-	if (ad.id == null) {
+function save(ad: Misskey.entities.Ad) {
+	if (ad.id === '') {
 		misskeyApi('admin/ad/create', {
 			...ad,
 			expiresAt: new Date(ad.expiresAt).getTime(),
@@ -217,7 +238,7 @@ function save(ad) {
 }
 
 function more() {
-	misskeyApi('admin/ad/list', { untilId: ads.value.reduce((acc, ad) => ad.id != null ? ad : acc).id, publishing: publishing }).then(adsResponse => {
+	misskeyApi('admin/ad/list', { untilId: ads.value.reduce((acc, ad) => ad.id !== '' ? ad : acc).id, publishing: publishing }).then(adsResponse => {
 		if (adsResponse == null) return;
 		ads.value = ads.value.concat(adsResponse.map(r => {
 			const exdate = new Date(r.expiresAt);

@@ -5,12 +5,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div v-if="!blocked" :class="$style.root">
-	<div v-if="media.isSensitive && hide" :class="$style.sensitive" @click="showHiddenContent">
+	<MkMediaAudio v-if="media.type.startsWith('audio') && media.type !== 'audio/midi'" :audio="media"/>
+	<div v-else-if="media.isSensitive && hide" :class="$style.sensitive" @click="showHiddenContent">
 		<span style="font-size: 1.6em;"><i class="ti ti-alert-triangle"></i></span>
 		<b>{{ i18n.ts.sensitive }}</b>
 		<span>{{ i18n.ts.clickToShow }}</span>
 	</div>
-	<MkMediaAudio v-else-if="media.type.startsWith('audio') && media.type !== 'audio/midi'" :audio="media" :user="user"/>
 	<a
 		v-else :class="$style.download"
 		:href="media.url"
@@ -36,7 +36,6 @@ import { prefer } from '@/preferences.js';
 
 const props = defineProps<{
 	media: Misskey.entities.DriveFile;
-	user?: Misskey.entities.UserLite;
 }>();
 
 const blocked = computed(() => props.media.isSensitive && sensitiveContentConsent.value === false);

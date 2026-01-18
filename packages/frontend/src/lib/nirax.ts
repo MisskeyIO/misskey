@@ -5,9 +5,9 @@
 
 // NIRAX --- A lightweight router
 
-import { onBeforeUnmount, shallowRef } from 'vue';
+import { computed, onBeforeUnmount, shallowRef } from 'vue';
 import { EventEmitter } from 'eventemitter3';
-import type { Component, ShallowRef } from 'vue';
+import type { Component, ShallowRef, Ref } from 'vue';
 
 function safeURIDecode(str: string): string {
 	try {
@@ -59,7 +59,7 @@ export type RouterEvent = {
 		beforePath: string;
 		path: string;
 		route: RouteDef | null;
-		props: Map<string, string> | null;
+		props: Map<string, string | boolean> | null;
 		key: string;
 	}) => void;
 	same: () => void;
@@ -80,6 +80,116 @@ export type Resolved = {
 };
 
 export type AfterNavigationHook = (to: RouteDef, from: RouteDef) => any;
+
+export type PathResolvedResult = Resolved;
+
+export type RouterFlag = 'forcePage';
+
+//#region Path Types
+type Prettify<T> = {
+	[K in keyof T]: T[K]
+} & {};
+
+type RemoveNever<T> = {
+	[K in keyof T as T[K] extends never ? never : K]: T[K];
+} & {};
+
+type IsPathParameter<Part extends string> = Part extends `${string}:${infer Parameter}` ? Parameter : never;
+
+type GetPathParamKeys<Path extends string> =
+	Path extends `${infer A}/${infer B}`
+		? IsPathParameter<A> | GetPathParamKeys<B>
+		: IsPathParameter<Path>;
+
+type GetPathParams<Path extends string> = Prettify<{
+	[Param in GetPathParamKeys<Path> as Param extends `${string}?` ? never : Param]: string;
+} & {
+	[Param in GetPathParamKeys<Path> as Param extends `${infer OptionalParam}?` ? OptionalParam : never]?: string;
+}>;
+
+type UnwrapReadOnly<T> = T extends ReadonlyArray<infer U>
+	? U
+	: T extends Readonly<infer U>
+		? U
+		: T;
+
+type GetPaths<Def extends RouteDef> = Def extends { path: infer Path }
+	? Path extends string
+		? Def extends { children: infer Children }
+			? Children extends RouteDef[]
+				? Path | `${Path}${FlattenAllPaths<Children>}`
+				: Path
+			: Path
+		: never
+	: never;
+
+type FlattenAllPaths<Defs extends RouteDef[]> = GetPaths<Defs[number]>;
+
+type GetSinglePathQuery<Def extends RouteDef, Path extends FlattenAllPaths<RouteDef[]>> = RemoveNever<
+	Def extends { path: infer BasePath, children: infer Children }
+		? BasePath extends string
+			? Path extends `${BasePath}${infer ChildPath}`
+				? Children extends RouteDef[]
+					? ChildPath extends FlattenAllPaths<Children>
+						? GetPathQuery<Children, ChildPath>
+						: Record<string, never>
+				: never
+				: never
+			: never
+		: Def['path'] extends Path
+			? Def extends { query: infer Query }
+				? Query extends Record<string, string>
+					? UnwrapReadOnly<{ [Key in keyof Query]?: string; }>
+					: Record<string, never>
+			: Record<string, never>
+		: Record<string, never>
+	>;
+
+type GetPathQuery<Defs extends RouteDef[], Path extends FlattenAllPaths<Defs>> = GetSinglePathQuery<Defs[number], Path>;
+
+type RequiredIfNotEmpty<K extends string, T extends Record<string, unknown>> = T extends Record<string, never>
+	? { [Key in K]?: T }
+	: { [Key in K]: T };
+
+type NotRequiredIfEmpty<T extends Record<string, unknown>> = T extends Record<string, never> ? T | undefined : T;
+
+type GetRouterOperationProps<Defs extends RouteDef[], Path extends FlattenAllPaths<Defs>> = NotRequiredIfEmpty<RequiredIfNotEmpty<'params', GetPathParams<Path>> & {
+	query?: GetPathQuery<Defs, Path>;
+	hash?: string;
+}>;
+//#endregion
+
+function buildFullPath(args: {
+	path: string;
+	params?: Record<string, string>;
+	query?: Record<string, string>;
+	hash?: string;
+}) {
+	let fullPath = args.path;
+
+	if (args.params) {
+		for (const key in args.params) {
+			const value = args.params[key];
+			const replaceRegex = new RegExp(`:${key}(\\?)?`, 'g');
+			fullPath = fullPath.replace(replaceRegex, value ? encodeURIComponent(value) : '');
+		}
+		// remove any optional parameters that are not provided
+		fullPath = fullPath.replace(/\/:\w+\?(?=\/|$)/g, '');
+	}
+
+	if (args.query) {
+		const queryString = new URLSearchParams(args.query).toString();
+		if (queryString) {
+			fullPath += '?' + queryString;
+		}
+	}
+
+	if (args.hash) {
+		fullPath += '#' + encodeURIComponent(args.hash);
+	}
+
+	return fullPath;
+}
 
 function parsePath(path: string): ParsedPath {
 	const res = [] as ParsedPath;
@@ -106,11 +216,11 @@ function parsePath(path: string): ParsedPath {
 	return res;
 }
 
-export interface IRouter extends EventEmitter<RouterEvent> {
+export interface IRouter<DEF extends RouteDef[] = RouteDef[]> extends EventEmitter<RouterEvent> {
 	current: Resolved;
 	currentRef: ShallowRef<Resolved>;
-	currentRoute: ShallowRef<RouteDef>;
-	navHook: ((path: string, flag?: any) => boolean) | null;
+	currentRoute: Ref<RouteDef>;
+	navHook: ((path: string, flag?: RouterFlag | null) => boolean) | null;
 	afterHooks: Array<AfterNavigationHook | null>;
 
 	/**
@@ -122,15 +232,25 @@ export interface IRouter extends EventEmitter<RouterEvent> {
 
 	isReady(): Promise<boolean>;
 
-	getCurrentPath(): any;
+	getCurrentPath(): string;
+
+	getCurrentFullPath(): string;
 
 	getCurrentKey(): string;
 
 	afterEach(hook: AfterNavigationHook): AfterNavigationHook | undefined;
 
-	push(path: string, flag?: any): void;
+	push<P extends FlattenAllPaths<DEF>>(path: P, props?: GetRouterOperationProps<DEF, P>, flag?: RouterFlag | null): void;
 
-	replace(path: string, key?: string | null): void;
+	replace<P extends FlattenAllPaths<DEF>>(path: P, props?: GetRouterOperationProps<DEF, P>, key?: string | null): void;
+
+	/** どうしても必要な場合に使用（パスが確定している場合は `Nirax.push` を使用すること） */
+	pushByPath(fullPath: string, flag?: RouterFlag | null): void;
+
+	/** どうしても必要な場合に使用（パスが確定している場合は `Nirax.replace` を使用すること） */
+	replaceByPath(fullPath: string, key?: string | null): void;
+
+	useListener<E extends keyof RouterEvent>(event: E, listener: EventEmitter.EventListener<RouterEvent, E>): void;
 
 	/** @see EventEmitter */
 	eventNames(): Array<EventEmitter.EventNames<RouterEvent>>;
@@ -194,10 +314,10 @@ export interface IRouter extends EventEmitter<RouterEvent> {
 	): this;
 }
 
-export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvent> implements IRouter {
+export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvent> implements IRouter<DEF> {
 	public current: Resolved;
 	public currentRef: ShallowRef<Resolved>;
-	public currentRoute: ShallowRef<RouteDef>;
+	public currentRoute: Ref<RouteDef>;
 	public navHook: ((path: string, flag?: any) => boolean) | null = null;
 	public afterHooks: Array<AfterNavigationHook | null> = [];
 	private routes: DEF;
@@ -213,7 +333,7 @@ export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvent> imp
 		this.routes = routes;
 		this.current = this.resolve(currentPath)!;
 		this.currentRef = shallowRef(this.current);
-		this.currentRoute = shallowRef(this.current.route);
+		this.currentRoute = computed(() => this.currentRef.value.route);
 		this.currentPath = currentPath;
 		this.isLoggedIn = isLoggedIn;
 		this.notFoundPageComponent = notFoundPageComponent;
@@ -253,7 +373,7 @@ export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvent> imp
 			forEachRouteLoop:
 			for (const route of routes) {
 				let parts = [..._parts];
-				const props = new Map<string, string>();
+				const props = new Map<string, string | boolean>();
 
 				pathMatchLoop:
 				for (const p of parsePath(route.path)) {
@@ -360,6 +480,10 @@ export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvent> imp
 		return this.currentPath;
 	}
 
+	public getCurrentFullPath() {
+		return this.current._parsedRoute.fullPath;
+	}
+
 	public getCurrentKey() {
 		return this.currentKey;
 	}
@@ -376,19 +500,40 @@ export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvent> imp
 		};
 	}
 
-	public push(path: string, flag?: any) {
-		const beforePath = this.currentPath;
-		if (path === beforePath) {
+	public push<P extends FlattenAllPaths<DEF>>(path: P, props?: GetRouterOperationProps<DEF, P>, flag?: RouterFlag | null) {
+		const fullPath = buildFullPath({
+			path,
+			params: props?.params,
+			query: props?.query,
+			hash: props?.hash,
+		});
+		this.pushByPath(fullPath, flag);
+	}
+
+	public replace<P extends FlattenAllPaths<DEF>>(path: P, props?: GetRouterOperationProps<DEF, P>, key?: string | null) {
+		const fullPath = buildFullPath({
+			path,
+			params: props?.params,
+			query: props?.query,
+			hash: props?.hash,
+		});
+		this.replaceByPath(fullPath, key);
+	}
+
+	/** どうしても必要な場合に使用（パスが確定している場合は `Nirax.push` を使用すること） */
+	public pushByPath(fullPath: string, flag?: RouterFlag | null) {
+		const beforePath = this.getCurrentFullPath();
+		if (fullPath === beforePath) {
 			this.emit('same');
 			return;
 		}
 		if (this.navHook) {
-			const cancel = this.navHook(path, flag);
+			const cancel = this.navHook(fullPath, flag ?? undefined);
 			if (cancel) return;
 		}
-		const res = this.navigate(path, null);
+		const res = this.navigate(fullPath, null);
 		if (res.route.path === '/:(*)') {
-			window.location.href = path;
+			window.location.href = fullPath;
 		} else {
 			this.emit('push', {
 				beforePath,
@@ -400,19 +545,20 @@ export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvent> imp
 		}
 	}
 
-	public replace(path: string, key?: string | null) {
-		const res = this.navigate(path, key);
+	/** どうしても必要な場合に使用（パスが確定している場合は `Nirax.replace` を使用すること） */
+	public replaceByPath(fullPath: string, key?: string | null) {
+		const res = this.navigate(fullPath, key);
 		this.emit('replace', {
 			path: res._parsedRoute.fullPath,
 			key: this.currentKey,
 		});
 	}
 
-	public useListener<E extends keyof RouterEvent>(event: E, listener: (...args: EventEmitter.ArgumentMap<RouterEvent>[Extract<E, keyof RouterEvent>]) => void, context?: any) {
-		this.addListener(event, listener, context);
+	public useListener<E extends keyof RouterEvent>(event: E, listener: EventEmitter.EventListener<RouterEvent, E>) {
+		this.addListener(event, listener);
 
 		onBeforeUnmount(() => {
-			this.removeListener(event, listener, context);
+			this.removeListener(event, listener);
 		});
 	}
 
@@ -443,10 +589,10 @@ export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvent> imp
 			}
 		}
 
-		if (res.route.loginRequired && !this.isLoggedIn) {
-			res.route['component'] = this.notFoundPageComponent;
-			res.props.set('showLoginPopup', true);
-		}
+			if (res.route.loginRequired && !this.isLoggedIn && 'component' in res.route) {
+				res.route.component = this.notFoundPageComponent;
+				res.props.set('showLoginPopup', true);
+			}
 
 		const isSamePath = beforePath === path;
 		if (isSamePath && key == null) key = this.currentKey;
@@ -477,4 +623,3 @@ export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvent> imp
 		};
 	}
 }
-

@@ -68,11 +68,13 @@ function send() {
 }
 
 function onEndpointChange() {
-	if (endpointAbortController.value) {
-		endpointAbortController.value.abort();
-	}
-	endpointAbortController.value = new AbortController();
-	misskeyApi('endpoint', { endpoint: endpoint.value }, withCredential.value ? undefined : null, endpointAbortController.value.signal).then(resp => {
+	misskeyApi('endpoint', { endpoint: endpoint.value }, withCredential.value ? undefined : null).then(resp => {
+		if (resp == null) {
+			body.value = '{}';
+			return;
+		}
+
+
 		const endpointBody = {};
 		for (const p of resp.params) {
 			endpointBody[p.name] =

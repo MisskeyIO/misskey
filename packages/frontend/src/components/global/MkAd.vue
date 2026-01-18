@@ -76,7 +76,7 @@ import { sensitiveContentConsent, requestSensitiveContentConsent } from '@/utili
 type Ad = (typeof instance)['ads'][number];
 
 const props = defineProps<{
-	preferForms: string[];
+	preferForms?: string[];
 	specify?: Ad;
 }>();
 
@@ -99,8 +99,8 @@ const choseAd = (): Ad | null => {
 		ratio: 0,
 	} : ad);
 
-	const valuableAds = allAds.filter(ad => ad.ratio !== 0);
-	const lowPriorityAds = allAds.filter(ad => ad.ratio === 0);
+const valuableAds = allAds.filter(ad => ad.ratio !== 0);
+const lowPriorityAds = allAds.filter(ad => ad.ratio === 0);
 
 	let ads: Ad[];
 	const preferredAds = valuableAds.filter(ad => props.preferForms.includes(ad.place));

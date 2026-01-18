@@ -4,7 +4,7 @@
  */
 
 export type PageHeaderItem = {
-	text: string;
+	text?: string;
 	icon: string;
 	label?: string;
 	highlighted?: boolean;

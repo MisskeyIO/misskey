@@ -72,12 +72,14 @@ import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
 import MkInfo from '@/components/MkInfo.vue';
 
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
 	message?: string,
 	openOnRemote?: OpenOnRemoteOptions,
+	initialUsername?: string;
 }>(), {
 	message: '',
 	openOnRemote: undefined,
+	initialUsername: undefined,
 });
 
 const isEmailAddress = computed(() => {
@@ -92,7 +94,7 @@ const emit = defineEmits<{
 
 const host = toUnicode(configHost);
 
-const username = ref('');
+const username = ref(props.initialUsername ?? '');
 
 const loginWithEmailAddress = ref(false);
 

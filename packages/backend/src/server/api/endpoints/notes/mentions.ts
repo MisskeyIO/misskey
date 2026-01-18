@@ -5,6 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import type { NotesRepository, FollowingsRepository } from '@/models/_.js';
+import { Brackets } from 'typeorm';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { QueryService } from '@/core/QueryService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
@@ -34,6 +35,8 @@ export const paramDef = {
 		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
 		sinceId: { type: 'string', format: 'misskey:id' },
 		untilId: { type: 'string', format: 'misskey:id' },
+		sinceDate: { type: 'integer' },
+		untilDate: { type: 'integer' },
 		visibility: { type: 'string' },
 	},
 	required: [],
@@ -57,8 +60,13 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				.where('following.followerId = :followerId', { followerId: me.id });
 
 			const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId)
-				.andWhere(':meIdAsList <@ note.mentions') // このmeIdAsListパラメータはqueryServiceのgenerateVisibilityQueryでセットされる
-				.orderBy('CONCAT(note.id)', 'DESC') // Avoid scanning primary key index
+				.andWhere(new Brackets(qb => {
+					qb // このmeIdAsListパラメータはqueryServiceのgenerateVisibilityQueryでセットされる
+						.where(':meIdAsList <@ note.mentions')
+						.orWhere(':meIdAsList <@ note.visibleUserIds');
+				}))
+				// Avoid scanning primary key index
+				.orderBy('CONCAT(note.id)', (ps.sinceDate || ps.sinceId) ? 'ASC' : 'DESC')
 				.innerJoinAndSelect('note.user', 'user')
 				.leftJoinAndSelect('note.reply', 'reply')
 				.leftJoinAndSelect('note.renote', 'renote')
@@ -66,10 +74,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				.leftJoinAndSelect('renote.user', 'renoteUser');
 
 			this.queryService.generateVisibilityQuery(query, me);
-			this.queryService.generateBlockedHostQueryForNote(query);
-			this.queryService.generateMutedUserQueryForNotes(query, me);
+			this.queryService.generateBaseNoteFilteringQuery(query, me);
 			this.queryService.generateMutedNoteThreadQuery(query, me);
-			this.queryService.generateBlockedUserQueryForNotes(query, me);
 
 			if (ps.visibility) {
 				query.andWhere('note.visibility = :visibility', { visibility: ps.visibility });

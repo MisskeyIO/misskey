@@ -44,10 +44,6 @@ export const meta = {
 					type: 'string',
 					optional: false, nullable: false,
 				},
-				isActive: {
-					type: 'boolean',
-					optional: false, nullable: false,
-				},
 				title: {
 					type: 'string',
 					optional: false, nullable: false,
@@ -64,7 +60,15 @@ export const meta = {
 					type: 'string',
 					optional: false, nullable: false,
 				},
+				isActive: {
+					type: 'boolean',
+					optional: false, nullable: false,
+				},
 				forExistingUsers: {
+					type: 'boolean',
+					optional: false, nullable: false,
+				},
+				silence: {
 					type: 'boolean',
 					optional: false, nullable: false,
 				},
@@ -82,10 +86,6 @@ export const meta = {
 				},
 				displayOrder: {
 					type: 'number',
-					optional: false, nullable: false,
-				},
-				silence: {
-					type: 'boolean',
 					optional: false, nullable: false,
 				},
 				userId: {
@@ -116,6 +116,8 @@ export const paramDef = {
 	properties: {
 		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
 		offset: { type: 'integer', default: 0 },
+		sinceDate: { type: 'integer' },
+		untilDate: { type: 'integer' },
 		userId: { type: 'string', format: 'misskey:id', nullable: true },
 		status: { type: 'string', enum: ['active', 'archived'], nullable: true },
 	},
@@ -131,6 +133,30 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const announcements = await this.announcementService.list(ps.userId ?? null, ps.limit, ps.offset, me, ps.status ?? null);
+			// FIXME Check 本流だと下のコードになっているので、announcementServiceを確認する
+			// const query = this.queryService.makePaginationQuery(this.announcementsRepository.createQueryBuilder('announcement'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate);
+			//
+			// if (ps.status === 'archived') {
+			// 	query.andWhere('announcement.isActive = false');
+			// } else if (ps.status === 'active') {
+			// 	query.andWhere('announcement.isActive = true');
+			// }
+			//
+			// if (ps.userId) {
+			// 	query.andWhere('announcement.userId = :userId', { userId: ps.userId });
+			// } else {
+			// 	query.andWhere('announcement.userId IS NULL');
+			// }
+			//
+			// const announcements = await query.limit(ps.limit).getMany();
+			//
+			// const reads = new Map<MiAnnouncement, number>();
+			//
+			// for (const announcement of announcements) {
+			// 	reads.set(announcement, await this.announcementReadsRepository.countBy({
+			// 		announcementId: announcement.id,
+			// 	}));
+			// }
 
 			return announcements.map(announcement => ({
 				id: announcement.id,

@@ -7,7 +7,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 <div class="_gaps_m">
 	<FormInfo warn>{{ i18n.ts.customCssWarn }}</FormInfo>
 
-	<MkCodeEditor v-model="localCustomCss" manualSave lang="css" :style="{ maxHeight: '30vh' }">
+	<FormInfo v-if="isSafeMode" warn>{{ i18n.ts.customCssIsDisabledBecauseSafeMode }}</FormInfo>
+
+	<MkCodeEditor v-model="localCustomCss" manualSave lang="css">
+
 		<template #label>CSS</template>
 	</MkCodeEditor>
 </div>
@@ -17,6 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, ref, watch } from 'vue';
 import MkCodeEditor from '@/components/MkCodeEditor.vue';
 import FormInfo from '@/components/MkInfo.vue';
+import { isSafeMode } from '@@/js/config.js';
 import * as os from '@/os.js';
 import { unisonReload } from '@/utility/unison-reload.js';
 import { i18n } from '@/i18n.js';

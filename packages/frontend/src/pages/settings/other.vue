@@ -89,7 +89,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<template #icon><SearchIcon><i class="ti ti-badges"></i></SearchIcon></template>
 					<template #label><SearchLabel>{{ i18n.ts.rolesAssignedToMe }}</SearchLabel></template>
 
-					<MkRolePreview v-for="role in $i.roles" :key="role.id" :role="role" :forModeration="false"/>
+					<div class="_gaps_s">
+						<MkRolePreview v-for="role in $i.roles" :key="role.id" :role="role" :forModeration="false"/>
+					</div>
 				</MkFolder>
 			</SearchMarker>
 
@@ -110,7 +112,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<div class="_gaps_m">
 						<FormInfo warn>{{ i18n.ts._accountDelete.mayTakeTime }}</FormInfo>
 						<FormInfo>{{ i18n.ts._accountDelete.sendEmail }}</FormInfo>
-						<MkButton v-if="!$i.isDeleted" danger @click="deleteAccount"><SearchKeyword>{{ i18n.ts._accountDelete.requestAccountDelete }}</SearchKeyword></MkButton>
+						<MkButton v-if="!$i.isDeleted" danger @click="deleteAccount"><SearchText>{{ i18n.ts._accountDelete.requestAccountDelete }}</SearchText></MkButton>
 						<MkButton v-else disabled>{{ i18n.ts._accountDelete.inProgress }}</MkButton>
 					</div>
 				</MkFolder>
@@ -130,6 +132,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</MkSwitch>
 						<MkSwitch v-model="stackingRouterView">
 							<template #label>Enable stacking router view</template>
+						</MkSwitch>
+						<MkSwitch v-model="enableFolderPageView">
+							<template #label>Enable folder page view</template>
+						</MkSwitch>
+						<MkSwitch v-model="enableHapticFeedback">
+							<template #label>Enable haptic feedback</template>
+						</MkSwitch>
+						<MkSwitch v-model="enableWebTranslatorApi">
+							<template #label>Enable in-browser translator API</template>
 						</MkSwitch>
 					</div>
 				</MkFolder>
@@ -154,6 +165,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<FormLink to="/registry"><template #icon><i class="ti ti-adjustments"></i></template>{{ i18n.ts.registry }}</FormLink>
 
 		<hr>
+
+		<MkButton @click="resetAllTips"><i class="ti ti-bulb"></i> {{ i18n.ts.redisplayAllTips }}</MkButton>
+		<MkButton @click="hideAllTips"><i class="ti ti-bulb-off"></i> {{ i18n.ts.hideAllTips }}</MkButton>
+
+		<hr>
+
+		<template v-if="$i.policies.chatAvailability !== 'unavailable'">
+			<MkButton @click="readAllChatMessages">{{ i18n.ts.readAllChatMessages }}</MkButton>
+
+			<hr>
+		</template>
+
+		<MkButton @click="forceCloudBackup">{{ i18n.ts._preferencesBackup.forceBackup }}</MkButton>
 
 		<FormSlot>
 			<MkButton danger @click="migrate"><i class="ti ti-refresh"></i> {{ i18n.ts.migrateOldSettings }}</MkButton>
@@ -180,12 +204,13 @@ import { misskeyApi } from '@/utility/misskey-api.js';
 import { ensureSignin } from '@/i.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
-import { reloadAsk } from '@/utility/reload-ask.js';
-import FormSection from '@/components/form/section.vue';
 import { prefer } from '@/preferences.js';
 import MkRolePreview from '@/components/MkRolePreview.vue';
 import { signout } from '@/signout.js';
 import { migrateOldSettings } from '@/pref-migrate.js';
+import { hideAllTips as _hideAllTips, resetAllTips as _resetAllTips } from '@/tips.js';
+import { suggestReload } from '@/utility/reload-suggest.js';
+import { cloudBackup } from '@/preferences/utility.js';
 
 const $i = ensureSignin();
 
@@ -198,9 +223,12 @@ const userLists = ref<Misskey.entities.UserList[]>([]);
 const antennas = ref<Misskey.entities.Antenna[]>([]);
 const selectedListId = ref<string | null>(null);
 const selectedAntennaId = ref<string | null>(null);
+const enableFolderPageView = prefer.model('experimental.enableFolderPageView');
+const enableHapticFeedback = prefer.model('experimental.enableHapticFeedback');
+const enableWebTranslatorApi = prefer.model('experimental.enableWebTranslatorApi');
 
-watch(skipNoteRender, async () => {
-	await reloadAsk({ reason: i18n.ts.reloadToApplySetting, unison: true });
+watch(skipNoteRender, () => {
+	suggestReload();
 });
 
 onMounted(async () => {
@@ -256,6 +284,25 @@ async function clearFanoutTimeline(type: 'home' | 'user' | 'list' | 'antenna', t
 
 function migrate() {
 	migrateOldSettings();
+}
+
+function resetAllTips() {
+	_resetAllTips();
+	os.success();
+}
+
+function hideAllTips() {
+	_hideAllTips();
+	os.success();
+}
+
+function readAllChatMessages() {
+	os.apiWithDialog('chat/read-all', {});
+}
+
+async function forceCloudBackup() {
+	await cloudBackup();
+	os.success();
 }
 
 const headerActions = computed(() => []);

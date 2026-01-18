@@ -34,23 +34,17 @@ jobs:
     name: Unit tests (frontend)
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [22.x]
-
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v4.3.0
       with:
         fetch-depth: 0
         submodules: true
-    - name: Install pnpm
-      uses: pnpm/action-setup@v4
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4.2.0
+    - name: Use Node.js
+      uses: actions/setup-node@v4.4.0
       with:
-        run_install: false
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v6
-      with:
-        node-version: ${{ matrix.node-version }}
+        node-version-file: '.node-version'
         cache: 'pnpm'
     - run: pnpm i --frozen-lockfile
     - name: Check pnpm-lock.yaml
@@ -66,3 +60,74 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./packages/frontend/coverage/coverage-final.json
+
+  e2e:
+    name: E2E tests (frontend)
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chrome]
+
+    services:
+      postgres:
+        image: postgres:18
+        ports:
+          - 54312:5432
+        env:
+          POSTGRES_DB: test-misskey
+          POSTGRES_HOST_AUTH_METHOD: trust
+      redis:
+        image: redis:7
+        ports:
+          - 56312:6379
+
+    steps:
+    - uses: actions/checkout@v4.3.0
+      with:
+        submodules: true
+    # https://github.com/cypress-io/cypress-docker-images/issues/150
+    #- name: Install mplayer for FireFox
+    #  run: sudo apt install mplayer -y
+    #  if: ${{ matrix.browser == 'firefox' }}
+    #- uses: browser-actions/setup-firefox@latest
+    #  if: ${{ matrix.browser == 'firefox' }}
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4.2.0
+    - name: Use Node.js
+      uses: actions/setup-node@v4.4.0
+      with:
+        node-version-file: '.node-version'
+        cache: 'pnpm'
+    - run: pnpm i --frozen-lockfile
+    - name: Copy Configure
+      run: cp .github/misskey/test.yml .config
+    - name: Build
+      run: pnpm build
+    # https://github.com/cypress-io/cypress/issues/4351#issuecomment-559489091
+    - name: ALSA Env
+      run: echo -e 'pcm.!default {\n type hw\n card 0\n}\n\nctl.!default {\n type hw\n card 0\n}' > ~/.asoundrc
+    # XXX: This tries reinstalling Cypress if the binary is not cached
+    # Remove this when the cache issue is fixed
+    - name: Cypress install
+      run: pnpm exec cypress install
+    - name: Cypress run
+      uses: cypress-io/github-action@v6
+      timeout-minutes: 15
+      with:
+        install: false
+        start: pnpm start:test
+        wait-on: 'http://localhost:61812'
+        headed: true
+        browser: ${{ matrix.browser }}
+    - uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: ${{ matrix.browser }}-cypress-screenshots
+        path: cypress/screenshots
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: ${{ matrix.browser }}-cypress-videos
+        path: cypress/videos

@@ -23,7 +23,7 @@ export async function getAccounts(): Promise<{
 	host: string;
 	id: Misskey.entities.User['id'];
 	username: Misskey.entities.User['username'];
-	user?: Misskey.entities.User | null;
+	user?: Misskey.entities.MeDetailed | null;
 	token: string | null;
 }[]> {
 	const tokens = store.s.accountTokens;
@@ -38,11 +38,10 @@ export async function getAccounts(): Promise<{
 	}));
 }
 
-async function addAccount(host: string, user: Misskey.entities.User, token: AccountWithToken['token']) {
+async function addAccount(host: string, user: Misskey.entities.MeDetailed, token: AccountWithToken['token']) {
 	const key = host + '/' + user.id;
 	store.set('accountTokens', { ...store.s.accountTokens, [key]: token });
 	store.set('accountInfos', { ...store.s.accountInfos, [key]: user });
-
 	if (!prefer.s.accounts.some(x => x[0] === host && x[1].id === user.id)) {
 		prefer.commit('accounts', [...prefer.s.accounts, [host, { id: user.id, username: user.username }]]);
 	}
@@ -222,13 +221,14 @@ export async function switchAccount(host: string, id: string) {
 	}
 }
 
-export async function openAccountMenu(opts: {
+export async function getAccountMenu(opts: {
 	includeCurrentAccount?: boolean;
 	withExtraOperation: boolean;
 	active?: Misskey.entities.User['id'];
 	onChoose?: (account: Misskey.entities.User) => void;
 }, ev: MouseEvent) {
-	if (!$i) return;
+	if ($i == null) throw new Error('No current account');
+	const me = $i;
 
 	async function switchAccountByUser(account: Misskey.entities.User) {
 		const storedAccounts = await getAccounts();

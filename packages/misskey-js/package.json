@@ -1,18 +1,21 @@
 {
   "type": "module",
   "name": "misskey-js",
-  "version": "2025.4.1-io.11c",
+  "version": "2025.11.1-io.0",
   "description": "Misskey SDK for JavaScript",
   "license": "MIT",
+  "main": "./built/index.js",
   "types": "./built/index.d.ts",
   "exports": {
     ".": {
       "import": "./built/index.js",
-      "types": "./built/index.d.ts"
+      "types": "./built/index.d.ts",
+      "default": "./built/index.js"
     },
     "./*": {
       "import": "./built/*",
-      "types": "./built/*"
+      "types": "./built/*",
+      "default": "./built/*"
     }
   },
   "scripts": {

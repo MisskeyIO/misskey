@@ -2,7 +2,9 @@ packages:
   - packages/backend
   - packages/frontend-shared
   - packages/frontend
+  - packages/frontend-builder
   - packages/frontend-embed
+  - packages/icons-subsetter
   - packages/sw
   - packages/misskey-js
   - packages/misskey-js/generator
@@ -17,6 +19,7 @@ catalog:
   '@bull-board/fastify': 6.16.2
   '@bull-board/ui': 6.16.2
   '@discordapp/twemoji': 16.0.1
+  '@eslint/js': 9.39.1
   '@fastify/accepts': 5.0.4
   '@fastify/cookie': 11.0.2
   '@fastify/cors': 11.2.0
@@ -114,6 +117,7 @@ catalog:
   '@types/oauth2orize-pkce': 0.1.2
   '@types/pg': 8.16.0
   '@types/pug': 2.0.10
+  '@types/punycode': 2.1.4
   '@types/punycode.js': npm:@types/punycode@2.1.4
   '@types/qrcode': 1.5.6
   '@types/random-seed': 0.3.5
@@ -287,6 +291,7 @@ catalog:
   sass: 1.97.1
   secure-json-parse: 4.1.0
   seedrandom: 3.0.5
+  semver: 7.7.1
   sharp: 0.34.5
   shiki: 3.20.0
   simple-oauth2: 5.1.0
@@ -344,16 +349,7 @@ catalog:
   ws: 8.18.3
   xev: 3.0.2
   xmlbuilder: 15.1.1
-
-catalogMode: strict
-
-cleanupUnusedCatalogs: false
-
-ignorePatchFailures: false
-
-ignoredBuiltDependencies:
-  - '@sentry-internal/node-cpu-profiler'
-  - unrs-resolver
+  intersection-observer: 0.12.2
 
 onlyBuiltDependencies:
   - '@nestjs/core'
@@ -376,7 +372,6 @@ onlyBuiltDependencies:
   - utf-8-validate
   - v-code-diff
   - vue-demi
-
 overrides:
   '@aiscript-dev/aiscript-languageserver': '-'
   '@misskey-dev/summaly': github:MisskeyIO/summaly#5.2.5-io.3
@@ -403,3 +398,16 @@ overrides:
 patchedDependencies:
   nsfwjs@4.2.1: patches/nsfwjs@4.2.1.patch
   pg-pool@3.10.1: patches/pg-pool@3.10.1.patch
+
+ignorePatchFailures: false
+# minimumReleaseAge: 10080 # delay 7days to mitigate supply-chain attack
+catalogMode: strict
+
+ignoredBuiltDependencies:
+  - '@sentry-internal/node-cpu-profiler'
+  - unrs-resolver
+
+minimumReleaseAgeExclude:
+  - '@syuilo/aiscript'
+  - vue-component-type-helpers
+  - '@types/pg'

@@ -22,6 +22,7 @@ import {
 	MiChannel,
 	MiChannelFavorite,
 	MiChannelFollowing,
+	MiChannelMuting,
 	MiClip,
 	MiClipFavorite,
 	MiClipNote,
@@ -46,6 +47,7 @@ import {
 	MiScheduledNote,
 	MiNoteReaction,
 	MiNoteThreadMuting,
+	MiNoteDraft,
 	MiPage,
 	MiPageLike,
 	MiPasswordResetRequest,
@@ -157,6 +159,12 @@ const $noteThreadMutingsRepository: Provider = {
 const $noteReactionsRepository: Provider = {
 	provide: DI.noteReactionsRepository,
 	useFactory: (db: DataSource) => db.getRepository(MiNoteReaction).extend(miRepository as MiRepository<MiNoteReaction>),
+	inject: [DI.db],
+};
+
+const $noteDraftsRepository: Provider = {
+	provide: DI.noteDraftsRepository,
+	useFactory: (db: DataSource) => db.getRepository(MiNoteDraft).extend(miRepository as MiRepository<MiNoteDraft>),
 	inject: [DI.db],
 };
 
@@ -466,6 +474,12 @@ const $channelFavoritesRepository: Provider = {
 	inject: [DI.db],
 };
 
+const $channelMutingRepository: Provider = {
+	provide: DI.channelMutingRepository,
+	useFactory: (db: DataSource) => db.getRepository(MiChannelMuting).extend(miRepository as MiRepository<MiChannelMuting>),
+	inject: [DI.db],
+};
+
 const $registryItemsRepository: Provider = {
 	provide: DI.registryItemsRepository,
 	useFactory: (db: DataSource) => db.getRepository(MiRegistryItem).extend(miRepository as MiRepository<MiRegistryItem>),
@@ -600,6 +614,7 @@ const $abuseReportResolversRepository: Provider = {
 		$noteFavoritesRepository,
 		$noteThreadMutingsRepository,
 		$noteReactionsRepository,
+		$noteDraftsRepository,
 		$pollsRepository,
 		$pollVotesRepository,
 		$userProfilesRepository,
@@ -651,6 +666,7 @@ const $abuseReportResolversRepository: Provider = {
 		$channelsRepository,
 		$channelFollowingsRepository,
 		$channelFavoritesRepository,
+		$channelMutingRepository,
 		$registryItemsRepository,
 		$webhooksRepository,
 		$systemWebhooksRepository,
@@ -684,6 +700,7 @@ const $abuseReportResolversRepository: Provider = {
 		$noteFavoritesRepository,
 		$noteThreadMutingsRepository,
 		$noteReactionsRepository,
+		$noteDraftsRepository,
 		$pollsRepository,
 		$pollVotesRepository,
 		$userProfilesRepository,
@@ -735,6 +752,7 @@ const $abuseReportResolversRepository: Provider = {
 		$channelsRepository,
 		$channelFollowingsRepository,
 		$channelFavoritesRepository,
+		$channelMutingRepository,
 		$registryItemsRepository,
 		$webhooksRepository,
 		$systemWebhooksRepository,

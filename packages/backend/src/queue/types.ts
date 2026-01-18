@@ -125,8 +125,13 @@ export type EndedPollNotificationJobData = {
 	noteId: MiNote['id'];
 };
 
+// FIXME Check 要確認
 export type ScheduledNoteJobData = {
 	draftId: MiScheduledNote['id'];
+};
+
+export type PostScheduledNoteJobData = {
+	noteDraftId: string;
 };
 
 export type SystemWebhookDeliverJobData<T extends SystemWebhookEventType = SystemWebhookEventType> = {

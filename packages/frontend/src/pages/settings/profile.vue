@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <SearchMarker path="/settings/profile" :label="i18n.ts.profile" :keywords="['profile']" icon="ti ti-user">
 	<div class="_gaps_m">
 		<div class="_panel">
-			<div :class="$style.banner" :style="{ backgroundImage: $i.bannerUrl ? `url(${ $i.bannerUrl })` : null }">
+			<div :class="$style.banner" :style="{ backgroundImage: $i.bannerUrl ? `url(${ $i.bannerUrl })` : '' }">
 				<div :class="$style.bannerEdit">
 					<SearchMarker :keywords="['banner', 'change']">
 						<MkButton primary rounded @click="changeBanner"><SearchLabel>{{ i18n.ts._profile.changeBanner }}</SearchLabel></MkButton>
@@ -53,9 +53,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</SearchMarker>
 
 		<SearchMarker :keywords="['language', 'locale']">
-			<MkSelect v-model="profile.lang">
+			<MkSelect v-model="profile.lang" :items="Object.entries(langmap).map(([code, def]) => ({ label: def.nativeName, value: code }))">
 				<template #label><SearchLabel>{{ i18n.ts.language }}</SearchLabel></template>
-				<option v-for="x in Object.keys(langmap)" :key="x" :value="x">{{ langmap[x].nativeName }}</option>
 			</MkSelect>
 		</SearchMarker>
 
@@ -130,14 +129,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 							@end="e => e.item.classList.remove('active')"
 						>
 							<template #item="{ element: sectionElement, index: sectionIndex }">
-								<div :class="$style.mutualLinkSectionRoot">
-									<button v-if="!mutualLinkSectionEditMode" class="_button" :class="$style.dragItemHandle" tabindex="-1"><i class="ti ti-menu"></i></button>
+									<div :class="$style.mutualLinkSectionRoot">
+										<button v-if="!mutualLinkSectionEditMode" class="_button" :class="$style.dragItemHandle" tabindex="-1"><i class="ti ti-menu"></i></button>
 
-									{{ sectionElement.length }}
-									<button v-if="mutualLinkSectionEditMode" :disabled="sectionElement.length <= 1" class="_button" :class="$style.dragItemRemove" @click="deleteMutualLinkSection(sectionIndex)"><i class="ti ti-x"></i></button>
-									<FormSlot :style="{flexGrow: 1}">
-										<MkFolder>
-											<template #label>{{ sectionElement.name || i18n.ts._profile.sectionNameNone }}</template>
+										<button v-if="mutualLinkSectionEditMode" :disabled="mutualLinkSections.length <= 1" class="_button" :class="$style.dragItemRemove" @click="deleteMutualLinkSection(sectionIndex)"><i class="ti ti-x"></i></button>
+										<FormSlot :style="{flexGrow: 1}">
+											<MkFolder>
+												<template #label>{{ sectionElement.name || i18n.ts._profile.sectionNameNone }}</template>
 
 											<div class="_gaps_s" :class="$style.metadataMargin">
 												<MkInfo v-if="sectionIndex >= $i.policies.mutualLinkSectionLimit" warn><Mfm :text="i18n.tsx._profile.policyDisplayLimitExceeded({ max: $i.policies.mutualLinkSectionLimit })"/></MkInfo>
@@ -156,9 +154,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 												@end="e => e.item.classList.remove('active')"
 											>
 												<template #item="{ element: linkElement, index: linkIndex }">
-													<div :class="$style.mutualLinkRoot">
-														<button v-if="!mutualLinkSectionEditMode" class="_button" :class="$style.dragItemHandle" tabindex="-1"><i class="ti ti-menu"></i></button>
-														<button v-if="mutualLinkSectionEditMode" class="_button" :class="$style.dragItemRemove" @click="deleteMutualLink(sectionIndex,linkIndex)"><i class="ti ti-x"></i></button>
+														<div :class="$style.mutualLinkRoot">
+															<button v-if="!mutualLinkSectionEditMode" class="_button" :class="$style.dragItemHandle" tabindex="-1"><i class="ti ti-menu"></i></button>
+															<button v-if="mutualLinkSectionEditMode" class="_button" :class="$style.dragItemRemove" @click="deleteMutualLink(sectionIndex, linkIndex)"><i class="ti ti-x"></i></button>
 
 														<div class="_gaps_s" :style="{flex: 1}">
 															<MkInfo v-if="linkIndex >= $i.policies.mutualLinkLimit" warn><Mfm :text="i18n.tsx._profile.policyDisplayLimitExceeded({ max: $i.policies.mutualLinkLimit })"/></MkInfo>
@@ -170,11 +168,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 															</MkInput>
 															<span>{{ i18n.ts._profile.mutualLinksBanner }}</span>
 															<img :class="$style.mutualLinkImg" :src="linkElement.imgSrc">
-															<MkButton class="_button" @click="ev => changeMutualLinkFile(ev, sectionIndex, linkIndex)">{{ i18n.ts.selectFile }}</MkButton>
+																<MkButton class="_button" @click="ev => changeMutualLinkFile(ev, sectionIndex, linkIndex)">{{ i18n.ts.selectFile }}</MkButton>
+															</div>
 														</div>
-													</div>
-												</template>
-											</Sortable>
+													</template>
+												</Sortable>
 										</MkFolder>
 									</FormSlot>
 								</div>
@@ -191,20 +189,24 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkInput v-model="profile.followedMessage" :max="200" manualSave :mfmPreview="false">
 				<template #label><SearchLabel>{{ i18n.ts._profile.followedMessage }}</SearchLabel><span class="_beta">{{ i18n.ts.beta }}</span></template>
 				<template #caption>
-					<div><SearchKeyword>{{ i18n.ts._profile.followedMessageDescription }}</SearchKeyword></div>
+					<div><SearchText>{{ i18n.ts._profile.followedMessageDescription }}</SearchText></div>
 					<div>{{ i18n.ts._profile.followedMessageDescriptionForLockedAccount }}</div>
 				</template>
 			</MkInput>
 		</SearchMarker>
 
 		<SearchMarker :keywords="['reaction']">
-			<MkSelect v-model="reactionAcceptance">
+			<MkSelect
+				v-model="reactionAcceptance"
+				:items="[
+					{ label: i18n.ts.all, value: null },
+					{ label: i18n.ts.likeOnlyForRemote, value: 'likeOnlyForRemote' },
+					{ label: i18n.ts.nonSensitiveOnly, value: 'nonSensitiveOnly' },
+					{ label: i18n.ts.nonSensitiveOnlyForLocalLikeOnlyForRemote, value: 'nonSensitiveOnlyForLocalLikeOnlyForRemote' },
+					{ label: i18n.ts.likeOnly, value: 'likeOnly' },
+				]"
+			>
 				<template #label><SearchLabel>{{ i18n.ts.reactionAcceptance }}</SearchLabel></template>
-				<option :value="null">{{ i18n.ts.all }}</option>
-				<option value="likeOnlyForRemote">{{ i18n.ts.likeOnlyForRemote }}</option>
-				<option value="nonSensitiveOnly">{{ i18n.ts.nonSensitiveOnly }}</option>
-				<option value="nonSensitiveOnlyForLocalLikeOnlyForRemote">{{ i18n.ts.nonSensitiveOnlyForLocalLikeOnlyForRemote }}</option>
-				<option value="likeOnly">{{ i18n.ts.likeOnly }}</option>
 			</MkSelect>
 		</SearchMarker>
 
@@ -229,49 +231,60 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 			</MkFolder>
 		</SearchMarker>
+
+		<hr>
+
+		<SearchMarker :keywords="['qrcode']">
+			<FormLink to="/qr">
+				<template #icon><i class="ti ti-qrcode"></i></template>
+				<SearchLabel>{{ i18n.ts.qr }}</SearchLabel>
+			</FormLink>
+		</SearchMarker>
 	</div>
 </SearchMarker>
 </template>
 
-<script lang="ts" setup>
-import { computed, reactive, ref, watch, defineAsyncComponent } from 'vue';
+	<script lang="ts" setup>
+	import { computed, reactive, ref, watch, defineAsyncComponent } from 'vue';
 import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import MkSelect from '@/components/MkSelect.vue';
 import FormSplit from '@/components/form/split.vue';
-import MkFolder from '@/components/MkFolder.vue';
-import FormSlot from '@/components/form/slot.vue';
-import { selectFile } from '@/utility/select-file.js';
-import * as os from '@/os.js';
-import { i18n } from '@/i18n.js';
-import { ensureSignin } from '@/i.js';
-import { langmap } from '@/utility/langmap.js';
-import { definePage } from '@/page.js';
+	import MkFolder from '@/components/MkFolder.vue';
+	import FormSlot from '@/components/form/slot.vue';
+	import FormLink from '@/components/form/link.vue';
+	import { chooseDriveFile, selectFile } from '@/utility/drive.js';
+	import * as os from '@/os.js';
+	import { i18n } from '@/i18n.js';
+	import { ensureSignin } from '@/i.js';
+	import { langmap } from '@/utility/langmap.js';
+	import { definePage } from '@/page.js';
 import { claimAchievement } from '@/utility/achievements.js';
 import { store } from '@/store.js';
 import MkInfo from '@/components/MkInfo.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
+import { genId } from '@/utility/id.js';
 
 const $i = ensureSignin();
 
-const Sortable = defineAsyncComponent(() => import('vuedraggable').then(x => x.default));
-const reactionAcceptance = computed(store.makeGetterSetter('reactionAcceptance'));
+	const Sortable = defineAsyncComponent(() => import('vuedraggable').then(x => x.default));
+	const reactionAcceptance = computed(store.makeGetterSetter('reactionAcceptance'));
 
-function assertVaildLang(lang: string | null): lang is keyof typeof langmap {
-	return lang != null && lang in langmap;
-}
+	function assertValidLang(lang: string | null): lang is keyof typeof langmap {
+		return lang != null && lang in langmap;
+	}
 
 const profile = reactive({
 	name: $i.name,
 	description: $i.description,
 	followedMessage: $i.followedMessage,
-	location: $i.location,
-	birthday: $i.birthday,
-	lang: assertVaildLang($i.lang) ? $i.lang : null,
-	isBot: $i.isBot ?? false,
-	isCat: $i.isCat ?? false,
-});
+		location: $i.location,
+		birthday: $i.birthday,
+		lang: assertValidLang($i.lang) ? $i.lang : null,
+		isBot: $i.isBot ?? false,
+		isCat: $i.isCat ?? false,
+	});
 
 watch(() => profile, () => {
 	save();
@@ -279,37 +292,65 @@ watch(() => profile, () => {
 	deep: true,
 });
 
-const mutualLinkSections = ref($i.mutualLinkSections.map(section => ({ ...section, id: Math.random().toString(), none: !section.name })) ?? []);
-const fields = ref($i.fields.map(field => ({ id: Math.random().toString(), name: field.name, value: field.value })) ?? []);
-const fieldEditMode = ref(false);
-const mutualLinkSectionEditMode = ref(false);
+	const fields = ref($i.fields.map(field => ({ id: genId(), name: field.name, value: field.value })) ?? []);
 
-function addField() {
-	fields.value.push({
-		id: Math.random().toString(),
-		name: '',
-		value: '',
-	});
-}
+	const fieldEditMode = ref(false);
+	const mutualLinkSectionEditMode = ref(false);
 
-function addMutualLinks(index:number) {
-	mutualLinkSections.value[index].mutualLinks.push({
-		id: Math.random().toString(),
-		fileId: '',
-		url: '',
-		imgSrc: '',
-		description: '',
-	});
-}
+	type MutualLink = {
+		id: string;
+		fileId: string;
+		url: string;
+		imgSrc: string;
+		description: string;
+	};
 
-function addMutualLinkSections() {
-	mutualLinkSections.value.push({
-		id: Math.random().toString(),
-		name: 'New Section',
-		none: false,
-		mutualLinks: [],
-	});
-}
+	type MutualLinkSection = {
+		id: string;
+		name: string | null;
+		none: boolean;
+		mutualLinks: MutualLink[];
+	};
+
+	const mutualLinkSections = ref<MutualLinkSection[]>((($i as any).mutualLinkSections ?? []).map((section: any) => ({
+		id: section.id ?? genId(),
+		name: section.name ?? null,
+		none: section.name == null,
+		mutualLinks: (section.mutualLinks ?? []).map((link: any) => ({
+			id: link.id ?? genId(),
+			fileId: link.fileId ?? '',
+			url: link.url ?? '',
+			imgSrc: link.imgSrc ?? '',
+			description: link.description ?? '',
+		})),
+	})));
+
+	function addField() {
+		fields.value.push({
+			id: genId(),
+			name: '',
+			value: '',
+		});
+	}
+
+	function addMutualLinks(index: number) {
+		mutualLinkSections.value[index].mutualLinks.push({
+			id: genId(),
+			fileId: '',
+			url: '',
+			imgSrc: '',
+			description: '',
+		});
+	}
+
+	function addMutualLinkSections() {
+		mutualLinkSections.value.push({
+			id: genId(),
+			name: 'New Section',
+			none: false,
+			mutualLinks: [],
+		});
+	}
 
 while (fields.value.length < 4) {
 	addField();
@@ -323,9 +364,9 @@ function deleteMutualLinkSection(index: number) {
 	mutualLinkSections.value.splice(index, 1);
 }
 
-function deleteMutualLink(sectionIndex:number, index: number) {
-	mutualLinkSections.value[sectionIndex].mutualLinks.splice(index, 1);
-}
+	function deleteMutualLink(sectionIndex: number, index: number) {
+		mutualLinkSections.value[sectionIndex].mutualLinks.splice(index, 1);
+	}
 
 function saveFields() {
 	os.apiWithDialog('i/update', {
@@ -333,11 +374,20 @@ function saveFields() {
 	});
 }
 
-function saveMutualLinks() {
-	os.apiWithDialog('i/update', {
-		mutualLinkSections: mutualLinkSections.value,
-	});
-}
+	function saveMutualLinks() {
+		os.apiWithDialog('i/update', {
+			mutualLinkSections: mutualLinkSections.value.map(section => ({
+				id: section.id,
+				name: section.none ? null : section.name,
+				mutualLinks: section.mutualLinks.map(link => ({
+					id: link.id,
+					fileId: link.fileId,
+					url: link.url,
+					description: link.description,
+				})),
+			})),
+		});
+	}
 
 function save() {
 	os.apiWithDialog('i/update', {
@@ -371,62 +421,107 @@ function save() {
 	}
 }
 
-function changeMutualLinkFile(ev: MouseEvent, sectionIndex: number, linkIndex: number) {
-	selectFile(ev.currentTarget ?? ev.target, i18n.ts.mutualLink).then(async (file) => {
+	async function changeMutualLinkFile(ev: MouseEvent, sectionIndex: number, linkIndex: number) {
+		const file = await selectFile({ anchorElement: ev.currentTarget ?? ev.target, multiple: false, label: i18n.ts.mutualLink });
 		mutualLinkSections.value[sectionIndex].mutualLinks[linkIndex].imgSrc = file.url;
 		mutualLinkSections.value[sectionIndex].mutualLinks[linkIndex].fileId = file.id;
-	});
-}
+	}
 
-function changeAvatar(ev) {
-	selectFile(ev.currentTarget ?? ev.target, i18n.ts.avatar).then(async (file) => {
-		let originalOrCropped = file;
-
-		const { canceled } = await os.confirm({
-			type: 'question',
-			text: i18n.ts.cropImageAsk,
-			okText: i18n.ts.cropYes,
-			cancelText: i18n.ts.cropNo,
-		});
-
-		if (!canceled) {
-			originalOrCropped = await os.cropImage(file, {
-				aspectRatio: 1,
+	function changeAvatar(ev: MouseEvent) {
+		async function done(driveFile) {
+			const i = await os.apiWithDialog('i/update', {
+				avatarId: driveFile.id,
 			});
-		}
-
-		const i = await os.apiWithDialog('i/update', {
-			avatarId: originalOrCropped.id,
-		});
 		$i.avatarId = i.avatarId;
 		$i.avatarUrl = i.avatarUrl;
 		claimAchievement('profileFilled');
-	});
-}
+	}
 
-function changeBanner(ev) {
-	selectFile(ev.currentTarget ?? ev.target, i18n.ts.banner).then(async (file) => {
-		let originalOrCropped = file;
+	os.popupMenu([{
+		text: i18n.ts.avatar,
+		type: 'label',
+	}, {
+		text: i18n.ts.upload,
+		icon: 'ti ti-upload',
+		action: async () => {
+			const files = await os.chooseFileFromPc({ multiple: false });
+			const file = files[0];
 
-		const { canceled } = await os.confirm({
-			type: 'question',
-			text: i18n.ts.cropImageAsk,
-			okText: i18n.ts.cropYes,
-			cancelText: i18n.ts.cropNo,
-		});
+			let originalOrCropped = file;
 
-		if (!canceled) {
-			originalOrCropped = await os.cropImage(file, {
-				aspectRatio: 2,
+			const { canceled } = await os.confirm({
+				type: 'question',
+				text: i18n.ts.cropImageAsk,
+				okText: i18n.ts.cropYes,
+				cancelText: i18n.ts.cropNo,
 			});
-		}
 
-		const i = await os.apiWithDialog('i/update', {
-			bannerId: originalOrCropped.id,
-		});
+			if (!canceled) {
+				originalOrCropped = await os.cropImageFile(file, {
+					aspectRatio: 1,
+				});
+			}
+
+			const driveFile = (await os.launchUploader([originalOrCropped], { multiple: false }))[0];
+			done(driveFile);
+		},
+	}, {
+		text: i18n.ts.fromDrive,
+		icon: 'ti ti-cloud',
+		action: () => {
+			chooseDriveFile({ multiple: false }).then(files => {
+				done(files[0]);
+			});
+		},
+		}], ev.currentTarget ?? ev.target);
+	}
+
+	function changeBanner(ev: MouseEvent) {
+		async function done(driveFile) {
+			const i = await os.apiWithDialog('i/update', {
+				bannerId: driveFile.id,
+			});
 		$i.bannerId = i.bannerId;
 		$i.bannerUrl = i.bannerUrl;
-	});
+	}
+
+	os.popupMenu([{
+		text: i18n.ts.banner,
+		type: 'label',
+	}, {
+		text: i18n.ts.upload,
+		icon: 'ti ti-upload',
+		action: async () => {
+			const files = await os.chooseFileFromPc({ multiple: false });
+			const file = files[0];
+
+			let originalOrCropped = file;
+
+			const { canceled } = await os.confirm({
+				type: 'question',
+				text: i18n.ts.cropImageAsk,
+				okText: i18n.ts.cropYes,
+				cancelText: i18n.ts.cropNo,
+			});
+
+			if (!canceled) {
+				originalOrCropped = await os.cropImageFile(file, {
+					aspectRatio: 2,
+				});
+			}
+
+			const driveFile = (await os.launchUploader([originalOrCropped], { multiple: false }))[0];
+			done(driveFile);
+		},
+	}, {
+		text: i18n.ts.fromDrive,
+		icon: 'ti ti-cloud',
+		action: () => {
+			chooseDriveFile({ multiple: false }).then(files => {
+				done(files[0]);
+			});
+		},
+	}], ev.currentTarget ?? ev.target);
 }
 
 const headerActions = computed(() => []);

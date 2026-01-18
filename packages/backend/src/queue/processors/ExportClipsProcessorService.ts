@@ -95,6 +95,10 @@ export class ExportClipsProcessorService {
 		let exportedClipsCount = 0;
 		let cursor: MiClip['id'] | null = null;
 
+		const total = await this.clipsRepository.countBy({
+			userId: user.id,
+		});
+
 		while (true) {
 			const query = this.clipsRepository.createQueryBuilder('clip')
 				.where('clip.userId = :userId', { userId: user.id })
@@ -126,11 +130,7 @@ export class ExportClipsProcessorService {
 				exportedClipsCount++;
 			}
 
-			const total = await this.clipsRepository.countBy({
-				userId: user.id,
-			});
-
-			job.updateProgress(exportedClipsCount / total);
+			job.updateProgress(exportedClipsCount / total * 100);
 		}
 	}
 

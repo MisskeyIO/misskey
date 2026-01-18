@@ -36,16 +36,15 @@ export function convertSchemaToOpenApiSchema(schema: Schema, type: 'param' | 're
 		if (o in schema) res[o] = schema[o]!.map(schema => convertSchemaToOpenApiSchema(schema, type, includeSelfRef));
 	}
 
-	if (type === 'res' && schema.ref && (!schema.selfRef || includeSelfRef)) {
-		const $ref = `#/components/schemas/${schema.ref}`;
-		if (schema.nullable || schema.optional) {
-			res.anyOf = [{ $ref }, { type: 'null' }];
-		} else {
-			res.$ref = $ref;
-		}
-	}
-
-	if (schema.nullable) {
+		if (type === 'res' && schema.ref && (!schema.selfRef || includeSelfRef)) {
+			const $ref = `#/components/schemas/${schema.ref}`;
+			if (schema.nullable) {
+				res.oneOf = [{ $ref }, { type: 'null' }];
+			} else {
+				res.$ref = $ref;
+			}
+		delete res.type;
+	} else if (schema.nullable) {
 		if (Array.isArray(schema.type) && !schema.type.includes('null')) {
 			res.type.push('null');
 		} else if (typeof schema.type === 'string') {

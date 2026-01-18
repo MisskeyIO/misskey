@@ -24,6 +24,7 @@ import { MiBubbleGameRecord } from '@/models/BubbleGameRecord.js';
 import { MiChannel } from '@/models/Channel.js';
 import { MiChannelFavorite } from '@/models/ChannelFavorite.js';
 import { MiChannelFollowing } from '@/models/ChannelFollowing.js';
+import { MiChannelMuting } from "@/models/ChannelMuting.js";
 import { MiChatApproval } from '@/models/ChatApproval.js';
 import { MiChatMessage } from '@/models/ChatMessage.js';
 import { MiChatRoom } from '@/models/ChatRoom.js';
@@ -50,6 +51,7 @@ import { MiMuting } from '@/models/Muting.js';
 import { MiNote } from '@/models/Note.js';
 import { MiNoteLanguage } from '@/models/NoteLanguage.js';
 import { MiScheduledNote } from '@/models/ScheduledNote.js';
+import { MiNoteDraft } from '@/models/NoteDraft.js';
 import { MiNoteFavorite } from '@/models/NoteFavorite.js';
 import { MiNoteReaction } from '@/models/NoteReaction.js';
 import { MiNoteThreadMuting } from '@/models/NoteThreadMuting.js';
@@ -117,6 +119,7 @@ export {
 	MiBlocking,
 	MiChannelFollowing,
 	MiChannelFavorite,
+	MiChannelMuting,
 	MiClip,
 	MiClipNote,
 	MiClipFavorite,
@@ -137,6 +140,7 @@ export {
 	MiNote,
 	MiNoteLanguage,
 	MiScheduledNote,
+	MiNoteDraft,
 	MiNoteFavorite,
 	MiNoteReaction,
 	MiNoteThreadMuting,
@@ -203,6 +207,7 @@ export type AuthSessionsRepository = Repository<MiAuthSession> & MiRepository<Mi
 export type BlockingsRepository = Repository<MiBlocking> & MiRepository<MiBlocking>;
 export type ChannelFollowingsRepository = Repository<MiChannelFollowing> & MiRepository<MiChannelFollowing>;
 export type ChannelFavoritesRepository = Repository<MiChannelFavorite> & MiRepository<MiChannelFavorite>;
+export type ChannelMutingRepository = Repository<MiChannelMuting> & MiRepository<MiChannelMuting>;
 export type ClipsRepository = Repository<MiClip> & MiRepository<MiClip>;
 export type ClipNotesRepository = Repository<MiClipNote> & MiRepository<MiClipNote>;
 export type ClipFavoritesRepository = Repository<MiClipFavorite> & MiRepository<MiClipFavorite>;
@@ -223,6 +228,7 @@ export type RenoteMutingsRepository = Repository<MiRenoteMuting> & MiRepository<
 export type NotesRepository = Repository<MiNote> & MiRepository<MiNote>;
 export type NoteLanguagesRepository = Repository<MiNoteLanguage> & MiRepository<MiNoteLanguage>;
 export type ScheduledNotesRepository = Repository<MiScheduledNote>;
+export type NoteDraftsRepository = Repository<MiNoteDraft> & MiRepository<MiNoteDraft>;
 export type NoteFavoritesRepository = Repository<MiNoteFavorite> & MiRepository<MiNoteFavorite>;
 export type NoteReactionsRepository = Repository<MiNoteReaction> & MiRepository<MiNoteReaction>;
 export type NoteThreadMutingsRepository = Repository<MiNoteThreadMuting> & MiRepository<MiNoteThreadMuting>;

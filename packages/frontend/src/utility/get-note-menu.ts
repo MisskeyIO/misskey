@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { defineAsyncComponent } from 'vue';
 import * as Misskey from 'misskey-js';
 import { url } from '@@/js/config.js';
 import { claimAchievement } from './achievements.js';
@@ -26,10 +25,15 @@ import { prefer } from '@/preferences.js';
 import { getPluginHandlers } from '@/plugin.js';
 import { isMute, playUrl } from '@/utility/sound';
 import { isAprilFoolsDay } from '@/utility/seasonal-events';
+import { globalEvents } from '@/events.js';
+
+const isInBrowserTranslationAvailable = (
+	'LanguageDetector' in window &&
+	'Translator' in window
+);
 
 export async function getNoteClipMenu(props: {
 	note: Misskey.entities.Note;
-	isDeleted: Ref<boolean>;
 	currentClip?: Misskey.entities.Clip;
 }) {
 	function getClipName(clip: Misskey.entities.Clip) {
@@ -40,17 +44,7 @@ export async function getNoteClipMenu(props: {
 		}
 	}
 
-	// const isRenote = (
-	// 	props.note.renote != null &&
-	// 	props.note.reply == null &&
-	// 	props.note.text == null &&
-	// 	props.note.cw == null &&
-	// 	props.note.fileIds && props.note.fileIds.length === 0 &&
-	// 	props.note.poll == null
-	// );
-
-	// const appearNote = isRenote ? props.note.renote as Misskey.entities.Note : props.note;
-	const appearNote = getAppearNote(props.note);
+	const appearNote = getAppearNote(props.note) ?? props.note;
 
 	const clips = await clipsCache.fetch();
 	const menu: MenuItem[] = [...clips.map(clip => ({
@@ -79,7 +73,6 @@ export async function getNoteClipMenu(props: {
 									}
 								}));
 							});
-							if (props.currentClip?.id === clip.id) props.isDeleted.value = true;
 						}
 					} else if (err.id === 'f0dba960-ff73-4615-8df4-d6ac5d9dc118') {
 						os.alert({
@@ -113,7 +106,7 @@ export async function getNoteClipMenu(props: {
 			const { canceled, result } = await os.form(i18n.ts.createNewClip, {
 				name: {
 					type: 'string',
-					default: null,
+					default: null as string | null,
 					label: i18n.ts.name,
 				},
 				description: {
@@ -147,12 +140,12 @@ export function getAbuseNoteMenu(note: Misskey.entities.Note, text: string): Men
 	return {
 		icon: 'ti ti-exclamation-circle',
 		text,
-		action: (): void => {
+		action: async (): Promise<void> => {
 			const localUrl = `${url}/notes/${note.id}`;
 			let noteInfo = '';
 			if (note.url ?? note.uri != null) noteInfo = `Note: ${note.url ?? note.uri}\n`;
 			noteInfo += `Local Note: ${localUrl}\n`;
-			os.popup(defineAsyncComponent(() => import('@/components/MkAbuseReportWindow.vue')), {
+			await os.popupAsyncWithDialog(import('@/components/MkAbuseReportWindow.vue').then(x => x.default), {
 				user: note.user,
 				initialComment: `${noteInfo}-----\n`,
 			}, {}, 'closed');
@@ -187,21 +180,11 @@ export function getNoteMenu(props: {
 	note: Misskey.entities.Note;
 	translation: Ref<Misskey.entities.NotesTranslateResponse | null>;
 	translating: Ref<boolean>;
-	isDeleted: Ref<boolean>;
 	currentClip?: Misskey.entities.Clip;
 	postFormDimension?: number | null;
 }) {
-	// const isRenote = (
-	// 	props.note.renote != null &&
-	// 	props.note.reply == null &&
-	// 	props.note.text == null &&
-	// 	props.note.cw == null &&
-	// 	props.note.fileIds && props.note.fileIds.length === 0 &&
-	// 	props.note.poll == null
-	// );
-	//
-	// const appearNote = isRenote ? props.note.renote as Misskey.entities.Note : props.note;
-	const appearNote = getAppearNote(props.note);
+	const appearNote = getAppearNote(props.note) ?? props.note;
+	const link = appearNote.url ?? appearNote.uri;
 
 	const cleanups = [] as (() => void)[];
 
@@ -211,6 +194,7 @@ export function getNoteMenu(props: {
 			text: isAprilFoolsDay() ? i18n.ts.deleteNotWash + '\n' + i18n.ts.noteDeleteConfirm : i18n.ts.noteDeleteConfirm,
 		}).then(({ canceled }) => {
 			if (canceled) return;
+			if ($i == null) return;
 
 			if (isAprilFoolsDay() && !isMute()) {
 				playUrl('/client-assets/sounds/flush.mp3', { volume: store.s.sound_masterVolume });
@@ -218,6 +202,8 @@ export function getNoteMenu(props: {
 
 			misskeyApi('notes/delete', {
 				noteId: appearNote.id,
+			}).then(() => {
+				globalEvents.emit('noteDeleted', appearNote.id);
 			});
 
 			if (Date.now() - new Date(appearNote.createdAt).getTime() < 1000 * 60 && appearNote.userId === $i.id) {
@@ -232,9 +218,12 @@ function delEdit(): void {
 			text: i18n.ts.deleteAndEditConfirm,
 		}).then(({ canceled }) => {
 			if (canceled) return;
+			if ($i == null) return;
 
 			misskeyApi('notes/delete', {
 				noteId: appearNote.id,
+			}).then(() => {
+				globalEvents.emit('noteDeleted', appearNote.id);
 			});
 
 			os.post({
@@ -281,7 +270,6 @@ function delEdit(): void {
 	async function unclip(): Promise<void> {
 		if (!props.currentClip) return;
 		os.apiWithDialog('clips/remove-note', { clipId: props.currentClip.id, noteId: appearNote.id });
-		props.isDeleted.value = true;
 	}
 
 	async function promote(): Promise<void> {
@@ -311,13 +299,48 @@ function delEdit(): void {
 
 	async function translate(): Promise<void> {
 		if (props.translation.value != null) return;
-		props.translating.value = true;
-		const res = await misskeyApi('notes/translate', {
-			noteId: appearNote.id,
-			targetLang: miLocalStorage.getItem('lang') ?? navigator.language,
-		});
-		props.translating.value = false;
-		props.translation.value = res;
+		if (prefer.s['experimental.enableWebTranslatorApi'] && isInBrowserTranslationAvailable && appearNote.text != null) {
+			props.translating.value = true;
+			try {
+				// @ts-expect-error 実験的なAPIなので型定義がない
+				const detector = await LanguageDetector.create();
+				const langResult = await detector.detect(appearNote.text);
+				let localStorageLang = miLocalStorage.getItem('lang');
+				if (localStorageLang != null) {
+					localStorageLang = localStorageLang.split('-')[0];
+				}
+
+				// 翻訳元と翻訳先の言語が同じ場合はTranslatorがthrowするのでそのまま返す
+				if (langResult[0]?.detectedLanguage === localStorageLang || langResult[0]?.detectedLanguage === navigator.language) {
+					props.translation.value = {
+						sourceLang: langResult[0]?.detectedLanguage ?? 'unknown',
+						text: appearNote.text,
+					};
+					return;
+				}
+
+				// @ts-expect-error 実験的なAPIなので型定義がない
+				const translator = await Translator.create({
+					sourceLanguage: langResult[0]?.detectedLanguage,
+					targetLanguage: localStorageLang ?? navigator.language,
+				});
+				const translated = await translator.translate(appearNote.text);
+				props.translation.value = {
+					sourceLang: langResult[0]?.detectedLanguage ?? 'unknown',
+					text: translated,
+				};
+			} finally {
+				props.translating.value = false;
+			}
+		} else if ($i?.policies.canUseTranslator && instance.translatorAvailable) {
+			props.translating.value = true;
+			const res = await misskeyApi('notes/translate', {
+				noteId: appearNote.id,
+				targetLang: miLocalStorage.getItem('lang') ?? navigator.language,
+			});
+			props.translating.value = false;
+			props.translation.value = res;
+		}
 	}
 
 	const menuItems: MenuItem[] = [];
@@ -346,18 +369,18 @@ function delEdit(): void {
 			action: copyContent,
 		}, getCopyNoteLinkMenu(appearNote, i18n.ts.copyLink));
 
-		if (appearNote.url || appearNote.uri) {
+		if (link) {
 			menuItems.push({
 				icon: 'ti ti-link',
 				text: i18n.ts.copyRemoteLink,
 				action: () => {
-					copyToClipboard(appearNote.url ?? appearNote.uri);
+					copyToClipboard(link);
 				},
 			}, {
 				icon: 'ti ti-external-link',
 				text: i18n.ts.showOnRemote,
 				action: () => {
-					window.open(appearNote.url ?? appearNote.uri, '_blank', 'noopener');
+					window.open(link, '_blank', 'noopener');
 				},
 			});
 		} else {
@@ -372,7 +395,7 @@ function delEdit(): void {
 			});
 		}
 
-		if ($i.policies.canUseTranslator && instance.translatorAvailable) {
+		if ((prefer.s['experimental.enableWebTranslatorApi'] && isInBrowserTranslationAvailable) || ($i.policies.canUseTranslator && instance.translatorAvailable)) {
 			menuItems.push({
 				icon: 'ti ti-language-hiragana',
 				text: i18n.ts.translate,
@@ -504,18 +527,18 @@ function delEdit(): void {
 			action: copyContent,
 		}, getCopyNoteLinkMenu(appearNote, i18n.ts.copyLink));
 
-		if (appearNote.url || appearNote.uri) {
+		if (link != null) {
 			menuItems.push({
 				icon: 'ti ti-link',
 				text: i18n.ts.copyRemoteLink,
 				action: () => {
-					copyToClipboard(appearNote.url ?? appearNote.uri);
+					copyToClipboard(link);
 				},
 			}, {
 				icon: 'ti ti-external-link',
 				text: i18n.ts.showOnRemote,
 				action: () => {
-					window.open(appearNote.url ?? appearNote.uri, '_blank', 'noopener');
+					window.open(link, '_blank', 'noopener');
 				},
 			});
 		} else {
@@ -571,21 +594,11 @@ function smallerVisibility(a: Visibility, b: Visibility): Visibility {
 
 export function getRenoteMenu(props: {
 	note: Misskey.entities.Note;
-	renoteButton: ShallowRef<HTMLElement | undefined>;
+	renoteButton: ShallowRef<HTMLElement | null | undefined>;
 	mock?: boolean;
 	postFormDimension?: number | null;
 }) {
-	// const isRenote = (
-	// 	props.note.renote != null &&
-	// 	props.note.reply == null &&
-	// 	props.note.text == null &&
-	// 	props.note.cw == null &&
-	// 	props.note.fileIds && props.note.fileIds.length === 0 &&
-	// 	props.note.poll == null
-	// );
-	//
-	// const appearNote = isRenote ? props.note.renote as Misskey.entities.Note : props.note;
-	const appearNote = getAppearNote(props.note);
+	const appearNote = getAppearNote(props.note) ?? props.note;
 	const dimension = appearNote.dimension ?? prefer.s.dimension ?? 0;
 	const postFormDimension = props.postFormDimension ?? undefined;
 
@@ -612,8 +625,9 @@ export function getRenoteMenu(props: {
 						channelId: appearNote.channelId,
 						dimension,
 						noCreatedNote: true,
-					}).then(() => {
+					}).then((res) => {
 						os.toast(i18n.ts.renoted);
+						globalEvents.emit('notePosted', res.createdNote);
 					});
 				}
 			},
@@ -661,12 +675,13 @@ export function getRenoteMenu(props: {
 						renoteId: appearNote.id,
 						dimension,
 						noCreatedNote: true,
-					}).then(() => {
+					}).then((res) => {
 						os.toast(i18n.ts.renoted);
+						globalEvents.emit('notePosted', res.createdNote);
 					});
 				}
 			},
-		}, (props.mock) ? undefined : {
+		}, ...(props.mock ? [] : [{
 			text: i18n.ts.quote,
 			icon: 'ti ti-quote',
 			action: () => {
@@ -675,7 +690,7 @@ export function getRenoteMenu(props: {
 					initialDimension: postFormDimension,
 				});
 			},
-		}]);
+		}])]);
 
 		normalExternalChannelRenoteItems.push({
 			type: 'parent',
@@ -703,8 +718,9 @@ export function getRenoteMenu(props: {
 								channelId: channel.id,
 								dimension,
 								noCreatedNote: true,
-							}).then(() => {
+							}).then((res) => {
 								os.toast(i18n.tsx.renotedToX({ name: channel.name }));
+								globalEvents.emit('notePosted', res.createdNote);
 							});
 						}
 					},

@@ -6,31 +6,26 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <PageWithHeader :actions="headerActions" :tabs="headerTabs">
 	<div class="_spacer" style="--MI_SPACER-w: 700px; --MI_SPACER-min: 16px; --MI_SPACER-max: 32px;">
-		<FormSuspense :p="init">
-			<MkFolder>
-				<template #label>DeepL Translation</template>
-
+		<SearchMarker path="/admin/external-services" :label="i18n.ts.externalServices" :keywords="['external', 'services', 'thirdparty']" icon="ti ti-link">
+			<MkSuspense :p="init">
 				<div class="_gaps_m">
-					<MkInput v-model="deeplAuthKey">
-						<template #prefix><i class="ti ti-key"></i></template>
-						<template #label>DeepL Auth Key</template>
-					</MkInput>
-					<MkSwitch v-model="deeplIsPro">
-						<template #label>Pro account</template>
-					</MkSwitch>
-				</div>
-			</MkFolder>
-			<MkFolder>
-				<template #label>Google Analytics</template>
+					<MkFolder>
+						<template #label>DeepL Translation</template>
 
-				<div class="_gaps_m">
-					<MkInput v-model="googleAnalyticsId">
-						<template #prefix><i class="ti ti-report-analytics"></i></template>
-						<template #label>Google Analytics ID</template>
-					</MkInput>
+						<div class="_gaps_m">
+							<MkInput v-model="deeplAuthKey">
+								<template #prefix><i class="ti ti-key"></i></template>
+								<template #label>DeepL Auth Key</template>
+							</MkInput>
+							<MkSwitch v-model="deeplIsPro">
+								<template #label>Pro account</template>
+							</MkSwitch>
+							<MkButton primary @click="save_deepl">Save</MkButton>
+						</div>
+					</MkFolder>
 				</div>
-			</MkFolder>
-		</FormSuspense>
+			</MkSuspense>
+		</SearchMarker>
 	</div>
 	<template #footer>
 		<div :class="$style.footer">
@@ -47,7 +42,6 @@ import { ref, computed } from 'vue';
 import MkInput from '@/components/MkInput.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
-import FormSuspense from '@/components/form/suspense.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { fetchInstance } from '@/instance.js';
@@ -55,22 +49,28 @@ import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import MkFolder from '@/components/MkFolder.vue';
 
-const deeplAuthKey = ref<string>('');
-const deeplIsPro = ref<boolean>(false);
-const googleAnalyticsId = ref<string>('');
+const deeplAuthKey = ref('');
+const deeplIsPro = ref(false);
 
 async function init() {
 	const meta = await misskeyApi('admin/meta');
-	deeplAuthKey.value = meta.deeplAuthKey;
+	deeplAuthKey.value = meta.deeplAuthKey ?? '';
 	deeplIsPro.value = meta.deeplIsPro;
-	googleAnalyticsId.value = meta.googleAnalyticsId;
 }
 
 function save() {
 	os.apiWithDialog('admin/update-meta', {
 		deeplAuthKey: deeplAuthKey.value,
 		deeplIsPro: deeplIsPro.value,
-		googleAnalyticsId: googleAnalyticsId.value,
+	}).then(() => {
+		fetchInstance(true);
+	});
+}
+
+function save_deepl() {
+	os.apiWithDialog('admin/update-meta', {
+		deeplAuthKey: deeplAuthKey.value,
+		deeplIsPro: deeplIsPro.value,
 	}).then(() => {
 		fetchInstance(true);
 	});

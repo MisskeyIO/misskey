@@ -14,7 +14,7 @@ import type { MiDriveFile } from '@/models/DriveFile.js';
 import type { MiNote } from '@/models/Note.js';
 import type { MiChannel } from '@/models/Channel.js';
 import { MAX_NOTE_TEXT_LENGTH } from '@/const.js';
-import { langmap } from '@/misc/langmap.js';
+import { postingLangCodes } from '@/misc/langmap.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { NoteCreateService } from '@/core/NoteCreateService.js';
@@ -203,7 +203,7 @@ export const paramDef = {
 		replyId: { type: 'string', format: 'misskey:id', nullable: true },
 		renoteId: { type: 'string', format: 'misskey:id', nullable: true },
 		channelId: { type: 'string', format: 'misskey:id', nullable: true },
-		lang: { type: 'string', enum: [null, ...Object.keys(langmap)] as string[], nullable: true },
+		lang: { type: 'string', enum: [null, ...postingLangCodes] as string[], nullable: true },
 
 		// anyOf内にバリデーションを書いても最初の一つしかチェックされない
 		// See https://github.com/misskey-dev/misskey/pull/10082

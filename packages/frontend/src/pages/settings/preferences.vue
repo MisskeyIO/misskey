@@ -860,7 +860,7 @@ import { instance } from '@/instance.js';
 import { ensureSignin } from '@/i.js';
 import { configureSensitiveContentConsent, sensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 import MkTagItem from '@/components/MkTagItem.vue';
-import { langmap } from '@/utility/langmap.js';
+import { langmap, postingLangCodes } from '@/utility/langmap.js';
 import { updateCurrentAccountPartial } from '@/accounts.js';
 
 const $i = ensureSignin();
@@ -929,9 +929,16 @@ const contextMenu = prefer.model('contextMenu');
 const menuStyle = prefer.model('menuStyle');
 const makeEveryTextElementsSelectable = prefer.model('makeEveryTextElementsSelectable');
 
-const postingLang = ref<string | null>($i.postingLang);
-const languageCodes = Object.keys(langmap);
-const initialViewingLangs = $i.viewingLangs ?? [];
+const postingLangCodeSet = new Set(postingLangCodes);
+const normalizedPostingLang = $i.postingLang != null && postingLangCodeSet.has($i.postingLang)
+	? $i.postingLang
+	: 'other';
+const postingLang = ref<string | null>(normalizedPostingLang);
+const languageCodes = [...postingLangCodes];
+const initialViewingLangs = Array.from(new Set(($i.viewingLangs ?? []).map((code) => {
+	if (code === 'unknown' || code === 'remote') return code;
+	return postingLangCodeSet.has(code) ? code : 'other';
+})));
 const showAllViewingLangs = ref(initialViewingLangs.length === 0);
 const includeUnknown = ref(initialViewingLangs.includes('unknown'));
 const includeRemote = ref(initialViewingLangs.includes('remote'));

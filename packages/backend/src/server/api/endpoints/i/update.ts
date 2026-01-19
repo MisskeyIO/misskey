@@ -23,7 +23,7 @@ import type { MiLocalUser, MiUser } from '@/models/User.js';
 import { birthdaySchema, descriptionSchema, followedMessageSchema, locationSchema, nameSchema } from '@/models/User.js';
 import type { MiUserProfile } from '@/models/UserProfile.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
-import { langmap } from '@/misc/langmap.js';
+import { langmap, postingLangCodes } from '@/misc/langmap.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
@@ -46,7 +46,7 @@ import { ApiError } from '@/server/api/error.js';
 import { IdService } from '@/core/IdService.js';
 
 const languageCodes = Object.keys(langmap);
-const viewingLanguageCodes = [...languageCodes, 'unknown', 'remote'];
+const viewingLanguageCodes = [...postingLangCodes, 'unknown', 'remote'];
 
 export const meta = {
 	tags: ['account'],
@@ -170,7 +170,7 @@ export const paramDef = {
 		location: { ...locationSchema, nullable: true },
 		birthday: { ...birthdaySchema, nullable: true },
 		lang: { type: 'string', enum: [null, ...languageCodes] as string[], nullable: true },
-		postingLang: { type: 'string', enum: [null, ...languageCodes] as string[], nullable: true },
+		postingLang: { type: 'string', enum: [null, ...postingLangCodes] as string[], nullable: true },
 		viewingLangs: {
 			type: 'array',
 			minItems: 0,

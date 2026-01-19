@@ -668,4 +668,10 @@ export const langmap = {
 	'zu-ZA': {
 		nativeName: 'isiZulu',
 	},
+	'other': {
+		nativeName: 'その他',
+	},
 };
+
+// TODO: Add zh-TW when it is released for posting language selection.
+export const postingLangCodes = ['ja', 'ko', 'other'] as const;

@@ -20,7 +20,7 @@ catalog:
   '@fastify/accepts': 5.0.4
   '@fastify/cookie': 11.0.2
   '@fastify/cors': 11.2.0
-  '@fastify/express': 4.0.3
+  '@fastify/express': 4.0.4
   '@fastify/formbody': 8.0.2
   '@fastify/http-proxy': 11.4.1
   '@fastify/multipart': 9.3.0

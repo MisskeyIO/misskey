@@ -180,6 +180,7 @@ export const paramDef = {
 				enum: viewingLanguageCodes as string[],
 			},
 		},
+		showMediaInAllLanguages: { type: 'boolean' },
 		avatarId: { type: 'string', format: 'misskey:id', nullable: true },
 		avatarDecorations: {
 			type: 'array', maxItems: 16, items: {
@@ -342,6 +343,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const languageUpdates: {
 				postingLang?: string | null;
 				viewingLangs?: string[];
+				showMediaInAllLanguages?: boolean;
 			} = {};
 			const policy = await this.roleService.getUserPolicies(user.id);
 
@@ -361,6 +363,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (ps.lang !== undefined) profileUpdates.lang = ps.lang;
 			if (ps.postingLang !== undefined) languageUpdates.postingLang = ps.postingLang;
 			if (ps.viewingLangs !== undefined) languageUpdates.viewingLangs = ps.viewingLangs;
+			if (ps.showMediaInAllLanguages !== undefined) languageUpdates.showMediaInAllLanguages = ps.showMediaInAllLanguages;
 			if (ps.location !== undefined) profileUpdates.location = ps.location;
 			if (ps.birthday !== undefined) profileUpdates.birthday = ps.birthday;
 			if (ps.followingVisibility !== undefined) profileUpdates.followingVisibility = ps.followingVisibility;
@@ -615,6 +618,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					userId: user.id,
 					postingLang: languageUpdates.postingLang ?? existing?.postingLang ?? null,
 					viewingLangs: languageUpdates.viewingLangs ?? existing?.viewingLangs ?? viewingLanguageCodes,
+					showMediaInAllLanguages: languageUpdates.showMediaInAllLanguages ?? existing?.showMediaInAllLanguages ?? false,
 				};
 
 				const saved = await this.userLanguagesRepository.save(next);

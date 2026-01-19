@@ -26,6 +26,11 @@ export class MiUserLanguage {
 	})
 	public viewingLangs: string[];
 
+	@Column('boolean', {
+		default: false,
+	})
+	public showMediaInAllLanguages: boolean;
+
 	@UpdateDateColumn({ type: 'timestamp with time zone' })
 	public updatedAt: Date;
 }

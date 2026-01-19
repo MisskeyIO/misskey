@@ -239,6 +239,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 												<MkSwitch v-if="includeUnknown" v-model="includeRemote">
 													{{ i18n.ts.viewingLanguagesIncludeRemote }}
 												</MkSwitch>
+												<MkSwitch v-model="showMediaInAllLanguages">
+													{{ i18n.ts.viewingLanguagesShowAllMedia }}
+													<template #caption>{{ i18n.ts.viewingLanguagesShowAllMediaDescription }}</template>
+												</MkSwitch>
 											</div>
 										</template>
 
@@ -944,6 +948,7 @@ const includeUnknown = ref(initialViewingLangs.includes('unknown'));
 const includeRemote = ref(initialViewingLangs.includes('remote'));
 const viewingLangs = ref<string[]>(initialViewingLangs.filter((code): code is string => typeof code === 'string' && code !== 'unknown' && code !== 'remote'));
 const viewingLangToAdd = ref<string | null>(postingLang.value);
+const showMediaInAllLanguages = ref($i.showMediaInAllLanguages ?? false);
 const addableViewingLangs = computed(() =>
 	languageCodes.filter(code => !viewingLangs.value.includes(code)),
 );
@@ -1012,7 +1017,7 @@ watch(showAllViewingLangs, (value) => {
 	languageUnsaved.value = true;
 });
 
-watch([includeUnknown, includeRemote, viewingLangs, showAllViewingLangs], () => {
+watch([includeUnknown, includeRemote, viewingLangs, showAllViewingLangs, showMediaInAllLanguages], () => {
 	if (languageSaving) return;
 	languageUnsaved.value = true;
 }, { deep: true });
@@ -1025,8 +1030,10 @@ watch(postingLang, (value) => {
 	languageUnsaved.value = true;
 });
 
+type ViewingLangCode = Misskey.entities.MeDetailed['viewingLangs'][number];
+
 async function saveLanguageConfig() {
-	const requestedViewingLangs = new Set(showAllViewingLangs.value ? [] : [
+	const requestedViewingLangs = new Set<ViewingLangCode>(showAllViewingLangs.value ? [] : [
 		...viewingLangs.value.filter(Boolean),
 		...(includeUnknown.value ? [
 			'unknown',
@@ -1036,15 +1043,18 @@ async function saveLanguageConfig() {
 
 	const isPostingLangChanged = $i.postingLang !== postingLang.value;
 	const isViewingLangsChanged = new Set($i.viewingLangs).symmetricDifference(requestedViewingLangs).size !== 0;
+	const isShowMediaInAllLanguagesChanged = $i.showMediaInAllLanguages !== showMediaInAllLanguages.value;
 
 	const i = await os.apiWithDialog('i/update', {
 		postingLang: postingLang.value ?? null,
 		viewingLangs: [...requestedViewingLangs],
+		showMediaInAllLanguages: showMediaInAllLanguages.value,
 	});
 
 	updateCurrentAccountPartial({
 		postingLang: i.postingLang,
 		viewingLangs: i.viewingLangs,
+		showMediaInAllLanguages: i.showMediaInAllLanguages,
 	});
 
 	languageSaving = true;
@@ -1053,6 +1063,7 @@ async function saveLanguageConfig() {
 	includeUnknown.value = i.viewingLangs.includes('unknown');
 	includeRemote.value = i.viewingLangs.includes('remote');
 	viewingLangs.value = i.viewingLangs.filter(code => code !== 'unknown' && code !== 'remote');
+	showMediaInAllLanguages.value = i.showMediaInAllLanguages ?? false;
 
 	queueMicrotask(() => {
 		languageSaving = false;
@@ -1061,6 +1072,7 @@ async function saveLanguageConfig() {
 
 	if (isPostingLangChanged) claimAchievement('postingLanguageConfigured');
 	if (isViewingLangsChanged) claimAchievement('viewingLanguagesConfigured');
+	if (isShowMediaInAllLanguagesChanged) claimAchievement('viewingLanguagesConfigured');
 }
 
 watch(dimension, (value, previous) => {

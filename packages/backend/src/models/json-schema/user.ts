@@ -630,6 +630,10 @@ export const packedMeDetailedOnlySchema = {
 				nullable: false, optional: false,
 			},
 		},
+		showMediaInAllLanguages: {
+			type: 'boolean',
+			nullable: false, optional: false,
+		},
 		notificationRecieveConfig: {
 			type: 'object',
 			nullable: false, optional: false,

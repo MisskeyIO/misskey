@@ -117,9 +117,15 @@ export class NoteEntityService implements OnModuleInit {
 		if (note.mentions?.includes(meId)) return true;
 		if (note.visibleUserIds?.includes(meId)) return true;
 
-		const viewingLangs = await this.cacheService.userLanguageCache.fetch(meId).then(c => c?.viewingLangs ?? null);
+		const languageConfig = await this.cacheService.userLanguageCache.fetch(meId);
+		const viewingLangs = languageConfig?.viewingLangs ?? null;
 		if (viewingLangs == null) return true;
 		if (viewingLangs.length === 0) return true;
+
+		if (languageConfig?.showMediaInAllLanguages) {
+			const fileIds = (note as MiNote).fileIds ?? (note as Packed<'Note'>).fileIds;
+			if (Array.isArray(fileIds) && fileIds.length > 0) return true;
+		}
 
 		let noteLang: string | null = null;
 		if (((note as MiNote).userHost ?? note.user?.host ?? null) != null) noteLang = 'remote';

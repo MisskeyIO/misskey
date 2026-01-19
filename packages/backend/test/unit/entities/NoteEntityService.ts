@@ -32,6 +32,7 @@ describe('NoteEntityService', () => {
 			user: null,
 			postingLang,
 			viewingLangs,
+			showMediaInAllLanguages: false,
 			updatedAt: new Date(),
 		};
 		await cacheService.userLanguageCache.set(userId, entry);
@@ -66,7 +67,7 @@ describe('NoteEntityService', () => {
 
 	test('isLanguageVisibleToMe allows null viewer and owner visibility', async () => {
 		const note = makeNote({ id: 'note-null', userId: 'user-null' });
-		await setNoteLang(note.id, 'en');
+		await setNoteLang(note.id, 'other');
 		await setUserLang('viewer-empty', null, []);
 
 		await expect(service.isLanguageVisibleToMe(note, null)).resolves.toBe(true);
@@ -87,7 +88,7 @@ describe('NoteEntityService', () => {
 		const note = makeNote({ id: 'note-override', userId: 'user-override' });
 		await setNoteLang(note.id, 'ja');
 		await setUserLang('viewer-ja', null, ['ja']);
-		await setUserLang('viewer-en', null, ['en']);
+		await setUserLang('viewer-en', null, ['other']);
 
 		await expect(service.isLanguageVisibleToMe(note, 'viewer-ja')).resolves.toBe(true);
 		await expect(service.isLanguageVisibleToMe(note, 'viewer-en')).resolves.toBe(false);
@@ -95,8 +96,8 @@ describe('NoteEntityService', () => {
 
 	test('isLanguageVisibleToMe falls back to posting language', async () => {
 		const note = makeNote({ id: 'note-posting', userId: 'user-posting' });
-		await setUserLang('user-posting', 'en', ['en']);
-		await setUserLang('viewer-en', null, ['en']);
+		await setUserLang('user-posting', 'other', ['other']);
+		await setUserLang('viewer-en', null, ['other']);
 
 		await expect(service.isLanguageVisibleToMe(note, 'viewer-en')).resolves.toBe(true);
 	});
@@ -115,8 +116,8 @@ describe('NoteEntityService', () => {
 		const dmNote = makeNote({ id: 'note-dm', userId: 'user-dm', visibleUserIds: ['viewer-dm'] });
 		await setNoteLang(mentionNote.id, 'ja');
 		await setNoteLang(dmNote.id, 'ja');
-		await setUserLang('viewer-mention', null, ['en']);
-		await setUserLang('viewer-dm', null, ['en']);
+		await setUserLang('viewer-mention', null, ['other']);
+		await setUserLang('viewer-dm', null, ['other']);
 
 		await expect(service.isLanguageVisibleToMe(mentionNote, 'viewer-mention')).resolves.toBe(true);
 		await expect(service.isLanguageVisibleToMe(dmNote, 'viewer-dm')).resolves.toBe(true);

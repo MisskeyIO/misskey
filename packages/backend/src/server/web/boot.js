@@ -31,7 +31,12 @@
 	if (!Object.hasOwn(localStorage, 'locale')) {
 		let lang = localStorage.getItem('lang');
 		if (lang == null || lang.toString == null || lang.toString() === 'null') {
-			lang = 'ja-JP';
+			const browserLang = navigator.language;
+			if (browserLang.toLowerCase().startsWith('ko')) {
+				lang = 'ko-KR';
+			} else {
+				lang = 'ja-JP';
+			}
 		}
 
 		const metaRes = await window.fetch('/api/meta', {

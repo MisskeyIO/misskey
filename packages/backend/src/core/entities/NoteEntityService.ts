@@ -124,7 +124,8 @@ export class NoteEntityService implements OnModuleInit {
 
 		if (languageConfig?.showMediaInAllLanguages) {
 			const fileIds = (note as MiNote).fileIds ?? (note as Packed<'Note'>).fileIds;
-			if (Array.isArray(fileIds) && fileIds.length > 0) return true;
+			const renoteFileIds = (note as MiNote).renote?.fileIds ?? (note as Packed<'Note'>).renote?.fileIds;
+			if ((Array.isArray(fileIds) && fileIds.length > 0) || (Array.isArray(renoteFileIds) && renoteFileIds.length > 0)) return true;
 		}
 
 		let noteLang: string | null = null;

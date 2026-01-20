@@ -27,7 +27,7 @@ export class MiUserLanguage {
 	public viewingLangs: string[];
 
 	@Column('boolean', {
-		default: false,
+		default: true,
 	})
 	public showMediaInAllLanguages: boolean;
 

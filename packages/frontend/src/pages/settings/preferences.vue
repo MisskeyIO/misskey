@@ -934,13 +934,11 @@ const menuStyle = prefer.model('menuStyle');
 const makeEveryTextElementsSelectable = prefer.model('makeEveryTextElementsSelectable');
 
 const postingLangCodeSet = new Set(postingLangCodes);
-const normalizedPostingLang = $i.postingLang === null ? null : ($i.postingLang === 'ja-JP' ? 'ja' : $i.postingLang === 'ko-KR' ? 'ko' : (postingLangCodeSet.has($i.postingLang) ? $i.postingLang : 'other'));
+const normalizedPostingLang = $i.postingLang === null ? null : (postingLangCodeSet.has($i.postingLang) ? $i.postingLang : 'other');
 const postingLang = ref<string | null>(normalizedPostingLang);
 const languageCodes = [...postingLangCodes];
 const initialViewingLangs = Array.from(new Set(($i.viewingLangs ?? []).map((code) => {
 	if (code === 'unknown' || code === 'remote' || code === null) return code;
-	if (code === 'ja-JP') return 'ja';
-	if (code === 'ko-KR') return 'ko';
 	return postingLangCodeSet.has(code) ? code : 'other';
 })));
 const showAllViewingLangs = ref(initialViewingLangs.length === 0);
@@ -1001,13 +999,6 @@ function addViewingLang() {
 	viewingLangToAdd.value = null;
 }
 
-function normalizeLangCode(code: string | null): (typeof postingLangCodes)[number] | null {
-	if (code == null) return null;
-	if (code === 'ja-JP') return 'ja';
-	if (code === 'ko-KR') return 'ko';
-	return [...postingLangCodes].includes(code as any) ? (code as (typeof postingLangCodes)[number]) : 'other';
-}
-
 watch(showAllViewingLangs, (value) => {
 	if (languageSaving) return;
 	if (value) {
@@ -1016,7 +1007,7 @@ watch(showAllViewingLangs, (value) => {
 		includeUnknown.value = false;
 		includeRemote.value = false;
 	} else {
-		viewingLangs.value = [postingLang.value ?? normalizeLangCode(lang.value) ?? 'ja'];
+		viewingLangs.value = [postingLang.value ?? lang.value];
 		viewingLangToAdd.value = null;
 		includeUnknown.value = true;
 		includeRemote.value = true;
@@ -1065,13 +1056,11 @@ async function saveLanguageConfig() {
 	});
 
 	languageSaving = true;
-	postingLang.value = i.postingLang === null ? null : (i.postingLang === 'ja-JP' ? 'ja' : i.postingLang === 'ko-KR' ? 'ko' : (postingLangCodeSet.has(i.postingLang) ? i.postingLang : 'other'));
+	postingLang.value = i.postingLang ?? null;
 	showAllViewingLangs.value = i.viewingLangs.length === 0;
 	includeUnknown.value = i.viewingLangs.includes('unknown');
 	includeRemote.value = i.viewingLangs.includes('remote');
-	viewingLangs.value = i.viewingLangs
-		.filter(code => code !== 'unknown' && code !== 'remote')
-		.map(code => code === 'ja-JP' ? 'ja' : code === 'ko-KR' ? 'ko' : (postingLangCodeSet.has(code) ? code : 'other'));
+	viewingLangs.value = i.viewingLangs.filter(code => code !== 'unknown' && code !== 'remote');
 	showMediaInAllLanguages.value = i.showMediaInAllLanguages ?? false;
 
 	queueMicrotask(() => {

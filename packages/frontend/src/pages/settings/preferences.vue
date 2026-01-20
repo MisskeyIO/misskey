@@ -946,7 +946,7 @@ const includeUnknown = ref(initialViewingLangs.includes('unknown'));
 const includeRemote = ref(initialViewingLangs.includes('remote'));
 const viewingLangs = ref<string[]>(initialViewingLangs.filter((code): code is string => typeof code === 'string' && code !== 'unknown' && code !== 'remote'));
 const viewingLangToAdd = ref<string | null>(postingLang.value);
-const showMediaInAllLanguages = ref($i.showMediaInAllLanguages ?? false);
+const showMediaInAllLanguages = ref($i.showMediaInAllLanguages ?? true);
 const addableViewingLangs = computed(() =>
 	languageCodes.filter(code => !viewingLangs.value.includes(code)),
 );
@@ -1061,7 +1061,7 @@ async function saveLanguageConfig() {
 	includeUnknown.value = i.viewingLangs.includes('unknown');
 	includeRemote.value = i.viewingLangs.includes('remote');
 	viewingLangs.value = i.viewingLangs.filter(code => code !== 'unknown' && code !== 'remote');
-	showMediaInAllLanguages.value = i.showMediaInAllLanguages ?? false;
+	showMediaInAllLanguages.value = i.showMediaInAllLanguages ?? true;
 
 	queueMicrotask(() => {
 		languageSaving = false;

@@ -618,7 +618,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					userId: user.id,
 					postingLang: languageUpdates.postingLang ?? existing?.postingLang ?? null,
 					viewingLangs: languageUpdates.viewingLangs ?? existing?.viewingLangs ?? viewingLanguageCodes,
-					showMediaInAllLanguages: languageUpdates.showMediaInAllLanguages ?? existing?.showMediaInAllLanguages ?? false,
+					showMediaInAllLanguages: languageUpdates.showMediaInAllLanguages ?? existing?.showMediaInAllLanguages ?? true,
 				};
 
 				const saved = await this.userLanguagesRepository.save(next);

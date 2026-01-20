@@ -610,7 +610,7 @@ export class UserEntityService implements OnModuleInit {
 				unreadNotificationsCount: notificationsInfo?.unreadCount,
 				postingLang: languageConfig?.postingLang ?? null,
 				viewingLangs: languageConfig?.viewingLangs ?? [],
-				showMediaInAllLanguages: languageConfig?.showMediaInAllLanguages ?? false,
+				showMediaInAllLanguages: languageConfig?.showMediaInAllLanguages ?? true,
 				mutedWords: profile!.mutedWords,
 				mutedInstances: profile!.mutedInstances,
 				mutingNotificationTypes: [], // 後方互換性のため

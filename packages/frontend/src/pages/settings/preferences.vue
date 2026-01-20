@@ -934,13 +934,11 @@ const menuStyle = prefer.model('menuStyle');
 const makeEveryTextElementsSelectable = prefer.model('makeEveryTextElementsSelectable');
 
 const postingLangCodeSet = new Set(postingLangCodes);
-const normalizedPostingLang = $i.postingLang != null && postingLangCodeSet.has($i.postingLang)
-	? $i.postingLang
-	: 'other';
+const normalizedPostingLang = $i.postingLang === null ? null : (postingLangCodeSet.has($i.postingLang) ? $i.postingLang : 'other');
 const postingLang = ref<string | null>(normalizedPostingLang);
 const languageCodes = [...postingLangCodes];
 const initialViewingLangs = Array.from(new Set(($i.viewingLangs ?? []).map((code) => {
-	if (code === 'unknown' || code === 'remote') return code;
+	if (code === 'unknown' || code === 'remote' || code === null) return code;
 	return postingLangCodeSet.has(code) ? code : 'other';
 })));
 const showAllViewingLangs = ref(initialViewingLangs.length === 0);

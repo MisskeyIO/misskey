@@ -184,7 +184,7 @@ catalog:
   eslint-plugin-storybook: 10.1.11
   eslint-plugin-vue: 10.7.0
   estree-walker: 3.0.3
-  eventemitter3: 5.0.1
+  eventemitter3: 5.0.4
   execa: 9.6.1
   fast-glob: 3.3.3
   fastify: 5.7.1

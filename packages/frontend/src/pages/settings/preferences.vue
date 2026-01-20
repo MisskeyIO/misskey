@@ -199,7 +199,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 									<div class="_gaps_s">
 										<MkSelect v-model="postingLang">
 											<template #label><SearchLabel>{{ i18n.ts.postingLanguage }}</SearchLabel></template>
-											<option v-for="code in languageCodes" :key="code" :value="code">{{ langmap[code].nativeName }}</option>
+											<option v-for="code in languageCodes" :key="code" :value="code">{{ code === 'other' ? i18n.ts.other : langmap[code].nativeName }}</option>
 											<template #caption>{{ i18n.ts.postingLanguageDescription }}</template>
 										</MkSelect>
 
@@ -933,14 +933,15 @@ const contextMenu = prefer.model('contextMenu');
 const menuStyle = prefer.model('menuStyle');
 const makeEveryTextElementsSelectable = prefer.model('makeEveryTextElementsSelectable');
 
-const postingLangCodeSet = new Set(postingLangCodes);
-const normalizedPostingLang = $i.postingLang === null ? null : (postingLangCodeSet.has($i.postingLang) ? $i.postingLang : 'other');
+const supportedLangCodes = postingLangCodes.filter(code => code !== 'other');
+const supportedLangCodeSet = new Set(supportedLangCodes);
+const normalizedPostingLang = $i.postingLang === null ? null : (supportedLangCodeSet.has($i.postingLang) ? $i.postingLang : null);
 const postingLang = ref<string | null>(normalizedPostingLang);
 const languageCodes = [...postingLangCodes];
 const initialViewingLangs = Array.from(new Set(($i.viewingLangs ?? []).map((code) => {
 	if (code === 'unknown' || code === 'remote' || code === null) return code;
-	return postingLangCodeSet.has(code) ? code : 'other';
-})));
+	return supportedLangCodeSet.has(code) ? code : null;
+}).filter(Boolean)));
 const showAllViewingLangs = ref(initialViewingLangs.length === 0);
 const includeUnknown = ref(initialViewingLangs.includes('unknown'));
 const includeRemote = ref(initialViewingLangs.includes('remote'));
@@ -984,6 +985,7 @@ watch(useSystemFont, () => {
 function getViewingLangLabel(code: string): string {
 	if (code === 'unknown') return i18n.ts.unknown;
 	if (code === 'remote') return i18n.ts.remote;
+	if (code === 'other') return i18n.ts.other;
 	return langmap[code]?.nativeName ?? code;
 }
 

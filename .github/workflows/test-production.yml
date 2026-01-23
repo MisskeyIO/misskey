@@ -8,15 +8,7 @@ on:
       - beta
       - io
       - host
-    paths:
-      - pnpm-lock.yaml
-      - packages/**
-      - .github/workflows/test-production.yml
   pull_request:
-    paths:
-      - pnpm-lock.yaml
-      - packages/**
-      - .github/workflows/test-production.yml
 
 permissions:
   contents: read

@@ -25,14 +25,23 @@ describe('NoteEntityService', () => {
 		} as MiNote;
 	}
 
-	async function setUserLang(userId: string, postingLang: string | null, viewingLangs: string[]) {
+	async function setUserLang(
+		userId: string,
+		postingLang: string | null,
+		viewingLangs: string[],
+		options: {
+			showMediaInAllLanguages?: boolean;
+			showHashtagsInAllLanguages?: boolean;
+		} = {},
+	) {
 		userIds.push(userId);
 		const entry: MiUserLanguage = {
 			userId,
 			user: null,
 			postingLang,
 			viewingLangs,
-			showMediaInAllLanguages: false,
+			showMediaInAllLanguages: options.showMediaInAllLanguages ?? false,
+			showHashtagsInAllLanguages: options.showHashtagsInAllLanguages ?? false,
 			updatedAt: new Date(),
 		};
 		await cacheService.userLanguageCache.set(userId, entry);
@@ -121,5 +130,12 @@ describe('NoteEntityService', () => {
 
 		await expect(service.isLanguageVisibleToMe(mentionNote, 'viewer-mention')).resolves.toBe(true);
 		await expect(service.isLanguageVisibleToMe(dmNote, 'viewer-dm')).resolves.toBe(true);
+	});
+
+	test('isLanguageVisibleToMe allows hashtags when configured', async () => {
+		const hashtagNote = makeNote({ id: 'note-hashtag', userId: 'user-hashtag', tags: ['misskey'] });
+		await setNoteLang(hashtagNote.id, 'ja');
+		await setUserLang('viewer-hashtag', null, ['other'], { showHashtagsInAllLanguages: true });
+		await expect(service.isLanguageVisibleToMe(hashtagNote, 'viewer-hashtag')).resolves.toBe(true);
 	});
 });

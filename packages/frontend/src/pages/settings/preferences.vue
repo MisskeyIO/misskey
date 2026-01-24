@@ -243,6 +243,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 													{{ i18n.ts.viewingLanguagesShowAllMedia }}
 													<template #caption>{{ i18n.ts.viewingLanguagesShowAllMediaDescription }}</template>
 												</MkSwitch>
+												<MkSwitch v-model="showHashtagsInAllLanguages">
+													{{ i18n.ts.viewingLanguagesShowAllHashtags }}
+													<template #caption>{{ i18n.ts.viewingLanguagesShowAllHashtagsDescription }}</template>
+												</MkSwitch>
 											</div>
 										</template>
 
@@ -948,6 +952,7 @@ const includeRemote = ref(initialViewingLangs.includes('remote'));
 const viewingLangs = ref<string[]>(initialViewingLangs.filter((code): code is string => typeof code === 'string' && code !== 'unknown' && code !== 'remote'));
 const viewingLangToAdd = ref<string | null>(postingLang.value);
 const showMediaInAllLanguages = ref($i.showMediaInAllLanguages ?? true);
+const showHashtagsInAllLanguages = ref($i.showHashtagsInAllLanguages ?? true);
 const addableViewingLangs = computed(() =>
 	languageCodes.filter(code => !viewingLangs.value.includes(code)),
 );
@@ -1017,7 +1022,7 @@ watch(showAllViewingLangs, (value) => {
 	languageUnsaved.value = true;
 });
 
-watch([includeUnknown, includeRemote, viewingLangs, showAllViewingLangs, showMediaInAllLanguages], () => {
+watch([includeUnknown, includeRemote, viewingLangs, showAllViewingLangs, showMediaInAllLanguages, showHashtagsInAllLanguages], () => {
 	if (languageSaving) return;
 	languageUnsaved.value = true;
 }, { deep: true });
@@ -1044,17 +1049,20 @@ async function saveLanguageConfig() {
 	const isPostingLangChanged = $i.postingLang !== postingLang.value;
 	const isViewingLangsChanged = new Set($i.viewingLangs).symmetricDifference(requestedViewingLangs).size !== 0;
 	const isShowMediaInAllLanguagesChanged = $i.showMediaInAllLanguages !== showMediaInAllLanguages.value;
+	const isShowHashtagsInAllLanguagesChanged = $i.showHashtagsInAllLanguages !== showHashtagsInAllLanguages.value;
 
 	const i = await os.apiWithDialog('i/update', {
 		postingLang: postingLang.value ?? null,
 		viewingLangs: [...requestedViewingLangs],
 		showMediaInAllLanguages: showMediaInAllLanguages.value,
+		showHashtagsInAllLanguages: showHashtagsInAllLanguages.value,
 	});
 
 	updateCurrentAccountPartial({
 		postingLang: i.postingLang,
 		viewingLangs: i.viewingLangs,
 		showMediaInAllLanguages: i.showMediaInAllLanguages,
+		showHashtagsInAllLanguages: i.showHashtagsInAllLanguages,
 	});
 
 	languageSaving = true;
@@ -1064,6 +1072,7 @@ async function saveLanguageConfig() {
 	includeRemote.value = i.viewingLangs.includes('remote');
 	viewingLangs.value = i.viewingLangs.filter(code => code !== 'unknown' && code !== 'remote');
 	showMediaInAllLanguages.value = i.showMediaInAllLanguages ?? true;
+	showHashtagsInAllLanguages.value = i.showHashtagsInAllLanguages ?? true;
 
 	queueMicrotask(() => {
 		languageSaving = false;
@@ -1073,6 +1082,7 @@ async function saveLanguageConfig() {
 	if (isPostingLangChanged) claimAchievement('postingLanguageConfigured');
 	if (isViewingLangsChanged) claimAchievement('viewingLanguagesConfigured');
 	if (isShowMediaInAllLanguagesChanged) claimAchievement('viewingLanguagesConfigured');
+	if (isShowHashtagsInAllLanguagesChanged) claimAchievement('viewingLanguagesConfigured');
 }
 
 watch(dimension, (value, previous) => {

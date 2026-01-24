@@ -9469,6 +9469,7 @@ export type components = {
             postingLang: string | null;
             viewingLangs: string[];
             showMediaInAllLanguages: boolean;
+            showHashtagsInAllLanguages: boolean;
             notificationRecieveConfig: {
                 note?: {
                     /** @enum {string} */
@@ -35239,6 +35240,7 @@ export interface operations {
                     postingLang?: null | 'ja' | 'ja-JP' | 'ko' | 'ko-KR' | 'other';
                     viewingLangs?: ('ja' | 'ja-JP' | 'ko' | 'ko-KR' | 'other' | 'unknown' | 'remote')[];
                     showMediaInAllLanguages?: boolean;
+                    showHashtagsInAllLanguages?: boolean;
                     /** Format: misskey:id */
                     avatarId?: string | null;
                     avatarDecorations?: {
@@ -45739,4 +45741,3 @@ export interface operations {
         };
     };
 }
-

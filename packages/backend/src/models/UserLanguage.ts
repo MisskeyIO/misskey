@@ -31,6 +31,11 @@ export class MiUserLanguage {
 	})
 	public showMediaInAllLanguages: boolean;
 
+	@Column('boolean', {
+		default: true,
+	})
+	public showHashtagsInAllLanguages: boolean;
+
 	@UpdateDateColumn({ type: 'timestamp with time zone' })
 	public updatedAt: Date;
 }

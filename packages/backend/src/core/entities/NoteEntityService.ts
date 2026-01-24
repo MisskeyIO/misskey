@@ -128,6 +128,12 @@ export class NoteEntityService implements OnModuleInit {
 			if ((Array.isArray(fileIds) && fileIds.length > 0) || (Array.isArray(renoteFileIds) && renoteFileIds.length > 0)) return true;
 		}
 
+		if (languageConfig?.showHashtagsInAllLanguages) {
+			const tags = (note as MiNote).tags ?? (note as Packed<'Note'>).tags;
+			const renoteTags = (note as MiNote).renote?.tags ?? (note as Packed<'Note'>).renote?.tags;
+			if ((Array.isArray(tags) && tags.length > 0) || (Array.isArray(renoteTags) && renoteTags.length > 0)) return true;
+		}
+
 		let noteLang: string | null = null;
 		if (((note as MiNote).userHost ?? note.user?.host ?? null) != null) noteLang = 'remote';
 

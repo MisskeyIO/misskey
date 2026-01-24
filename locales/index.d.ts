@@ -2206,6 +2206,14 @@ export interface Locale extends ILocale {
      */
     "viewingLanguagesShowAllMediaDescription": string;
     /**
+     * ハッシュタグはすべて表示する
+     */
+    "viewingLanguagesShowAllHashtags": string;
+    /**
+     * 言語設定に関係なくハッシュタグ付きの投稿を表示します。
+     */
+    "viewingLanguagesShowAllHashtagsDescription": string;
+    /**
      * 未分類の投稿を表示する
      */
     "viewingLanguagesIncludeUnknown": string;

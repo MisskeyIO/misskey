@@ -766,8 +766,8 @@ catalogs:
       specifier: 3.4.1
       version: 3.4.1
     re2:
-      specifier: 1.23.0
-      version: 1.23.0
+      specifier: 1.23.1
+      version: 1.23.1
     react:
       specifier: 19.2.3
       version: 19.2.3
@@ -1429,7 +1429,7 @@ importers:
         version: 3.4.1
       re2:
         specifier: 'catalog:'
-        version: 1.23.0
+        version: 1.23.1
       redis-lock:
         specifier: 'catalog:'
         version: 1.0.0
@@ -11158,8 +11158,8 @@ packages:
     resolution: {integrity: sha512-g8OUrgMXAR9ys/ZuJVfBr05sPPoMA7nHIVs8VEvg9QwM5W4GR2qSFEEHjsyHF1eWlBaf8Ev40WNjQFQ+nJTO3w==}
     engines: {node: '>=18'}
 
-  re2@1.23.0:
-    resolution: {integrity: sha512-mT7+/Lz+Akjm/C/X6PiaHihcJL92TNNXai/C4c/dfBbhtwMm1uKEEoA2Lz/FF6aBFfQzg5mAyv4BGjM4q44QwQ==}
+  re2@1.23.1:
+    resolution: {integrity: sha512-S5UHlgjCp84BGyciTQgSxcQJD4H51l4iNk8drGWQCWAYDr71C4lHEf+DxmAoLoGRwEYzOcV7v4LSXrx0hFc/pQ==}
 
   react-docgen-typescript@2.4.0:
     resolution: {integrity: sha512-ZtAp5XTO5HRzQctjPU0ybY0RRCQO19X/8fxn3w7y2VVTUbGHDKULPTL4ky3vB05euSgG5NpALhEhDPvQ56wvXg==}
@@ -23378,7 +23378,7 @@ snapshots:
     dependencies:
       setimmediate: 1.0.5
 
-  re2@1.23.0:
+  re2@1.23.1:
     dependencies:
       install-artifact-from-github: 1.4.0
       nan: 2.24.0

@@ -153,7 +153,7 @@ catalog:
   body-parser: 2.2.2
   broadcast-channel: 7.3.0
   bufferutil: 4.1.0
-  bullmq: 5.66.7
+  bullmq: 5.67.1
   buraha: 0.0.1
   cacheable-lookup: 7.0.0
   canvas-confetti: 1.9.4

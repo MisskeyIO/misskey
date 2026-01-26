@@ -418,8 +418,8 @@ catalogs:
       specifier: 4.1.0
       version: 4.1.0
     bullmq:
-      specifier: 5.66.7
-      version: 5.66.7
+      specifier: 5.67.1
+      version: 5.67.1
     buraha:
       specifier: 0.0.1
       version: 0.0.1
@@ -1228,7 +1228,7 @@ importers:
         version: 2.2.2
       bullmq:
         specifier: 'catalog:'
-        version: 5.66.7
+        version: 5.67.1
       cacheable-lookup:
         specifier: 'catalog:'
         version: 7.0.0
@@ -7182,8 +7182,8 @@ packages:
     resolution: {integrity: sha512-ZMANVnAixE6AWWnPzlW2KpUrxhm9woycYvPOo67jWHyFowASTEd9s+QN1EIMsSDtwhIxN4sWE1jotpuDUIgyIw==}
     engines: {node: '>=6.14.2'}
 
-  bullmq@5.66.7:
-    resolution: {integrity: sha512-X6YIjTXVN9fFjrMCKBppu74XZBnfWf0OgvwSVcpJE99irlszpGMKyyBcAOzd3126Lh9PwKygSfmHL4UfYrrIUQ==}
+  bullmq@5.67.1:
+    resolution: {integrity: sha512-ELJEAzwzesgFxk29emvnAakqrwdBEhEyfZREPQ8pbG4ALVz/mk/AhfuChzxkFpJ7SfL2qclPHbiUGBZzaqcLvg==}
 
   bundle-name@4.1.0:
     resolution: {integrity: sha512-tjwM5exMg6BGRI+kNmTntNsvdZS1X8BFYS6tnJ2hdH0kVxM6/eVZ2xy+FqStSWvYmtfFMDLIxurorHwDKfDz5Q==}
@@ -18776,7 +18776,7 @@ snapshots:
       node-gyp-build: 4.8.4
     optional: true
 
-  bullmq@5.66.7:
+  bullmq@5.67.1:
     dependencies:
       cron-parser: 4.9.0
       ioredis: 5.9.2

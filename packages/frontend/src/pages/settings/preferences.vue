@@ -20,7 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<SearchMarker :keywords="['language']">
 							<MkSelect v-model="lang">
 								<template #label><SearchLabel>{{ i18n.ts.uiLanguage }}</SearchLabel></template>
-								<option v-for="x in langs" :key="x[0]" :value="x[0]">{{ x[1] }}</option>
+								<option v-for="x in langs" :key="x[0]" :value="x[0]">{{ x[0] === 'other' ? i18n.ts.other : x[1] }}</option>
 								<template #caption>
 									<I18n :src="i18n.ts.i18nInfo" tag="span">
 										<template #link>

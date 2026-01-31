@@ -20,7 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<SearchMarker :keywords="['language']">
 							<MkSelect v-model="lang">
 								<template #label><SearchLabel>{{ i18n.ts.uiLanguage }}</SearchLabel></template>
-								<option v-for="x in langs" :key="x[0]" :value="x[0]">{{ x[1] }}</option>
+								<option v-for="x in langs" :key="x[0]" :value="x[0]">{{ x[0] === 'other' ? i18n.ts.other : x[1] }}</option>
 								<template #caption>
 									<I18n :src="i18n.ts.i18nInfo" tag="span">
 										<template #link>
@@ -199,7 +199,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 									<div class="_gaps_s">
 										<MkSelect v-model="postingLang">
 											<template #label><SearchLabel>{{ i18n.ts.postingLanguage }}</SearchLabel></template>
-											<option v-for="code in languageCodes" :key="code" :value="code">{{ langmap[code].nativeName }}</option>
+											<option v-for="code in languageCodes" :key="code" :value="code">{{ code === 'other' ? i18n.ts.other : langmap[code].nativeName }}</option>
 											<template #caption>{{ i18n.ts.postingLanguageDescription }}</template>
 										</MkSelect>
 
@@ -238,6 +238,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 												</MkSwitch>
 												<MkSwitch v-if="includeUnknown" v-model="includeRemote">
 													{{ i18n.ts.viewingLanguagesIncludeRemote }}
+												</MkSwitch>
+												<MkSwitch v-model="showMediaInAllLanguages">
+													{{ i18n.ts.viewingLanguagesShowAllMedia }}
+													<template #caption>{{ i18n.ts.viewingLanguagesShowAllMediaDescription }}</template>
+												</MkSwitch>
+												<MkSwitch v-model="showHashtagsInAllLanguages">
+													{{ i18n.ts.viewingLanguagesShowAllHashtags }}
+													<template #caption>{{ i18n.ts.viewingLanguagesShowAllHashtagsDescription }}</template>
 												</MkSwitch>
 											</div>
 										</template>
@@ -860,7 +868,7 @@ import { instance } from '@/instance.js';
 import { ensureSignin } from '@/i.js';
 import { configureSensitiveContentConsent, sensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 import MkTagItem from '@/components/MkTagItem.vue';
-import { langmap } from '@/utility/langmap.js';
+import { langmap, postingLangCodes } from '@/utility/langmap.js';
 import { updateCurrentAccountPartial } from '@/accounts.js';
 
 const $i = ensureSignin();
@@ -929,14 +937,23 @@ const contextMenu = prefer.model('contextMenu');
 const menuStyle = prefer.model('menuStyle');
 const makeEveryTextElementsSelectable = prefer.model('makeEveryTextElementsSelectable');
 
-const postingLang = ref<string | null>($i.postingLang);
-const languageCodes = Object.keys(langmap);
-const initialViewingLangs = $i.viewingLangs ?? [];
+const supportedLangCodes = postingLangCodes.filter((code): code is Exclude<(typeof postingLangCodes)[number], 'other'> => code !== 'other');
+const supportedLangCodeSet = new Set(supportedLangCodes);
+const isSupportedPostingLang = (code: string) => code === 'other' || supportedLangCodeSet.has(code as (typeof supportedLangCodes)[number]);
+const normalizedPostingLang = $i.postingLang === null ? null : (isSupportedPostingLang($i.postingLang) ? $i.postingLang : null);
+const postingLang = ref<string | null>(normalizedPostingLang);
+const languageCodes = [...postingLangCodes];
+const initialViewingLangs = Array.from(new Set(($i.viewingLangs ?? []).map((code) => {
+	if (code === 'unknown' || code === 'remote' || code === null) return code;
+	return isSupportedPostingLang(code) ? code : null;
+}).filter(Boolean)));
 const showAllViewingLangs = ref(initialViewingLangs.length === 0);
 const includeUnknown = ref(initialViewingLangs.includes('unknown'));
 const includeRemote = ref(initialViewingLangs.includes('remote'));
 const viewingLangs = ref<string[]>(initialViewingLangs.filter((code): code is string => typeof code === 'string' && code !== 'unknown' && code !== 'remote'));
 const viewingLangToAdd = ref<string | null>(postingLang.value);
+const showMediaInAllLanguages = ref($i.showMediaInAllLanguages ?? true);
+const showHashtagsInAllLanguages = ref($i.showHashtagsInAllLanguages ?? true);
 const addableViewingLangs = computed(() =>
 	languageCodes.filter(code => !viewingLangs.value.includes(code)),
 );
@@ -974,6 +991,7 @@ watch(useSystemFont, () => {
 function getViewingLangLabel(code: string): string {
 	if (code === 'unknown') return i18n.ts.unknown;
 	if (code === 'remote') return i18n.ts.remote;
+	if (code === 'other') return i18n.ts.other;
 	return langmap[code]?.nativeName ?? code;
 }
 
@@ -997,7 +1015,8 @@ watch(showAllViewingLangs, (value) => {
 		includeUnknown.value = false;
 		includeRemote.value = false;
 	} else {
-		viewingLangs.value = [postingLang.value ?? lang.value];
+		const fallbackLang = postingLang.value ?? (lang.value && isSupportedPostingLang(lang.value) ? lang.value : 'other');
+		viewingLangs.value = [fallbackLang];
 		viewingLangToAdd.value = null;
 		includeUnknown.value = true;
 		includeRemote.value = true;
@@ -1005,7 +1024,7 @@ watch(showAllViewingLangs, (value) => {
 	languageUnsaved.value = true;
 });
 
-watch([includeUnknown, includeRemote, viewingLangs, showAllViewingLangs], () => {
+watch([includeUnknown, includeRemote, viewingLangs, showAllViewingLangs, showMediaInAllLanguages, showHashtagsInAllLanguages], () => {
 	if (languageSaving) return;
 	languageUnsaved.value = true;
 }, { deep: true });
@@ -1018,8 +1037,10 @@ watch(postingLang, (value) => {
 	languageUnsaved.value = true;
 });
 
+type ViewingLangCode = Misskey.entities.MeDetailed['viewingLangs'][number];
+
 async function saveLanguageConfig() {
-	const requestedViewingLangs = new Set(showAllViewingLangs.value ? [] : [
+	const requestedViewingLangs = new Set<ViewingLangCode>(showAllViewingLangs.value ? [] : [
 		...viewingLangs.value.filter(Boolean),
 		...(includeUnknown.value ? [
 			'unknown',
@@ -1029,15 +1050,21 @@ async function saveLanguageConfig() {
 
 	const isPostingLangChanged = $i.postingLang !== postingLang.value;
 	const isViewingLangsChanged = new Set($i.viewingLangs).symmetricDifference(requestedViewingLangs).size !== 0;
+	const isShowMediaInAllLanguagesChanged = $i.showMediaInAllLanguages !== showMediaInAllLanguages.value;
+	const isShowHashtagsInAllLanguagesChanged = $i.showHashtagsInAllLanguages !== showHashtagsInAllLanguages.value;
 
 	const i = await os.apiWithDialog('i/update', {
 		postingLang: postingLang.value ?? null,
 		viewingLangs: [...requestedViewingLangs],
+		showMediaInAllLanguages: showMediaInAllLanguages.value,
+		showHashtagsInAllLanguages: showHashtagsInAllLanguages.value,
 	});
 
 	updateCurrentAccountPartial({
 		postingLang: i.postingLang,
 		viewingLangs: i.viewingLangs,
+		showMediaInAllLanguages: i.showMediaInAllLanguages,
+		showHashtagsInAllLanguages: i.showHashtagsInAllLanguages,
 	});
 
 	languageSaving = true;
@@ -1046,6 +1073,8 @@ async function saveLanguageConfig() {
 	includeUnknown.value = i.viewingLangs.includes('unknown');
 	includeRemote.value = i.viewingLangs.includes('remote');
 	viewingLangs.value = i.viewingLangs.filter(code => code !== 'unknown' && code !== 'remote');
+	showMediaInAllLanguages.value = i.showMediaInAllLanguages ?? true;
+	showHashtagsInAllLanguages.value = i.showHashtagsInAllLanguages ?? true;
 
 	queueMicrotask(() => {
 		languageSaving = false;
@@ -1053,7 +1082,9 @@ async function saveLanguageConfig() {
 	});
 
 	if (isPostingLangChanged) claimAchievement('postingLanguageConfigured');
-	if (isViewingLangsChanged) claimAchievement('viewingLanguagesConfigured');
+	if (isViewingLangsChanged || isShowMediaInAllLanguagesChanged || isShowHashtagsInAllLanguagesChanged) {
+		claimAchievement('viewingLanguagesConfigured');
+	}
 }
 
 watch(dimension, (value, previous) => {

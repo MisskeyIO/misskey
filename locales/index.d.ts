@@ -2198,6 +2198,22 @@ export interface Locale extends ILocale {
      */
     "viewingLanguagesShowAllDescription": string;
     /**
+     * メディアはすべて表示する
+     */
+    "viewingLanguagesShowAllMedia": string;
+    /**
+     * 言語設定に関係なくメディア付きの投稿を表示します。
+     */
+    "viewingLanguagesShowAllMediaDescription": string;
+    /**
+     * ハッシュタグはすべて表示する
+     */
+    "viewingLanguagesShowAllHashtags": string;
+    /**
+     * 言語設定に関係なくハッシュタグ付きの投稿を表示します。
+     */
+    "viewingLanguagesShowAllHashtagsDescription": string;
+    /**
      * 未分類の投稿を表示する
      */
     "viewingLanguagesIncludeUnknown": string;

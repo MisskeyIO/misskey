@@ -1,10 +1,10 @@
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
-import { langmap } from '@/utility/langmap.js';
+import { langmap, postingLangCodes } from '@/utility/langmap.js';
 
-const postingLanguageOptions = Object.entries(langmap).map(([code, info]) => ({
+const postingLanguageOptions = postingLangCodes.map((code) => ({
 	value: code,
-	text: info.nativeName ?? code,
+	text: code === 'other' ? i18n.ts.other : langmap[code]?.nativeName ?? code,
 }));
 
 export async function selectPostingLanguage(current: string | null): Promise<string | null | undefined> {

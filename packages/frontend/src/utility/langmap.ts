@@ -669,3 +669,5 @@ export const langmap = {
 		nativeName: 'isiZulu',
 	},
 };
+
+export const postingLangCodes = ['ja', 'ja-JP', 'ko', 'ko-KR', 'other'] as const;

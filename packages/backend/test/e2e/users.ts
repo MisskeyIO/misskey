@@ -131,6 +131,8 @@ describe('ユーザー', () => {
 			isDeleted: user.isDeleted,
 			postingLang: user.postingLang,
 			viewingLangs: user.viewingLangs,
+			showMediaInAllLanguages: user.showMediaInAllLanguages,
+			showHashtagsInAllLanguages: user.showHashtagsInAllLanguages,
 			twoFactorBackupCodesStock: user.twoFactorBackupCodesStock,
 			hideOnlineStatus: user.hideOnlineStatus,
 			hasUnreadSpecifiedNotes: user.hasUnreadSpecifiedNotes,

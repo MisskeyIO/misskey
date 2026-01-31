@@ -1015,7 +1015,8 @@ watch(showAllViewingLangs, (value) => {
 		includeUnknown.value = false;
 		includeRemote.value = false;
 	} else {
-		viewingLangs.value = [postingLang.value ?? lang.value];
+		const fallbackLang = postingLang.value ?? (lang.value && isSupportedPostingLang(lang.value) ? lang.value : 'other');
+		viewingLangs.value = [fallbackLang];
 		viewingLangToAdd.value = null;
 		includeUnknown.value = true;
 		includeRemote.value = true;

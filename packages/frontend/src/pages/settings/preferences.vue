@@ -937,14 +937,15 @@ const contextMenu = prefer.model('contextMenu');
 const menuStyle = prefer.model('menuStyle');
 const makeEveryTextElementsSelectable = prefer.model('makeEveryTextElementsSelectable');
 
-const supportedLangCodes = postingLangCodes.filter(code => code !== 'other');
+const supportedLangCodes = postingLangCodes.filter((code): code is Exclude<(typeof postingLangCodes)[number], 'other'> => code !== 'other');
 const supportedLangCodeSet = new Set(supportedLangCodes);
-const normalizedPostingLang = $i.postingLang === null ? null : (supportedLangCodeSet.has($i.postingLang) ? $i.postingLang : null);
+const isSupportedPostingLang = (code: string) => code === 'other' || supportedLangCodeSet.has(code as (typeof supportedLangCodes)[number]);
+const normalizedPostingLang = $i.postingLang === null ? null : (isSupportedPostingLang($i.postingLang) ? $i.postingLang : null);
 const postingLang = ref<string | null>(normalizedPostingLang);
 const languageCodes = [...postingLangCodes];
 const initialViewingLangs = Array.from(new Set(($i.viewingLangs ?? []).map((code) => {
 	if (code === 'unknown' || code === 'remote' || code === null) return code;
-	return supportedLangCodeSet.has(code) ? code : null;
+	return isSupportedPostingLang(code) ? code : null;
 }).filter(Boolean)));
 const showAllViewingLangs = ref(initialViewingLangs.length === 0);
 const includeUnknown = ref(initialViewingLangs.includes('unknown'));
@@ -1080,9 +1081,9 @@ async function saveLanguageConfig() {
 	});
 
 	if (isPostingLangChanged) claimAchievement('postingLanguageConfigured');
-	if (isViewingLangsChanged) claimAchievement('viewingLanguagesConfigured');
-	if (isShowMediaInAllLanguagesChanged) claimAchievement('viewingLanguagesConfigured');
-	if (isShowHashtagsInAllLanguagesChanged) claimAchievement('viewingLanguagesConfigured');
+	if (isViewingLangsChanged || isShowMediaInAllLanguagesChanged || isShowHashtagsInAllLanguagesChanged) {
+		claimAchievement('viewingLanguagesConfigured');
+	}
 }
 
 watch(dimension, (value, previous) => {

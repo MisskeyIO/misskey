@@ -670,5 +670,4 @@ export const langmap = {
 	},
 };
 
-// TODO: Add zh-TW when it is released for posting language selection.
 export const postingLangCodes = ['ja', 'ja-JP', 'ko', 'ko-KR', 'other'] as const;

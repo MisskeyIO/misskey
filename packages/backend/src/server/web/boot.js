@@ -28,17 +28,15 @@
 	let id = localStorage.getItem('id');
 
 	//#region Detect language & fetch translations
-	if (!Object.hasOwn(localStorage, 'locale')) {
+	if (!localStorage.hasOwnProperty('locale')) {
 		let lang = localStorage.getItem('lang');
 		if (lang == null || lang.toString == null || lang.toString() === 'null') {
 			const browserLang = typeof navigator !== 'undefined' && typeof navigator.language === 'string'
 				? navigator.language.toLowerCase()
 				: '';
-			if (browserLang.startsWith('ko')) {
-				lang = 'ko-KR';
-			} else {
-				lang = 'ja-JP';
-			}
+			if (browserLang.startsWith('ko')) lang = 'ko-KR';
+			else if (browserLang.startsWith('ja')) lang = 'ja-JP';
+			else lang = 'ja-JP';
 		}
 
 		const metaRes = await window.fetch('/api/meta', {

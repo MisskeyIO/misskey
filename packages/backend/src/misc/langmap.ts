@@ -670,4 +670,4 @@ export const langmap = {
 	},
 };
 
-export const postingLangCodes = ['ja-JP', 'ko-KR', 'other'] as const;
+export const postingLangCodes = ['ja', 'ja-JP', 'ko', 'ko-KR', 'other'] as const;

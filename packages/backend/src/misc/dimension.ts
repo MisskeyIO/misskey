@@ -8,6 +8,7 @@ export function normalizeDimension(value: number | null | undefined, dimensionCo
 	return value;
 }
 
+
 export function getNoteDimension(note: Packed<'Note'>): number {
 	return typeof note.dimension === 'number' ? note.dimension : 0;
 }
@@ -41,7 +42,7 @@ export function shouldDeliverByDimension(note: Packed<'Note'>, viewerDimension: 
 }
 
 export function getDeliverTargetDimensions(noteDimension: number | null | undefined): number[] {
-	if (noteDimension == null || noteDimension <= 0) return [0];
-	if (noteDimension < 1000) return [noteDimension, 0];
+	if (noteDimension == null || noteDimension <= 0) return [];
+	if (noteDimension < 1000) return [noteDimension];
 	return [noteDimension];
 }

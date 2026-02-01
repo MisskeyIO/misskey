@@ -78,7 +78,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
 			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
 			const viewerDimension = typeof ps.dimension === 'number'
-				? normalizeDimension(ps.dimension, this.instanceMeta.dimensions ?? 1)
+				? normalizeDimension(ps.dimension, this.instanceMeta.dimensions ?? 1) || null
 				: null;
 
 			const role = await this.rolesRepository.findOneBy({

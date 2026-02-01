@@ -435,7 +435,7 @@ export class NoteEntityService implements OnModuleInit {
 
 		if (opts?.viewerDimension != null) {
 			const viewerDimension = normalizeDimension(opts.viewerDimension, this.meta.dimensions ?? 1);
-			if (viewerDimension > 0 && !(await this.shouldDeliverByDimensionPreview(note, viewerDimension, meId))) {
+			if (!(await this.shouldDeliverByDimensionPreview(note, viewerDimension, meId))) {
 				throw new IdentifiableError('b74b13d0-49ee-4eac-a75a-48247c16d17a', 'Note is not visible in this dimension.');
 			}
 		}
@@ -544,7 +544,7 @@ export class NoteEntityService implements OnModuleInit {
 
 		if (opts?.viewerDimension != null) {
 			const viewerDimension = normalizeDimension(opts.viewerDimension, this.meta.dimensions ?? 1);
-			if (viewerDimension > 0 && !shouldDeliverByDimension(packed, viewerDimension, meId)) {
+			if (!shouldDeliverByDimension(packed, viewerDimension, meId)) {
 				throw new IdentifiableError('b74b13d0-49ee-4eac-a75a-48247c16d17a', 'Note is not visible in this dimension.');
 			}
 		}

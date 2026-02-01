@@ -73,7 +73,9 @@ export class FanoutTimelineEndpointService {
 		const ascending = ps.sinceId && !ps.untilId;
 		const idCompare: (a: string, b: string) => number = ascending ? (a, b) => a < b ? -1 : 1 : (a, b) => a > b ? -1 : 1;
 
-		const dimension = typeof ps.viewerDimension === 'number' ? ps.viewerDimension : null;
+		const dimension = typeof ps.viewerDimension === 'number' && ps.viewerDimension > 0
+			? ps.viewerDimension
+			: null;
 		const redisResult = dimension == null
 			? await this.fanoutTimelineService.getMulti(ps.redisTimelines, ps.untilId, ps.sinceId)
 			: await this.fanoutTimelineService.getMultiDimension(ps.redisTimelines, dimension, ps.untilId, ps.sinceId);

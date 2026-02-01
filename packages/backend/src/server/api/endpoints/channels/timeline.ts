@@ -76,9 +76,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		super(meta, paramDef, async (ps, me) => {
 			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
 			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
-			const viewerDimension = typeof ps.dimension === 'number'
-				? normalizeDimension(ps.dimension, this.serverSettings.dimensions ?? 1) || null
-				: null;
+			const viewerDimension = normalizeDimension(ps.dimension, this.serverSettings.dimensions ?? 1);
 			const channel = await this.channelsRepository.findOneBy({
 				id: ps.channelId,
 			});

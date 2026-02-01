@@ -956,11 +956,9 @@ export class NoteCreateService implements OnApplicationShutdown {
 		);
 		
 		const pushToDimension = (name: FanoutTimelineName, id: string, maxlen: number) => {
-			if (noteDimension < 1000) {
-				this.fanoutTimelineService.push(name, id, maxlen, r);
-			}
 			for (const dimension of dimensionTargets) {
-				this.fanoutTimelineService.pushDimension(name, id, dimension, r);
+				if (dimension > 0) this.fanoutTimelineService.pushDimension(name, id, dimension, r);
+				else this.fanoutTimelineService.push(name, id, maxlen, r);
 			}
 		};
 

@@ -1,7 +1,6 @@
 name: Test (production install and build)
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
@@ -10,6 +9,7 @@ on:
       - io
       - host
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read

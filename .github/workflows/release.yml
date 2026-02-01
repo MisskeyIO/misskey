@@ -97,6 +97,7 @@ jobs:
               exit 1
             fi
           done
+
       - name: Force push main to beta
         run: |
           git fetch origin main
@@ -165,14 +166,17 @@ jobs:
             PR_NUMBER=$EXISTING_PR
             PR_URL="https://github.com/${{ github.repository }}/pull/$PR_NUMBER"
           fi
+
           CONFLICT_MARKERS=$(git grep -n '^<<<<<<< HEAD' HEAD || true)
           if [ -n "$CONFLICT_MARKERS" ]; then
             echo "Conflict markers detected in diff. Manual resolution required; skipping auto merge."
             echo "$CONFLICT_MARKERS"
             exit 1
           fi
+
           git fetch origin next
           git push origin $BRANCH_NAME:next -f
+
           gh pr merge $PR_URL --auto --merge --delete-branch --subject "$IO_VERSION (MisskeyIO#${PR_NUMBER})"
 
   update-host-branch:

@@ -246,7 +246,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 		if (data.channel != null) data.visibleUsers = [];
 		if (data.channel != null) data.localOnly = true;
 		data.dimension = normalizeDimension(data.dimension, this.meta.dimensions ?? 1);
-		if (data.dimension >= 1000) data.localOnly = true;
+		if (typeof data.dimension === 'number' && data.dimension >= 1000) data.localOnly = true;
 
 		const meta = this.meta;
 		const policies = await this.roleService.getUserPolicies(user.id);
@@ -947,14 +947,15 @@ export class NoteCreateService implements OnApplicationShutdown {
 		if (!meta.enableFanoutTimeline) return;
 
 		const r = this.redisForTimelines.pipeline();
-		const noteDimension = typeof (note as MiNoteWithDimension).dimension === 'number'
-			? (note as MiNoteWithDimension).dimension
-			: 0;
-		const dimensionTargets = getDeliverTargetDimensions(noteDimension);
+		const dimensionTargets = await getDeliverTargetDimensions(
+			note as MiNoteWithDimension,
+			(noteId) => this.cacheService.noteDimensionCache.get(noteId),
+		);
+
 		const pushToDimension = (name: FanoutTimelineName, id: string, maxlen: number) => {
-			this.fanoutTimelineService.push(name, id, maxlen, r);
 			for (const dimension of dimensionTargets) {
-				this.fanoutTimelineService.pushDimension(name, id, dimension, r);
+				if (dimension > 0) this.fanoutTimelineService.pushDimension(name, id, dimension, r);
+				else this.fanoutTimelineService.push(name, id, maxlen, r);
 			}
 		};
 

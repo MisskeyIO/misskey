@@ -625,7 +625,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 		// Increment notes count (user)
 		this.incNotesCountOfUser(user);
 
-		this.pushToTl(note, user, data);
+		this.pushToTl(note, user);
 
 		this.antennaService.addNoteToAntennas({
 			...note,
@@ -941,7 +941,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 	}
 
 	@bindThis
-	private async pushToTl(note: MiNote, user: { id: MiUser['id']; host: MiUser['host']; }, data?: NoteCreateOption) {
+	private async pushToTl(note: MiNote, user: { id: MiUser['id']; host: MiUser['host']; }) {
 		const meta = this.meta;
 
 		if (!meta.enableFanoutTimeline) return;
@@ -950,11 +950,12 @@ export class NoteCreateService implements OnApplicationShutdown {
 		const noteDimension = typeof (note as MiNoteWithDimension).dimension === 'number'
 			? (note as MiNoteWithDimension).dimension
 			: 0;
-		const replyDimension = data?.reply && typeof (data.reply as MiNoteWithDimension).dimension === 'number'
-			? (data.reply as MiNoteWithDimension).dimension
+		// Fetch reply and renote dimensions from cache using note IDs
+		const replyDimension = note.replyId
+			? (await this.cacheService.noteDimensionCache.get(note.replyId)) ?? undefined
 			: undefined;
-		const renoteDimension = data?.renote && typeof (data.renote as MiNoteWithDimension).dimension === 'number'
-			? (data.renote as MiNoteWithDimension).dimension
+		const renoteDimension = note.renoteId
+			? (await this.cacheService.noteDimensionCache.get(note.renoteId)) ?? undefined
 			: undefined;
 		const dimensionTargets = getDeliverTargetDimensions(noteDimension, replyDimension, renoteDimension);
 		const pushToDimension = (name: FanoutTimelineName, id: string, maxlen: number) => {

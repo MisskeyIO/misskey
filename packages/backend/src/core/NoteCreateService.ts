@@ -246,7 +246,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 		if (data.channel != null) data.visibleUsers = [];
 		if (data.channel != null) data.localOnly = true;
 		data.dimension = normalizeDimension(data.dimension, this.meta.dimensions ?? 1);
-		if (data.dimension >= 1000) data.localOnly = true;
+		if (typeof data.dimension === 'number' && data.dimension >= 1000) data.localOnly = true;
 
 		const meta = this.meta;
 		const policies = await this.roleService.getUserPolicies(user.id);

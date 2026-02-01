@@ -9,8 +9,8 @@ export function normalizeDimension(value: number | null | undefined, dimensionCo
 	return value;
 }
 
-export function getNoteDimension(note: Packed<'Note'>): number {
-	return typeof note.dimension === 'number' ? note.dimension : 0;
+export function getNoteDimension(note: MiNoteWithDimension | Packed<'Note'>): number {
+	return (typeof note.dimension === 'number' && note.dimension > 0) ? note.dimension : 0;
 }
 
 export function isCrossDimensionInteraction(note: Packed<'Note'>, viewerId: MiUser['id'] | null | undefined): boolean {
@@ -42,30 +42,29 @@ export function shouldDeliverByDimension(note: Packed<'Note'>, viewerDimension: 
 }
 
 export async function getDeliverTargetDimensions(
-	note: MiNoteWithDimension,
+	note: MiNoteWithDimension | Packed<'Note'>,
 	getDimensionFromCache: (noteId: string) => Promise<number | null | undefined>,
 ): Promise<number[]> {
 	const targets = new Set<number>();
-	
-	const normalizedNoteDimension = (typeof note.dimension === 'number' && note.dimension > 0) ? note.dimension : 0;
-	
-	if (normalizedNoteDimension > 0) {
-		targets.add(normalizedNoteDimension);
+	const noteDimension = getNoteDimension(note);
+
+	if (noteDimension > 0) {
+		targets.add(noteDimension);
 	}
-	
-	if (normalizedNoteDimension < 1000) {
+
+	if (noteDimension < 1000) {
 		targets.add(0);
 	}
-	
+
 	const replyDimension = note.replyId ? await getDimensionFromCache(note.replyId) : undefined;
-	if (typeof replyDimension === 'number' && replyDimension > 0 && replyDimension !== normalizedNoteDimension) {
+	if (typeof replyDimension === 'number' && replyDimension > 0 && replyDimension !== noteDimension) {
 		targets.add(replyDimension);
 	}
-	
+
 	const renoteDimension = note.renoteId ? await getDimensionFromCache(note.renoteId) : undefined;
-	if (typeof renoteDimension === 'number' && renoteDimension > 0 && renoteDimension !== normalizedNoteDimension) {
+	if (typeof renoteDimension === 'number' && renoteDimension > 0 && renoteDimension !== noteDimension) {
 		targets.add(renoteDimension);
 	}
-	
-	return Array.from(targets).sort((a, b) => a - b);
+
+	return Array.from(targets);
 }

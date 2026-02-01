@@ -273,7 +273,7 @@ export default class Connection {
 			return;
 		}
 
-		const dimension = params && Object.hasOwn(params, 'dimension') ? params.dimension : null;
+		const dimension = typeof params?.dimension === 'number' ? params.dimension : null;
 		const normalizedDimension = normalizeDimension(dimension, this.meta.dimensions ?? 1) ?? 0;
 		const ch: Channel = channelService.create(id, this, normalizedDimension);
 		this.channels.push(ch);

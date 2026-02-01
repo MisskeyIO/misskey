@@ -1,10 +1,10 @@
 import type { Packed } from '@/misc/json-schema.js';
 import type { MiUser } from '@/models/User.js';
 
-export function normalizeDimension(value: number | null | undefined, dimensionCount: number): number {
+export function normalizeDimension(value: number | null | undefined, dimensionCount: number): number | null {
 	const count = Math.max(1, dimensionCount);
-	if (typeof value !== 'number' || !Number.isFinite(value) || !Number.isInteger(value)) return 0;
-	if (value < 0 || value >= count) return 0;
+	if (typeof value !== 'number' || !Number.isFinite(value) || !Number.isInteger(value)) return null;
+	if (value <= 0 || value >= count) return null;
 	return value;
 }
 

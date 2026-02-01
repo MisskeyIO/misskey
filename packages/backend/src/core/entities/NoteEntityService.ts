@@ -433,8 +433,10 @@ export class NoteEntityService implements OnModuleInit {
 			throw new IdentifiableError('ab3e8c80-9d5b-4fb8-9ee0-089ed96d07e0', 'Note language is not visible for you.');
 		}
 
-		if (opts?.viewerDimension != null) {
-			const viewerDimension = normalizeDimension(opts.viewerDimension, this.meta.dimensions ?? 1);
+		if (opts && Object.hasOwn(opts, 'viewerDimension')) {
+			const viewerDimension = opts.viewerDimension == null
+				? 0
+				: normalizeDimension(opts.viewerDimension, this.meta.dimensions ?? 1) ?? 0;
 			if (!(await this.shouldDeliverByDimensionPreview(note, viewerDimension, meId))) {
 				throw new IdentifiableError('b74b13d0-49ee-4eac-a75a-48247c16d17a', 'Note is not visible in this dimension.');
 			}
@@ -542,8 +544,10 @@ export class NoteEntityService implements OnModuleInit {
 			} : {}),
 		});
 
-		if (opts?.viewerDimension != null) {
-			const viewerDimension = normalizeDimension(opts.viewerDimension, this.meta.dimensions ?? 1);
+		if (opts && Object.hasOwn(opts, 'viewerDimension')) {
+			const viewerDimension = opts.viewerDimension == null
+				? 0
+				: normalizeDimension(opts.viewerDimension, this.meta.dimensions ?? 1) ?? 0;
 			if (!shouldDeliverByDimension(packed, viewerDimension, meId)) {
 				throw new IdentifiableError('b74b13d0-49ee-4eac-a75a-48247c16d17a', 'Note is not visible in this dimension.');
 			}

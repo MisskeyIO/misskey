@@ -13,7 +13,6 @@ import ActiveUsersChart from '@/core/chart/charts/active-users.js';
 import { DI } from '@/di-symbols.js';
 import { RoleService } from '@/core/RoleService.js';
 import { ApiError } from '../../error.js';
-import { normalizeDimension } from '@/misc/dimension.js';
 
 export const meta = {
 	tags: ['notes'],
@@ -115,7 +114,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			return await this.noteEntityService.packMany(
 				timeline,
 				me,
-				{ viewerDimension: normalizeDimension(ps.dimension, this.serverSettings.dimensions ?? 1) },
+				{ viewerDimension: ps.dimension ?? 0 },
 			);
 		});
 	}

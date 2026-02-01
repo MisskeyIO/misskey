@@ -13,7 +13,6 @@ import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { IdService } from '@/core/IdService.js';
 import { FanoutTimelineService } from '@/core/FanoutTimelineService.js';
 import { ApiError } from '../../error.js';
-import { normalizeDimension } from '@/misc/dimension.js';
 
 export const meta = {
 	tags: ['role', 'notes'],
@@ -77,7 +76,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		super(meta, paramDef, async (ps, me) => {
 			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
 			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
-			const viewerDimension = normalizeDimension(ps.dimension, this.instanceMeta.dimensions ?? 1);
+			const viewerDimension = ps.dimension ?? 0;
 
 			const role = await this.rolesRepository.findOneBy({
 				id: ps.roleId,

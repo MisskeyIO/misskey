@@ -19,6 +19,7 @@ import { isQuote, isRenote } from '@/misc/is-renote.js';
 import { CacheService } from '@/core/CacheService.js';
 import { isReply } from '@/misc/is-reply.js';
 import { isInstanceMuted } from '@/misc/is-instance-muted.js';
+import { normalizeDimension } from '@/misc/dimension.js';
 
 type TimelineOptions = {
 	untilId: string | null,
@@ -73,9 +74,7 @@ export class FanoutTimelineEndpointService {
 		const ascending = ps.sinceId && !ps.untilId;
 		const idCompare: (a: string, b: string) => number = ascending ? (a, b) => a < b ? -1 : 1 : (a, b) => a > b ? -1 : 1;
 
-		const dimension = typeof ps.viewerDimension === 'number' && ps.viewerDimension > 0
-			? ps.viewerDimension
-			: null;
+		const dimension = normalizeDimension(ps.viewerDimension, this.meta.dimensions ?? 1);
 		const redisResult = dimension == null
 			? await this.fanoutTimelineService.getMulti(ps.redisTimelines, ps.untilId, ps.sinceId)
 			: await this.fanoutTimelineService.getMultiDimension(ps.redisTimelines, dimension, ps.untilId, ps.sinceId);

@@ -100,15 +100,13 @@ jobs:
           done
 
       - name: Force push main to beta
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git fetch origin main
           git checkout main
           git reset --hard origin/main
           git push origin main:beta -f
-      - name: Dispatch workflows for beta
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
           gh workflow run test-production.yml --ref beta
           gh workflow run sourcemaps.yml --ref beta
           gh workflow run docker.yml --ref beta
@@ -184,10 +182,6 @@ jobs:
 
           git fetch origin next
           git push origin $BRANCH_NAME:next -f
-      - name: Dispatch workflows for next
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
           gh workflow run test-production.yml --ref next
           gh workflow run sourcemaps.yml --ref next
           gh workflow run docker.yml --ref next

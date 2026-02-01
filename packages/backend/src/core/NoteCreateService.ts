@@ -947,14 +947,11 @@ export class NoteCreateService implements OnApplicationShutdown {
 		if (!meta.enableFanoutTimeline) return;
 
 		const r = this.redisForTimelines.pipeline();
-		const noteDimension = typeof (note as MiNoteWithDimension).dimension === 'number'
-			? (note as MiNoteWithDimension).dimension
-			: 0;
 		const dimensionTargets = await getDeliverTargetDimensions(
 			note as MiNoteWithDimension,
 			(noteId) => this.cacheService.noteDimensionCache.get(noteId),
 		);
-		
+
 		const pushToDimension = (name: FanoutTimelineName, id: string, maxlen: number) => {
 			for (const dimension of dimensionTargets) {
 				if (dimension > 0) this.fanoutTimelineService.pushDimension(name, id, dimension, r);

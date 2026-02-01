@@ -1,5 +1,6 @@
 import type { Packed } from '@/misc/json-schema.js';
 import type { MiUser } from '@/models/User.js';
+import type { MiNoteWithDimension } from '@/models/Note.js';
 
 export function normalizeDimension(value: number | null | undefined, dimensionCount: number): number | null {
 	const count = Math.max(1, dimensionCount);
@@ -41,14 +42,14 @@ export function shouldDeliverByDimension(note: Packed<'Note'>, viewerDimension: 
 }
 
 export function getDeliverTargetDimensions(
-	noteDimension: number | null | undefined,
+	note: MiNoteWithDimension,
 	replyDimension?: number | null | undefined,
 	renoteDimension?: number | null | undefined,
 ): number[] {
 	const targets = new Set<number>();
 	
 	// Normalize the note's dimension
-	const normalizedNoteDimension = (typeof noteDimension === 'number' && noteDimension > 0) ? noteDimension : 0;
+	const normalizedNoteDimension = (typeof note.dimension === 'number' && note.dimension > 0) ? note.dimension : 0;
 	
 	// Determine if this note is private (dimension >= 1000)
 	const isPrivateNote = normalizedNoteDimension >= 1000;

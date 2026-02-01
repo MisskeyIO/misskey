@@ -957,9 +957,17 @@ export class NoteCreateService implements OnApplicationShutdown {
 		const renoteDimension = note.renoteId
 			? (await this.cacheService.noteDimensionCache.get(note.renoteId)) ?? undefined
 			: undefined;
-		const dimensionTargets = getDeliverTargetDimensions(noteDimension, replyDimension, renoteDimension);
+		const dimensionTargets = getDeliverTargetDimensions(note as MiNoteWithDimension, replyDimension, renoteDimension);
+		
+		// Determine if this note is private (dimension >= 1000)
+		const isPrivateNote = noteDimension >= 1000;
+		
 		const pushToDimension = (name: FanoutTimelineName, id: string, maxlen: number) => {
-			this.fanoutTimelineService.push(name, id, maxlen, r);
+			// Only push to base fanout timeline if not a private dimension note
+			if (!isPrivateNote) {
+				this.fanoutTimelineService.push(name, id, maxlen, r);
+			}
+			// Always push to dimension-specific timelines
 			for (const dimension of dimensionTargets) {
 				this.fanoutTimelineService.pushDimension(name, id, dimension, r);
 			}

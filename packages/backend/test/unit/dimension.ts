@@ -1,8 +1,3 @@
-/*
- * SPDX-FileCopyrightText: syuilo and misskey-project
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { getDeliverTargetDimensions } from '@/misc/dimension.js';
 import type { MiNoteWithDimension } from '@/models/Note.js';
 

@@ -625,7 +625,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 		// Increment notes count (user)
 		this.incNotesCountOfUser(user);
 
-		this.pushToTl(note, user);
+		this.pushToTl(note, user, data);
 
 		this.antennaService.addNoteToAntennas({
 			...note,
@@ -941,7 +941,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 	}
 
 	@bindThis
-	private async pushToTl(note: MiNote, user: { id: MiUser['id']; host: MiUser['host']; }) {
+	private async pushToTl(note: MiNote, user: { id: MiUser['id']; host: MiUser['host']; }, data?: NoteCreateOption) {
 		const meta = this.meta;
 
 		if (!meta.enableFanoutTimeline) return;
@@ -950,7 +950,13 @@ export class NoteCreateService implements OnApplicationShutdown {
 		const noteDimension = typeof (note as MiNoteWithDimension).dimension === 'number'
 			? (note as MiNoteWithDimension).dimension
 			: 0;
-		const dimensionTargets = getDeliverTargetDimensions(noteDimension);
+		const replyDimension = data?.reply && typeof (data.reply as MiNoteWithDimension).dimension === 'number'
+			? (data.reply as MiNoteWithDimension).dimension
+			: undefined;
+		const renoteDimension = data?.renote && typeof (data.renote as MiNoteWithDimension).dimension === 'number'
+			? (data.renote as MiNoteWithDimension).dimension
+			: undefined;
+		const dimensionTargets = getDeliverTargetDimensions(noteDimension, replyDimension, renoteDimension);
 		const pushToDimension = (name: FanoutTimelineName, id: string, maxlen: number) => {
 			this.fanoutTimelineService.push(name, id, maxlen, r);
 			for (const dimension of dimensionTargets) {

@@ -32,7 +32,7 @@
 	}
 
 	//#region Detect language & fetch translations
-	if (!localStorage.hasOwnProperty('locale')) {
+	if (localStorage.getItem('locale') === null) {
 		let lang = localStorage.getItem('lang');
 		if (lang == null || lang.toString == null || lang.toString() === 'null') {
 			const browserLang = typeof navigator !== 'undefined' && typeof navigator.language === 'string'

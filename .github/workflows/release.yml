@@ -98,6 +98,13 @@ jobs:
             fi
           done
 
+      - name: Force push main to beta
+        run: |
+          git fetch origin main
+          git checkout main
+          git reset --hard origin/main
+          git push origin main:beta -f
+
   update-io-branch:
     runs-on: ubuntu-latest
     needs: version-bump
@@ -166,6 +173,9 @@ jobs:
             echo "$CONFLICT_MARKERS"
             exit 1
           fi
+
+          git fetch origin next
+          git push origin $BRANCH_NAME:next -f
 
           gh pr merge $PR_URL --auto --merge --delete-branch --subject "$IO_VERSION (MisskeyIO#${PR_NUMBER})"
 

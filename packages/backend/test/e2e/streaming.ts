@@ -183,6 +183,30 @@ describe('Streaming', () => {
 				assert.strictEqual(received.some(note => note.text === 'dim0-note'), false);
 			});
 
+			test('dimension null does not filter streaming timelines', async () => {
+				const [viewer, posterDim1, posterDim0] = await Promise.all([signup(), signup(), signup()]);
+
+				await api('following/create', { userId: posterDim1.id }, viewer);
+				await api('following/create', { userId: posterDim0.id }, viewer);
+				await setTimeout(1000);
+
+				const received: misskey.entities.Note[] = [];
+				const ws = await connectStream(viewer, 'homeTimeline', (msg) => {
+					if (msg.type === 'note') {
+						received.push(msg.body);
+					}
+				}, { minimize: false, dimension: null });
+
+				await api('notes/create', { text: 'dim1-note', dimension: 1 }, posterDim1);
+				await api('notes/create', { text: 'dim0-note', dimension: 0 }, posterDim0);
+
+				await setTimeout(1000);
+				ws.close();
+
+				assert.strictEqual(received.some(note => note.text === 'dim1-note'), true);
+				assert.strictEqual(received.some(note => note.text === 'dim0-note'), true);
+			});
+
 			test('フォローしているユーザーの visibility: followers な投稿が流れる', async () => {
 				const fired = await waitFire(
 					ayano, 'homeTimeline',		// ayano:home

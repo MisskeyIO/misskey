@@ -61,7 +61,7 @@ export default class Connection {
 		if (token) this.token = token;
 	}
 
-	public normalizeDimension(value: number | null | undefined): number {
+	public normalizeDimension(value: number | null | undefined): number | null {
 		return normalizeDimension(value, this.meta.dimensions ?? 1);
 	}
 
@@ -273,8 +273,8 @@ export default class Connection {
 			return;
 		}
 
-		const dimension = params && Object.hasOwn(params, 'dimension') ? params.dimension : null;
-		const ch: Channel = channelService.create(id, this, this.normalizeDimension(typeof dimension === 'number' ? dimension : null));
+		const dimension = typeof params?.dimension === 'number' ? params.dimension : null;
+		const ch: Channel = channelService.create(id, this, this.normalizeDimension(dimension) ?? 0);
 		this.channels.push(ch);
 		ch.init(params ?? {});
 

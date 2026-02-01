@@ -12,6 +12,7 @@ on:
       - packages/backend/**
       # for permissions
       - packages/misskey-js/**
+      - pnpm-lock.yaml
       - .github/workflows/test-backend.yml
       - .github/misskey/test.yml
   pull_request:
@@ -19,6 +20,7 @@ on:
       - packages/backend/**
       # for permissions
       - packages/misskey-js/**
+      - pnpm-lock.yaml
       - .github/workflows/test-backend.yml
       - .github/misskey/test.yml
 

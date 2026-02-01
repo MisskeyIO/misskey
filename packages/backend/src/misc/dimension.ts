@@ -41,39 +41,29 @@ export function shouldDeliverByDimension(note: Packed<'Note'>, viewerDimension: 
 	return false;
 }
 
-export function getDeliverTargetDimensions(
+export async function getDeliverTargetDimensions(
 	note: MiNoteWithDimension,
-	replyDimension?: number | null | undefined,
-	renoteDimension?: number | null | undefined,
-): number[] {
+	getDimensionFromCache: (noteId: string) => Promise<number | null | undefined>,
+): Promise<number[]> {
 	const targets = new Set<number>();
 	
-	// Normalize the note's dimension
 	const normalizedNoteDimension = (typeof note.dimension === 'number' && note.dimension > 0) ? note.dimension : 0;
-	
-	// Determine if this note is private (dimension >= 1000)
 	const isPrivateNote = normalizedNoteDimension >= 1000;
 	
-	// Add the note's own dimension
 	if (normalizedNoteDimension > 0) {
 		targets.add(normalizedNoteDimension);
 	}
 	
-	// For non-private dimensions, also deliver to dimension-0 (base timeline)
-	// Private notes (dimension >= 1000) should NEVER appear in dimension-0 fanout
-	// to prevent leaking private dimension content to users with dimension null/0
 	if (!isPrivateNote) {
 		targets.add(0);
 	}
 	
-	// If this is a reply to another dimension, also deliver to that dimension
-	// This ensures cross-dimension interactions are visible in the target dimension
+	const replyDimension = note.replyId ? await getDimensionFromCache(note.replyId) : undefined;
 	if (typeof replyDimension === 'number' && replyDimension > 0 && replyDimension !== normalizedNoteDimension) {
 		targets.add(replyDimension);
 	}
 	
-	// If this is a renote of another dimension, also deliver to that dimension
-	// This ensures cross-dimension renotes are visible in the target dimension
+	const renoteDimension = note.renoteId ? await getDimensionFromCache(note.renoteId) : undefined;
 	if (typeof renoteDimension === 'number' && renoteDimension > 0 && renoteDimension !== normalizedNoteDimension) {
 		targets.add(renoteDimension);
 	}

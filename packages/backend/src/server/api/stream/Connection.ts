@@ -274,8 +274,7 @@ export default class Connection {
 		}
 
 		const dimension = typeof params?.dimension === 'number' ? params.dimension : null;
-		const normalizedDimension = normalizeDimension(dimension, this.meta.dimensions ?? 1) ?? 0;
-		const ch: Channel = channelService.create(id, this, normalizedDimension);
+		const ch: Channel = channelService.create(id, this, normalizeDimension(dimension, this.meta.dimensions ?? 1) ?? 0);
 		this.channels.push(ch);
 		ch.init(params ?? {});
 

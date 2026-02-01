@@ -59,17 +59,20 @@ export function getDeliverTargetDimensions(
 	}
 	
 	// For non-private dimensions, also deliver to dimension-0 (base timeline)
-	// Private notes (dimension >= 1000) should NEVER appear in dimension-0
+	// Private notes (dimension >= 1000) should NEVER appear in dimension-0 fanout
+	// to prevent leaking private dimension content to users with dimension null/0
 	if (!isPrivateNote) {
 		targets.add(0);
 	}
 	
 	// If this is a reply to another dimension, also deliver to that dimension
+	// This ensures cross-dimension interactions are visible in the target dimension
 	if (typeof replyDimension === 'number' && replyDimension > 0 && replyDimension !== normalizedNoteDimension) {
 		targets.add(replyDimension);
 	}
 	
 	// If this is a renote of another dimension, also deliver to that dimension
+	// This ensures cross-dimension renotes are visible in the target dimension
 	if (typeof renoteDimension === 'number' && renoteDimension > 0 && renoteDimension !== normalizedNoteDimension) {
 		targets.add(renoteDimension);
 	}

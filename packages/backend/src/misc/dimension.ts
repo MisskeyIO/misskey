@@ -8,7 +8,6 @@ export function normalizeDimension(value: number | null | undefined, dimensionCo
 	return value;
 }
 
-
 export function getNoteDimension(note: Packed<'Note'>): number {
 	return typeof note.dimension === 'number' ? note.dimension : 0;
 }

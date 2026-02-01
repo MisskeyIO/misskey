@@ -955,10 +955,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 			(noteId) => this.cacheService.noteDimensionCache.get(noteId),
 		);
 		
-		const isPrivateNote = noteDimension >= 1000;
-		
 		const pushToDimension = (name: FanoutTimelineName, id: string, maxlen: number) => {
-			if (!isPrivateNote) {
+			if (noteDimension < 1000) {
 				this.fanoutTimelineService.push(name, id, maxlen, r);
 			}
 			for (const dimension of dimensionTargets) {

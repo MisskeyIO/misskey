@@ -48,13 +48,12 @@ export async function getDeliverTargetDimensions(
 	const targets = new Set<number>();
 	
 	const normalizedNoteDimension = (typeof note.dimension === 'number' && note.dimension > 0) ? note.dimension : 0;
-	const isPrivateNote = normalizedNoteDimension >= 1000;
 	
 	if (normalizedNoteDimension > 0) {
 		targets.add(normalizedNoteDimension);
 	}
 	
-	if (!isPrivateNote) {
+	if (normalizedNoteDimension < 1000) {
 		targets.add(0);
 	}
 	

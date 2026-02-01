@@ -66,5 +66,5 @@ export async function getDeliverTargetDimensions(
 		targets.add(renoteDimension);
 	}
 
-	return Array.from(targets);
+	return Array.from(targets).sort();
 }

@@ -79,6 +79,21 @@ type Source = {
 		browserTracingIntegration?: Parameters<typeof SentryVue.browserTracingIntegration>[0] | null;
 		replayIntegration?: Parameters<typeof SentryVue.replayIntegration>[0] | null;
 	};
+	s3?: {
+		baseUrl: string;
+		bucket: string;
+		prefix: string;
+		endpoint: string;
+		region?: string;
+		useSSL: boolean;
+		accessKey: string;
+		secretKey: string;
+		options?: {
+			setPublicRead?: boolean;
+			forcePathStyle?: boolean;
+			useProxy?: boolean;
+		}
+	};
 
 	opensearch?: {
 		host: string;
@@ -196,6 +211,21 @@ export type Config = {
 		ssl?: boolean;
 		rejectUnauthorized?: boolean;
 		index: string;
+	} | undefined;
+	s3: {
+		baseUrl: string;
+		bucket: string;
+		prefix: string;
+		endpoint: string;
+		region?: string;
+		useSSL: boolean;
+		accessKey: string;
+		secretKey: string;
+		options?: {
+			setPublicRead?: boolean;
+			forcePathStyle?: boolean;
+			useProxy?: boolean;
+		}
 	} | undefined;
 	skebStatus: {
 		method: string;
@@ -353,6 +383,7 @@ export function loadConfig(): Config {
 		fulltextSearch: config.fulltextSearch,
 		meilisearch: config.meilisearch,
 		opensearch: config.opensearch,
+		s3: config.s3,
 		redis,
 		redisForPubsub: config.redisForPubsub ? convertRedisOptions(config.redisForPubsub, host) : redis,
 		redisForSystemQueue: config.redisForSystemQueue ? convertRedisOptions(config.redisForSystemQueue, host) : redisForJobQueue,

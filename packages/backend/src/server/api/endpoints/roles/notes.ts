@@ -7,6 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { MiMeta, NotesRepository, RolesRepository } from '@/models/_.js';
+import { normalizeDimension } from '@/misc/dimension.js';
 import { QueryService } from '@/core/QueryService.js';
 import { DI } from '@/di-symbols.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
@@ -76,7 +77,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		super(meta, paramDef, async (ps, me) => {
 			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
 			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
-			const viewerDimension = ps.dimension ?? 0;
+			const viewerDimension = normalizeDimension(ps.dimension, this.instanceMeta.dimensions ?? 1);
 
 			const role = await this.rolesRepository.findOneBy({
 				id: ps.roleId,

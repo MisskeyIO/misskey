@@ -9,6 +9,7 @@ on:
       - io
       - host
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read

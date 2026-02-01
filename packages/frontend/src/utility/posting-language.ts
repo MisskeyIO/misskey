@@ -16,3 +16,16 @@ export async function selectPostingLanguage(current: string | null): Promise<str
 	if (canceled) return undefined;
 	return result;
 }
+
+export function getAutoPostingLang(browserLanguage?: string | null): string {
+	if (browserLanguage) {
+		const normalized = browserLanguage.toLowerCase();
+		if (normalized.startsWith('ko')) return 'ko-KR';
+		if (normalized.startsWith('ja')) return 'ja-JP';
+	}
+	return 'ja-JP';
+}
+
+export function getDefaultViewingLangs(postingLang: string): string[] {
+	return Array.from(new Set([postingLang, 'ja-JP']));
+}

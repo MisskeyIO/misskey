@@ -197,11 +197,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<MkFolder>
 									<template #label><SearchLabel>{{ i18n.ts.postingAndViewingLanguage }}</SearchLabel></template>
 									<div class="_gaps_s">
-										<MkSelect v-model="postingLang">
-											<template #label><SearchLabel>{{ i18n.ts.postingLanguage }}</SearchLabel></template>
-											<option v-for="code in languageCodes" :key="code" :value="code">{{ code === 'other' ? i18n.ts.other : langmap[code].nativeName }}</option>
-											<template #caption>{{ i18n.ts.postingLanguageDescription }}</template>
-										</MkSelect>
+									<MkSelect v-model="postingLang">
+										<template #label><SearchLabel>{{ i18n.ts.postingLanguage }}</SearchLabel></template>
+										<option v-for="code in languageCodes" :key="code" :value="code">{{ code === 'other' ? i18n.ts.other : langmap[code].nativeName }}</option>
+										<template #caption>{{ i18n.ts.postingLanguageDescription }}</template>
+									</MkSelect>
+
+									<MkInfo v-if="shouldNotifyPostingLangReconfigure" warn>
+										{{ i18n.ts.postingLanguageBrowserLangChanged }}
+									</MkInfo>
 
 										<MkSwitch v-model="showAllViewingLangs">
 											{{ i18n.ts.viewingLanguagesShowAll }}
@@ -232,13 +236,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 											</div>
 
 											<div class="_gaps_s">
-												<MkSwitch v-model="includeUnknown">
-													{{ i18n.ts.viewingLanguagesIncludeUnknown }}
-													<template #caption>{{ i18n.ts.viewingLanguagesIncludeUnknownDescription }}</template>
-												</MkSwitch>
-												<MkSwitch v-if="includeUnknown" v-model="includeRemote">
-													{{ i18n.ts.viewingLanguagesIncludeRemote }}
-												</MkSwitch>
 												<MkSwitch v-model="showMediaInAllLanguages">
 													{{ i18n.ts.viewingLanguagesShowAllMedia }}
 													<template #caption>{{ i18n.ts.viewingLanguagesShowAllMediaDescription }}</template>
@@ -246,6 +243,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 												<MkSwitch v-model="showHashtagsInAllLanguages">
 													{{ i18n.ts.viewingLanguagesShowAllHashtags }}
 													<template #caption>{{ i18n.ts.viewingLanguagesShowAllHashtagsDescription }}</template>
+												</MkSwitch>
+												<MkSwitch v-model="includeUnknown">
+													{{ i18n.ts.viewingLanguagesIncludeUnknown }}
+													<template #caption>{{ i18n.ts.viewingLanguagesIncludeUnknownDescription }}</template>
+												</MkSwitch>
+												<MkSwitch v-if="includeUnknown" v-model="includeRemote">
+													{{ i18n.ts.viewingLanguagesIncludeRemote }}
 												</MkSwitch>
 											</div>
 										</template>
@@ -869,6 +873,7 @@ import { ensureSignin } from '@/i.js';
 import { configureSensitiveContentConsent, sensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 import MkTagItem from '@/components/MkTagItem.vue';
 import { langmap, postingLangCodes } from '@/utility/langmap.js';
+import { getAutoPostingLang, getDefaultViewingLangs } from '@/utility/posting-language.js';
 import { updateCurrentAccountPartial } from '@/accounts.js';
 
 const $i = ensureSignin();
@@ -937,17 +942,22 @@ const contextMenu = prefer.model('contextMenu');
 const menuStyle = prefer.model('menuStyle');
 const makeEveryTextElementsSelectable = prefer.model('makeEveryTextElementsSelectable');
 
+const browserLanguage = typeof navigator === 'undefined' ? null : navigator.language;
 const supportedLangCodes = postingLangCodes.filter((code): code is Exclude<(typeof postingLangCodes)[number], 'other'> => code !== 'other');
 const supportedLangCodeSet = new Set(supportedLangCodes);
 const isSupportedPostingLang = (code: string) => code === 'other' || supportedLangCodeSet.has(code as (typeof supportedLangCodes)[number]);
 const normalizedPostingLang = $i.postingLang === null ? null : (isSupportedPostingLang($i.postingLang) ? $i.postingLang : null);
-const postingLang = ref<string | null>(normalizedPostingLang);
+const hasLanguageConfig = $i.postingLang != null || ($i.viewingLangs?.length ?? 0) > 0;
+const autoPostingLang = getAutoPostingLang(browserLanguage);
+const initialPostingLang = hasLanguageConfig ? normalizedPostingLang : autoPostingLang;
+const postingLang = ref<string | null>(initialPostingLang);
 const languageCodes = [...postingLangCodes];
-const initialViewingLangs = Array.from(new Set(($i.viewingLangs ?? []).map((code) => {
+const rawInitialViewingLangs = hasLanguageConfig ? ($i.viewingLangs ?? []) : getDefaultViewingLangs(autoPostingLang);
+const initialViewingLangs = Array.from(new Set(rawInitialViewingLangs.map((code) => {
 	if (code === 'unknown' || code === 'remote' || code === null) return code;
 	return isSupportedPostingLang(code) ? code : null;
 }).filter(Boolean)));
-const showAllViewingLangs = ref(initialViewingLangs.length === 0);
+const showAllViewingLangs = ref(hasLanguageConfig ? initialViewingLangs.length === 0 : false);
 const includeUnknown = ref(initialViewingLangs.includes('unknown'));
 const includeRemote = ref(initialViewingLangs.includes('remote'));
 const viewingLangs = ref<string[]>(initialViewingLangs.filter((code): code is string => typeof code === 'string' && code !== 'unknown' && code !== 'remote'));
@@ -959,6 +969,15 @@ const addableViewingLangs = computed(() =>
 );
 const languageUnsaved = ref(false);
 let languageSaving = false;
+const autoDetectedPostingLang = miLocalStorage.getItem('postingLangAutoDetected');
+const autoDetectedBrowserLang = miLocalStorage.getItem('postingLangAutoDetectBase');
+const shouldNotifyPostingLangReconfigure = computed(() =>
+	autoDetectedPostingLang != null
+	&& postingLang.value === autoDetectedPostingLang
+	&& autoDetectedBrowserLang != null
+	&& browserLanguage != null
+	&& autoDetectedBrowserLang !== browserLanguage
+);
 
 type SensitiveContentConsentSetting = 'show' | 'hide' | 'notSet';
 const sensitiveContentConsentSetting = computed<SensitiveContentConsentSetting>(() => sensitiveContentConsent.value === null ? 'notSet' : sensitiveContentConsent.value ? 'show' : 'hide');
@@ -1015,8 +1034,8 @@ watch(showAllViewingLangs, (value) => {
 		includeUnknown.value = false;
 		includeRemote.value = false;
 	} else {
-		const fallbackLang = postingLang.value ?? (lang.value && isSupportedPostingLang(lang.value) ? lang.value : 'other');
-		viewingLangs.value = [fallbackLang];
+		const fallbackLang = postingLang.value ?? getAutoPostingLang(browserLanguage);
+		viewingLangs.value = getDefaultViewingLangs(fallbackLang);
 		viewingLangToAdd.value = null;
 		includeUnknown.value = true;
 		includeRemote.value = true;
@@ -1084,6 +1103,10 @@ async function saveLanguageConfig() {
 	if (isPostingLangChanged) claimAchievement('postingLanguageConfigured');
 	if (isViewingLangsChanged || isShowMediaInAllLanguagesChanged || isShowHashtagsInAllLanguagesChanged) {
 		claimAchievement('viewingLanguagesConfigured');
+	}
+	if (isPostingLangChanged) {
+		miLocalStorage.removeItem('postingLangAutoDetected');
+		miLocalStorage.removeItem('postingLangAutoDetectBase');
 	}
 }
 

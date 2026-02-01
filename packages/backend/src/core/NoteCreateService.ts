@@ -950,11 +950,15 @@ export class NoteCreateService implements OnApplicationShutdown {
 		const noteDimension = typeof (note as MiNoteWithDimension).dimension === 'number'
 			? (note as MiNoteWithDimension).dimension
 			: 0;
-		const dimensionTargets = getDeliverTargetDimensions(noteDimension);
+		const dimensionTargets = await getDeliverTargetDimensions(
+			note as MiNoteWithDimension,
+			(noteId) => this.cacheService.noteDimensionCache.get(noteId),
+		);
+		
 		const pushToDimension = (name: FanoutTimelineName, id: string, maxlen: number) => {
-			this.fanoutTimelineService.push(name, id, maxlen, r);
 			for (const dimension of dimensionTargets) {
-				this.fanoutTimelineService.pushDimension(name, id, dimension, r);
+				if (dimension > 0) this.fanoutTimelineService.pushDimension(name, id, dimension, r);
+				else this.fanoutTimelineService.push(name, id, maxlen, r);
 			}
 		};
 

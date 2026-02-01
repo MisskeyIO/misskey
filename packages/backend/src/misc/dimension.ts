@@ -1,5 +1,6 @@
 import type { Packed } from '@/misc/json-schema.js';
 import type { MiUser } from '@/models/User.js';
+import type { MiNoteWithDimension } from '@/models/Note.js';
 
 export function normalizeDimension(value: number | null | undefined, dimensionCount: number): number | null {
 	const count = Math.max(1, dimensionCount);
@@ -40,8 +41,31 @@ export function shouldDeliverByDimension(note: Packed<'Note'>, viewerDimension: 
 	return false;
 }
 
-export function getDeliverTargetDimensions(noteDimension: number | null | undefined): number[] {
-	if (noteDimension == null || noteDimension <= 0) return [];
-	if (noteDimension < 1000) return [noteDimension];
-	return [noteDimension];
+export async function getDeliverTargetDimensions(
+	note: MiNoteWithDimension,
+	getDimensionFromCache: (noteId: string) => Promise<number | null | undefined>,
+): Promise<number[]> {
+	const targets = new Set<number>();
+	
+	const normalizedNoteDimension = (typeof note.dimension === 'number' && note.dimension > 0) ? note.dimension : 0;
+	
+	if (normalizedNoteDimension > 0) {
+		targets.add(normalizedNoteDimension);
+	}
+	
+	if (normalizedNoteDimension < 1000) {
+		targets.add(0);
+	}
+	
+	const replyDimension = note.replyId ? await getDimensionFromCache(note.replyId) : undefined;
+	if (typeof replyDimension === 'number' && replyDimension > 0 && replyDimension !== normalizedNoteDimension) {
+		targets.add(replyDimension);
+	}
+	
+	const renoteDimension = note.renoteId ? await getDimensionFromCache(note.renoteId) : undefined;
+	if (typeof renoteDimension === 'number' && renoteDimension > 0 && renoteDimension !== normalizedNoteDimension) {
+		targets.add(renoteDimension);
+	}
+	
+	return Array.from(targets).sort((a, b) => a - b);
 }

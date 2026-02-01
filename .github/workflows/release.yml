@@ -11,6 +11,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write
 
 jobs:
   version-bump:
@@ -104,6 +105,13 @@ jobs:
           git checkout main
           git reset --hard origin/main
           git push origin main:beta -f
+      - name: Dispatch workflows for beta
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run test-production.yml --ref beta
+          gh workflow run sourcemaps.yml --ref beta
+          gh workflow run docker.yml --ref beta
 
   update-io-branch:
     runs-on: ubuntu-latest
@@ -176,6 +184,13 @@ jobs:
 
           git fetch origin next
           git push origin $BRANCH_NAME:next -f
+      - name: Dispatch workflows for next
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run test-production.yml --ref next
+          gh workflow run sourcemaps.yml --ref next
+          gh workflow run docker.yml --ref next
 
           gh pr merge $PR_URL --auto --merge --delete-branch --subject "$IO_VERSION (MisskeyIO#${PR_NUMBER})"
 

@@ -517,8 +517,8 @@ catalogs:
       specifier: 3.3.3
       version: 3.3.3
     fastify:
-      specifier: 5.7.2
-      version: 5.7.2
+      specifier: 5.7.3
+      version: 5.7.3
     fastify-http-errors-enhanced:
       specifier: 7.0.1
       version: 7.0.1
@@ -1258,7 +1258,7 @@ importers:
         version: 0.1.21
       fastify:
         specifier: 'catalog:'
-        version: 5.7.2
+        version: 5.7.3
       fastify-http-errors-enhanced:
         specifier: 'catalog:'
         version: 7.0.1
@@ -8194,8 +8194,8 @@ packages:
     resolution: {integrity: sha512-2qfoaQ3BQDhZ1gtbkKZd6n0kKxJISJGM6u/skD9ljdWItAscjXrtZ1lnjr7PavmXX9j4EyCPmBDiIsLn07d5vA==}
     engines: {node: '>= 10'}
 
-  fastify@5.7.2:
-    resolution: {integrity: sha512-dBJolW+hm6N/yJVf6J5E1BxOBNkuXNl405nrfeR8SpvGWG3aCC2XDHyiFBdow8Win1kj7sjawQc257JlYY6M/A==}
+  fastify@5.7.3:
+    resolution: {integrity: sha512-QHzWSmTNUg9Ba8tNXzb92FTH77K+c8yeQPH80EeSIc9wyZj85jbPisMP0rwmyKv8oJwUFPe1UpN8HkNIXwCnUQ==}
 
   fastq@1.20.1:
     resolution: {integrity: sha512-GGToxJ/w1x32s/D2EKND7kTil4n8OVk/9mycTc4VDza13lOvpUZTGX3mFSCtV9ksdGBVzvsyAVLM6mHFThxXxw==}
@@ -19753,7 +19753,7 @@ snapshots:
       raw-body: 3.0.2
       secure-json-parse: 2.7.0
 
-  fastify@5.7.2:
+  fastify@5.7.3:
     dependencies:
       '@fastify/ajv-compiler': 4.0.5
       '@fastify/error': 4.2.0

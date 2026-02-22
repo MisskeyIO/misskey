@@ -773,28 +773,6 @@ export type paths = {
          */
         post: operations['admin___send-email'];
     };
-    '/admin/server-info': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * admin/server-info
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *read:admin:server-info*
-         */
-        post: operations['admin___server-info'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     '/admin/show-moderation-logs': {
         /**
          * admin/show-moderation-logs
@@ -2567,6 +2545,15 @@ export type paths = {
          */
         post: operations['i___pin'];
     };
+    '/i/purge-timeline-cache': {
+        /**
+         * i/purge-timeline-cache
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:account*
+         */
+        post: operations['i___purge-timeline-cache'];
+    };
     '/i/read-announcement': {
         /**
          * i/read-announcement
@@ -3492,39 +3479,6 @@ export type paths = {
          *     **Credential required**: *No*
          */
         post: operations['roles___users'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    '/server-info': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * server-info
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        get: operations['get___server-info'];
-        put?: never;
-        /**
-         * server-info
-         * @description No description provided.
-         *
-         *     **Credential required**: *No*
-         */
-        post: operations['server-info'];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
     };
     '/stats': {
         /**
@@ -4110,6 +4064,9 @@ export type components = {
             unreadNotificationsCount: number;
             mutedWords: string[][];
             mutedInstances: string[];
+            /** @example ja-JP */
+            postingLang: string | null;
+            viewingLangs: string[];
             showMediaInAllLanguages: boolean;
             showHashtagsInAllLanguages: boolean;
             notificationRecieveConfig: {
@@ -4358,6 +4315,7 @@ export type components = {
             ratio: number;
             url: string;
             imageUrl: string;
+            imageBlurhash: string | null;
             memo: string;
             dayOfWeek: number;
             isSensitive: boolean;
@@ -4457,6 +4415,7 @@ export type components = {
                 userId: string | null;
             } | null;
             localOnly?: boolean;
+            dimension?: number | null;
             /** @enum {string|null} */
             reactionAcceptance: 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote' | null;
             reactionEmojis: {
@@ -4523,7 +4482,10 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                lang?: string | null;
+                dimension?: number | null;
                 allowRenoteToExternal: boolean;
+                files: components['schemas']['DriveFile'][];
                 userId: string | null;
             } | null;
             localOnly: boolean;
@@ -5535,6 +5497,7 @@ export type components = {
             uri: string;
             description: string | null;
             langs: string[];
+            dimensions: number;
             tosUrl: string | null;
             /** @default https://github.com/misskey-dev/misskey */
             repositoryUrl: string | null;
@@ -5578,8 +5541,9 @@ export type components = {
                 ratio: number;
                 /** Format: url */
                 imageUrl: string;
+                imageBlurhash: string | null;
                 dayOfWeek: number;
-                isSensitive?: boolean;
+                isSensitive: boolean;
             }[];
             wellKnownWebsites: string[];
             /** @default 0 */
@@ -6941,6 +6905,7 @@ export interface operations {
                     startsAt: number;
                     imageUrl: string;
                     dayOfWeek: number;
+                    /** @default false */
                     isSensitive?: boolean;
                 };
             };
@@ -10325,6 +10290,7 @@ export interface operations {
                         defaultLightTheme: string | null;
                         clientOptions: Record<string, never>;
                         description: string | null;
+                        dimensions: number;
                         disableRegistration: boolean;
                         impressumUrl: string | null;
                         maintainerEmail: string | null;
@@ -11916,95 +11882,6 @@ export interface operations {
             204: {
                 headers: {
                     [name: string]: unknown;
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    'admin___server-info': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        machine: string;
-                        /** @example linux */
-                        os: string;
-                        node: string;
-                        psql: string;
-                        cpu: {
-                            model: string;
-                            cores: number;
-                        };
-                        mem: {
-                            /** Format: bytes */
-                            total: number;
-                        };
-                        fs: {
-                            /** Format: bytes */
-                            total: number;
-                            /** Format: bytes */
-                            used: number;
-                        };
-                        net: {
-                            /** @example eth0 */
-                            interface: string;
-                        };
-                    };
                 };
             };
             /** @description Client error */
@@ -13753,6 +13630,7 @@ export interface operations {
                     maintainerName?: string | null;
                     maintainerEmail?: string | null;
                     langs?: string[];
+                    dimensions?: number;
                     deeplAuthKey?: string | null;
                     deeplIsPro?: boolean;
                     enableEmail?: boolean;
@@ -16509,6 +16387,7 @@ export interface operations {
                     untilDate?: number;
                     /** @default false */
                     allowPartial?: boolean;
+                    dimension?: number | null;
                 };
             };
         };
@@ -26082,6 +25961,73 @@ export interface operations {
             };
         };
     };
+    'i___purge-timeline-cache': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** @enum {string} */
+                    type: 'home' | 'user' | 'list' | 'antenna';
+                    /** Format: misskey:id */
+                    listId?: string | null;
+                    /** Format: misskey:id */
+                    antennaId?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
     'i___read-announcement': {
         requestBody: {
             content: {
@@ -26956,8 +26902,10 @@ export interface operations {
                     /** @enum {string|null} */
                     lang?: null | 'ach' | 'ady' | 'af' | 'af-NA' | 'af-ZA' | 'ak' | 'ar' | 'ar-AR' | 'ar-MA' | 'ar-SA' | 'ay-BO' | 'az' | 'az-AZ' | 'be-BY' | 'bg' | 'bg-BG' | 'bn' | 'bn-IN' | 'bn-BD' | 'br' | 'bs-BA' | 'ca' | 'ca-ES' | 'cak' | 'ck-US' | 'cs' | 'cs-CZ' | 'cy' | 'cy-GB' | 'da' | 'da-DK' | 'de' | 'de-AT' | 'de-DE' | 'de-CH' | 'dsb' | 'el' | 'el-GR' | 'en' | 'en-GB' | 'en-AU' | 'en-CA' | 'en-IE' | 'en-IN' | 'en-PI' | 'en-SG' | 'en-UD' | 'en-US' | 'en-ZA' | 'en@pirate' | 'eo' | 'eo-EO' | 'es' | 'es-AR' | 'es-419' | 'es-CL' | 'es-CO' | 'es-EC' | 'es-ES' | 'es-LA' | 'es-NI' | 'es-MX' | 'es-US' | 'es-VE' | 'et' | 'et-EE' | 'eu' | 'eu-ES' | 'fa' | 'fa-IR' | 'fb-LT' | 'ff' | 'fi' | 'fi-FI' | 'fo' | 'fo-FO' | 'fr' | 'fr-CA' | 'fr-FR' | 'fr-BE' | 'fr-CH' | 'fy-NL' | 'ga' | 'ga-IE' | 'gd' | 'gl' | 'gl-ES' | 'gn-PY' | 'gu-IN' | 'gv' | 'gx-GR' | 'he' | 'he-IL' | 'hi' | 'hi-IN' | 'hr' | 'hr-HR' | 'hsb' | 'ht' | 'hu' | 'hu-HU' | 'hy' | 'hy-AM' | 'id' | 'id-ID' | 'is' | 'is-IS' | 'it' | 'it-IT' | 'ja' | 'ja-JP' | 'jv-ID' | 'ka-GE' | 'kk-KZ' | 'km' | 'kl' | 'km-KH' | 'kab' | 'kn' | 'kn-IN' | 'ko' | 'ko-KR' | 'ku-TR' | 'kw' | 'la' | 'la-VA' | 'lb' | 'li-NL' | 'lt' | 'lt-LT' | 'lv' | 'lv-LV' | 'mai' | 'mg-MG' | 'mk' | 'mk-MK' | 'ml' | 'ml-IN' | 'mn-MN' | 'mr' | 'mr-IN' | 'ms' | 'ms-MY' | 'mt' | 'mt-MT' | 'my' | 'no' | 'nb' | 'nb-NO' | 'ne' | 'ne-NP' | 'nl' | 'nl-BE' | 'nl-NL' | 'nn-NO' | 'oc' | 'or-IN' | 'pa' | 'pa-IN' | 'pl' | 'pl-PL' | 'ps-AF' | 'pt' | 'pt-BR' | 'pt-PT' | 'qu-PE' | 'rm-CH' | 'ro' | 'ro-RO' | 'ru' | 'ru-RU' | 'sa-IN' | 'se-NO' | 'sh' | 'si-LK' | 'sk' | 'sk-SK' | 'sl' | 'sl-SI' | 'so-SO' | 'sq' | 'sq-AL' | 'sr' | 'sr-RS' | 'su' | 'sv' | 'sv-SE' | 'sw' | 'sw-KE' | 'ta' | 'ta-IN' | 'te' | 'te-IN' | 'tg' | 'tg-TJ' | 'th' | 'th-TH' | 'fil' | 'tlh' | 'tr' | 'tr-TR' | 'tt-RU' | 'uk' | 'uk-UA' | 'ur' | 'ur-PK' | 'uz' | 'uz-UZ' | 'vi' | 'vi-VN' | 'xh-ZA' | 'yi' | 'yi-DE' | 'zh' | 'zh-Hans' | 'zh-Hant' | 'zh-CN' | 'zh-HK' | 'zh-SG' | 'zh-TW' | 'zu-ZA';
                     /** @enum {string|null} */
-                    postingLang?: null | 'ach' | 'ady' | 'af' | 'af-NA' | 'af-ZA' | 'ak' | 'ar' | 'ar-AR' | 'ar-MA' | 'ar-SA' | 'ay-BO' | 'az' | 'az-AZ' | 'be-BY' | 'bg' | 'bg-BG' | 'bn' | 'bn-IN' | 'bn-BD' | 'br' | 'bs-BA' | 'ca' | 'ca-ES' | 'cak' | 'ck-US' | 'cs' | 'cs-CZ' | 'cy' | 'cy-GB' | 'da' | 'da-DK' | 'de' | 'de-AT' | 'de-DE' | 'de-CH' | 'dsb' | 'el' | 'el-GR' | 'en' | 'en-GB' | 'en-AU' | 'en-CA' | 'en-IE' | 'en-IN' | 'en-PI' | 'en-SG' | 'en-UD' | 'en-US' | 'en-ZA' | 'en@pirate' | 'eo' | 'eo-EO' | 'es' | 'es-AR' | 'es-419' | 'es-CL' | 'es-CO' | 'es-EC' | 'es-ES' | 'es-LA' | 'es-NI' | 'es-MX' | 'es-US' | 'es-VE' | 'et' | 'et-EE' | 'eu' | 'eu-ES' | 'fa' | 'fa-IR' | 'fb-LT' | 'ff' | 'fi' | 'fi-FI' | 'fo' | 'fo-FO' | 'fr' | 'fr-CA' | 'fr-FR' | 'fr-BE' | 'fr-CH' | 'fy-NL' | 'ga' | 'ga-IE' | 'gd' | 'gl' | 'gl-ES' | 'gn-PY' | 'gu-IN' | 'gv' | 'gx-GR' | 'he' | 'he-IL' | 'hi' | 'hi-IN' | 'hr' | 'hr-HR' | 'hsb' | 'ht' | 'hu' | 'hu-HU' | 'hy' | 'hy-AM' | 'id' | 'id-ID' | 'is' | 'is-IS' | 'it' | 'it-IT' | 'ja' | 'ja-JP' | 'jv-ID' | 'ka-GE' | 'kk-KZ' | 'km' | 'kl' | 'km-KH' | 'kab' | 'kn' | 'kn-IN' | 'ko' | 'ko-KR' | 'ku-TR' | 'kw' | 'la' | 'la-VA' | 'lb' | 'li-NL' | 'lt' | 'lt-LT' | 'lv' | 'lv-LV' | 'mai' | 'mg-MG' | 'mk' | 'mk-MK' | 'ml' | 'ml-IN' | 'mn-MN' | 'mr' | 'mr-IN' | 'ms' | 'ms-MY' | 'mt' | 'mt-MT' | 'my' | 'no' | 'nb' | 'nb-NO' | 'ne' | 'ne-NP' | 'nl' | 'nl-BE' | 'nl-NL' | 'nn-NO' | 'oc' | 'or-IN' | 'pa' | 'pa-IN' | 'pl' | 'pl-PL' | 'ps-AF' | 'pt' | 'pt-BR' | 'pt-PT' | 'qu-PE' | 'rm-CH' | 'ro' | 'ro-RO' | 'ru' | 'ru-RU' | 'sa-IN' | 'se-NO' | 'sh' | 'si-LK' | 'sk' | 'sk-SK' | 'sl' | 'sl-SI' | 'so-SO' | 'sq' | 'sq-AL' | 'sr' | 'sr-RS' | 'su' | 'sv' | 'sv-SE' | 'sw' | 'sw-KE' | 'ta' | 'ta-IN' | 'te' | 'te-IN' | 'tg' | 'tg-TJ' | 'th' | 'th-TH' | 'fil' | 'tlh' | 'tr' | 'tr-TR' | 'tt-RU' | 'uk' | 'uk-UA' | 'ur' | 'ur-PK' | 'uz' | 'uz-UZ' | 'vi' | 'vi-VN' | 'xh-ZA' | 'yi' | 'yi-DE' | 'zh' | 'zh-Hans' | 'zh-Hant' | 'zh-CN' | 'zh-HK' | 'zh-SG' | 'zh-TW' | 'zu-ZA';
-                    viewingLangs?: ('ach' | 'ady' | 'af' | 'af-NA' | 'af-ZA' | 'ak' | 'ar' | 'ar-AR' | 'ar-MA' | 'ar-SA' | 'ay-BO' | 'az' | 'az-AZ' | 'be-BY' | 'bg' | 'bg-BG' | 'bn' | 'bn-IN' | 'bn-BD' | 'br' | 'bs-BA' | 'ca' | 'ca-ES' | 'cak' | 'ck-US' | 'cs' | 'cs-CZ' | 'cy' | 'cy-GB' | 'da' | 'da-DK' | 'de' | 'de-AT' | 'de-DE' | 'de-CH' | 'dsb' | 'el' | 'el-GR' | 'en' | 'en-GB' | 'en-AU' | 'en-CA' | 'en-IE' | 'en-IN' | 'en-PI' | 'en-SG' | 'en-UD' | 'en-US' | 'en-ZA' | 'en@pirate' | 'eo' | 'eo-EO' | 'es' | 'es-AR' | 'es-419' | 'es-CL' | 'es-CO' | 'es-EC' | 'es-ES' | 'es-LA' | 'es-NI' | 'es-MX' | 'es-US' | 'es-VE' | 'et' | 'et-EE' | 'eu' | 'eu-ES' | 'fa' | 'fa-IR' | 'fb-LT' | 'ff' | 'fi' | 'fi-FI' | 'fo' | 'fo-FO' | 'fr' | 'fr-CA' | 'fr-FR' | 'fr-BE' | 'fr-CH' | 'fy-NL' | 'ga' | 'ga-IE' | 'gd' | 'gl' | 'gl-ES' | 'gn-PY' | 'gu-IN' | 'gv' | 'gx-GR' | 'he' | 'he-IL' | 'hi' | 'hi-IN' | 'hr' | 'hr-HR' | 'hsb' | 'ht' | 'hu' | 'hu-HU' | 'hy' | 'hy-AM' | 'id' | 'id-ID' | 'is' | 'is-IS' | 'it' | 'it-IT' | 'ja' | 'ja-JP' | 'jv-ID' | 'ka-GE' | 'kk-KZ' | 'km' | 'kl' | 'km-KH' | 'kab' | 'kn' | 'kn-IN' | 'ko' | 'ko-KR' | 'ku-TR' | 'kw' | 'la' | 'la-VA' | 'lb' | 'li-NL' | 'lt' | 'lt-LT' | 'lv' | 'lv-LV' | 'mai' | 'mg-MG' | 'mk' | 'mk-MK' | 'ml' | 'ml-IN' | 'mn-MN' | 'mr' | 'mr-IN' | 'ms' | 'ms-MY' | 'mt' | 'mt-MT' | 'my' | 'no' | 'nb' | 'nb-NO' | 'ne' | 'ne-NP' | 'nl' | 'nl-BE' | 'nl-NL' | 'nn-NO' | 'oc' | 'or-IN' | 'pa' | 'pa-IN' | 'pl' | 'pl-PL' | 'ps-AF' | 'pt' | 'pt-BR' | 'pt-PT' | 'qu-PE' | 'rm-CH' | 'ro' | 'ro-RO' | 'ru' | 'ru-RU' | 'sa-IN' | 'se-NO' | 'sh' | 'si-LK' | 'sk' | 'sk-SK' | 'sl' | 'sl-SI' | 'so-SO' | 'sq' | 'sq-AL' | 'sr' | 'sr-RS' | 'su' | 'sv' | 'sv-SE' | 'sw' | 'sw-KE' | 'ta' | 'ta-IN' | 'te' | 'te-IN' | 'tg' | 'tg-TJ' | 'th' | 'th-TH' | 'fil' | 'tlh' | 'tr' | 'tr-TR' | 'tt-RU' | 'uk' | 'uk-UA' | 'ur' | 'ur-PK' | 'uz' | 'uz-UZ' | 'vi' | 'vi-VN' | 'xh-ZA' | 'yi' | 'yi-DE' | 'zh' | 'zh-Hans' | 'zh-Hant' | 'zh-CN' | 'zh-HK' | 'zh-SG' | 'zh-TW' | 'zu-ZA' | 'unknown' | 'remote')[];
+                    postingLang?: null | 'ja' | 'ja-JP' | 'ko' | 'ko-KR' | 'other';
+                    viewingLangs?: ('ja' | 'ja-JP' | 'ko' | 'ko-KR' | 'other' | 'unknown' | 'remote')[];
+                    showMediaInAllLanguages?: boolean;
+                    showHashtagsInAllLanguages?: boolean;
                     /** Format: misskey:id */
                     avatarId?: string | null;
                     avatarDecorations?: {
@@ -28696,6 +28644,7 @@ export interface operations {
                     cw?: string | null;
                     /** @default false */
                     localOnly?: boolean;
+                    dimension?: number | null;
                     /**
                      * @default null
                      * @enum {string|null}
@@ -28714,7 +28663,7 @@ export interface operations {
                     /** Format: misskey:id */
                     channelId?: string | null;
                     /** @enum {string|null} */
-                    lang?: null | 'ach' | 'ady' | 'af' | 'af-NA' | 'af-ZA' | 'ak' | 'ar' | 'ar-AR' | 'ar-MA' | 'ar-SA' | 'ay-BO' | 'az' | 'az-AZ' | 'be-BY' | 'bg' | 'bg-BG' | 'bn' | 'bn-IN' | 'bn-BD' | 'br' | 'bs-BA' | 'ca' | 'ca-ES' | 'cak' | 'ck-US' | 'cs' | 'cs-CZ' | 'cy' | 'cy-GB' | 'da' | 'da-DK' | 'de' | 'de-AT' | 'de-DE' | 'de-CH' | 'dsb' | 'el' | 'el-GR' | 'en' | 'en-GB' | 'en-AU' | 'en-CA' | 'en-IE' | 'en-IN' | 'en-PI' | 'en-SG' | 'en-UD' | 'en-US' | 'en-ZA' | 'en@pirate' | 'eo' | 'eo-EO' | 'es' | 'es-AR' | 'es-419' | 'es-CL' | 'es-CO' | 'es-EC' | 'es-ES' | 'es-LA' | 'es-NI' | 'es-MX' | 'es-US' | 'es-VE' | 'et' | 'et-EE' | 'eu' | 'eu-ES' | 'fa' | 'fa-IR' | 'fb-LT' | 'ff' | 'fi' | 'fi-FI' | 'fo' | 'fo-FO' | 'fr' | 'fr-CA' | 'fr-FR' | 'fr-BE' | 'fr-CH' | 'fy-NL' | 'ga' | 'ga-IE' | 'gd' | 'gl' | 'gl-ES' | 'gn-PY' | 'gu-IN' | 'gv' | 'gx-GR' | 'he' | 'he-IL' | 'hi' | 'hi-IN' | 'hr' | 'hr-HR' | 'hsb' | 'ht' | 'hu' | 'hu-HU' | 'hy' | 'hy-AM' | 'id' | 'id-ID' | 'is' | 'is-IS' | 'it' | 'it-IT' | 'ja' | 'ja-JP' | 'jv-ID' | 'ka-GE' | 'kk-KZ' | 'km' | 'kl' | 'km-KH' | 'kab' | 'kn' | 'kn-IN' | 'ko' | 'ko-KR' | 'ku-TR' | 'kw' | 'la' | 'la-VA' | 'lb' | 'li-NL' | 'lt' | 'lt-LT' | 'lv' | 'lv-LV' | 'mai' | 'mg-MG' | 'mk' | 'mk-MK' | 'ml' | 'ml-IN' | 'mn-MN' | 'mr' | 'mr-IN' | 'ms' | 'ms-MY' | 'mt' | 'mt-MT' | 'my' | 'no' | 'nb' | 'nb-NO' | 'ne' | 'ne-NP' | 'nl' | 'nl-BE' | 'nl-NL' | 'nn-NO' | 'oc' | 'or-IN' | 'pa' | 'pa-IN' | 'pl' | 'pl-PL' | 'ps-AF' | 'pt' | 'pt-BR' | 'pt-PT' | 'qu-PE' | 'rm-CH' | 'ro' | 'ro-RO' | 'ru' | 'ru-RU' | 'sa-IN' | 'se-NO' | 'sh' | 'si-LK' | 'sk' | 'sk-SK' | 'sl' | 'sl-SI' | 'so-SO' | 'sq' | 'sq-AL' | 'sr' | 'sr-RS' | 'su' | 'sv' | 'sv-SE' | 'sw' | 'sw-KE' | 'ta' | 'ta-IN' | 'te' | 'te-IN' | 'tg' | 'tg-TJ' | 'th' | 'th-TH' | 'fil' | 'tlh' | 'tr' | 'tr-TR' | 'tt-RU' | 'uk' | 'uk-UA' | 'ur' | 'ur-PK' | 'uz' | 'uz-UZ' | 'vi' | 'vi-VN' | 'xh-ZA' | 'yi' | 'yi-DE' | 'zh' | 'zh-Hans' | 'zh-Hant' | 'zh-CN' | 'zh-HK' | 'zh-SG' | 'zh-TW' | 'zu-ZA';
+                    lang?: null | 'ja' | 'ja-JP' | 'ko' | 'ko-KR' | 'other';
                     text?: string | null;
                     fileIds?: string[];
                     mediaIds?: string[];
@@ -29499,6 +29448,7 @@ export interface operations {
                     untilId?: string;
                     sinceDate?: number;
                     untilDate?: number;
+                    dimension?: number | null;
                 };
             };
         };
@@ -29585,6 +29535,7 @@ export interface operations {
                     withRenotes?: boolean;
                     /** @default false */
                     withReplies?: boolean;
+                    dimension?: number | null;
                 };
             };
         };
@@ -29665,6 +29616,7 @@ export interface operations {
                     allowPartial?: boolean;
                     sinceDate?: number;
                     untilDate?: number;
+                    dimension?: number | null;
                 };
             };
         };
@@ -30977,6 +30929,7 @@ export interface operations {
                     withFiles?: boolean;
                     /** @default true */
                     withRenotes?: boolean;
+                    dimension?: number | null;
                 };
             };
         };
@@ -33264,6 +33217,7 @@ export interface operations {
                     untilId?: string;
                     sinceDate?: number;
                     untilDate?: number;
+                    dimension?: number | null;
                 };
             };
         };
@@ -33419,235 +33373,6 @@ export interface operations {
                         id: string;
                         user: components['schemas']['UserDetailed'];
                     }[];
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    'get___server-info': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        machine: string;
-                        cpu: {
-                            model: string;
-                            cores: number;
-                        };
-                        mem: {
-                            total: number;
-                        };
-                        fs: {
-                            total: number;
-                            used: number;
-                        };
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    'server-info': {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        machine: string;
-                        cpu: {
-                            model: string;
-                            cores: number;
-                        };
-                        mem: {
-                            total: number;
-                        };
-                        fs: {
-                            total: number;
-                            used: number;
-                        };
-                    };
-                };
-            };
-            /** @description Client error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Authentication error */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Forbidden error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description I'm Ai */
-            418: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-            /** @description Internal server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': components['schemas']['Error'];
-                };
-            };
-        };
-    };
-    get___stats: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK (with results) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        notesCount: number;
-                        originalNotesCount: number;
-                        usersCount: number;
-                        originalUsersCount: number;
-                        instances: number;
-                        driveUsageLocal: number;
-                        driveUsageRemote: number;
-                    };
                 };
             };
             /** @description Client error */
@@ -36923,3 +36648,4 @@ export interface operations {
         };
     };
 }
+

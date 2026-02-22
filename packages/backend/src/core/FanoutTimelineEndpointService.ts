@@ -21,6 +21,7 @@ import { isReply } from '@/misc/is-reply.js';
 import { isInstanceMuted } from '@/misc/is-instance-muted.js';
 import { ChannelMutingService } from '@/core/ChannelMutingService.js';
 import { isChannelRelated } from '@/misc/is-channel-related.js';
+import { normalizeDimension } from '@/misc/dimension.js';
 
 type NoteFilter = (note: MiNote) => boolean;
 

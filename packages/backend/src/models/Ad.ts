@@ -77,11 +77,6 @@ export class MiAd {
 	})
 	public dayOfWeek: number;
 
-	@Column('boolean', {
-		default: false,
-	})
-	public isSensitive: boolean;
-
 	constructor(data: Partial<MiAd>) {
 		if (data == null) return;
 

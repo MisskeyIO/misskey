@@ -71,7 +71,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				place: ad.place,
 				priority: ad.priority,
 				ratio: ad.ratio,
-				isSensitive: ad.isSensitive,
 			}));
 		});
 	}

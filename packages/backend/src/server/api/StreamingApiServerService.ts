@@ -105,8 +105,8 @@ export class StreamingApiServerService {
 				this.cacheService,
 				this.roleService,
 				this.channelFollowingService,
-				this.channelMutingService,
 				this.meta,
+				this.channelMutingService,
 				user, app,
 			);
 

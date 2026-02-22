@@ -696,7 +696,7 @@ function showOtherSettings() {
 	}
 
 	const postingLangCaption = postingLang.value != null
-		? (langmap[postingLang.value]?.nativeName ?? postingLang.value)
+		? (postingLang.value === 'other' ? i18n.ts.other : langmap[postingLang.value]?.nativeName ?? postingLang.value)
 		: i18n.ts.default;
 
 	const menuItems = [{

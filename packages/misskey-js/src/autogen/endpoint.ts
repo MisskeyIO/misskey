@@ -116,7 +116,6 @@ import type {
 	AdminRolesUsersRequest,
 	AdminRolesUsersResponse,
 	AdminSendEmailRequest,
-	AdminServerInfoResponse,
 	AdminShowModerationLogsRequest,
 	AdminShowModerationLogsResponse,
 	AdminShowUserRequest,
@@ -569,7 +568,6 @@ import type {
 	RolesShowResponse,
 	RolesUsersRequest,
 	RolesUsersResponse,
-	ServerInfoResponse,
 	StatsResponse,
 	SwRegisterRequest,
 	SwRegisterResponse,
@@ -735,7 +733,6 @@ export type Endpoints = {
 	'admin/roles/update-inline-policies': { req: AdminRolesUpdateInlinePoliciesRequest; res: EmptyResponse };
 	'admin/roles/users': { req: AdminRolesUsersRequest; res: AdminRolesUsersResponse };
 	'admin/send-email': { req: AdminSendEmailRequest; res: EmptyResponse };
-	'admin/server-info': { req: EmptyRequest; res: AdminServerInfoResponse };
 	'admin/show-moderation-logs': { req: AdminShowModerationLogsRequest; res: AdminShowModerationLogsResponse };
 	'admin/show-user': { req: AdminShowUserRequest; res: AdminShowUserResponse };
 	'admin/show-user-account-move-logs': { req: AdminShowUserAccountMoveLogsRequest; res: AdminShowUserAccountMoveLogsResponse };
@@ -1032,7 +1029,6 @@ export type Endpoints = {
 	'roles/notes': { req: RolesNotesRequest; res: RolesNotesResponse };
 	'roles/show': { req: RolesShowRequest; res: RolesShowResponse };
 	'roles/users': { req: RolesUsersRequest; res: RolesUsersResponse };
-	'server-info': { req: EmptyRequest; res: ServerInfoResponse };
 	'stats': { req: EmptyRequest; res: StatsResponse };
 	'sw/register': { req: SwRegisterRequest; res: SwRegisterResponse };
 	'sw/show-registration': { req: SwShowRegistrationRequest; res: SwShowRegistrationResponse };

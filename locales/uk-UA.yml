@@ -1425,7 +1425,6 @@ _widgets:
   button: "Кнопка"
   onlineUsers: "Користувачі онлайн"
   jobQueue: "Черга завдань"
-  serverMetric: "Показники сервера "
   aiscript: "Консоль AiScript"
   aichan: "Ai"
   userList: "Список користувачів"

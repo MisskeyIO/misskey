@@ -145,7 +145,7 @@ describe('Timelines', () => {
 				let res = await api('notes/timeline', { limit: 100 }, alice);
 				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
 
-				await api('i/update', { viewingLangs: ['en'] }, alice);
+				await api('i/update', { viewingLangs: ['other'] }, alice);
 				res = await api('notes/timeline', { limit: 100 }, alice);
 				assert.strictEqual(res.body.some(note => note.id === bobNote.id), false);
 			});
@@ -155,7 +155,7 @@ describe('Timelines', () => {
 
 				await api('following/create', { userId: bob.id }, alice);
 				await setTimeout(1000);
-				await api('i/update', { viewingLangs: ['en'] }, alice);
+				await api('i/update', { viewingLangs: ['other'] }, alice);
 				const bobNote = await post(bob, { text: 'no-lang' });
 
 				await waitForPushToTl();
@@ -163,7 +163,7 @@ describe('Timelines', () => {
 				let res = await api('notes/timeline', { limit: 100 }, alice);
 				assert.strictEqual(res.body.some(note => note.id === bobNote.id), false);
 
-				await api('i/update', { viewingLangs: ['en', 'unknown'] }, alice);
+				await api('i/update', { viewingLangs: ['other', 'unknown'] }, alice);
 				res = await api('notes/timeline', { limit: 100 }, alice);
 				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
 			});

@@ -1967,7 +1967,6 @@ _widgets:
   button: "Кнопка"
   onlineUsers: "Пользователи сейчас с сети"
   jobQueue: "Очередь заданий"
-  serverMetric: "Показатели сервера"
   aiscript: "Консоль AiScript"
   aiscriptApp: "Приложение на AiScript"
   aichan: "Ай"

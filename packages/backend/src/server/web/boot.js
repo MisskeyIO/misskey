@@ -22,18 +22,57 @@
 		return;
 	}
 
-	//#region Detect language
+	if (localStorage.getItem('id') === null) {
+		localStorage.setItem('id', crypto.randomUUID().replaceAll('-', ''));
+	}
+	let id = localStorage.getItem('id');
+
+	//#region Detect language & fetch translations
 	const supportedLangs = LANGS;
 	/** @type { string } */
 	let lang = localStorage.getItem('lang');
 	if (lang == null || !supportedLangs.includes(lang)) {
-		if (supportedLangs.includes(navigator.language)) {
+		const browserLang = typeof navigator !== 'undefined' && typeof navigator.language === 'string'
+			? navigator.language.toLowerCase()
+			: '';
+		if (browserLang.startsWith('ko')) lang = 'ko-KR';
+		else if (browserLang.startsWith('ja')) lang = 'ja-JP';
+		else if (supportedLangs.includes(navigator.language)) {
 			lang = navigator.language;
 		} else {
 			lang = supportedLangs.find(x => x.split('-')[0] === navigator.language);
-
-			// Fallback
 			if (lang == null) lang = 'en-US';
+		}
+	}
+
+	if (localStorage.getItem('locale') === null) {
+		const metaRes = await window.fetch('/api/meta', {
+			method: 'GET',
+			credentials: 'omit',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-Client-Transaction-Id': `${id}-misskey-${crypto.randomUUID().replaceAll('-', '')}`
+			},
+		});
+		if (metaRes.status !== 200) {
+			renderError('META_FETCH');
+			return;
+		}
+		const meta = await metaRes.json();
+		const v = meta.version;
+		if (v == null) {
+			renderError('META_FETCH_V');
+			return;
+		}
+
+		const localRes = await window.fetch(`/assets/locales/${lang}.${v}.json`);
+		if (localRes.status === 200) {
+			localStorage.setItem('lang', lang);
+			localStorage.setItem('locale', await localRes.text());
+			localStorage.setItem('localeVersion', v);
+		} else {
+			renderError('LOCALE_FETCH');
+			return;
 		}
 	}
 

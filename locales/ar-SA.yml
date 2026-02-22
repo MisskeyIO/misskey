@@ -1362,7 +1362,6 @@ _widgets:
   button: "زر"
   onlineUsers: "المتّصلون"
   jobQueue: "قائمة الانتظار"
-  serverMetric: "إحصائيات الخادم"
   userList: "قائمة المستخدمين"
   _userList:
     chooseList: "اختر قائمة"

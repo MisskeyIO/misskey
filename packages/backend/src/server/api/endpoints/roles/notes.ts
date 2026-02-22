@@ -8,6 +8,7 @@ import * as Redis from 'ioredis';
 import { Brackets } from 'typeorm';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { MiMeta, NotesRepository, RolesRepository } from '@/models/_.js';
+import { normalizeDimension } from '@/misc/dimension.js';
 import { QueryService } from '@/core/QueryService.js';
 import { DI } from '@/di-symbols.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
@@ -15,7 +16,6 @@ import { IdService } from '@/core/IdService.js';
 import { FanoutTimelineService } from '@/core/FanoutTimelineService.js';
 import { ChannelMutingService } from '@/core/ChannelMutingService.js';
 import { ApiError } from '../../error.js';
-import { normalizeDimension } from '@/misc/dimension.js';
 
 export const meta = {
 	tags: ['role', 'notes'],
@@ -80,9 +80,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		super(meta, paramDef, async (ps, me) => {
 			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
 			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
-			const viewerDimension = typeof ps.dimension === 'number'
-				? normalizeDimension(ps.dimension, this.instanceMeta.dimensions ?? 1)
-				: null;
+			const viewerDimension = normalizeDimension(ps.dimension, this.instanceMeta.dimensions ?? 1);
 
 			const role = await this.rolesRepository.findOneBy({
 				id: ps.roleId,

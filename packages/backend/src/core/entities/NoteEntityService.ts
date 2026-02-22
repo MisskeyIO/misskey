@@ -128,9 +128,22 @@ export class NoteEntityService implements OnModuleInit {
 		if (note.mentions?.includes(meId)) return true;
 		if (note.visibleUserIds?.includes(meId)) return true;
 
-		const viewingLangs = await this.cacheService.userLanguageCache.fetch(meId).then(c => c?.viewingLangs ?? null);
+		const languageConfig = await this.cacheService.userLanguageCache.fetch(meId);
+		const viewingLangs = languageConfig?.viewingLangs ?? null;
 		if (viewingLangs == null) return true;
 		if (viewingLangs.length === 0) return true;
+
+		if (languageConfig?.showMediaInAllLanguages) {
+			const fileIds = (note as MiNote).fileIds ?? (note as Packed<'Note'>).fileIds;
+			const renoteFileIds = (note as MiNote).renote?.fileIds ?? (note as Packed<'Note'>).renote?.fileIds;
+			if ((Array.isArray(fileIds) && fileIds.length > 0) || (Array.isArray(renoteFileIds) && renoteFileIds.length > 0)) return true;
+		}
+
+		if (languageConfig?.showHashtagsInAllLanguages) {
+			const tags = (note as MiNote).tags ?? (note as Packed<'Note'>).tags;
+			const renoteTags = (note as MiNote).renote?.tags ?? (note as Packed<'Note'>).renote?.tags;
+			if ((Array.isArray(tags) && tags.length > 0) || (Array.isArray(renoteTags) && renoteTags.length > 0)) return true;
+		}
 
 		let noteLang: string | null = null;
 		if (((note as MiNote).userHost ?? note.user?.host ?? null) != null) noteLang = 'remote';

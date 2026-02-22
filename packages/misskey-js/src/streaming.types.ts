@@ -19,8 +19,6 @@ import type {
 	PageEvent,
 	QueueStats,
 	QueueStatsLog,
-	ServerStats,
-	ServerStatsLog,
 	ReversiGameDetailed,
 } from './entities.js';
 import type {
@@ -182,19 +180,6 @@ export type Channels = {
 			folderUpdated: (payload: DriveFolder) => void;
 		};
 		receives: null;
-	};
-	serverStats: {
-		params: null;
-		events: {
-			stats: (payload: ServerStats) => void;
-			statsLog: (payload: ServerStatsLog) => void;
-		};
-		receives: {
-			requestLog: {
-				id: string | number;
-				length: number;
-			};
-		};
 	};
 	queueStats: {
 		params: null;

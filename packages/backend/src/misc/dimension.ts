@@ -1,15 +1,16 @@
 import type { Packed } from '@/misc/json-schema.js';
 import type { MiUser } from '@/models/User.js';
+import type { MiNoteWithDimension } from '@/models/Note.js';
 
-export function normalizeDimension(value: number | null | undefined, dimensionCount: number): number {
+export function normalizeDimension(value: number | null | undefined, dimensionCount: number): number | null {
 	const count = Math.max(1, dimensionCount);
-	if (typeof value !== 'number' || !Number.isFinite(value) || !Number.isInteger(value)) return 0;
-	if (value < 0 || value >= count) return 0;
+	if (typeof value !== 'number' || !Number.isFinite(value) || !Number.isInteger(value)) return null;
+	if (value <= 0 || value >= count) return null;
 	return value;
 }
 
-export function getNoteDimension(note: Packed<'Note'>): number {
-	return typeof note.dimension === 'number' ? note.dimension : 0;
+export function getNoteDimension(note: MiNoteWithDimension | Packed<'Note'>): number {
+	return (typeof note.dimension === 'number' && note.dimension > 0) ? note.dimension : 0;
 }
 
 export function isCrossDimensionInteraction(note: Packed<'Note'>, viewerId: MiUser['id'] | null | undefined): boolean {
@@ -40,8 +41,30 @@ export function shouldDeliverByDimension(note: Packed<'Note'>, viewerDimension: 
 	return false;
 }
 
-export function getDeliverTargetDimensions(noteDimension: number | null | undefined): number[] {
-	if (noteDimension == null || noteDimension <= 0) return [0];
-	if (noteDimension < 1000) return [noteDimension, 0];
-	return [noteDimension];
+export async function getDeliverTargetDimensions(
+	note: MiNoteWithDimension | Packed<'Note'>,
+	getDimensionFromCache: (noteId: string) => Promise<number | null | undefined>,
+): Promise<number[]> {
+	const targets = new Set<number>();
+	const noteDimension = getNoteDimension(note);
+
+	if (noteDimension > 0) {
+		targets.add(noteDimension);
+	}
+
+	if (noteDimension < 1000) {
+		targets.add(0);
+	}
+
+	const replyDimension = note.replyId ? await getDimensionFromCache(note.replyId) : undefined;
+	if (typeof replyDimension === 'number' && replyDimension > 0 && replyDimension !== noteDimension) {
+		targets.add(replyDimension);
+	}
+
+	const renoteDimension = note.renoteId ? await getDimensionFromCache(note.renoteId) : undefined;
+	if (typeof renoteDimension === 'number' && renoteDimension > 0 && renoteDimension !== noteDimension) {
+		targets.add(renoteDimension);
+	}
+
+	return Array.from(targets).sort((a, b) => a - b);
 }

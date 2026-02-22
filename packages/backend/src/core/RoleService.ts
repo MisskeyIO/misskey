@@ -20,6 +20,7 @@ import type {
 import { MemoryKVCache, MemorySingleCache } from '@/misc/cache.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import type { MiUser } from '@/models/User.js';
+import type { MiNoteWithDimension } from '@/models/Note.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import { CacheService } from '@/core/CacheService.js';
@@ -33,7 +34,7 @@ import type { Packed } from '@/misc/json-schema.js';
 import { FanoutTimelineService } from '@/core/FanoutTimelineService.js';
 import { NotificationService } from '@/core/NotificationService.js';
 import type { OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
-import { getDeliverTargetDimensions, getNoteDimension } from '@/misc/dimension.js';
+import { getDeliverTargetDimensions } from '@/misc/dimension.js';
 
 // misskey-js の rolePolicies と同期すべし
 export type RolePolicies = {
@@ -768,12 +769,15 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		const roles = await this.getUserRoles(note.userId);
 
 		const redisPipeline = this.redisForTimelines.pipeline();
-		const dimensionTargets = getDeliverTargetDimensions(getNoteDimension(note));
+		const dimensionTargets = await getDeliverTargetDimensions(
+			note,
+			(noteId) => this.cacheService.noteDimensionCache.get(noteId),
+		);
 
 		for (const role of roles) {
-			this.fanoutTimelineService.push(`roleTimeline:${role.id}`, note.id, 1000, redisPipeline);
 			for (const dimension of dimensionTargets) {
-				this.fanoutTimelineService.pushDimension(`roleTimeline:${role.id}`, note.id, dimension, redisPipeline);
+				if (dimension > 0) this.fanoutTimelineService.pushDimension(`roleTimeline:${role.id}`, note.id, dimension, redisPipeline);
+				else this.fanoutTimelineService.push(`roleTimeline:${role.id}`, note.id, 1000, redisPipeline);
 			}
 			this.globalEventService.publishRoleTimelineStream(role.id, 'note', note);
 		}

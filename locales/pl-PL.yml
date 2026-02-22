@@ -1355,7 +1355,6 @@ _widgets:
   button: "Przycisk"
   onlineUsers: "Użytkownicy online"
   jobQueue: "Kolejka zadań"
-  serverMetric: "Metryka serwera"
   aiscript: "Konsola AiScript"
   aichan: "Ai"
   userList: "Lista użytkowników"

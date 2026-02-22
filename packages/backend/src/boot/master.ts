@@ -15,7 +15,6 @@ import { nodeProfilingIntegration } from '@sentry/profiling-node';
 import { coreLogger } from '@/logger.js';
 import { loadConfig } from '@/config.js';
 import type { Config } from '@/config.js';
-import { showMachineInfo } from '@/misc/show-machine-info.js';
 import { envOption } from '@/env.js';
 import { jobQueue, server } from './common.js';
 
@@ -60,7 +59,6 @@ export async function masterMain() {
 	try {
 		greet();
 		showEnvironment();
-		await showMachineInfo(bootLogger);
 		showNodejsVersion();
 		config = loadConfigBoot();
 		//await connectDb();

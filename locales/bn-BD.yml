@@ -1133,7 +1133,6 @@ _widgets:
   button: "বাটন"
   onlineUsers: "অনলাইনে থাকা ব্যবহারকারীগণ"
   jobQueue: "জব কিউ"
-  serverMetric: "সার্ভার মেট্রিক্স"
   aiscript: "AiScript কনসোল"
   aichan: "আই চান"
   _userList:

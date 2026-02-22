@@ -48,7 +48,9 @@ export type Keys = (
 	'kawaii' |
 	'gaConsent' |
 	'gtagConsent' |
-	'sensitiveContentConsent'
+	'sensitiveContentConsent' |
+	'postingLangAutoDetected' |
+	'postingLangAutoDetectBase'
 );
 
 // セッション毎に廃棄されるLocalStorage代替（セーフモードなどで使用できそう）

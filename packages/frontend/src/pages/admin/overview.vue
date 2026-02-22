@@ -87,7 +87,6 @@ import MkFoldableSection from '@/components/MkFoldableSection.vue';
 import { genId } from '@/utility/id.js';
 
 const rootEl = useTemplateRef('rootEl');
-const serverInfo = ref<Misskey.entities.ServerInfoResponse | null>(null);
 const topSubInstancesForPie = ref<InstanceForPie[] | null>(null);
 const topPubInstancesForPie = ref<InstanceForPie[] | null>(null);
 const federationPubActive = ref<number | null>(null);
@@ -149,10 +148,6 @@ onMounted(async () => {
 			})),
 			{ name: '(other)', color: '#80808080', value: res.otherFollowingCount },
 		];
-	});
-
-	misskeyApi('admin/server-info').then(serverInfoResponse => {
-		serverInfo.value = serverInfoResponse;
 	});
 
 	misskeyApi('admin/show-users', {

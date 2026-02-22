@@ -1228,7 +1228,6 @@ _widgets:
   button: "Tlačidlo"
   onlineUsers: "Online používatelia"
   jobQueue: "Fronta úloh"
-  serverMetric: "Metriky servera"
   aiscript: "Konzola AiScript"
   aichan: "Ai"
   _userList:

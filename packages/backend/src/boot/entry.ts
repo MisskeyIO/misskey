@@ -14,8 +14,6 @@ import chalk from 'chalk';
 import Xev from 'xev';
 import { coreLogger } from '@/logger.js';
 import { envOption } from '../env.js';
-import { masterMain } from './master.js';
-import { workerMain } from './worker.js';
 
 import 'reflect-metadata';
 
@@ -89,6 +87,10 @@ process.on('warning', warning => {
 //#endregion
 
 if (cluster.isPrimary || envOption.disableClustering) {
+	// NOTE: Avoid loading worker-side code in the master process (and vice-versa).
+	// This reduces cold-start time in clustered environments where spawning a worker
+	// would otherwise re-import the full master/server module graph.
+	const { masterMain } = await import('./master.js');
 	await masterMain();
 
 	if (cluster.isPrimary) {
@@ -97,6 +99,7 @@ if (cluster.isPrimary || envOption.disableClustering) {
 }
 
 if (cluster.isWorker) {
+	const { workerMain } = await import('./worker.js');
 	await workerMain();
 }
 

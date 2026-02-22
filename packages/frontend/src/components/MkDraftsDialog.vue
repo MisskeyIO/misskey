@@ -206,7 +206,7 @@ function loadDrafts() {
 
 function getLangLabel(lang: string | null | undefined): string {
 	if (!lang) return '';
-	return langmap[lang]?.nativeName ?? lang;
+	return lang === 'other' ? i18n.ts.other : langmap[lang]?.nativeName ?? lang;
 }
 
 function getLangTitle(lang: string | null | undefined): string {

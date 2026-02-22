@@ -21,7 +21,6 @@ import { FanoutTimelineEndpointService } from '@/core/FanoutTimelineEndpointServ
 import { ChannelMutingService } from '@/core/ChannelMutingService.js';
 import { ChannelFollowingService } from '@/core/ChannelFollowingService.js';
 import { ApiError } from '../../error.js';
-import { normalizeDimension } from '@/misc/dimension.js';
 
 export const meta = {
 	tags: ['notes'],
@@ -91,9 +90,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		super(meta, paramDef, async (ps, me) => {
 			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
 			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
-			const viewerDimension = typeof ps.dimension === 'number'
-				? normalizeDimension(ps.dimension, this.serverSettings.dimensions ?? 1)
-				: null;
+			const viewerDimension = ps.dimension ?? 0;
 
 			const policies = await this.roleService.getUserPolicies(me.id);
 			if (!policies.ltlAvailable) {

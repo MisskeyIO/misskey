@@ -56,7 +56,6 @@
     "eslint-plugin-import": "catalog:",
     "eslint-plugin-vue": "catalog:",
     "fast-glob": "catalog:",
-    "happy-dom": "catalog:",
     "intersection-observer": "catalog:",
     "jsdom": "catalog:",
     "lightningcss": "catalog:",

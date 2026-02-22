@@ -1482,6 +1482,41 @@ federationJobs: "연합 작업"
 forwardReport: "리모트 서버에도 신고 내용 보내기"
 forwardReportIsAnonymous: "리모트 서버에서는 나의 정보를 볼 수 없으며, 익명의 시스템 계정으로 표시됩니다."
 realtimeMode: "실시간 모드"
+abort: '중지'
+advice: '참고'
+cannotUploadBecauseUnallowedFileType: '허가되지 않은 유형의 파일이기에 업로드할 수 없습니다.'
+createUserSpecifiedNote: '사용자 지정 노트를 작성'
+customCssIsDisabledBecauseSafeMode: '세이프 모드가 활성화돼있기에 커스텀 CSS는 적용되지 않습니다.'
+defaultCompressionLevel: '기본 압축 정도 '
+defaultCompressionLevel_description: '낮추면 품질을 유지합니다만 파일 크기는 증가합니다. <br>높이면 파일 크기를 줄일 수 있습니다만 품질은 저하됩니다.'
+deviceInfo: '장치 정보'
+deviceInfoDescription: '기술적 문의의 경우 아래의 정보를 병기하면 문제의 해결에 도움이 됩니다.'
+driveAboutTip: |
+  드라이브는 이전에 업로드한 파일 목록을 표시해요. <br>
+  노트에 첨부할 때 다시 사용하거나 나중에 게시할 파일을 미리 업로드할 수 있어요. <br>
+  <b>파일을 삭제하면, 지금까지 그 파일을 사용한 모든 장소(노트, 페이지, 아바타, 배너 등)에서도 보이지 않게 되므로 주의해 주세요. 폴더를 만들고 정리할 수도 있어요.</b><br>
+emojiMute: '이모티콘 뮤트'
+emojiUnmute: '이모티콘 뮤트 해제'
+frame: '프레임'
+hideAllTips: "모든 '팁과 유용한 정보'를 비표시"
+inDays: '일'
+inMinutes: '분'
+muteX: '{x}를 뮤트'
+pluginsAreDisabledBecauseSafeMode: '세이프 모드가 활성화돼있기에 플러그인은 전부 비활성화됩니다.'
+presets: '프리셋'
+redisplayAllTips: "모든 '팁과 유용한 정보'를 재표시"
+safeModeEnabled: '세이프 모드가 활성화돼있습니다'
+schedulePost: '게시 예약'
+scheduledToPostOnX: '{x}에 게시가 예약돼있습니다.'
+thankYouForTestingBeta: '베타 버전의 검증에 협력해 주셔서 감사합니다!'
+themeIsDefaultBecauseSafeMode: '세이프 모드가 활성화돼있는 동안에는 기본 테마가 사용됩니다. 세이프 모드를 끄면 원래대로 돌아옵니다.'
+tip: '팁과 유용한 정보'
+turnItOff: '끄기'
+turnItOn: '켜기'
+unmuteX: '{x}의 뮤트를 해제'
+widgets: '위젯'
+youAreAdmin: '당신은 관리자입니다.'
+zeroPadding: '0으로 채우기'
 
 _chat:
   messages: "메시지"
@@ -2592,6 +2627,7 @@ _auth:
   scopeUser: "다음 사용자로서 작업 중"
   pleaseLogin: "어플리케이션의 접근을 허가하려면 로그인하십시오."
   byClickingYouWillBeRedirectedToThisUrl: "접근을 허가하면 자동으로 다음 URL로 이동합니다"
+  alreadyAuthorized: '이 애플리케이션은 이미 접근이 허가돼있습니다.'
 _antennaSources:
   all: "모든 노트"
   homeTimeline: "팔로우중인 유저의 노트"
@@ -3530,3 +3566,56 @@ _qr:
   scanFile: "단말기의 이미지 스캔"
   raw: "텍스트"
   mfm: "MFM"
+
+_compression:
+  _quality:
+    high: '고품질'
+    low: '저품질'
+    medium: '중간 품질'
+  _size:
+    large: '대형'
+    medium: '중형'
+    small: '소형'
+_imageEditing:
+  _vars:
+    camera_f: '조리개 조절'
+    camera_iso: 'ISO 감도'
+    camera_lens_model: '렌즈 이름'
+    camera_mm: '초점 거리'
+    camera_mm_35: '초점 거리(35m판 환산)'
+    camera_model: '카메라 이름'
+    camera_s: '셔터 속도'
+    caption: '파일 설명'
+    day: '촬영한 날'
+    filename: '파일명'
+    filename_without_ext: '확장자가 없는 파일명'
+    gps_lat: '위도'
+    gps_long: '경도'
+    hour: '촬영한 시각(시)'
+    minute: '촬영한 시각(분)'
+    month: '촬영한 달'
+    second: '촬영한 시각(초)'
+    year: '촬영한 해'
+_imageFrameEditor:
+  availableVariables: '이용 가능한 변수'
+  backgroundColor: '배경색'
+  borderThickness: '테두리의 폭'
+  captionMain: '캡션(대)'
+  captionSub: '캡션(소)'
+  centered: '중앙 정렬'
+  failedToLoadImage: '이미지 로드에 실패했습니다.'
+  font: '폰트'
+  fontSansSerif: '고딕체'
+  fontSerif: '명조체'
+  footer: '꼬리말'
+  header: '헤더'
+  labelScale: '라벨의 스케일'
+  labelThickness: '라벨의 폭'
+  quitWithoutSaveConfirm: '보존하지 않고 종료하시겠습니까?'
+  textColor: '글꼴 색상'
+  tip: '이미지에 프레임이나 메타 데이터를 포함한 라벨을 추가해 장식할 수 있습니다.'
+  title: '프레임 편집'
+  withQrCode: 'QR 코드'
+_order:
+  newest: '최신 순'
+  oldest: '오래된 순'

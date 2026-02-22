@@ -1489,6 +1489,37 @@ forwardReport: "Forward report to remote instance"
 forwardReportIsAnonymous: "Instead of your account, an anonymous system account will be displayed as reporter at the remote instance."
 realtimeMode: "Real-time mode"
 widgets: "Widgets"
+abort: 'Abort'
+advice: 'Advice'
+cancelFollowRequestConfirm: 'Are you sure that you want to cancel your follow request to {name}?'
+cannotUploadBecauseUnallowedFileType: 'Unable to upload due to unauthorized file type.'
+createUserSpecifiedNote: 'Create a direct note'
+customCssIsDisabledBecauseSafeMode: 'Custom CSS is not applied because safe mode is enabled.'
+defaultCompressionLevel: 'Default compression level'
+defaultCompressionLevel_description: 'Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.'
+deviceInfo: 'Device information'
+deviceInfoDescription: 'When making technical inquiries, including the following information may help resolve the issue.'
+emojiMute: 'Mute emoji'
+emojiUnmute: 'Unmute emoji'
+frame: 'Frame'
+hideAllTips: 'Hide all "Tips & Tricks"'
+inDays: 'Day(s)'
+inMinutes: 'Minute(s)'
+muteX: 'Mute {x}'
+pluginsAreDisabledBecauseSafeMode: 'All plugins are disabled because safe mode is enabled.'
+presets: 'Preset'
+redisplayAllTips: 'Show all “Tips & Tricks” again'
+rejectFollowRequestConfirm: 'Are you sure that you want to reject the follow request from {name}?'
+safeModeEnabled: 'Safe mode is enabled'
+schedulePost: 'Schedule note'
+scheduledToPostOnX: 'Note is scheduled for {x}'
+thankYouForTestingBeta: 'Thank you for helping us test the beta version!'
+themeIsDefaultBecauseSafeMode: 'While safe mode is active, the default theme is used. Disabling safe mode will revert these changes.'
+turnItOff: 'Turn off'
+turnItOn: 'Turn on'
+unmuteX: 'Unmute {x}'
+youAreAdmin: 'You are admin'
+zeroPadding: 'Zero padding'
 
 _chat:
   messages: "Messages"
@@ -2201,6 +2232,13 @@ _role:
     canImportMuting: "Allow importing muting"
     canImportUserLists: "Allow importing lists"
     chatAvailability: "Allow Chat"
+    canSearchUsers: 'User search'
+    noteDraftLimit: 'Number of possible drafts of server notes'
+    scheduledNoteLimit: 'Maximum number of simultaneous scheduled notes'
+    uploadableFileTypes: 'Uploadable file types'
+    uploadableFileTypes_caption: 'Specifies the allowed MIME/file types. Multiple MIME types can be specified by separating them with a new line, and wildcards can be specified with an asterisk (*). (e.g., image/*)'
+    uploadableFileTypes_caption2: 'Some files types might fail to be detected. To allow such files, add {x} to the specification.'
+    watermarkAvailable: 'Watermark function'
   _condition:
     roleAssignedTo: "Assigned to manual roles"
     isLocal: "Local user"
@@ -3234,6 +3272,7 @@ _customEmojisManager:
     registrationLogs: "Registration log"
     registrationLogsCaption: "Logs will be displayed when updating or deleting Emojis. They will disappear after updating or deleting them, moving to a new page, or reloading."
     alertEmojisRegisterFailedDescription: "Failed to update or delete Emojis. Please check the registration log for details."
+    searchLimit: ''
   _logs:
     showSuccessLogSwitch: "Show success log"
     failureLogNothing: "There is no failure log."
@@ -3258,6 +3297,9 @@ _customEmojisManager:
       confirmDeleteEmojisDescription: "Delete checked {count} Emoji(s). Are you sure to continue?"
       confirmMovePageDesciption: "Changes have been made to the Emojis on this page.\nIf you leave the page without saving, all changes made on this page will be discarded."
       dialogSelectRoleTitle: "Search by role set in Emojis"
+      confirmChangeView: ''
+      confirmMovePage: 'Would you like to move pages?'
+      confirmResetDescription: ''
     _register:
       uploadSettingTitle: "Upload settings"
       uploadSettingDescription: "On this screen, you can configure the behavior when uploading Emojis."
@@ -3533,3 +3575,56 @@ _qr:
   scanFile: "Scan image from device"
   raw: "Text"
   mfm: "MFM"
+
+_compression:
+  _quality:
+    high: 'High quality'
+    low: 'Low quality'
+    medium: 'Medium quality'
+  _size:
+    large: 'Large size'
+    medium: 'Medium size'
+    small: 'Small size'
+_imageEditing:
+  _vars:
+    camera_f: 'Aperture (f-number)'
+    camera_iso: 'ISO'
+    camera_lens_model: 'Lens model'
+    camera_mm: 'Focal length'
+    camera_mm_35: 'Focal length (in 35 mm format)'
+    camera_model: 'Camera Name'
+    camera_s: 'Shutter speed'
+    caption: 'File caption'
+    day: 'Date of photography'
+    filename: 'Filename'
+    filename_without_ext: 'Filename without extension'
+    gps_lat: 'Latitude'
+    gps_long: 'Longitude'
+    hour: 'Time the photo was taken (hour)'
+    minute: 'Time the photo was taken (minute)'
+    month: 'Month of photogrphy'
+    second: 'Time the photo was taken (second)'
+    year: 'Year of photography'
+_imageFrameEditor:
+  availableVariables: 'Supported variables'
+  backgroundColor: 'Background color'
+  borderThickness: 'Frame width'
+  captionMain: 'Caption (Big)'
+  captionSub: 'Caption (Small)'
+  centered: 'Centered'
+  failedToLoadImage: 'Failed to load image'
+  font: 'Font'
+  fontSansSerif: 'Sans Serif'
+  fontSerif: 'Serif'
+  footer: 'Footer'
+  header: 'Header'
+  labelScale: 'Label scale'
+  labelThickness: 'Label width'
+  quitWithoutSaveConfirm: 'Discard unsaved changes?'
+  textColor: 'Text color'
+  tip: 'You can decorate images by adding labels that include frames and metadata.'
+  title: 'Edit frame'
+  withQrCode: 'QR Code'
+_order:
+  newest: 'Newest First'
+  oldest: 'Oldest First'

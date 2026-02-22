@@ -6007,6 +6007,122 @@ export interface Locale extends ILocale {
      * ウィジェット
      */
     "widgets": string;
+    /**
+     * 中止
+     */
+    "abort": string;
+    /**
+     * アドバイス
+     */
+    "advice": string;
+    /**
+     * 許可されていないファイル種別のためアップロードできません。
+     */
+    "cannotUploadBecauseUnallowedFileType": string;
+    /**
+     * ユーザー指定ノートを作成
+     */
+    "createUserSpecifiedNote": string;
+    /**
+     * セーフモードが有効なため、カスタムCSSは適用されていません。
+     */
+    "customCssIsDisabledBecauseSafeMode": string;
+    /**
+     * デフォルトの圧縮度
+     */
+    "defaultCompressionLevel": string;
+    /**
+     * 低くすると品質を保てますが、ファイルサイズは増加します。<br>高くするとファイルサイズを減らせますが、品質は低下します。
+     */
+    "defaultCompressionLevel_description": string;
+    /**
+     * デバイス情報
+     */
+    "deviceInfo": string;
+    /**
+     * 技術的なお問い合わせの際に、以下の情報を併記すると問題の解決に役立つことがあります。
+     */
+    "deviceInfoDescription": string;
+    /**
+     * 絵文字ミュート
+     */
+    "emojiMute": string;
+    /**
+     * 絵文字ミュート解除
+     */
+    "emojiUnmute": string;
+    /**
+     * フレーム
+     */
+    "frame": string;
+    /**
+     * 全ての「ヒントとコツ」を非表示
+     */
+    "hideAllTips": string;
+    /**
+     * 日
+     */
+    "inDays": string;
+    /**
+     * 分
+     */
+    "inMinutes": string;
+    /**
+     * {x}をミュート
+     */
+    "muteX": ParameterizedString<"x">;
+    /**
+     * セーフモードが有効なため、プラグインはすべて無効化されています。
+     */
+    "pluginsAreDisabledBecauseSafeMode": string;
+    /**
+     * プリセット
+     */
+    "presets": string;
+    /**
+     * 全ての「ヒントとコツ」を再表示
+     */
+    "redisplayAllTips": string;
+    /**
+     * セーフモードが有効です
+     */
+    "safeModeEnabled": string;
+    /**
+     * 投稿を予約
+     */
+    "schedulePost": string;
+    /**
+     * {x}に投稿が予約されています
+     */
+    "scheduledToPostOnX": ParameterizedString<"x">;
+    /**
+     * ベータ版の検証にご協力いただきありがとうございます！
+     */
+    "thankYouForTestingBeta": string;
+    /**
+     * セーフモードが有効な間はデフォルトのテーマが使用されます。セーフモードをオフにすると元に戻ります。
+     */
+    "themeIsDefaultBecauseSafeMode": string;
+    /**
+     * オフにする
+     */
+    "turnItOff": string;
+    /**
+     * オンにする
+     */
+    "turnItOn": string;
+    /**
+     * {x}のミュートを解除
+     */
+    "unmuteX": ParameterizedString<"x">;
+    /**
+     * あなたは管理者です
+     */
+    "youAreAdmin": string;
+    /**
+     * ゼロ埋め
+     */
+    "zeroPadding": string;
     "_chat": {
         /**
          * メッセージ
@@ -8614,6 +8730,30 @@ export interface Locale extends ILocale {
              * チャットを許可
              */
             "chatAvailability": string;
+            /**
+             * サーバーサイドのノートの下書きの作成可能数
+             */
+            "noteDraftLimit": string;
+            /**
+             * 予約投稿の同時作成可能数
+             */
+            "scheduledNoteLimit": string;
+            /**
+             * アップロード可能なファイル種別
+             */
+            "uploadableFileTypes": string;
+            /**
+             * MIMEタイプを指定します。改行で区切って複数指定できるほか、アスタリスク(*)でワイルドカード指定できます。(例: image/*)
+             */
+            "uploadableFileTypes_caption": string;
+            /**
+             * ファイルによっては種別を判定できないことがあります。そのようなファイルを許可する場合は {x} を指定に追加してください。
+             */
+            "uploadableFileTypes_caption2": ParameterizedString<"x">;
+            /**
+             * ウォーターマーク機能の使用可否
+             */
+            "watermarkAvailable": string;
         };
         "_condition": {
             /**
@@ -11635,6 +11775,36 @@ export interface Locale extends ILocale {
              */
             "reportAutoResolved": string;
         };
+        "_systemEvents": {
+            /**
+             * ユーザーから通報があったとき
+             */
+            "abuseReport": string;
+            /**
+             * ユーザーからの通報を処理したとき
+             */
+            "abuseReportResolved": string;
+            /**
+             * モデレーターが一定期間非アクティブだったため、システムにより招待制へと変更されたとき
+             */
+            "inactiveModeratorsInvitationOnlyChanged": string;
+            /**
+             * モデレーターが一定期間非アクティブになったとき
+             */
+            "inactiveModeratorsWarning": string;
+            /**
+             * ユーザーが作成されたとき
+             */
+            "userCreated": string;
+        };
+        /**
+         * Webhookを削除しますか？
+         */
+        "deleteConfirm": string;
+        /**
+         * スイッチの右にあるボタンをクリックするとダミーのデータを使用したテスト用Webhookを送信できます。
+         */
+        "testRemarks": string;
     };
     "_abuse": {
         "_resolver": {
@@ -13764,6 +13934,200 @@ export interface Locale extends ILocale {
          * MFM
          */
         "mfm": string;
+    };
+    "_compression": {
+        "_quality": {
+            /**
+             * 高品質
+             */
+            "high": string;
+            /**
+             * 低品質
+             */
+            "low": string;
+            /**
+             * 中品質
+             */
+            "medium": string;
+        };
+        "_size": {
+            /**
+             * サイズ大
+             */
+            "large": string;
+            /**
+             * サイズ中
+             */
+            "medium": string;
+            /**
+             * サイズ小
+             */
+            "small": string;
+        };
+    };
+    "_imageEditing": {
+        "_vars": {
+            /**
+             * 絞り
+             */
+            "camera_f": string;
+            /**
+             * ISO感度
+             */
+            "camera_iso": string;
+            /**
+             * レンズ名
+             */
+            "camera_lens_model": string;
+            /**
+             * 焦点距離
+             */
+            "camera_mm": string;
+            /**
+             * 焦点距離(35mm判換算)
+             */
+            "camera_mm_35": string;
+            /**
+             * カメラ名
+             */
+            "camera_model": string;
+            /**
+             * シャッタースピード
+             */
+            "camera_s": string;
+            /**
+             * ファイルのキャプション
+             */
+            "caption": string;
+            /**
+             * 撮影日
+             */
+            "day": string;
+            /**
+             * ファイル名
+             */
+            "filename": string;
+            /**
+             * 拡張子無しファイル名
+             */
+            "filename_without_ext": string;
+            /**
+             * 緯度
+             */
+            "gps_lat": string;
+            /**
+             * 経度
+             */
+            "gps_long": string;
+            /**
+             * 撮影した時刻(時)
+             */
+            "hour": string;
+            /**
+             * 撮影した時刻(分)
+             */
+            "minute": string;
+            /**
+             * 撮影月
+             */
+            "month": string;
+            /**
+             * 撮影した時刻(秒)
+             */
+            "second": string;
+            /**
+             * 撮影年
+             */
+            "year": string;
+        };
+    };
+    "_imageFrameEditor": {
+        /**
+         * 利用可能な変数
+         */
+        "availableVariables": string;
+        /**
+         * 背景色
+         */
+        "backgroundColor": string;
+        /**
+         * フチの幅
+         */
+        "borderThickness": string;
+        /**
+         * キャプション(大)
+         */
+        "captionMain": string;
+        /**
+         * キャプション(小)
+         */
+        "captionSub": string;
+        /**
+         * 中央揃え
+         */
+        "centered": string;
+        /**
+         * 画像の読み込みに失敗しました
+         */
+        "failedToLoadImage": string;
+        /**
+         * フォント
+         */
+        "font": string;
+        /**
+         * サンセリフ
+         */
+        "fontSansSerif": string;
+        /**
+         * セリフ
+         */
+        "fontSerif": string;
+        /**
+         * フッター
+         */
+        "footer": string;
+        /**
+         * ヘッダー
+         */
+        "header": string;
+        /**
+         * ラベルのスケール
+         */
+        "labelScale": string;
+        /**
+         * ラベルの幅
+         */
+        "labelThickness": string;
+        /**
+         * 保存せずに終了しますか？
+         */
+        "quitWithoutSaveConfirm": string;
+        /**
+         * 文字色
+         */
+        "textColor": string;
+        /**
+         * 画像にフレームやメタデータを含んだラベルを追加して装飾できます。
+         */
+        "tip": string;
+        /**
+         * フレームの編集
+         */
+        "title": string;
+        /**
+         * 二次元コード
+         */
+        "withQrCode": string;
+    };
+    "_order": {
+        /**
+         * 新しい順
+         */
+        "newest": string;
+        /**
+         * 古い順
+         */
+        "oldest": string;
     };
 }
 declare const locales: {

@@ -31,7 +31,6 @@ import type { FormWithDefault, GetFormResultType } from '@/utility/form.js';
 import MkContainer from '@/components/MkContainer.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { useInterval } from '@@/js/use-interval.js';
-import MkContainer from '@/components/MkContainer.vue';
 import { i18n } from '@/i18n.js';
 import { $i } from '@/i.js';
 

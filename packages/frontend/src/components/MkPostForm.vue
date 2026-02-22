@@ -1037,6 +1037,9 @@ async function uploadFiles() {
 		files.value.push(uploadedItem.uploaded!);
 		uploader.removeItem(uploadedItem);
 
+	}
+}
+
 function loadDraft(exactMatch = false) {
 	const drafts = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}') as Record<string, Misskey.entities.NoteDraft>;
 	const scope = exactMatch ? draftKey.value : draftKey.value.replace(`note:${draftId.value}`, 'note:');

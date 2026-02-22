@@ -205,7 +205,6 @@ import MkEmoji from '@/components/global/MkEmoji.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import { store } from '@/store';
 import { prefer } from '@/preferences';
-import { reloadAsk } from '@/utility/reload-ask';
 import { Paginator } from '@/utility/paginator.js';
 
 import { suggestReload } from '@/utility/reload-suggest.js';
@@ -236,8 +235,8 @@ const showSoftWordMutedWord = prefer.model('showSoftWordMutedWord');
 watch([
 	hideMutedNotes,
 	showSoftWordMutedWord,
-], async () => {
-	await reloadAsk({ reason: i18n.ts.reloadToApplySetting, unison: true });
+], () => {
+	suggestReload();
 });
 
 watch(() => mutedReactions.value, () => {

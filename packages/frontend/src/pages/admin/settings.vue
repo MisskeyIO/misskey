@@ -109,7 +109,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 				<SearchMarker v-slot="slotProps" :keywords="['serviceWorker']">
 					<MkFolder :defaultOpen="slotProps.isParentOfTarget">
-						<template #icon><SearchIcon><i class="ti ti-cube"></i></searchicon></template>
+						<template #icon><SearchIcon><i class="ti ti-cube"></i></SearchIcon></template>
 						<template #label>{{ i18n.ts.dimension }}</template>
 						<template v-if="dimensionForm.modified.value" #footer>
 							<MkFormFooter :form="dimensionForm"/>
@@ -124,7 +124,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</MkFolder>
 
 					<MkFolder>
-						<template #icon><i class="ti ti-world-cog"></i></SearchIcon></template>
+						<template #icon><SearchIcon><i class="ti ti-world-cog"></i></SearchIcon></template>
 						<template #label><SearchLabel>ServiceWorker</SearchLabel></template>
 						<template v-if="serviceWorkerForm.modified.value" #footer>
 							<MkFormFooter :form="serviceWorkerForm"/>

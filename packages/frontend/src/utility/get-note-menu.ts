@@ -625,9 +625,9 @@ export function getRenoteMenu(props: {
 						channelId: appearNote.channelId,
 						dimension,
 						noCreatedNote: true,
-					}).then((res) => {
+					}).then(() => {
 						os.toast(i18n.ts.renoted);
-						globalEvents.emit('notePosted', res.createdNote);
+						globalEvents.emit('notePosted');
 					});
 				}
 			},
@@ -675,9 +675,9 @@ export function getRenoteMenu(props: {
 						renoteId: appearNote.id,
 						dimension,
 						noCreatedNote: true,
-					}).then((res) => {
+					}).then(() => {
 						os.toast(i18n.ts.renoted);
-						globalEvents.emit('notePosted', res.createdNote);
+						globalEvents.emit('notePosted');
 					});
 				}
 			},
@@ -718,9 +718,9 @@ export function getRenoteMenu(props: {
 								channelId: channel.id,
 								dimension,
 								noCreatedNote: true,
-							}).then((res) => {
+							}).then(() => {
 								os.toast(i18n.tsx.renotedToX({ name: channel.name }));
-								globalEvents.emit('notePosted', res.createdNote);
+								globalEvents.emit('notePosted');
 							});
 						}
 					},

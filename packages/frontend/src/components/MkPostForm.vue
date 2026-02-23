@@ -229,7 +229,6 @@ if (props.initialVisibleUsers) {
 	props.initialVisibleUsers.forEach(u => pushVisibleUser(u));
 }
 const reactionAcceptance = ref(store.s.reactionAcceptance);
-const scheduledAt = ref<number | null>(null);
 
 const draghover = ref(false);
 const quoteId = ref<string | null>(null);
@@ -666,6 +665,67 @@ async function pickDimension() {
 	dimension.value = selected;
 }
 
+function showDraftsDialog() {
+	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkNoteDraftsDialog.vue')), {}, {
+		restore: async (draft) => {
+			text.value = draft.text ?? '';
+			useCw.value = draft.cw != null;
+			cw.value = draft.cw ?? null;
+			visibility.value = draft.visibility;
+			localOnly.value = draft.localOnly ?? false;
+			files.value = draft.files ?? [];
+			hashtags.value = draft.hashtag ?? '';
+			if (draft.hashtag) withHashtags.value = true;
+			if (draft.poll) {
+				poll.value = null;
+				nextTick(() => {
+					poll.value = {
+						choices: draft.poll.choices,
+						multiple: draft.poll.multiple,
+						expiresAt: draft.poll.expiresAt ? (new Date(draft.poll.expiresAt)).getTime() : null,
+						expiredAfter: null,
+					};
+				});
+			}
+			if (draft.visibleUserIds) {
+				misskeyApi('users/show', { userIds: draft.visibleUserIds }).then(users => {
+					users.forEach(u => pushVisibleUser(u));
+				});
+			}
+			quoteId.value = draft.renoteId ?? null;
+			renoteTargetNote.value = draft.renote;
+			replyTargetNote.value = draft.reply;
+			reactionAcceptance.value = draft.reactionAcceptance;
+			scheduledTime.value = draft.scheduledAt ? new Date(draft.scheduledAt) : null;
+			if (draft.channel) targetChannel.value = draft.channel;
+
+			visibleUsers.value = [];
+			draft.visibleUserIds?.forEach(uid => {
+				if (!visibleUsers.value.some(u => u.id === uid)) {
+					misskeyApi('users/show', { userId: uid }).then(user => {
+						pushVisibleUser(user);
+					});
+				}
+			});
+
+			serverDraftId.value = draft.id;
+		},
+		cancel: () => {},
+		closed: () => {
+			dispose();
+		},
+	});
+}
+
+function showScheduledNotesDialog() {
+	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkNoteScheduledDialog.vue')), {}, {
+		cancel: () => {},
+		closed: () => {
+			dispose();
+		},
+	});
+}
+
 //#region その他の設定メニューpopup
 function showOtherSettings() {
 	let reactionAcceptanceIcon = 'ti ti-icons';
@@ -741,6 +801,20 @@ function showOtherSettings() {
 			schedule();
 		},
 	}] : []), { type: 'divider' }, {
+		type: 'button',
+		text: i18n.ts._drafts.listDrafts,
+		icon: 'ti ti-cloud-download',
+		action: () => {
+			showDraftsDialog();
+		},
+	}, {
+		type: 'button',
+		text: i18n.ts._drafts.listScheduledNotes,
+		icon: 'ti ti-clock-down',
+		action: () => {
+			showScheduledNotesDialog();
+		},
+	}, { type: 'divider' }, {
 		type: 'switch',
 		icon: 'ti ti-eye',
 		text: i18n.ts.preview,
@@ -795,7 +869,7 @@ function clear() {
 	poll.value = null;
 	visibleUsers.value = [];
 	quoteId.value = null;
-	scheduledAt.value = null;
+	scheduledTime.value = null;
 }
 
 function onKeydown(ev: KeyboardEvent) {
@@ -983,7 +1057,6 @@ function saveDraft() {
 			...( visibleUsers.value.length > 0 ? { visibleUserIds: visibleUsers.value.map(x => x.id) } : {}),
 			quoteId: quoteId.value,
 			reactionAcceptance: reactionAcceptance.value,
-			scheduledAt: scheduledAt.value,
 		},
 	};
 
@@ -1000,9 +1073,7 @@ function deleteDraft() {
 	miLocalStorage.setItem('drafts', JSON.stringify(draftData));
 }
 
-async function saveServerDraft(options: {
-	isActuallyScheduled?: boolean;
-} = {}) {
+async function saveServerDraft() {
 	return await os.apiWithDialog(serverDraftId.value == null ? 'notes/drafts/create' : 'notes/drafts/update', {
 		...(serverDraftId.value == null ? {} : { draftId: serverDraftId.value }),
 		text: text.value,
@@ -1017,8 +1088,7 @@ async function saveServerDraft(options: {
 		replyId: replyTargetNote.value ? replyTargetNote.value.id : null,
 		channelId: targetChannel.value ? targetChannel.value.id : null,
 		reactionAcceptance: reactionAcceptance.value,
-		scheduledAt: scheduledAt.value,
-		isActuallyScheduled: options.isActuallyScheduled ?? false,
+		scheduledAt: scheduledTime.value?.getTime() ?? undefined,
 	});
 }
 
@@ -1086,21 +1156,6 @@ async function post(ev?: MouseEvent) {
 			const y = rect.top + (el.offsetHeight / 2);
 			os.popup(MkRippleEffect, { x, y }, {}, 'end');
 		}
-	}
-
-	if (scheduledAt.value != null) {
-		if (uploader.items.value.some(x => x.uploaded == null)) {
-			await uploadFiles();
-
-			// アップロード失敗したものがあったら中止
-			if (uploader.items.value.some(x => x.uploaded == null)) {
-				return;
-			}
-		}
-
-		await postAsScheduled();
-		clear();
-		return;
 	}
 
 	if (props.mock) return;
@@ -1211,7 +1266,7 @@ async function post(ev?: MouseEvent) {
 			clear();
 		}
 
-		globalEvents.emit('notePosted', res.createdNote);
+		globalEvents.emit('notePosted');
 
 		nextTick(() => {
 			deleteDraft();
@@ -1279,14 +1334,6 @@ async function post(ev?: MouseEvent) {
 		emit('postError');
 	});
 	emit('posting');
-}
-
-async function postAsScheduled() {
-	if (props.mock) return;
-
-	await saveServerDraft({
-		isActuallyScheduled: true,
-	});
 }
 
 function cancel() {
@@ -1366,63 +1413,6 @@ const postAccount = ref<Misskey.entities.UserDetailed | null>(null);
 async function openAccountMenu(ev: MouseEvent) {
 	if (props.mock) return;
 
-	function showDraftsDialog(scheduled: boolean) {
-		const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkNoteDraftsDialog.vue')), {
-			scheduled,
-		}, {
-			restore: async (draft: Misskey.entities.NoteDraft) => {
-				text.value = draft.text ?? '';
-				useCw.value = draft.cw != null;
-				cw.value = draft.cw ?? null;
-				visibility.value = draft.visibility;
-				localOnly.value = draft.localOnly ?? false;
-				files.value = draft.files ?? [];
-				hashtags.value = draft.hashtag ?? '';
-				if (draft.hashtag) withHashtags.value = true;
-				if (draft.poll) {
-					// 投票を一時的に空にしないと反映されないため
-					poll.value = null;
-					nextTick(() => {
-						poll.value = {
-							choices: draft.poll!.choices,
-							multiple: draft.poll!.multiple,
-							expiresAt: draft.poll!.expiresAt ? (new Date(draft.poll!.expiresAt)).getTime() : null,
-							expiredAfter: null,
-						};
-					});
-				}
-				if (draft.visibleUserIds) {
-					misskeyApi('users/show', { userIds: draft.visibleUserIds }).then(users => {
-						users.forEach(u => pushVisibleUser(u));
-					});
-				}
-				quoteId.value = draft.renoteId ?? null;
-				renoteTargetNote.value = draft.renote;
-				replyTargetNote.value = draft.reply;
-				reactionAcceptance.value = draft.reactionAcceptance;
-				scheduledAt.value = draft.scheduledAt ?? null;
-				if (draft.channel) targetChannel.value = draft.channel as unknown as Misskey.entities.Channel;
-
-				visibleUsers.value = [];
-				draft.visibleUserIds?.forEach(uid => {
-					if (!visibleUsers.value.some(u => u.id === uid)) {
-						misskeyApi('users/show', { userId: uid }).then(user => {
-							pushVisibleUser(user);
-						});
-					}
-				});
-
-				serverDraftId.value = draft.id;
-			},
-			cancel: () => {
-
-			},
-			closed: () => {
-				dispose();
-			},
-		});
-	}
-
 	const items = await getAccountMenu({
 		withExtraOperation: false,
 		includeCurrentAccount: true,
@@ -1434,23 +1424,9 @@ async function openAccountMenu(ev: MouseEvent) {
 				postAccount.value = account;
 			}
 		},
-	});
+	}, ev);
 
-	os.popupMenu([{
-		type: 'button',
-		text: i18n.ts._drafts.listDrafts,
-		icon: 'ti ti-cloud-download',
-		action: () => {
-			showDraftsDialog(false);
-		},
-	}, {
-		type: 'button',
-		text: i18n.ts._drafts.listScheduledNotes,
-		icon: 'ti ti-clock-down',
-		action: () => {
-			showDraftsDialog(true);
-		},
-	}, { type: 'divider' }, ...items], (ev.currentTarget ?? ev.target ?? undefined) as HTMLElement | undefined);
+	os.popupMenu([...items], (ev.currentTarget ?? ev.target ?? undefined) as HTMLElement | undefined);
 }
 
 function showPerUploadItemMenu(item: UploaderItem, ev: MouseEvent) {
@@ -1470,11 +1446,11 @@ async function schedule() {
 	if (canceled) return;
 	if (result.getTime() <= Date.now()) return;
 
-	scheduledAt.value = result.getTime();
+	scheduledTime.value = result;
 }
 
 function cancelSchedule() {
-	scheduledAt.value = null;
+	scheduledTime.value = null;
 }
 
 function showTour() {

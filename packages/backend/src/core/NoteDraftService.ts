@@ -14,7 +14,6 @@ import type { MiLocalUser, MiUser } from '@/models/User.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { isRenote, isQuote } from '@/misc/is-renote.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
-import { QueueService } from '@/core/QueueService.js';
 
 export type NoteDraftOptions = Omit<MiNoteDraft, 'id' | 'userId' | 'user' | 'reply' | 'renote' | 'channel'>;
 
@@ -42,7 +41,6 @@ export class NoteDraftService {
 		private roleService: RoleService,
 		private idService: IdService,
 		private noteEntityService: NoteEntityService,
-		private queueService: QueueService,
 	) {
 	}
 
@@ -67,16 +65,6 @@ export class NoteDraftService {
 		if (currentCount >= policies.noteDraftLimit) {
 			throw new IdentifiableError('9ee33bbe-fde3-4c71-9b51-e50492c6b9c8', 'Too many drafts');
 		}
-
-		if (data.isActuallyScheduled) {
-			const currentScheduledCount = await this.noteDraftsRepository.countBy({
-				userId: me.id,
-				isActuallyScheduled: true,
-			});
-			if (currentScheduledCount >= policies.scheduledNoteLimit) {
-				throw new IdentifiableError('c3275f19-4558-4c59-83e1-4f684b5fab66', 'Too many scheduled notes');
-			}
-		}
 		//#endregion
 
 		await this.validate(me, data);
@@ -86,10 +74,6 @@ export class NoteDraftService {
 			id: this.idService.gen(),
 			userId: me.id,
 		});
-
-		if (draft.scheduledAt && draft.isActuallyScheduled) {
-			this.schedule(draft);
-		}
 
 		return draft;
 	}
@@ -105,20 +89,6 @@ export class NoteDraftService {
 			throw new IdentifiableError('49cd6b9d-848e-41ee-b0b9-adaca711a6b1', 'No such note draft');
 		}
 
-		//#region check draft limit
-		const policies = await this.roleService.getUserPolicies(me.id);
-
-		if (!draft.isActuallyScheduled && data.isActuallyScheduled) {
-			const currentScheduledCount = await this.noteDraftsRepository.countBy({
-				userId: me.id,
-				isActuallyScheduled: true,
-			});
-			if (currentScheduledCount >= policies.scheduledNoteLimit) {
-				throw new IdentifiableError('bacdf856-5c51-4159-b88a-804fa5103be5', 'Too many scheduled notes');
-			}
-		}
-		//#endregion
-
 		await this.validate(me, data);
 
 		const updatedDraft = await this.noteDraftsRepository.createQueryBuilder().update()
@@ -127,12 +97,6 @@ export class NoteDraftService {
 			.returning('*')
 			.execute()
 			.then((response) => response.raw[0]);
-
-		this.clearSchedule(draftId).then(() => {
-			if (updatedDraft.scheduledAt != null && updatedDraft.isActuallyScheduled) {
-				this.schedule(updatedDraft);
-			}
-		});
 
 		return updatedDraft;
 	}
@@ -149,8 +113,6 @@ export class NoteDraftService {
 		}
 
 		await this.noteDraftsRepository.delete(draft.id);
-
-		this.clearSchedule(draftId);
 	}
 
 	@bindThis
@@ -172,14 +134,6 @@ export class NoteDraftService {
 		me: MiLocalUser,
 		data: Partial<NoteDraftOptions>,
 	): Promise<void> {
-		if (data.isActuallyScheduled) {
-			if (data.scheduledAt == null) {
-				throw new IdentifiableError('94a89a43-3591-400a-9c17-dd166e71fdfa', 'scheduledAt is required when isActuallyScheduled is true');
-			} else if (data.scheduledAt.getTime() < Date.now()) {
-				throw new IdentifiableError('b34d0c1b-996f-4e34-a428-c636d98df457', 'scheduledAt must be in the future');
-			}
-		}
-
 		if (data.pollExpiresAt != null) {
 			if (data.pollExpiresAt.getTime() < Date.now()) {
 				throw new IdentifiableError('04da457d-b083-4055-9082-955525eda5a5', 'Cannot create expired poll');
@@ -302,38 +256,5 @@ export class NoteDraftService {
 			}
 		}
 		//#endregion
-	}
-
-	@bindThis
-	public async schedule(draft: MiNoteDraft): Promise<void> {
-		if (!draft.isActuallyScheduled) return;
-		if (draft.scheduledAt == null) return;
-		if (draft.scheduledAt.getTime() <= Date.now()) return;
-
-		const delay = draft.scheduledAt.getTime() - Date.now();
-		this.queueService.postScheduledNoteQueue.add(draft.id, {
-			noteDraftId: draft.id,
-		}, {
-			delay,
-			removeOnComplete: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 30,
-			},
-			removeOnFail: {
-				age: 3600 * 24 * 7, // keep up to 7 days
-				count: 100,
-			},
-		});
-	}
-
-	@bindThis
-	public async clearSchedule(draftId: MiNoteDraft['id']): Promise<void> {
-		// TODO: 線形探索なのをどうにかする
-		const jobs = await this.queueService.postScheduledNoteQueue.getJobs(['delayed', 'waiting', 'active']);
-		for (const job of jobs) {
-			if (job.data.noteDraftId === draftId) {
-				await job.remove();
-			}
-		}
 	}
 }

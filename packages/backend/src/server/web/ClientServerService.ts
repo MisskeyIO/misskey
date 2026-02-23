@@ -63,7 +63,6 @@ import type {
 	EndedPollNotificationQueue,
 	InboxQueue,
 	ObjectStorageQueue,
-	PostScheduledNoteQueue,
 	RelationshipQueue,
 	SystemQueue,
 	SystemWebhookDeliverQueue,
@@ -123,7 +122,6 @@ export class ClientServerService {
 
 		@Inject('queue:system') public systemQueue: SystemQueue,
 		@Inject('queue:endedPollNotification') public endedPollNotificationQueue: EndedPollNotificationQueue,
-		@Inject('queue:postScheduledNote') public postScheduledNoteQueue: PostScheduledNoteQueue,
 		@Inject('queue:deliver') public deliverQueue: DeliverQueue,
 		@Inject('queue:inbox') public inboxQueue: InboxQueue,
 		@Inject('queue:db') public dbQueue: DbQueue,

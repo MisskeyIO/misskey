@@ -4443,7 +4443,6 @@ export type components = {
             /** Format: date-time */
             createdAt: string;
             scheduledAt: number | null;
-            isActuallyScheduled: boolean;
             reason?: string | null;
             text: string | null;
             cw: string | null;
@@ -10455,7 +10454,7 @@ export interface operations {
             content: {
                 'application/json': {
                     /** @enum {string} */
-                    type: 'system' | 'endedPollNotification' | 'postScheduledNote' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
+                    type: 'system' | 'endedPollNotification' | 'deliver' | 'inbox' | 'db' | 'relationship' | 'objectStorage' | 'userWebhookDeliver' | 'systemWebhookDeliver';
                     /** @enum {string} */
                     state: '*' | 'wait' | 'delayed';
                 };
@@ -28917,8 +28916,6 @@ export interface operations {
                         expiredAfter?: number | null;
                     } | null;
                     scheduledAt?: number | null;
-                    /** @default false */
-                    isActuallyScheduled?: boolean;
                 };
             };
         };
@@ -29065,7 +29062,6 @@ export interface operations {
                     untilId?: string;
                     sinceDate?: number;
                     untilDate?: number;
-                    scheduled?: boolean | null;
                 };
             };
         };
@@ -29155,7 +29151,6 @@ export interface operations {
                         expiredAfter?: number | null;
                     } | null;
                     scheduledAt?: number | null;
-                    isActuallyScheduled?: boolean;
                 };
             };
         };

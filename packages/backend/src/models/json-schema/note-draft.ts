@@ -21,10 +21,6 @@ export const packedNoteDraftSchema = {
 			type: 'number',
 			optional: false, nullable: true,
 		},
-		isActuallyScheduled: {
-			type: 'boolean',
-			optional: false, nullable: false,
-		},
 		reason: {
 			type: 'string',
 			optional: true, nullable: true,

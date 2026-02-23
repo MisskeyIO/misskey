@@ -130,10 +130,6 @@ export type ScheduledNoteJobData = {
 	draftId: MiScheduledNote['id'];
 };
 
-export type PostScheduledNoteJobData = {
-	noteDraftId: string;
-};
-
 export type SystemWebhookDeliverJobData<T extends SystemWebhookEventType = SystemWebhookEventType> = {
 	type: T;
 	content: SystemWebhookPayload<T>;

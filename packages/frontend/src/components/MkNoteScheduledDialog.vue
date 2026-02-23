@@ -15,75 +15,71 @@ SPDX-License-Identifier: AGPL-3.0-only
 	@esc="cancel()"
 >
 	<template #header>
-		{{ i18n.ts._drafts.listDrafts }} ({{ currentDraftsCount }}/{{ $i?.policies.noteDraftLimit }})
+		{{ i18n.ts._drafts.listScheduledNotes }}
 	</template>
 
 	<div class="_spacer">
-		<MkPagination :paginator="draftsPaginator" withControl>
+		<MkPagination :paginator="scheduledPaginator" withControl>
 			<template #empty>
-				<MkResult type="empty" :text="i18n.ts._drafts.noDrafts"/>
+				<MkResult type="empty" :text="i18n.ts.nothing"/>
 			</template>
 
 			<template #default="{ items }">
 				<div class="_gaps_s">
 					<div
-						v-for="draft in (items as unknown as Misskey.entities.NoteDraft[])"
-						:key="draft.id"
+						v-for="scheduled in (items as any[])"
+						:key="scheduled.id"
 						v-panel
 						:class="[$style.draft]"
 					>
 						<div :class="$style.draftBody" class="_gaps_s">
+							<MkInfo v-if="scheduled.scheduledAt != null">
+								<I18n :src="i18n.ts.scheduledToPostOnX" tag="span">
+									<template #x>
+										<MkTime :time="scheduled.scheduledAt" :mode="'detail'" style="font-weight: bold;"/>
+									</template>
+								</I18n>
+							</MkInfo>
+							<MkInfo v-if="scheduled.reason" warn>
+								{{ i18n.ts.error }}: {{ scheduled.reason }}
+							</MkInfo>
 							<div :class="$style.draftInfo">
 								<div :class="$style.draftMeta">
-									<div v-if="draft.reply" class="_nowrap">
+									<div v-if="scheduled.reply" class="_nowrap">
 										<i class="ti ti-arrow-back-up"></i> <I18n :src="i18n.ts._drafts.replyTo" tag="span">
 											<template #user>
-												<Mfm v-if="draft.reply.user.name != null" :text="draft.reply.user.name" :plain="true" :nowrap="true"/>
-												<MkAcct v-else :user="draft.reply.user"/>
+												<Mfm v-if="scheduled.reply.user.name != null" :text="scheduled.reply.user.name" :plain="true" :nowrap="true"/>
+												<MkAcct v-else :user="scheduled.reply.user"/>
 											</template>
 										</I18n>
 									</div>
-									<div v-else-if="draft.replyId" class="_nowrap">
-										<i class="ti ti-arrow-back-up"></i> <I18n :src="i18n.ts._drafts.replyTo" tag="span">
-											<template #user>
-												{{ i18n.ts.deletedNote }}
-											</template>
-										</I18n>
-									</div>
-									<div v-if="draft.renote && draft.text != null" class="_nowrap">
+									<div v-if="scheduled.renote" class="_nowrap">
 										<i class="ti ti-quote"></i> <I18n :src="i18n.ts._drafts.quoteOf" tag="span">
 											<template #user>
-												<Mfm v-if="draft.renote.user.name != null" :text="draft.renote.user.name" :plain="true" :nowrap="true"/>
-												<MkAcct v-else :user="draft.renote.user"/>
+												<Mfm v-if="scheduled.renote.user.name != null" :text="scheduled.renote.user.name" :plain="true" :nowrap="true"/>
+												<MkAcct v-else :user="scheduled.renote.user"/>
 											</template>
 										</I18n>
 									</div>
-									<div v-else-if="draft.renoteId" class="_nowrap">
-										<i class="ti ti-quote"></i> <I18n :src="i18n.ts._drafts.quoteOf" tag="span">
-											<template #user>
-												{{ i18n.ts.deletedNote }}
-											</template>
-										</I18n>
-									</div>
-									<div v-if="draft.channel" class="_nowrap">
-										<i class="ti ti-device-tv"></i> {{ i18n.tsx._drafts.postTo({ channel: draft.channel.name }) }}
+									<div v-if="scheduled.channel" class="_nowrap">
+										<i class="ti ti-device-tv"></i> {{ i18n.tsx._drafts.postTo({ channel: scheduled.channel.name }) }}
 									</div>
 								</div>
 							</div>
 							<div :class="$style.draftContent">
-								<Mfm :text="getNoteSummary(draft, { showRenote: false, showReply: false })" :plain="true" :author="draft.user"/>
+								<Mfm :text="getNoteSummary({ ...scheduled.data, renote: scheduled.renote, reply: scheduled.reply }, { showRenote: false, showReply: false })" :plain="true"/>
 							</div>
 							<div :class="$style.draftFooter">
 								<div :class="$style.draftVisibility">
-									<span :title="i18n.ts._visibility[draft.visibility]">
-										<i v-if="draft.visibility === 'public'" class="ti ti-world"></i>
-										<i v-else-if="draft.visibility === 'home'" class="ti ti-home"></i>
-										<i v-else-if="draft.visibility === 'followers'" class="ti ti-lock"></i>
-										<i v-else-if="draft.visibility === 'specified'" class="ti ti-mail"></i>
+									<span :title="i18n.ts._visibility[scheduled.data.visibility]">
+										<i v-if="scheduled.data.visibility === 'public'" class="ti ti-world"></i>
+										<i v-else-if="scheduled.data.visibility === 'home'" class="ti ti-home"></i>
+										<i v-else-if="scheduled.data.visibility === 'followers'" class="ti ti-lock"></i>
+										<i v-else-if="scheduled.data.visibility === 'specified'" class="ti ti-mail"></i>
 									</span>
-									<span v-if="draft.localOnly" :title="i18n.ts._visibility['disableFederation']"><i class="ti ti-rocket-off"></i></span>
+									<span v-if="scheduled.data.localOnly" :title="i18n.ts._visibility['disableFederation']"><i class="ti ti-rocket-off"></i></span>
 								</div>
-								<MkTime :time="draft.createdAt" :class="$style.draftCreatedAt" mode="detail" colored/>
+								<MkTime :time="scheduled.createdAt" :class="$style.draftCreatedAt" mode="detail" colored/>
 							</div>
 						</div>
 
@@ -91,18 +87,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<MkButton
 								:class="$style.itemButton"
 								small
-								@click="restoreDraft(draft)"
+								@click="cancelSchedule(scheduled)"
 							>
-								<i class="ti ti-corner-up-left"></i> {{ i18n.ts._drafts.restore }}
+								<i class="ti ti-calendar-x"></i> {{ i18n.ts._drafts.cancelSchedule }}
 							</MkButton>
 							<MkButton
-								v-tooltip="i18n.ts._drafts.delete"
+								v-tooltip="i18n.ts.delete"
 								danger
 								small
 								:iconOnly="true"
 								:class="$style.itemButton"
 								style="margin-left: auto;"
-								@click="deleteDraft(draft)"
+								@click="deleteScheduledNote(scheduled)"
 							>
 								<i class="ti ti-trash"></i>
 							</MkButton>
@@ -116,32 +112,26 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, shallowRef, markRaw } from 'vue';
+import { shallowRef, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@/components/MkButton.vue';
 import MkPagination from '@/components/MkPagination.vue';
 import MkModalWindow from '@/components/MkModalWindow.vue';
+import MkInfo from '@/components/MkInfo.vue';
 import { getNoteSummary } from '@/utility/get-note-summary.js';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
-import { $i } from '@/i.js';
-import { misskeyApi } from '@/utility/misskey-api';
 import { Paginator } from '@/utility/paginator.js';
 
 const emit = defineEmits<{
-	(ev: 'restore', draft: Misskey.entities.NoteDraft): void;
 	(ev: 'cancel'): void;
 	(ev: 'closed'): void;
 }>();
 
-const draftsPaginator = markRaw(new Paginator('notes/drafts/list', {
+const scheduledPaginator = markRaw(new Paginator('notes/scheduled/list', {
 	limit: 10,
+	offsetMode: true,
 }));
-
-const currentDraftsCount = ref(0);
-misskeyApi('notes/drafts/count').then((count) => {
-	currentDraftsCount.value = count;
-});
 
 const dialogEl = shallowRef<InstanceType<typeof MkModalWindow>>();
 
@@ -150,21 +140,24 @@ function cancel() {
 	dialogEl.value?.close();
 }
 
-function restoreDraft(draft: Misskey.entities.NoteDraft) {
-	emit('restore', draft);
-	dialogEl.value?.close();
+async function cancelSchedule(draft: any) {
+	os.apiWithDialog('notes/scheduled/cancel', {
+		draftId: draft.id,
+	}).then(() => {
+		scheduledPaginator.reload();
+	});
 }
 
-async function deleteDraft(draft: Misskey.entities.NoteDraft) {
+async function deleteScheduledNote(draft: any) {
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		text: i18n.ts._drafts.deleteAreYouSure,
+		text: i18n.ts.deleteAreYouSure.replace('{x}', getNoteSummary({ ...draft.data, renote: draft.renote, reply: draft.reply }, { showRenote: false, showReply: false })),
 	});
 
 	if (canceled) return;
 
-	os.apiWithDialog('notes/drafts/delete', { draftId: draft.id }).then(() => {
-		draftsPaginator.reload();
+	os.apiWithDialog('notes/scheduled/cancel', { draftId: draft.id }).then(() => {
+		scheduledPaginator.reload();
 	});
 }
 </script>

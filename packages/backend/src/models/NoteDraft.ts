@@ -159,10 +159,4 @@ export class MiNoteDraft {
 		nullable: true,
 	})
 	public scheduledAt: Date | null;
-
-	// scheduledAtに基づいて実際にスケジュールされているか
-	@Column('boolean', {
-		default: false,
-	})
-	public isActuallyScheduled: boolean;
 }

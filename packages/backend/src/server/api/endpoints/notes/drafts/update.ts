@@ -160,23 +160,6 @@ export const meta = {
 			id: '215dbc76-336c-4d2a-9605-95766ba7dab0',
 		},
 
-		tooManyScheduledNotes: {
-			message: 'You cannot create scheduled notes any more.',
-			code: 'TOO_MANY_SCHEDULED_NOTES',
-			id: '02f5df79-08ae-4a33-8524-f1503c8f6212',
-		},
-
-		scheduledAtRequired: {
-			message: 'scheduledAt is required when isActuallyScheduled is true.',
-			code: 'SCHEDULED_AT_REQUIRED',
-			id: 'fe9737d5-cc41-498c-af9d-149207307530',
-		},
-
-		scheduledAtMustBeInFuture: {
-			message: 'scheduledAt must be in the future.',
-			code: 'SCHEDULED_AT_MUST_BE_IN_FUTURE',
-			id: 'ed1a6673-d0d1-4364-aaae-9bf3f139cbc5',
-		},
 	},
 
 	limit: {
@@ -234,7 +217,6 @@ export const paramDef = {
 			required: ['choices'],
 		},
 		scheduledAt: { type: 'integer', nullable: true },
-		isActuallyScheduled: { type: 'boolean' },
 	},
 	required: ['draftId'],
 } as const;
@@ -263,7 +245,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				visibleUserIds: ps.visibleUserIds,
 				channelId: ps.channelId,
 				scheduledAt: ps.scheduledAt ? new Date(ps.scheduledAt) : null,
-				isActuallyScheduled: ps.isActuallyScheduled,
 			}).catch((err) => {
 				if (err instanceof IdentifiableError) {
 					switch (err.id) {
@@ -305,12 +286,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 							throw new ApiError(meta.errors.containsProhibitedWords);
 						case '4de0363a-3046-481b-9b0f-feff3e211025':
 							throw new ApiError(meta.errors.containsTooManyMentions);
-						case 'bacdf856-5c51-4159-b88a-804fa5103be5':
-							throw new ApiError(meta.errors.tooManyScheduledNotes);
-						case '94a89a43-3591-400a-9c17-dd166e71fdfa':
-							throw new ApiError(meta.errors.scheduledAtRequired);
-						case 'b34d0c1b-996f-4e34-a428-c636d98df457':
-							throw new ApiError(meta.errors.scheduledAtMustBeInFuture);
 						default:
 							throw err;
 					}

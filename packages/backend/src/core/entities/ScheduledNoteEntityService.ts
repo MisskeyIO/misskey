@@ -36,7 +36,6 @@ export class ScheduledNoteEntityService {
 			id: item.id,
 			createdAt: this.idService.parse(item.id).date.toISOString(),
 			scheduledAt: item.scheduledAt?.getTime() ?? null,
-			isActuallyScheduled: item.scheduledAt != null,
 			reason: item.reason ?? undefined,
 			channel: item.draft.channel ? {
 				id: item.draft.channel.id,

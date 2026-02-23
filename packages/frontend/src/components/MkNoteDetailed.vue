@@ -275,6 +275,7 @@ import MkButton from '@/components/MkButton.vue';
 import { isEnabledUrlPreview } from '@/utility/url-preview.js';
 import { getAppearNote } from '@/utility/get-appear-note.js';
 import { prefer } from '@/preferences.js';
+import { store } from '@/store';
 import { getPluginHandlers } from '@/plugin.js';
 import { DI } from '@/di.js';
 import { globalEvents, useGlobalEvent } from '@/events.js';
@@ -336,11 +337,11 @@ const urls = parsed ? extractUrlFromMfm(parsed).filter((url) => appearNote.renot
 const showTicker = (prefer.s.instanceTicker === 'always') || (prefer.s.instanceTicker === 'remote' && appearNote.user.instance);
 const conversation = ref<Misskey.entities.Note[]>([]);
 const replies = ref<Misskey.entities.Note[]>([]);
-const canRenote = computed(() => ['public', 'home'].includes(appearNote.value.visibility) || appearNote.value.userId === $i?.id);
+const canRenote = computed(() => ['public', 'home'].includes(appearNote.visibility) || appearNote.userId === $i?.id);
 const mutedReactions = ref<string[]>(store.s.mutedReactions);
 
 useGlobalEvent('noteDeleted', (noteId) => {
-	if (noteId === note.value.id || noteId === appearNote.value.id) {
+	if (noteId === note.value.id || noteId === appearNote.id) {
 		isDeleted.value = true;
 	}
 });

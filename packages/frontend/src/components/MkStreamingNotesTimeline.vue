@@ -89,6 +89,7 @@ const props = withDefaults(defineProps<{
 	withReplies?: boolean;
 	withSensitive?: boolean;
 	onlyFiles?: boolean;
+	dimension?: number;
 }>(), {
 	withRenotes: true,
 	withReplies: false,
@@ -116,6 +117,7 @@ if (props.src === 'antenna') {
 		computedParams: computed(() => ({
 			withRenotes: props.withRenotes,
 			withFiles: props.onlyFiles ? true : undefined,
+			dimension: props.dimension,
 		})),
 		useShallowRef: true,
 	}));
@@ -125,6 +127,7 @@ if (props.src === 'antenna') {
 			withRenotes: props.withRenotes,
 			withReplies: props.withReplies,
 			withFiles: props.onlyFiles ? true : undefined,
+			dimension: props.dimension,
 		})),
 		useShallowRef: true,
 	}));
@@ -134,6 +137,7 @@ if (props.src === 'antenna') {
 			withRenotes: props.withRenotes,
 			withReplies: props.withReplies,
 			withFiles: props.onlyFiles ? true : undefined,
+			dimension: props.dimension,
 		})),
 		useShallowRef: true,
 	}));
@@ -142,6 +146,7 @@ if (props.src === 'antenna') {
 		computedParams: computed(() => ({
 			withRenotes: props.withRenotes,
 			withFiles: props.onlyFiles ? true : undefined,
+			dimension: props.dimension,
 		})),
 		useShallowRef: true,
 	}));
@@ -162,6 +167,7 @@ if (props.src === 'antenna') {
 			withRenotes: props.withRenotes,
 			withFiles: props.onlyFiles ? true : undefined,
 			listId: props.list!,
+			dimension: props.dimension,
 		})),
 		useShallowRef: true,
 	}));
@@ -169,6 +175,7 @@ if (props.src === 'antenna') {
 	paginator = markRaw(new Paginator('channels/timeline', {
 		computedParams: computed(() => ({
 			channelId: props.channel!,
+			dimension: props.dimension,
 		})),
 		useShallowRef: true,
 	}));
@@ -176,6 +183,7 @@ if (props.src === 'antenna') {
 	paginator = markRaw(new Paginator('roles/notes', {
 		computedParams: computed(() => ({
 			roleId: props.role!,
+			dimension: props.dimension,
 		})),
 		useShallowRef: true,
 	}));
@@ -400,7 +408,7 @@ if (store.s.realtimeMode) {
 	connectChannel();
 }
 
-watch(() => [props.list, props.antenna, props.channel, props.role, props.withRenotes], () => {
+watch(() => [props.list, props.antenna, props.channel, props.role, props.withRenotes, props.dimension], () => {
 	if (store.s.realtimeMode) {
 		disconnectChannel();
 		connectChannel();

@@ -19,8 +19,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</button>
 		</div>
 		<div :class="$style.headerRight">
-			<template v-if="!(targetChannel != null && fixed)">
-				<button v-if="targetChannel == null" ref="visibilityButton" v-tooltip="i18n.ts.visibility" :class="['_button', $style.headerRightItem, $style.visibility]" @click="setVisibility">
+			<template v-if="!(channel != null && fixed)">
+				<button v-if="channel == null" ref="visibilityButton" v-tooltip="i18n.ts.visibility" :class="['_button', $style.headerRightItem, $style.visibility]" @click="setVisibility">
 					<span v-if="visibility === 'public'"><i class="ti ti-world"></i></span>
 					<span v-if="visibility === 'home'"><i class="ti ti-home"></i></span>
 					<span v-if="visibility === 'followers'"><i class="ti ti-lock"></i></span>
@@ -29,10 +29,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</button>
 				<button v-else class="_button" :class="[$style.headerRightItem, $style.visibility]" disabled>
 					<span><i class="ti ti-device-tv"></i></span>
-					<span :class="$style.headerRightButtonText">{{ targetChannel.name }}</span>
+					<span :class="$style.headerRightButtonText">{{ channel.name }}</span>
 				</button>
 			</template>
-			<button v-tooltip="i18n.ts._visibility.disableFederation" class="_button" :class="[$style.headerRightItem, { [$style.danger]: localOnly }]" :disabled="targetChannel != null || visibility === 'specified' || isPrivateDimension" @click="toggleLocalOnly">
+			<button v-tooltip="i18n.ts._visibility.disableFederation" class="_button" :class="[$style.headerRightItem, { [$style.danger]: localOnly }]" :disabled="channel != null || visibility === 'specified' || isPrivateDimension" @click="toggleLocalOnly">
 				<span v-if="!localOnly"><i class="ti ti-rocket"></i></span>
 				<span v-else><i class="ti ti-rocket-off"></i></span>
 			</button>
@@ -43,7 +43,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<template v-else-if="posting"><MkEllipsis/></template>
 					<template v-else>{{ submitText }}</template>
 					<i style="margin-left: 6px;" :class="submitIcon"></i>
-
 				</div>
 			</button>
 		</div>
@@ -51,7 +50,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<MkInfo v-if="isPrivateDimension" warn style="margin-top: 8px;">
 		<Mfm :text="i18n.tsx._postForm.dimensionPrivateNotice({ dimension })"/>
 	</MkInfo>
-	<MkNoteSimple v-if="replyTargetNote" :class="$style.targetNote" :note="replyTargetNote"/>
+	<MkNoteSimple v-if="reply" :class="$style.targetNote" :note="reply"/>
 	<MkNoteSimple v-if="renoteTargetNote" :class="$style.targetNote" :note="renoteTargetNote"/>
 	<div v-if="quoteId" :class="$style.withQuote"><i class="ti ti-quote"></i> {{ i18n.ts.quoteAttached }}<button @click="quoteId = null; renoteTargetNote = null;"><i class="ti ti-x"></i></button></div>
 	<div v-if="visibility === 'specified'" :class="$style.toSpecified">
@@ -70,7 +69,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div v-if="maxCwTextLength - cwTextLength < 20" :class="['_acrylic', $style.cwTextCount, { [$style.cwTextOver]: cwTextLength > maxCwTextLength }]">{{ maxCwTextLength - cwTextLength }}</div>
 	</div>
 	<div :class="[$style.textOuter, { [$style.withCw]: useCw }]">
-		<div v-if="targetChannel" :class="$style.colorBar" :style="{ background: targetChannel.color }"></div>
+		<div v-if="channel" :class="$style.colorBar" :style="{ background: channel.color }"></div>
 		<textarea ref="textareaEl" v-model="text" :class="[$style.text]" :disabled="posting || posted" :readonly="textAreaReadOnly" :placeholder="placeholder" data-cy-post-form-text @keydown="onKeydown" @keyup="onKeyup" @paste="onPaste" @compositionupdate="onCompositionUpdate" @compositionend="onCompositionEnd"/>
 		<div v-if="maxTextLength - textLength < 100" :class="['_acrylic', $style.textCount, { [$style.textOver]: textLength > maxTextLength }]">{{ maxTextLength - textLength }}</div>
 	</div>
@@ -239,10 +238,6 @@ const showingOptions = ref(false);
 const textAreaReadOnly = ref(false);
 const justEndedComposition = ref(false);
 const renoteTargetNote: ShallowRef<PostFormProps['renote'] | null> = shallowRef(props.renote);
-const replyTargetNote: ShallowRef<PostFormProps['reply'] | null> = shallowRef(props.reply);
-const targetChannel = shallowRef(props.channel);
-
-const serverDraftId = ref<string | null>(null);
 const postFormActions = getPluginHandlers('post_form_action');
 
 const uploader = useUploader({
@@ -259,13 +254,12 @@ uploader.events.on('itemUploaded', ctx => {
 });
 
 const draftKey = computed((): string => {
-	let key = targetChannel.value ? `channel:${targetChannel.value.id}` : '';
+	let key = props.channel ? `channel:${props.channel.id}` : '';
 
 	if (renoteTargetNote.value) {
 		key += `renote:${renoteTargetNote.value.id}`;
-	} else if (replyTargetNote.value) {
-		key += `reply:${replyTargetNote.value.id}`;
-
+	} else if (props.reply) {
+		key += `reply:${props.reply.id}`;
 	} else {
 		key += `note:${draftId.value}`;
 	}
@@ -276,10 +270,9 @@ const draftKey = computed((): string => {
 const placeholder = computed((): string => {
 	if (renote.value) {
 		return i18n.ts._postForm.quotePlaceholder;
-	} else if (replyTargetNote.value) {
+	} else if (props.reply) {
 		return i18n.ts._postForm.replyPlaceholder;
-	} else if (targetChannel.value) {
-
+	} else if (props.channel) {
 		return i18n.ts._postForm.channelPlaceholder;
 	} else {
 		const xs = [
@@ -349,11 +342,6 @@ const canPost = computed((): boolean => {
 	;
 });
 
-// cannot save pure renote as draft
-const canSaveAsServerDraft = computed((): boolean => {
-	return canPost.value && (textLength.value > 0 || files.value.length > 0 || poll.value != null);
-});
-
 const withHashtags = computed(store.makeGetterSetter('postFormWithHashtags'));
 const hashtags = computed(store.makeGetterSetter('postFormHashtags'));
 
@@ -389,13 +377,13 @@ if (props.mention) {
 	text.value += ' ';
 }
 
-if (replyTargetNote.value && (replyTargetNote.value.user.username !== $i.username || (replyTargetNote.value.user.host != null && replyTargetNote.value.user.host !== host))) {
-	text.value = `@${replyTargetNote.value.user.username}${replyTargetNote.value.user.host != null ? '@' + toASCII(replyTargetNote.value.user.host) : ''} `;
+if (props.reply && (props.reply.user.username !== $i.username || (props.reply.user.host != null && props.reply.user.host !== host))) {
+	text.value = `@${props.reply.user.username}${props.reply.user.host != null ? '@' + toASCII(props.reply.user.host) : ''} `;
 }
 
-if (replyTargetNote.value && replyTargetNote.value.text != null) {
-	const ast = mfm.parse(replyTargetNote.value.text);
-	const otherHost = replyTargetNote.value.user.host;
+if (props.reply && props.reply.text != null) {
+	const ast = mfm.parse(props.reply.text);
+	const otherHost = props.reply.user.host;
 
 
 	for (const x of extractMentions(ast)) {
@@ -419,35 +407,32 @@ if ($i.isSilenced && visibility.value === 'public') {
 	visibility.value = 'home';
 }
 
-if (targetChannel.value) {
-
+if (props.channel) {
 	visibility.value = 'public';
 	localOnly.value = true; // TODO: チャンネルが連合するようになった折には消す
 }
 
 // 公開以外へのリプライ時は元の公開範囲を引き継ぐ
-if (replyTargetNote.value && ['home', 'followers', 'specified'].includes(replyTargetNote.value.visibility)) {
-	if (replyTargetNote.value.visibility === 'home' && visibility.value === 'followers') {
+if (props.reply && ['home', 'followers', 'specified'].includes(props.reply.visibility)) {
+	if (props.reply.visibility === 'home' && visibility.value === 'followers') {
 		visibility.value = 'followers';
-	} else if (['home', 'followers'].includes(replyTargetNote.value.visibility) && visibility.value === 'specified') {
+	} else if (['home', 'followers'].includes(props.reply.visibility) && visibility.value === 'specified') {
 		visibility.value = 'specified';
 	} else {
-		visibility.value = replyTargetNote.value.visibility;
+		visibility.value = props.reply.visibility;
 	}
 
 	if (visibility.value === 'specified') {
-		if (replyTargetNote.value.visibleUserIds) {
+		if (props.reply.visibleUserIds) {
 			misskeyApi('users/show', {
-				userIds: replyTargetNote.value.visibleUserIds.filter(uid => uid !== $i.id && uid !== replyTargetNote.value?.userId),
-
+				userIds: props.reply.visibleUserIds.filter(uid => uid !== $i.id && uid !== props.reply?.userId),
 			}).then(users => {
 				users.forEach(u => pushVisibleUser(u));
 			});
 		}
 
-		if (replyTargetNote.value.userId !== $i.id) {
-			misskeyApi('users/show', { userId: replyTargetNote.value.userId }).then(user => {
-
+		if (props.reply.userId !== $i.id) {
+			misskeyApi('users/show', { userId: props.reply.userId }).then(user => {
 				pushVisibleUser(user);
 			});
 		}
@@ -460,10 +445,9 @@ if (props.specified) {
 }
 
 // keep cw when reply
-if (prefer.s.keepCw && replyTargetNote.value && replyTargetNote.value.cw) {
+if (prefer.s.keepCw && props.reply && props.reply.cw) {
 	useCw.value = true;
-	cw.value = replyTargetNote.value.cw;
-
+	cw.value = props.reply.cw;
 }
 
 function watchForDraft() {
@@ -566,8 +550,7 @@ function updateFileName(file, name) {
 }
 
 async function setVisibility() {
-	if (targetChannel.value) {
-
+	if (props.channel) {
 		visibility.value = 'public';
 		localOnly.value = true; // TODO: チャンネルが連合するようになった折には消す
 		return;
@@ -578,8 +561,7 @@ async function setVisibility() {
 		isSilenced: $i.isSilenced,
 		localOnly: localOnly.value,
 		anchorElement: visibilityButton.value,
-		...(replyTargetNote.value ? { isReplyVisibilitySpecified: replyTargetNote.value.visibility === 'specified' } : {}),
-
+		...(props.reply ? { isReplyVisibilitySpecified: props.reply.visibility === 'specified' } : {}),
 	}, {
 		changeVisibility: v => {
 			visibility.value = v;
@@ -591,8 +573,7 @@ async function setVisibility() {
 }
 
 async function toggleLocalOnly() {
-	if (targetChannel.value) {
-
+	if (props.channel) {
 		visibility.value = 'public';
 		localOnly.value = true; // TODO: チャンネルが連合するようになった折には消す
 		return;
@@ -1054,7 +1035,7 @@ function saveDraft() {
 			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 			files: files.value.filter(f => f?.id && f.type && f.name),
 			poll: poll.value,
-			...( visibleUsers.value.length > 0 ? { visibleUserIds: visibleUsers.value.map(x => x.id) } : {}),
+			visibleUserIds: visibility.value === 'specified' ? visibleUsers.value.map(x => x.id) : undefined,
 			quoteId: quoteId.value,
 			reactionAcceptance: reactionAcceptance.value,
 		},
@@ -1071,25 +1052,6 @@ function deleteDraft() {
 	draftId.value = Date.now().toString();
 
 	miLocalStorage.setItem('drafts', JSON.stringify(draftData));
-}
-
-async function saveServerDraft() {
-	return await os.apiWithDialog(serverDraftId.value == null ? 'notes/drafts/create' : 'notes/drafts/update', {
-		...(serverDraftId.value == null ? {} : { draftId: serverDraftId.value }),
-		text: text.value,
-		cw: useCw.value ? cw.value || null : null,
-		visibility: visibility.value,
-		localOnly: localOnly.value,
-		hashtag: hashtags.value,
-		fileIds: files.value.map(f => f.id),
-		poll: poll.value,
-		visibleUserIds: visibleUsers.value.map(x => x.id),
-		renoteId: renoteTargetNote.value ? renoteTargetNote.value.id : quoteId.value ? quoteId.value : null,
-		replyId: replyTargetNote.value ? replyTargetNote.value.id : null,
-		channelId: targetChannel.value ? targetChannel.value.id : null,
-		reactionAcceptance: reactionAcceptance.value,
-		scheduledAt: scheduledTime.value?.getTime() ?? undefined,
-	});
 }
 
 function isAnnoying(text: string): boolean {
@@ -1199,10 +1161,9 @@ async function post(ev?: MouseEvent) {
 	let postData = {
 		text: text.value === '' ? null : text.value,
 		fileIds: files.value.length > 0 ? files.value.map(f => f.id) : undefined,
-		replyId: replyTargetNote.value ? replyTargetNote.value.id : undefined,
+		replyId: props.reply ? props.reply.id : undefined,
 		renoteId: renoteTargetNote.value ? renoteTargetNote.value.id : quoteId.value ? quoteId.value : undefined,
-		channelId: targetChannel.value ? targetChannel.value.id : undefined,
-
+		channelId: props.channel ? props.channel.id : undefined,
 		poll: poll.value,
 		cw: useCw.value ? cw.value ?? '' : null,
 		localOnly: localOnly.value,
@@ -1319,10 +1280,6 @@ async function post(ev?: MouseEvent) {
 			}
 			if (m === 0 && s === 0) {
 				claimAchievement('postedAt0min0sec');
-			}
-
-			if (serverDraftId.value != null) {
-				misskeyApi('notes/drafts/delete', { draftId: serverDraftId.value });
 			}
 		});
 	}).catch(err => {
@@ -1593,18 +1550,21 @@ defineExpose({
 
 .headerLeft {
 	display: flex;
-	flex: 1;
-	flex-wrap: nowrap;
-	align-items: center;
-	gap: 6px;
-	padding-left: 12px;
+	flex: 0 1 100px;
 }
 
 .cancel {
-	padding: 8px;
+	padding: 0;
+	font-size: 1em;
+	height: 100%;
+	flex: 0 1 50px;
 }
 
 .account {
+	height: 100%;
+	display: inline-flex;
+	vertical-align: bottom;
+	flex: 0 1 50px;
 }
 
 .avatar {

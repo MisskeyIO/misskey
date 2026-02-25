@@ -2894,51 +2894,6 @@ export type paths = {
          */
         post: operations['notes___delete'];
     };
-    '/notes/drafts/count': {
-        /**
-         * notes/drafts/count
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *read:account*
-         */
-        post: operations['notes___drafts___count'];
-    };
-    '/notes/drafts/create': {
-        /**
-         * notes/drafts/create
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *write:account*
-         */
-        post: operations['notes___drafts___create'];
-    };
-    '/notes/drafts/delete': {
-        /**
-         * notes/drafts/delete
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *write:account*
-         */
-        post: operations['notes___drafts___delete'];
-    };
-    '/notes/drafts/list': {
-        /**
-         * notes/drafts/list
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *read:account*
-         */
-        post: operations['notes___drafts___list'];
-    };
-    '/notes/drafts/update': {
-        /**
-         * notes/drafts/update
-         * @description No description provided.
-         *
-         *     **Credential required**: *Yes* / **Permission**: *write:account*
-         */
-        post: operations['notes___drafts___update'];
-    };
     '/notes/favorites/create': {
         /**
          * notes/favorites/create
@@ -4442,10 +4397,8 @@ export type components = {
             id: string;
             /** Format: date-time */
             createdAt: string;
-            scheduledAt: number | null;
-            reason?: string | null;
             text: string | null;
-            cw: string | null;
+            cw?: string | null;
             /** Format: id */
             userId: string;
             user: components['schemas']['UserLite'];
@@ -4453,50 +4406,43 @@ export type components = {
              * Format: id
              * @example xxxxxxxxxx
              */
-            replyId: string | null;
+            replyId?: string | null;
             /**
              * Format: id
              * @example xxxxxxxxxx
              */
-            renoteId: string | null;
+            renoteId?: string | null;
             reply?: components['schemas']['Note'] | null;
             renote?: components['schemas']['Note'] | null;
             /** @enum {string} */
             visibility: 'public' | 'home' | 'followers' | 'specified';
-            visibleUserIds: string[];
-            fileIds: string[];
-            files: components['schemas']['DriveFile'][];
-            hashtag: string | null;
+            visibleUserIds?: string[];
+            fileIds?: string[];
+            files?: components['schemas']['DriveFile'][];
+            hashtag?: string;
+            poll?: {
+                /** Format: date-time */
+                expiresAt?: string | null;
+                expiredAfter?: number | null;
+                multiple: boolean;
+                choices: string[];
+            } | null;
             /**
              * Format: id
              * @example xxxxxxxxxx
              */
-            channelId: string | null;
+            channelId?: string | null;
             channel?: {
-                /**
-                 * Format: id
-                 * @example xxxxxxxxxx
-                 */
                 id: string;
                 name: string;
                 color: string;
                 isSensitive: boolean;
-                lang?: string | null;
-                dimension?: number | null;
                 allowRenoteToExternal: boolean;
-                files: components['schemas']['DriveFile'][];
                 userId: string | null;
             } | null;
-            localOnly: boolean;
+            localOnly?: boolean;
             /** @enum {string|null} */
             reactionAcceptance: 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote' | null;
-            poll: {
-                choices: string[];
-                multiple: boolean;
-                /** Format: date-time */
-                expiresAt?: string | null;
-                expiredAfter: number | null;
-            } | null;
         };
         NoteReaction: {
             /** Format: id */
@@ -5410,8 +5356,6 @@ export type components = {
             /** @enum {string} */
             chatAvailability: 'available' | 'readonly' | 'unavailable';
             noteDraftLimit: number;
-            scheduledNoteLimit: number;
-            watermarkAvailable: boolean;
         };
         ReversiGameLite: {
             /** Format: id */
@@ -28915,7 +28859,6 @@ export interface operations {
                         expiresAt?: number | null;
                         expiredAfter?: number | null;
                     } | null;
-                    scheduledAt?: number | null;
                 };
             };
         };
@@ -29060,8 +29003,6 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
-                    sinceDate?: number;
-                    untilDate?: number;
                 };
             };
         };
@@ -29128,13 +29069,20 @@ export interface operations {
                 'application/json': {
                     /** Format: misskey:id */
                     draftId: string;
-                    /** @enum {string} */
+                    /**
+                     * @default public
+                     * @enum {string}
+                     */
                     visibility?: 'public' | 'home' | 'followers' | 'specified';
                     visibleUserIds?: string[];
                     cw?: string | null;
                     hashtag?: string | null;
+                    /** @default false */
                     localOnly?: boolean;
-                    /** @enum {string|null} */
+                    /**
+                     * @default null
+                     * @enum {string|null}
+                     */
                     reactionAcceptance?: null | 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote';
                     /** Format: misskey:id */
                     replyId?: string | null;
@@ -29150,7 +29098,6 @@ export interface operations {
                         expiresAt?: number | null;
                         expiredAfter?: number | null;
                     } | null;
-                    scheduledAt?: number | null;
                 };
             };
         };

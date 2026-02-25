@@ -5817,10 +5817,6 @@ export interface Locale extends ILocale {
      */
     "draft": string;
     /**
-     * 下書きと予約投稿
-     */
-    "draftsAndScheduledNotes": string;
-    /**
      * リアクションする際に確認する
      */
     "confirmOnReact": string;

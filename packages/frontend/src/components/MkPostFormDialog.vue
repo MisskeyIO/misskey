@@ -8,9 +8,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 	ref="modal"
 	:preferType="'dialog'"
 	:hasInteractionWithOtherFocusTrappedEls="true"
-	@click="_close()"
+	@click="onBgClick()"
 	@closed="onModalClosed()"
-	@esc="_close()"
+	@esc="onEsc"
 >
 	<MkPostForm
 		ref="form"
@@ -64,6 +64,13 @@ async function _close() {
 	modal.value?.close();
 }
 
+function onEsc() {
+	_close();
+}
+
+function onBgClick() {
+	_close();
+}
 function onModalClosed() {
 	emit('closed');
 }

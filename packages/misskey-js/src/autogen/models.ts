@@ -16,6 +16,7 @@ export type Ad = components['schemas']['Ad'];
 export type Announcement = components['schemas']['Announcement'];
 export type App = components['schemas']['App'];
 export type Note = components['schemas']['Note'];
+export type NoteDraft = components['schemas']['NoteDraft'];
 export type NoteReaction = components['schemas']['NoteReaction'];
 export type NoteReactionWithNote = components['schemas']['NoteReactionWithNote'];
 export type NoteFavorite = components['schemas']['NoteFavorite'];

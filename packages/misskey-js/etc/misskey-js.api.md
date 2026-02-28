@@ -1937,6 +1937,14 @@ declare namespace entities {
         NotesCreateRequest,
         NotesCreateResponse,
         NotesDeleteRequest,
+        NotesDraftsCountResponse,
+        NotesDraftsCreateRequest,
+        NotesDraftsCreateResponse,
+        NotesDraftsDeleteRequest,
+        NotesDraftsListRequest,
+        NotesDraftsListResponse,
+        NotesDraftsUpdateRequest,
+        NotesDraftsUpdateResponse,
         NotesFavoritesCreateRequest,
         NotesFavoritesDeleteRequest,
         NotesFeaturedRequest,
@@ -2115,6 +2123,7 @@ declare namespace entities {
         Announcement,
         App,
         Note,
+        NoteDraft,
         NoteReaction,
         NoteReactionWithNote,
         NoteFavorite,
@@ -3336,6 +3345,9 @@ export type NoteFavorite = components['schemas']['NoteFavorite'];
 export type NoteReaction = components['schemas']['NoteReaction'];
 
 // @public (undocumented)
+export type NoteReactionWithNote = components['schemas']['NoteReactionWithNote'];
+
+// @public (undocumented)
 export type NotesChildrenRequest = operations['notes___children']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
@@ -3369,28 +3381,28 @@ export type NotesDraftsCountResponse = operations['notes___drafts___count']['res
 export type NotesDraftsCreateRequest = operations['notes___drafts___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesDraftsCountResponse = operations['notes___drafts___count']['responses']['200']['content']['application/json'];
+export type NotesDraftsCreateResponse = operations['notes___drafts___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesDraftsCreateRequest = operations['notes___drafts___create']['requestBody']['content']['application/json'];
+export type NotesDraftsDeleteRequest = operations['notes___drafts___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesDraftsCreateResponse = operations['notes___drafts___create']['responses']['200']['content']['application/json'];
+export type NotesDraftsListRequest = operations['notes___drafts___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesDraftsDeleteRequest = operations['notes___drafts___delete']['requestBody']['content']['application/json'];
+export type NotesDraftsListResponse = operations['notes___drafts___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesDraftsListRequest = operations['notes___drafts___list']['requestBody']['content']['application/json'];
+export type NotesDraftsUpdateRequest = operations['notes___drafts___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesDraftsListResponse = operations['notes___drafts___list']['responses']['200']['content']['application/json'];
+export type NotesDraftsUpdateResponse = operations['notes___drafts___update']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-type NotesDraftsUpdateRequest = operations['notes___drafts___update']['requestBody']['content']['application/json'];
+export type NotesFavoritesCreateRequest = operations['notes___favorites___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-type NotesDraftsUpdateResponse = operations['notes___drafts___update']['responses']['200']['content']['application/json'];
+export type NotesFavoritesDeleteRequest = operations['notes___favorites___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 export type NotesFeaturedRequest = operations['notes___featured']['requestBody']['content']['application/json'];

@@ -99,6 +99,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				expiresAt: ad.expiresAt.toISOString(),
 				startsAt: ad.startsAt.toISOString(),
 				dayOfWeek: ad.dayOfWeek,
+				isSensitive: ad.isSensitive,
 				url: ad.url,
 				imageUrl: ad.imageUrl,
 				imageBlurhash: ad.imageBlurhash,
@@ -106,7 +107,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				ratio: ad.ratio,
 				place: ad.place,
 				memo: ad.memo,
-				isSensitive: ad.isSensitive,
 			};
 		});
 	}

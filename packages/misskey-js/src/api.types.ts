@@ -1,6 +1,12 @@
 import type { Endpoints as Gen } from './autogen/endpoint.js';
 import type { UserDetailed } from './autogen/models.js';
-import type { AdminRolesCreateRequest, AdminRolesCreateResponse, UsersShowRequest } from './autogen/entities.js';
+import type {
+	AdminRolesCreateRequest,
+	AdminRolesCreateResponse,
+	EmptyRequest,
+	EmptyResponse,
+	UsersShowRequest,
+} from './autogen/entities.js';
 import type {
 	PartialRolePolicyOverride,
 	SigninFlowRequest,
@@ -102,6 +108,14 @@ export type Endpoints = Overwrite<
 					$default: SigninWithPasskeyInitResponse;
 				},
 			},
-		}
+		},
+		'admin/roles/create': {
+			req: Overwrite<AdminRolesCreateRequest, { policies: PartialRolePolicyOverride }>;
+			res: AdminRolesCreateResponse;
+		},
+		'clear-browser-cache': {
+			req: EmptyRequest;
+			res: EmptyResponse;
+		},
 	}
 >;

@@ -54,7 +54,7 @@ export class MiPage {
 	@Column('varchar', {
 		length: 32,
 	})
-	public font: string;
+	public font: 'serif' | 'sans-serif';
 
 	@Index()
 	@Column({
@@ -76,7 +76,7 @@ export class MiPage {
 	public eyeCatchingImageId: MiDriveFile['id'] | null;
 
 	@ManyToOne(type => MiDriveFile, {
-		onDelete: 'CASCADE',
+		onDelete: 'SET NULL',
 	})
 	@JoinColumn()
 	public eyeCatchingImage: MiDriveFile | null;

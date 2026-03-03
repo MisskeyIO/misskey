@@ -233,7 +233,8 @@ async function install() {
 const urlParams = new URLSearchParams(window.location.search);
 url.value = urlParams.get('url');
 hash.value = urlParams.get('hash');
-await _fetch_();
+_fetch_();
+
 
 definePage(() => ({
 	title: i18n.ts._externalResourceInstaller.title,

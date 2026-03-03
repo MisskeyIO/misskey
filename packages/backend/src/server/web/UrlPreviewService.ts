@@ -94,13 +94,13 @@ export class UrlPreviewService {
 				throw new Error('unsupported schema included');
 			}
 
-			summary.icon = this.wrap(summary.icon);
-			summary.thumbnail = this.wrap(summary.thumbnail);
+				summary.icon = this.wrap(summary.icon);
+				summary.thumbnail = this.wrap(summary.thumbnail);
 
-			const includeDenyList = this.meta.urlPreviewDenyList.some(filter => {
-				// represents RegExp
-				const regexp = /^\/(.+)\/(.*)$/.exec(filter);
-				// This should never happen due to input sanitisation.
+				const includeDenyList = this.meta.urlPreviewDenyList.some(filter => {
+					// represents RegExp
+					const regexp = /^\/(.+)\/(.*)$/.exec(filter);
+					// This should never happen due to input sanitisation.
 				if (!regexp) {
 					const words = filter.split(' ');
 					return words.every(keyword => summary.url.includes(keyword));
@@ -111,15 +111,16 @@ export class UrlPreviewService {
 					// This should never happen due to input sanitisation.
 					return false;
 				}
-			});
-			if (includeDenyList) summary.sensitive = true;
+				});
+				if (includeDenyList) summary.sensitive = true;
 
-			// Cache 7days
-			reply.header('Cache-Control', 'max-age=604800, immutable');
+				// Cache 1day
+				reply.header('Cache-Control', 'max-age=86400, immutable');
 
-			return summary;
-		} catch (err) {
-			this.logger.warn(`Failed to get preview of ${url}: ${err}`);
+
+				return summary;
+			} catch (err) {
+				this.logger.warn(`Failed to get preview of ${url}: ${err}`);
 
 			reply.code(422);
 			reply.header('Cache-Control', 'max-age=86400, immutable');
@@ -142,7 +143,7 @@ export class UrlPreviewService {
 			: undefined;
 
 		return summaly(url, {
-			followRedirects: false,
+			followRedirects: this.meta.urlPreviewAllowRedirect,
 			lang: lang ?? 'ja-JP',
 			agent: agent,
 			userAgent: meta.urlPreviewUserAgent ?? undefined,
@@ -157,6 +158,7 @@ export class UrlPreviewService {
 		const queryStr = query({
 			url: url,
 			lang: lang ?? 'ja-JP',
+			followRedirects: this.meta.urlPreviewAllowRedirect,
 			userAgent: meta.urlPreviewUserAgent ?? undefined,
 			operationTimeout: meta.urlPreviewTimeout,
 			contentLengthLimit: meta.urlPreviewMaximumContentLength,

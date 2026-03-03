@@ -43,6 +43,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
+import * as Misskey from 'misskey-js';
 import MkInput from '@/components/MkInput.vue';
 import FormSection from '@/components/form/section.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
@@ -68,7 +69,7 @@ const event_reportResolved = ref(false);
 const event_reportAutoResolved = ref(false);
 
 async function create(): Promise<void> {
-	const events = [];
+	const events = [] as Misskey.entities.UserWebhook['on'];
 	if (event_follow.value) events.push('follow');
 	if (event_followed.value) events.push('followed');
 	if (event_note.value) events.push('note');

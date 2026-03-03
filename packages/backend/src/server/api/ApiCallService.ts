@@ -6,7 +6,6 @@
 import { randomUUID } from 'node:crypto';
 import * as fs from 'node:fs';
 import * as stream from 'node:stream/promises';
-import { Transform } from 'node:stream';
 import { Inject, Injectable } from '@nestjs/common';
 import * as Sentry from '@sentry/node';
 import { DI } from '@/di-symbols.js';
@@ -14,13 +13,11 @@ import { getIpHash } from '@/misc/get-ip-hash.js';
 import type { MiLocalUser, MiUser } from '@/models/User.js';
 import type { MiAccessToken } from '@/models/AccessToken.js';
 import type Logger from '@/logger.js';
-import type { UserIpsRepository } from '@/models/_.js';
+import type { MiMeta, UserIpsRepository } from '@/models/_.js';
 import { createTemp } from '@/misc/create-temp.js';
-import { AttachmentFile } from '@/server/api/endpoint-base.js';
 import { bindThis } from '@/decorators.js';
 import { RoleService } from '@/core/RoleService.js';
 import type { Config } from '@/config.js';
-import { MetaService } from '@/core/MetaService.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { ApiError } from './error.js';
 import { RateLimiterService } from './RateLimiterService.js';
@@ -46,12 +43,6 @@ const uploadFileSizeExceeded = <ConstructorParameters<typeof ApiError>[0]>{
 	kind: 'client',
 };
 
-type PreparedFile = {
-	file: AttachmentFile;
-	size: number;
-	cleanup: () => void;
-};
-
 @Injectable()
 export class ApiCallService implements OnApplicationShutdown {
 	private logger: Logger;
@@ -59,11 +50,13 @@ export class ApiCallService implements OnApplicationShutdown {
 	private userIpHistoriesClearIntervalId: NodeJS.Timeout;
 
 	constructor(
+		@Inject(DI.meta)
+		private meta: MiMeta,
+
 		@Inject(DI.config)
 		private config: Config,
 		@Inject(DI.userIpsRepository)
 		private userIpsRepository: UserIpsRepository,
-		private metaService: MetaService,
 		private authenticateService: AuthenticateService,
 		private rateLimiterService: RateLimiterService,
 		private roleService: RoleService,
@@ -204,39 +197,59 @@ export class ApiCallService implements OnApplicationShutdown {
 	}
 
 	@bindThis
-	public handleRequest(
+	public async handleRequest(
 		endpoint: IEndpoint & { exec: any },
 		request: FastifyRequest<{ Body: Record<string, unknown> | undefined, Querystring: Record<string, unknown> }>,
 		reply: FastifyReply,
-	): void {
+	): Promise<void> {
 		const body = request.method === 'GET'
 			? request.query
-			: request.body;
+			: (request.body ?? {});
 
 		// https://datatracker.ietf.org/doc/html/rfc6750.html#section-2.1 (case sensitive)
 		const token = request.headers.authorization?.startsWith('Bearer ')
 			? request.headers.authorization.slice(7)
 			: body?.['i'];
 		if (token != null && typeof token !== 'string') {
-			reply.code(400);
+			this.#sendApiError(reply, new ApiError({
+				message: 'Invalid param.',
+				code: 'INVALID_PARAM',
+				id: '3d81ceae-475f-4600-b2a8-2bc116157532',
+				httpStatusCode: 400,
+				kind: 'client',
+			}, {
+				param: 'i',
+				reason: 'must be string',
+			}));
 			return;
 		}
-		this.authenticateService.authenticate(token).then(([user, app]) => {
-			this.call(endpoint, user, app, body, null, request).then((res) => {
-				if (request.method === 'GET' && endpoint.meta.cacheSec && !token && !user) {
-					reply.header('Cache-Control', `public, max-age=${endpoint.meta.cacheSec}`);
-				}
-				this.send(reply, res);
-			}).catch((err: ApiError) => {
-				this.#sendApiError(reply, err);
-			});
 
-			if (user) {
-				this.logIp(request, user);
-			}
-		}).catch(err => {
+		let user: MiLocalUser | null;
+		let app: MiAccessToken | null;
+		try {
+			[user, app] = await this.authenticateService.authenticate(token);
+		} catch (err) {
 			this.#sendAuthenticationError(reply, err);
-		});
+			return;
+		}
+
+		try {
+			const res = await this.call(endpoint, user, app, body, null, request);
+			if (request.method === 'GET' && endpoint.meta.cacheSec && !token && !user) {
+				reply.header('Cache-Control', `public, max-age=${endpoint.meta.cacheSec}`);
+			}
+			this.send(reply, res);
+		} catch (err) {
+			if (err instanceof AuthenticationError) {
+				this.#sendAuthenticationError(reply, err);
+			} else {
+				this.#sendApiError(reply, err as ApiError);
+			}
+		}
+
+		if (user) {
+			this.logIp(request, user);
+		}
 	}
 
 	@bindThis
@@ -256,72 +269,10 @@ export class ApiCallService implements OnApplicationShutdown {
 			return;
 		}
 
-		let preparedFile: PreparedFile | undefined;
-		const fields = {} as Record<string, unknown>;
-
-		const parts = request.parts();
-
-		const globalSizeLimitStream = (limit: number) => {
-			let total = 0;
-			return new Transform({
-				transform: (chunk, _enc, callback) => {
-					total += chunk.length;
-					if (total > limit) {
-						callback(new ApiError(uploadFileSizeExceeded));
-					} else {
-						callback(null, chunk);
-					}
-				},
-			});
-		};
-
-		for await (const part of parts) {
-			if (part.type === 'file') {
-				this.logger.debug('received multipart file', { endpoint: endpoint.name, filename: part.filename });
-				if (preparedFile) {
-					this.#sendApiError(reply, new ApiError({
-						message: 'Only a single file may be uploaded at a time',
-						code: 'INVALID_PARAM',
-						id: '5c95c8b6-25bf-40e1-8c7d-d6d727d3503b',
-						httpStatusCode: 406,
-						kind: 'client',
-					}));
-					return;
-				}
-
-				const [path, cleanup] = await createTemp();
-				try {
-					await stream.pipeline(part.file, globalSizeLimitStream(this.config.maxFileSize), fs.createWriteStream(path));
-				} catch (err) {
-					cleanup();
-					if ((err as { code?: string; })?.code === 'FST_REQ_FILE_TOO_LARGE' || err instanceof ApiError) {
-						this.#sendApiError(reply, err instanceof ApiError ? err : new ApiError(uploadFileSizeExceeded));
-						return;
-					}
-					throw err;
-				}
-
-				if (part.file.truncated) {
-					cleanup();
-					this.#sendApiError(reply, new ApiError(uploadFileSizeExceeded));
-					return;
-				}
-
-				const stats = await fs.promises.stat(path);
-				preparedFile = {
-					file: {
-						name: part.filename ?? null,
-						path,
-					},
-					size: stats.size,
-					cleanup,
-				};
-			} else if (part.type === 'field') {
-				fields[part.fieldname] = part.value;
-			}
-		}
-
-		if (!preparedFile) {
+		const multipartData = await request.file().catch(() => {
+			/* Fastify throws if the remote didn't send multipart data. Return 400/422 below. */
+		});
+		if (multipartData == null) {
 			this.#sendApiError(reply, new ApiError({
 				message: 'No files found in multipart request',
 				code: 'INVALID_PARAM',
@@ -332,35 +283,82 @@ export class ApiCallService implements OnApplicationShutdown {
 			return;
 		}
 
+		const fields = {} as Record<string, unknown>;
+		for (const [k, v] of Object.entries(multipartData.fields)) {
+			fields[k] = typeof v === 'object' && v && 'value' in v ? (v as any).value : undefined;
+		}
+
+		this.logger.debug('received multipart file', { endpoint: endpoint.name, filename: multipartData.filename });
+
+		const [path, cleanup] = await createTemp();
+		try {
+			await stream.pipeline(multipartData.file, fs.createWriteStream(path));
+		} catch (err) {
+			cleanup();
+			if ((err as { code?: string; })?.code === 'FST_REQ_FILE_TOO_LARGE') {
+				this.#sendApiError(reply, new ApiError(uploadFileSizeExceeded));
+				return;
+			}
+			throw err;
+		}
+
+		// ファイルサイズが制限を超えていた場合
+		// なお truncated はストリームを読み切ってからでないと機能しないため、stream.pipeline より後にある必要がある
+		if (multipartData.file.truncated) {
+			cleanup();
+			this.#sendApiError(reply, new ApiError(uploadFileSizeExceeded));
+			return;
+		}
+
 		// https://datatracker.ietf.org/doc/html/rfc6750.html#section-2.1 (case sensitive)
 		const token = request.headers.authorization?.startsWith('Bearer ')
 			? request.headers.authorization.slice(7)
 			: fields['i'];
 		if (token != null && typeof token !== 'string') {
+			cleanup();
 			this.#sendApiError(reply, new ApiError({
-				message: 'No authorization token was found',
-				code: 'AUTHENTICATION_FAILED',
-				id: '39591dd6-b5e8-4399-bb03-13b0a8a62a21',
-				httpStatusCode: 401,
+				message: 'Invalid param.',
+				code: 'INVALID_PARAM',
+				id: '3d81ceae-475f-4600-b2a8-2bc116157532',
+				httpStatusCode: 400,
 				kind: 'client',
+			}, {
+				param: 'i',
+				reason: 'must be string',
 			}));
 			return;
 		}
 
-		this.authenticateService.authenticate(token).then(([user, app]) => {
-			this.call(endpoint, user, app, fields, preparedFile, request).then((res) => {
-				this.send(reply, res);
-			}).catch((err: ApiError) => {
-				this.#sendApiError(reply, err);
-			});
-
-			if (user) {
-				this.logIp(request, user);
-			}
-		}).catch(err => {
-			preparedFile.cleanup();
+		let user: MiLocalUser | null;
+		let app: MiAccessToken | null;
+		try {
+			[user, app] = await this.authenticateService.authenticate(token);
+		} catch (err) {
+			cleanup();
 			this.#sendAuthenticationError(reply, err);
-		});
+			return;
+		}
+
+		try {
+			const res = await this.call(endpoint, user, app, fields, {
+				name: multipartData.filename ?? null,
+				path,
+				cleanup,
+			}, request);
+			this.send(reply, res);
+		} catch (err) {
+			if (err instanceof AuthenticationError) {
+				this.#sendAuthenticationError(reply, err);
+			} else {
+				this.#sendApiError(reply, err as ApiError);
+			}
+		} finally {
+			cleanup();
+		}
+
+		if (user) {
+			this.logIp(request, user);
+		}
 	}
 
 	@bindThis
@@ -386,9 +384,8 @@ export class ApiCallService implements OnApplicationShutdown {
 	}
 
 	@bindThis
-	private async logIp(request: FastifyRequest, user: MiLocalUser) {
-		const meta = await this.metaService.fetch();
-		if (!meta.enableIpLogging) return;
+	private logIp(request: FastifyRequest, user: MiLocalUser) {
+		if (!this.meta.enableIpLogging) return;
 		const ip = request.ip;
 		const ips = this.userIpHistories.get(user.id);
 		if (ips == null || !ips.has(ip)) {
@@ -398,14 +395,11 @@ export class ApiCallService implements OnApplicationShutdown {
 				ips.add(ip);
 			}
 
-			try {
-				this.userIpsRepository.createQueryBuilder().insert().values({
-					createdAt: new Date(),
-					userId: user.id,
-					ip: ip,
-				}).orIgnore(true).execute();
-			} catch {
-			}
+			void this.userIpsRepository.createQueryBuilder().insert().values({
+				createdAt: new Date(),
+				userId: user.id,
+				ip: ip,
+			}).orIgnore(true).execute().catch(() => {});
 		}
 	}
 
@@ -415,10 +409,13 @@ export class ApiCallService implements OnApplicationShutdown {
 		user: MiLocalUser | null | undefined,
 		token: MiAccessToken | null | undefined,
 		data: any,
-		preparedFile: PreparedFile | null | undefined,
+		file: {
+			name: string | null;
+			path: string;
+			cleanup: () => void;
+		} | null,
 		request: FastifyRequest<{ Body: Record<string, unknown> | undefined, Querystring: Record<string, unknown> }>,
 	) {
-		const meta = await this.metaService.fetch();
 		const isSecure = user != null && token == null;
 
 		if (ep.meta.secure && !isSecure) {
@@ -500,7 +497,7 @@ export class ApiCallService implements OnApplicationShutdown {
 			});
 		}
 
-		if ((ep.meta.requireModerator || ep.meta.requireAdmin) && (meta.rootUserId !== user!.id)) {
+		if ((ep.meta.requireModerator || ep.meta.requireAdmin) && (this.meta.rootUserId !== user!.id)) {
 			const myRoles = await this.roleService.getUserRoles(user!.id);
 			if (ep.meta.requireModerator && !myRoles.some(r => r.isModerator || r.isAdministrator)) {
 				throw new ApiError({
@@ -520,7 +517,7 @@ export class ApiCallService implements OnApplicationShutdown {
 			}
 		}
 
-		if (ep.meta.requiredRolePolicy != null && (meta.rootUserId !== user!.id)) {
+		if (ep.meta.requiredRolePolicy != null && (this.meta.rootUserId !== user!.id)) {
 			const myRoles = await this.roleService.getUserRoles(user!.id);
 			const policies = await this.roleService.getUserPolicies(user!.id);
 			if (!policies[ep.meta.requiredRolePolicy] && !myRoles.some(r => r.isAdministrator)) {
@@ -554,19 +551,14 @@ export class ApiCallService implements OnApplicationShutdown {
 			}
 		}
 
-		let attachmentFile: AttachmentFile | null = null;
+		let attachmentFile: { name: string | null; path: string } | null = null;
 		let onExecCleanup: (() => void) | undefined = undefined;
-		if (ep.meta.requireFile && preparedFile) {
-			const policies = await this.roleService.getUserPolicies(user!.id);
-			const userMaxFileSize = policies.maxFileSizeMb * 1024 * 1024;
-
-			if (preparedFile.size > userMaxFileSize) {
-				preparedFile.cleanup();
-				throw new ApiError(uploadFileSizeExceeded);
-			}
-
-			attachmentFile = preparedFile.file;
-			onExecCleanup = () => preparedFile.cleanup();
+		if (ep.meta.requireFile && file) {
+			attachmentFile = {
+				name: file.name,
+				path: file.path,
+			};
+			onExecCleanup = () => file.cleanup();
 		}
 
 		// API invoking

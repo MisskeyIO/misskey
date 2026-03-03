@@ -9,7 +9,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div v-if="!thin_ && narrow && props.displayMyAvatar && $i" class="_button" :class="$style.buttonsLeft" @click="openAccountMenu">
 			<MkAvatar :class="$style.avatar" :user="$i"/>
 		</div>
-		<div v-else-if="!thin_ && narrow && !hideTitle" :class="$style.buttonsLeft"/>
+		<div v-else-if="!thin_ && narrow && !hideTitle" :class="[$style.buttons, $style.buttonsLeft]"></div>
 
 		<template v-if="pageMetadata">
 			<div v-if="!hideTitle" :class="$style.titleContainer" @click="top">
@@ -18,9 +18,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 				<i v-else-if="pageMetadata.icon" :class="[$style.titleIcon, pageMetadata.icon]"></i>
 
-				<div :class="$style.title">
+				<div class="_nowrap" :class="$style.title">
 					<MkUserName v-if="pageMetadata.userName" :user="pageMetadata.userName" :nowrap="true"/>
-					<div v-else-if="pageMetadata.title">{{ pageMetadata.title }}</div>
+					<div v-else-if="pageMetadata.title" class="_nowrap">{{ pageMetadata.title }}</div>
 					<div v-if="pageMetadata.subtitle" :class="$style.subtitle">
 						{{ pageMetadata.subtitle }}
 					</div>
@@ -28,7 +28,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 			<XTabs v-if="!narrow || hideTitle" :class="$style.tabs" :tab="tab" :tabs="tabs" :rootEl="el" @update:tab="key => emit('update:tab', key)" @tabClick="onTabClick"/>
 		</template>
-		<div v-if="(!thin_ && narrow && !hideTitle) || hasActions" :class="$style.buttonsRight">
+		<div v-if="(!thin_ && narrow && !hideTitle) || hasActions" :class="[$style.buttons, $style.buttonsRight]">
 			<template v-for="action in visibleActions">
 				<button v-tooltip.noDelay="action.text" class="_button" :class="[$style.button, { [$style.highlighted]: action.highlighted }]" @click.stop="action.handler" @touchstart="preventDrag">
 					<span v-if="action.label">{{ action.label }}</span>
@@ -55,6 +55,7 @@ export type PageHeaderProps = {
 	actions?: PageHeaderItem[] | null;
 	thin?: boolean;
 	hideTitle?: boolean;
+	canOmitTitle?: boolean;
 	displayMyAvatar?: boolean;
 };
 </script>
@@ -64,9 +65,10 @@ import { onMounted, onUnmounted, ref, inject, useTemplateRef, computed } from 'v
 import { scrollToTop } from '@@/js/scroll.js';
 import XTabs from './MkPageHeader.tabs.vue';
 import { globalEvents } from '@/events.js';
-import { openAccountMenu as openAccountMenu_ } from '@/accounts.js';
+import { getAccountMenu } from '@/accounts.js';
 import { $i } from '@/i.js';
 import { DI } from '@/di.js';
+import * as os from '@/os.js';
 
 const props = withDefaults(defineProps<PageHeaderProps>(), {
 	tabs: () => ([] as Tab[]),
@@ -80,7 +82,7 @@ const emit = defineEmits<{
 const injectedPageMetadata = inject(DI.pageMetadata, ref(null));
 const pageMetadata = computed(() => props.overridePageMetadata ?? injectedPageMetadata.value);
 
-const hideTitle = computed(() => inject('shouldOmitHeaderTitle', false) || props.hideTitle);
+const hideTitle = computed(() => inject('shouldOmitHeaderTitle', false) || props.hideTitle || (props.canOmitTitle && props.tabs.length > 0));
 const thin_ = props.thin || inject('shouldHeaderThin', false);
 
 const el = useTemplateRef('el');
@@ -106,10 +108,12 @@ const top = () => {
 	}
 };
 
-function openAccountMenu(ev: MouseEvent) {
-	openAccountMenu_({
+async function openAccountMenu(ev: MouseEvent) {
+	const menuItems = await getAccountMenu({
 		withExtraOperation: true,
-	}, ev);
+	});
+
+	os.popupMenu(menuItems, ev.currentTarget ?? ev.target);
 }
 
 function onTabClick(): void {
@@ -159,8 +163,10 @@ onUnmounted(() => {
 
 .upper {
 	--height: 50px;
+	--margin: var(--MI-margin);
 	display: flex;
-	gap: var(--MI-margin);
+	gap: var(--margin);
+	align-items: center;
 	height: var(--height);
 
 	.tabs:first-child {
@@ -173,6 +179,7 @@ onUnmounted(() => {
 
 	&.thin {
 		--height: 40px;
+		--margin: 8px;
 
 		> .buttons {
 			> .button {
@@ -183,12 +190,8 @@ onUnmounted(() => {
 
 	&.slim {
 		text-align: center;
-		gap: 0;
 
-		.tabs:first-child {
-			margin-left: 0;
-		}
-		> .titleContainer {
+		.titleContainer {
 			margin: 0 auto;
 			max-width: 100%;
 		}
@@ -201,7 +204,7 @@ onUnmounted(() => {
 }
 
 .buttons {
-	--margin: 8px;
+	flex-shrink: 0;
 	display: flex;
 	align-items: center;
 	min-width: var(--height);
@@ -209,16 +212,6 @@ onUnmounted(() => {
 	&:empty {
 		width: var(--height);
 	}
-}
-
-.buttonsLeft {
-	composes: buttons;
-	margin: 0 var(--MI-margin) 0 0;
-}
-
-.buttonsRight {
-	composes: buttons;
-	margin: 0 0 0 var(--MI-margin);
 }
 
 .avatar {
@@ -236,7 +229,7 @@ onUnmounted(() => {
 	justify-content: center;
 	gap: 4px;
 	height: var(--height);
-	width: calc(var(--height) - (var(--margin)));
+	width: calc(var(--height) - 8px);
 	box-sizing: border-box;
 	position: relative;
 	border-radius: 5px;
@@ -259,6 +252,7 @@ onUnmounted(() => {
 .titleContainer {
 	display: flex;
 	align-items: center;
+	min-width: 0;
 	max-width: min(30vw, 400px);
 	overflow: clip;
 	white-space: nowrap;
@@ -292,9 +286,6 @@ onUnmounted(() => {
 
 .title {
 	min-width: 0;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
 	line-height: 1.1;
 }
 

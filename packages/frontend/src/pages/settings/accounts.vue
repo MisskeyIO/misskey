@@ -12,8 +12,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 
 		<template v-for="x in accounts" :key="x.host + x.id">
-			<MkUserCardMini v-if="x.user" :user="x.user" :class="$style.user" @click.prevent="menu(x.host, x.id, $event)"/>
-			<div v-else :class="$style.unknownUser" @click.prevent="menu(x.host, x.id, $event)">
+			<MkUserCardMini v-if="x.user" :user="x.user" :class="$style.user" @click.prevent="showMenu(x.host, x.id, $event)"/>
+			<div v-else :class="$style.unknownUser" @click.prevent="showMenu(x.host, x.id, $event)">
 				<span :class="$style.unknownUserAvatarMock"><i class="ti ti-user"></i></span>
 				<div>
 					<span :class="$style.unknownUserTitle">{{ x.username }}</span>
@@ -26,41 +26,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted, watch } from 'vue';
-import * as Misskey from 'misskey-js';
+import { computed } from 'vue';
 import type { MenuItem } from '@/types/menu.js';
 import MkButton from '@/components/MkButton.vue';
 import * as os from '@/os.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
 import { getAccounts, switchAccount, removeAccount, login, getAccountWithSigninDialog, getAccountWithSignupDialog } from '@/accounts.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import MkUserCardMini from '@/components/MkUserCardMini.vue';
-import { prefer } from '@/preferences.js';
 
-const accounts = ref<Awaited<ReturnType<typeof getAccounts>>[number][]>([]);
+const accounts = await getAccounts();
 
-async function loadAccounts() {
-	const entries = await getAccounts();
-	const missingIds = entries.filter(account => !account.user).map(account => account.id);
-	let usersMap = new Map<string, Misskey.entities.User>();
-
-	if (missingIds.length > 0) {
-		try {
-			const users = await misskeyApi('users/show', { userIds: missingIds });
-			usersMap = new Map(users.map(user => [user.id, user]));
-		} catch {
-			// ignore
-		}
-	}
-
-	accounts.value = entries.map(account => ({
-		...account,
-		user: account.user ?? usersMap.get(account.id) ?? null,
-	}));
-}
-
-function menu(host: string, accountId: string, ev: MouseEvent) {
+function showMenu(host: string, accountId: string, ev: MouseEvent) {
 	let menu: MenuItem[];
 
 	menu = [{
@@ -101,14 +78,6 @@ function createAccount() {
 		}
 	});
 }
-
-onMounted(() => {
-	void loadAccounts();
-});
-
-watch(prefer.r.accounts, () => {
-	void loadAccounts();
-}, { deep: true });
 
 const headerActions = computed(() => []);
 

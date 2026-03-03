@@ -102,16 +102,16 @@ describe('AnnouncementService', () => {
 		moderationLogService = app.get<ModerationLogService>(ModerationLogService) as jest.Mocked<ModerationLogService>;
 	});
 
-	afterEach(async () => {
-		await Promise.all([
-			app.get(DI.metasRepository).delete({ id: Not(IsNull()) }),
-			usersRepository.delete({ id: Not(IsNull()) }),
-			announcementsRepository.delete({ id: Not(IsNull()) }),
-			announcementReadsRepository.delete({ id: Not(IsNull()) }),
-		]);
+		afterEach(async () => {
+			await Promise.all([
+				app.get(DI.metasRepository).createQueryBuilder().delete().execute(),
+				usersRepository.createQueryBuilder().delete().execute(),
+				announcementsRepository.createQueryBuilder().delete().execute(),
+				announcementReadsRepository.createQueryBuilder().delete().execute(),
+			]);
 
-		await app.close();
-	});
+			await app.close();
+		});
 
 	describe('getUnreadAnnouncements', () => {
 		test('通常', async () => {
@@ -208,4 +208,3 @@ describe('AnnouncementService', () => {
 		// TODO
 	});
 });
-

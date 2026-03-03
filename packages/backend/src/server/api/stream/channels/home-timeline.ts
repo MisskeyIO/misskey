@@ -47,7 +47,10 @@ class HomeTimelineChannel extends Channel {
 		const isMe = this.user!.id === note.userId;
 
 		if (note.channelId) {
-			if (!this.followingChannels.has(note.channelId)) return;
+			// そのチャンネルをフォローしていない
+			if (!this.followingChannels.has(note.channelId)) {
+				return;
+			}
 		} else {
 			// その投稿のユーザーをフォローしていなかったら弾く
 			if (!isMe && !Object.hasOwn(this.following, note.userId)) return;
@@ -97,10 +100,6 @@ class HomeTimelineChannel extends Channel {
 				const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
 				note.renote.myReaction = myRenoteReaction;
 			}
-		}
-
-		if (this.user && (note.visibleUserIds?.includes(this.user.id) ?? note.mentions?.includes(this.user.id))) {
-			this.connection.cacheNote(note);
 		}
 
 		if (this.minimize && ['public', 'home'].includes(note.visibility)) {

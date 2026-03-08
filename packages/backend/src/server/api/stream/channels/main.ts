@@ -26,9 +26,10 @@ class MainChannel extends Channel {
 	}
 
 	@bindThis
-	public async init(params: JsonObject) {
-		// Subscribe main stream channel
-		this.subscriber.on(`mainStream:${this.user!.id}`, async data => {
+	public async init(params: JsonObject): Promise<boolean> {
+		if (!this.user) return false;
+
+		this.subscriber.on(`mainStream:${this.user.id}`, async data => {
 			switch (data.type) {
 				case 'notification': {
 					// Ignore notifications from instances the user has muted
@@ -73,6 +74,8 @@ class MainChannel extends Channel {
 
 			this.send(data.type, data.body);
 		});
+
+		return true;
 	}
 }
 

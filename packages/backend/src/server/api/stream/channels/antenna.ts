@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { bindThis } from '@/decorators.js';
+import { DI } from '@/di-symbols.js';
+import type { AntennasRepository } from '@/models/_.js';
 import { RoleService } from '@/core/RoleService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { NoteStreamingHidingService } from '../NoteStreamingHidingService.js';
@@ -22,6 +24,9 @@ class AntennaChannel extends Channel {
 	private minimize: boolean;
 
 	constructor(
+		@Inject(DI.antennasRepository)
+		private antennasRepository: AntennasRepository,
+
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
 		private noteStreamingHidingService: NoteStreamingHidingService,
@@ -33,13 +38,26 @@ class AntennaChannel extends Channel {
 	}
 
 	@bindThis
-	public async init(params: JsonObject) {
-		if (typeof params.antennaId !== 'string') return;
+	public async init(params: JsonObject): Promise<boolean> {
+		if (typeof params.antennaId !== 'string') return false;
+		if (!this.user) return false;
+
 		this.antennaId = params.antennaId;
 		this.minimize = !!(params.minimize ?? false);
 
+		const antennaExists = await this.antennasRepository.exists({
+			where: {
+				id: this.antennaId,
+				userId: this.user.id,
+			},
+		});
+
+		if (!antennaExists) return false;
+
 		// Subscribe stream
 		this.subscriber.on(`antennaStream:${this.antennaId}`, this.onEvent);
+
+		return true;
 	}
 
 	@bindThis
@@ -112,6 +130,9 @@ export class AntennaChannelService implements MiChannelService<true> {
 	public readonly kind = AntennaChannel.kind;
 
 	constructor(
+		@Inject(DI.antennasRepository)
+		private antennasRepository: AntennasRepository,
+
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
 		private noteStreamingHidingService: NoteStreamingHidingService,
@@ -121,6 +142,7 @@ export class AntennaChannelService implements MiChannelService<true> {
 	@bindThis
 	public create(id: string, connection: Channel['connection'], dimension?: number | null): AntennaChannel {
 		return new AntennaChannel(
+			this.antennasRepository,
 			this.roleService,
 			this.noteEntityService,
 			this.noteStreamingHidingService,

@@ -4,10 +4,11 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import { bindThis } from '@/decorators.js';
 import type { Packed } from '@/misc/json-schema.js';
-import { RoleService } from '@/core/RoleService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { NoteStreamingHidingService } from '../NoteStreamingHidingService.js';
+import { bindThis } from '@/decorators.js';
+import { RoleService } from '@/core/RoleService.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import type { JsonObject } from '@/misc/json-value.js';
 import Channel, { type MiChannelService } from '../channel.js';
@@ -24,7 +25,7 @@ class HomeTimelineChannel extends Channel {
 	constructor(
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
-
+		private noteStreamingHidingService: NoteStreamingHidingService,
 		id: string,
 		connection: Channel['connection'],
 		dimension?: number | null,
@@ -57,11 +58,7 @@ class HomeTimelineChannel extends Channel {
 		if (this.withFiles && (note.fileIds == null || note.fileIds.length === 0)) return;
 		if (this.withFiles && (note.files === undefined || note.files.length === 0)) return;
 
-		if (note.visibility === 'followers') {
-			if (!isMe && !Object.hasOwn(this.following, note.userId)) return;
-		} else if (note.visibility === 'specified') {
-			if (!isMe && !note.visibleUserIds!.includes(this.user!.id)) return;
-		}
+		if (!this.isNoteVisibleForMe(note)) return;
 
 		if (note.reply) {
 			const reply = note.reply;
@@ -92,10 +89,15 @@ class HomeTimelineChannel extends Channel {
 
 		if (this.isNoteMutedOrBlocked(note)) return;
 
-		if (this.user && isRenotePacked(note) && !isQuotePacked(note)) {
-			if (note.renote && Object.keys(note.renote.reactions).length > 0) {
-				const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
-				note.renote.myReaction = myRenoteReaction;
+		const { shouldSkip } = await this.noteStreamingHidingService.processHiding(note, this.user?.id ?? null);
+		if (shouldSkip) return;
+
+		if (this.user) {
+			if (isRenotePacked(note) && !isQuotePacked(note)) {
+				if (note.renote && Object.keys(note.renote.reactions).length > 0) {
+					const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
+					note.renote.myReaction = myRenoteReaction;
+				}
 			}
 		}
 
@@ -134,6 +136,7 @@ export class HomeTimelineChannelService implements MiChannelService<true> {
 	constructor(
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
+		private noteStreamingHidingService: NoteStreamingHidingService,
 	) {
 	}
 
@@ -142,6 +145,7 @@ export class HomeTimelineChannelService implements MiChannelService<true> {
 		return new HomeTimelineChannel(
 			this.roleService,
 			this.noteEntityService,
+			this.noteStreamingHidingService,
 			id,
 			connection,
 			dimension,

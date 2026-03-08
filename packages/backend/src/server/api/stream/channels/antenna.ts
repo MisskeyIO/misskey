@@ -7,6 +7,8 @@ import { Injectable } from '@nestjs/common';
 import { bindThis } from '@/decorators.js';
 import { RoleService } from '@/core/RoleService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { NoteStreamingHidingService } from '../NoteStreamingHidingService.js';
+import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import type { GlobalEvents } from '@/core/GlobalEventService.js';
 import type { JsonObject } from '@/misc/json-value.js';
 import Channel, { type MiChannelService } from '../channel.js';
@@ -22,7 +24,7 @@ class AntennaChannel extends Channel {
 	constructor(
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
-
+		private noteStreamingHidingService: NoteStreamingHidingService,
 		id: string,
 		connection: Channel['connection'],
 	) {
@@ -59,7 +61,20 @@ class AntennaChannel extends Channel {
 
 			if (!(await this.noteEntityService.isLanguageVisibleToMe(note, this.user?.id))) return;
 
+			if (!this.isNoteVisibleForMe(note)) return;
 			if (this.isNoteMutedOrBlocked(note)) return;
+
+			const { shouldSkip } = await this.noteStreamingHidingService.processHiding(note, this.user?.id ?? null);
+			if (shouldSkip) return;
+
+			if (this.user) {
+				if (isRenotePacked(note) && !isQuotePacked(note)) {
+					if (note.renote && Object.keys(note.renote.reactions).length > 0) {
+						const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
+						note.renote.myReaction = myRenoteReaction;
+					}
+				}
+			}
 
 			if (this.user && (note.visibleUserIds?.includes(this.user.id) ?? note.mentions?.includes(this.user.id))) {
 				this.connection.cacheNote(note);
@@ -99,6 +114,7 @@ export class AntennaChannelService implements MiChannelService<true> {
 	constructor(
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
+		private noteStreamingHidingService: NoteStreamingHidingService,
 	) {
 	}
 
@@ -107,6 +123,7 @@ export class AntennaChannelService implements MiChannelService<true> {
 		return new AntennaChannel(
 			this.roleService,
 			this.noteEntityService,
+			this.noteStreamingHidingService,
 			id,
 			connection,
 		);

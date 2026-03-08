@@ -7,6 +7,7 @@ import { Injectable } from '@nestjs/common';
 import { bindThis } from '@/decorators.js';
 import { RoleService } from '@/core/RoleService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { NoteStreamingHidingService } from '../NoteStreamingHidingService.js';
 import type { GlobalEvents } from '@/core/GlobalEventService.js';
 import type { JsonObject } from '@/misc/json-value.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
@@ -22,7 +23,7 @@ class RoleTimelineChannel extends Channel {
 	constructor(
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
-
+		private noteStreamingHidingService: NoteStreamingHidingService,
 		id: string,
 		connection: Channel['connection'],
 		dimension?: number | null,
@@ -49,6 +50,9 @@ class RoleTimelineChannel extends Channel {
 				return;
 			}
 			if (note.visibility !== 'public') return;
+			if (note.user.requireSigninToViewContents && this.user == null) return;
+			if (note.renote && note.renote.user.requireSigninToViewContents && this.user == null) return;
+			if (note.reply && note.reply.user.requireSigninToViewContents && this.user == null) return;
 
 			if (note.reply) {
 				const reply = note.reply;
@@ -72,6 +76,9 @@ class RoleTimelineChannel extends Channel {
 			if (!(await this.noteEntityService.isLanguageVisibleToMe(note, this.user?.id))) return;
 
 			if (this.isNoteMutedOrBlocked(note)) return;
+
+			const { shouldSkip } = await this.noteStreamingHidingService.processHiding(note, this.user?.id ?? null);
+			if (shouldSkip) return;
 
 			if (this.user && isRenotePacked(note) && !isQuotePacked(note)) {
 				if (note.renote && Object.keys(note.renote.reactions).length > 0) {
@@ -118,6 +125,7 @@ export class RoleTimelineChannelService implements MiChannelService<false> {
 	constructor(
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
+		private noteStreamingHidingService: NoteStreamingHidingService,
 	) {
 	}
 
@@ -126,6 +134,7 @@ export class RoleTimelineChannelService implements MiChannelService<false> {
 		return new RoleTimelineChannel(
 			this.roleService,
 			this.noteEntityService,
+			this.noteStreamingHidingService,
 			id,
 			connection,
 			dimension,

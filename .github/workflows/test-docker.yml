@@ -57,7 +57,7 @@ jobs:
 
           echo "BRANCH_NAME=${branch_name}" >> "${GITHUB_ENV}"
       - name: Build an image from Dockerfile
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         id: build-scan
         with:
           context: .

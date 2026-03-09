@@ -72,7 +72,7 @@ jobs:
           echo "BRANCH_NAME=${branch_name}" >> "${GITHUB_ENV}"
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ghcr.io/misskeyio/misskey
           tags: |

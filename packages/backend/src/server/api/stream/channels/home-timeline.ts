@@ -45,7 +45,10 @@ class HomeTimelineChannel extends Channel {
 
 	@bindThis
 	private async onNote(note: Packed<'Note'>) {
-		const isMe = this.user!.id === note.userId;
+		const user = this.user;
+		if (!user) return;
+
+		const isMe = user.id === note.userId;
 
 		if (note.channelId) {
 			if (!this.followingChannels.has(note.channelId)) return;
@@ -66,7 +69,7 @@ class HomeTimelineChannel extends Channel {
 				if (!this.isNoteVisibleForMe(reply)) return;
 			} else {
 				// 「チャンネル接続主への返信」でもなければ、「チャンネル接続主が行った返信」でもなければ、「投稿者の投稿者自身への返信」でもない場合
-				if (reply.userId !== this.user!.id && !isMe && reply.userId !== note.userId) return;
+				if (reply.userId !== user.id && !isMe && reply.userId !== note.userId) return;
 			}
 		}
 
@@ -85,19 +88,17 @@ class HomeTimelineChannel extends Channel {
 
 		if (this.isNoteMutedOrBlocked(note)) return;
 
-		const { shouldSkip } = await this.noteStreamingHidingService.processHiding(note, this.user?.id ?? null);
+		const { shouldSkip } = await this.noteStreamingHidingService.processHiding(note, user.id);
 		if (shouldSkip) return;
 
-		if (this.user) {
-			if (isRenotePacked(note) && !isQuotePacked(note)) {
-				if (note.renote && Object.keys(note.renote.reactions).length > 0) {
-					const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
-					note.renote.myReaction = myRenoteReaction;
-				}
+		if (isRenotePacked(note) && !isQuotePacked(note)) {
+			if (note.renote && Object.keys(note.renote.reactions).length > 0) {
+				const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, user.id);
+				note.renote.myReaction = myRenoteReaction;
 			}
 		}
 
-		if (this.user && (note.visibleUserIds?.includes(this.user.id) ?? note.mentions?.includes(this.user.id))) {
+		if (note.visibleUserIds?.includes(user.id) ?? note.mentions?.includes(user.id)) {
 			this.connection.cacheNote(note);
 		}
 

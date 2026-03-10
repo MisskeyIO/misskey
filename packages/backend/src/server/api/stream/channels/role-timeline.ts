@@ -55,21 +55,18 @@ class RoleTimelineChannel extends Channel {
 			if (note.user.requireSigninToViewContents && this.user == null) return;
 			if (note.renote && note.renote.user.requireSigninToViewContents && this.user == null) return;
 			if (note.reply && note.reply.user.requireSigninToViewContents && this.user == null) return;
+			if (!this.isNoteVisibleForMe(note)) return;
 
 			if (note.reply) {
 				const reply = note.reply;
-				// 自分のフォローしていないユーザーの visibility: followers な投稿への返信は弾く
-				if (reply.visibility === 'followers' && !Object.hasOwn(this.following, reply.userId)) return;
-				// 自分の見ることができないユーザーの visibility: specified な投稿への返信は弾く
-				if (reply.visibility === 'specified' && !reply.visibleUserIds!.includes(this.user!.id)) return;
+				if (!this.isNoteVisibleForMe(reply)) return;
 			}
 
 			// 純粋なリノート（引用リノートでないリノート）の場合
 			if (note.renote && isRenotePacked(note) && !isQuotePacked(note)) {
 				if (note.renote.reply) {
 					const reply = note.renote.reply;
-					// 自分のフォローしていないユーザーの visibility: followers な投稿への返信のリノートは弾く
-					if (reply.visibility === 'followers' && !Object.hasOwn(this.following, reply.userId)) return;
+					if (!this.isNoteVisibleForMe(reply)) return;
 				}
 			}
 

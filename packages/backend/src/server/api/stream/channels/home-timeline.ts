@@ -88,7 +88,7 @@ class HomeTimelineChannel extends Channel {
 
 		if (this.isNoteMutedOrBlocked(note)) return;
 
-		const { shouldSkip } = await this.noteStreamingHidingService.processHiding(note, user.id);
+		const { shouldSkip } = await this.noteStreamingHidingService.processHiding(note, this.user?.id ?? null);
 		if (shouldSkip) return;
 
 		if (isRenotePacked(note) && !isQuotePacked(note)) {

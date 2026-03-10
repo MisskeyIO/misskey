@@ -38,9 +38,9 @@ class HybridTimelineChannel extends Channel {
 	}
 
 	@bindThis
-	public async init(params: JsonObject): Promise<void> {
+	public async init(params: JsonObject): Promise<boolean> {
 		const policies = await this.roleService.getUserPolicies(this.user ? this.user.id : null);
-		if (!policies.ltlAvailable) return;
+		if (!policies.ltlAvailable) return false;
 
 		this.withRenotes = !!(params.withRenotes ?? true);
 		this.withReplies = !!(params.withReplies ?? false);
@@ -49,6 +49,8 @@ class HybridTimelineChannel extends Channel {
 
 		// Subscribe events
 		this.subscriber.on('notesStream', this.onNote);
+
+		return true;
 	}
 
 	@bindThis

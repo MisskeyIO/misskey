@@ -208,12 +208,12 @@ export default class Connection {
 		// 自分自身ではないかつ
 		if (data.body.userId !== this.user?.id) {
 			// 公開範囲が指名で自分が含まれてない
-			if (data.body.visibility === 'specified' && (this.user == null || !data.body.visibleUserIds.includes(this.user.id))) {
+			if (data.body.visibility === 'specified' && (this.user == null || (!data.body.visibleUserIds.includes(this.user.id) && !(data.body.mentions?.includes(this.user.id) ?? false)))) {
 				return;
 			}
 
 			// 公開範囲がフォロワーで自分がフォロワーでない
-			if (data.body.visibility === 'followers' && !Object.hasOwn(this.following, data.body.userId)) {
+			if (data.body.visibility === 'followers' && (this.user == null || (!Object.hasOwn(this.following, data.body.userId) && data.body.replyUserId !== this.user.id && !(data.body.mentions?.includes(this.user.id) ?? false)))) {
 				return;
 			}
 		}

@@ -39,7 +39,7 @@ class LocalTimelineChannel extends Channel {
 	@bindThis
 	public async init(params: JsonObject) {
 		const policies = await this.roleService.getUserPolicies(this.user ? this.user.id : null);
-		if (!policies.ltlAvailable) return;
+		if (!policies.ltlAvailable) return false;
 
 		this.withRenotes = !!(params.withRenotes ?? true);
 		this.withReplies = !!(params.withReplies ?? false);
@@ -48,6 +48,8 @@ class LocalTimelineChannel extends Channel {
 
 		// Subscribe events
 		this.subscriber.on('notesStream', this.onNote);
+
+		return true;
 	}
 
 	@bindThis

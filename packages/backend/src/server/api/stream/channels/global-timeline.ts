@@ -38,7 +38,7 @@ class GlobalTimelineChannel extends Channel {
 	@bindThis
 	public async init(params: JsonObject) {
 		const policies = await this.roleService.getUserPolicies(this.user ? this.user.id : null);
-		if (!policies.gtlAvailable) return;
+		if (!policies.gtlAvailable) return false;
 
 		this.withRenotes = !!(params.withRenotes ?? true);
 		this.withFiles = !!(params.withFiles ?? false);
@@ -46,6 +46,8 @@ class GlobalTimelineChannel extends Channel {
 
 		// Subscribe events
 		this.subscriber.on('notesStream', this.onNote);
+
+		return true;
 	}
 
 	@bindThis

@@ -86,7 +86,8 @@ export default abstract class Channel {
 				return true;
 			} else {
 				// 指定されているかどうか
-				return note.visibleUserIds?.some(id => meId === id) ?? false;
+				return (note.visibleUserIds?.some(id => meId === id) ?? false)
+					|| (note.mentions?.some(id => meId === id) ?? false);
 			}
 		}
 

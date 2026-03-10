@@ -11,7 +11,6 @@ import type { JsonObject } from '@/misc/json-value.js';
 import { ChatService } from '@/core/ChatService.js';
 import Channel, { type MiChannelService } from '../channel.js';
 import type { ChatRoomsRepository } from '@/models/_.js';
-import type { ChatRoomsRepository } from '@/models/_.js';
 
 class ChatRoomChannel extends Channel {
 	public readonly chName = 'chatRoom';

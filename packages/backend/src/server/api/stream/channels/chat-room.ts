@@ -9,8 +9,8 @@ import { bindThis } from '@/decorators.js';
 import type { GlobalEvents } from '@/core/GlobalEventService.js';
 import type { JsonObject } from '@/misc/json-value.js';
 import { ChatService } from '@/core/ChatService.js';
-import Channel, { type MiChannelService } from '../channel.js';
 import type { ChatRoomsRepository } from '@/models/_.js';
+import Channel, { type MiChannelService } from '../channel.js';
 
 class ChatRoomChannel extends Channel {
 	public readonly chName = 'chatRoom';

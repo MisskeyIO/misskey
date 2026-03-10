@@ -58,9 +58,10 @@ class UserListChannel extends Channel {
 		});
 		if (!listExist) return false;
 
+		await this.updateListUsers();
+
 		// Subscribe stream
 		this.subscriber.on(`userListStream:${this.listId}`, this.send);
-		await this.updateListUsers();
 
 		this.subscriber.on('notesStream', this.onNote);
 

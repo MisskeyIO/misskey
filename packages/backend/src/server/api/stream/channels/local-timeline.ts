@@ -73,8 +73,7 @@ class LocalTimelineChannel extends Channel {
 				if (!this.isNoteVisibleForMe(reply)) return;
 			} else {
 				// 「チャンネル接続主への返信」でもなければ、「チャンネル接続主が行った返信」でもなければ、「投稿者の投稿者自身への返信」でもない場合
-				if (!this.user) return;
-				if (reply.userId !== this.user.id && note.userId !== this.user.id && reply.userId !== note.userId) return;
+				if (reply.userId !== note.userId && (!this.user || (reply.userId !== this.user.id && note.userId !== this.user.id))) return;
 			}
 		}
 

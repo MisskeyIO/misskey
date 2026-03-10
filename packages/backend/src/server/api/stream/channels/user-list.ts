@@ -43,6 +43,7 @@ class UserListChannel extends Channel {
 	@bindThis
 	public async init(params: JsonObject): Promise<boolean> {
 		if (typeof params.listId !== 'string') return false;
+		if (!this.user) return false;
 		this.listId = params.listId;
 		this.withFiles = !!(params.withFiles ?? false);
 		this.withRenotes = !!(params.withRenotes ?? true);
@@ -59,11 +60,15 @@ class UserListChannel extends Channel {
 
 		// Subscribe stream
 		this.subscriber.on(`userListStream:${this.listId}`, this.send);
+		await this.updateListUsers();
 
 		this.subscriber.on('notesStream', this.onNote);
 
-		this.updateListUsers();
-		this.listUsersClock = setInterval(this.updateListUsers, 5000);
+		this.listUsersClock = setInterval(() => {
+			void this.updateListUsers().catch(() => {
+				this.connection.disconnectChannel(this.id);
+			});
+		}, 5000);
 
 		return true;
 	}
@@ -74,7 +79,7 @@ class UserListChannel extends Channel {
 			where: {
 				userListId: this.listId,
 			},
-			select: ['userId'],
+			select: ['userId', 'withReplies'],
 		});
 
 		const membershipsMap: Record<string, Pick<MiUserListMembership, 'withReplies'> | undefined> = {};

@@ -24,7 +24,6 @@ class AntennaChannel extends Channel {
 	private minimize: boolean;
 
 	constructor(
-		@Inject(DI.antennasRepository)
 		private antennasRepository: AntennasRepository,
 
 		private roleService: RoleService,

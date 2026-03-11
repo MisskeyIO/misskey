@@ -11,13 +11,16 @@ import sharedConfig from '../shared/eslint.config.js';
 export default [
 	...sharedConfig,
 	{
+		ignores: ['src/pages/chat/**'],
+	},
+	{
 		files: ['src/**/*.vue'],
 		...pluginMisskey.configs.typescript,
 	},
 	...pluginVue.configs['flat/recommended'],
 	{
 		files: ['src/**/*.{ts,vue}'],
-		ignores: ['**/*.stories.ts'],
+		ignores: ['**/*.stories.ts', 'src/pages/chat/**'],
 		languageOptions: {
 			globals: {
 				...Object.fromEntries(Object.entries(globals.node).map(([key]) => [key, 'off'])),

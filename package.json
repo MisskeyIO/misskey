@@ -19,6 +19,9 @@
     "packages/misskey-bubble-game"
   ],
   "private": true,
+  "engines": {
+    "node": "^22.21.0 || ^24.0.0"
+  },
   "scripts": {
     "build-pre": "node ./scripts/build-pre.js",
     "build-assets": "node ./scripts/build-assets.mjs",

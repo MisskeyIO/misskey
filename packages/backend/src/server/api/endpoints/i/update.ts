@@ -421,6 +421,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				}
 			}
 
+			if (ps.mutedWords !== undefined) {
+				checkMuteWordCount(ps.mutedWords, policy.wordMuteLimit);
+			}
+
 			if (ps.mutedInstances !== undefined) profileUpdates.mutedInstances = ps.mutedInstances;
 			if (ps.notificationRecieveConfig !== undefined) profileUpdates.notificationRecieveConfig = ps.notificationRecieveConfig;
 			if (typeof ps.isLocked === 'boolean') updates.isLocked = ps.isLocked;

@@ -20,8 +20,8 @@ class ChatRoomChannel extends Channel {
 	private roomId: string;
 
 	constructor(
-		private chatRoomsRepository: ChatRoomsRepository,
-		private chatService: ChatService,
+		private readonly chatRoomsRepository: ChatRoomsRepository,
+		private readonly chatService: ChatService,
 
 		id: string,
 		connection: Channel['connection'],
@@ -78,9 +78,9 @@ export class ChatRoomChannelService implements MiChannelService<true> {
 
 	constructor(
 		@Inject(DI.chatRoomsRepository)
-		private chatRoomsRepository: ChatRoomsRepository,
+		private readonly chatRoomsRepository: ChatRoomsRepository,
 
-		private chatService: ChatService,
+		private readonly chatService: ChatService,
 	) {
 	}
 

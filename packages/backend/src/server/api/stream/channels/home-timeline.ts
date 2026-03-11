@@ -23,9 +23,9 @@ class HomeTimelineChannel extends Channel {
 	private minimize: boolean;
 
 	constructor(
-		private roleService: RoleService,
-		private noteEntityService: NoteEntityService,
-		private noteStreamingHidingService: NoteStreamingHidingService,
+		private readonly roleService: RoleService,
+		private readonly noteEntityService: NoteEntityService,
+		private readonly noteStreamingHidingService: NoteStreamingHidingService,
 		id: string,
 		connection: Channel['connection'],
 		dimension?: number | null,
@@ -67,10 +67,7 @@ class HomeTimelineChannel extends Channel {
 			const reply = note.reply;
 			if (this.following[note.userId]?.withReplies) {
 				if (!this.isNoteVisibleForMe(reply)) return;
-			} else {
-				// 「チャンネル接続主への返信」でもなければ、「チャンネル接続主が行った返信」でもなければ、「投稿者の投稿者自身への返信」でもない場合
-				if (reply.userId !== user.id && !isMe && reply.userId !== note.userId) return;
-			}
+			} else if (reply.userId !== user.id && !isMe && reply.userId !== note.userId) return;
 		}
 
 		// 純粋なリノート（引用リノートでないリノート）の場合
@@ -84,17 +81,24 @@ class HomeTimelineChannel extends Channel {
 
 		if (!this.shouldDeliverByDimension(note)) return;
 
-		if (!(await this.noteEntityService.isLanguageVisibleToMe(note, this.user?.id))) return;
+		if (!(await this.noteEntityService.isLanguageVisibleToMe(note, user.id))) return;
 
 		if (this.isNoteMutedOrBlocked(note)) return;
 
-		const { shouldSkip } = await this.noteStreamingHidingService.processHiding(note, this.user?.id ?? null);
+		const { shouldSkip } = await this.noteStreamingHidingService.processHiding(note, user.id);
 		if (shouldSkip) return;
 
+		let noteToSend = note;
 		if (isRenotePacked(note) && !isQuotePacked(note)) {
 			if (note.renote && Object.keys(note.renote.reactions).length > 0) {
 				const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, user.id);
-				note.renote.myReaction = myRenoteReaction;
+				noteToSend = {
+					...note,
+					renote: {
+						...note.renote,
+						myReaction: myRenoteReaction,
+					},
+				};
 			}
 		}
 
@@ -106,14 +110,14 @@ class HomeTimelineChannel extends Channel {
 			const badgeRoles = this.iAmModerator ? await this.roleService.getUserBadgeRoles(note.userId, false) : undefined;
 
 			this.send('note', {
-				id: note.id, myReaction: note.myReaction,
-				poll: note.poll?.choices ? { choices: note.poll.choices } : undefined,
-				reply: note.reply?.myReaction ? { myReaction: note.reply.myReaction } : undefined,
-				renote: note.renote?.myReaction ? { myReaction: note.renote.myReaction } : undefined,
+				id: noteToSend.id, myReaction: noteToSend.myReaction,
+				poll: noteToSend.poll?.choices ? { choices: noteToSend.poll.choices } : undefined,
+				reply: noteToSend.reply?.myReaction ? { myReaction: noteToSend.reply.myReaction } : undefined,
+				renote: noteToSend.renote?.myReaction ? { myReaction: noteToSend.renote.myReaction } : undefined,
 				...(badgeRoles?.length ? { user: { badgeRoles } } : {}),
 			});
 		} else {
-			this.send('note', note);
+			this.send('note', noteToSend);
 		}
 	}
 
@@ -131,9 +135,9 @@ export class HomeTimelineChannelService implements MiChannelService<true> {
 	public readonly kind = HomeTimelineChannel.kind;
 
 	constructor(
-		private roleService: RoleService,
-		private noteEntityService: NoteEntityService,
-		private noteStreamingHidingService: NoteStreamingHidingService,
+		private readonly roleService: RoleService,
+		private readonly noteEntityService: NoteEntityService,
+		private readonly noteStreamingHidingService: NoteStreamingHidingService,
 	) {
 	}
 

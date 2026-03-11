@@ -79,10 +79,17 @@ class RoleTimelineChannel extends Channel {
 			const { shouldSkip } = await this.noteStreamingHidingService.processHiding(note, this.user?.id ?? null);
 			if (shouldSkip) return;
 
+			let noteToSend = note;
 			if (this.user && isRenotePacked(note) && !isQuotePacked(note)) {
 				if (note.renote && Object.keys(note.renote.reactions).length > 0) {
 					const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
-					note.renote.myReaction = myRenoteReaction;
+					noteToSend = {
+						...note,
+						renote: {
+							...note.renote,
+							myReaction: myRenoteReaction,
+						},
+					};
 				}
 			}
 
@@ -94,14 +101,14 @@ class RoleTimelineChannel extends Channel {
 				const badgeRoles = this.iAmModerator ? await this.roleService.getUserBadgeRoles(note.userId, false) : undefined;
 
 				this.send('note', {
-					id: note.id, myReaction: note.myReaction,
-					poll: note.poll?.choices ? { choices: note.poll.choices } : undefined,
-					reply: note.reply?.myReaction ? { myReaction: note.reply.myReaction } : undefined,
-					renote: note.renote?.myReaction ? { myReaction: note.renote.myReaction } : undefined,
+					id: noteToSend.id, myReaction: noteToSend.myReaction,
+					poll: noteToSend.poll?.choices ? { choices: noteToSend.poll.choices } : undefined,
+					reply: noteToSend.reply?.myReaction ? { myReaction: noteToSend.reply.myReaction } : undefined,
+					renote: noteToSend.renote?.myReaction ? { myReaction: noteToSend.renote.myReaction } : undefined,
 					...(badgeRoles?.length ? { user: { badgeRoles } } : {}),
 				});
 			} else {
-				this.send('note', note);
+				this.send('note', noteToSend);
 			}
 		} else {
 			this.send(data.type, data.body);

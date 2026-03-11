@@ -145,52 +145,59 @@ export class NoteEntityService implements OnModuleInit {
 	}
 
 	@bindThis
-	public async shouldHideNote(packedNote: Packed<'Note'>, meId: MiUser['id'] | null): Promise<boolean> {
-		if (meId === packedNote.userId) return false;
+	private isSpecifiedVisibleTo(packedNote: Packed<'Note'>, meId: MiUser['id'] | null): boolean {
+		if (meId == null) return false;
 
-		// TODO: isVisibleForMe を使うようにしても良さそう(型違うけど)
+		return (packedNote.visibleUserIds?.includes(meId) ?? false)
+			|| (packedNote.mentions?.includes(meId) ?? false);
+	}
 
+	@bindThis
+	private isSigninOrTimeHidden(packedNote: Packed<'Note'>, meId: MiUser['id'] | null): boolean {
 		if (packedNote.user.requireSigninToViewContents && meId == null) {
 			return true;
 		}
 
 		const hiddenBefore = packedNote.user.makeNotesHiddenBefore;
-		if (shouldHideNoteByTime(hiddenBefore, packedNote.createdAt)) {
+		return shouldHideNoteByTime(hiddenBefore, packedNote.createdAt);
+	}
+
+	@bindThis
+	private async isFollowerVisibleTo(packedNote: Packed<'Note'>, meId: MiUser['id'] | null): Promise<boolean> {
+		if (meId == null) {
+			return false;
+		}
+
+		if (packedNote.reply?.userId === meId) {
+			return true;
+		}
+
+		if (packedNote.mentions?.includes(meId)) {
+			return true;
+		}
+
+		const followings = await this.cacheService.userFollowingsCache.fetch(meId);
+		return Object.hasOwn(followings, packedNote.userId);
+	}
+
+	@bindThis
+	public async shouldHideNote(packedNote: Packed<'Note'>, meId: MiUser['id'] | null): Promise<boolean> {
+		if (meId === packedNote.userId) return false;
+
+		// TODO: isVisibleForMe を使うようにしても良さそう(型違うけど)
+
+		if (this.isSigninOrTimeHidden(packedNote, meId)) {
 			return true;
 		}
 
 		// visibility が specified かつ自分が指定されていなかったら非表示
-		if (packedNote.visibility === 'specified') {
-			if (meId == null) {
-				return true;
-			} else {
-				// 指定されているかどうか
-				const specified = (packedNote.visibleUserIds?.some(id => meId === id) ?? false)
-					|| (packedNote.mentions?.some(id => meId === id) ?? false);
-
-				if (!specified) {
-					return true;
-				}
-			}
+		if (packedNote.visibility === 'specified' && !this.isSpecifiedVisibleTo(packedNote, meId)) {
+			return true;
 		}
 
 		// visibility が followers かつ自分が投稿者のフォロワーでなかったら非表示
-		if (packedNote.visibility === 'followers') {
-			if (meId == null) {
-				return true;
-			} else if (packedNote.reply && (meId === packedNote.reply.userId)) {
-				// 自分の投稿に対するリプライ
-				return false;
-			} else if (packedNote.mentions && packedNote.mentions.some(id => meId === id)) {
-				// 自分へのメンション
-				return false;
-			} else {
-				// フォロワーかどうか
-				const followings = await this.cacheService.userFollowingsCache.fetch(meId);
-				if (!Object.hasOwn(followings, packedNote.userId)) {
-					return true;
-				}
-			}
+		if (packedNote.visibility === 'followers' && !(await this.isFollowerVisibleTo(packedNote, meId))) {
+			return true;
 		}
 
 		return false;

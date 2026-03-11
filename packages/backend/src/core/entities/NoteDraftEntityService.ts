@@ -105,7 +105,6 @@ export class NoteDraftEntityService implements OnModuleInit {
 		const packed: Packed<'NoteDraft'> = await awaitAll({
 			id: noteDraft.id,
 			createdAt: this.idService.parse(noteDraft.id).date.toISOString(),
-			scheduledAt: noteDraft.scheduledAt?.getTime() ?? null,
 			userId: noteDraft.userId,
 			user: packedUsers?.get(noteDraft.userId) ?? this.userEntityService.pack(noteDraft.user ?? noteDraft.userId, me),
 			text: text,

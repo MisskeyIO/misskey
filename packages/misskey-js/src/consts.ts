@@ -27,8 +27,6 @@ export const notificationTypes = [
 	'reaction',
 	'pollEnded',
 	'noteScheduled',
-	'scheduledNotePosted',
-	'scheduledNotePostFailed',
 	'scheduledNoteError',
 	'receiveFollowRequest',
 	'followRequestAccepted',

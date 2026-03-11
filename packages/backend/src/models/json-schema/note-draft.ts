@@ -17,10 +17,6 @@ export const packedNoteDraftSchema = {
 			optional: false, nullable: false,
 			format: 'date-time',
 		},
-		scheduledAt: {
-			type: 'number',
-			optional: false, nullable: true,
-		},
 		reason: {
 			type: 'string',
 			optional: true, nullable: true,
@@ -195,4 +191,3 @@ export const packedNoteDraftSchema = {
 		},
 	},
 } as const;
-

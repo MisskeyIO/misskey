@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <div :class="$style.root">
 	<div :class="$style.head">
 		<MkAvatar v-if="['pollEnded', 'note'].includes(notification.type) && notification.note" :class="$style.icon" :user="notification.note.user" link preview/>
-		<MkAvatar v-else-if="['roleAssigned', 'achievementEarned', 'exportCompleted', 'login', 'noteScheduled', 'scheduledNotePosted', 'scheduledNoteError', 'createToken', 'scheduledNotePosted', 'scheduledNotePostFailed'].includes(notification.type)" :class="$style.icon" :user="$i" link preview/>
+		<MkAvatar v-else-if="['roleAssigned', 'achievementEarned', 'exportCompleted', 'login', 'noteScheduled', 'scheduledNotePosted', 'scheduledNoteError', 'createToken'].includes(notification.type)" :class="$style.icon" :user="$i" link preview/>
 		<div
 			v-else-if="notification.type === 'sensitiveFlagAssigned'"
 			:class="$style.iconFrame"
@@ -75,7 +75,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<header :class="$style.header">
 			<span v-if="notification.type === 'pollEnded'" :class="$style.headerName">{{ i18n.ts._notification.pollEnded }}</span>
 			<span v-else-if="notification.type === 'scheduledNotePosted'">{{ i18n.ts._notification.scheduledNotePosted }}</span>
-			<span v-else-if="notification.type === 'scheduledNotePostFailed'">{{ i18n.ts._notification.scheduledNotePostFailed }}</span>
 			<span v-else-if="notification.type === 'note'" :class="$style.headerName">{{ i18n.ts._notification.newNote }}: <MkUserName :user="notification.note.user"/></span>
 			<span v-else-if="notification.type === 'roleAssigned'" :class="$style.headerName">{{ i18n.ts._notification.roleAssigned }}</span>
 			<span v-else-if="notification.type === 'chatRoomInvitationReceived'" :class="$style.headerName">{{ i18n.ts._notification.chatRoomInvitationReceived }}</span>
@@ -382,11 +381,6 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 }
 
 .t_scheduledNotePosted {
-	background: var(--eventOther);
-	pointer-events: none;
-}
-
-.t_scheduledNotePostFailed {
 	background: var(--eventOther);
 	pointer-events: none;
 }

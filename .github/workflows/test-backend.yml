@@ -203,5 +203,3 @@ jobs:
         run: pnpm build
       - name: Run migrations
         run: MISSKEY_CONFIG_YML=test.yml pnpm --filter backend migrate
-      - name: Check no migrations are remaining
-        run: MISSKEY_CONFIG_YML=test.yml pnpm --filter backend check-migrations

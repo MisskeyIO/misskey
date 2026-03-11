@@ -261,7 +261,9 @@ const autocompleteTextareaInput = ref<Autocomplete | null>(null);
 const autocompleteCwInput = ref<Autocomplete | null>(null);
 const autocompleteHashtagsInput = ref<Autocomplete | null>(null);
 if (props.initialVisibleUsers) {
-	props.initialVisibleUsers.forEach(u => pushVisibleUser(u));
+	props.initialVisibleUsers.forEach(u => {
+		pushVisibleUser(u);
+	});
 }
 const reactionAcceptance = ref(store.s.reactionAcceptance);
 
@@ -471,7 +473,9 @@ if (replyTargetNote.value && ['home', 'followers', 'specified'].includes(replyTa
 				userIds: replyTargetNote.value.visibleUserIds.filter(uid => uid !== $i.id && uid !== replyTargetNote.value?.userId),
 
 			}).then(users => {
-				users.forEach(u => pushVisibleUser(u));
+				users.forEach(u => {
+					pushVisibleUser(u);
+				});
 			});
 		}
 
@@ -713,14 +717,16 @@ function showDraftsDialog() {
 			}
 			if (draft.visibleUserIds) {
 				misskeyApi('users/show', { userIds: draft.visibleUserIds }).then(users => {
-					users.forEach(u => pushVisibleUser(u));
+					users.forEach(u => {
+						pushVisibleUser(u);
+					});
 				});
 			}
 			quoteId.value = draft.renoteId ?? null;
 			renoteTargetNote.value = draft.renote;
 			replyTargetNote.value = draft.reply;
 			reactionAcceptance.value = draft.reactionAcceptance;
-			scheduledTime.value = draft.scheduledAt ? new Date(draft.scheduledAt) : null;
+			scheduledTime.value = null;
 			if (draft.channel) targetChannel.value = draft.channel;
 
 			visibleUsers.value = [];
@@ -1109,7 +1115,6 @@ async function saveServerDraft() {
 		replyId: replyTargetNote.value ? replyTargetNote.value.id : null,
 		channelId: targetChannel.value ? targetChannel.value.id : null,
 		reactionAcceptance: reactionAcceptance.value,
-		scheduledAt: scheduledTime.value?.getTime() ?? undefined,
 	});
 }
 
@@ -1160,7 +1165,9 @@ function loadDraft(exactMatch = false) {
 		}
 		if (draft.value.data.visibleUserIds) {
 			misskeyApi('users/show', { userIds: draft.value.data.visibleUserIds }).then(users => {
-				users.forEach(u => pushVisibleUser(u));
+				users.forEach(u => {
+					pushVisibleUser(u);
+				});
 			});
 		}
 	}
@@ -1555,7 +1562,9 @@ onMounted(() => {
 			}
 			if (init.visibleUserIds) {
 				misskeyApi('users/show', { userIds: init.visibleUserIds }).then(users => {
-					users.forEach(u => pushVisibleUser(u));
+					users.forEach(u => {
+						pushVisibleUser(u);
+					});
 				});
 			}
 			quoteId.value = init.renote ? init.renote.id : null;

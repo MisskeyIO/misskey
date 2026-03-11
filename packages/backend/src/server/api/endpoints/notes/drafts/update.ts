@@ -216,7 +216,6 @@ export const paramDef = {
 			},
 			required: ['choices'],
 		},
-		scheduledAt: { type: 'integer', nullable: true },
 	},
 	required: ['draftId'],
 } as const;
@@ -244,7 +243,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				visibility: ps.visibility,
 				visibleUserIds: ps.visibleUserIds,
 				channelId: ps.channelId,
-				scheduledAt: ps.scheduledAt ? new Date(ps.scheduledAt) : null,
 			}).catch((err) => {
 				if (err instanceof IdentifiableError) {
 					switch (err.id) {

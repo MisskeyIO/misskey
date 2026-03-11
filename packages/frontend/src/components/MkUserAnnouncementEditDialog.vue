@@ -89,36 +89,6 @@ type AdminAnnouncementWithStats = Required<AdminAnnouncementType> & {
 	lastReadAt?: string | null;
 };
 
-function normalizeAnnouncement(announcement: {
-	id: string;
-	title: string;
-	text: string;
-	imageUrl: string | null;
-	icon?: string | null;
-	display?: string | null;
-	needConfirmationToRead?: boolean;
-	needEnrollmentTutorialToRead?: boolean;
-	closeDuration?: number;
-	displayOrder?: number;
-	silence?: boolean;
-	userId?: string | null;
-}): AdminAnnouncementType {
-	return {
-		id: announcement.id,
-		title: announcement.title,
-		text: announcement.text,
-		imageUrl: announcement.imageUrl,
-		icon: announcement.icon === 'error' || announcement.icon === 'warning' || announcement.icon === 'success' ? announcement.icon : 'info',
-		display: announcement.display === 'banner' || announcement.display === 'normal' ? announcement.display : 'dialog',
-		needConfirmationToRead: announcement.needConfirmationToRead ?? false,
-		needEnrollmentTutorialToRead: announcement.needEnrollmentTutorialToRead ?? false,
-		closeDuration: announcement.closeDuration ?? 0,
-		displayOrder: announcement.displayOrder ?? 0,
-		silence: announcement.silence ?? false,
-		userId: announcement.userId ?? null,
-	};
-}
-
 const props = defineProps<{
 	user: Misskey.entities.User,
 	announcement?: AdminAnnouncementWithStats,
@@ -170,10 +140,10 @@ async function done(): Promise<void> {
 		});
 
 		emit('done', {
-			updated: normalizeAnnouncement({
+			updated: {
 				...params,
 				id: props.announcement.id,
-			}),
+			},
 		});
 
 		dialog.value?.close();
@@ -181,7 +151,7 @@ async function done(): Promise<void> {
 		const created = await os.apiWithDialog('admin/announcements/create', params);
 
 		emit('done', {
-			created: normalizeAnnouncement(created),
+			created,
 		});
 
 		dialog.value?.close();

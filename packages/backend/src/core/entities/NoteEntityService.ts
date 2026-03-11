@@ -148,8 +148,7 @@ export class NoteEntityService implements OnModuleInit {
 	private isSpecifiedVisibleTo(packedNote: Packed<'Note'>, meId: MiUser['id'] | null): boolean {
 		if (meId == null) return false;
 
-		return (packedNote.visibleUserIds?.includes(meId) ?? false)
-			|| (packedNote.mentions?.includes(meId) ?? false);
+		return packedNote.visibleUserIds?.includes(meId) ?? false;
 	}
 
 	@bindThis

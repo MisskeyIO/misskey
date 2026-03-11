@@ -442,18 +442,7 @@ export class ApRendererService {
 			// Append quote link as `<br><br><span class="quote-inline">RE: <a href="...">...</a></span>`
 			// the claas name `quote-inline` is used in non-misskey clients for styling quote notes.
 			// For compatibility, the span part should be kept as possible.
-			apAppend.push((doc, body) => {
-				body.appendChild(doc.createElement('br'));
-				body.appendChild(doc.createElement('br'));
-				const span = doc.createElement('span');
-				span.className = 'quote-inline';
-				span.appendChild(doc.createTextNode('RE: '));
-				const link = doc.createElement('a');
-				link.setAttribute('href', quote);
-				link.textContent = quote;
-				span.appendChild(link);
-				body.appendChild(span);
-			});
+			apAppend.push(() => `<br /><br /><span class="quote-inline">RE: <a href="${quote}">${quote}</a></span>`);
 		}
 
 		const summary = note.cw === '' ? String.fromCharCode(0x200B) : note.cw;

@@ -6,7 +6,7 @@
 import * as crypto from 'node:crypto';
 import { URL } from 'node:url';
 import { Inject, Injectable } from '@nestjs/common';
-import { JSDOM } from 'jsdom';
+import * as htmlParser from 'node-html-parser';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import type { MiUser } from '@/models/User.js';
@@ -217,7 +217,7 @@ export class ApRequestService {
 		) {
 			const html = await res.text();
 			try {
-				const fragment = JSDOM.fragment(html);
+				const fragment = htmlParser.parse(html);
 
 				const alternate = fragment.querySelector('head > link[rel="alternate"][type="application/activity+json"]');
 				if (alternate) {

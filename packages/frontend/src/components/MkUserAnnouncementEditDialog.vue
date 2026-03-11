@@ -83,19 +83,8 @@ import MkSwitch from '@/components/MkSwitch.vue';
 import MkRadios from '@/components/MkRadios.vue';
 import MkUserCardMini from '@/components/MkUserCardMini.vue';
 
-type AdminAnnouncementType = {
-	id: string;
-	title: string;
-	text: string;
-	imageUrl: string | null;
-	icon: 'error' | 'warning' | 'info' | 'success';
-	display: 'dialog' | 'normal' | 'banner';
-	needConfirmationToRead: boolean;
-	needEnrollmentTutorialToRead: boolean;
-	closeDuration: number;
-	displayOrder: number;
-	silence: boolean;
-	userId?: string | null;
+type AdminAnnouncementType = Misskey.entities.AdminAnnouncementsCreateRequest & { id: string; };
+type AdminAnnouncementWithStats = Required<AdminAnnouncementType> & {
 	reads?: number;
 	lastReadAt?: string | null;
 };
@@ -113,8 +102,6 @@ function normalizeAnnouncement(announcement: {
 	displayOrder?: number;
 	silence?: boolean;
 	userId?: string | null;
-	reads?: number;
-	lastReadAt?: string | null;
 }): AdminAnnouncementType {
 	return {
 		id: announcement.id,
@@ -129,14 +116,12 @@ function normalizeAnnouncement(announcement: {
 		displayOrder: announcement.displayOrder ?? 0,
 		silence: announcement.silence ?? false,
 		userId: announcement.userId ?? null,
-		reads: announcement.reads,
-		lastReadAt: announcement.lastReadAt ?? null,
 	};
 }
 
 const props = defineProps<{
 	user: Misskey.entities.User,
-	announcement?: Required<AdminAnnouncementType>,
+	announcement?: AdminAnnouncementWithStats,
 }>();
 
 const emit = defineEmits<{
@@ -154,8 +139,8 @@ const needEnrollmentTutorialToRead = ref(props.announcement ? props.announcement
 const closeDuration = ref<number>(props.announcement ? props.announcement.closeDuration : 0);
 const displayOrder = ref<number>(props.announcement ? props.announcement.displayOrder : 0);
 const silence = ref<boolean>(props.announcement ? props.announcement.silence : false);
-const reads = ref<number>(props.announcement ? props.announcement.reads : 0);
-const lastReadAt = ref<string | null>(props.announcement ? props.announcement.lastReadAt : null);
+const reads = ref<number>(props.announcement?.reads ?? 0);
+const lastReadAt = ref<string | null>(props.announcement?.lastReadAt ?? null);
 
 const announceTitleEl = shallowRef<HTMLInputElement | null>(null);
 

@@ -8,7 +8,7 @@ import { action } from 'storybook/actions';
 import { channel } from '../../.storybook/fakes.js';
 import { commonHandlers } from '../../.storybook/mocks.js';
 import MkChannelList from './MkChannelList.vue';
-import type { StoryObj } from '@storybook/vue3';
+import type { StoryObj } from '@storybook/vue3-vite';
 import { Paginator } from '@/utility/paginator.js';
 export const Default = {
 	render(args) {
@@ -21,14 +21,7 @@ export const Default = {
 					args,
 				};
 			},
-			computed: {
-				props() {
-					return {
-						...this.args,
-					};
-				},
-			},
-			template: '<MkChannelList v-bind="props" />',
+			template: '<MkChannelList v-bind="args" />',
 		};
 	},
 	args: {

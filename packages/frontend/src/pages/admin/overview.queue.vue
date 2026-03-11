@@ -38,10 +38,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { markRaw, onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import XChart from './overview.queue.chart.vue';
-import type { ApQueueDomain } from '@/pages/admin/federation-job-queue.vue';
 import number from '@/filters/number.js';
 import { useStream } from '@/stream.js';
 import { genId } from '@/utility/id.js';
+
+type ApQueueDomain = keyof Misskey.entities.QueueStats;
 
 const connection = markRaw(useStream().useChannel('queueStats'));
 

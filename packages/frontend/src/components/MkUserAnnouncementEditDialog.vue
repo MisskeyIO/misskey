@@ -70,6 +70,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { ref, shallowRef, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkModalWindow from '@/components/MkModalWindow.vue';
 import MkButton from '@/components/MkButton.vue';
@@ -82,7 +83,56 @@ import MkSwitch from '@/components/MkSwitch.vue';
 import MkRadios from '@/components/MkRadios.vue';
 import MkUserCardMini from '@/components/MkUserCardMini.vue';
 
-type AdminAnnouncementType = Misskey.entities.AdminAnnouncementsCreateRequest & { id: string; };
+type AdminAnnouncementType = {
+	id: string;
+	title: string;
+	text: string;
+	imageUrl: string | null;
+	icon: 'error' | 'warning' | 'info' | 'success';
+	display: 'dialog' | 'normal' | 'banner';
+	needConfirmationToRead: boolean;
+	needEnrollmentTutorialToRead: boolean;
+	closeDuration: number;
+	displayOrder: number;
+	silence: boolean;
+	userId?: string | null;
+	reads?: number;
+	lastReadAt?: string | null;
+};
+
+function normalizeAnnouncement(announcement: {
+	id: string;
+	title: string;
+	text: string;
+	imageUrl: string | null;
+	icon?: string | null;
+	display?: string | null;
+	needConfirmationToRead?: boolean;
+	needEnrollmentTutorialToRead?: boolean;
+	closeDuration?: number;
+	displayOrder?: number;
+	silence?: boolean;
+	userId?: string | null;
+	reads?: number;
+	lastReadAt?: string | null;
+}): AdminAnnouncementType {
+	return {
+		id: announcement.id,
+		title: announcement.title,
+		text: announcement.text,
+		imageUrl: announcement.imageUrl,
+		icon: announcement.icon === 'error' || announcement.icon === 'warning' || announcement.icon === 'success' ? announcement.icon : 'info',
+		display: announcement.display === 'banner' || announcement.display === 'normal' ? announcement.display : 'dialog',
+		needConfirmationToRead: announcement.needConfirmationToRead ?? false,
+		needEnrollmentTutorialToRead: announcement.needEnrollmentTutorialToRead ?? false,
+		closeDuration: announcement.closeDuration ?? 0,
+		displayOrder: announcement.displayOrder ?? 0,
+		silence: announcement.silence ?? false,
+		userId: announcement.userId ?? null,
+		reads: announcement.reads,
+		lastReadAt: announcement.lastReadAt ?? null,
+	};
+}
 
 const props = defineProps<{
 	user: Misskey.entities.User,
@@ -97,8 +147,8 @@ const emit = defineEmits<{
 const dialog = useTemplateRef('dialog');
 const title = ref<string>(props.announcement ? props.announcement.title : '');
 const text = ref<string>(props.announcement ? props.announcement.text : '');
-const icon = ref<string>(props.announcement ? props.announcement.icon : 'info');
-const display = ref<string>(props.announcement ? props.announcement.display : 'dialog');
+const icon = ref<AdminAnnouncementType['icon']>(props.announcement ? props.announcement.icon : 'info');
+const display = ref<AdminAnnouncementType['display']>(props.announcement ? props.announcement.display : 'dialog');
 const needConfirmationToRead = ref(props.announcement ? props.announcement.needConfirmationToRead : false);
 const needEnrollmentTutorialToRead = ref(props.announcement ? props.announcement.needEnrollmentTutorialToRead : false);
 const closeDuration = ref<number>(props.announcement ? props.announcement.closeDuration : 0);
@@ -125,7 +175,6 @@ async function done(): Promise<void> {
 		closeDuration: closeDuration.value,
 		displayOrder: displayOrder.value,
 		silence: silence.value,
-		reads: reads.value,
 		userId: props.user.id,
 	} satisfies Misskey.entities.AdminAnnouncementsCreateRequest;
 
@@ -136,10 +185,10 @@ async function done(): Promise<void> {
 		});
 
 		emit('done', {
-			updated: {
+			updated: normalizeAnnouncement({
 				...params,
 				id: props.announcement.id,
-			},
+			}),
 		});
 
 		dialog.value?.close();
@@ -147,7 +196,7 @@ async function done(): Promise<void> {
 		const created = await os.apiWithDialog('admin/announcements/create', params);
 
 		emit('done', {
-			created: created,
+			created: normalizeAnnouncement(created),
 		});
 
 		dialog.value?.close();

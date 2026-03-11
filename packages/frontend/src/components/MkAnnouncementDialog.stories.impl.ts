@@ -20,19 +20,10 @@ export const Default = {
 					args,
 				};
 			},
-			computed: {
-				props() {
-					return {
-						...this.args,
-					};
-				},
-				events() {
-					return {
-						closed: action('closed'),
-					};
-				},
+			template: '<MkAnnouncementDialog v-bind="args" @closed="action(\'closed\')" />',
+			methods: {
+				action,
 			},
-			template: '<MkAnnouncementDialog v-bind="props" v-on="events" />',
 		};
 	},
 	args: {
@@ -45,6 +36,8 @@ export const Default = {
 			icon: 'info',
 			imageUrl: null,
 			display: 'dialog',
+			closeDuration: 0,
+			displayOrder: 0,
 			needConfirmationToRead: false,
 			needEnrollmentTutorialToRead: false,
 			silence: false,

@@ -52,7 +52,7 @@ import {
 	hasDimension,
 	isAvailableBasicTimeline,
 	isBasicTimeline,
-	basicTimelineIconClass} from '@/timelines.js';
+	basicTimelineIconClass } from '@/timelines.js';
 import { prefer } from '@/preferences.js';
 
 const tlComponent = useTemplateRef('tlComponent');

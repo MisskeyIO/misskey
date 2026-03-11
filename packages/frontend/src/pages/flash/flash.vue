@@ -217,7 +217,6 @@ async function run() {
 
 	const { Interpreter, Parser, values } = isLegacy ? (await import('@syuilo/aiscript-0-19-0') as any) : await import('@syuilo/aiscript');
 
-
 	const parser = new Parser();
 
 	components.value = [];

@@ -74,7 +74,6 @@ function onEndpointChange() {
 			return;
 		}
 
-
 		const endpointBody = {};
 		for (const p of resp.params) {
 			endpointBody[p.name] =

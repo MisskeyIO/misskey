@@ -209,7 +209,6 @@ if (iAmModerator) {
 }
 
 async function _fetch_(): Promise<void> {
-
 	if (iAmAdmin) {
 		meta.value = await misskeyApi('admin/meta');
 	}

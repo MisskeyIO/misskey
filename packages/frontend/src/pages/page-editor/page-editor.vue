@@ -205,7 +205,6 @@ async function save() {
 				initPageId: pageId.value,
 			},
 		});
-
 	}
 }
 
@@ -283,7 +282,6 @@ async function add() {
 			note: null,
 		});
 	}
-
 }
 
 function setEyeCatchingImage(img: Event) {

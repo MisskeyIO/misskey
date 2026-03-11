@@ -99,7 +99,6 @@ async function read(target): Promise<void> {
 	updateCurrentAccountPartial({
 		unreadAnnouncements: $i!.unreadAnnouncements.filter(a => a.id !== target.id),
 	});
-
 }
 
 const headerActions = computed(() => []);

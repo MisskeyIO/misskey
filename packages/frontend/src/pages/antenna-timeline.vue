@@ -36,7 +36,6 @@ const props = defineProps<{
 const antenna = ref<Misskey.entities.Antenna | null>(null);
 const tlEl = useTemplateRef('tlEl');
 
-
 function settings() {
 	router.push('/my/antennas/:antennaId', {
 		params: {

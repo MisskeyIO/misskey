@@ -149,7 +149,6 @@ const edit = async (emoji) => {
 				}));
 			} else if (result.deleted) {
 				paginator.removeItem(emoji.id);
-
 			}
 		},
 	}, 'closed');
@@ -237,7 +236,6 @@ const setCategoryBulk = async () => {
 		category: result,
 	});
 	paginator.reload();
-
 };
 
 const setLicenseBulk = async () => {
@@ -251,7 +249,6 @@ const setLicenseBulk = async () => {
 		license: result,
 	});
 	paginator.reload();
-
 };
 
 const addTagBulk = async () => {
@@ -264,7 +261,6 @@ const addTagBulk = async () => {
 		aliases: result.split(' '),
 	});
 	paginator.reload();
-
 };
 
 const removeTagBulk = async () => {
@@ -277,7 +273,6 @@ const removeTagBulk = async () => {
 		aliases: result.split(' '),
 	});
 	paginator.reload();
-
 };
 
 const setTagBulk = async () => {
@@ -290,7 +285,6 @@ const setTagBulk = async () => {
 		aliases: result.split(' '),
 	});
 	paginator.reload();
-
 };
 
 const delBulk = async () => {
@@ -303,7 +297,6 @@ const delBulk = async () => {
 		ids: selectedEmojis.value,
 	});
 	paginator.reload();
-
 };
 
 const headerActions = computed(() => [{

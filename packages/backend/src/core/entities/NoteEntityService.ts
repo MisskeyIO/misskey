@@ -165,7 +165,8 @@ export class NoteEntityService implements OnModuleInit {
 				return true;
 			} else {
 				// 指定されているかどうか
-				const specified = packedNote.visibleUserIds!.some(id => meId === id);
+				const specified = (packedNote.visibleUserIds?.some(id => meId === id) ?? false)
+					|| (packedNote.mentions?.some(id => meId === id) ?? false);
 
 				if (!specified) {
 					return true;

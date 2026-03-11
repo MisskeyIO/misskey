@@ -300,7 +300,6 @@ const draftKey = computed((): string => {
 		key += `renote:${renoteTargetNote.value.id}`;
 	} else if (replyTargetNote.value) {
 		key += `reply:${replyTargetNote.value.id}`;
-
 	} else {
 		key += `note:${draftId.value}`;
 	}
@@ -314,7 +313,6 @@ const placeholder = computed((): string => {
 	} else if (replyTargetNote.value) {
 		return i18n.ts._postForm.replyPlaceholder;
 	} else if (targetChannel.value) {
-
 		return i18n.ts._postForm.channelPlaceholder;
 	} else {
 		const xs = [
@@ -343,7 +341,6 @@ const submitText = computed((): string => {
 
 const submitIcon = computed((): string => {
 	return posted.value ? 'ti ti-check' : scheduledTime.value != null ? 'ti ti-calendar-time' : replyTargetNote.value ? 'ti ti-arrow-back-up' : renoteTargetNote.value ? 'ti ti-quote' : 'ti ti-send';
-
 });
 
 const textLength = computed((): number => {
@@ -432,7 +429,6 @@ if (replyTargetNote.value && replyTargetNote.value.text != null) {
 	const ast = mfm.parse(replyTargetNote.value.text);
 	const otherHost = replyTargetNote.value.user.host;
 
-
 	for (const x of extractMentions(ast)) {
 		const mention = x.host ?
 			`@${x.username}@${toASCII(x.host)}` :
@@ -455,7 +451,6 @@ if ($i.isSilenced && visibility.value === 'public') {
 }
 
 if (targetChannel.value) {
-
 	visibility.value = 'public';
 	localOnly.value = true; // TODO: チャンネルが連合するようになった折には消す
 }
@@ -482,7 +477,6 @@ if (replyTargetNote.value && ['home', 'followers', 'specified'].includes(replyTa
 
 		if (replyTargetNote.value.userId !== $i.id) {
 			misskeyApi('users/show', { userId: replyTargetNote.value.userId }).then(user => {
-
 				pushVisibleUser(user);
 			});
 		}
@@ -498,7 +492,6 @@ if (props.specified) {
 if (prefer.s.keepCw && replyTargetNote.value && replyTargetNote.value.cw) {
 	useCw.value = true;
 	cw.value = replyTargetNote.value.cw;
-
 }
 
 function watchForDraft() {
@@ -514,7 +507,6 @@ function watchForDraft() {
 	watch(quoteId, () => saveDraft());
 	watch(reactionAcceptance, () => saveDraft());
 	watch(scheduledTime, () => saveDraft());
-
 }
 
 function checkMissingMention() {
@@ -581,7 +573,6 @@ function chooseFileFromDrive(ev: MouseEvent) {
 
 	chooseDriveFile({ multiple: true }).then(driveFiles => {
 		files.value.push(...driveFiles);
-
 	});
 }
 
@@ -602,7 +593,6 @@ function updateFileName(file, name) {
 
 async function setVisibility() {
 	if (targetChannel.value) {
-
 		visibility.value = 'public';
 		localOnly.value = true; // TODO: チャンネルが連合するようになった折には消す
 		return;
@@ -627,7 +617,6 @@ async function setVisibility() {
 
 async function toggleLocalOnly() {
 	if (targetChannel.value) {
-
 		visibility.value = 'public';
 		localOnly.value = true; // TODO: チャンネルが連合するようになった折には消す
 		return;
@@ -1038,7 +1027,6 @@ function onDrop(ev: DragEvent): void {
 			files.value.push(...droppedData);
 			ev.preventDefault();
 		}
-
 	}
 	//#endregion
 }
@@ -1139,7 +1127,6 @@ async function uploadFiles() {
 	for (const uploadedItem of uploader.items.value.filter(x => x.uploaded != null)) {
 		files.value.push(uploadedItem.uploaded!);
 		uploader.removeItem(uploadedItem);
-
 	}
 }
 
@@ -1593,7 +1580,6 @@ async function canClose() {
 
 	return true;
 }
-
 
 defineExpose({
 	clear,

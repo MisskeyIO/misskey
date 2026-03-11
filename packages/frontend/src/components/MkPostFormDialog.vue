@@ -71,6 +71,7 @@ function onEsc() {
 function onBgClick() {
 	_close();
 }
+
 function onModalClosed() {
 	emit('closed');
 }

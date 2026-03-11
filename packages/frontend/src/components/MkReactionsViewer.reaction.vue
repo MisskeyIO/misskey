@@ -71,7 +71,6 @@ const canToggle = computed(() => {
 const canGetInfo = computed(() => !props.reaction.match(/@\w/) && props.reaction.includes(':'));
 const isLocalCustomEmoji = props.reaction[0] === ':' && props.reaction.includes('@.');
 
-
 async function toggleReaction() {
 	if (!canToggle.value) return;
 	if ($i == null) return;
@@ -208,7 +207,6 @@ async function menu(ev) {
 	}
 
 	os.popupMenu(menuItems, ev.currentTarget ?? ev.target);
-
 }
 
 function anime() {
@@ -256,7 +254,6 @@ if (!mock) {
 		dispose();
 		stop();
 	});
-
 }, 100);
 }
 </script>

@@ -183,7 +183,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</template>
 					</MkFolder>
 
-
 					<div>
 						<MkButton v-if="iAmModerator" inline danger style="margin-right: 8px;" @click="unsetUserAvatar"><i class="ti ti-user-circle"></i> {{ i18n.ts.unsetUserAvatar }}</MkButton>
 						<MkButton v-if="iAmModerator" inline danger @click="unsetUserBanner"><i class="ti ti-photo"></i> {{ i18n.ts.unsetUserBanner }}</MkButton>
@@ -213,7 +212,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 		<div v-else-if="tab === 'announcements'" class="_gaps">
 			<MkButton primary rounded @click="createAnnouncement"><i class="ti ti-plus"></i> {{ i18n.ts.createNew }}</MkButton>
-
 
 			<MkSelect v-model="announcementsStatus" :items="announcementsStatusDef">
 				<template #label>{{ i18n.ts.filter }}</template>
@@ -350,7 +348,6 @@ const filesPaginator = markRaw(new Paginator('admin/drive/files', {
 		userId: props.userId,
 	})),
 }));
-
 
 const {
 	model: announcementsStatus,

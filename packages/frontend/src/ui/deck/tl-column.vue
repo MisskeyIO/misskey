@@ -141,6 +141,7 @@ async function setType() {
 		tl: src ?? undefined,
 	});
 }
+
 function onNote() {
 	sound.playMisskeySfxFile(soundSetting.value);
 }

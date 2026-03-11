@@ -190,7 +190,6 @@ async function addRole(type: boolean) {
 	} else {
 		rolesThatCanNotBeUsedThisEmojiAsReaction.value.push(role);
 	}
-
 }
 
 async function removeRole(type: boolean, role: Misskey.entities.RoleLite, ev: Event) {

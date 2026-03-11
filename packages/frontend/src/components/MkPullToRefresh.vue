@@ -100,7 +100,6 @@ function moveStartByMouse(event: MouseEvent) {
 	if (scrollPos !== 0) {
 		unlockDownScroll();
 		return;
-
 	}
 
 	lockDownScroll();
@@ -186,7 +185,6 @@ function onPullRelease() {
 			emit('refresh');
 			props.refresher().then(() => {
 				refreshFinished();
-
 			});
 		});
 	} else {
@@ -202,7 +200,6 @@ function toggleScrollLockOnTouchEnd() {
 		unlockDownScroll();
 	}
 }
-
 
 function moving(event: MouseEvent | TouchEvent) {
 	if ((scrollEl?.scrollTop ?? 0) > SCROLL_STOP + pullDistance.value || isHorizontalSwipeSwiping.value) {
@@ -226,7 +223,6 @@ function moving(event: MouseEvent | TouchEvent) {
 	isPulledEnough.value = pullDistance.value >= FIRE_THRESHOLD;
 
 	if (isPulledEnough.value) haptic();
-
 }
 
 /**
@@ -240,7 +236,6 @@ function refreshFinished() {
 		isRefreshing.value = false;
 	});
 }
-
 
 onMounted(() => {
 	isRefreshing.value = false;
@@ -257,7 +252,6 @@ onUnmounted(() => {
 	if (rootEl.value) rootEl.value.removeEventListener('mousedown', moveStartByMouse);
 	if (rootEl.value) rootEl.value.removeEventListener('touchstart', moveStartByTouch);
 	if (rootEl.value) rootEl.value.removeEventListener('touchend', toggleScrollLockOnTouchEnd);
-
 });
 </script>
 

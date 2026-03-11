@@ -24,7 +24,8 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version-file:
+          - .github/min.node-version
 
     steps:
       - name: Checkout
@@ -38,10 +39,10 @@ jobs:
         with:
           run_install: false
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js ${{ matrix.node-version-file }}
         uses: actions/setup-node@v6
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version-file: ${{ matrix.node-version-file }}
           cache: 'pnpm'
 
       - name: Install dependencies

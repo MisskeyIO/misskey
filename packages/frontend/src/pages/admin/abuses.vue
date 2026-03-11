@@ -76,7 +76,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, markRaw } from 'vue';
+import {computed, ref, markRaw, useTemplateRef} from 'vue';
 import MkSelect from '@/components/MkSelect.vue';
 import MkPagination from '@/components/MkPagination.vue';
 import MkFolder from '@/components/MkFolder.vue';
@@ -87,7 +87,6 @@ import * as os from '@/os.js';
 import { definePage } from '@/page.js';
 import { useMkSelect } from '@/composables/use-mkselect.js';
 import MkButton from '@/components/MkButton.vue';
-import { store } from '@/store.js';
 import { Paginator } from '@/utility/paginator.js';
 
 const reports = useTemplateRef('reports');

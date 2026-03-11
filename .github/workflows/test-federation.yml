@@ -12,12 +12,14 @@ on:
       - packages/backend/**
       - packages/misskey-js/**
       - pnpm-lock.yaml
+      - .github/min.node-version
       - .github/workflows/test-federation.yml
   pull_request:
     paths:
       - packages/backend/**
       - packages/misskey-js/**
       - pnpm-lock.yaml
+      - .github/min.node-version
       - .github/workflows/test-federation.yml
 
 permissions:

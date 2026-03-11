@@ -150,7 +150,8 @@ export const operationTypes = [
 	'note',
 	'notification',
 	'reaction',
-	'chatMessage',
+	// FIXME チャット機能が有効になった暁には解除する
+	// 'chatMessage',
 ] as const;
 
 /** サウンドの種類 */

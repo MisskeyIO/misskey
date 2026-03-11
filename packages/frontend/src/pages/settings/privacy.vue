@@ -266,19 +266,20 @@ const {
 	],
 	initialValue: $i.followersVisibility,
 });
-const {
-	model: chatScope,
-	def: chatScopeDef,
-} = useMkSelect({
-	items: [
-		{ label: i18n.ts._chat._chatAllowedUsers.everyone, value: 'everyone' },
-		{ label: i18n.ts._chat._chatAllowedUsers.followers, value: 'followers' },
-		{ label: i18n.ts._chat._chatAllowedUsers.following, value: 'following' },
-		{ label: i18n.ts._chat._chatAllowedUsers.mutual, value: 'mutual' },
-		{ label: i18n.ts._chat._chatAllowedUsers.none, value: 'none' },
-	],
-	initialValue: $i.chatScope,
-});
+// FIXME チャット機能が有効になった暁には解除する
+// const {
+// 	model: chatScope,
+// 	def: chatScopeDef,
+// } = useMkSelect({
+// 	items: [
+// 		{ label: i18n.ts._chat._chatAllowedUsers.everyone, value: 'everyone' },
+// 		{ label: i18n.ts._chat._chatAllowedUsers.followers, value: 'followers' },
+// 		{ label: i18n.ts._chat._chatAllowedUsers.following, value: 'following' },
+// 		{ label: i18n.ts._chat._chatAllowedUsers.mutual, value: 'mutual' },
+// 		{ label: i18n.ts._chat._chatAllowedUsers.none, value: 'none' },
+// 	],
+// 	initialValue: $i.chatScope,
+// });
 
 const makeNotesFollowersOnlyBefore_type = computed({
 	get: () => {
@@ -489,7 +490,8 @@ function save() {
 		publicReactions: !!publicReactions.value,
 		followingVisibility: followingVisibility.value,
 		followersVisibility: followersVisibility.value,
-		chatScope: chatScope.value,
+		// FIXME チャット機能が有効になった暁には解除する
+		// chatScope: chatScope.value,
 	});
 }
 

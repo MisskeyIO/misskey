@@ -50,13 +50,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 				:tabs="[{
 					key: 'note',
 					title: 'Note',
-				}, {
-					key: 'chat',
-					title: 'Chat',
 				}]"
 			/>
+			<!-- FIXME チャット機能が有効になった暁には解除する -->
 			<XNotes v-if="usageTab === 'note'" :fileId="props.file.id"/>
-			<XChat v-else-if="usageTab === 'chat'" :fileId="props.file.id"/>
+			<!-- <XChat v-else-if="usageTab === 'chat'" :fileId="props.file.id"/> -->
 		</div>
 		<div v-else-if="tab === 'ip' && info" class="_gaps_m">
 			<MkInfo v-if="!iAmAdmin" warn>{{ i18n.ts.requireAdminForView }}</MkInfo>
@@ -104,9 +102,11 @@ const props = defineProps<{
 
 const tab = ref('overview');
 const isSensitive = ref(props.file.isSensitive);
-const usageTab = ref<'note' | 'chat'>('note');
+// FIXME チャット機能が有効になった暁には解除する
+const usageTab = ref<'note'>('note');
 const XNotes = defineAsyncComponent(() => import('./drive.file.notes.vue'));
-const XChat = defineAsyncComponent(() => import('./admin-file.chat.vue'));
+// FIXME チャット機能が有効になった暁には解除する
+// const XChat = defineAsyncComponent(() => import('./admin-file.chat.vue'));
 
 async function del() {
 	const { canceled } = await os.confirm({

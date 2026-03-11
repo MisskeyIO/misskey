@@ -81,13 +81,14 @@ const notUseSound = prefer.model('sound.notUseSound');
 const useSoundOnlyWhenActive = prefer.model('sound.useSoundOnlyWhenActive');
 const masterVolume = prefer.model('sound.masterVolume');
 
-const sounds = ref<Record<OperationType, Ref<SoundStore>>>({
-	note: prefer.r['sound.on.note'],
-	noteMy: prefer.r['sound.on.noteMy'],
-	notification: prefer.r['sound.on.notification'],
-	reaction: prefer.r['sound.on.reaction'],
-	chatMessage: prefer.r['sound.on.chatMessage'],
-});
+	const sounds = ref<Record<OperationType, Ref<SoundStore>>>({
+		note: prefer.r['sound.on.note'],
+		noteMy: prefer.r['sound.on.noteMy'],
+		notification: prefer.r['sound.on.notification'],
+		reaction: prefer.r['sound.on.reaction'],
+		// FIXME チャット機能が有効になった暁には解除する
+		// chatMessage: prefer.r['sound.on.chatMessage'],
+	});
 
 function getSoundTypeName(f: SoundType): string {
 	switch (f) {

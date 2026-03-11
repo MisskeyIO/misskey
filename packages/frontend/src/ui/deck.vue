@@ -106,7 +106,8 @@ import XWidgetsColumn from '@/ui/deck/widgets-column.vue';
 import XMentionsColumn from '@/ui/deck/mentions-column.vue';
 import XDirectColumn from '@/ui/deck/direct-column.vue';
 import XRoleTimelineColumn from '@/ui/deck/role-timeline-column.vue';
-import XChatColumn from '@/ui/deck/chat-column.vue';
+// FIXME チャット機能が有効になった暁には解除する
+// import XChatColumn from '@/ui/deck/chat-column.vue';
 import { mainRouter } from '@/router.js';
 import { columns, layout, columnTypes, switchProfileMenu, addColumn as addColumnToStore, deleteProfile as deleteProfile_ } from '@/deck.js';
 import { shouldSuggestRestoreBackup } from '@/preferences/utility.js';
@@ -126,7 +127,8 @@ const columnComponents = {
 	mentions: XMentionsColumn,
 	direct: XDirectColumn,
 	roleTimeline: XRoleTimelineColumn,
-	chat: XChatColumn,
+	// FIXME チャット機能が有効になった暁には解除する
+	// chat: XChatColumn,
 };
 
 mainRouter.navHook = (path, flag): boolean => {
@@ -167,7 +169,8 @@ const columnsEl = useTemplateRef('columnsEl');
 const addColumn = async (ev) => {
 	const { canceled, result: column } = await os.select({
 		title: i18n.ts._deck.addColumn,
-		items: columnTypes.filter(column => column !== 'chat' || $i == null || $i.policies.chatAvailability !== 'unavailable').map(column => ({
+		// FIXME チャット機能が有効になった暁には解除する
+		items: columnTypes.filter(column => column !== 'chat').map(column => ({
 			value: column, label: i18n.ts._deck._columns[column],
 		})),
 	});

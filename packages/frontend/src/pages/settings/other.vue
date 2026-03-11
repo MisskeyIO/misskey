@@ -169,11 +169,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 		<hr>
 
+		<!-- FIXME チャット機能が有効になった暁には解除する
 		<template v-if="$i.policies.chatAvailability !== 'unavailable'">
 			<MkButton @click="readAllChatMessages">{{ i18n.ts.readAllChatMessages }}</MkButton>
 
 			<hr>
 		</template>
+		-->
 
 		<MkButton @click="forceCloudBackup">{{ i18n.ts._preferencesBackup.forceBackup }}</MkButton>
 
@@ -296,9 +298,10 @@ function hideAllTips() {
 	os.success();
 }
 
-function readAllChatMessages() {
-	os.apiWithDialog('chat/read-all', {});
-}
+// FIXME チャット機能が有効になった暁には解除する
+// function readAllChatMessages() {
+// 	os.apiWithDialog('chat/read-all', {});
+// }
 
 async function forceCloudBackup() {
 	await cloudBackup();

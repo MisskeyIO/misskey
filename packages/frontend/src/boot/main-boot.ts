@@ -374,10 +374,11 @@ export async function mainBoot() {
 				});
 			});
 
-			main.on('newChatMessage', () => {
-				updateCurrentAccountPartial({ hasUnreadChatMessages: true });
-				sound.playMisskeySfx('chatMessage');
-			});
+			// FIXME チャット機能が有効になった暁には解除する
+			// main.on('newChatMessage', () => {
+			// 	updateCurrentAccountPartial({ hasUnreadChatMessages: true });
+			// 	sound.playMisskeySfx('chatMessage');
+			// });
 
 			main.on('readAllAnnouncements', () => {
 				updateCurrentAccountPartial({

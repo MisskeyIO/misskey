@@ -190,7 +190,8 @@ export const PREF_DEF = definePreferences({
 			'clips',
 			'drive',
 			'followRequests',
-			'chat',
+			// FIXME チャット機能が有効になった暁には解除する
+			// 'chat',
 			'-',
 			'explore',
 			'announcements',

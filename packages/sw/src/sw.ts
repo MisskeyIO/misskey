@@ -138,14 +138,18 @@ globalThis.addEventListener('push', ev => {
 			// case 'driveFileCreated':
 			case 'notification':
 			case 'unreadAntennaNote':
-			case 'newChatMessage':
 				// 1日以上経過している場合は無視
 				if (Date.now() - data.dateTime > 1000 * 60 * 60 * 24) break;
 
 				return createNotification(data);
+			case 'newChatMessage':
+				// FIXME チャット機能が有効になった暁には解除する
+				return;
 			case 'readAllNotifications':
 				await globalThis.registration.getNotifications()
-					.then(notifications => notifications.forEach(n => n.tag !== 'read_notification' && n.close()));
+					.then(notifications => notifications.forEach(n => {
+						if (n.tag !== 'read_notification') n.close();
+					}));
 				break;
 		}
 
@@ -219,13 +223,15 @@ globalThis.addEventListener('notificationclick', (ev: ServiceWorkerGlobalScopeEv
 				client = await swos.openAntenna(data.body.antenna.id, loginId);
 				break;
 			case 'newChatMessage':
-				client = await swos.openChat(data.body, loginId);
+				// FIXME チャット機能が有効になった暁には解除する
 				break;
 			default:
 				switch (action) {
 					case 'markAllAsRead':
 						await globalThis.registration.getNotifications()
-							.then(notifications => notifications.forEach(n => n.tag !== 'read_notification' && n.close()));
+							.then(notifications => notifications.forEach(n => {
+								if (n.tag !== 'read_notification') n.close();
+							}));
 						await get<Pick<Misskey.entities.SignupResponse, 'id' | 'token'>[]>('accounts').then(accounts => {
 							return Promise.all((accounts ?? []).map(async account => {
 								await swos.sendMarkAllAsRead(account.id);

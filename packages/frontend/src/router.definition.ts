@@ -17,9 +17,10 @@ export const page = (loader: AsyncComponentLoader) => defineAsyncComponent({
 	errorComponent: MkError,
 });
 
-function chatPage(...args: Parameters<typeof page>) {
-	return $i?.policies.chatAvailability !== 'unavailable' ? page(...args) : page(() => import('@/pages/not-found.vue'));
-}
+// FIXME チャット機能が有効になった暁には解除する
+// function chatPage(...args: Parameters<typeof page>) {
+// 	return $i?.policies.chatAvailability !== 'unavailable' ? page(...args) : page(() => import('@/pages/not-found.vue'));
+// }
 
 export const ROUTE_DEF: RouteDef[] = [{
 	name: 'index',
@@ -52,8 +53,9 @@ export const ROUTE_DEF: RouteDef[] = [{
 }, {
 	path: '/clips/:clipId',
 	component: page(() => import('@/pages/clip.vue')),
-}
-// 	{
+},
+// FIXME チャット機能が有効になった暁には解除する
+// {
 // 	path: '/chat',
 // 	component: chatPage(() => import('@/pages/chat/home.vue')),
 // 	loginRequired: true,
@@ -70,7 +72,7 @@ export const ROUTE_DEF: RouteDef[] = [{
 // 	component: chatPage(() => import('@/pages/chat/message.vue')),
 // 	loginRequired: true,
 // },
-, {
+{
 	path: '/instance-info/:host',
 	component: page(() => import('@/pages/instance-info.vue')),
 }, {

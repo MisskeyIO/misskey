@@ -49,6 +49,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</MkSwitch>
 					</MkFolder>
 
+					<!-- FIXME チャット機能が有効になった暁には解除する
 					<MkFolder v-if="matchQuery([i18n.ts._role._options.chatAvailability, 'chatAvailability'])">
 						<template #label>{{ i18n.ts._role._options.chatAvailability }}</template>
 						<template #suffix>{{ policies.chatAvailability === 'available' ? i18n.ts.yes : policies.chatAvailability === 'readonly' ? i18n.ts.readonly : i18n.ts.no }}</template>
@@ -63,6 +64,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<template #label>{{ i18n.ts.enable }}</template>
 						</MkSelect>
 					</MkFolder>
+					-->
 
 					<MkFolder v-if="matchQuery([i18n.ts._role._options.canScheduleNote, 'canScheduleNote'])">
 							<template #label>{{ i18n.ts._role._options.canScheduleNote }}</template>

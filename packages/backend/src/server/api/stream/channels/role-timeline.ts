@@ -64,8 +64,11 @@ class RoleTimelineChannel extends Channel {
 
 			// 純粋なリノート（引用リノートでないリノート）の場合
 			if (note.renote && isRenotePacked(note) && !isQuotePacked(note)) {
+				if (!this.isNoteVisibleForMe(note.renote)) return;
+				if (note.renote.user.requireSigninToViewContents && this.user == null) return;
 				if (note.renote.reply) {
 					const reply = note.renote.reply;
+					if (reply.user.requireSigninToViewContents && this.user == null) return;
 					if (!this.isNoteVisibleForMe(reply)) return;
 				}
 			}

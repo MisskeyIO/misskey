@@ -117,7 +117,6 @@ export class UrlPreviewService {
 				// Cache 1day
 				reply.header('Cache-Control', 'max-age=86400, immutable');
 
-
 				return summary;
 			} catch (err) {
 				this.logger.warn(`Failed to get preview of ${url}: ${err}`);

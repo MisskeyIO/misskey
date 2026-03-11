@@ -107,7 +107,7 @@ export const paramDef = {
 		},
 		{
 			type: 'object',
-			properties: {host: {
+			properties: { host: {
 			type: 'string',
 			nullable: true,
 			description: 'The local host is represented with `null`.',

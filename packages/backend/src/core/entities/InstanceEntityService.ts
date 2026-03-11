@@ -44,7 +44,7 @@ export class InstanceEntityService {
 			isNotResponding: instance.isNotResponding,
 			isSuspended: instance.suspensionState !== 'none' || Boolean(softwareSuspended),
 			suspensionState: instance.suspensionState === 'none' && softwareSuspended ? 'softwareSuspended' : instance.suspensionState,
-			isBlocked: this.utilityService.isItemListedIn(instance.host,this.meta.blockedHosts),
+			isBlocked: this.utilityService.isItemListedIn(instance.host, this.meta.blockedHosts),
 			softwareName: instance.softwareName,
 			softwareVersion: instance.softwareVersion,
 			openRegistrations: instance.openRegistrations,

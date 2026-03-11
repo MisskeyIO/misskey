@@ -390,7 +390,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					return length;
 				};
 
-
 				const length = count(mutedWords);
 				if (length > limit) {
 					throw new ApiError(meta.errors.tooManyMutedWords);
@@ -422,6 +421,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					profileUpdates.enableWordMute = ps.mutedWords.length > 0;
 				}
 			}
+
 			if (ps.mutedInstances !== undefined) profileUpdates.mutedInstances = ps.mutedInstances;
 			if (ps.notificationRecieveConfig !== undefined) profileUpdates.notificationRecieveConfig = ps.notificationRecieveConfig;
 			if (typeof ps.isLocked === 'boolean') updates.isLocked = ps.isLocked;

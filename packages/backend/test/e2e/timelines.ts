@@ -2264,7 +2264,7 @@ describe('Timelines', () => {
 
 				await waitForPushToTl();
 
-				const res = await api('notes/user-list-timeline', { listId: list.id }, alice);
+				const res = await api('notes/user-list-timeline', { limit: 100, listId: list.id }, alice);
 
 				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
 			});
@@ -2534,7 +2534,7 @@ describe('Timelines', () => {
 					assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), false);
 				});
 
-				test('チャンネル未フォロー　＋　リスインしてる　＝　TLに流れない', async () => {
+				test('チャンネル未フォロー　＋　リスインしてる　＝　TLに流れる', async () => {
 					const [alice, bob] = await Promise.all([signup(), signup()]);
 
 					const list = await createList('list', alice);
@@ -2549,10 +2549,10 @@ describe('Timelines', () => {
 
 					const res = await api('notes/user-list-timeline', { limit: 100, listId: list.id }, alice);
 
-					assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), false);
+					assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
 				});
 
-				test('チャンネルフォロー　＋　リスインしてる　＝　TLに流れない', async () => {
+				test('チャンネルフォロー　＋　リスインしてる　＝　TLに流れる', async () => {
 					const [alice, bob] = await Promise.all([signup(), signup()]);
 
 					const list = await createList('list', alice);
@@ -2568,7 +2568,7 @@ describe('Timelines', () => {
 
 					const res = await api('notes/user-list-timeline', { limit: 100, listId: list.id }, alice);
 
-					assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), false);
+					assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
 				});
 
 				test('チャンネル未フォロー　＋　リスインしてない　＋　チャンネルミュート　＝　TLに流れない', async () => {

@@ -152,5 +152,4 @@ export class MiNoteDraft {
 	public pollExpiredAfter: number | null;
 
 	//#endregion
-
 }

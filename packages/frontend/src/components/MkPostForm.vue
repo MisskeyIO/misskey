@@ -159,6 +159,41 @@ import { useUploader } from '@/composables/use-uploader.js';
 import { startTour } from '@/utility/tour.js';
 import { closeTip } from '@/tips.js';
 
+type LocalScheduledDraftData = {
+	text: string | null;
+	useCw: boolean;
+	cw: string | null;
+	visibility: 'public' | 'home' | 'followers' | 'specified';
+	localOnly: boolean;
+	lang: string | null;
+	dimension: number | null;
+	files: Misskey.entities.DriveFile[];
+	poll: PollEditorModelValue | null;
+	visibleUserIds?: string[];
+	quoteId?: string | null;
+	reactionAcceptance?: Misskey.entities.NoteDraft['reactionAcceptance'];
+};
+
+type LocalScheduledDraft = {
+	updatedAt: string;
+	scheduledAt: string | null;
+	channel?: {
+		id: string;
+		name: string;
+	};
+	renote?: {
+		id: string;
+		text?: string | null;
+		user: Misskey.Acct;
+	};
+	reply?: {
+		id: string;
+		text?: string | null;
+		user: Misskey.Acct;
+	};
+	data: LocalScheduledDraftData;
+};
+
 const $i = ensureSignin();
 
 const modal = inject(DI.inModal, false);
@@ -1016,7 +1051,7 @@ function saveDraft() {
 		scheduledAt = null;
 	}
 
-	const draftData = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}') as Record<string, Misskey.entities.NoteDraft>;
+	const draftData = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}') as Record<string, LocalScheduledDraft>;
 
 	draftData[draftKey.value] = {
 		updatedAt: new Date().toISOString(),
@@ -1029,7 +1064,6 @@ function saveDraft() {
 			id: renote.value.id,
 			text: (renote.value.cw ?? renote.value.text)?.substring(0, 100),
 			user: {
-				id: renote.value.userId,
 				username: renote.value.user.username,
 				host: renote.value.user.host,
 			},
@@ -1038,7 +1072,6 @@ function saveDraft() {
 			id: reply.value.id,
 			text: (reply.value.cw ?? reply.value.text)?.substring(0, 100),
 			user: {
-				id: reply.value.userId,
 				username: reply.value.user.username,
 				host: reply.value.user.host,
 			},
@@ -1064,7 +1097,7 @@ function saveDraft() {
 }
 
 function deleteDraft() {
-	const draftData = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}') as Record<string, Misskey.entities.NoteDraft>;
+	const draftData = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}') as Record<string, LocalScheduledDraft>;
 
 	delete draftData[draftKey.value];
 
@@ -1111,7 +1144,7 @@ async function uploadFiles() {
 }
 
 function loadDraft(exactMatch = false) {
-	const drafts = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}') as Record<string, Misskey.entities.NoteDraft>;
+	const drafts = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}') as Record<string, LocalScheduledDraft>;
 	const scope = exactMatch ? draftKey.value : draftKey.value.replace(`note:${draftId.value}`, 'note:');
 	const draft = Object.entries(drafts).filter(([k]) => k.startsWith(scope))
 		.map(r => ({ key: r[0], value: { ...r[1], updatedAt: new Date(r[1].updatedAt).getTime() } }))
@@ -1131,7 +1164,7 @@ function loadDraft(exactMatch = false) {
 		cw.value = draft.value.data.cw;
 		visibility.value = draft.value.data.visibility;
 		localOnly.value = draft.value.data.localOnly;
-		postingLang.value = draft.value.data.lang;
+		postingLang.value = draft.value.data.lang ?? null;
 		dimension.value = draft.value.data.dimension ?? prefer.s.dimension;
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		files.value = draft.value.data.files?.filter(f => f?.id && f.type && f.name) || [];

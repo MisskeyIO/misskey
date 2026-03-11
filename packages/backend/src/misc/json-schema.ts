@@ -33,6 +33,7 @@ import { packedModerationLogSchema } from '@/models/json-schema/moderation-log.j
 import { packedNoteFavoriteSchema } from '@/models/json-schema/note-favorite.js';
 import { packedNoteSchema } from '@/models/json-schema/note.js';
 import { packedNoteDraftSchema } from '@/models/json-schema/note-draft.js';
+import { packedScheduledNoteSchema } from '@/models/json-schema/scheduled-note.js';
 import { packedNotificationSchema } from '@/models/json-schema/notification.js';
 import { packedPageLikeSchema, packedPageBlockSchema, packedPageSchema } from '@/models/json-schema/page.js';
 import {
@@ -97,6 +98,7 @@ export const refs = {
 	App: packedAppSchema,
 	Note: packedNoteSchema,
 	NoteDraft: packedNoteDraftSchema,
+	ScheduledNote: packedScheduledNoteSchema,
 	NoteReaction: packedNoteReactionSchema,
 	NoteReactionWithNote: packedNoteReactionWithNoteSchema,
 	NoteFavorite: packedNoteFavoriteSchema,

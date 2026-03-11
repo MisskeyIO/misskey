@@ -27,7 +27,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template #default="{ items }">
 				<div class="_gaps_s">
 					<div
-						v-for="scheduled in (items as any[])"
+						v-for="scheduled in (items as Misskey.entities.ScheduledNote[])"
 						:key="scheduled.id"
 						v-panel
 						:class="[$style.draft]"
@@ -47,27 +47,27 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<div :class="$style.draftMeta">
 									<div v-if="scheduled.reply" class="_nowrap">
 										<i class="ti ti-arrow-back-up"></i> <I18n :src="i18n.ts._drafts.replyTo" tag="span">
-											<template #user>
-												<Mfm v-if="scheduled.reply.user.name != null" :text="scheduled.reply.user.name" :plain="true" :nowrap="true"/>
-												<MkAcct v-else :user="scheduled.reply.user"/>
-											</template>
-										</I18n>
-									</div>
-									<div v-if="scheduled.renote" class="_nowrap">
-										<i class="ti ti-quote"></i> <I18n :src="i18n.ts._drafts.quoteOf" tag="span">
-											<template #user>
-												<Mfm v-if="scheduled.renote.user.name != null" :text="scheduled.renote.user.name" :plain="true" :nowrap="true"/>
-												<MkAcct v-else :user="scheduled.renote.user"/>
-											</template>
-										</I18n>
-									</div>
+									<template #user>
+										<Mfm v-if="scheduled.reply.user.name != null" :text="scheduled.reply.user.name" :plain="true" :nowrap="true"/>
+										<MkAcct v-else :user="scheduled.reply.user"/>
+									</template>
+								</I18n>
+							</div>
+							<div v-if="scheduled.renote" class="_nowrap">
+								<i class="ti ti-quote"></i> <I18n :src="i18n.ts._drafts.quoteOf" tag="span">
+									<template #user>
+										<Mfm v-if="scheduled.renote.user.name != null" :text="scheduled.renote.user.name" :plain="true" :nowrap="true"/>
+										<MkAcct v-else :user="scheduled.renote.user"/>
+									</template>
+								</I18n>
+							</div>
 									<div v-if="scheduled.channel" class="_nowrap">
 										<i class="ti ti-device-tv"></i> {{ i18n.tsx._drafts.postTo({ channel: scheduled.channel.name }) }}
 									</div>
 								</div>
 							</div>
 							<div :class="$style.draftContent">
-								<Mfm :text="getNoteSummary({ ...scheduled.data, renote: scheduled.renote, reply: scheduled.reply }, { showRenote: false, showReply: false })" :plain="true"/>
+								<Mfm :text="getScheduledSummary(scheduled)" :plain="true"/>
 							</div>
 							<div :class="$style.draftFooter">
 								<div :class="$style.draftVisibility">
@@ -118,7 +118,6 @@ import MkButton from '@/components/MkButton.vue';
 import MkPagination from '@/components/MkPagination.vue';
 import MkModalWindow from '@/components/MkModalWindow.vue';
 import MkInfo from '@/components/MkInfo.vue';
-import { getNoteSummary } from '@/utility/get-note-summary.js';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import { Paginator } from '@/utility/paginator.js';
@@ -135,12 +134,34 @@ const scheduledPaginator = markRaw(new Paginator('notes/scheduled/list', {
 
 const dialogEl = shallowRef<InstanceType<typeof MkModalWindow>>();
 
+function getScheduledSummary(scheduled: Misskey.entities.ScheduledNote): string {
+	let summary = scheduled.data.cw ?? scheduled.data.text ?? '';
+
+	if (scheduled.data.files.length !== 0) {
+		summary += ` (${i18n.tsx.withNFiles({ n: scheduled.data.files.length })})`;
+	}
+
+	if (scheduled.data.poll) {
+		summary += ` (${i18n.ts.poll})`;
+	}
+
+	if (scheduled.reply) {
+		summary += `\n\nRE: ${scheduled.reply.text ?? '...'}`;
+	}
+
+	if (scheduled.renote) {
+		summary += `\n\nRN: ${scheduled.renote.text ?? '...'}`;
+	}
+
+	return summary.trim();
+}
+
 function cancel() {
 	emit('cancel');
 	dialogEl.value?.close();
 }
 
-async function cancelSchedule(draft: any) {
+async function cancelSchedule(draft: Misskey.entities.ScheduledNote) {
 	os.apiWithDialog('notes/scheduled/cancel', {
 		draftId: draft.id,
 	}).then(() => {
@@ -148,10 +169,10 @@ async function cancelSchedule(draft: any) {
 	});
 }
 
-async function deleteScheduledNote(draft: any) {
+async function deleteScheduledNote(draft: Misskey.entities.ScheduledNote) {
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		text: i18n.ts.deleteAreYouSure.replace('{x}', getNoteSummary({ ...draft.data, renote: draft.renote, reply: draft.reply }, { showRenote: false, showReply: false })),
+		text: i18n.ts.deleteAreYouSure.replace('{x}', getScheduledSummary(draft)),
 	});
 
 	if (canceled) return;

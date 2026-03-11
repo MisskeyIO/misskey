@@ -4,6 +4,7 @@
  */
 
 import { randomUUID, randomBytes } from 'node:crypto';
+import { promises as fsp } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Inject, Injectable } from '@nestjs/common';
@@ -20,7 +21,6 @@ import { FastifyAdapter as BullBoardFastifyAdapter } from '@bull-board/fastify';
 import fastifyCookie from '@fastify/cookie';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { createBullBoard } from '@bull-board/api';
-import locales from '../../../../../locales/index.js';
 import type { Config } from '@/config.js';
 import { getNoteSummary } from '@/misc/get-note-summary.js';
 import { DI } from '@/di-symbols.js';
@@ -75,6 +75,7 @@ const _dirname = dirname(_filename);
 const staticAssets = `${_dirname}/../../../assets/`;
 const clientAssets = `${_dirname}/../../../../frontend/assets/`;
 const assets = `${_dirname}/../../../../../built/_frontend_dist_/`;
+const frontendLocales = `${assets}/locales/`;
 const swAssets = `${_dirname}/../../../../../built/_sw_dist_/`;
 const frontendViteOut = `${_dirname}/../../../../../built/_frontend_vite_/`;
 // const frontendEmbedViteOut = `${_dirname}/../../../../../built/_frontend_embed_vite_/`;
@@ -82,6 +83,7 @@ const frontendViteOut = `${_dirname}/../../../../../built/_frontend_vite_/`;
 @Injectable()
 export class ClientServerService {
 	private logger: Logger;
+	private supportedLangs: string[] | null = null;
 
 	constructor(
 		@Inject(DI.config)
@@ -146,6 +148,32 @@ export class ClientServerService {
 		private clientLoggerService: ClientLoggerService,
 	) {
 		//this.createServer = this.createServer.bind(this);
+	}
+
+	@bindThis
+	private async getSupportedLangs(): Promise<string[]> {
+		if (this.supportedLangs != null) {
+			return this.supportedLangs;
+		}
+
+		const suffix = `.${this.config.version}.json`;
+
+		try {
+			const entries = await fsp.readdir(frontendLocales, { withFileTypes: true });
+			const langs = entries
+				.filter(entry => entry.isFile() && entry.name.endsWith(suffix))
+				.map(entry => entry.name.slice(0, -suffix.length))
+				.sort((a, b) => a.localeCompare(b));
+
+			if (langs.length > 0) {
+				this.supportedLangs = langs;
+				return langs;
+			}
+		} catch {
+		}
+
+		this.supportedLangs = this.meta.langs.length > 0 ? [...this.meta.langs] : ['en-US'];
+		return this.supportedLangs;
 	}
 
 	@bindThis
@@ -218,14 +246,14 @@ export class ClientServerService {
 			serverErrorImageUrl: meta.serverErrorImageUrl ?? 'https://xn--931a.moe/assets/error.jpg',
 			infoImageUrl: meta.infoImageUrl ?? 'https://xn--931a.moe/assets/info.jpg',
 			notFoundImageUrl: meta.notFoundImageUrl ?? 'https://xn--931a.moe/assets/not-found.jpg',
-				instanceUrl: this.config.url,
-				metaJson: htmlSafeJsonStringify(await this.metaEntityService.packDetailed(meta)),
-				now: Date.now(),
-				langs: Object.keys(locales),
-				extraHead: this.config.extraHead,
-				federationEnabled: meta.federation !== 'none',
-			};
-		}
+			instanceUrl: this.config.url,
+			metaJson: htmlSafeJsonStringify(await this.metaEntityService.packDetailed(meta)),
+			now: Date.now(),
+			langs: await this.getSupportedLangs(),
+			extraHead: this.config.extraHead,
+			federationEnabled: meta.federation !== 'none',
+		};
+	}
 
 		@bindThis
 		public createServer(fastify: FastifyInstance, options: FastifyPluginOptions, done: (err?: Error) => void) {

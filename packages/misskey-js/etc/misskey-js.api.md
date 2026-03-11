@@ -2124,6 +2124,7 @@ declare namespace entities {
         App,
         Note,
         NoteDraft,
+        ScheduledNote,
         NoteReaction,
         NoteReactionWithNote,
         NoteFavorite,
@@ -3905,6 +3906,9 @@ export type RolesUsersRequest = operations['roles___users']['requestBody']['cont
 
 // @public (undocumented)
 export type RolesUsersResponse = operations['roles___users']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+export type ScheduledNote = components['schemas']['ScheduledNote'];
 
 // @public (undocumented)
 export type Signin = components['schemas']['Signin'];

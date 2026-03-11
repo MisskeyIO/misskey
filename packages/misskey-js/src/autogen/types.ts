@@ -4498,6 +4498,61 @@ export type components = {
                 expiredAfter: number | null;
             } | null;
         };
+        ScheduledNote: {
+            /**
+             * Format: id
+             * @example xxxxxxxxxx
+             */
+            id: string;
+            /** Format: date-time */
+            createdAt: string;
+            scheduledAt: number | null;
+            reason?: string | null;
+            channel?: {
+                /**
+                 * Format: id
+                 * @example xxxxxxxxxx
+                 */
+                id: string;
+                name: string;
+            } | null;
+            renote?: {
+                /**
+                 * Format: id
+                 * @example xxxxxxxxxx
+                 */
+                id: string;
+                text: string | null;
+                user: components['schemas']['UserLite'];
+            } | null;
+            reply?: {
+                /**
+                 * Format: id
+                 * @example xxxxxxxxxx
+                 */
+                id: string;
+                text: string | null;
+                user: components['schemas']['UserLite'];
+            } | null;
+            data: {
+                text: string | null;
+                useCw: boolean;
+                cw: string | null;
+                /** @enum {string} */
+                visibility: 'public' | 'home' | 'followers' | 'specified';
+                localOnly: boolean;
+                lang: string | null;
+                dimension: number | null;
+                files: components['schemas']['DriveFile'][];
+                poll: {
+                    choices: string[];
+                    multiple: boolean;
+                    expiresAt: number | null;
+                    expiredAfter: number | null;
+                } | null;
+                visibleUserIds?: string[];
+            };
+        };
         NoteReaction: {
             /** Format: id */
             id: string;
@@ -4701,7 +4756,7 @@ export type components = {
             createdAt: string;
             /** @enum {string} */
             type: 'noteScheduled';
-            draft: components['schemas']['NoteDraft'];
+            draft: components['schemas']['ScheduledNote'];
         } | {
             /** Format: id */
             id: string;
@@ -4717,7 +4772,7 @@ export type components = {
             createdAt: string;
             /** @enum {string} */
             type: 'scheduledNoteError';
-            draft: components['schemas']['NoteDraft'];
+            draft: components['schemas']['ScheduledNote'];
         } | {
             /** Format: id */
             id: string;
@@ -30330,7 +30385,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    'application/json': components['schemas']['NoteDraft'][];
+                    'application/json': components['schemas']['ScheduledNote'][];
                 };
             };
             /** @description Client error */

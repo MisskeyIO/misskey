@@ -376,19 +376,19 @@ export const packedNotificationSchema = {
 		},
 	}, {
 		type: 'object',
-		properties: {
-			...baseSchema.properties,
-			type: {
-				type: 'string',
-				optional: false, nullable: false,
-				enum: ['noteScheduled'],
+			properties: {
+				...baseSchema.properties,
+				type: {
+					type: 'string',
+					optional: false, nullable: false,
+					enum: ['noteScheduled'],
+				},
+				draft: {
+					type: 'object',
+					ref: 'ScheduledNote',
+					optional: false, nullable: false,
+				},
 			},
-			draft: {
-				type: 'object',
-				ref: 'NoteDraft',
-				optional: false, nullable: false,
-			},
-		},
 	}, {
 		type: 'object',
 		properties: {
@@ -406,19 +406,19 @@ export const packedNotificationSchema = {
 		},
 	}, {
 		type: 'object',
-		properties: {
-			...baseSchema.properties,
-			type: {
-				type: 'string',
-				optional: false, nullable: false,
-				enum: ['scheduledNoteError'],
+			properties: {
+				...baseSchema.properties,
+				type: {
+					type: 'string',
+					optional: false, nullable: false,
+					enum: ['scheduledNoteError'],
+				},
+				draft: {
+					type: 'object',
+					ref: 'ScheduledNote',
+					optional: false, nullable: false,
+				},
 			},
-			draft: {
-				type: 'object',
-				ref: 'NoteDraft',
-				optional: false, nullable: false,
-			},
-		},
 	}, {
 		type: 'object',
 		properties: {

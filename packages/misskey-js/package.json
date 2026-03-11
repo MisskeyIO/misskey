@@ -28,8 +28,8 @@
     "eslint": "eslint './**/*.{js,jsx,ts,tsx}'",
     "typecheck": "tsc --noEmit",
     "lint": "pnpm typecheck && pnpm eslint",
-    "jest": "jest --coverage --detectOpenHandles",
-    "test": "pnpm jest && pnpm tsd",
+    "vitest": "vitest run --coverage",
+    "test": "pnpm vitest && pnpm tsd",
     "update-autogen-code": "pnpm --filter misskey-js-type-generator generate && ncp generator/built/autogen src/autogen"
   },
   "repository": {

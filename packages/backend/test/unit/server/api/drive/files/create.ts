@@ -136,13 +136,14 @@ describe('/drive/files/create', () => {
 		return await request(server.server)
 			.post('/api/drive/files/create')
 			.set('Content-Type', 'multipart/form-data')
+			.set('Authorization', `Bearer ${root.token ?? ''}`)
 			.attach('file', fileContent)
 			.field('name', name)
 			.field('comment', comment)
 			.field('isSensitive', isSensitive)
 			.field('force', force)
 			.field('folderId', folder.id)
-			.field('i', root.token ?? '');
+			;
 	}
 
 	test('200 ok (all types allowed)', async () => {

@@ -20,7 +20,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<SearchMarker :keywords="['language']">
 							<MkSelect v-model="lang" :items="langs.map(x => ({ label: x[1], value: x[0] }))">
 								<template #label><SearchLabel>{{ i18n.ts.uiLanguage }}</SearchLabel></template>
-								<option v-for="x in langs" :key="x[0]" :value="x[0]">{{ x[0] === 'other' ? i18n.ts.other : x[1] }}</option>
 								<template #caption>
 									<I18n :src="i18n.ts.i18nInfo" tag="span">
 										<template #link>
@@ -201,9 +200,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<MkFolder>
 									<template #label><SearchLabel>{{ i18n.ts.postingAndViewingLanguage }}</SearchLabel></template>
 									<div class="_gaps_s">
-									<MkSelect v-model="postingLang">
+									<MkSelect v-model="postingLang" :items="postingLangItems">
 										<template #label><SearchLabel>{{ i18n.ts.postingLanguage }}</SearchLabel></template>
-										<option v-for="code in languageCodes" :key="code" :value="code">{{ code === 'other' ? i18n.ts.other : langmap[code].nativeName }}</option>
 										<template #caption>{{ i18n.ts.postingLanguageDescription }}</template>
 									</MkSelect>
 
@@ -218,11 +216,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 										<template v-if="!showAllViewingLangs">
 											<div :class="$style.viewingLangSelector">
-												<MkSelect v-model="viewingLangToAdd" style="flex: 1;">
-													<template #label><SearchLabel>{{ i18n.ts.viewingLanguages }}</SearchLabel></template>
-													<option v-for="code in addableViewingLangs" :key="code" :value="code">{{ getViewingLangLabel(code) }}</option>
-													<template #caption>{{ i18n.ts.viewingLanguagesDescription }}</template>
-												</MkSelect>
+											<MkSelect v-model="viewingLangToAdd" :items="viewingLangToAddItems" style="flex: 1;">
+												<template #label><SearchLabel>{{ i18n.ts.viewingLanguages }}</SearchLabel></template>
+												<template #caption>{{ i18n.ts.viewingLanguagesDescription }}</template>
+											</MkSelect>
 												<MkButton :disabled="viewingLangToAdd == null" @click="addViewingLang">
 													<i class="ti ti-plus"></i> {{ i18n.ts.add }}
 												</MkButton>
@@ -900,11 +897,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 						<SearchMarker :keywords="['ad', 'adult', 'sensitive', 'nsfw', '18']">
 							<MkPreferenceContainer k="displayOfSensitiveAds">
-								<MkSelect v-model="displayOfSensitiveAds">
+								<MkSelect v-model="displayOfSensitiveAds" :items="displayOfSensitiveAdsItems">
 									<template #label><SearchLabel>{{ i18n.ts.displayOfSensitiveAds }}</SearchLabel></template>
-									<option value="hidden">{{ i18n.ts._displayOfSensitiveAds.hidden }}</option>
-									<option value="always">{{ i18n.ts._displayOfSensitiveAds.always }}</option>
-									<option value="filtered">{{ i18n.ts._displayOfSensitiveAds.filtered }}</option>
 								</MkSelect>
 							</MkPreferenceContainer>
 						</SearchMarker>
@@ -1064,6 +1058,10 @@ const autoPostingLang = getAutoPostingLang(browserLanguage);
 const initialPostingLang = hasLanguageConfig ? normalizedPostingLang : autoPostingLang;
 const postingLang = ref<string | null>(initialPostingLang);
 const languageCodes = [...postingLangCodes];
+const postingLangItems = languageCodes.map(code => ({
+	label: code === 'other' ? i18n.ts.other : langmap[code].nativeName,
+	value: code,
+}));
 const rawInitialViewingLangs = hasLanguageConfig ? ($i.viewingLangs ?? []) : getDefaultViewingLangs(autoPostingLang);
 const initialViewingLangs = Array.from(new Set(rawInitialViewingLangs.map((code) => {
 	if (code === 'unknown' || code === 'remote' || code === null) return code;
@@ -1079,6 +1077,15 @@ const showHashtagsInAllLanguages = ref($i.showHashtagsInAllLanguages ?? true);
 const addableViewingLangs = computed(() =>
 	languageCodes.filter(code => !viewingLangs.value.includes(code)),
 );
+const viewingLangToAddItems = computed(() => addableViewingLangs.value.map(code => ({
+	label: getViewingLangLabel(code),
+	value: code,
+})));
+const displayOfSensitiveAdsItems = [
+	{ label: i18n.ts._displayOfSensitiveAds.hidden, value: 'hidden' },
+	{ label: i18n.ts._displayOfSensitiveAds.always, value: 'always' },
+	{ label: i18n.ts._displayOfSensitiveAds.filtered, value: 'filtered' },
+];
 const languageUnsaved = ref(false);
 let languageSaving = false;
 const autoDetectedPostingLang = miLocalStorage.getItem('postingLangAutoDetected');

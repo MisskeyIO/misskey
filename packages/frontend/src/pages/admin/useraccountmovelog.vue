@@ -3,17 +3,11 @@
 	<div class="_spacer" style="--MI_SPACER-w: 900px;">
 		<div style="display: flex; flex-direction: column; gap: var(--MI-margin); flex-wrap: wrap;">
 			<div :class="$style.inputs">
-				<MkSelect v-model="from" :class="$style.input">
+				<MkSelect v-model="from" :class="$style.input" :items="serverScopeItems">
 					<template #label>{{ i18n.ts._accountMigration.movedFromServer }}</template>
-					<option value="all">{{ i18n.ts.all }}</option>
-					<option value="remote">{{ i18n.ts.remote }}</option>
-					<option value="local">{{ i18n.ts.local }}</option>
 				</MkSelect>
-				<MkSelect v-model="to" :class="$style.input">
+				<MkSelect v-model="to" :class="$style.input" :items="serverScopeItems">
 					<template #label>{{ i18n.ts._accountMigration.movedToServer }}</template>
-					<option value="all">{{ i18n.ts.all }}</option>
-					<option value="remote">{{ i18n.ts.remote }}</option>
-					<option value="local">{{ i18n.ts.local }}</option>
 				</MkSelect>
 			</div>
 			<div :class="$style.inputs">
@@ -70,6 +64,12 @@ const movedToId = ref('');
 const movedFromId = ref('');
 const from = ref('all');
 const to = ref('all');
+
+const serverScopeItems = [
+	{ label: i18n.ts.all, value: 'all' },
+	{ label: i18n.ts.remote, value: 'remote' },
+	{ label: i18n.ts.local, value: 'local' },
+] as const;
 
 const pagination = {
 	endpoint: 'admin/show-user-account-move-logs' as const,

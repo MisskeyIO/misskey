@@ -93,13 +93,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<MkInfo>{{ i18n.ts.inlinePoliciesDescription }}</MkInfo>
 
 								<div v-for="(policy, index) in inlinePoliciesForm" :key="policy.id ?? index" :class="$style.inlinePolicyRow">
-									<MkSelect :modelValue="policy.policy" :class="$style.inlinePolicyField" @update:modelValue="value => onChangeInlinePolicy(index, value as string)">
-										<option v-for="option in inlinePolicyOptions" :key="option" :value="option">{{ option }}</option>
+									<MkSelect :modelValue="policy.policy" :items="inlinePolicyItems" :class="$style.inlinePolicyField" @update:modelValue="value => onChangeInlinePolicy(index, value as string)">
 									</MkSelect>
 
-									<MkSelect v-model="policy.operation" :class="$style.inlinePolicyField" :disabled="policyValueType(policy.policy) !== 'number'">
-										<option value="set">{{ i18n.ts.inlinePolicyOperationSet }}</option>
-										<option value="increment">{{ i18n.ts.inlinePolicyOperationIncrement }}</option>
+									<MkSelect v-model="policy.operation" :items="inlinePolicyOperationItems" :class="$style.inlinePolicyField" :disabled="policyValueType(policy.policy) !== 'number'">
 									</MkSelect>
 
 									<div :class="$style.inlinePolicyValue">
@@ -110,8 +107,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 											type="number"
 											@update:modelValue="value => policy.value = value != null ? Number(value) : 0"
 										/>
-										<MkSelect v-else-if="policy.policy === 'chatAvailability'" v-model="policy.value">
-											<option v-for="option in chatAvailabilityOptions" :key="option" :value="option">{{ option }}</option>
+										<MkSelect v-else-if="policy.policy === 'chatAvailability'" v-model="policy.value" :items="chatAvailabilityItems">
 										</MkSelect>
 										<MkInput v-else v-model="policy.value" />
 									</div>
@@ -319,6 +315,11 @@ type InlinePolicyForm = {
 const inlinePoliciesForm = ref<InlinePolicyForm[]>([]);
 const inlinePoliciesInitial = ref<InlinePolicyForm[]>([]);
 const chatAvailabilityOptions = ['available', 'readonly', 'unavailable'];
+const chatAvailabilityItems = chatAvailabilityOptions.map(option => ({ label: option, value: option }));
+const inlinePolicyOperationItems = [
+	{ label: i18n.ts.inlinePolicyOperationSet, value: 'set' },
+	{ label: i18n.ts.inlinePolicyOperationIncrement, value: 'increment' },
+] as const;
 
 const result = await _fetch_();
 resetInlinePoliciesFromInfo(result.info);
@@ -373,6 +374,7 @@ const announcementsPaginator = markRaw(new Paginator('admin/announcements/list',
 const expandedRoleIds = ref<(typeof info.value.roles[number]['id'])[]>([]);
 
 const inlinePolicyOptions = computed(() => Object.keys(info.value?.policies ?? {}));
+const inlinePolicyItems = computed(() => inlinePolicyOptions.value.map(option => ({ label: option, value: option })));
 
 function _fetch_() {
 	return Promise.all([misskeyApi('users/show', {

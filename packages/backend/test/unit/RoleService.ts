@@ -219,7 +219,7 @@ describe('RoleService', () => {
 
 			// expiresAtあり（期限切れでない）
 			const future = new Date(Date.now() + 1000 * 60 * 60); // +1 hour
-			await roleService.assign(user.id, roleNotExpired.id, future);
+			await roleService.assign(user.id, roleNotExpired.id, null, future);
 
 			// expiresAtあり（期限切れ）
 			await assignRole({ userId: user.id, roleId: roleExpired.id, expiresAt: new Date(Date.now() - 1000) });
@@ -500,7 +500,7 @@ describe('RoleService', () => {
 
 			// expiresAt あり（期限切れでない）
 			const future = new Date(Date.now() + 1000 * 60 * 60); // +1 hour
-			await roleService.assign(user.id, roleNotExpired.id, future);
+			await roleService.assign(user.id, roleNotExpired.id, null, future);
 
 			// expiresAt あり（期限切れ）
 			await assignRole({ userId: user.id, roleId: roleExpired.id, expiresAt: new Date(Date.now() - 1000) });

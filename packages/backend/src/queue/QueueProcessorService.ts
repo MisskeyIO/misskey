@@ -550,7 +550,6 @@ export class QueueProcessorService implements OnApplicationShutdown {
 			});
 		}
 		//#endregion
-
 	}
 
 	@bindThis

@@ -66,18 +66,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</div>
 
 						<div class="_gaps_s">
-							<MkSelect v-model="selectedListId" :disabled="userLists?.length === 0">
-								<template #label>{{ i18n.ts.selectList }}</template>
-								<option v-for="list in userLists" :key="list.id" :value="list.id">{{ list.name }}</option>
-							</MkSelect>
+						<MkSelect v-model="selectedListId" :items="userListItems" :disabled="userLists?.length === 0">
+							<template #label>{{ i18n.ts.selectList }}</template>
+						</MkSelect>
 							<MkButton :disabled="!selectedListId" @click="clearFanoutTimeline('list', selectedListId)"><i class="ti ti-trash"></i> {{ i18n.ts.purgeUserListTimelineCache }}</MkButton>
 						</div>
 
 						<div class="_gaps_s">
-							<MkSelect v-model="selectedAntennaId" :disabled="antennas?.length === 0">
-								<template #label>{{ i18n.ts.selectAntenna }}</template>
-								<option v-for="antenna in antennas" :key="antenna.id" :value="antenna.id">{{ antenna.name }}</option>
-							</MkSelect>
+						<MkSelect v-model="selectedAntennaId" :items="antennaItems" :disabled="antennas?.length === 0">
+							<template #label>{{ i18n.ts.selectAntenna }}</template>
+						</MkSelect>
 							<MkButton :disabled="!selectedAntennaId" @click="clearFanoutTimeline('antenna', selectedAntennaId)"><i class="ti ti-trash"></i> {{ i18n.ts.purgeAntennaTimelineCache }}</MkButton>
 						</div>
 					</div>
@@ -226,6 +224,8 @@ const selectedAntennaId = ref<string | null>(null);
 const enableFolderPageView = prefer.model('experimental.enableFolderPageView');
 const enableHapticFeedback = prefer.model('experimental.enableHapticFeedback');
 const enableWebTranslatorApi = prefer.model('experimental.enableWebTranslatorApi');
+const userListItems = computed(() => userLists.value.map(list => ({ label: list.name, value: list.id })));
+const antennaItems = computed(() => antennas.value.map(antenna => ({ label: antenna.name, value: antenna.id })));
 
 watch(skipNoteRender, () => {
 	suggestReload();

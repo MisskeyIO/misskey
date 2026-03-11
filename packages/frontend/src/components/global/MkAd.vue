@@ -75,10 +75,12 @@ import { sensitiveContentConsent, requestSensitiveContentConsent } from '@/utili
 
 type Ad = (typeof instance)['ads'][number];
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
 	preferForms?: string[];
 	specify?: Ad;
-}>();
+}>(), {
+	preferForms: () => [],
+});
 
 const showMenu = ref(false);
 const toggleMenu = (): void => {

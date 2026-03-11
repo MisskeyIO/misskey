@@ -4,7 +4,7 @@
  */
 
 import MkResult from './MkResult.vue';
-import type { StoryObj } from '@storybook/vue3';
+import type { StoryObj } from '@storybook/vue3-vite';
 export const Default = {
 	render(args) {
 		return {
@@ -16,14 +16,7 @@ export const Default = {
 					args,
 				};
 			},
-			computed: {
-				props() {
-					return {
-						...this.args,
-					};
-				},
-			},
-			template: '<MkResult v-bind="props" />',
+			template: '<MkResult v-bind="args" />',
 		};
 	},
 	args: {

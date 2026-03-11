@@ -17,14 +17,7 @@ export const Default = {
 					args,
 				};
 			},
-			computed: {
-				props() {
-					return {
-						...this.args,
-					};
-				},
-			},
-			template: '<MkAbuseReportResolver v-bind="props" />',
+			template: '<MkAbuseReportResolver v-bind="args" />',
 		};
 	},
 	args: {
@@ -34,6 +27,7 @@ export const Default = {
 			targetUserPattern: '^.*@.+$',
 			reporterPattern: null,
 			reportContentPattern: null,
+			expirationDate: null,
 			expiresAt: 'indefinitely',
 			forward: false,
 		},

@@ -65,6 +65,7 @@ export type MkPaginationOptions = {
 <script lang="ts" setup generic="T extends IPaginator">
 import { isLink } from '@@/js/is-link.js';
 import { onMounted, computed, watch, unref, isRef } from 'vue';
+import type * as Misskey from 'misskey-js';
 import type { UnwrapRef, ComputedRef } from 'vue';
 import { Paginator, type IPaginator, type MisskeyEntity } from '@/utility/paginator.js';
 import MkButton from '@/components/MkButton.vue';
@@ -185,7 +186,7 @@ watch(() => paginator.items.value, (items) => {
 function createLegacyPaginator(): IPaginator | null {
 	if (!props.pagination) return null;
 	const params = props.pagination.params;
-	const computedParams = isRef(params) ? params as ComputedRef<Misskey.Endpoints[typeof props.pagination.endpoint]['req']> : null;
+	const computedParams = isRef(params) ? params as ComputedRef<Misskey.Endpoints[typeof props.pagination.endpoint]['req']> : undefined;
 	const staticParams = !isRef(params) ? (params ?? {}) : undefined;
 	return new Paginator(props.pagination.endpoint as any, {
 		limit: props.pagination.limit,

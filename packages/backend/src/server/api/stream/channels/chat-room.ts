@@ -20,7 +20,6 @@ class ChatRoomChannel extends Channel {
 	private roomId: string;
 
 	constructor(
-		@Inject(DI.chatRoomsRepository)
 		private chatRoomsRepository: ChatRoomsRepository,
 		private chatService: ChatService,
 

@@ -1161,6 +1161,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 		}
 
 		for (const userListMembership of userListMemberships) {
+			if (note.channelId) continue;
+
 			// ダイレクトのとき、そのリストが対象外のユーザーの場合
 			if (
 				note.visibility === 'specified' &&

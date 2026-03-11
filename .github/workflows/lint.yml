@@ -106,7 +106,6 @@ jobs:
       matrix:
         workspace:
         - backend
-        - frontend
         - sw
         - misskey-js
     steps:
@@ -122,9 +121,7 @@ jobs:
           cache: 'pnpm'
       - run: pnpm i --frozen-lockfile
       - run: pnpm --filter misskey-js run build
-        if: ${{ matrix.workspace == 'backend' || matrix.workspace == 'frontend' || matrix.workspace == 'sw' }}
+        if: ${{ matrix.workspace == 'backend' || matrix.workspace == 'sw' }}
       - run: pnpm --filter misskey-reversi run build
-        if: ${{ matrix.workspace == 'backend' || matrix.workspace == 'frontend' }}
-      - run: pnpm --filter misskey-bubble-game run build
-        if: ${{ matrix.workspace == 'frontend' }}
+        if: ${{ matrix.workspace == 'backend' }}
       - run: pnpm --filter ${{ matrix.workspace }} run typecheck

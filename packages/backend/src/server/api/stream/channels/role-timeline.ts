@@ -7,10 +7,10 @@ import { Injectable } from '@nestjs/common';
 import { bindThis } from '@/decorators.js';
 import { RoleService } from '@/core/RoleService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
-import { NoteStreamingHidingService } from '../NoteStreamingHidingService.js';
 import type { GlobalEvents } from '@/core/GlobalEventService.js';
 import type { JsonObject } from '@/misc/json-value.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
+import { NoteStreamingHidingService } from '../NoteStreamingHidingService.js';
 import Channel, { type MiChannelService } from '../channel.js';
 
 class RoleTimelineChannel extends Channel {
@@ -131,7 +131,7 @@ export class RoleTimelineChannelService implements MiChannelService<false> {
 	constructor(
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
-		private noteStreamingHidingService: NoteStreamingHidingService,
+		private readonly noteStreamingHidingService: NoteStreamingHidingService,
 	) {
 	}
 

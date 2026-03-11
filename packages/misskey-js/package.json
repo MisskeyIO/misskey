@@ -40,22 +40,19 @@
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
     "@misskey-dev/eslint-plugin": "catalog:",
-    "@swc/jest": "catalog:",
-    "@types/jest": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
     "@types/node": "catalog:",
     "@typescript-eslint/eslint-plugin": "catalog:",
     "@typescript-eslint/parser": "catalog:",
     "esbuild": "catalog:",
     "eslint": "catalog:",
     "glob": "catalog:",
-    "jest": "catalog:",
-    "jest-fetch-mock": "catalog:",
-    "jest-websocket-mock": "catalog:",
-    "mock-socket": "catalog:",
     "ncp": "catalog:",
     "nodemon": "catalog:",
     "tsd": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "vitest-websocket-mock": "0.5.0"
   },
   "files": [
     "built"

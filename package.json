@@ -31,7 +31,7 @@
     "start": "cd packages/backend && cross-env-shell \"node ./built/boot/entry.js\"",
     "start:docker": "cd packages/backend && cross-env-shell \"node ${MK_NODE_ARGS:-''} ./built/boot/entry.js\"",
     "start:inspect": "cd packages/backend && node --inspect ./built/boot/entry.js",
-    "start:test": "ncp ./.github/misskey/test.yml ./.config/test.yml && cd packages/backend && cross-env NODE_ENV=test cross-env-shell \"node $MK_NODE_ARGS ./built/boot/entry.js\"",
+    "start:test": "ncp ./.github/misskey/test.yml ./.config/test.yml && cd packages/backend && cross-env NODE_ENV=test cross-env-shell \"node ${MK_NODE_ARGS:-} ./built/boot/entry.js\"",
     "cli": "cd packages/backend && pnpm cli",
     "init": "pnpm migrate",
     "migrate": "cd packages/backend && pnpm migrate",

@@ -269,10 +269,54 @@ export class ApiCallService implements OnApplicationShutdown {
 			return;
 		}
 
-		const multipartData = await request.file().catch(() => {
-			/* Fastify throws if the remote didn't send multipart data. Return 400/422 below. */
-		});
-		if (multipartData == null) {
+		const fields = {} as Record<string, unknown>;
+		let file: {
+			name: string | null;
+			path: string;
+			cleanup: () => void;
+		} | null = null;
+
+		for await (const part of request.parts()) {
+			if (part.type === 'field') {
+				fields[part.fieldname] = part.value;
+				continue;
+			}
+
+			if (file != null) {
+				part.file.resume();
+				continue;
+			}
+
+			this.logger.debug('received multipart file', { endpoint: endpoint.name, filename: part.filename });
+
+			const [path, cleanup] = await createTemp();
+			try {
+				await stream.pipeline(part.file, fs.createWriteStream(path));
+			} catch (err) {
+				cleanup();
+				if ((err as { code?: string; })?.code === 'FST_REQ_FILE_TOO_LARGE') {
+					this.#sendApiError(reply, new ApiError(uploadFileSizeExceeded));
+					return;
+				}
+				throw err;
+			}
+
+			// ファイルサイズが制限を超えていた場合
+			// なお truncated はストリームを読み切ってからでないと機能しないため、stream.pipeline より後にある必要がある
+			if (part.file.truncated) {
+				cleanup();
+				this.#sendApiError(reply, new ApiError(uploadFileSizeExceeded));
+				return;
+			}
+
+			file = {
+				name: part.filename ?? null,
+				path,
+				cleanup,
+			};
+		}
+
+		if (file == null) {
 			this.#sendApiError(reply, new ApiError({
 				message: 'No files found in multipart request',
 				code: 'INVALID_PARAM',
@@ -283,39 +327,12 @@ export class ApiCallService implements OnApplicationShutdown {
 			return;
 		}
 
-		const fields = {} as Record<string, unknown>;
-		for (const [k, v] of Object.entries(multipartData.fields)) {
-			fields[k] = typeof v === 'object' && v && 'value' in v ? (v as any).value : undefined;
-		}
-
-		this.logger.debug('received multipart file', { endpoint: endpoint.name, filename: multipartData.filename });
-
-		const [path, cleanup] = await createTemp();
-		try {
-			await stream.pipeline(multipartData.file, fs.createWriteStream(path));
-		} catch (err) {
-			cleanup();
-			if ((err as { code?: string; })?.code === 'FST_REQ_FILE_TOO_LARGE') {
-				this.#sendApiError(reply, new ApiError(uploadFileSizeExceeded));
-				return;
-			}
-			throw err;
-		}
-
-		// ファイルサイズが制限を超えていた場合
-		// なお truncated はストリームを読み切ってからでないと機能しないため、stream.pipeline より後にある必要がある
-		if (multipartData.file.truncated) {
-			cleanup();
-			this.#sendApiError(reply, new ApiError(uploadFileSizeExceeded));
-			return;
-		}
-
 		// https://datatracker.ietf.org/doc/html/rfc6750.html#section-2.1 (case sensitive)
 		const token = request.headers.authorization?.startsWith('Bearer ')
 			? request.headers.authorization.slice(7)
 			: fields['i'];
 		if (token != null && typeof token !== 'string') {
-			cleanup();
+			file.cleanup();
 			this.#sendApiError(reply, new ApiError({
 				message: 'Invalid param.',
 				code: 'INVALID_PARAM',
@@ -334,17 +351,13 @@ export class ApiCallService implements OnApplicationShutdown {
 		try {
 			[user, app] = await this.authenticateService.authenticate(token);
 		} catch (err) {
-			cleanup();
+			file.cleanup();
 			this.#sendAuthenticationError(reply, err);
 			return;
 		}
 
 		try {
-			const res = await this.call(endpoint, user, app, fields, {
-				name: multipartData.filename ?? null,
-				path,
-				cleanup,
-			}, request);
+			const res = await this.call(endpoint, user, app, fields, file, request);
 			this.send(reply, res);
 		} catch (err) {
 			if (err instanceof AuthenticationError) {
@@ -353,7 +366,7 @@ export class ApiCallService implements OnApplicationShutdown {
 				this.#sendApiError(reply, err as ApiError);
 			}
 		} finally {
-			cleanup();
+			file.cleanup();
 		}
 
 		if (user) {

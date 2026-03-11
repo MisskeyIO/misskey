@@ -4142,15 +4142,15 @@ export type components = {
                     /** Format: misskey:id */
                     userListId: string;
                 };
-	                scheduledNotePosted?: {
-	                    /** @enum {string} */
-	                    type: 'all' | 'following' | 'follower' | 'mutualFollow' | 'followingOrFollower' | 'never';
-	                } | {
-	                    /** @enum {string} */
-	                    type: 'list';
-	                    /** Format: misskey:id */
-	                    userListId: string;
-	                };
+                scheduledNotePosted?: {
+                    /** @enum {string} */
+                    type: 'all' | 'following' | 'follower' | 'mutualFollow' | 'followingOrFollower' | 'never';
+                } | {
+                    /** @enum {string} */
+                    type: 'list';
+                    /** Format: misskey:id */
+                    userListId: string;
+                };
                 receiveFollowRequest?: {
                     /** @enum {string} */
                     type: 'all' | 'following' | 'follower' | 'mutualFollow' | 'followingOrFollower' | 'never';
@@ -4425,16 +4425,16 @@ export type components = {
             hasPoll?: boolean;
             myReaction?: string | null;
         };
-	        NoteDraft: {
+        NoteDraft: {
             /**
              * Format: id
              * @example xxxxxxxxxx
              */
-	            id: string;
-	            /** Format: date-time */
-	            createdAt: string;
-	            reason?: string | null;
-	            text: string | null;
+            id: string;
+            /** Format: date-time */
+            createdAt: string;
+            reason?: string | null;
+            text: string | null;
             cw: string | null;
             /** Format: id */
             userId: string;
@@ -4658,9 +4658,9 @@ export type components = {
             /** @enum {string} */
             type: 'scheduledNotePosted';
             note: components['schemas']['Note'];
-	        } | {
-	            /** Format: id */
-	            id: string;
+        } | {
+            /** Format: id */
+            id: string;
             /** Format: date-time */
             createdAt: string;
             /** @enum {string} */
@@ -12156,15 +12156,15 @@ export interface operations {
                                 /** Format: misskey:id */
                                 userListId: string;
                             };
-	                            scheduledNotePosted?: {
-	                                /** @enum {string} */
-	                                type: 'all' | 'following' | 'follower' | 'mutualFollow' | 'followingOrFollower' | 'never';
-	                            } | {
-	                                /** @enum {string} */
-	                                type: 'list';
-	                                /** Format: misskey:id */
-	                                userListId: string;
-	                            };
+                            scheduledNotePosted?: {
+                                /** @enum {string} */
+                                type: 'all' | 'following' | 'follower' | 'mutualFollow' | 'followingOrFollower' | 'never';
+                            } | {
+                                /** @enum {string} */
+                                type: 'list';
+                                /** Format: misskey:id */
+                                userListId: string;
+                            };
                             receiveFollowRequest?: {
                                 /** @enum {string} */
                                 type: 'all' | 'following' | 'follower' | 'mutualFollow' | 'followingOrFollower' | 'never';
@@ -25618,8 +25618,8 @@ export interface operations {
                     untilDate?: number;
                     /** @default true */
                     markAsRead?: boolean;
-	                        includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'noteScheduled' | 'scheduledNoteError' | 'sensitiveFlagAssigned' | 'createToken' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
-	                        excludeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'noteScheduled' | 'scheduledNoteError' | 'sensitiveFlagAssigned' | 'createToken' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
+                    includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'noteScheduled' | 'scheduledNoteError' | 'sensitiveFlagAssigned' | 'createToken' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
+                    excludeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'noteScheduled' | 'scheduledNoteError' | 'sensitiveFlagAssigned' | 'createToken' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
                 };
             };
         };
@@ -25703,8 +25703,8 @@ export interface operations {
                     untilDate?: number;
                     /** @default true */
                     markAsRead?: boolean;
-	                        includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'noteScheduled' | 'scheduledNoteError' | 'sensitiveFlagAssigned' | 'createToken' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
-	                        excludeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'noteScheduled' | 'scheduledNoteError' | 'sensitiveFlagAssigned' | 'createToken' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
+                    includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'noteScheduled' | 'scheduledNoteError' | 'sensitiveFlagAssigned' | 'createToken' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
+                    excludeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'noteScheduled' | 'scheduledNoteError' | 'sensitiveFlagAssigned' | 'createToken' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
                 };
             };
         };
@@ -27049,15 +27049,15 @@ export interface operations {
                             /** Format: misskey:id */
                             userListId: string;
                         };
-	                        scheduledNotePosted?: {
-	                            /** @enum {string} */
-	                            type: 'all' | 'following' | 'follower' | 'mutualFollow' | 'followingOrFollower' | 'never';
-	                        } | {
-	                            /** @enum {string} */
-	                            type: 'list';
-	                            /** Format: misskey:id */
-	                            userListId: string;
-	                        };
+                        scheduledNotePosted?: {
+                            /** @enum {string} */
+                            type: 'all' | 'following' | 'follower' | 'mutualFollow' | 'followingOrFollower' | 'never';
+                        } | {
+                            /** @enum {string} */
+                            type: 'list';
+                            /** Format: misskey:id */
+                            userListId: string;
+                        };
                         receiveFollowRequest?: {
                             /** @enum {string} */
                             type: 'all' | 'following' | 'follower' | 'mutualFollow' | 'followingOrFollower' | 'never';
@@ -28928,14 +28928,14 @@ export interface operations {
                     channelId?: string | null;
                     text?: string | null;
                     fileIds?: string[];
-	                    poll?: {
-	                        choices: string[];
-	                        multiple?: boolean;
-	                        expiresAt?: number | null;
-	                        expiredAfter?: number | null;
-	                    } | null;
-	                };
-	            };
+                    poll?: {
+                        choices: string[];
+                        multiple?: boolean;
+                        expiresAt?: number | null;
+                        expiredAfter?: number | null;
+                    } | null;
+                };
+            };
         };
         responses: {
             /** @description OK (with results) */
@@ -29162,14 +29162,14 @@ export interface operations {
                     channelId?: string | null;
                     text?: string | null;
                     fileIds?: string[];
-	                    poll?: {
-	                        choices: string[];
-	                        multiple?: boolean;
-	                        expiresAt?: number | null;
-	                        expiredAfter?: number | null;
-	                    } | null;
-	                };
-	            };
+                    poll?: {
+                        choices: string[];
+                        multiple?: boolean;
+                        expiresAt?: number | null;
+                        expiredAfter?: number | null;
+                    } | null;
+                };
+            };
         };
         responses: {
             /** @description OK (with results) */
@@ -36660,3 +36660,4 @@ export interface operations {
         };
     };
 }
+

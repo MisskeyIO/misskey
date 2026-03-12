@@ -4,6 +4,7 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
+import { Brackets } from 'typeorm';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { ChannelsRepository, MiMeta, NotesRepository } from '@/models/_.js';
 import { QueryService } from '@/core/QueryService.js';
@@ -138,7 +139,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				.then(x => x.map(x => x.id).filter(x => x !== ps.channelId));
 			if (mutingChannelIds.length > 0) {
 				query.andWhere('note.channelId NOT IN (:...mutingChannelIds)', { mutingChannelIds });
-				query.andWhere('note.renoteChannelId NOT IN (:...mutingChannelIds)', { mutingChannelIds });
+				query.andWhere(new Brackets(qb => {
+					qb.where('note.renoteChannelId IS NULL');
+					qb.orWhere('note.renoteChannelId NOT IN (:...mutingChannelIds)', { mutingChannelIds });
+				}));
 			}
 		}
 		//#endregion

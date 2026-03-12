@@ -38,6 +38,7 @@ import { IdService } from '@/core/IdService.js';
 import type { MiLocalUser, MiRemoteUser, MiUser } from '@/models/User.js';
 import type { IPoll } from '@/models/Poll.js';
 import { MiPoll } from '@/models/Poll.js';
+import { noteVisibilities } from '@/types.js';
 import type { MinimumUser, NoteCreateOption } from '@/types.js';
 import { isDuplicateKeyValueError } from '@/misc/is-duplicate-key-value-error.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
@@ -79,6 +80,7 @@ import { CacheService } from '@/core/CacheService.js';
 import { isQuote, isRenote } from '@/misc/is-renote.js';
 
 type NotificationType = 'reply' | 'renote' | 'quote' | 'mention';
+type NoteVisibility = typeof noteVisibilities[number];
 
 class NotificationManager {
 	private notifier: { id: MiUser['id']; };
@@ -225,6 +227,11 @@ export class NoteCreateService implements OnApplicationShutdown {
 		this.updateNotesCountQueue = new CollapsedQueue(process.env.NODE_ENV !== 'test' ? 60 * 1000 * 5 : 0, this.collapseNotesCount, this.performUpdateNotesCount);
 	}
 
+	@bindThis
+	private isValidVisibility(visibility: string): visibility is NoteVisibility {
+		return noteVisibilities.includes(visibility as NoteVisibility);
+	}
+
 	// FIXME Check
 	@bindThis
 	public async fetchAndCreate(user: {
@@ -250,9 +257,17 @@ export class NoteCreateService implements OnApplicationShutdown {
 		apHashtags?: string[] | null;
 		apEmojis?: string[] | null;
 	}): Promise<MiNote> {
+		if (!this.isValidVisibility(data.visibility)) {
+			throw new IdentifiableError('39678714-7d12-43db-8f57-487ffa59d64b', 'Invalid visibility');
+		}
+
 		const visibleUsers = data.visibleUserIds.length > 0 ? await this.usersRepository.findBy({
 			id: In(data.visibleUserIds),
 		}) : [];
+
+		if (visibleUsers.length !== data.visibleUserIds.length) {
+			throw new IdentifiableError('181b86bb-77d5-45d7-bdb7-4c5495c728a6', 'No such user');
+		}
 
 		let files: MiDriveFile[] = [];
 		if (data.fileIds.length > 0) {
@@ -297,7 +312,9 @@ export class NoteCreateService implements OnApplicationShutdown {
 				}
 			}
 
-			if (renote.visibility === 'followers' && renote.userId !== user.id) {
+			if (!await this.noteEntityService.isVisibleForMe(renote, user.id)) {
+				throw new IdentifiableError('48d7a997-da5c-4716-b3c3-92db3f37bf7d', 'Renote target visibility');
+			} else if (renote.visibility === 'followers' && renote.userId !== user.id) {
 				// 他人のfollowers noteはreject
 				throw new IdentifiableError('90b9d6f0-893a-4fef-b0f1-e9a33989f71a', 'Renote target visibility');
 			} else if (renote.visibility === 'specified') {

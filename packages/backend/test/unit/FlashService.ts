@@ -61,6 +61,14 @@ describe('FlashService', () => {
 		return user;
 	}
 
+	async function createFlashLike(userId: MiUser['id'], flashId: MiFlash['id']) {
+		await flashLikesRepository.insert({
+			id: idService.gen(),
+			userId,
+			flashId,
+		});
+	}
+
 	// --------------------------------------------------------------------------------------
 
 	beforeEach(async () => {
@@ -152,6 +160,36 @@ describe('FlashService', () => {
 			});
 
 			expect(result).toEqual([flash3, flash2]);
+		});
+	});
+
+	describe('search', () => {
+		test('should require all search words across title and summary', async () => {
+			const bothWords = await createFlash({ title: 'hello', summary: 'world', visibility: 'public' });
+			await createFlash({ title: 'hello', summary: 'summary', visibility: 'public' });
+			await createFlash({ title: 'title', summary: 'world', visibility: 'public' });
+
+			const result = await service.search('hello world', {
+				limit: 10,
+			});
+
+			expect(result).toEqual([bothWords]);
+		});
+	});
+
+	describe('myLikes', () => {
+		test('should require all search words across title and summary in liked flashes', async () => {
+			const bothWords = await createFlash({ title: 'hello', summary: 'world' });
+			const titleOnly = await createFlash({ title: 'hello', summary: 'summary' });
+			await createFlashLike(alice.id, bothWords.id);
+			await createFlashLike(alice.id, titleOnly.id);
+
+			const result = await service.myLikes(alice.id, {
+				limit: 10,
+				search: 'hello world',
+			});
+
+			expect(result.map(like => like.flashId)).toEqual([bothWords.id]);
 		});
 	});
 });

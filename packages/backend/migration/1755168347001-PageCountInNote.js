@@ -28,13 +28,10 @@ export class PageCountInNote1755168347001 {
                     SELECT
                         block_list.page_id,
                         child_block AS block
-                    FROM LATERAL (
-                        SELECT page_id, block
-                            FROM block_list
-                            WHERE block_list.block->>'type' = 'section'
-                        ) block_list
+                    FROM block_list
                         CROSS JOIN LATERAL jsonb_array_elements(block_list.block->'children') child_block
-                    WHERE child_block->>'type' = 'note' OR child_block->>'type' = 'section'
+                    WHERE block_list.block->>'type' = 'section'
+                        AND (child_block->>'type' = 'note' OR child_block->>'type' = 'section')
                 )
             ),
             clipped_notes AS (

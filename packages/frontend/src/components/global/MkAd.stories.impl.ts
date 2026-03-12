@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import type { StoryObj } from '@storybook/vue3-vite';
 import MkAd from './MkAd.vue';
@@ -20,14 +19,7 @@ const common = {
 					args,
 				};
 			},
-			computed: {
-				props() {
-					return {
-						...this.args,
-					};
-				},
-			},
-			template: '<MkAd v-bind="props" />',
+			template: '<MkAd v-bind="args" />',
 		};
 	},
 	async play({ canvasElement, args }) {
@@ -68,14 +60,16 @@ const common = {
 		await expect(imgAgain).toBeInTheDocument();
 	},
 	args: {
-		prefer: [],
+		preferForms: [],
 		specify: {
 			id: 'someadid',
 			ratio: 1,
 			url: '#test',
-			place: '',
+			place: 'square',
 			imageUrl: '',
+			imageBlurhash: null,
 			dayOfWeek: 7,
+			isSensitive: false,
 		},
 	},
 	parameters: {
@@ -86,37 +80,40 @@ export const Square = {
 	...common,
 	args: {
 		...common.args,
-		specify: {
-			...common.args.specify,
-			place: 'square',
-			imageUrl:
-				'https://github.com/misskey-dev/misskey/blob/master/packages/frontend/assets/about-icon.png?raw=true',
+			specify: {
+				...common.args.specify,
+				place: 'square',
+				imageUrl:
+					'https://github.com/misskey-dev/misskey/blob/master/packages/frontend/assets/about-icon.png?raw=true',
+				imageBlurhash: null,
+			},
 		},
-	},
 } satisfies StoryObj<typeof MkAd>;
 export const Horizontal = {
 	...common,
 	args: {
 		...common.args,
-		specify: {
-			...common.args.specify,
-			place: 'horizontal',
-			imageUrl:
-				'https://github.com/misskey-dev/misskey/blob/master/packages/frontend/assets/fedi.jpg?raw=true',
+			specify: {
+				...common.args.specify,
+				place: 'horizontal',
+				imageUrl:
+					'https://github.com/misskey-dev/misskey/blob/master/packages/frontend/assets/fedi.jpg?raw=true',
+				imageBlurhash: null,
+			},
 		},
-	},
 } satisfies StoryObj<typeof MkAd>;
 export const HorizontalBig = {
 	...common,
 	args: {
 		...common.args,
-		specify: {
-			...common.args.specify,
-			place: 'horizontal-big',
-			imageUrl:
-				'https://github.com/misskey-dev/misskey/blob/master/packages/frontend/assets/fedi.jpg?raw=true',
+			specify: {
+				...common.args.specify,
+				place: 'horizontal-big',
+				imageUrl:
+					'https://github.com/misskey-dev/misskey/blob/master/packages/frontend/assets/fedi.jpg?raw=true',
+				imageBlurhash: null,
+			},
 		},
-	},
 } satisfies StoryObj<typeof MkAd>;
 export const ZeroRatio = {
 	...Square,

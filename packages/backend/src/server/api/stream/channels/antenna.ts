@@ -61,10 +61,6 @@ class AntennaChannel extends Channel {
 
 			if (this.isNoteMutedOrBlocked(note)) return;
 
-			if (this.user && (note.visibleUserIds?.includes(this.user.id) ?? note.mentions?.includes(this.user.id))) {
-				this.connection.cacheNote(note);
-			}
-
 			if (this.minimize && ['public', 'home'].includes(note.visibility)) {
 				const badgeRoles = this.iAmModerator ? await this.roleService.getUserBadgeRoles(note.userId, false) : undefined;
 

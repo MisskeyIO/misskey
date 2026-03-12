@@ -19,7 +19,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div v-else-if="notification.type === 'reaction:grouped' && notification.note.reactionAcceptance === 'likeOnly'" :class="[$style.icon, $style.icon_reactionGroupHeart]"><i class="ti ti-heart" style="line-height: 1;"></i></div>
 		<div v-else-if="notification.type === 'reaction:grouped'" :class="[$style.icon, $style.icon_reactionGroup]"><i class="ti ti-plus" style="line-height: 1;"></i></div>
 		<div v-else-if="notification.type === 'renote:grouped'" :class="[$style.icon, $style.icon_renoteGroup]"><i class="ti ti-repeat" style="line-height: 1;"></i></div>
-		<img v-else-if="notification.type === 'test'" :class="$style.icon" :src="infoImageUrl"/>
 		<MkAvatar v-else-if="'user' in notification" :class="$style.icon" :user="notification.user" link preview/>
 		<img v-else-if="'icon' in notification && notification.icon != null" :class="[$style.icon, $style.icon_app]" :src="notification.icon" alt=""/>
 		<div
@@ -75,12 +74,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div :class="$style.tail">
 		<header :class="$style.header">
 			<span v-if="notification.type === 'pollEnded'" :class="$style.headerName">{{ i18n.ts._notification.pollEnded }}</span>
+			<span v-else-if="notification.type === 'scheduledNotePosted'">{{ i18n.ts._notification.scheduledNotePosted }}</span>
 			<span v-else-if="notification.type === 'note'" :class="$style.headerName">{{ i18n.ts._notification.newNote }}: <MkUserName :user="notification.note.user"/></span>
 			<span v-else-if="notification.type === 'roleAssigned'" :class="$style.headerName">{{ i18n.ts._notification.roleAssigned }}</span>
 			<span v-else-if="notification.type === 'chatRoomInvitationReceived'" :class="$style.headerName">{{ i18n.ts._notification.chatRoomInvitationReceived }}</span>
 			<span v-else-if="notification.type === 'achievementEarned'" :class="$style.headerName">{{ i18n.ts._notification.achievementEarned }}</span>
 			<span v-else-if="notification.type === 'noteScheduled'" :class="$style.headerName">{{ i18n.ts._notification.noteScheduled }}</span>
-			<span v-else-if="notification.type === 'scheduledNotePosted'" :class="$style.headerName">{{ i18n.ts._notification.scheduledNotePosted }}</span>
 			<span v-else-if="notification.type === 'scheduledNoteError'" :class="$style.headerName">{{ i18n.ts._notification.scheduledNoteError }}</span>
 			<span v-else-if="notification.type === 'login'" :class="$style.headerName">{{ i18n.ts._notification.login }}</span>
 			<span v-else-if="notification.type === 'createToken'" :class="$style.headerName">{{ i18n.ts._notification.createToken }}</span>
@@ -217,7 +216,6 @@ import { userPage } from '@/filters/user.js';
 import { i18n } from '@/i18n.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { ensureSignin } from '@/i.js';
-import { infoImageUrl } from '@/instance.js';
 
 const $i = ensureSignin();
 
@@ -378,6 +376,11 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 }
 
 .t_pollEnded {
+	background: var(--eventOther);
+	pointer-events: none;
+}
+
+.t_scheduledNotePosted {
 	background: var(--eventOther);
 	pointer-events: none;
 }

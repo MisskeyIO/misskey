@@ -6,7 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <PageWithHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs">
 	<div class="_spacer" style="--MI_SPACER-w: 600px; --MI_SPACER-min: 16px; --MI_SPACER-max: 32px;">
-		<FormSuspense :p="init">
+		<MkSuspense :p="init">
 			<MkTextarea v-if="tab === 'block'" v-model="blockedHosts">
 				<span>{{ i18n.ts.blockedInstances }}</span>
 				<template #caption>{{ i18n.ts.blockedInstancesDescription }}</template>
@@ -20,7 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #caption>{{ i18n.ts.sensitiveMediaInstancesDescription }}</template>
 			</MkTextarea>
 			<MkButton primary @click="save"><i class="ti ti-device-floppy"></i> {{ i18n.ts.save }}</MkButton>
-		</FormSuspense>
+		</MkSuspense>
 	</div>
 </PageWithHeader>
 </template>
@@ -30,7 +30,6 @@ import { ref, computed } from 'vue';
 import { definePage } from '@/page.js';
 import MkButton from '@/components/MkButton.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
-import FormSuspense from '@/components/form/suspense.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { fetchInstance } from '@/instance.js';

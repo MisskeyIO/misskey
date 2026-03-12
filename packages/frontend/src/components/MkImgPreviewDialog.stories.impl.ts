@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { StoryObj } from '@storybook/vue3-vite';
+import type { StoryObj } from '@storybook/vue3-vite';
 import { file } from '../../.storybook/fakes.js';
 import MkImgPreviewDialog from './MkImgPreviewDialog.vue';
 export const Default = {
@@ -17,14 +17,7 @@ export const Default = {
 					args,
 				};
 			},
-			computed: {
-				props() {
-					return {
-						...this.args,
-					};
-				},
-			},
-			template: '<MkImgPreviewDialog v-bind="props" />',
+			template: '<MkImgPreviewDialog v-bind="args" />',
 		};
 	},
 	args: {

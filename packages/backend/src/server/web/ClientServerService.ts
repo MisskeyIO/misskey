@@ -4,6 +4,7 @@
  */
 
 import { randomUUID, randomBytes } from 'node:crypto';
+import { promises as fsp } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Inject, Injectable } from '@nestjs/common';
@@ -24,17 +25,6 @@ import type { Config } from '@/config.js';
 import { getNoteSummary } from '@/misc/get-note-summary.js';
 import { DI } from '@/di-symbols.js';
 import * as Acct from '@/misc/acct.js';
-import type {
-	DbQueue,
-	DeliverQueue,
-	EndedPollNotificationQueue,
-	InboxQueue,
-	ObjectStorageQueue,
-	RelationshipQueue,
-	SystemQueue,
-	UserWebhookDeliverQueue,
-	SystemWebhookDeliverQueue,
-} from '@/core/QueueModule.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { PageEntityService } from '@/core/entities/PageEntityService.js';
@@ -67,6 +57,17 @@ import { FeedService } from './FeedService.js';
 import { UrlPreviewService } from './UrlPreviewService.js';
 import { ClientLoggerService } from './ClientLoggerService.js';
 import type { FastifyError, FastifyInstance, FastifyPluginOptions, FastifyReply } from 'fastify';
+import type {
+	DbQueue,
+	DeliverQueue,
+	EndedPollNotificationQueue,
+	InboxQueue,
+	ObjectStorageQueue,
+	RelationshipQueue,
+	SystemQueue,
+	SystemWebhookDeliverQueue,
+	UserWebhookDeliverQueue
+} from "@/core/QueueModule.js";
 
 const _filename = fileURLToPath(import.meta.url);
 const _dirname = dirname(_filename);
@@ -74,6 +75,7 @@ const _dirname = dirname(_filename);
 const staticAssets = `${_dirname}/../../../assets/`;
 const clientAssets = `${_dirname}/../../../../frontend/assets/`;
 const assets = `${_dirname}/../../../../../built/_frontend_dist_/`;
+const frontendLocales = `${assets}/locales/`;
 const swAssets = `${_dirname}/../../../../../built/_sw_dist_/`;
 const frontendViteOut = `${_dirname}/../../../../../built/_frontend_vite_/`;
 // const frontendEmbedViteOut = `${_dirname}/../../../../../built/_frontend_embed_vite_/`;
@@ -81,6 +83,7 @@ const frontendViteOut = `${_dirname}/../../../../../built/_frontend_vite_/`;
 @Injectable()
 export class ClientServerService {
 	private logger: Logger;
+	private supportedLangs: string[] | null = null;
 
 	constructor(
 		@Inject(DI.config)
@@ -119,6 +122,16 @@ export class ClientServerService {
 		@Inject(DI.announcementsRepository)
 		private announcementsRepository: AnnouncementsRepository,
 
+		@Inject('queue:system') public systemQueue: SystemQueue,
+		@Inject('queue:endedPollNotification') public endedPollNotificationQueue: EndedPollNotificationQueue,
+		@Inject('queue:deliver') public deliverQueue: DeliverQueue,
+		@Inject('queue:inbox') public inboxQueue: InboxQueue,
+		@Inject('queue:db') public dbQueue: DbQueue,
+		@Inject('queue:relationship') public relationshipQueue: RelationshipQueue,
+		@Inject('queue:objectStorage') public objectStorageQueue: ObjectStorageQueue,
+		@Inject('queue:userWebhookDeliver') public userWebhookDeliverQueue: UserWebhookDeliverQueue,
+		@Inject('queue:systemWebhookDeliver') public systemWebhookDeliverQueue: SystemWebhookDeliverQueue,
+
 		private flashEntityService: FlashEntityService,
 		private userEntityService: UserEntityService,
 		private noteEntityService: NoteEntityService,
@@ -133,18 +146,34 @@ export class ClientServerService {
 		private feedService: FeedService,
 		private roleService: RoleService,
 		private clientLoggerService: ClientLoggerService,
-
-		@Inject('queue:system') public systemQueue: SystemQueue,
-		@Inject('queue:endedPollNotification') public endedPollNotificationQueue: EndedPollNotificationQueue,
-		@Inject('queue:deliver') public deliverQueue: DeliverQueue,
-		@Inject('queue:inbox') public inboxQueue: InboxQueue,
-		@Inject('queue:db') public dbQueue: DbQueue,
-		@Inject('queue:relationship') public relationshipQueue: RelationshipQueue,
-		@Inject('queue:objectStorage') public objectStorageQueue: ObjectStorageQueue,
-		@Inject('queue:userWebhookDeliver') public userWebhookDeliverQueue: UserWebhookDeliverQueue,
-		@Inject('queue:systemWebhookDeliver') public systemWebhookDeliverQueue: SystemWebhookDeliverQueue,
 	) {
 		//this.createServer = this.createServer.bind(this);
+	}
+
+	@bindThis
+	private async getSupportedLangs(): Promise<string[]> {
+		if (this.supportedLangs != null) {
+			return this.supportedLangs;
+		}
+
+		const suffix = `.${this.config.version}.json`;
+
+		try {
+			const entries = await fsp.readdir(frontendLocales, { withFileTypes: true });
+			const langs = entries
+				.filter(entry => entry.isFile() && entry.name.endsWith(suffix))
+				.map(entry => entry.name.slice(0, -suffix.length))
+				.sort((a, b) => a.localeCompare(b));
+
+			if (langs.length > 0) {
+				this.supportedLangs = langs;
+				return langs;
+			}
+		} catch {
+		}
+
+		this.supportedLangs = this.meta.langs.length > 0 ? [...this.meta.langs] : ['en-US'];
+		return this.supportedLangs;
 	}
 
 	@bindThis
@@ -192,6 +221,10 @@ export class ClientServerService {
 					'url': 'url',
 				},
 			},
+			'shortcuts': [{
+				'name': 'Safemode',
+				'url': '/?safemode=true',
+			}],
 		};
 
 		manifest = {
@@ -216,18 +249,22 @@ export class ClientServerService {
 			instanceUrl: this.config.url,
 			metaJson: htmlSafeJsonStringify(await this.metaEntityService.packDetailed(meta)),
 			now: Date.now(),
+			langs: await this.getSupportedLangs(),
 			extraHead: this.config.extraHead,
+			federationEnabled: meta.federation !== 'none',
 		};
 	}
 
-	@bindThis
-	public createServer(fastify: FastifyInstance, options: FastifyPluginOptions, done: (err?: Error) => void) {
-		fastify.register(fastifyCookie, {});
+		@bindThis
+		public createServer(fastify: FastifyInstance, options: FastifyPluginOptions, done: (err?: Error) => void) {
+			fastify.register(fastifyCookie, {});
 
-		//#region Bull Dashboard
-		const bullBoardPath = '/queue';
+			const configUrl = new URL(this.config.url);
 
-		// Authenticate
+			//#region Bull Dashboard
+			const bullBoardPath = '/queue';
+
+			// Authenticate
 		fastify.addHook('onRequest', async (request, reply) => {
 			if (request.routeOptions.url == null) {
 				reply.code(404).send('Not found');
@@ -276,13 +313,13 @@ export class ClientServerService {
 			serverAdapter: bullBoardServerAdapter,
 		});
 
-		bullBoardServerAdapter.setBasePath(bullBoardPath);
-		(fastify.register as any)(bullBoardServerAdapter.registerPlugin(), { prefix: bullBoardPath });
-		// #endregion
+			bullBoardServerAdapter.setBasePath(bullBoardPath);
+			(fastify.register as any)(bullBoardServerAdapter.registerPlugin(), { prefix: bullBoardPath });
+			// #endregion
 
-		fastify.register(fastifyView, {
-			root: _dirname + '/views',
-			engine: {
+			fastify.register(fastifyView, {
+				root: _dirname + '/views',
+				engine: {
 				pug: pug,
 			},
 			defaultContext: {
@@ -342,7 +379,6 @@ export class ClientServerService {
 				done();
 			});
 		} else {
-			const configUrl = new URL(this.config.url);
 			const urlOriginWithoutPort = configUrl.origin.replace(/:\d+$/, '');
 
 			const port = (process.env.VITE_PORT ?? '5173');
@@ -588,7 +624,13 @@ export class ClientServerService {
 
 			vary(reply.raw, 'Accept');
 
-			if (user) {
+			if (
+				user != null &&
+				(
+					this.meta.ugcVisibilityForVisitor === 'all' ||
+					(this.meta.ugcVisibilityForVisitor === 'local' && user.host == null)
+				)
+			) {
 				const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
 				const me = profile.fields
 					? profile.fields
@@ -647,10 +689,17 @@ export class ClientServerService {
 					id: request.params.note,
 					visibility: In(['public', 'home']),
 				},
-				relations: ['user'],
+				relations: ['user', 'reply', 'renote'],
 			});
 
-			if (note && !note.user!.requireSigninToViewContents) {
+			if (
+				note &&
+				!note.user!.requireSigninToViewContents &&
+				(
+					this.meta.ugcVisibilityForVisitor === 'all' ||
+						(this.meta.ugcVisibilityForVisitor === 'local' && note.userHost == null)
+				)
+			) {
 				try {
 					const _note = await this.noteEntityService.pack(note, null);
 					const profile = await this.userProfilesRepository.findOneByOrFail({ userId: note.userId });
@@ -669,7 +718,8 @@ export class ClientServerService {
 						...await this.generateCommonPugData(this.meta),
 						clientCtx: htmlSafeJsonStringify({
 							note: _note,
-						}) });
+						})
+					});
 				} catch (err) {
 					if ((err as IdentifiableError).id === '85ab9bd7-3a41-4530-959d-f07073900109') {
 						return await renderBase(reply);
@@ -966,25 +1016,25 @@ export class ClientServerService {
 		// User with Tags
 		fastify.get<{ Params: { clip: string; } }>('/user-tags/:tag', async (request, reply) => {
 			return await renderBase(reply, { noindex: true });
-		});
-		//#endregion
+			});
+			//#endregion
 
-		//#region embed pages
-		// fastify.get<{ Params: { user: string; } }>('/embed/user-timeline/:user', async (request, reply) => {
-		// 	reply.removeHeader('X-Frame-Options');
+		// 	//#region embed pages
+		// 	fastify.get<{ Params: { user: string; } }>('/embed/user-timeline/:user', async (request, reply) => {
+		// 		reply.removeHeader('X-Frame-Options');
 		//
-		// 	const user = await this.usersRepository.findOneBy({
+		// 		const user = await this.usersRepository.findOneBy({
 		// 		id: request.params.user,
 		// 	});
 		//
-		// 	if (user == null) return;
-		// 	if (user.host != null) return;
+		// 		if (user == null) return;
+		// 		if (user.host != null) return;
 		//
-		// 	const _user = await this.userEntityService.pack(user, null);
+		// 		const _user = await this.userEntityService.pack(user, null);
 		//
-		// 	reply.header('Cache-Control', 'public, max-age=3600');
-		// 	return await reply.view('base-embed', {
-		// 		title: this.meta.name ?? 'Misskey',
+		// 		reply.header('Cache-Control', 'public, max-age=3600');
+		// 		return await reply.view('base-embed', {
+		// 			title: this.meta.name ?? 'Misskey',
 		// 		...await this.generateCommonPugData(this.meta),
 		// 		embedCtx: htmlSafeJsonStringify({
 		// 			user: _user,
@@ -995,8 +1045,11 @@ export class ClientServerService {
 		// fastify.get<{ Params: { note: string; } }>('/embed/notes/:note', async (request, reply) => {
 		// 	reply.removeHeader('X-Frame-Options');
 		//
-		// 	const note = await this.notesRepository.findOneBy({
-		// 		id: request.params.note,
+		// 	const note = await this.notesRepository.findOne({
+		// 		where: {
+		// 			id: request.params.note,
+		// 		},
+		// 		relations: ['user', 'reply', 'renote'],
 		// 	});
 		//
 		// 	if (note == null) return;
@@ -1024,27 +1077,27 @@ export class ClientServerService {
 		//
 		// 	if (clip == null) return;
 		//
-		// 	const _clip = await this.clipEntityService.pack(clip, null);
+		// 		const _clip = await this.clipEntityService.pack(clip, null);
 		//
-		// 	reply.header('Cache-Control', 'public, max-age=3600');
-		// 	return await reply.view('base-embed', {
+		// 		reply.header('Cache-Control', 'public, max-age=3600');
+		// 		return await reply.view('base-embed', {
 		// 		title: this.meta.name ?? 'Misskey',
 		// 		...await this.generateCommonPugData(this.meta),
 		// 		embedCtx: htmlSafeJsonStringify({
 		// 			clip: _clip,
-		// 		}),
+		// 			}),
+		// 		});
 		// 	});
-		// });
 		//
 		// fastify.get('/embed/*', async (request, reply) => {
 		// 	reply.removeHeader('X-Frame-Options');
 		//
 		// 	reply.header('Cache-Control', 'public, max-age=3600');
 		// 	return await reply.view('base-embed', {
-		// 		title: this.meta.name ?? 'Misskey',
-		// 		...await this.generateCommonPugData(this.meta),
+		// 			title: this.meta.name ?? 'Misskey',
+		// 			...await this.generateCommonPugData(this.meta),
+		// 		});
 		// 	});
-		// });
 
 		fastify.get('/_info_card_', async (request, reply) => {
 			reply.removeHeader('X-Frame-Options');
@@ -1073,6 +1126,22 @@ export class ClientServerService {
 			[, ...target.split('/').filter(x => x), ...source.split('/').filter(x => x).splice(depth)].join('/');
 
 		fastify.get('/flush', async (request, reply) => {
+			let sendHeader = true;
+
+			if (request.headers['origin']) {
+				const originURL = new URL(request.headers['origin']);
+				if (originURL.protocol !== 'https:') { // Clear-Site-Data only supports https
+					sendHeader = false;
+				}
+				if (originURL.host !== configUrl.host) {
+					sendHeader = false;
+				}
+			}
+
+			if (sendHeader) {
+				reply.header('Clear-Site-Data', '"*"');
+			}
+			reply.header('Set-Cookie', 'http-flush-failed=1; Path=/flush; Max-Age=60');
 			return await reply.view('flush');
 		});
 

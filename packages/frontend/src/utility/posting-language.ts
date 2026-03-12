@@ -8,16 +8,16 @@ const postingLanguageOptions = postingLangCodes.map((code) => ({
 }));
 
 export async function selectPostingLanguage(current: string | null): Promise<string | null | undefined> {
-	const { canceled, result } = await os.select<string | null>({
+	const { canceled, result } = await os.select<(typeof postingLangCodes)[number], (typeof postingLangCodes)[number] | null>({
 		title: i18n.ts.postingLanguage,
 		items: postingLanguageOptions,
-		default: current ?? null,
+		default: current === null ? null : postingLangCodes.includes(current as (typeof postingLangCodes)[number]) ? current as (typeof postingLangCodes)[number] : null,
 	});
 	if (canceled) return undefined;
 	return result;
 }
 
-export function getAutoPostingLang(browserLanguage?: string | null): string {
+export function getAutoPostingLang(browserLanguage?: string | null): (typeof postingLangCodes)[number] {
 	if (browserLanguage) {
 		const normalized = browserLanguage.toLowerCase();
 		if (normalized.startsWith('ko')) return 'ko-KR';
@@ -26,6 +26,6 @@ export function getAutoPostingLang(browserLanguage?: string | null): string {
 	return 'ja-JP';
 }
 
-export function getDefaultViewingLangs(postingLang: string): string[] {
+export function getDefaultViewingLangs(postingLang: (typeof postingLangCodes)[number]): Array<(typeof postingLangCodes)[number] | 'unknown' | 'remote'> {
 	return Array.from(new Set([postingLang, 'ja-JP', 'unknown', 'remote']));
 }

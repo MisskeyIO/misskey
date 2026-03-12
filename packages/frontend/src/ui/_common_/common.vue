@@ -26,7 +26,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	:leaveToClass="prefer.s.animation ? $style.transition_menuDrawer_leaveTo : ''"
 >
 	<div v-if="drawerMenuShowing" :class="$style.menuDrawer">
-		<XDrawerMenu/>
+		<XNavbar style="height: 100%;" :asDrawer="true" :showWidgetButton="false"/>
 	</div>
 </Transition>
 
@@ -65,8 +65,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	v-on="popup.events"
 />
 
-<XUpload v-if="uploads.length > 0"/>
-
 <component
 	:is="prefer.s.animation ? TransitionGroup : 'div'"
 	tag="div"
@@ -96,6 +94,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 <div v-if="dev" id="devTicker"><span style="animation: dev-ticker-blink 2s infinite;">DEV BUILD</span></div>
 
 <div v-if="$i && $i.isBot" id="botWarn"><span style="animation: dev-ticker-blink 2s infinite;">{{ i18n.ts.loggedInAsBot }}</span></div>
+
+<div v-if="isSafeMode" id="safemodeWarn">
+	<span style="animation: dev-ticker-blink 2s infinite;">{{ i18n.ts.safeModeEnabled }}</span>&nbsp;
+	<button class="_textButton" style="pointer-events: all;" @click="exitSafeMode">{{ i18n.ts.turnItOff }}</button>
+</div>
 </template>
 
 <script lang="ts" setup>
@@ -103,20 +106,22 @@ import { defineAsyncComponent, ref, TransitionGroup } from 'vue';
 import * as Misskey from 'misskey-js';
 import { swInject } from './sw-inject.js';
 import XNotification from './notification.vue';
+import { isSafeMode } from '@@/js/config.js';
 import { popups } from '@/os.js';
+import { unisonReload } from '@/utility/unison-reload.js';
+import { miLocalStorage } from '@/local-storage.js';
 import { pendingApiRequestsCount } from '@/utility/misskey-api.js';
 import { filterMutedNotification } from '@/utility/filter-muted-notification.js';
-import { uploads } from '@/utility/upload.js';
 import * as sound from '@/utility/sound.js';
 import { $i } from '@/i.js';
 import { useStream } from '@/stream.js';
 import { i18n } from '@/i18n.js';
 import { prefer } from '@/preferences.js';
 import { globalEvents } from '@/events.js';
-import XDrawerMenu from '@/ui/_common_/navbar-for-mobile.vue';
+import { store } from '@/store.js';
+import XNavbar from '@/ui/_common_/navbar.vue';
 
 const XStreamIndicator = defineAsyncComponent(() => import('./stream-indicator.vue'));
-const XUpload = defineAsyncComponent(() => import('./upload.vue'));
 const XWidgets = defineAsyncComponent(() => import('./widgets.vue'));
 
 const drawerMenuShowing = defineModel<boolean>('drawerMenuShowing');
@@ -130,7 +135,9 @@ function onNotification(notification: Misskey.entities.Notification, isClient = 
 	if (window.document.visibilityState === 'visible') {
 		if (!isClient && notification.type !== 'test') {
 			// サーバーサイドのテスト通知の際は自動で既読をつけない（テストできないので）
-			useStream().send('readNotification');
+			if (store.s.realtimeMode) {
+				useStream().send('readNotification');
+			}
 		}
 
 		if (!filterMutedNotification(notification)) return;
@@ -148,12 +155,20 @@ function onNotification(notification: Misskey.entities.Notification, isClient = 
 	sound.playMisskeySfx('notification');
 }
 
+function exitSafeMode() {
+	miLocalStorage.removeItem('isSafeMode');
+	const url = new URL(window.location.href);
+	url.searchParams.delete('safemode');
+	unisonReload(url.toString());
+}
+
 if ($i) {
-	const connection = useStream().useChannel('main', null, 'UI');
-	connection.on('notification', onNotification);
+	if (store.s.realtimeMode) {
+		const connection = useStream().useChannel('main');
+		connection.on('notification', onNotification);
+	}
 	globalEvents.on('clientNotification', notification => onNotification(notification, true));
 
-	//#region Listen message from SW
 	if ('serviceWorker' in navigator) {
 		swInject();
 	}
@@ -229,12 +244,6 @@ if ($i) {
 	left: 0;
 	z-index: 1001;
 	height: 100dvh;
-	width: 240px;
-	box-sizing: border-box;
-	contain: strict;
-	overflow: auto;
-	overscroll-behavior: contain;
-	background: var(--MI_THEME-navBg);
 }
 
 .widgetsDrawerBg {
@@ -405,13 +414,18 @@ if ($i) {
 	width: 100%;
 	height: max-content;
 	text-align: center;
-	z-index: 2147483647;
+	z-index: 2147483646;
 	color: #ff0;
 	background: rgba(0, 0, 0, 0.5);
 	padding: 4px 7px;
 	font-size: 14px;
 	pointer-events: none;
 	user-select: none;
+}
+
+#safemodeWarn {
+	@extend #botWarn;
+	z-index: 2147483647;
 }
 
 #devTicker {

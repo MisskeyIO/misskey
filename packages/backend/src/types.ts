@@ -19,6 +19,7 @@ import type { MiNote } from '@/models/Note.js';
  * quote - 投稿が引用Renoteされた
  * reaction - 投稿にリアクションされた
  * pollEnded - 自分のアンケートもしくは自分が投票したアンケートが終了した
+ * scheduledNotePosted - 予約したノートが投稿された
  * receiveFollowRequest - フォローリクエストされた
  * followRequestAccepted - 自分の送ったフォローリクエストが承認された
  * roleAssigned - ロールが付与された
@@ -43,6 +44,7 @@ export const notificationTypes = [
 	'quote',
 	'reaction',
 	'pollEnded',
+	'scheduledNotePosted',
 	'receiveFollowRequest',
 	'followRequestAccepted',
 	'roleAssigned',
@@ -51,7 +53,6 @@ export const notificationTypes = [
 	'exportCompleted',
 	'login',
 	'noteScheduled',
-	'scheduledNotePosted',
 	'scheduledNoteError',
 	'sensitiveFlagAssigned',
 	'createToken',
@@ -68,6 +69,8 @@ export const groupedNotificationTypes = [
 export const obsoleteNotificationTypes = ['pollVote', 'groupInvited'] as const;
 
 export const noteVisibilities = ['public', 'home', 'followers', 'specified'] as const;
+
+export const noteReactionAcceptances = ['likeOnly', 'likeOnlyForRemote', 'nonSensitiveOnly', 'nonSensitiveOnlyForLocalLikeOnlyForRemote', null] as const;
 
 export const mutedNoteReasons = ['word', 'manual', 'spam', 'other'] as const;
 

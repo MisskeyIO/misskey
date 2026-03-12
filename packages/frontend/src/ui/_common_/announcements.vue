@@ -4,7 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<div :class="$style.root">
+<div v-if="$i" :class="$style.root">
 	<MkA v-if="instance.emailRequiredForSignup && $i && !$i.email" :class="$style.item" to="/settings/email">
 		<span :class="$style.icon">
 			<i class="ti ti-circle-x" style="color: var(--MI_THEME-error);"></i>

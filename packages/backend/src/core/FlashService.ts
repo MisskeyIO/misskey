@@ -52,10 +52,11 @@ export class FlashService {
 			.leftJoinAndSelect('like.flash', 'flash');
 
 		if (opts.search != null) {
-			for (const word of opts.search.trim().split(' ')) {
+			for (const [index, word] of opts.search.trim().split(' ').entries()) {
+				const search = `search${index}`;
 				query.andWhere(new Brackets(qb => {
-					qb.orWhere('flash.title ILIKE :search', { search: `%${sqlLikeEscape(word)}%` });
-					qb.orWhere('flash.summary ILIKE :search', { search: `%${sqlLikeEscape(word)}%` });
+					qb.orWhere(`flash.title ILIKE :${search}`, { [search]: `%${sqlLikeEscape(word)}%` });
+					qb.orWhere(`flash.summary ILIKE :${search}`, { [search]: `%${sqlLikeEscape(word)}%` });
 				}));
 			}
 		}
@@ -71,10 +72,11 @@ export class FlashService {
 		const query = this.queryService.makePaginationQuery(this.flashRepository.createQueryBuilder('flash'), opts.sinceId, opts.untilId, opts.sinceDate, opts.untilDate)
 			.andWhere('flash.visibility = \'public\'');
 
-		for (const word of searchQuery.trim().split(' ')) {
+		for (const [index, word] of searchQuery.trim().split(' ').entries()) {
+			const search = `search${index}`;
 			query.andWhere(new Brackets(qb => {
-				qb.orWhere('flash.title ILIKE :search', { search: `%${sqlLikeEscape(word)}%` });
-				qb.orWhere('flash.summary ILIKE :search', { search: `%${sqlLikeEscape(word)}%` });
+				qb.orWhere(`flash.title ILIKE :${search}`, { [search]: `%${sqlLikeEscape(word)}%` });
+				qb.orWhere(`flash.summary ILIKE :${search}`, { [search]: `%${sqlLikeEscape(word)}%` });
 			}));
 		}
 

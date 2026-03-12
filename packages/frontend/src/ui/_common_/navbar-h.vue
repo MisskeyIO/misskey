@@ -184,11 +184,10 @@ onMounted(() => {
 
 .instance {
 	display: inline-block;
-	position: relative;
+	position: sticky;
 	width: 56px;
 	height: 100%;
 	vertical-align: bottom;
-	position: sticky;
 	top: 0;
 	left: 0;
 	z-index: 1;

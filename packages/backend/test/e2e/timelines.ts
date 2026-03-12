@@ -828,6 +828,24 @@ describe('Timelines', () => {
 					assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), false);
 				});
 
+				test('DB fallback時: 別チャンネルをミュートしていても、フォロー中ユーザーの通常ノートは含まれる', async () => {
+					if (enableFanoutTimeline) return;
+
+					const [alice, bob] = await Promise.all([signup(), signup()]);
+					await api('following/create', { userId: bob.id }, alice);
+
+					const channel = await createChannel('channel', bob);
+					await muteChannel(channel.id, alice);
+
+					const bobNote = await post(bob, { text: 'ok' });
+
+					await waitForPushToTl();
+
+					const res = await api('notes/timeline', { limit: 100 }, alice);
+
+					assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+				});
+
 				test('チャンネルフォロー　＋　ユーザフォロー　＋　チャンネルミュート　＝　TLに流れない', async () => {
 					const [alice, bob] = await Promise.all([signup(), signup()]);
 					await api('following/create', { userId: bob.id }, alice);
@@ -3125,6 +3143,23 @@ describe('Timelines', () => {
 					assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), false);
 				});
 
+				test('DB fallback時: 別チャンネルをミュートしていても、通常ノートは含まれる', async () => {
+					if (enableFanoutTimeline) return;
+
+					const [alice, bob] = await Promise.all([signup(), signup()]);
+
+					const channel = await createChannel('channel', bob);
+					await muteChannel(channel.id, alice);
+
+					const bobNote = await post(bob, { text: 'ok' });
+
+					await waitForPushToTl();
+
+					const res = await api('users/notes', { userId: bob.id, withChannelNotes: true }, alice);
+
+					assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+				});
+
 				test('[チャンネル外リノート] チャンネルミュートなし　＝　TLに流れる', async () => {
 					const [alice, bob] = await Promise.all([signup(), signup()]);
 
@@ -3344,8 +3379,8 @@ describe('Timelines', () => {
 				assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
 			});
 
-			test('閲覧中チャンネルとは別チャンネルをミュートしているとき、そのチャンネルからのリノートは含まれない', async() => {
-				const [alice, bob] = await Promise.all([signup(), signup()]);
+				test('閲覧中チャンネルとは別チャンネルをミュートしているとき、そのチャンネルからのリノートは含まれない', async() => {
+					const [alice, bob] = await Promise.all([signup(), signup()]);
 
 				const channel = await createChannel('channel', bob);
 				const channel2 = await createChannel('channel', bob);
@@ -3359,9 +3394,27 @@ describe('Timelines', () => {
 
 				const res = await api('channels/timeline', { channelId: channel.id }, alice);
 
-				assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), false);
+					assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), false);
+				});
+
+				test('DB fallback時: 閲覧中とは別チャンネルをミュートしていても、そのチャンネルの通常ノートは含まれる', async() => {
+					if (enableFanoutTimeline) return;
+
+					const [alice, bob] = await Promise.all([signup(), signup()]);
+
+					const channel = await createChannel('channel', bob);
+					const channel2 = await createChannel('channel2', bob);
+					await muteChannel(channel2.id, alice);
+
+					const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
+
+					await waitForPushToTl();
+
+					const res = await api('channels/timeline', { channelId: channel.id }, alice);
+
+					assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+				});
 			});
-		});
 		// TODO: リノートミュート済みユーザーのテスト
 		// TODO: ページネーションのテスト
 	});

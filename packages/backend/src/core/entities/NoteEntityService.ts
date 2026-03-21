@@ -167,7 +167,7 @@ export class NoteEntityService implements OnModuleInit {
 			return false;
 		}
 
-		if (packedNote.reply?.userId === meId) {
+		if (packedNote.replyUserId === meId) {
 			return true;
 		}
 
@@ -176,7 +176,12 @@ export class NoteEntityService implements OnModuleInit {
 		}
 
 		const followings = await this.cacheService.userFollowingsCache.fetch(meId);
-		return Object.hasOwn(followings, packedNote.userId);
+		if (Object.hasOwn(followings, packedNote.userId)) {
+			return true;
+		}
+
+		const viewer = await this.usersRepository.findOneBy({ id: meId });
+		return packedNote.user.host != null && viewer?.host != null;
 	}
 
 	@bindThis
@@ -506,6 +511,7 @@ export class NoteEntityService implements OnModuleInit {
 			fileIds: note.fileIds,
 			files: packedFiles != null ? this.packAttachedFiles(note.fileIds, packedFiles, me) : this.driveFileEntityService.packManyByIds(note.fileIds, me),
 			replyId: note.replyId,
+			replyUserId: note.reply?.userId ?? note.replyUserId,
 			renoteId: note.renoteId,
 			channelId: note.channelId ?? undefined,
 			channel: channel ? {

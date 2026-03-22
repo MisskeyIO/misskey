@@ -18,7 +18,7 @@
     "restart": "pnpm build && pnpm start",
     "dev": "nodemon -w src -e ts,js,mjs,cjs,json --exec \"cross-env NODE_ENV=development pnpm run restart\"",
     "typecheck": "tsc --noEmit && tsc -p test --noEmit && tsc -p test-federation --noEmit",
-    "eslint": "eslint --quiet \"{src,test-federation}/**/*.ts\"",
+    "eslint": "eslint --quiet \"src/**/*.ts\" \"test-federation/**/*.ts\" --ignore-pattern \"test-federation/volumes/**\"",
     "lint": "pnpm typecheck && pnpm eslint",
     "jest": "cross-env NODE_ENV=test node --experimental-vm-modules --experimental-import-meta-resolve --experimental-require-module node_modules/jest/bin/jest.js --forceExit --config jest.config.unit.cjs",
     "jest:e2e": "cross-env NODE_ENV=test node --experimental-vm-modules --experimental-import-meta-resolve --experimental-require-module node_modules/jest/bin/jest.js --forceExit --config jest.config.e2e.cjs",

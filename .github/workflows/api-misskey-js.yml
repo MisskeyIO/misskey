@@ -17,6 +17,9 @@ jobs:
   report:
 
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22.x]
 
     steps:
       - name: Checkout
@@ -33,7 +36,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version-file: '.node-version'
+          node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
 
       - name: Install dependencies

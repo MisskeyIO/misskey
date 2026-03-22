@@ -12,14 +12,12 @@ on:
       - packages/backend/**
       - packages/misskey-js/**
       - pnpm-lock.yaml
-      - .github/min.node-version
       - .github/workflows/test-federation.yml
   pull_request:
     paths:
       - packages/backend/**
       - packages/misskey-js/**
       - pnpm-lock.yaml
-      - .github/min.node-version
       - .github/workflows/test-federation.yml
 
 permissions:
@@ -31,8 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version-file:
-          - .github/min.node-version
+        node-version: [22.x]
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -41,7 +38,7 @@ jobs:
           submodules: true
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
           run_install: false
 
@@ -64,14 +61,11 @@ jobs:
           path: /opt/hostedtoolcache/ffmpeg
           key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ steps.setup-ffmpeg.outputs.ffmpeg-version }}
 
-      - name: Setup Node.js
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v6
         with:
-          node-version-file: ${{ matrix.node-version-file }}
+          node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
-
-      - name: Export Node.js version for Docker Compose
-        run: echo "NODE_VERSION=$(cat '${{ matrix.node-version-file }}')" >> "$GITHUB_ENV"
 
       - name: Install dependencies
         run: pnpm i --frozen-lockfile

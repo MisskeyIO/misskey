@@ -14,6 +14,12 @@ let ctx: AudioContext;
 const cache = new Map<string, AudioBuffer>();
 let canPlay = true;
 
+type DriveFileSoundStore = Extract<SoundStore, { type: '_driveFile_' }>;
+
+function isDriveFileSoundStore(sound: SoundStore): sound is DriveFileSoundStore {
+	return sound.type === '_driveFile_';
+}
+
 function isValidUrl(url: string): boolean {
 	try {
 		new URL(url);
@@ -205,7 +211,7 @@ export async function loadAudio(url: string, options?: { useCache?: boolean; }) 
 export function playMisskeySfx(operationType: OperationType) {
 	const sound = prefer.s[`sound.on.${operationType}`];
 	playMisskeySfxFile(sound).then((succeed) => {
-		if (!succeed && sound.type === '_driveFile_') {
+		if (!succeed && isDriveFileSoundStore(sound)) {
 			// ドライブファイルが存在しない場合はデフォルトのサウンドを再生する
 			const default_ = getInitialPrefValue(`sound.on.${operationType}`);
 			const soundName = default_.type as Exclude<SoundType, '_driveFile_'>;
@@ -228,7 +234,7 @@ export async function playMisskeySfxFile(soundStore: SoundStore): Promise<boolea
 	// ユーザーアクティベーションが必要な場合はそれがない場合は再生しない
 	if ('userActivation' in navigator && !navigator.userActivation.hasBeenActive) return false;
 	// サウンドがない場合は再生しない
-	if (soundStore.type === null || soundStore.type === '_driveFile_' && !soundStore.fileUrl) return false;
+	if (soundStore.type === null || (isDriveFileSoundStore(soundStore) && !soundStore.fileUrl)) return false;
 
 	canPlay = false;
 	return await playMisskeySfxFileInternal(soundStore).finally(() => {
@@ -242,14 +248,14 @@ export async function playMisskeySfxFile(soundStore: SoundStore): Promise<boolea
 const rateLimiter = new RateLimiter<string>({ duration: 50, max: 1 });
 
 async function playMisskeySfxFileInternal(soundStore: SoundStore): Promise<boolean> {
-	if (soundStore.type === null || (soundStore.type === '_driveFile_' && (!$i?.policies.canUseDriveFileInSoundSettings || !soundStore.fileUrl))) {
+	if (soundStore.type === null || (isDriveFileSoundStore(soundStore) && (!$i?.policies.canUseDriveFileInSoundSettings || !soundStore.fileUrl))) {
 		return false;
 	}
 	const masterVolume = prefer.s['sound.masterVolume'];
 	if (isMute() || masterVolume === 0 || soundStore.volume === 0) {
 		return true; // ミュート時は成功として扱う
 	}
-	const url = soundStore.type === '_driveFile_' ? soundStore.fileUrl : `/client-assets/sounds/${soundStore.type}.mp3`;
+	const url = isDriveFileSoundStore(soundStore) ? soundStore.fileUrl : `/client-assets/sounds/${soundStore.type}.mp3`;
 	const buffer = await loadAudio(url).catch(() => {
 		return undefined;
 	});

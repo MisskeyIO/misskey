@@ -58,8 +58,8 @@ async function fetchHistory() {
 	fetching.value = true;
 
 	const [userMessages, roomMessages] = await Promise.all([
-		misskeyApi('chat/history', { room: false }),
-		misskeyApi('chat/history', { room: true }),
+		misskeyApi<Misskey.entities.ChatMessage[]>('chat/history', { room: false }),
+		misskeyApi<Misskey.entities.ChatMessage[]>('chat/history', { room: true }),
 	]);
 
 	history.value = [...userMessages, ...roomMessages]

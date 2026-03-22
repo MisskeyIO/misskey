@@ -46,6 +46,12 @@ export const packedNoteSchema = {
 			format: 'id',
 			example: 'xxxxxxxxxx',
 		},
+		replyUserId: {
+			type: 'string',
+			optional: true, nullable: true,
+			format: 'id',
+			example: 'xxxxxxxxxx',
+		},
 		renoteId: {
 			type: 'string',
 			optional: true, nullable: true,

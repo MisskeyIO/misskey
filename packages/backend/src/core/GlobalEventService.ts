@@ -133,6 +133,11 @@ export interface NoteEventTypes {
 type NoteStreamEventTypes = {
 	[key in keyof NoteEventTypes]: {
 		id: MiNote['id'];
+		userId: MiNote['userId'];
+		visibility: MiNote['visibility'];
+		visibleUserIds: MiNote['visibleUserIds'];
+		mentions: MiNote['mentions'];
+		replyUserId: MiNote['replyUserId'];
 		body: NoteEventTypes[key];
 	};
 };
@@ -383,9 +388,14 @@ export class GlobalEventService {
 	}
 
 	@bindThis
-	public publishNoteStream<K extends keyof NoteEventTypes>(noteId: MiNote['id'], type: K, value?: NoteEventTypes[K]): void {
-		this.publish(`noteStream:${noteId}`, type, {
-			id: noteId,
+	public publishNoteStream<K extends keyof NoteEventTypes>(note: MiNote, type: K, value?: NoteEventTypes[K]): void {
+		this.publish(`noteStream:${note.id}`, type, {
+			id: note.id,
+			userId: note.userId,
+			visibility: note.visibility,
+			visibleUserIds: note.visibleUserIds,
+			mentions: note.mentions,
+			replyUserId: note.replyUserId,
 			body: value,
 		});
 	}

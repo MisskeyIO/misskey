@@ -127,6 +127,10 @@ export type NormalizedChatMessage = Omit<Misskey.entities.ChatMessageLite, 'from
 	})[];
 };
 
+type ChatRoomShowResponse = Misskey.entities.ChatRoom & {
+	invitationExists: boolean;
+};
+
 const initializing = ref(false);
 const initialized = ref(false);
 const moreFetching = ref(false);
@@ -180,7 +184,7 @@ async function initialize() {
 	if (props.userId) {
 		const [u, m] = await Promise.all([
 			misskeyApi('users/show', { userId: props.userId }),
-			misskeyApi('chat/messages/user-timeline', { userId: props.userId, limit: LIMIT }),
+			misskeyApi<Misskey.entities.ChatMessageLite[]>('chat/messages/user-timeline', { userId: props.userId, limit: LIMIT }),
 		]);
 
 		user.value = u;
@@ -198,12 +202,11 @@ async function initialize() {
 		connection.value.on('react', onReact);
 		connection.value.on('unreact', onUnreact);
 	} else if (props.roomId) {
-		const [rResult, mResult] = await Promise.allSettled([
-			misskeyApi('chat/rooms/show', { roomId: props.roomId }),
-			misskeyApi('chat/messages/room-timeline', { roomId: props.roomId, limit: LIMIT }),
-		]);
+		let r: ChatRoomShowResponse;
 
-		if (rResult.status === 'rejected') {
+		try {
+			r = await misskeyApi<ChatRoomShowResponse>('chat/rooms/show', { roomId: props.roomId });
+		} catch {
 			os.alert({
 				type: 'error',
 				text: i18n.ts.somethingHappened,
@@ -212,7 +215,7 @@ async function initialize() {
 			return;
 		}
 
-		const r = rResult.value as Misskey.entities.ChatRoomsShowResponse;
+		const m = await misskeyApi<Misskey.entities.ChatMessageLite[]>('chat/messages/room-timeline', { roomId: props.roomId, limit: LIMIT }).catch(() => []);
 
 		if (r.invitationExists) {
 			const confirm = await os.confirm({
@@ -232,8 +235,6 @@ async function initialize() {
 			}
 		}
 
-		const m = mResult.status === 'fulfilled' ? mResult.value as Misskey.entities.ChatMessagesRoomTimelineResponse : [];
-
 		room.value = r;
 		messages.value = m.map(x => normalizeMessage(x));
 
@@ -242,7 +243,7 @@ async function initialize() {
 		}
 
 		connection.value = useStream().useChannel('chatRoom', {
-			roomId: room.value.id,
+			roomId: r.id,
 		});
 		connection.value.on('message', onMessage);
 		connection.value.on('deleted', onDeleted);
@@ -271,11 +272,11 @@ async function fetchMore() {
 
 	moreFetching.value = true;
 
-	const newMessages = props.userId ? await misskeyApi('chat/messages/user-timeline', {
+	const newMessages = props.userId ? await misskeyApi<Misskey.entities.ChatMessageLite[]>('chat/messages/user-timeline', {
 		userId: user.value!.id,
 		limit: LIMIT,
 		untilId: messages.value[messages.value.length - 1].id,
-	}) : await misskeyApi('chat/messages/room-timeline', {
+	}) : await misskeyApi<Misskey.entities.ChatMessageLite[]>('chat/messages/room-timeline', {
 		roomId: room.value!.id,
 		limit: LIMIT,
 		untilId: messages.value[messages.value.length - 1].id,
@@ -288,7 +289,7 @@ async function fetchMore() {
 }
 
 function onMessage(message: Misskey.entities.ChatMessageLite) {
-	sound.playMisskeySfx('chatMessage');
+	sound.playMisskeySfx('notification');
 
 	messages.value.unshift(normalizeMessage(message));
 

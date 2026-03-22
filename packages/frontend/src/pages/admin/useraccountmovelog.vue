@@ -22,7 +22,7 @@
 
 		<MkPagination v-slot="{items}" ref="logs" :pagination="pagination" style="margin-top: var(--MI-margin);">
 			<div class="_gaps_s">
-				<MkFolder v-for="item in items" :key="item.id">
+				<MkFolder v-for="item in (items as unknown as UserAccountMoveLog[])" :key="item.id">
 					<template #label>
 						{{ i18n.tsx.userAccountMoveLogsTitle({
 							from: '@' + item.movedFrom.username + (item.movedFrom.host ? `@${item.movedFrom.host}` : ''),
@@ -50,6 +50,7 @@
 
 <script lang="ts" setup>
 import { computed, shallowRef, ref } from 'vue';
+import * as Misskey from 'misskey-js';
 import MkInput from '@/components/MkInput.vue';
 import MkPagination from '@/components/MkPagination.vue';
 import { i18n } from '@/i18n.js';
@@ -58,7 +59,13 @@ import MkFolder from '@/components/MkFolder.vue';
 import { definePage } from '@/page.js';
 import MkSelect from '@/components/MkSelect.vue';
 
-const logs = shallowRef<InstanceType<typeof MkPagination>>();
+const logs = shallowRef<{ reload: () => void } | null>(null);
+
+type UserAccountMoveLog = {
+	id: string;
+	movedFrom: Misskey.entities.User;
+	movedTo: Misskey.entities.User;
+};
 
 const movedToId = ref('');
 const movedFromId = ref('');
@@ -69,7 +76,7 @@ const serverScopeItems = [
 	{ label: i18n.ts.all, value: 'all' },
 	{ label: i18n.ts.remote, value: 'remote' },
 	{ label: i18n.ts.local, value: 'local' },
-] as const;
+];
 
 const pagination = {
 	endpoint: 'admin/show-user-account-move-logs' as const,

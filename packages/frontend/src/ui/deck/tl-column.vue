@@ -123,8 +123,6 @@ async function setType() {
 		}, {
 			value: 'local', label: i18n.ts._timelines.local,
 		}, {
-			value: 'media' as const, text: i18n.ts._timelines.media,
-		}, {
 			value: 'social', label: i18n.ts._timelines.social,
 		}, {
 			value: 'global', label: i18n.ts._timelines.global,

@@ -480,19 +480,23 @@ function delEdit(): void {
 						channelChildMenu.push({
 							icon: 'ti ti-pinned-off',
 							text: i18n.ts.unpin,
-							action: () => os.apiWithDialog('channels/update', {
-								channelId: appearNote.channel!.id,
-								pinnedNoteIds: channel.pinnedNoteIds.filter(id => id !== appearNote.id),
-							}),
+							action: () => {
+								void os.apiWithDialog('channels/update', {
+									channelId: appearNote.channel!.id,
+									pinnedNoteIds: channel.pinnedNoteIds.filter(id => id !== appearNote.id),
+								});
+							},
 						});
 					} else {
 						channelChildMenu.push({
 							icon: 'ti ti-pin',
 							text: i18n.ts.pin,
-							action: () => os.apiWithDialog('channels/update', {
-								channelId: appearNote.channel!.id,
-								pinnedNoteIds: [...channel.pinnedNoteIds, appearNote.id],
-							}),
+							action: () => {
+								void os.apiWithDialog('channels/update', {
+									channelId: appearNote.channel!.id,
+									pinnedNoteIds: [...channel.pinnedNoteIds, appearNote.id],
+								});
+							},
 						});
 					}
 					return channelChildMenu;

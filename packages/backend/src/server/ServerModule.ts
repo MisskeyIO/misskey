@@ -47,6 +47,7 @@ import { ChatUserChannelService } from './api/stream/channels/chat-user.js';
 import { ChatRoomChannelService } from './api/stream/channels/chat-room.js';
 import { ReversiChannelService } from './api/stream/channels/reversi.js';
 import { ReversiGameChannelService } from './api/stream/channels/reversi-game.js';
+import { NoteStreamingHidingService } from './api/stream/NoteStreamingHidingService.js';
 import { SigninWithPasskeyApiService } from './api/SigninWithPasskeyApiService.js';
 
 @Module({
@@ -93,6 +94,7 @@ import { SigninWithPasskeyApiService } from './api/SigninWithPasskeyApiService.j
 		LocalTimelineChannelService,
 		QueueStatsChannelService,
 		UserListChannelService,
+		NoteStreamingHidingService,
 		OpenApiServerService,
 		OAuth2ProviderService,
 		JWTIdentifyProviderService,

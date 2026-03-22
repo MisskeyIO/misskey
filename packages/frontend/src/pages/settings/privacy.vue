@@ -393,7 +393,7 @@ const gaConsent = computed({
 		gaConsentInternal.value = value;
 	},
 });
-const gtagConsentInternal = ref({
+const defaultGtagConsent: GtagConsentParams = {
 	ad_storage: 'denied',
 	ad_user_data: 'denied',
 	ad_personalization: 'denied',
@@ -401,7 +401,11 @@ const gtagConsentInternal = ref({
 	functionality_storage: 'denied',
 	personalization_storage: 'denied',
 	security_storage: 'granted',
-	...(miLocalStorage.getItemAsJson('gtagConsent') as GtagConsentParams),
+};
+const storedGtagConsent = miLocalStorage.getItemAsJson('gtagConsent') as Partial<GtagConsentParams> | null;
+const gtagConsentInternal = ref<GtagConsentParams>({
+	...defaultGtagConsent,
+	...(storedGtagConsent ?? {}),
 });
 const gtagConsentParams = computed({
 	get: () => gtagConsentInternal.value,
@@ -456,7 +460,7 @@ watch(gaConsent, async () => {
 });
 
 watch(gtagConsentParams, async () => {
-	gtagConsent('update', gtagConsentParams.value as GtagConsentParams);
+	gtagConsent('update', gtagConsentParams.value);
 });
 
 watch([makeNotesFollowersOnlyBefore, makeNotesHiddenBefore], () => {

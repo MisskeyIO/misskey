@@ -189,7 +189,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 							<SearchMarker :keywords="['dimension']">
 								<MkPreferenceContainer k="dimension">
-									<MkInput v-model="dimension" type="number" min="0" :max="instance.dimensions" step="1" manualSave>
+								<MkInput v-model="dimension" type="number" :min="0" :max="Number(instance.dimensions)" step="1" manualSave>
 										<template #label><SearchLabel>{{ i18n.ts.dimension }}</SearchLabel></template>
 										<template #caption>{{ i18n.ts.dimensionDescription }}</template>
 									</MkInput>
@@ -1049,14 +1049,15 @@ const menuStyle = prefer.model('menuStyle');
 const makeEveryTextElementsSelectable = prefer.model('makeEveryTextElementsSelectable');
 
 const browserLanguage = typeof navigator === 'undefined' ? null : navigator.language;
+type PostingLangCode = (typeof postingLangCodes)[number];
 const supportedLangCodes = postingLangCodes.filter((code): code is Exclude<(typeof postingLangCodes)[number], 'other'> => code !== 'other');
 const supportedLangCodeSet = new Set(supportedLangCodes);
-const isSupportedPostingLang = (code: string) => code === 'other' || supportedLangCodeSet.has(code as (typeof supportedLangCodes)[number]);
+const isSupportedPostingLang = (code: string): code is PostingLangCode => code === 'other' || supportedLangCodeSet.has(code as (typeof supportedLangCodes)[number]);
 const normalizedPostingLang = $i.postingLang === null ? null : (isSupportedPostingLang($i.postingLang) ? $i.postingLang : null);
 const hasLanguageConfig = $i.postingLang != null || ($i.viewingLangs?.length ?? 0) > 0;
 const autoPostingLang = getAutoPostingLang(browserLanguage);
 const initialPostingLang = hasLanguageConfig ? normalizedPostingLang : autoPostingLang;
-const postingLang = ref<string | null>(initialPostingLang);
+const postingLang = ref<PostingLangCode | null>(initialPostingLang);
 const languageCodes = [...postingLangCodes];
 const postingLangItems = languageCodes.map(code => ({
 	label: code === 'other' ? i18n.ts.other : langmap[code].nativeName,
@@ -1070,8 +1071,8 @@ const initialViewingLangs = Array.from(new Set(rawInitialViewingLangs.map((code)
 const showAllViewingLangs = ref(hasLanguageConfig ? initialViewingLangs.length === 0 : false);
 const includeUnknown = ref(initialViewingLangs.includes('unknown'));
 const includeRemote = ref(initialViewingLangs.includes('remote'));
-const viewingLangs = ref<string[]>(initialViewingLangs.filter((code): code is string => typeof code === 'string' && code !== 'unknown' && code !== 'remote'));
-const viewingLangToAdd = ref<string | null>(postingLang.value);
+const viewingLangs = ref<PostingLangCode[]>(initialViewingLangs.filter((code): code is PostingLangCode => typeof code === 'string' && postingLangCodes.includes(code as PostingLangCode)));
+const viewingLangToAdd = ref<PostingLangCode | null>(postingLang.value);
 const showMediaInAllLanguages = ref($i.showMediaInAllLanguages ?? true);
 const showHashtagsInAllLanguages = ref($i.showHashtagsInAllLanguages ?? true);
 const addableViewingLangs = computed(() =>
@@ -1152,7 +1153,7 @@ watch(showAllViewingLangs, (value) => {
 		includeRemote.value = false;
 	} else {
 		const fallbackLang = postingLang.value ?? getAutoPostingLang(browserLanguage);
-		viewingLangs.value = getDefaultViewingLangs(fallbackLang);
+		viewingLangs.value = getDefaultViewingLangs(fallbackLang).filter((code): code is PostingLangCode => code !== 'unknown' && code !== 'remote');
 		viewingLangToAdd.value = null;
 		includeUnknown.value = true;
 		includeRemote.value = true;
@@ -1204,11 +1205,11 @@ async function saveLanguageConfig() {
 	});
 
 	languageSaving = true;
-	postingLang.value = i.postingLang ?? null;
+	postingLang.value = i.postingLang != null && isSupportedPostingLang(i.postingLang) ? i.postingLang : null;
 	showAllViewingLangs.value = i.viewingLangs.length === 0;
 	includeUnknown.value = i.viewingLangs.includes('unknown');
 	includeRemote.value = i.viewingLangs.includes('remote');
-	viewingLangs.value = i.viewingLangs.filter(code => code !== 'unknown' && code !== 'remote');
+	viewingLangs.value = i.viewingLangs.filter((code): code is PostingLangCode => isSupportedPostingLang(code));
 	showMediaInAllLanguages.value = i.showMediaInAllLanguages ?? true;
 	showHashtagsInAllLanguages.value = i.showHashtagsInAllLanguages ?? true;
 

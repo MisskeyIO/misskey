@@ -114,7 +114,17 @@ import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import { useMkSelect } from '@/composables/use-mkselect.js';
 
-const ads = ref<Misskey.entities.Ad[]>([]);
+type AdPlace = 'square' | 'horizontal' | 'vertical' | 'horizontal-big';
+type DisplayAd = Omit<Misskey.entities.Ad, 'place'> & { place: AdPlace };
+
+const ads = ref<DisplayAd[]>([]);
+
+function toAdPlace(place: string): AdPlace {
+	if (place === 'square' || place === 'horizontal' || place === 'vertical' || place === 'horizontal-big') {
+		return place;
+	}
+	return 'square';
+}
 
 // ISO形式はTZがUTCになってしまうので、TZ分ずらして時間を初期化
 const localTime = new Date();
@@ -142,6 +152,7 @@ misskeyApi('admin/ad/list', { publishing: publishing }).then(adsResponse => {
 			stdate.setMilliseconds(stdate.getMilliseconds() - localTimeDiff);
 			return {
 				...r,
+				place: toAdPlace(r.place),
 				expiresAt: exdate.toISOString().slice(0, 16),
 				startsAt: stdate.toISOString().slice(0, 16),
 			};
@@ -162,7 +173,7 @@ const filterItems = (v: typeof filterType.value) => {
 };
 
 // 選択された曜日(index)のビットフラグを操作する
-function toggleDayOfWeek(ad: Misskey.entities.Ad, index: number) {
+function toggleDayOfWeek(ad: DisplayAd, index: number) {
 	ad.dayOfWeek ^= 1 << index;
 }
 
@@ -183,7 +194,7 @@ function add() {
 	});
 }
 
-function remove(ad: Misskey.entities.Ad) {
+function remove(ad: DisplayAd) {
 	os.confirm({
 		type: 'warning',
 		text: i18n.tsx.removeAreYouSure({ x: ad.url }),
@@ -199,7 +210,7 @@ function remove(ad: Misskey.entities.Ad) {
 	});
 }
 
-function save(ad: Misskey.entities.Ad) {
+function save(ad: DisplayAd) {
 	if (ad.id === '') {
 		misskeyApi('admin/ad/create', {
 			...ad,
@@ -246,6 +257,7 @@ function more() {
 			stdate.setMilliseconds(stdate.getMilliseconds() - localTimeDiff);
 			return {
 				...r,
+				place: toAdPlace(r.place),
 				expiresAt: exdate.toISOString().slice(0, 16),
 				startsAt: stdate.toISOString().slice(0, 16),
 			};
@@ -263,6 +275,7 @@ function refresh() {
 			stdate.setMilliseconds(stdate.getMilliseconds() - localTimeDiff);
 			return {
 				...r,
+				place: toAdPlace(r.place),
 				expiresAt: exdate.toISOString().slice(0, 16),
 				startsAt: stdate.toISOString().slice(0, 16),
 			};

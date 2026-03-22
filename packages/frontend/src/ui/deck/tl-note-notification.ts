@@ -11,6 +11,10 @@ import { getSoundDuration, playMisskeySfxFile, soundsTypes } from '@/utility/sou
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 
+function isDriveFileSoundStore(sound: SoundStore): sound is Extract<SoundStore, { type: '_driveFile_' }> {
+	return sound.type === '_driveFile_';
+}
+
 export async function soundSettingsButton(soundSetting: Ref<SoundStore>): Promise<void> {
 	function getSoundTypeName(f: SoundType): string {
 		switch (f) {
@@ -36,7 +40,7 @@ export async function soundSettingsButton(soundSetting: Ref<SoundStore>): Promis
 		soundFile: {
 			type: 'drive-file',
 			label: i18n.ts.file,
-			defaultFileId: soundSetting.value.type === '_driveFile_' ? soundSetting.value.fileId : null,
+			defaultFileId: isDriveFileSoundStore(soundSetting.value) ? soundSetting.value.fileId : null,
 			hidden: v => v.type !== '_driveFile_',
 			validate: async (file: Misskey.entities.DriveFile) => {
 				if (!file.type.startsWith('audio')) {
@@ -91,8 +95,8 @@ export async function soundSettingsButton(soundSetting: Ref<SoundStore>): Promis
 	function buildSoundStore(r: NonNullable<typeof result>): SoundStore | null {
 		const type = (r.type === 'none' ? null : r.type);
 		const volume = r.volume;
-		const fileId = r.soundFile?.id ?? (soundSetting.value.type === '_driveFile_' ? soundSetting.value.fileId : undefined);
-		const fileUrl = r.soundFile?.url ?? (soundSetting.value.type === '_driveFile_' ? soundSetting.value.fileUrl : undefined);
+		const fileId = r.soundFile?.id ?? (isDriveFileSoundStore(soundSetting.value) ? soundSetting.value.fileId : undefined);
+		const fileUrl = r.soundFile?.url ?? (isDriveFileSoundStore(soundSetting.value) ? soundSetting.value.fileUrl : undefined);
 
 		if (type === '_driveFile_') {
 			if (!fileUrl || !fileId) {

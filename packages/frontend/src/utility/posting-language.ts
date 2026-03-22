@@ -4,7 +4,7 @@ import { langmap, postingLangCodes } from '@/utility/langmap.js';
 
 const postingLanguageOptions = postingLangCodes.map((code) => ({
 	value: code,
-	text: code === 'other' ? i18n.ts.other : langmap[code]?.nativeName ?? code,
+	label: code === 'other' ? i18n.ts.other : langmap[code]?.nativeName ?? code,
 }));
 
 export async function selectPostingLanguage(current: string | null): Promise<string | null | undefined> {

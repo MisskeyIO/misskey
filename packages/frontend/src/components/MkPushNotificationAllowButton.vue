@@ -102,11 +102,15 @@ async function subscribe() {
 			pushSubscription.value = subscription;
 
 			// Register
-			pushRegistrationInServer.value = await misskeyApi('sw/register', {
+			const registration = await misskeyApi('sw/register', {
 				endpoint: subscription.endpoint,
 				auth: encode(subscription.getKey('auth')),
 				publickey: encode(subscription.getKey('p256dh')),
 			});
+			pushRegistrationInServer.value = {
+				...registration,
+				key: registration.key ?? undefined,
+			};
 		}, async err => { // When subscribe failed
 			// 通知が許可されていなかったとき
 			if (err?.name === 'NotAllowedError') {

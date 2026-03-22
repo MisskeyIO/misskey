@@ -155,7 +155,7 @@ export class DeliverProcessorService {
 				}
 
 				// 5xx etc.
-				throw new Error(`${res.statusCode} ${res.statusMessage}`);
+				throw new Error(`${res.statusCode} ${res.statusMessage}`, { cause: res });
 			} else {
 				// DNS error, socket error, timeout ...
 				throw res;

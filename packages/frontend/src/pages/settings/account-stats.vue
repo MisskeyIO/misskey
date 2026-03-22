@@ -89,7 +89,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</MkKeyValue>
 	</FormSection>
 
-	<FormSection>
+	<FormSection v-if="$i">
 		<template #label>{{ i18n.ts.other }}</template>
 		<MkKeyValue oneline style="margin: 1em 0;">
 			<template #key>emailVerified</template>

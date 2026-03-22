@@ -121,27 +121,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 				<SearchMarker>
 					<MkFolder :defaultOpen="true">
-						<template #icon><SearchIcon><i class="ti ti-bolt"></i></SearchIcon></template>
-						<template #label><SearchLabel>Misskey® Reactions Boost Technology™ (RBT)</SearchLabel><span class="_beta">{{ i18n.ts.beta }}</span></template>
-						<template v-if="rbtForm.savedState.enableReactionsBuffering" #suffix>Enabled</template>
-						<template v-else #suffix>Disabled</template>
-						<template v-if="rbtForm.modified.value" #footer>
-							<MkFormFooter :form="rbtForm"/>
-						</template>
-
-						<div class="_gaps_m">
-							<SearchMarker>
-								<MkSwitch v-model="rbtForm.state.enableReactionsBuffering">
-									<template #label><SearchLabel>{{ i18n.ts.enable }}</SearchLabel><span v-if="rbtForm.modifiedStates.enableReactionsBuffering" class="_modified">{{ i18n.ts.modified }}</span></template>
-									<template #caption><SearchText>{{ i18n.ts._serverSettings.reactionsBufferingDescription }}</SearchText></template>
-								</MkSwitch>
-							</SearchMarker>
-						</div>
-					</MkFolder>
-				</SearchMarker>
-
-				<SearchMarker>
-					<MkFolder :defaultOpen="true">
 						<template #icon><SearchIcon><i class="ti ti-recycle"></i></SearchIcon></template>
 						<template #label><SearchLabel>Remote Notes Cleaning (仮)</SearchLabel></template>
 						<template v-if="remoteNotesCleaningForm.savedState.enableRemoteNotesCleaning" #suffix>Enabled</template>
@@ -195,7 +174,7 @@ const meta = await misskeyApi('admin/meta');
 const enableServerMachineStats = ref(meta.enableServerMachineStats);
 const enableIdenticonGeneration = ref(meta.enableIdenticonGeneration);
 const enableChartsForRemoteUser = ref(meta.enableChartsForRemoteUser);
-const enableStatsForFederatedInstances = ref(meta.enableStatsForFederatedInstances);
+const enableStatsForFederatedInstances = ref(meta.enableChartsForFederatedInstances);
 const enableChartsForFederatedInstances = ref(meta.enableChartsForFederatedInstances);
 const showRoleBadgesOfRemoteUsers = ref(meta.showRoleBadgesOfRemoteUsers);
 
@@ -225,7 +204,7 @@ function onChange_enableChartsForRemoteUser(value: boolean) {
 
 function onChange_enableStatsForFederatedInstances(value: boolean) {
 	os.apiWithDialog('admin/update-meta', {
-		enableStatsForFederatedInstances: value,
+		enableChartsForFederatedInstances: value,
 	}).then(() => {
 		fetchInstance(true);
 	});
@@ -262,15 +241,6 @@ const fttForm = useForm({
 		perRemoteUserUserTimelineCacheMax: state.perRemoteUserUserTimelineCacheMax,
 		perUserHomeTimelineCacheMax: state.perUserHomeTimelineCacheMax,
 		perUserListTimelineCacheMax: state.perUserListTimelineCacheMax,
-	});
-	fetchInstance(true);
-});
-
-const rbtForm = useForm({
-	enableReactionsBuffering: meta.enableReactionsBuffering,
-}, async (state) => {
-	await os.apiWithDialog('admin/update-meta', {
-		enableReactionsBuffering: state.enableReactionsBuffering,
 	});
 	fetchInstance(true);
 });

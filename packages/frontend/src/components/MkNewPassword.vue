@@ -50,7 +50,7 @@ defineExpose({
 });
 
 async function getPasswordStrength(source: string): Promise<number> {
-	let strength = 0;
+	let strength: number;
 	let power = 0.018;
 
 	// 英数字
@@ -158,4 +158,3 @@ function onChangePasswordRetype(): void {
 	}
 }
 </style>
-

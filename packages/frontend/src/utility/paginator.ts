@@ -24,8 +24,20 @@ type AbsEndpointType = {
 	res: unknown;
 };
 
+type EndpointResponse<
+	E extends keyof Misskey.Endpoints,
+	P extends Misskey.Endpoints[E]['req'] = Misskey.Endpoints[E]['req'],
+> = Misskey.api.SwitchCaseResponseType<E, P>;
+
+type EndpointItem<E extends keyof Misskey.Endpoints> =
+	EndpointResponse<E> extends Array<infer Item> ? Item : never;
+
 type FilterByEpRes<E extends Record<string, AbsEndpointType>> = {
-	[K in keyof E]: E[K]['res'] extends Array<{ id: string }> ? K : never
+	[K in keyof E]: K extends keyof Misskey.Endpoints
+		? EndpointResponse<K> extends Array<{ id: string }>
+			? K
+			: never
+		: never
 }[keyof E];
 export type PaginatorCompatibleEndpointPaths = FilterByEpRes<Misskey.Endpoints>;
 export type PaginatorCompatibleEndpoints = {
@@ -72,7 +84,7 @@ export interface IPaginator<T = unknown, _T = T & MisskeyEntity> {
 export class Paginator<
 	Endpoint extends PaginatorCompatibleEndpointPaths,
 	E extends PaginatorCompatibleEndpoints[Endpoint] = PaginatorCompatibleEndpoints[Endpoint],
-	T extends E['res'][number] & MisskeyEntity = E['res'][number] & MisskeyEntity,
+	T extends EndpointItem<Endpoint> & MisskeyEntity = EndpointItem<Endpoint> & MisskeyEntity,
 	SRef extends boolean = false,
 > implements IPaginator {
 	/**

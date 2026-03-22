@@ -169,8 +169,7 @@ const columnsEl = useTemplateRef('columnsEl');
 const addColumn = async (ev) => {
 	const { canceled, result: column } = await os.select({
 		title: i18n.ts._deck.addColumn,
-		// FIXME チャット機能が有効になった暁には解除する
-		items: columnTypes.filter(column => column !== 'chat').map(column => ({
+		items: columnTypes.map(column => ({
 			value: column, label: i18n.ts._deck._columns[column],
 		})),
 	});

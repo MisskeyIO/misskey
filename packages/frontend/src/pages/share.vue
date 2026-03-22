@@ -112,7 +112,6 @@ async function init() {
 				...(visibleUserIds ? visibleUserIds.split(',').map(userId => ({ userId })) : []),
 				...(visibleAccts ? visibleAccts.split(',').map(Misskey.acct.parse) : []),
 			]
-			// @ts-expect-error payloadの引数側の型が正常に解決されない
 				.map(q => misskeyApi('users/show', q)
 					.then(user => {
 						visibleUsers.value.push(user);

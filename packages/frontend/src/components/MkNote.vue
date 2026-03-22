@@ -307,7 +307,7 @@ const urls = computed(() => parsed.value ? extractUrlFromMfm(parsed.value).filte
 const isLong = shouldCollapsed(appearNote, urls.value ?? []);
 const collapsed = ref(appearNote.cw == null && isLong);
 const muted = ref(checkMute(appearNote, $i?.mutedWords ?? []));
-const hardMuted = ref(props.withHardMute && checkMute(appearNote, $i?.hardMutedWords, true));
+const hardMuted = ref(props.withHardMute && checkMute(appearNote, $i?.mutedWords ?? [], true));
 const showSoftWordMutedWord = computed(() => prefer.s.showSoftWordMutedWord);
 const translation = ref<Misskey.entities.NotesTranslateResponse | null>(null);
 const translating = ref(false);

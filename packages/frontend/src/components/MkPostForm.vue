@@ -553,7 +553,9 @@ function togglePoll() {
 }
 
 function addTag(tag: string) {
-	insertTextAtCursor(textareaEl.value, ` #${tag} `);
+	if (textareaEl.value) {
+		insertTextAtCursor(textareaEl.value, ` #${tag} `);
+	}
 }
 
 function focus() {
@@ -957,7 +959,9 @@ async function onPaste(ev: ClipboardEvent) {
 			text: i18n.ts.quoteQuestion,
 		}).then(({ canceled }) => {
 			if (canceled) {
-				insertTextAtCursor(textareaEl.value, paste);
+				if (textareaEl.value) {
+					insertTextAtCursor(textareaEl.value, paste);
+				}
 				return;
 			}
 
@@ -972,7 +976,9 @@ async function onPaste(ev: ClipboardEvent) {
 			text: i18n.ts.attachAsFileQuestion,
 		}).then(({ canceled }) => {
 			if (canceled) {
-				insertTextAtCursor(textareaEl.value, paste);
+				if (textareaEl.value) {
+					insertTextAtCursor(textareaEl.value, paste);
+				}
 				return;
 			}
 
@@ -1369,7 +1375,9 @@ function cancel() {
 
 function insertMention() {
 	os.selectUser({ localOnly: localOnly.value, includeSelf: true }).then(user => {
-		insertTextAtCursor(textareaEl.value, '@' + Misskey.acct.toString(user) + ' ');
+		if (textareaEl.value) {
+			insertTextAtCursor(textareaEl.value, '@' + Misskey.acct.toString(user) + ' ');
+		}
 	});
 }
 
@@ -1435,7 +1443,7 @@ function showActions(ev: MouseEvent) {
 	})), ev.currentTarget ?? ev.target);
 }
 
-const postAccount = ref<Misskey.entities.UserDetailed | null>(null);
+const postAccount = ref<Misskey.entities.User | null>(null);
 
 async function openAccountMenu(ev: MouseEvent) {
 	if (props.mock) return;
@@ -1451,9 +1459,11 @@ async function openAccountMenu(ev: MouseEvent) {
 				postAccount.value = account;
 			}
 		},
-	}, ev);
+	});
 
-	os.popupMenu([...items], (ev.currentTarget ?? ev.target ?? undefined) as HTMLElement | undefined);
+	os.popupMenu(items, ev.currentTarget ?? ev.target, {
+		align: 'left',
+	});
 }
 
 function showPerUploadItemMenu(item: UploaderItem, ev: MouseEvent) {
@@ -1528,9 +1538,15 @@ onMounted(() => {
 		});
 	}
 
-	autocompleteTextareaInput.value = new Autocomplete(textareaEl.value, text);
-	autocompleteCwInput.value = new Autocomplete(cwInputEl.value, cw);
-	autocompleteHashtagsInput.value = new Autocomplete(hashtagsInputEl.value, hashtags);
+	if (textareaEl.value) {
+		autocompleteTextareaInput.value = new Autocomplete(textareaEl.value, text);
+	}
+	if (cwInputEl.value) {
+		autocompleteCwInput.value = new Autocomplete(cwInputEl.value, cw);
+	}
+	if (hashtagsInputEl.value) {
+		autocompleteHashtagsInput.value = new Autocomplete(hashtagsInputEl.value, hashtags);
+	}
 
 	nextTick(() => {
 		// 書きかけの投稿を復元
@@ -1549,7 +1565,7 @@ onMounted(() => {
 			cw.value = init.cw ?? null;
 			visibility.value = init.visibility;
 			localOnly.value = init.localOnly ?? false;
-			postingLang.value = init.lang ?? null;
+			postingLang.value = ('lang' in init && typeof init.lang === 'string') ? init.lang : null;
 			dimension.value = init.dimension ?? props.initialDimension ?? store.r.tl.value?.dimensionBySrc?.[store.r.tl.value.src] ?? prefer.s.dimension;
 			files.value = init.files ?? [];
 			if (init.poll) {

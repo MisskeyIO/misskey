@@ -59,7 +59,7 @@ const props = defineProps<{
 
 const showingFiles = ref<Set<string>>(new Set());
 
-const files = computed(() => props.note.files.filter(file => !(file.isSensitive && sensitiveContentConsent.value === false)));
+const files = computed(() => (props.note.files ?? []).filter(file => !(file.isSensitive && sensitiveContentConsent.value === false)));
 
 const shouldHide = (file: Misskey.entities.DriveFile): boolean => {
 	if (prefer.s.nsfw === 'force' || (prefer.s.dataSaver.media && file.type.startsWith('image/'))) return true;

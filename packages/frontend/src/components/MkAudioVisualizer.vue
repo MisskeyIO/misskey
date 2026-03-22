@@ -35,9 +35,9 @@ let height: number;
 let uniforms: { [p: string]: THREE.IUniform };
 let texture: THREE.Texture;
 let maskTexture: THREE.Texture;
-let dataArray1: Uint8Array;
-let dataArray2: Uint8Array;
-let dataArrayOrigin: Uint8Array;
+let dataArray1: Uint8Array<ArrayBuffer>;
+let dataArray2: Uint8Array<ArrayBuffer>;
+let dataArrayOrigin: Uint8Array<ArrayBuffer>;
 let bufferLength: number;
 
 const init = () => {
@@ -94,9 +94,9 @@ const init = () => {
 const play = () => {
 	if (props.analyser) {
 		bufferLength = props.analyser.frequencyBinCount;
-		dataArrayOrigin = new Uint8Array(bufferLength);
-		dataArray1 = new Uint8Array(bufferLength);
-		dataArray2 = new Uint8Array(bufferLength);
+	dataArrayOrigin = new Uint8Array(new ArrayBuffer(bufferLength));
+	dataArray1 = new Uint8Array(new ArrayBuffer(bufferLength));
+	dataArray2 = new Uint8Array(new ArrayBuffer(bufferLength));
 		uniforms = {
 			enableAudio: {
 				value: 1,

@@ -105,7 +105,6 @@ async function fetchUser() {
 			Misskey.acct.parse(props.q.substring(1)) :
 			{ userId: props.q };
 
-		// @ts-expect-error payloadの引数側の型が正常に解決されない
 		misskeyApi('users/show', query).then(res => {
 			if (!props.showing) return;
 			user.value = res;

@@ -28,7 +28,9 @@
 		"baseUrl": ".",
 		"paths": {
 			"@/*": ["./src/*"],
-			"@@/*": ["../frontend-shared/*"]
+			"@@/*": ["../frontend-shared/*"],
+			"misskey-bubble-game": ["../misskey-bubble-game/src/index.ts"],
+			"misskey-bubble-game/*": ["../misskey-bubble-game/src/*"]
 		},
 		"typeRoots": [
 			"./@types",

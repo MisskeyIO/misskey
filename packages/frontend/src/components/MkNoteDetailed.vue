@@ -22,13 +22,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<MkAvatar :class="$style.renoteAvatar" :user="note.user" link preview/>
 		<i class="ti ti-repeat" style="margin-right: 4px;"></i>
 		<span :class="$style.renoteText">
-			<I18n :src="i18n.ts.renotedBy" tag="span">
-				<template #user>
-					<MkA v-user-preview="note.userId" :class="$style.renoteName" :to="userPage(note.user)">
-						<MkUserName :user="note.user"/>
-					</MkA>
-				</template>
-			</I18n>
+			<MkA v-user-preview="note.userId" :class="$style.renoteName" :to="userPage(note.user)">
+				<MkUserName :user="note.user"/>
+			</MkA>
+			<span> {{ i18n.tsx.renotedBy({ user: '' }) }}</span>
 		</span>
 		<div :class="$style.renoteInfo">
 			<button ref="renoteTime" class="_button" :class="$style.renoteTime" @mousedown.prevent="showRenoteMenu()">
@@ -221,13 +218,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 </div>
 <div v-else-if="muted" class="_panel" :class="$style.muted" @click="muted = false">
-	<I18n :src="i18n.ts.userSaysSomething" tag="small">
-		<template #name>
-			<MkA v-user-preview="appearNote.userId" :to="userPage(appearNote.user)">
-				<MkUserName :user="appearNote.user"/>
-			</MkA>
-		</template>
-	</I18n>
+	<small>
+		{{ i18n.tsx.userSaysSomething({ name: '' }) }}
+		<MkA v-user-preview="appearNote.userId" :to="userPage(appearNote.user)">
+			<MkUserName :user="appearNote.user"/>
+		</MkA>
+	</small>
 </div>
 </template>
 
@@ -290,13 +286,13 @@ const props = withDefaults(defineProps<{
 
 const inChannel = inject('inChannel', null);
 
-let note = deepClone(props.note);
+let note = deepClone(props.note) as Misskey.entities.Note;
 
 // plugin
 const noteViewInterruptors = getPluginHandlers('note_view_interruptor');
 if (noteViewInterruptors.length > 0) {
 onMounted(async () => {
-	let result: Misskey.entities.Note | null = deepClone(note.value);
+	let result: Misskey.entities.Note | null = deepClone(note) as Misskey.entities.Note;
 	for (const interruptor of noteViewInterruptors) {
 		try {
 			result = await interruptor.handler(result!) as Misskey.entities.Note | null;
@@ -308,7 +304,7 @@ onMounted(async () => {
 			console.error(err);
 		}
 	}
-	note.value = result as Misskey.entities.Note;
+	note = result as Misskey.entities.Note;
 });
 }
 
@@ -341,7 +337,7 @@ const canRenote = computed(() => ['public', 'home'].includes(appearNote.visibili
 const mutedReactions = ref<string[]>(store.s.mutedReactions);
 
 useGlobalEvent('noteDeleted', (noteId) => {
-	if (noteId === note.value.id || noteId === appearNote.id) {
+	if (noteId === note.id || noteId === appearNote.id) {
 		isDeleted.value = true;
 	}
 });

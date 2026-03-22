@@ -46,7 +46,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 		<div v-else>
 			<div class="_gaps">
-				<MkFolder ref="folderComponent">
+				<MkFolder>
 					<template #label><i class="ti ti-plus" style="margin-right: 5px;"></i>{{ i18n.ts.createNew }}</template>
 					<MkAbuseReportResolver v-model="newResolver" :editable="true">
 						<template #button>
@@ -76,7 +76,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, markRaw, useTemplateRef } from 'vue';
+import { computed, ref, markRaw } from 'vue';
 import MkSelect from '@/components/MkSelect.vue';
 import MkPagination from '@/components/MkPagination.vue';
 import MkFolder from '@/components/MkFolder.vue';
@@ -89,9 +89,9 @@ import { useMkSelect } from '@/composables/use-mkselect.js';
 import MkButton from '@/components/MkButton.vue';
 import { Paginator } from '@/utility/paginator.js';
 
-const reports = useTemplateRef('reports');
-const resolverPagingComponent = ref<InstanceType<typeof MkPagination>>();
-const folderComponent = ref<InstanceType<typeof MkFolder>>();
+const resolverPagingComponent = ref<{ reload: () => void } | null>(null);
+
+type ResolverExpiresAt = 'indefinitely' | '1hour' | '12hours' | '1day' | '1week' | '1month' | '3months' | '6months' | '1year';
 
 const {
 	model: state,
@@ -128,7 +128,16 @@ const {
 });
 
 const editableResolver = ref<null | string>(null);
-const defaultResolver = {
+const tab = ref<'list' | 'resolver'>('list');
+const defaultResolver: {
+	name: string;
+	targetUserPattern: string;
+	reporterPattern: string;
+	reportContentPattern: string;
+	expirationDate: string;
+	expiresAt: ResolverExpiresAt;
+	forward: boolean;
+} = {
 	name: '',
 	targetUserPattern: '',
 	reporterPattern: '',
@@ -144,7 +153,7 @@ const newResolver = ref<{
 	reporterPattern: string;
 	reportContentPattern: string;
 	expirationDate: string;
-	expiresAt: string;
+	expiresAt: ResolverExpiresAt;
 	forward: boolean;
 }>(defaultResolver);
 
@@ -153,10 +162,10 @@ const editingResolver = ref<{
 	targetUserPattern: string;
 	reporterPattern: string;
 	reportContentPattern: string;
-	expiresAt: string;
+	expiresAt: ResolverExpiresAt;
 	expirationDate: string;
 	forward: boolean;
-	previousExpiresAt?: string;
+	previousExpiresAt?: ResolverExpiresAt;
 }>(defaultResolver);
 
 const searchUsername = ref('');
@@ -176,14 +185,17 @@ const resolverPagination = {
 	limit: 10,
 };
 
-function resolved(reportId) {
-reports.value?.removeItem(reportId);
+function resolved(reportId: string) {
+	paginator.removeItem(reportId);
+}
 
 function edit(id: string) {
 	editableResolver.value = id;
 }
 
 function save(): void {
+	if (editableResolver.value == null) return;
+
 	os.apiWithDialog('admin/abuse-report-resolver/update', {
 		resolverId: editableResolver.value,
 		name: editingResolver.value.name,
@@ -216,7 +228,6 @@ function create(): void {
 		expiresAt: newResolver.value.expiresAt,
 		forward: newResolver.value.forward,
 	}).then(() => {
-		folderComponent.value?.toggle();
 		resolverPagingComponent.value?.reload();
 		newResolver.value.name = '';
 		newResolver.value.targetUserPattern = '';
@@ -225,7 +236,6 @@ function create(): void {
 		newResolver.value.expiresAt = 'indefinitely';
 		newResolver.value.forward = false;
 	});
-}
 }
 
 const headerActions = computed(() => []);

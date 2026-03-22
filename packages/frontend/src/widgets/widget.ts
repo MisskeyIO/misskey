@@ -39,11 +39,12 @@ export const useWidgetPropsManager = <F extends FormWithDefault>(
 	configure: () => void;
 } => {
 	const widgetProps = reactive<GetFormResultType<F>>((props.widget ? deepClone(props.widget.data) : {}) as GetFormResultType<F>);
+	const widgetPropsRecord = widgetProps as Record<string, unknown>;
 
 	const mergeProps = () => {
-		for (const prop of Object.keys(propsDef) as (keyof GetFormResultType<F> & keyof F)[]) {
-			if (typeof widgetProps[prop] === 'undefined') {
-				widgetProps[prop] = propsDef[prop].default as GetFormResultType<F>[typeof prop];
+		for (const prop of Object.keys(propsDef)) {
+			if (typeof widgetPropsRecord[prop] === 'undefined') {
+				widgetPropsRecord[prop] = propsDef[prop].default;
 			}
 		}
 	};
@@ -59,13 +60,13 @@ export const useWidgetPropsManager = <F extends FormWithDefault>(
 	const configure = async () => {
 		const form = deepClone(propsDef);
 		for (const item of Object.keys(form)) {
-			form[item].default = widgetProps[item];
+			form[item].default = widgetPropsRecord[item];
 		}
 		const { canceled, result } = await os.form(name, form);
 		if (canceled) return;
 
-		for (const key of Object.keys(result) as (keyof GetFormResultType<F>)[]) {
-			widgetProps[key] = result[key] as GetFormResultType<F>[typeof key];
+		for (const key of Object.keys(result)) {
+			widgetPropsRecord[key] = result[key];
 		}
 
 		save();

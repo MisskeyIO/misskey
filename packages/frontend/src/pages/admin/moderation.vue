@@ -305,6 +305,14 @@ function save_urlSettings() {
 	});
 }
 
+function save_blockedHosts() {
+	os.apiWithDialog('admin/update-meta', {
+		blockedHosts: blockedHosts.value.split('\n'),
+	}).then(() => {
+		fetchInstance(true);
+	});
+}
+
 function save_silencedHosts() {
 	os.apiWithDialog('admin/update-meta', {
 		silencedHosts: silencedHosts.value.split('\n'),

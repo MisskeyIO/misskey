@@ -26,7 +26,7 @@ on:
   workflow_dispatch:
     inputs:
       force_ffmpeg_cache_update:
-        description: 'Force update ffmpeg cache'
+        description: Force update ffmpeg cache
         required: false
         default: false
         type: boolean
@@ -38,10 +38,10 @@ jobs:
   unit:
     name: Unit tests (backend)
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        node-version-file:
-          - .node-version
+        node-version: [22.x]
 
     services:
       postgres:
@@ -66,14 +66,14 @@ jobs:
         fetch-depth: 0
         submodules: true
     - name: Install pnpm
-      uses: pnpm/action-setup@v4
+      uses: pnpm/action-setup@v5
       with:
         run_install: false
     - name: Restore FFmpeg binary cache
       uses: actions/cache/restore@v5
       with:
         path: /opt/hostedtoolcache/ffmpeg
-        key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-latest
+        key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ github.event_name == 'workflow_dispatch' && inputs.force_ffmpeg_cache_update && github.run_id || 'latest' }}
         restore-keys: |
           ffmpeg-${{ runner.os }}-${{ runner.arch }}-
     - name: Install FFmpeg
@@ -86,11 +86,11 @@ jobs:
       uses: actions/cache/save@v5
       with:
         path: /opt/hostedtoolcache/ffmpeg
-        key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ steps.setup-ffmpeg.outputs.ffmpeg-version }}
-    - name: Use Node.js ${{ matrix.node-version-file }}
+        key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ github.event_name == 'workflow_dispatch' && inputs.force_ffmpeg_cache_update && github.run_id || steps.setup-ffmpeg.outputs.ffmpeg-version }}
+    - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v6
       with:
-        node-version-file: ${{ matrix.node-version-file }}
+        node-version: ${{ matrix.node-version }}
         cache: 'pnpm'
     - run: pnpm i --frozen-lockfile
     - name: Check pnpm-lock.yaml
@@ -110,11 +110,10 @@ jobs:
   e2e:
     name: E2E tests (backend)
     runs-on: ubuntu-latest
+
     strategy:
-      fail-fast: false
       matrix:
-        node-version-file:
-          - .node-version
+        node-version: [22.x]
 
     services:
       postgres:
@@ -134,16 +133,18 @@ jobs:
           - 56312:6379
 
     steps:
-      - uses: actions/checkout@v4.3.0
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           submodules: true
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4.2.0
-      - name: Use Node.js
-        uses: actions/setup-node@v4.4.0
+      - name: Install pnpm
+        uses: pnpm/action-setup@v5
         with:
-          node-version-file: ${{ matrix.node-version-file }}
+          run_install: false
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
       - run: pnpm i --frozen-lockfile
       - name: Check pnpm-lock.yaml

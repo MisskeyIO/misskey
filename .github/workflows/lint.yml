@@ -43,18 +43,23 @@ permissions:
 jobs:
   pnpm_install:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22.x]
     steps:
-      - uses: actions/checkout@v4.3.0
-        with:
-          fetch-depth: 0
-          submodules: true
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4.2.0
-      - uses: actions/setup-node@v4.4.0
-        with:
-          node-version-file: '.node-version'
-          cache: 'pnpm'
-      - run: pnpm i --frozen-lockfile
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+        submodules: true
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v5
+      with:
+        run_install: false
+    - uses: actions/setup-node@v6
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'pnpm'
+    - run: pnpm i --frozen-lockfile
 
   lint:
     needs: [pnpm_install]
@@ -62,6 +67,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
+        node-version: [22.x]
         workspace:
         - backend
         - frontend
@@ -82,12 +88,12 @@ jobs:
         fetch-depth: 0
         submodules: true
     - name: Setup pnpm
-      uses: pnpm/action-setup@v4
+      uses: pnpm/action-setup@v5
       with:
         run_install: false
     - uses: actions/setup-node@v6
       with:
-        node-version-file: '.node-version'
+        node-version: ${{ matrix.node-version }}
         cache: 'pnpm'
     - run: pnpm i --frozen-lockfile
     - name: Restore eslint cache
@@ -104,24 +110,24 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
+        node-version: [22.x]
         workspace:
         - backend
         - sw
         - misskey-js
     steps:
-      - uses: actions/checkout@v4.3.0
-        with:
-          fetch-depth: 0
-          submodules: true
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4.2.0
-      - uses: actions/setup-node@v4.4.0
-        with:
-          node-version-file: '.node-version'
-          cache: 'pnpm'
-      - run: pnpm i --frozen-lockfile
-      - run: pnpm --filter misskey-js run build
-        if: ${{ matrix.workspace == 'backend' || matrix.workspace == 'sw' }}
-      - run: pnpm --filter misskey-reversi run build
-        if: ${{ matrix.workspace == 'backend' }}
-      - run: pnpm --filter ${{ matrix.workspace }} run typecheck
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+        submodules: true
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v5
+      with:
+        run_install: false
+    - uses: actions/setup-node@v6
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'pnpm'
+    - run: pnpm i --frozen-lockfile
+    - run: pnpm --filter misskey-reversi --filter misskey-bubble-game --filter misskey-js run build
+    - run: pnpm --filter ${{ matrix.workspace }} run typecheck

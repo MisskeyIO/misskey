@@ -213,9 +213,9 @@ export async function addCustomEmoji(
 	return await admin.client.request('admin/emoji/add', { name, fileId: file.id, ...param });
 }
 
-export function deepStrictEqualWithExcludedFields<T>(actual: T, expected: T, excludedFields: (keyof T)[]) {
-	const _actual = structuredClone(actual);
-	const _expected = structuredClone(expected);
+export function deepStrictEqualWithExcludedFields<T>(actual: T, expected: T, excludedFields: string[]) {
+	const _actual = structuredClone(actual) as Record<string, unknown>;
+	const _expected = structuredClone(expected) as Record<string, unknown>;
 	for (const obj of [_actual, _expected]) {
 		for (const field of excludedFields) {
 			delete obj[field];

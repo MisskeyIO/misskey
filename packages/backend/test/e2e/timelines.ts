@@ -228,7 +228,7 @@ describe('Timelines', () => {
 				await api('following/update', { userId: bob.id, withReplies: true }, alice);
 				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
-				const bobNote = await post(bob, { text: 'hi', replyId: carolNote.id, visibility: 'specified', visibleUserIds: [carolNote.id] });
+				const bobNote = await post(bob, { text: 'hi', replyId: carolNote.id, visibility: 'specified', visibleUserIds: [carol.id] });
 
 				await waitForPushToTl();
 
@@ -307,7 +307,7 @@ describe('Timelines', () => {
 				await api('following/update', { userId: bob.id, withReplies: true }, alice);
 				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
-				const bobNote = await post(bob, { text: 'hi', replyId: carolNote.id, visibility: 'specified', visibleUserIds: [carolNote.id] });
+				const bobNote = await post(bob, { text: 'hi', replyId: carolNote.id, visibility: 'specified', visibleUserIds: [carol.id] });
 
 				await waitForPushToTl();
 

@@ -23,14 +23,6 @@ export const meta = {
 		type: 'object',
 		optional: false, nullable: false,
 		properties: {
-			cacheRemoteFiles: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			cacheRemoteSensitiveFiles: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
 			emailRequiredForSignup: {
 				type: 'boolean',
 				optional: false, nullable: false,
@@ -266,54 +258,6 @@ export const meta = {
 				type: 'string',
 				optional: false, nullable: true,
 			},
-			useObjectStorage: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			objectStorageBaseUrl: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-			objectStorageBucket: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-			objectStoragePrefix: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-			objectStorageEndpoint: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-			objectStorageRegion: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-			objectStoragePort: {
-				type: 'number',
-				optional: false, nullable: true,
-			},
-			objectStorageAccessKey: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-			objectStorageSecretKey: {
-				type: 'string',
-				optional: false, nullable: true,
-			},
-			objectStorageUseSSL: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			objectStorageUseProxy: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
-			objectStorageSetPublicRead: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
 			enableIpLogging: {
 				type: 'boolean',
 				optional: false, nullable: false,
@@ -470,10 +414,6 @@ export const meta = {
 				type: 'string',
 				optional: false, nullable: true,
 			},
-			objectStorageS3ForcePathStyle: {
-				type: 'boolean',
-				optional: false, nullable: false,
-			},
 			privacyPolicyUrl: {
 				type: 'string',
 				optional: false, nullable: true,
@@ -622,8 +562,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				enableEmail: instance.enableEmail,
 				enableServiceWorker: instance.enableServiceWorker,
 				translatorAvailable: instance.deeplAuthKey != null,
-				cacheRemoteFiles: instance.cacheRemoteFiles,
-				cacheRemoteSensitiveFiles: instance.cacheRemoteSensitiveFiles,
 				pinnedUsers: instance.pinnedUsers,
 				hiddenTags: instance.hiddenTags,
 				blockedHosts: instance.blockedHosts,
@@ -650,19 +588,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				smtpUser: instance.smtpUser,
 				smtpPass: instance.smtpPass,
 				swPrivateKey: instance.swPrivateKey,
-				useObjectStorage: instance.useObjectStorage,
-				objectStorageBaseUrl: instance.objectStorageBaseUrl,
-				objectStorageBucket: instance.objectStorageBucket,
-				objectStoragePrefix: instance.objectStoragePrefix,
-				objectStorageEndpoint: instance.objectStorageEndpoint,
-				objectStorageRegion: instance.objectStorageRegion,
-				objectStoragePort: instance.objectStoragePort,
-				objectStorageAccessKey: instance.objectStorageAccessKey,
-				objectStorageSecretKey: instance.objectStorageSecretKey,
-				objectStorageUseSSL: instance.objectStorageUseSSL,
-				objectStorageUseProxy: instance.objectStorageUseProxy,
-				objectStorageSetPublicRead: instance.objectStorageSetPublicRead,
-				objectStorageS3ForcePathStyle: instance.objectStorageS3ForcePathStyle,
 				deeplAuthKey: instance.deeplAuthKey,
 				deeplIsPro: instance.deeplIsPro,
 				enableIpLogging: instance.enableIpLogging,

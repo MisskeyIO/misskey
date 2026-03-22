@@ -64,17 +64,12 @@ export class ApImageService {
 
 		this.logger.info(`Creating the Image: ${image.url}`);
 
-		// Cache if remote file cache is on AND either
-		// 1. remote sensitive file is also on
-		// 2. or the image is not sensitive
-		const shouldBeCached = this.meta.cacheRemoteFiles && (this.meta.cacheRemoteSensitiveFiles || !image.sensitive);
-
 		const file = await this.driveService.uploadFromUrl({
 			url: image.url,
 			user: actor,
 			uri: image.url,
 			sensitive: image.sensitive,
-			isLink: !shouldBeCached,
+			isLink: true,
 			comment: truncate(image.name ?? undefined, DB_MAX_IMAGE_COMMENT_LENGTH),
 		});
 		if (!file.isLink || file.url === image.url) return file;

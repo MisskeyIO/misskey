@@ -156,7 +156,7 @@ export class DriveService {
 		// thunbnail, webpublic を必要なら生成
 		const alts = await this.generateAlts(path, fileType, !file.uri);
 
-		if (this.meta.useObjectStorage) {
+		if (this.config.s3) {
 		//#region ObjectStorage params
 			let [ext] = (name.match(/\.([a-zA-Z0-9_-]+)$/) ?? ['']);
 
@@ -175,11 +175,11 @@ export class DriveService {
 				ext = '';
 			}
 
-			const baseUrl = this.meta.objectStorageBaseUrl
-				?? `${ this.meta.objectStorageUseSSL ? 'https' : 'http' }://${ this.meta.objectStorageEndpoint }${ this.meta.objectStoragePort ? `:${this.meta.objectStoragePort}` : '' }/${ this.meta.objectStorageBucket }`;
+			const baseUrl = this.config.s3.baseUrl
+				?? `${ this.config.s3.useSSL ? 'https' : 'http' }://${ this.config.s3.endpoint }/${ this.config.s3.bucket }`;
 
 			// for original
-			const prefix = this.meta.objectStoragePrefix ? `${this.meta.objectStoragePrefix}/` : '';
+			const prefix = this.config.s3.prefix ? `${this.config.s3.prefix}/` : '';
 			const key = `${prefix}${randomUUID()}${ext}`;
 			const url = `${ baseUrl }/${ key }`;
 
@@ -385,7 +385,7 @@ export class DriveService {
 		if (!FILE_TYPE_BROWSERSAFE.includes(fileType)) type = 'application/octet-stream';
 
 		const params = {
-			Bucket: this.meta.objectStorageBucket,
+			Bucket: this.config.s3?.bucket,
 			Key: key,
 			Body: stream,
 			ContentType: type,
@@ -398,9 +398,9 @@ export class DriveService {
 			// 許可されているファイル形式でしか拡張子をつけない
 			ext ? correctFilename(filename, ext) : filename,
 		);
-		if (this.meta.objectStorageSetPublicRead) params.ACL = 'public-read';
+		if (this.config.s3?.options?.setPublicRead) params.ACL = 'public-read';
 
-		await this.s3Service.upload(this.meta, params)
+		await this.s3Service.upload(params)
 			.then(
 				result => {
 					if ('Bucket' in result) { // CompleteMultipartUploadCommandOutput
@@ -844,11 +844,11 @@ export class DriveService {
 	public async deleteObjectStorageFile(key: string) {
 		try {
 			const param = {
-				Bucket: this.meta.objectStorageBucket,
+				Bucket: this.config.s3?.bucket,
 				Key: key,
 			} as DeleteObjectCommandInput;
 
-			await this.s3Service.delete(this.meta, param);
+			await this.s3Service.delete(param);
 		} catch (err: any) {
 			if (err.name === 'NoSuchKey') {
 				this.deleteLogger.warn(`The object storage had no such key to delete: ${key}. Skipping this.`, err as Error);

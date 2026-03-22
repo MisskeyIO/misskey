@@ -18,7 +18,6 @@ import type { TestingModule } from '@nestjs/testing';
 import { GlobalModule } from '@/GlobalModule.js';
 import { CoreModule } from '@/core/CoreModule.js';
 import { S3Service } from '@/core/S3Service.js';
-import { MiMeta } from '@/models/_.js';
 
 describe('S3Service', () => {
 	let app: TestingModule;
@@ -47,7 +46,7 @@ describe('S3Service', () => {
 		test('upload a file', async () => {
 			s3Mock.on(PutObjectCommand).resolves({});
 
-			await s3Service.upload({ objectStorageRegion: 'us-east-1' } as MiMeta, {
+			await s3Service.upload({
 				Bucket: 'fake',
 				Key: 'fake',
 				Body: 'x',
@@ -59,7 +58,7 @@ describe('S3Service', () => {
 			s3Mock.on(UploadPartCommand).resolves({ ETag: '1' });
 			s3Mock.on(CompleteMultipartUploadCommand).resolves({ Bucket: 'fake', Key: 'fake' });
 
-			await s3Service.upload({} as MiMeta, {
+			await s3Service.upload({
 				Bucket: 'fake',
 				Key: 'fake',
 				Body: 'x'.repeat(8 * 1024 * 1024 + 1), // デフォルトpartSizeにしている 8 * 1024 * 1024 を越えるサイズ
@@ -69,7 +68,7 @@ describe('S3Service', () => {
 		test('upload a file error', async () => {
 			s3Mock.on(PutObjectCommand).rejects({ name: 'Fake Error' });
 
-			await expect(s3Service.upload({ objectStorageRegion: 'us-east-1' } as MiMeta, {
+			await expect(s3Service.upload({
 				Bucket: 'fake',
 				Key: 'fake',
 				Body: 'x',
@@ -79,7 +78,7 @@ describe('S3Service', () => {
 		test('upload a large file error', async () => {
 			s3Mock.on(UploadPartCommand).rejects();
 
-			await expect(s3Service.upload({} as MiMeta, {
+			await expect(s3Service.upload({
 				Bucket: 'fake',
 				Key: 'fake',
 				Body: 'x'.repeat(8 * 1024 * 1024 + 1), // デフォルトpartSizeにしている 8 * 1024 * 1024 を越えるサイズ

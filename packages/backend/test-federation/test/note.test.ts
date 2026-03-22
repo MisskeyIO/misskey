@@ -63,13 +63,16 @@ describe('Note', () => {
 			deepStrictEqualWithExcludedFields(note, resolvedNote, [
 				'id',
 				'emojis',
+				'reactionAcceptance',
 				'replyId',
+				'replyUserId',
 				'reply',
 				'userId',
 				'user',
 				'uri',
 			]);
 			assert(resolvedNote.replyId != null);
+			strictEqual(Reflect.get(resolvedNote, 'replyUserId'), aliceInB.id);
 			assert(resolvedNote.reply != null);
 			strictEqual(resolvedNote.reply.userId, aliceInB.id);
 			deepStrictEqualWithExcludedFields(replyedNote, resolvedNote.reply, [

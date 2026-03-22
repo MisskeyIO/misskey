@@ -30,7 +30,7 @@ jobs:
           set -euo pipefail
           printf '%s\n' "$(git rev-parse --short HEAD)" > .git-commit
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -57,7 +57,7 @@ jobs:
 
           echo "BRANCH_NAME=${branch_name}" >> "${GITHUB_ENV}"
       - name: Build an image from Dockerfile
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         id: build-scan
         with:
           context: .

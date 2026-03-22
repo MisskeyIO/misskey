@@ -365,7 +365,7 @@ export class ApRendererService {
 			return ids.map(id => items.find(item => item.id === id)).filter(x => x != null);
 		};
 
-		let inReplyTo: string | IPost | null;
+		let inReplyTo: string | IPost | null = null;
 		let inReplyToNote: MiNote | null;
 
 		if (note.replyId) {
@@ -386,11 +386,9 @@ export class ApRendererService {
 					}
 				}
 			}
-		} else {
-			inReplyTo = null;
 		}
 
-		let quote: string | null;
+		let quote: string | null = null;
 
 		if (note.renoteId) {
 			const renote = await this.notesRepository.findOneBy({ id: note.renoteId });
@@ -496,12 +494,12 @@ export class ApRendererService {
 					mediaType: 'text/x.misskeymarkdown',
 				},
 			}),
-			_misskey_quote: quote,
-			quoteUrl: quote,
+			_misskey_quote: quote ?? undefined,
+			quoteUrl: quote ?? undefined,
 			published: this.idService.parse(note.id).date.toISOString(),
 			to,
 			cc,
-			inReplyTo,
+			inReplyTo: inReplyTo ?? undefined,
 			attachment: files.map(x => this.renderDocument(x)),
 			sensitive: note.cw != null || files.some(file => file.isSensitive),
 			tag,

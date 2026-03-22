@@ -350,8 +350,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const policy = await this.roleService.getUserPolicies(user.id);
 
 			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
-			let policies: RolePolicies | null = null;
-
 			if (ps.name !== undefined) {
 				if (ps.name === null) {
 					updates.name = null;
@@ -486,7 +484,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			}
 
 			if (ps.avatarDecorations) {
-				policies ??= await this.roleService.getUserPolicies(user.id);
 				const decorations = await this.avatarDecorationService.getAll(true);
 				const myRoles = await this.roleService.getUserRoles(user.id);
 				const allRoles = await this.roleService.getRoles();

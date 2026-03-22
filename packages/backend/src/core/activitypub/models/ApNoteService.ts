@@ -356,7 +356,7 @@ export class ApNoteService {
 			this.logger.info('The note is already inserted while creating itself, reading again');
 			const duplicate = await this.fetchNote(value);
 			if (!duplicate) {
-				throw new Error(`The note creation failed with duplication error even when there is no duplication: ${entryUri}`);
+				throw new Error(`The note creation failed with duplication error even when there is no duplication: ${entryUri}`, { cause: err });
 			}
 			return duplicate;
 		}

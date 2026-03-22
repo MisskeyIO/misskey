@@ -9757,6 +9757,11 @@ export type components = {
              * Format: id
              * @example xxxxxxxxxx
              */
+            replyUserId?: string | null;
+            /**
+             * Format: id
+             * @example xxxxxxxxxx
+             */
             renoteId?: string | null;
             reply?: ((components['schemas']['Note'] | null) | null) | components['schemas']['Note'] | null;
             renote?: ((components['schemas']['Note'] | null) | null) | components['schemas']['Note'] | null;
@@ -45741,3 +45746,4 @@ export interface operations {
         };
     };
 }
+

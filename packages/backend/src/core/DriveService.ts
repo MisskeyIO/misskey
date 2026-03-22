@@ -306,7 +306,7 @@ export class DriveService {
 			};
 		}
 
-		let img: sharp.Sharp | null = null;
+		let img: sharp.Sharp;
 		let satisfyWebpublic: boolean;
 		let isAnimated: boolean;
 

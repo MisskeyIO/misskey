@@ -71,9 +71,13 @@ export class ChannelFollowingService implements OnModuleInit {
 				.select('channel_following.followeeId')
 				.where('channel_following.followerId = :userId', { userId: params.requestUserId });
 
-			return q
-				.getRawMany<{ channel_following_followeeId: string }>()
-				.then(xs => xs.map(x => ({ id: x.channel_following_followeeId } as MiChannel)));
+			const followings = await q.getRawMany<{ channel_following_followeeId: string }>();
+
+			return followings.map(({ channel_following_followeeId }) => {
+				const channel = new MiChannel();
+				channel.id = channel_following_followeeId;
+				return channel;
+			});
 		} else {
 			const q = this.channelsRepository.createQueryBuilder('channel')
 				.innerJoin('channel_following', 'channel_following', 'channel_following.followeeId = channel.id')

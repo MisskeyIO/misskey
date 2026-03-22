@@ -222,7 +222,7 @@ export class UserSearchService {
 
 		const isUsername = query.startsWith('@') && !query.includes(' ') && query.indexOf('@', 1) === -1;
 
-		let users: MiUser[] = [];
+		let users: MiUser[];
 
 		const mutingQuery = meId == null ? null : this.mutingsRepository.createQueryBuilder('muting')
 			.select('muting.muteeId')

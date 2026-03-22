@@ -220,7 +220,7 @@ async function _fetch_(): Promise<void> {
 	isSilenced.value = instance.value?.isSilenced ?? false;
 	isSensitiveMedia.value = instance.value?.isSensitiveMedia ?? false;
 	faviconUrl.value = getProxiedImageUrlNullable(instance.value?.faviconUrl, 'preview') ?? getProxiedImageUrlNullable(instance.value?.iconUrl, 'preview');
-	moderationNote.value = instance.value?.moderationNote;
+	moderationNote.value = instance.value?.moderationNote ?? '';
 }
 
 async function toggleBlock(): Promise<void> {

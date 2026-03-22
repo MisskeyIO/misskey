@@ -23,7 +23,7 @@ let prev = '';
 
 export async function load() {
 	try {
-		saveData.value = await misskeyApi('i/registry/get', {
+		saveData.value = await misskeyApi<SaveData>('i/registry/get', {
 			scope: ['clickerGame'],
 			key: 'saveData',
 		});

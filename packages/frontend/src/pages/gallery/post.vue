@@ -35,7 +35,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<MkUserName :user="post.user" style="display: block;"/>
 								<MkAcct :user="post.user"/>
 							</div>
-							<MkFollowButton v-if="!$i || $i.id != post.user.id" v-model:user="post.user" :inline="true" :transparent="false" :full="true" large class="koudoku"/>
+							<MkFollowButton v-if="postUserForFollow && (!$i || $i.id != post.user.id)" :user="postUserForFollow" :inline="true" :transparent="false" :full="true" large class="koudoku"/>
 						</div>
 					</div>
 					<MkAd :preferForms="['square', 'horizontal', 'horizontal-big']"/>
@@ -86,6 +86,7 @@ const props = defineProps<{
 
 const post = ref<Misskey.entities.GalleryPost | null>(null);
 const error = ref<any>(null);
+const postUserForFollow = computed(() => post.value ? post.value.user as unknown as Misskey.entities.UserDetailed : null);
 const otherPostsPaginator = markRaw(new Paginator('users/gallery/posts', {
 	limit: 6,
 	computedParams: computed(() => ({

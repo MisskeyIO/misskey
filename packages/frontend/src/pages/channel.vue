@@ -298,14 +298,15 @@ function saveTlDimension(value: number | null): void {
 }
 
 const headerActions = computed(() => {
-	if (!channel.value) return null;
+	const channelValue = channel.value;
+	if (!channelValue) return null;
 	const headerItems: PageHeaderItem[] = [];
 
 	headerItems.push({
 		icon: 'ti ti-link',
 		text: i18n.ts.copyUrl,
 		handler: async (): Promise<void> => {
-			copyToClipboard(`${url}/channels/${channel.value.id}`);
+			copyToClipboard(`${url}/channels/${channelValue.id}`);
 		},
 	});
 
@@ -315,9 +316,9 @@ const headerActions = computed(() => {
 			text: i18n.ts.share,
 			handler: async (): Promise<void> => {
 				navigator.share({
-					title: channel.value.name,
-					text: channel.value.description ?? undefined,
-					url: `${url}/channels/${channel.value.id}`,
+					title: channelValue.name,
+					text: channelValue.description ?? undefined,
+					url: `${url}/channels/${channelValue.id}`,
 				});
 			},
 		});
@@ -332,7 +333,7 @@ const headerActions = computed(() => {
 		});
 	}
 
-	if (!channel.value.isMuting) {
+	if (!channelValue.isMuting) {
 		headerItems.push({
 			icon: 'ti ti-volume',
 			text: i18n.ts.mute,
@@ -350,7 +351,7 @@ const headerActions = computed(() => {
 		});
 	}
 
-	if (($i && $i.id === channel.value.userId) || iAmModerator) {
+	if (($i && $i.id === channelValue.userId) || iAmModerator) {
 		headerItems.push({
 			icon: 'ti ti-settings',
 			text: i18n.ts.edit,

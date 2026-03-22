@@ -1,17 +1,18 @@
-/*
+ /*
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
 import { Injectable } from '@nestjs/common';
-import { bindThis } from '@/decorators.js';
 import type { Packed } from '@/misc/json-schema.js';
-import { RoleService } from '@/core/RoleService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { bindThis } from '@/decorators.js';
+import { RoleService } from '@/core/RoleService.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import { isInstanceMuted } from '@/misc/is-instance-muted.js';
 import { isUserRelated } from '@/misc/is-user-related.js';
 import type { JsonObject } from '@/misc/json-value.js';
+import { NoteStreamingHidingService } from '../NoteStreamingHidingService.js';
 import Channel, { type MiChannelService } from '../channel.js';
 
 class ChannelChannel extends Channel {
@@ -24,6 +25,7 @@ class ChannelChannel extends Channel {
 	constructor(
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
+		private noteStreamingHidingService: NoteStreamingHidingService,
 		id: string,
 		connection: Channel['connection'],
 		dimension?: number | null,
@@ -34,40 +36,50 @@ class ChannelChannel extends Channel {
 
 	@bindThis
 	public async init(params: JsonObject) {
-		if (typeof params.channelId !== 'string') return;
+		if (typeof params.channelId !== 'string') return false;
 		this.channelId = params.channelId;
 		this.minimize = !!(params.minimize ?? false);
 
 		// Subscribe stream
 		this.subscriber.on('notesStream', this.onNote);
+
+		return true;
 	}
 
 	@bindThis
-		private async onNote(note: Packed<'Note'>) {
-			if (note.channelId !== this.channelId) return;
+	private async onNote(note: Packed<'Note'>) {
+		if (note.channelId !== this.channelId) return;
 
-			if (note.user.requireSigninToViewContents && this.user == null) return;
-			if (note.renote && note.renote.user.requireSigninToViewContents && this.user == null) return;
-			if (note.reply && note.reply.user.requireSigninToViewContents && this.user == null) return;
-			if (this.user && note.reply) {
-				const reply = note.reply;
-				// 自分のフォローしていないユーザーの visibility: followers な投稿への返信は弾く
-				if (reply.visibility === 'followers' && !Object.hasOwn(this.following, reply.userId)) return;
-				// 自分の見ることができないユーザーの visibility: specified な投稿への返信は弾く
-				if (reply.visibility === 'specified' && !reply.visibleUserIds!.includes(this.user.id)) return;
-			}
+		if (note.user.requireSigninToViewContents && this.user == null) return;
+		if (note.renote && note.renote.user.requireSigninToViewContents && this.user == null) return;
+		if (note.reply && note.reply.user.requireSigninToViewContents && this.user == null) return;
 
-			if (!this.shouldDeliverByDimension(note)) return;
+		if (note.reply) {
+			const reply = note.reply;
+			if (!this.isNoteVisibleForMe(reply)) return;
+		}
+
+		if (!this.shouldDeliverByDimension(note)) return;
 
 		if (!(await this.noteEntityService.isLanguageVisibleToMe(note, this.user?.id))) return;
 
+		if (!this.isNoteVisibleForMe(note)) return;
 		if (this.isNoteMutedOrBlocked(note)) return;
 
-		if (this.user && isRenotePacked(note) && !isQuotePacked(note)) {
-			if (note.renote && Object.keys(note.renote.reactions).length > 0) {
-				const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
-				note.renote.myReaction = myRenoteReaction;
+		const { shouldSkip } = await this.noteStreamingHidingService.processHiding(note, this.user?.id ?? null);
+		if (shouldSkip) return;
+
+		if (this.user) {
+			if (isRenotePacked(note) && !isQuotePacked(note)) {
+				if (note.renote && Object.keys(note.renote.reactions).length > 0) {
+					const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
+					note.renote.myReaction = myRenoteReaction;
+				}
 			}
+		}
+
+		if (this.user && (note.visibleUserIds?.includes(this.user.id) ?? note.mentions?.includes(this.user.id))) {
+			this.connection.cacheNote(note);
 		}
 
 		if (this.minimize && ['public', 'home'].includes(note.visibility)) {
@@ -80,10 +92,10 @@ class ChannelChannel extends Channel {
 				renote: note.renote?.myReaction ? { myReaction: note.renote.myReaction } : undefined,
 				...(badgeRoles?.length ? { user: { badgeRoles } } : {}),
 			});
-			} else {
-				this.send('note', note);
-			}
+		} else {
+			this.send('note', note);
 		}
+	}
 
 	/*
 	 * ミュートとブロックされてるを処理する
@@ -130,6 +142,7 @@ export class ChannelChannelService implements MiChannelService<false> {
 	constructor(
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
+		private noteStreamingHidingService: NoteStreamingHidingService,
 	) {
 	}
 
@@ -138,6 +151,7 @@ export class ChannelChannelService implements MiChannelService<false> {
 		return new ChannelChannel(
 			this.roleService,
 			this.noteEntityService,
+			this.noteStreamingHidingService,
 			id,
 			connection,
 			dimension,

@@ -15,6 +15,7 @@ import { TAB_ID } from '@/tab-id.js';
 
 // クラウド同期用グループ名
 const syncGroup = 'default';
+type RegistrySyncEntry = [Parameters<typeof isSameScope>[0], unknown];
 
 const io: StorageProvider = {
 	load: () => {
@@ -34,14 +35,14 @@ const io: StorageProvider = {
 		// TODO: この取得方法だとアカウントが変わると保存場所も変わってしまうので改修する
 		// 例えば複数アカウントある場合でも設定値を保存するための「プライマリアカウント」を設定できるようにするとか
 		try {
-			const cloudData = await misskeyApi('i/registry/get', {
+			const cloudData = await misskeyApi<RegistrySyncEntry[]>('i/registry/get', {
 				scope: ['client', 'preferences', 'sync'],
 				key: syncGroup + ':' + ctx.key,
-			}) as [any, any][];
+			});
 			const target = cloudData.find(([scope]) => isSameScope(scope, ctx.scope));
 			if (target == null) return null;
 			return {
-				value: target[1],
+				value: target[1] as never,
 			};
 		} catch (err: any) {
 			if (err.code === 'NO_SUCH_KEY') { // TODO: いちいちエラーキャッチするのは面倒なのでキーが無くてもエラーにならない maybe-get のようなエンドポイントをバックエンドに実装する
@@ -53,12 +54,12 @@ const io: StorageProvider = {
 	},
 
 	cloudSet: async (ctx) => {
-		let cloudData: [any, any][] = [];
+		let cloudData: RegistrySyncEntry[];
 		try {
-			cloudData = await misskeyApi('i/registry/get', {
+			cloudData = await misskeyApi<RegistrySyncEntry[]>('i/registry/get', {
 				scope: ['client', 'preferences', 'sync'],
 				key: syncGroup + ':' + ctx.key,
-			}) as [any, any][];
+			});
 		} catch (err: any) {
 			if (err.code === 'NO_SUCH_KEY') { // TODO: いちいちエラーキャッチするのは面倒なのでキーが無くてもエラーにならない maybe-get のようなエンドポイントをバックエンドに実装する
 				cloudData = [];

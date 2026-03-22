@@ -17,7 +17,7 @@ export async function warningExternalWebsite(ev: MouseEvent, url: string) {
 		} else if (expression.includes(' ')) return expression.split(' ').every(keyword => url.includes(keyword));
 		else return domain.endsWith(expression);
 	});
-	const isTrusted = prefer.r.trustedExternalWebsites.value.includes(domain);
+	const isTrusted = domain != null && prefer.r.trustedExternalWebsites.value.includes(domain);
 
 	if (!self && !isWellKnownWebsite && !isTrusted) {
 		ev.preventDefault();
@@ -32,7 +32,7 @@ export async function warningExternalWebsite(ev: MouseEvent, url: string) {
 
 		if (confirm.canceled) return false;
 
-		if (confirm.toggle) {
+		if (confirm.toggle && domain != null) {
 			await prefer.commit('trustedExternalWebsites', [...prefer.r.trustedExternalWebsites.value, domain]);
 		}
 

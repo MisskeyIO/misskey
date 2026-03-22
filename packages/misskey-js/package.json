@@ -1,21 +1,18 @@
 {
   "type": "module",
   "name": "misskey-js",
-  "version": "2025.11.1-io.0",
+  "version": "2025.4.1-mhq.12b",
   "description": "Misskey SDK for JavaScript",
   "license": "MIT",
-  "main": "./built/index.js",
   "types": "./built/index.d.ts",
   "exports": {
     ".": {
       "import": "./built/index.js",
-      "types": "./built/index.d.ts",
-      "default": "./built/index.js"
+      "types": "./built/index.d.ts"
     },
     "./*": {
       "import": "./built/*",
-      "types": "./built/*",
-      "default": "./built/*"
+      "types": "./built/*"
     }
   },
   "scripts": {
@@ -28,7 +25,7 @@
     "eslint": "eslint './**/*.{js,jsx,ts,tsx}'",
     "typecheck": "tsc --noEmit",
     "lint": "pnpm typecheck && pnpm eslint",
-    "vitest": "vitest run --coverage",
+    "vitest": "vitest --run --coverage",
     "test": "pnpm vitest && pnpm tsd",
     "update-autogen-code": "pnpm --filter misskey-js-type-generator generate && ncp generator/built/autogen src/autogen"
   },
@@ -47,12 +44,13 @@
     "esbuild": "catalog:",
     "eslint": "catalog:",
     "glob": "catalog:",
+    "vitest": "catalog:",
+    "vitest-websocket-mock": "catalog:",
+    "mock-socket": "catalog:",
     "ncp": "catalog:",
     "nodemon": "catalog:",
     "tsd": "catalog:",
-    "typescript": "catalog:",
-    "vitest": "catalog:",
-    "vitest-websocket-mock": "0.5.0"
+    "typescript": "catalog:"
   },
   "files": [
     "built"

@@ -47,7 +47,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, markRaw, defineAsyncComponent, watch, useTemplateRef } from 'vue';
+import { ref, computed, markRaw, defineAsyncComponent, watch } from 'vue';
 
 import MkPagination from '@/components/MkPagination.vue';
 import MkButton from '@/components/MkButton.vue';
@@ -68,17 +68,17 @@ const paginator = markRaw(new Paginator('announcements', {
 }));
 
 const tab = ref('current');
-const paginationEl = useTemplateRef('paginationEl');
+const paginationEl = ref<{ reload: () => void } | null>(null);
 
 async function read(target): Promise<void> {
 	if (target.needEnrollmentTutorialToRead) {
-		const tutorialCompleted = await (new Promise<boolean>(async (resolve) => {
-			await os.popup(defineAsyncComponent(() => import('@/components/MkTutorialDialog.vue')), {}, {
+		const tutorialCompleted = await new Promise<boolean>((resolve) => {
+			os.popup(defineAsyncComponent(() => import('@/components/MkTutorialDialog.vue')), {}, {
 				done: () => {
 					resolve(true);
 				},
 			}, 'closed');
-		}));
+		});
 		if (!tutorialCompleted) return;
 	}
 

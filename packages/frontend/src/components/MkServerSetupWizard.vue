@@ -128,11 +128,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div>{{ serverSettings.enableFanoutTimelineDbFallback ? i18n.ts.yes : i18n.ts.no }}</div>
 			</div>
 			<div>
-				<div><b>RBT:</b></div>
-				<div>{{ serverSettings.enableReactionsBuffering ? i18n.ts.yes : i18n.ts.no }}</div>
-			</div>
-
-			<div>
 				<div><b>{{ i18n.ts._serverSettings.entrancePageStyle }}:</b></div>
 				<div>{{ serverSettings.clientOptions?.entrancePageStyle }}</div>
 			</div>
@@ -220,13 +215,6 @@ const q_adminName = ref('');
 const q_adminEmail = ref('');
 
 const serverSettings = computed<Misskey.entities.AdminUpdateMetaRequest>(() => {
-	let enableReactionsBuffering;
-	if (q_use.value === 'single') {
-		enableReactionsBuffering = false;
-	} else {
-		enableReactionsBuffering = q_scale.value !== 'small';
-	}
-
 	return {
 		singleUserMode: q_use.value === 'single',
 		disableRegistration: q_use.value !== 'open',
@@ -236,7 +224,6 @@ const serverSettings = computed<Misskey.entities.AdminUpdateMetaRequest>(() => {
 		enableRemoteNotesCleaning: q_remoteContentsCleaning.value,
 		enableFanoutTimeline: true,
 		enableFanoutTimelineDbFallback: q_use.value === 'single',
-		enableReactionsBuffering,
 		clientOptions: {
 			entrancePageStyle: q_use.value === 'open' ? 'classic' : 'simple',
 		} as any,
@@ -354,7 +341,6 @@ function applySettings() {
 			maintainerEmail: q_adminEmail.value === '' ? undefined : q_adminEmail.value,
 		}, props.token),
 		misskeyApi('admin/roles/update-default-policies', {
-			// @ts-expect-error バックエンド側の型
 			policies: defaultPolicies.value,
 		}, props.token),
 	]).then(() => {

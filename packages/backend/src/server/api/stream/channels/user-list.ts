@@ -4,6 +4,7 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
+import { NoteStreamingHidingService } from '../NoteStreamingHidingService.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import type { MiUserListMembership, UserListMembershipsRepository, UserListsRepository } from '@/models/_.js';
@@ -21,6 +22,7 @@ class UserListChannel extends Channel {
 	private listId: string;
 	private membershipsMap: Record<string, Pick<MiUserListMembership, 'withReplies'> | undefined> = {};
 	private listUsersClock: NodeJS.Timeout;
+	private isUpdatingListUsers = false;
 	private withFiles: boolean;
 	private withRenotes: boolean;
 	private minimize: boolean;
@@ -30,7 +32,7 @@ class UserListChannel extends Channel {
 		private userListMembershipsRepository: UserListMembershipsRepository,
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
-
+		private noteStreamingHidingService: NoteStreamingHidingService,
 		id: string,
 		connection: Channel['connection'],
 	) {
@@ -40,8 +42,9 @@ class UserListChannel extends Channel {
 	}
 
 	@bindThis
-	public async init(params: JsonObject) {
-		if (typeof params.listId !== 'string') return;
+	public async init(params: JsonObject): Promise<boolean> {
+		if (typeof params.listId !== 'string') return false;
+		if (!this.user) return false;
 		this.listId = params.listId;
 		this.withFiles = !!(params.withFiles ?? false);
 		this.withRenotes = !!(params.withRenotes ?? true);
@@ -54,15 +57,27 @@ class UserListChannel extends Channel {
 				userId: this.user!.id,
 			},
 		});
-		if (!listExist) return;
+		if (!listExist) return false;
+
+		await this.updateListUsers();
 
 		// Subscribe stream
 		this.subscriber.on(`userListStream:${this.listId}`, this.send);
 
 		this.subscriber.on('notesStream', this.onNote);
 
-		this.updateListUsers();
-		this.listUsersClock = setInterval(this.updateListUsers, 5000);
+		this.listUsersClock = setInterval(() => {
+			if (this.isUpdatingListUsers) return;
+
+			this.isUpdatingListUsers = true;
+			void this.updateListUsers().catch(() => {
+				this.connection.disconnectChannel(this.id);
+			}).finally(() => {
+				this.isUpdatingListUsers = false;
+			});
+		}, 5000);
+
+		return true;
 	}
 
 	@bindThis
@@ -71,7 +86,7 @@ class UserListChannel extends Channel {
 			where: {
 				userListId: this.listId,
 			},
-			select: ['userId'],
+			select: ['userId', 'withReplies'],
 		});
 
 		const membershipsMap: Record<string, Pick<MiUserListMembership, 'withReplies'> | undefined> = {};
@@ -93,19 +108,12 @@ class UserListChannel extends Channel {
 
 		if (!Object.hasOwn(this.membershipsMap, note.userId)) return;
 
-		if (note.visibility === 'followers') {
-			if (!isMe && !Object.hasOwn(this.following, note.userId)) return;
-		} else if (note.visibility === 'specified') {
-			if (!note.visibleUserIds!.includes(this.user!.id)) return;
-		}
+		if (!this.isNoteVisibleForMe(note)) return;
 
 		if (note.reply) {
 			const reply = note.reply;
 			if (this.membershipsMap[note.userId]?.withReplies) {
-				// 自分のフォローしていないユーザーの visibility: followers な投稿への返信は弾く
-				if (reply.visibility === 'followers' && !Object.hasOwn(this.following, reply.userId)) return;
-				// 自分の見ることができないユーザーの visibility: specified な投稿への返信は弾く
-				if (reply.visibility === 'specified' && !reply.visibleUserIds!.includes(this.user!.id)) return;
+				if (!this.isNoteVisibleForMe(reply)) return;
 			} else {
 				// 「チャンネル接続主への返信」でもなければ、「チャンネル接続主が行った返信」でもなければ、「投稿者の投稿者自身への返信」でもない場合
 				if (reply.userId !== this.user!.id && !isMe && reply.userId !== note.userId) return;
@@ -117,8 +125,7 @@ class UserListChannel extends Channel {
 			if (!this.withRenotes) return;
 			if (note.renote.reply) {
 				const reply = note.renote.reply;
-				// 自分のフォローしていないユーザーの visibility: followers な投稿への返信のリノートは弾く
-				if (reply.visibility === 'followers' && !Object.hasOwn(this.following, reply.userId)) return;
+				if (!this.isNoteVisibleForMe(reply)) return;
 			}
 		}
 
@@ -126,10 +133,20 @@ class UserListChannel extends Channel {
 
 		if (this.isNoteMutedOrBlocked(note)) return;
 
+		const { shouldSkip } = await this.noteStreamingHidingService.processHiding(note, this.user?.id ?? null);
+		if (shouldSkip) return;
+
+		let noteToSend = note;
 		if (this.user && isRenotePacked(note) && !isQuotePacked(note)) {
 			if (note.renote && Object.keys(note.renote.reactions).length > 0) {
 				const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
-				note.renote.myReaction = myRenoteReaction;
+				noteToSend = {
+					...note,
+					renote: {
+						...note.renote,
+						myReaction: myRenoteReaction,
+					},
+				};
 			}
 		}
 
@@ -137,14 +154,14 @@ class UserListChannel extends Channel {
 			const badgeRoles = this.iAmModerator ? await this.roleService.getUserBadgeRoles(note.userId, false) : undefined;
 
 			this.send('note', {
-				id: note.id, myReaction: note.myReaction,
-				poll: note.poll?.choices ? { choices: note.poll.choices } : undefined,
-				reply: note.reply?.myReaction ? { myReaction: note.reply.myReaction } : undefined,
-				renote: note.renote?.myReaction ? { myReaction: note.renote.myReaction } : undefined,
+				id: noteToSend.id, myReaction: noteToSend.myReaction,
+				poll: noteToSend.poll?.choices ? { choices: noteToSend.poll.choices } : undefined,
+				reply: noteToSend.reply?.myReaction ? { myReaction: noteToSend.reply.myReaction } : undefined,
+				renote: noteToSend.renote?.myReaction ? { myReaction: noteToSend.renote.myReaction } : undefined,
 				...(badgeRoles?.length ? { user: { badgeRoles } } : {}),
 			});
 		} else {
-			this.send('note', note);
+			this.send('note', noteToSend);
 		}
 	}
 
@@ -173,6 +190,7 @@ export class UserListChannelService implements MiChannelService<false> {
 
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
+		private noteStreamingHidingService: NoteStreamingHidingService,
 	) {
 	}
 
@@ -183,6 +201,7 @@ export class UserListChannelService implements MiChannelService<false> {
 			this.userListMembershipsRepository,
 			this.roleService,
 			this.noteEntityService,
+			this.noteStreamingHidingService,
 			id,
 			connection,
 		);

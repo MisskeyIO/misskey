@@ -53,9 +53,7 @@ import { WorkerMultiDispatch } from '@@/js/worker-multi-dispatch.js';
 import { extractAvgColorFromBlurhash } from '@@/js/extract-avg-color-from-blurhash.js';
 
 // テスト環境で Web Worker インスタンスは作成できない
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-const isTest = (import.meta.env.MODE === 'test' || window.Cypress != null);
+const isTest = import.meta.env.MODE === 'test' || ('Cypress' in window && window.Cypress != null);
 
 const canvasPromise = new Promise<WorkerMultiDispatch | HTMLCanvasElement>(resolve => {
 	if (isTest) {

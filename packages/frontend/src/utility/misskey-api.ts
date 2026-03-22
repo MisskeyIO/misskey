@@ -31,7 +31,7 @@ export function generateClientTransactionId(initiator: string) {
 function handleResponse<_ResT>(
 	resolve: (value: (_ResT | PromiseLike<_ResT>)) => void,
 	reject: (reason?: any) => void,
-): ((value: Response<any, any>) => (void | PromiseLike<void>)) {
+): ((value: Response) => (void | PromiseLike<void>)) {
 	return async (res) => {
 		if (res.ok && res.status !== 204) {
 			const body = await res.json();
@@ -51,27 +51,43 @@ function handleResponse<_ResT>(
 export type Endpoint = keyof Misskey.Endpoints;
 
 export type Request<E extends Endpoint> = Misskey.Endpoints[E]['req'];
+type ApiResponseType<E extends Endpoint, P extends Request<E>> = Misskey.api.SwitchCaseResponseType<E, P>;
+type ApiRequestBody = Record<string, unknown> & { i?: string | null };
 
-export type AnyRequest<E extends Endpoint | (string & unknown)> =
-	(E extends Endpoint ? Request<E> : never) | object;
-
-export type Response<E extends Endpoint | (string & unknown), P extends AnyRequest<E>> =
-	E extends Endpoint
-	? P extends Request<E> ? Misskey.api.SwitchCaseResponseType<E, P> : never
-	: object;
 // Implements Misskey.api.ApiClient.request
 export function misskeyApi<
-	ResT = void,
-	E extends keyof Misskey.Endpoints = keyof Misskey.Endpoints,
-	P extends Misskey.Endpoints[E]['req'] = Misskey.Endpoints[E]['req'],
-	_ResT = ResT extends void ? Misskey.api.SwitchCaseResponseType<E, P> : ResT,
+	E extends Endpoint,
+ 	P extends Request<E>,
 >(
 	endpoint: E,
-	data: P & { i?: string | null; } = {} as any,
+	data: P,
+	token?: string | null | undefined,
+	signal?: AbortSignal,
+	initiator?: string,
+): Promise<ApiResponseType<E, P>>;
+export function misskeyApi<
+	E extends Endpoint,
+>(
+	endpoint: E,
+	data?: Request<E>,
+	token?: string | null | undefined,
+	signal?: AbortSignal,
+	initiator?: string,
+): Promise<ApiResponseType<E, Request<E>>>;
+export function misskeyApi<ResT = unknown>(
+	endpoint: string,
+	data?: ApiRequestBody,
+	token?: string | null | undefined,
+	signal?: AbortSignal,
+	initiator?: string,
+): Promise<ResT>;
+export function misskeyApi(
+	endpoint: string,
+	data: Record<string, unknown> = {},
 	token?: string | null | undefined,
 	signal?: AbortSignal,
 	initiator = 'misskey',
-): Promise<_ResT> {
+): Promise<unknown> {
 	if (endpoint.includes('://')) throw new Error('invalid endpoint');
 	pendingApiRequestsCount.value++;
 
@@ -81,16 +97,17 @@ export function misskeyApi<
 		pendingApiRequestsCount.value--;
 	};
 
-	const promise = new Promise<_ResT>((resolve, reject) => {
+	const promise = new Promise<unknown>((resolve, reject) => {
+		const payload: ApiRequestBody = { ...data };
 		// Append a credential
-		if ($i) data.i = $i.token;
-		if (token !== undefined) data.i = token;
+		if ($i) payload.i = $i.token;
+		if (token !== undefined) payload.i = token;
 
 		// Send request
 		const initiateTime = Date.now();
 		window.fetch(`${apiUrl}/${endpoint}`, {
 			method: 'POST',
-			body: JSON.stringify(data),
+			body: JSON.stringify(payload),
 			credentials: 'include',
 			headers: {
 				'Content-Type': 'application/json',
@@ -117,24 +134,39 @@ export function misskeyApi<
 
 // Implements Misskey.api.ApiClient.request
 export function misskeyApiGet<
-	ResT = void,
-	E extends keyof Misskey.Endpoints = keyof Misskey.Endpoints,
-	P extends Misskey.Endpoints[E]['req'] = Misskey.Endpoints[E]['req'],
-	_ResT = ResT extends void ? Misskey.api.SwitchCaseResponseType<E, P> : ResT,
+	E extends Endpoint,
+ 	P extends Request<E>,
 >(
 	endpoint: E,
-	data: P = {} as any,
+	data: P,
+	initiator?: string,
+): Promise<ApiResponseType<E, P>>;
+export function misskeyApiGet<
+	E extends Endpoint,
+>(
+	endpoint: E,
+	data?: Request<E>,
+	initiator?: string,
+): Promise<ApiResponseType<E, Request<E>>>;
+export function misskeyApiGet<ResT = unknown>(
+	endpoint: string,
+	data?: Record<string, unknown>,
+	initiator?: string,
+): Promise<ResT>;
+export function misskeyApiGet(
+	endpoint: string,
+	data: Record<string, unknown> = {},
 	initiator = 'misskey',
-): Promise<_ResT> {
+): Promise<unknown> {
 	pendingApiRequestsCount.value++;
 
 	const onFinally = () => {
 		pendingApiRequestsCount.value--;
 	};
 
-	const query = new URLSearchParams(data as any);
+	const query = new URLSearchParams(data as Record<string, string>);
 
-	const promise = new Promise<_ResT>((resolve, reject) => {
+	const promise = new Promise<unknown>((resolve, reject) => {
 		// Send request
 		const initiateTime = Date.now();
 		window.fetch(`${apiUrl}/${endpoint}?${query}`, {

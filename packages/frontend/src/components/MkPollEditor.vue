@@ -130,18 +130,15 @@ function get(): PollEditorModelValue {
 	};
 
 	const calcAfter = () => {
-		let base = Number.parseInt(after.value.toString());
-		switch (unit.value) {
-			// @ts-expect-error fallthrough
-			case 'day': base *= 24;
-			// @ts-expect-error fallthrough
-			case 'hour': base *= 60;
-			// @ts-expect-error fallthrough
-			case 'minute': base *= 60;
-			// eslint-disable-next-line no-fallthrough
-			case 'second': return base *= 1000;
-			default: return null;
-		}
+		const base = Number.parseInt(after.value.toString());
+		const multiplier = {
+			second: 1000,
+			minute: 60 * 1000,
+			hour: 60 * 60 * 1000,
+			day: 24 * 60 * 60 * 1000,
+		}[unit.value];
+
+		return multiplier == null ? null : base * multiplier;
 	};
 
 	return {

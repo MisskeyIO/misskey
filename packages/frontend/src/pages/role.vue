@@ -126,7 +126,6 @@ const headerActions = computed(() => {
 	if (tab.value === 'timeline' && visible.value && $i) {
 		headerItems.push({
 			icon: 'ti ti-cube',
-			label: dimension.value,
 			text: i18n.tsx.dimensionWithNumber({ dimension: dimension.value }),
 			handler: pickDimension,
 		});

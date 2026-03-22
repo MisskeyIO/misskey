@@ -113,7 +113,9 @@ async function openAccountMenu(ev: MouseEvent) {
 		withExtraOperation: true,
 	});
 
-	os.popupMenu(menuItems, ev.currentTarget ?? ev.target);
+	os.popupMenu(menuItems, ev.currentTarget ?? ev.target, {
+		align: 'left',
+	});
 }
 
 function onTabClick(): void {

@@ -27,7 +27,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkInfo>
 							<Mfm :text="i18n.tsx._2fa.detailedGuide({ link: `[${i18n.ts.here}](https://go.misskey.io/howto-2fa)`})"/>
 						</MkInfo>
-						<MkInfo v-if="$i.securityKeysList?.length > 0">{{ i18n.ts._2fa.whyTOTPOnlyRenew }}</MkInfo>
+						<MkInfo v-if="($i.securityKeysList?.length ?? 0) > 0">{{ i18n.ts._2fa.whyTOTPOnlyRenew }}</MkInfo>
 
 						<div v-if="$i.twoFactorEnabled" class="_gaps_s">
 							<div v-text="i18n.ts._2fa.alreadyRegistered"/>
@@ -91,6 +91,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { defineAsyncComponent, computed } from 'vue';
 import { browserSupportsWebAuthn as webAuthnSupported, startRegistration } from '@simplewebauthn/browser';
+import type { PublicKeyCredentialCreationOptionsJSON } from '@simplewebauthn/browser';
 import MkButton from '@/components/MkButton.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
@@ -216,8 +217,35 @@ async function addSecurityKey() {
 	});
 	if (name.canceled) return;
 
+	const optionsJSON: PublicKeyCredentialCreationOptionsJSON = {
+		challenge: registrationOptions.challenge,
+		user: registrationOptions.user,
+		rp: {
+			id: registrationOptions.rp?.id,
+			name: window.location.host,
+		},
+		attestation: registrationOptions.attestation ?? undefined,
+		authenticatorSelection: registrationOptions.authenticatorSelection ?? undefined,
+		excludeCredentials: registrationOptions.excludeCredentials?.map(credential => ({
+			...credential,
+			type: 'public-key',
+		})),
+		extensions: registrationOptions.extensions ? {
+			appid: registrationOptions.extensions.appid ?? undefined,
+			credProps: registrationOptions.extensions.credProps ?? undefined,
+			hmacCreateSecret: registrationOptions.extensions.hmacCreateSecret ?? undefined,
+		} : undefined,
+		timeout: registrationOptions.timeout ?? undefined,
+		pubKeyCredParams: registrationOptions.pubKeyCredParams.map(param => ({
+			...param,
+			type: 'public-key',
+		})),
+	};
+
 	const credential = await os.promiseDialog(
-		startRegistration({ optionsJSON: registrationOptions }),
+		startRegistration({
+			optionsJSON,
+		}),
 		null,
 		() => {}, // ユーザーのキャンセルはrejectなのでエラーダイアログを出さない
 		i18n.ts._2fa.tapSecurityKey,
@@ -231,7 +259,6 @@ async function addSecurityKey() {
 		password: auth.result.password,
 		token: auth.result.token,
 		name: name.result,
-		// @ts-expect-error misskey-js側に型がない
 		credential,
 	});
 }

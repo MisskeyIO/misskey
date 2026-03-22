@@ -162,10 +162,14 @@ function editUser(announcement): void {
 }
 
 function insertEmoji(ev: MouseEvent): void {
+	const initialInput = window.document.activeElement instanceof HTMLInputElement
+		? window.document.activeElement
+		: null;
+
 	os.openEmojiPicker(
 		(ev.currentTarget ?? ev.target) as HTMLElement,
 		{ asReactionPicker: false },
-		announceTitleEl.value,
+		initialInput,
 	);
 }
 

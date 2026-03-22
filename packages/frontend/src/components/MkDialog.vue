@@ -33,7 +33,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<span v-else-if="okButtonDisabledReason === 'invalid'" v-text="i18n.tsx._dialog.invalid({ current: inputValue ?? 'NaN' })"/>
 				</template>
 			</MkInput>
-			<MkTextarea v-if="input.type === 'textarea'" v-model="inputValue" :placeholder="input.placeholder || undefined" :autocomplete="input.autocomplete">
+			<MkTextarea v-if="input.type === 'textarea'" v-model="textareaInputValue" :placeholder="input.placeholder || undefined" :autocomplete="input.autocomplete">
 				<template #label>{{ input.placeholder }}</template>
 				<template #caption>
 					<span v-if="okButtonDisabledReason === 'charactersExceeded'" v-text="i18n.tsx._dialog.charactersExceeded({ current: (inputValue as string)?.length ?? 0, max: input.maxLength ?? 'NaN' })"/>
@@ -146,9 +146,15 @@ const emit = defineEmits<{
 }>();
 
 const modal = useTemplateRef('modal');
-const inputComponent = useTemplateRef<InstanceType<typeof MkInput>>('inputComponent');
+const inputComponent = useTemplateRef('inputComponent');
 
 const inputValue = ref<string | number | null>(props.input?.default ?? null);
+const textareaInputValue = computed<string | null>({
+	get: () => (typeof inputValue.value === 'number' ? String(inputValue.value) : inputValue.value),
+	set: (value) => {
+		inputValue.value = value;
+	},
+});
 const switchValue = ref<boolean>(false);
 
 const sec = ref(props.okWaitDuration);
@@ -178,10 +184,6 @@ const okButtonDisabledReason = computed<null | 'charactersExceeded' | 'character
 					return 'numberAbove';
 				}
 			} else if (numericValue != null) {
-				return 'invalid';
-			}
-
-			if (inputComponent.value && !inputComponent.value.inputEl.validity.valid) {
 				return 'invalid';
 			}
 		}

@@ -71,6 +71,7 @@ describe('Note', () => {
 			]);
 			assert(resolvedNote.replyId != null);
 			assert(resolvedNote.reply != null);
+			strictEqual(resolvedNote.reply.userId, aliceInB.id);
 			deepStrictEqualWithExcludedFields(replyedNote, resolvedNote.reply, [
 				'id',
 				// TODO: why clippedCount loses consistency?

@@ -9,7 +9,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div :class="$style.top">
 			<button v-tooltip.noDelay.right="instance.name ?? i18n.ts.instance" class="_button" :class="$style.instance" @click="openInstanceMenu">
 				<img v-if="kawaiiMode" src="/client-assets/kawaii/misskey-io.png" alt="" :class="$style.instanceIconAlt"/>
-				<img v-else :src="instance.iconUrl || instance.faviconUrl || '/favicon.ico'" alt="" :class="$style.instanceIcon" style="view-transition-name: navbar-serverIcon;"/>
+			<img v-else :src="instance.iconUrl || '/favicon.ico'" alt="" :class="$style.instanceIcon" style="view-transition-name: navbar-serverIcon;"/>
 			</button>
 			<button v-if="!iconOnly" v-tooltip.noDelay.right="i18n.ts.realtimeMode" class="_button" :class="[$style.realtimeMode, store.r.realtimeMode.value ? $style.on : null]" @click="toggleRealtimeMode">
 				<i v-if="store.r.realtimeMode.value" class="ti ti-bolt ti-fw"></i>
@@ -180,7 +180,9 @@ async function openAccountMenu(ev: MouseEvent) {
 		withExtraOperation: true,
 	});
 
-	os.popupMenu(menuItems, ev.currentTarget ?? ev.target);
+	os.popupMenu(menuItems, ev.currentTarget ?? ev.target, {
+		align: 'left',
+	});
 }
 
 async function more(ev: MouseEvent) {

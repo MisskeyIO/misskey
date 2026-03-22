@@ -12,74 +12,76 @@ packages:
   - packages/misskey-bubble-game
 
 catalog:
-  '@authenio/samlify-node-xmllint': 2.0.0
-  '@aws-sdk/client-s3': ~3
-  '@aws-sdk/lib-storage': ~3
-  '@bull-board/api': 6.16.4
-  '@bull-board/fastify': 6.16.4
-  '@bull-board/ui': 6.16.4
-  '@discordapp/twemoji': 16.0.1
+  '@eslint/eslintrc': 3.3.5
   '@eslint/js': 9.39.1
+  '@authenio/samlify-node-xmllint': 2.0.0
+  '@aws-sdk/client-s3': ~3.1014.0
+  '@aws-sdk/lib-storage': ~3.1014.0
+  '@bull-board/api': 6.20.6
+  '@bull-board/fastify': 6.20.6
+  '@bull-board/ui': 6.20.6
+  '@discordapp/twemoji': 16.0.1
   '@fastify/accepts': 5.0.4
   '@fastify/cookie': 11.0.2
   '@fastify/cors': 11.2.0
   '@fastify/express': 4.0.4
   '@fastify/formbody': 8.0.2
-  '@fastify/http-proxy': 11.4.1
+  '@fastify/http-proxy': 11.4.2
   '@fastify/multipart': 9.4.0
   '@fastify/static': 9.0.0
   '@fastify/view': 11.1.1
   '@isaacs/ttlcache': 2.1.4
-  '@jest/globals': 30.2.0
+  '@jest/globals': 30.3.0
   '@mcaptcha/vanilla-glue': 0.1.0-alpha-3
-  '@microsoft/api-extractor': 7.56.0
+  '@microsoft/api-extractor': 7.57.7
   '@misskey-dev/browser-image-resizer': 2024.1.0
   '@misskey-dev/eslint-plugin': 2.2.0
   '@misskey-dev/sharp-read-bmp': 1.3.0
   '@misskey-dev/summaly': github:MisskeyIO/summaly#5.2.5-io.3
-  '@napi-rs/canvas': 0.1.89
-  '@nestjs/common': 11.1.12
-  '@nestjs/core': 11.1.12
-  '@nestjs/platform-express': 11.1.12
-  '@nestjs/testing': 11.1.12
+  '@napi-rs/canvas': 0.1.97
+  '@nestjs/common': 11.1.17
+  '@nestjs/core': 11.1.17
+  '@nestjs/platform-express': 11.1.17
+  '@nestjs/testing': 11.1.17
   '@opensearch-project/opensearch': 3.5.1
   '@opentelemetry/api': ^1.9.0
   '@opentelemetry/auto-instrumentations-node': ^0.69.0
   '@opentelemetry/exporter-metrics-otlp-http': ^0.211.0
   '@opentelemetry/exporter-trace-otlp-http': ^0.211.0
-  '@opentelemetry/resources': ^2.2.0
-  '@opentelemetry/sdk-metrics': ^2.2.0
+  '@opentelemetry/resources': ^2.6.0
+  '@opentelemetry/sdk-metrics': ^2.6.0
   '@opentelemetry/sdk-node': ^0.211.0
-  '@opentelemetry/semantic-conventions': ^1.38.0
+  '@opentelemetry/semantic-conventions': ^1.40.0
   '@peertube/http-signature': 1.7.0
-  '@readme/openapi-parser': 5.5.0
+  '@readme/openapi-parser': 6.0.0
   '@rollup/plugin-json': 6.1.0
   '@rollup/plugin-replace': 6.0.3
   '@rollup/plugin-typescript': 12.3.0
   '@rollup/pluginutils': 5.3.0
-  '@sentry/node': 10.38.0
-  '@sentry/profiling-node': 10.38.0
-  '@sentry/vue': 10.38.0
-  '@simplewebauthn/browser': 13.2.2
-  '@simplewebauthn/server': 13.2.2
-  '@sinonjs/fake-timers': 15.1.0
-  '@smithy/node-http-handler': 4.4.8
-  '@storybook/addon-links': 10.2.3
-  '@storybook/react-vite': 10.2.3
-  '@storybook/vue3-vite': 10.2.3
-  '@swc/cli': 0.7.10
-  '@swc/core': 1.15.11
-  '@swc/core-darwin-arm64': 1.15.11
-  '@swc/core-darwin-x64': 1.15.11
-  '@swc/core-linux-arm-gnueabihf': 1.15.11
-  '@swc/core-linux-arm64-gnu': 1.15.11
-  '@swc/core-linux-arm64-musl': 1.15.11
-  '@swc/core-linux-x64-gnu': 1.15.11
-  '@swc/core-linux-x64-musl': 1.15.11
-  '@swc/core-win32-arm64-msvc': 1.15.11
-  '@swc/core-win32-ia32-msvc': 1.15.11
-  '@swc/core-win32-x64-msvc': 1.15.11
+  '@sentry/node': 10.45.0
+  '@sentry/profiling-node': 10.45.0
+  '@sentry/vue': 10.45.0
+  '@simplewebauthn/browser': 13.3.0
+  '@simplewebauthn/server': 13.3.0
+  '@sinonjs/fake-timers': 15.1.1
+  '@smithy/node-http-handler': 4.5.0
+  '@storybook/addon-links': 10.3.1
+  '@storybook/react-vite': 10.3.1
+  '@storybook/vue3-vite': 10.3.1
+  '@swc/cli': 0.8.0
+  '@swc/core': 1.15.18
+  '@swc/core-darwin-arm64': 1.15.18
+  '@swc/core-darwin-x64': 1.15.18
+  '@swc/core-linux-arm-gnueabihf': 1.15.18
+  '@swc/core-linux-arm64-gnu': 1.15.18
+  '@swc/core-linux-arm64-musl': 1.15.18
+  '@swc/core-linux-x64-gnu': 1.15.18
+  '@swc/core-linux-x64-musl': 1.15.18
+  '@swc/core-win32-arm64-msvc': 1.15.18
+  '@swc/core-win32-ia32-msvc': 1.15.18
+  '@swc/core-win32-x64-msvc': 1.15.18
   '@swc/jest': 0.2.39
+  '@syuilo/aiscript-0-19-0': npm:@syuilo/aiscript@^0.19.0
   '@syuilo/aiscript': 1.2.1
   '@syuilo/aiscript-v0': npm:@syuilo/aiscript@~0
   '@tabler/icons-webfont': 3.35.0
@@ -92,7 +94,7 @@ catalog:
   '@types/archiver': 7.0.0
   '@types/body-parser': 1.19.6
   '@types/canvas-confetti': 1.9.0
-  '@types/color-convert': 2.0.4
+  '@types/color-convert': 3.0.1
   '@types/content-disposition': 0.5.9
   '@types/escape-regexp': 0.0.3
   '@types/estree': 1.0.8
@@ -111,11 +113,11 @@ catalog:
   '@types/ms': 2.1.0
   '@types/node': ~22
   '@types/node-forge': 1.3.14
-  '@types/nodemailer': 7.0.9
+  '@types/nodemailer': 7.0.11
   '@types/oauth': 0.9.6
   '@types/oauth2orize': 1.11.5
   '@types/oauth2orize-pkce': 0.1.2
-  '@types/pg': 8.16.0
+  '@types/pg': 8.20.0
   '@types/pug': 2.0.10
   '@types/punycode': 2.1.4
   '@types/punycode.js': npm:@types/punycode@2.1.4
@@ -123,31 +125,31 @@ catalog:
   '@types/random-seed': 0.3.5
   '@types/ratelimiter': 3.4.6
   '@types/rename': 1.0.7
-  '@types/sanitize-html': 2.16.0
+  '@types/sanitize-html': 2.16.1
   '@types/seedrandom': 3.0.8
   '@types/semver': 7.7.1
-  '@types/serviceworker': 0.0.182
+  '@types/serviceworker': 0.0.194
   '@types/simple-oauth2': 5.0.8
   '@types/sinonjs__fake-timers': 15.0.1
-  '@types/supertest': 6.0.3
-  '@types/three': 0.182.0
+  '@types/supertest': 7.2.0
+  '@types/three': 0.183.1
   '@types/throttle-debounce': 5.0.2
   '@types/tinycolor2': 1.4.6
   '@types/tmp': 0.2.6
   '@types/vary': 1.1.3
   '@types/web-push': 3.6.4
   '@types/ws': 8.18.1
-  '@typescript-eslint/eslint-plugin': 8.54.0
-  '@typescript-eslint/parser': 8.54.0
-  '@vitejs/plugin-vue': 6.0.3
-  '@vitest/coverage-v8': 4.0.18
-  '@vue/compiler-core': 3.5.27
-  '@vue/compiler-sfc': 3.5.27
-  '@vue/runtime-core': 3.5.27
+  '@typescript-eslint/eslint-plugin': 8.57.1
+  '@typescript-eslint/parser': 8.57.1
+  '@vitejs/plugin-vue': 6.0.5
+  '@vitest/coverage-v8': 4.1.0
+  '@vue/compiler-core': 3.5.30
+  '@vue/compiler-sfc': 3.5.30
+  '@vue/runtime-core': 3.5.30
   accepts: 1.3.8
-  acorn: 8.15.0
+  acorn: 8.16.0
   aiscript-vscode: github:aiscript-dev/aiscript-vscode#v0.1.16
-  ajv: 8.17.1
+  ajv: 8.18.0
   archiver: 7.0.1
   astring: 1.9.0
   async-mutex: 0.5.0
@@ -157,11 +159,11 @@ catalog:
   body-parser: 2.2.2
   broadcast-channel: 7.3.0
   bufferutil: 4.1.0
-  bullmq: 5.67.2
+  bullmq: 5.71.0
   buraha: 0.0.1
   cacheable-lookup: 7.0.0
   canvas-confetti: 1.9.4
-  cbor: 10.0.11
+  cbor: 10.0.12
   chalk: 5.6.2
   chalk-template: 1.1.2
   chart.js: 4.5.1
@@ -170,130 +172,136 @@ catalog:
   chartjs-plugin-gradient: 0.6.1
   chartjs-plugin-zoom: 2.2.0
   chokidar: 5.0.0
-  chromatic: 13.3.5
+  chromatic: 15.3.0
   color-convert: 3.1.3
   compare-versions: 6.1.1
   content-disposition: 1.0.1
   crc-32: 1.2.2
   cropperjs: 2.1.0
   cross-env: 10.1.0
-  cssnano: 7.1.2
-  cypress: 15.9.0
+  cssnano: 7.1.3
+  cypress: 15.12.0
   date-fns: 4.1.0
   deep-email-validator: 0.1.21
-  esbuild: 0.27.2
+  esbuild: 0.27.4
   escape-regexp: 0.0.1
-  eslint: 9.39.2
+  eslint: 10.1.0
   eslint-plugin-import: 2.32.0
-  eslint-plugin-storybook: 10.2.3
-  eslint-plugin-vue: 10.7.0
+  eslint-plugin-storybook: 10.3.1
+  eslint-plugin-vue: 10.8.0
   estree-walker: 3.0.3
   eventemitter3: 5.0.4
+  exifreader: 4.32.0
   execa: 9.6.1
   fast-glob: 3.3.3
-  fastify: 5.7.2
+  fastify: 5.8.2
   fastify-http-errors-enhanced: 7.0.1
   fastify-raw-body: 5.0.0
   feed: 5.2.0
-  file-type: 21.3.0
+  file-type: 21.3.3
   fkill: 10.0.3
   fluent-ffmpeg: 2.1.3
   form-data: 4.0.5
-  glob: 13.0.0
-  globals: 17.2.0
+  glob: 13.0.6
+  globals: 17.4.0
   got: 14.6.6
   hpagent: 1.2.0
   htmlescape: 1.1.1
   http-link-header: 1.1.3
   idb-keyval: 6.2.2
   ignore-walk: 8.0.0
+  intersection-observer: 0.12.2
   insert-text-at-cursor: 0.3.0
-  ioredis: 5.9.2
+  ioredis: 5.10.1
+  ios-haptics: 0.1.4
   ip-cidr: 4.0.2
   ipaddr.js: 2.3.0
   is-file-animated: 1.0.2
   is-svg: 6.1.0
-  jest: 30.2.0
+  jest: 30.3.0
   jest-fetch-mock: 3.0.3
-  jest-mock: 30.2.0
+  jest-mock: 30.3.0
   jest-websocket-mock: 2.5.0
-  jose: 6.1.3
+  jose: 6.2.2
   js-yaml: 4.1.1
   jsdom: 27.2.0
   json5: 2.2.3
   jsonld: 9.0.0
-  jsrsasign: 11.1.0
-  juice: 11.1.0
-  lightningcss: 1.31.1
+  jsrsasign: 11.1.1
+  juice: 11.1.1
+  lightningcss: 1.32.0
   magic-string: 0.30.21
   matter-js: 0.20.0
-  meilisearch: 0.55.0
+  mediabunny: 1.25.0
+  meilisearch: 0.56.0
   mfm-js: 0.25.0
   microformats-parser: 2.0.4
   micromatch: 4.0.8
   mime-types: 3.0.2
-  minimatch: 10.1.1
+  minimatch: 10.2.4
   mock-socket: 9.3.1
   ms: 3.0.0-canary.1
-  msw: 2.12.7
+  msw: 2.12.14
   msw-storybook-addon: 2.0.6
-  nanoid: 5.1.6
+  nanoid: 5.1.7
   ncp: 2.0.0
   nested-property: 4.0.0
   node-fetch: 3.3.2
   node-html-parser: 7.0.2
   node-forge: 1.3.3
-  nodemailer: 7.0.13
-  nodemon: 3.1.11
+  nodemailer: 8.0.3
+  nodemon: 3.1.14
   nsfwjs: 4.2.1
   oauth: 0.10.2
   oauth2orize: 1.12.0
   oauth2orize-pkce: 0.1.2
   openapi-types: 12.1.3
-  openapi-typescript: 7.10.1
-  otpauth: 9.4.1
+  openapi-typescript: 7.13.0
+  otpauth: 9.5.0
   parse5: 8.0.0
-  pg: 8.18.0
-  pg-connection-string: 2.11.0
-  pg-native: 3.5.2
-  pg-pool: 3.11.0
-  pg-protocol: 1.11.0
-  pg-query-stream: 4.12.0
+  pg: 8.20.0
+  pg-connection-string: 2.12.0
+  pg-native: 3.7.0
+  pg-pool: 3.13.0
+  pg-protocol: 1.13.0
+  pg-query-stream: 4.14.0
   pg-types: 4.1.0
   photoswipe: 5.4.4
-  pid-port: 2.0.1
-  pino: 10.3.0
+  pid-port: 2.1.0
+  pino: 10.3.1
   pino-pretty: 13.1.3
-  pkce-challenge: 5.0.1
-  pnpm: 10.28.2
-  postcss: 8.5.6
-  postcss-preset-env: 11.1.2
+  pkce-challenge: 6.0.0
+  pnpm: 10.32.1
+  postcss: 8.5.8
+  postcss-preset-env: 11.2.0
   prettier: 3.8.1
   probe-image-size: 7.2.3
   promise-limit: 2.7.0
   psl: 1.15.0
-  pug: 3.0.3
+  pug: 3.0.4
   punycode.js: 2.3.1
   qrcode: 1.5.4
+  qr-code-styling: 1.9.2
+  qr-scanner: 1.4.2
   random-seed: 0.3.0
   ratelimiter: 3.4.1
-  re2: 1.23.2
+  re2: 1.23.3
   react: 19.2.4
   react-dom: 19.2.4
   redis-lock: 1.0.0
   reflect-metadata: 0.2.2
   rename: 1.0.4
-  rollup: 4.57.1
+  rollup: 4.59.1
   rss-parser: 3.13.0
   rxjs: 7.8.2
   samlify: 2.10.2
-  sanitize-html: 2.17.0
-  sass: 1.97.3
+  sanitize-html: 2.17.2
+  sass: 1.98.0
   secure-json-parse: 4.1.0
   seedrandom: 3.0.5
   semver: 7.7.1
   sharp: 0.34.5
-  shiki: 3.22.0
+  shiki: 4.0.2
   simple-oauth2: 5.1.0
   slacc: 0.0.10
   slacc-android-arm-eabi: 0.0.10
@@ -309,15 +317,16 @@ catalog:
   slacc-linux-x64-musl: 0.0.10
   slacc-win32-arm64-msvc: 0.0.10
   slacc-win32-x64-msvc: 0.0.10
-  start-server-and-test: 2.1.3
-  storybook: 10.2.3
+  start-server-and-test: 2.1.5
+  storybook: 10.3.1
   strict-event-emitter-types: 2.0.0
   stringz: 2.1.0
   supertest: 7.2.2
-  terser: 5.46.0
+  terser: 5.46.1
   textarea-caret: 3.1.0
-  three: 0.182.0
+  three: 0.183.2
   throttle-debounce: 5.0.2
+  type-fest: 2.19.0
   tinycolor2: 1.6.0
   tmp: 0.2.5
   ts-case-convert: 2.1.0
@@ -333,22 +342,33 @@ catalog:
   v-code-diff: 1.13.1
   vary: 1.1.2
   vite: 7.3.1
+  vite-plugin-glsl: 1.5.4
   vite-plugin-turbosnap: 1.0.3
-  vitest: 4.0.18
+  vitest: 4.1.0
   vitest-fetch-mock: 0.4.5
-  vue: 3.5.27
-  vue-component-type-helpers: 3.2.4
-  vue-eslint-parser: 10.2.0
-  vue-gtag: 3.6.3
-  vue-tsc: 3.2.4
+  vitest-websocket-mock: 0.5.0
+  vue: 3.5.30
+  vue-component-type-helpers: 3.2.6
+  vue-eslint-parser: 10.4.0
+  vue-gtag: 3.7.0
+  vue-tsc: 3.2.6
   vuedraggable: next
   wanakana: 5.3.1
   web-push: 3.6.7
   webgl-audiovisualizer: github:MisskeyIO/webgl-audiovisualizer
-  ws: 8.19.0
+  ws: 8.20.0
   xev: 3.0.2
   xmlbuilder: 15.1.1
-  intersection-observer: 0.12.2
+
+catalogMode: strict
+
+cleanupUnusedCatalogs: false
+
+ignorePatchFailures: false
+
+ignoredBuiltDependencies:
+  - '@sentry-internal/node-cpu-profiler'
+  - unrs-resolver
 
 onlyBuiltDependencies:
   - '@nestjs/core'
@@ -371,6 +391,7 @@ onlyBuiltDependencies:
   - utf-8-validate
   - v-code-diff
   - vue-demi
+
 overrides:
   '@aiscript-dev/aiscript-languageserver': '-'
   '@misskey-dev/summaly': github:MisskeyIO/summaly#5.2.5-io.3
@@ -380,7 +401,7 @@ overrides:
   '@types/jsdom': 21.1.7
   '@types/punycode': 2.1.4
   '@types/punycode.js': npm:@types/punycode@2.1.4
-  axios: 1.13.4
+  axios: 1.13.6
   chokidar: 5.0.0
   cookie: 1.1.1
   cookie-signature: 1.2.2
@@ -389,24 +410,11 @@ overrides:
   jsdom: 26.1.0
   lodash: 4.17.23
   nsfwjs: 4.2.1
-  qs: 6.14.1
+  qs: 6.15.0
   sharp: 0.34.5
   tough-cookie: 6.0.0
   web-streams-polyfill: 4.2.0
 
 patchedDependencies:
   nsfwjs@4.2.1: patches/nsfwjs@4.2.1.patch
-  pg-pool@3.11.0: patches/pg-pool@3.11.0.patch
-
-ignorePatchFailures: false
-# minimumReleaseAge: 10080 # delay 7days to mitigate supply-chain attack
-catalogMode: strict
-
-ignoredBuiltDependencies:
-  - '@sentry-internal/node-cpu-profiler'
-  - unrs-resolver
-
-minimumReleaseAgeExclude:
-  - '@syuilo/aiscript'
-  - vue-component-type-helpers
-  - '@types/pg'
+  pg-pool@3.13.0: patches/pg-pool@3.13.0.patch

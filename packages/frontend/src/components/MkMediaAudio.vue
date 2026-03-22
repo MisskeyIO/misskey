@@ -167,6 +167,10 @@ function calcHide(): boolean {
 
 const hide = ref(calcHide());
 
+function reveal() {
+	hide.value = false;
+}
+
 // Menu
 const menuShowing = ref(false);
 

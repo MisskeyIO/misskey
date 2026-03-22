@@ -43,8 +43,8 @@ const tab = ref('block');
 async function init() {
 	const meta = await misskeyApi('admin/meta');
 	blockedHosts.value = meta.blockedHosts.join('\n');
-	silencedHosts.value = meta.silencedHosts.join('\n');
-	sensitiveMediaHosts.value = meta.sensitiveMediaHosts.join('\n');
+	silencedHosts.value = (meta.silencedHosts ?? []).join('\n');
+	sensitiveMediaHosts.value = (meta.sensitiveMediaHosts ?? []).join('\n');
 }
 
 function save() {

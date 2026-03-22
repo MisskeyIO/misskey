@@ -116,7 +116,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</template>
 
 						<div class="_gaps">
-							<MkInput v-model="dimensionForm.state.dimensions" type="number" min="1" step="1">
+							<MkInput v-model="dimensionForm.state.dimensions" type="number" :min="1" step="1">
 								<template #label>{{ i18n.ts._serverSettings.dimensions }}<span v-if="dimensionForm.modifiedStates.dimensions" class="_modified">{{ i18n.ts.modified }}</span></template>
 								<template #caption>{{ i18n.ts._serverSettings.dimensionsDescription }}</template>
 							</MkInput>
@@ -436,7 +436,7 @@ const infoForm = useForm({
 });
 
 const dimensionForm = useForm({
-	dimensions: meta.dimensions,
+	dimensions: Number(meta.dimensions),
 }, async (state) => {
 	await os.apiWithDialog('admin/update-meta', {
 		dimensions: state.dimensions,

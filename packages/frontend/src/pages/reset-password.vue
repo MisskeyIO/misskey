@@ -58,9 +58,9 @@ onMounted(async () => {
 			closed: () => dispose(),
 		});
 
-		await os.popupAsyncWithDialog(import('@/components/MkForgotPassword.vue').then(x => x.default), {}, {
+		await os.popupAsyncWithDialog(import('@/components/MkForgotPassword.vue').then(x => x.default), {
 			initialPage: 1,
-		}, 'closed');
+		}, {}, 'closed');
 
 		mainRouter.push('/');
 	}

@@ -1,6 +1,6 @@
 {
   "name": "misskey",
-  "version": "2025.11.1-io.0",
+  "version": "2025.11.1-mhq.0",
   "codename": "nasubi",
   "repository": {
     "type": "git",
@@ -76,6 +76,7 @@
     "typescript": "catalog:"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "catalog:",
     "@eslint/js": "catalog:",
     "@misskey-dev/eslint-plugin": "catalog:",
     "@types/js-yaml": "catalog:",

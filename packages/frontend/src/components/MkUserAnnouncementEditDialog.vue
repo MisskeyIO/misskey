@@ -95,7 +95,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-	(ev: 'done', v: { deleted?: boolean; updated?: AdminAnnouncementType; created?: AdminAnnouncementType; }): void,
+	(ev: 'done', v: { deleted?: boolean; updated?: AdminAnnouncementType; created?: Misskey.entities.AdminAnnouncementsCreateResponse; }): void,
 	(ev: 'closed'): void
 }>();
 

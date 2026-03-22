@@ -1,0 +1,13 @@
+diff --git a/index.js b/index.js
+index 3ff6b2c639219f1f5f4156b46fa2ecb5e5097beb..d44ff4a1bfbf5e192ec64cfc8e4bc4888e8d7a88 100644
+--- a/index.js
++++ b/index.js
+@@ -252,7 +252,7 @@ class Pool extends EventEmitter {
+         if (client.connection) {
+           this.log('ending client due to timeout')
+           timeoutHit = true
+-          client.connection.stream.destroy()
++          client.connection.end()
+         } else if (!client.isConnected()) {
+           this.log('ending client due to timeout')
+           timeoutHit = true

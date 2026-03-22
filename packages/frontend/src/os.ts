@@ -10,7 +10,7 @@ import { EventEmitter } from 'eventemitter3';
 import insertTextAtCursor from 'insert-text-at-cursor';
 import * as Misskey from 'misskey-js';
 import type { Component, InputHTMLAttributes, Ref } from 'vue';
-import type { ComponentEmit, ComponentProps as CP } from 'vue-component-type-helpers';
+import type { ComponentProps as CP } from 'vue-component-type-helpers';
 import type { Form, GetFormResultType } from '@/utility/form.js';
 import type { MenuItem } from '@/types/menu.js';
 import type { PostFormProps } from '@/types/post-form.js';
@@ -39,19 +39,66 @@ import { store } from '@/store';
 export const openingWindowsCount = ref(0);
 
 export type ApiWithDialogCustomErrors = Record<string, { title?: string; text: string; }>;
-export const apiWithDialog = (<E extends keyof Misskey.Endpoints, P extends Misskey.Endpoints[E]['req'] = Misskey.Endpoints[E]['req']>(
+type ApiSuccessHandler<T> = ((res: T) => void) | null | undefined;
+type ApiFailureHandler = ((err: Misskey.api.APIError) => void) | null | undefined;
+type ApiArg4<T> = ApiSuccessHandler<T> | ApiWithDialogCustomErrors;
+type ApiArg5 = ApiFailureHandler | ApiWithDialogCustomErrors;
+
+export function apiWithDialog<
+	E extends keyof Misskey.Endpoints,
+>(
 	endpoint: E,
-	data: P = {} as P,
+	data?: Misskey.Endpoints[E]['req'] | Record<string, unknown>,
 	token?: string | null | undefined,
-	onSuccess?: ((res: Misskey.api.SwitchCaseResponseType<E, P>) => void) | null | undefined,
-	onFailure?: ((err: Misskey.api.APIError) => void) | null,
-	customErrors?: ApiWithDialogCustomErrors,
-): Promise<Misskey.api.SwitchCaseResponseType<E, P>> => {
+	arg4?: ApiArg4<Misskey.api.SwitchCaseResponseType<E, Misskey.Endpoints[E]['req']>>,
+	arg5?: ApiArg5,
+	arg6?: ApiWithDialogCustomErrors,
+): Promise<Misskey.api.SwitchCaseResponseType<E, Misskey.Endpoints[E]['req']>>;
+export function apiWithDialog<ResT = unknown>(
+	endpoint: string,
+	data?: Record<string, unknown>,
+	token?: string | null | undefined,
+	arg4?: ApiArg4<ResT>,
+	arg5?: ApiArg5,
+	arg6?: ApiWithDialogCustomErrors,
+): Promise<ResT>;
+export function apiWithDialog(
+	endpoint: string,
+	data: Record<string, unknown> = {},
+	token?: string | null | undefined,
+	arg4?: ApiArg4<unknown>,
+	arg5?: ApiArg5,
+	arg6?: ApiWithDialogCustomErrors,
+): Promise<unknown> {
+	let onSuccess: ApiSuccessHandler<unknown>;
+	let onFailure: ApiFailureHandler;
+	let customErrors: ApiWithDialogCustomErrors | undefined;
+
+	if (typeof arg4 === 'function' || arg4 == null) {
+		onSuccess = arg4;
+		if (typeof arg5 === 'function' || arg5 == null) {
+			onFailure = arg5;
+		} else {
+			customErrors = arg5;
+		}
+	} else {
+		customErrors = arg4;
+		if (typeof arg5 === 'function' || arg5 == null) {
+			onFailure = arg5;
+		} else {
+			customErrors = arg5;
+		}
+	}
+
+	if (arg6) {
+		customErrors = arg6;
+	}
+
 	const promise = misskeyApi(endpoint, data, token);
 	promiseDialog(promise, onSuccess ?? null, err => (onFailure ? onFailure(err) : apiErrorHandler(err, endpoint, customErrors)));
 
 	return promise;
-});
+}
 
 export async function apiErrorHandler(err: Misskey.api.APIError, endpoint?: string, customErrors?: ApiWithDialogCustomErrors): Promise<void> {
 	let title: string | undefined;
@@ -124,7 +171,7 @@ export async function apiErrorHandler(err: Misskey.api.APIError, endpoint?: stri
 
 export function promiseDialog<T>(
 	promise: Promise<T>,
-	onSuccess?: ((res: Awaited<T>) => void) | null,
+	onSuccess?: ((res: T) => void) | null,
 	onFailure?: ((err: Misskey.api.APIError) => void) | null,
 	text?: string,
 ): Promise<T> {
@@ -186,13 +233,14 @@ export function claimZIndex(priority: keyof typeof zIndexes = 'low'): number {
 }
 
 // props に ref を許可するようにする
-type ComponentProps<T extends Component> = { [K in keyof CP<T>]: CP<T>[K] | Ref<CP<T>[K]> };
+type ComponentProps<T extends Component> = Partial<{ [K in keyof CP<T>]: CP<T>[K] | Ref<CP<T>[K]> }> | Record<string, unknown>;
+type PopupEventHandlers = Record<string, (...args: any[]) => void>;
 
 export function popup<T extends Component>(
 	component: T,
 	props: ComponentProps<T>,
-	events: ComponentEmit<T> = {} as ComponentEmit<T>,
-	disposeEvent?: keyof ComponentEmit<T>,
+	events: PopupEventHandlers = {},
+	disposeEvent?: string,
 ): { dispose: () => void } {
 	markRaw(component);
 
@@ -223,10 +271,10 @@ export function popup<T extends Component>(
 export async function popupAsyncWithDialog<T extends Component>(
 	componentFetching: Promise<T>,
 	props: ComponentProps<T>,
-	events: Partial<ComponentEmit<T>> = {} as ComponentEmit<T>,
-	disposeEvent?: keyof ComponentEmit<T>,
+	events: PopupEventHandlers = {},
+	disposeEvent?: string,
 ): Promise<{ dispose: () => void }> {
-	let component: T;
+	let component!: T;
 	let closeWaiting = () => {};
 
 	const timer = window.setTimeout(() => {
@@ -790,7 +838,9 @@ export async function openEmojiPicker(src: HTMLElement, opts: ComponentProps<typ
 		...opts,
 	}, {
 		chosen: emoji => {
-			insertTextAtCursor(activeTextarea, emoji);
+			if (activeTextarea) {
+				insertTextAtCursor(activeTextarea, emoji);
+			}
 		},
 		closed: () => {
 			openingEmojiPicker!.dispose();

@@ -12,8 +12,6 @@ packages:
   - packages/misskey-bubble-game
 
 catalog:
-  '@eslint/eslintrc': 3.3.5
-  '@eslint/js': 9.39.1
   '@authenio/samlify-node-xmllint': 2.0.0
   '@aws-sdk/client-s3': ~3.1014.0
   '@aws-sdk/lib-storage': ~3.1014.0
@@ -21,6 +19,8 @@ catalog:
   '@bull-board/fastify': 6.20.6
   '@bull-board/ui': 6.20.6
   '@discordapp/twemoji': 16.0.1
+  '@eslint/eslintrc': 3.3.5
+  '@eslint/js': 10.0.1
   '@fastify/accepts': 5.0.4
   '@fastify/cookie': 11.0.2
   '@fastify/cors': 11.2.0
@@ -45,12 +45,12 @@ catalog:
   '@nestjs/testing': 11.1.17
   '@opensearch-project/opensearch': 3.5.1
   '@opentelemetry/api': ^1.9.0
-  '@opentelemetry/auto-instrumentations-node': ^0.69.0
-  '@opentelemetry/exporter-metrics-otlp-http': ^0.211.0
-  '@opentelemetry/exporter-trace-otlp-http': ^0.211.0
+  '@opentelemetry/auto-instrumentations-node': ^0.71.0
+  '@opentelemetry/exporter-metrics-otlp-http': ^0.213.0
+  '@opentelemetry/exporter-trace-otlp-http': ^0.213.0
   '@opentelemetry/resources': ^2.6.0
   '@opentelemetry/sdk-metrics': ^2.6.0
-  '@opentelemetry/sdk-node': ^0.211.0
+  '@opentelemetry/sdk-node': ^0.213.0
   '@opentelemetry/semantic-conventions': ^1.40.0
   '@peertube/http-signature': 1.7.0
   '@readme/openapi-parser': 6.0.0
@@ -69,20 +69,20 @@ catalog:
   '@storybook/react-vite': 10.3.1
   '@storybook/vue3-vite': 10.3.1
   '@swc/cli': 0.8.0
-  '@swc/core': 1.15.18
-  '@swc/core-darwin-arm64': 1.15.18
-  '@swc/core-darwin-x64': 1.15.18
-  '@swc/core-linux-arm-gnueabihf': 1.15.18
-  '@swc/core-linux-arm64-gnu': 1.15.18
-  '@swc/core-linux-arm64-musl': 1.15.18
-  '@swc/core-linux-x64-gnu': 1.15.18
-  '@swc/core-linux-x64-musl': 1.15.18
-  '@swc/core-win32-arm64-msvc': 1.15.18
-  '@swc/core-win32-ia32-msvc': 1.15.18
-  '@swc/core-win32-x64-msvc': 1.15.18
+  '@swc/core': 1.15.21
+  '@swc/core-darwin-arm64': 1.15.21
+  '@swc/core-darwin-x64': 1.15.21
+  '@swc/core-linux-arm-gnueabihf': 1.15.21
+  '@swc/core-linux-arm64-gnu': 1.15.21
+  '@swc/core-linux-arm64-musl': 1.15.21
+  '@swc/core-linux-x64-gnu': 1.15.21
+  '@swc/core-linux-x64-musl': 1.15.21
+  '@swc/core-win32-arm64-msvc': 1.15.21
+  '@swc/core-win32-ia32-msvc': 1.15.21
+  '@swc/core-win32-x64-msvc': 1.15.21
   '@swc/jest': 0.2.39
-  '@syuilo/aiscript-0-19-0': npm:@syuilo/aiscript@^0.19.0
   '@syuilo/aiscript': 1.2.1
+  '@syuilo/aiscript-0-19-0': npm:@syuilo/aiscript@^0.19.0
   '@syuilo/aiscript-v0': npm:@syuilo/aiscript@~0
   '@tabler/icons-webfont': 3.35.0
   '@tensorflow/tfjs': 4.22.0
@@ -137,6 +137,7 @@ catalog:
   '@types/tinycolor2': 1.4.6
   '@types/tmp': 0.2.6
   '@types/vary': 1.1.3
+  '@types/wawoff2': 1.0.2
   '@types/web-push': 3.6.4
   '@types/ws': 8.18.1
   '@typescript-eslint/eslint-plugin': 8.57.1
@@ -191,27 +192,28 @@ catalog:
   eslint-plugin-vue: 10.8.0
   estree-walker: 3.0.3
   eventemitter3: 5.0.4
-  exifreader: 4.32.0
   execa: 9.6.1
+  exifreader: 4.37.0
   fast-glob: 3.3.3
   fastify: 5.8.2
   fastify-http-errors-enhanced: 7.0.1
   fastify-raw-body: 5.0.0
   feed: 5.2.0
-  file-type: 21.3.3
+  file-type: 21.3.4
   fkill: 10.0.3
   fluent-ffmpeg: 2.1.3
   form-data: 4.0.5
   glob: 13.0.6
   globals: 17.4.0
   got: 14.6.6
+  harfbuzzjs: 0.10.1
   hpagent: 1.2.0
   htmlescape: 1.1.1
   http-link-header: 1.1.3
   idb-keyval: 6.2.2
   ignore-walk: 8.0.0
-  intersection-observer: 0.12.2
   insert-text-at-cursor: 0.3.0
+  intersection-observer: 0.12.2
   ioredis: 5.10.1
   ios-haptics: 0.1.4
   ip-cidr: 4.0.2
@@ -232,7 +234,7 @@ catalog:
   lightningcss: 1.32.0
   magic-string: 0.30.21
   matter-js: 0.20.0
-  mediabunny: 1.25.0
+  mediabunny: 1.40.0
   meilisearch: 0.56.0
   mfm-js: 0.25.0
   microformats-parser: 2.0.4
@@ -247,8 +249,8 @@ catalog:
   ncp: 2.0.0
   nested-property: 4.0.0
   node-fetch: 3.3.2
-  node-html-parser: 7.0.2
   node-forge: 1.3.3
+  node-html-parser: 7.1.0
   nodemailer: 8.0.3
   nodemon: 3.1.14
   nsfwjs: 4.2.1
@@ -280,9 +282,9 @@ catalog:
   psl: 1.15.0
   pug: 3.0.4
   punycode.js: 2.3.1
-  qrcode: 1.5.4
   qr-code-styling: 1.9.2
   qr-scanner: 1.4.2
+  qrcode: 1.5.4
   random-seed: 0.3.0
   ratelimiter: 3.4.1
   re2: 1.23.3
@@ -291,7 +293,7 @@ catalog:
   redis-lock: 1.0.0
   reflect-metadata: 0.2.2
   rename: 1.0.4
-  rollup: 4.59.1
+  rollup: 4.60.0
   rss-parser: 3.13.0
   rxjs: 7.8.2
   samlify: 2.10.2
@@ -299,7 +301,7 @@ catalog:
   sass: 1.98.0
   secure-json-parse: 4.1.0
   seedrandom: 3.0.5
-  semver: 7.7.1
+  semver: 7.7.4
   sharp: 0.34.5
   shiki: 4.0.2
   simple-oauth2: 5.1.0
@@ -326,7 +328,7 @@ catalog:
   textarea-caret: 3.1.0
   three: 0.183.2
   throttle-debounce: 5.0.2
-  type-fest: 2.19.0
+  tiny-glob: 0.2.9
   tinycolor2: 1.6.0
   tmp: 0.2.5
   ts-case-convert: 2.1.0
@@ -334,6 +336,7 @@ catalog:
   tsconfig-paths: 4.2.0
   tsd: 0.33.0
   tsx: 4.21.0
+  type-fest: 2.19.0
   typeorm: 0.3.28
   typescript: 5.9.3
   ulid: 3.0.2
@@ -342,7 +345,7 @@ catalog:
   v-code-diff: 1.13.1
   vary: 1.1.2
   vite: 7.3.1
-  vite-plugin-glsl: 1.5.4
+  vite-plugin-glsl: 1.5.6
   vite-plugin-turbosnap: 1.0.3
   vitest: 4.1.0
   vitest-fetch-mock: 0.4.5
@@ -354,11 +357,13 @@ catalog:
   vue-tsc: 3.2.6
   vuedraggable: next
   wanakana: 5.3.1
+  wawoff2: 2.0.1
   web-push: 3.6.7
   webgl-audiovisualizer: github:MisskeyIO/webgl-audiovisualizer
   ws: 8.20.0
   xev: 3.0.2
   xmlbuilder: 15.1.1
+  yauzl: 3.2.1
 
 catalogMode: strict
 
@@ -381,6 +386,7 @@ onlyBuiltDependencies:
   - core-js
   - cypress
   - esbuild
+  - exifreader
   - libpq
   - msgpackr-extract
   - msw
@@ -406,6 +412,7 @@ overrides:
   cookie: 1.1.1
   cookie-signature: 1.2.2
   debug: 4.4.3
+  file-type: 21.3.4
   jpeg-js: 0.4.4
   jsdom: 26.1.0
   lodash: 4.17.23
@@ -414,6 +421,7 @@ overrides:
   sharp: 0.34.5
   tough-cookie: 6.0.0
   web-streams-polyfill: 4.2.0
+  yauzl: 3.2.1
 
 patchedDependencies:
   nsfwjs@4.2.1: patches/nsfwjs@4.2.1.patch

@@ -433,7 +433,7 @@ export class ApPersonService implements OnModuleInit {
 			if (isDuplicateKeyValueError(e)) {
 				// /users/@a => /users/:id のように入力がaliasなときにエラーになることがあるのを対応
 				const u = await this.usersRepository.findOneBy({ uri: person.id });
-				if (u == null) throw new Error('already registered');
+				if (u == null) throw new Error('already registered', { cause: e });
 
 				user = u as MiRemoteUser;
 			} else {

@@ -30,16 +30,13 @@ const props = defineProps<{
 const instanceName = computed(() => props.host == null ? localInstanceName : props.instance?.name ?? props.host);
 
 const faviconUrl = computed(() => {
-	let imageSrc: string | null = null;
 	if (props.host == null) {
 		if (localInstance.iconUrl == null) {
 			return '/favicon.ico';
-		} else {
-			imageSrc = localInstance.iconUrl;
 		}
-	} else {
-		imageSrc = props.instance?.faviconUrl ?? null;
 	}
+
+	const imageSrc = props.host == null ? localInstance.iconUrl : props.instance?.faviconUrl ?? null;
 	return getProxiedImageUrlNullable(imageSrc);
 });
 

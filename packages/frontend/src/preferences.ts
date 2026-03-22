@@ -57,7 +57,7 @@ const storageProvider: StorageProvider = {
 	},
 
 	cloudSet: async (ctx) => {
-		let cloudData: [any, any][] = [];
+		let cloudData: [any, any][];
 		try {
 			cloudData = await misskeyApi('i/registry/get', {
 				scope: ['client', 'preferences', 'sync'],

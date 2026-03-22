@@ -92,8 +92,8 @@ export class ApRendererService {
 	public renderAnnounce(object: string | IObject, note: MiNote): IAnnounce {
 		const attributedTo = this.userEntityService.genLocalUserUri(note.userId);
 
-		let to: string[] = [];
-		let cc: string[] = [];
+		let to: string[];
+		let cc: string[];
 
 		if (note.visibility === 'public') {
 			to = ['https://www.w3.org/ns/activitystreams#Public'];
@@ -365,7 +365,7 @@ export class ApRendererService {
 			return ids.map(id => items.find(item => item.id === id)).filter(x => x != null);
 		};
 
-		let inReplyTo;
+		let inReplyTo: string | IPost | null;
 		let inReplyToNote: MiNote | null;
 
 		if (note.replyId) {
@@ -390,7 +390,7 @@ export class ApRendererService {
 			inReplyTo = null;
 		}
 
-		let quote;
+		let quote: string | null;
 
 		if (note.renoteId) {
 			const renote = await this.notesRepository.findOneBy({ id: note.renoteId });
@@ -404,8 +404,8 @@ export class ApRendererService {
 
 		const mentions = (JSON.parse(note.mentionedRemoteUsers) as IMentionedRemoteUsers).map(x => x.uri);
 
-		let to: string[] = [];
-		let cc: string[] = [];
+		let to: string[];
+		let cc: string[];
 
 		if (note.visibility === 'public') {
 			to = ['https://www.w3.org/ns/activitystreams#Public'];
@@ -418,6 +418,7 @@ export class ApRendererService {
 			cc = mentions;
 		} else {
 			to = mentions;
+			cc = [];
 		}
 
 		const mentionedUsers = note.mentions.length > 0 ? await this.usersRepository.findBy({

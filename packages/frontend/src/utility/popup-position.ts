@@ -97,8 +97,8 @@ export function calcPopupPosition(el: HTMLElement, props: {
 	};
 
 	const calcPosWhenRight = () => {
-		let left = 0; // TSを黙らすためとりあえず初期値を0に
-		let top = 0; // TSを黙らすためとりあえず初期値を0に
+		let left: number;
+		let top: number;
 
 		if (props.anchorElement) {
 			left = (rect.left + props.anchorElement.offsetWidth + window.scrollX) + props.innerMargin;
@@ -107,7 +107,7 @@ export function calcPopupPosition(el: HTMLElement, props: {
 				top = rect.top + window.scrollY;
 				if (props.alignOffset != null) top += props.alignOffset;
 			} else if (props.align === 'bottom') {
-				// TODO
+				top = rect.top + window.scrollY;
 			} else { // center
 				top = rect.top + window.scrollY + (props.anchorElement.offsetHeight / 2);
 				top -= (el.offsetHeight / 2);

@@ -761,31 +761,26 @@ function showScheduledNotesDialog() {
 //#region その他の設定メニューpopup
 function showOtherSettings() {
 	let reactionAcceptanceIcon = 'ti ti-icons';
-	let reactionAcceptanceCaption = '';
+	const reactionAcceptanceCaption = (() => {
+		switch (reactionAcceptance.value) {
+			case 'likeOnly':
+				reactionAcceptanceIcon = 'ti ti-heart _love';
+				return i18n.ts.likeOnly;
 
-	switch (reactionAcceptance.value) {
-		case 'likeOnly':
-			reactionAcceptanceIcon = 'ti ti-heart _love';
-			reactionAcceptanceCaption = i18n.ts.likeOnly;
-			break;
+			case 'likeOnlyForRemote':
+				reactionAcceptanceIcon = 'ti ti-heart-plus';
+				return i18n.ts.likeOnlyForRemote;
 
-		case 'likeOnlyForRemote':
-			reactionAcceptanceIcon = 'ti ti-heart-plus';
-			reactionAcceptanceCaption = i18n.ts.likeOnlyForRemote;
-			break;
+			case 'nonSensitiveOnly':
+				return i18n.ts.nonSensitiveOnly;
 
-		case 'nonSensitiveOnly':
-			reactionAcceptanceCaption = i18n.ts.nonSensitiveOnly;
-			break;
+			case 'nonSensitiveOnlyForLocalLikeOnlyForRemote':
+				return i18n.ts.nonSensitiveOnlyForLocalLikeOnlyForRemote;
 
-		case 'nonSensitiveOnlyForLocalLikeOnlyForRemote':
-			reactionAcceptanceCaption = i18n.ts.nonSensitiveOnlyForLocalLikeOnlyForRemote;
-			break;
-
-		default:
-			reactionAcceptanceCaption = i18n.ts.all;
-			break;
-	}
+			default:
+				return '';
+		}
+	})();
 
 	const postingLangCaption = postingLang.value != null
 		? (postingLang.value === 'other' ? i18n.ts.other : langmap[postingLang.value]?.nativeName ?? postingLang.value)

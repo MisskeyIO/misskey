@@ -31,7 +31,7 @@ export async function getTheme(mode: 'light' | 'dark', getName = false): Promise
 	}
 
 	if (theme.codeHighlighter) {
-		let _res: ThemeRegistration = {};
+		let _res: ThemeRegistration;
 		if (theme.codeHighlighter.base === '_none_') {
 			_res = deepClone(theme.codeHighlighter.overrides);
 		} else {

@@ -164,16 +164,9 @@ export function getConfig(): UserConfig {
 				},
 				external: externalPackages.map(p => p.match),
 				output: {
-					manualChunks(id: string) {
-						if (/node_modules\/(vue|@vue)\//.test(id)) {
-							return 'vue';
-						}
-
-						if (/node_modules\/photoswipe\//.test(id)) {
-							return 'photoswipe';
-						}
-
-						return undefined;
+					manualChunks: {
+						vue: ['vue'],
+						photoswipe: ['photoswipe', 'photoswipe/lightbox', 'photoswipe/style.css'],
 					},
 					entryFileNames: `${meta.version}.[hash].js`,
 					chunkFileNames: `${meta.version}.[hash].js`,

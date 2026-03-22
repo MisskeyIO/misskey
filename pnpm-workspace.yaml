@@ -328,7 +328,7 @@ catalog:
   uuid: 13.0.0
   v-code-diff: 1.13.1
   vary: 1.1.2
-  vite: 8.0.1
+  vite: 7.3.1
   vite-plugin-turbosnap: 1.0.3
   vitest: 4.1.0
   vitest-fetch-mock: 0.4.5

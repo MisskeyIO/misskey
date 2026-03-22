@@ -188,13 +188,13 @@ export function validateTheme(theme: Record<string, any>): boolean {
 }
 
 export function parseThemeCode(code: string): Theme {
-	let theme;
-
-	try {
-		theme = JSON5.parse(code);
-	} catch (err) {
-		throw new Error('Failed to parse theme json');
-	}
+	const theme = (() => {
+		try {
+			return JSON5.parse(code);
+		} catch (err) {
+			throw new Error('Failed to parse theme json', { cause: err });
+		}
+	})();
 	if (!validateTheme(theme)) {
 		throw new Error('This theme is invaild');
 	}

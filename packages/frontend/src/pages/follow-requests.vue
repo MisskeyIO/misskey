@@ -5,14 +5,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <PageWithHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs" :swipable="true">
-	<div class="_spacer" style="--MI_SPACER-w: 800px;">
-		<MkPagination ref="paginationComponent" :pagination="pagination">
-			<template #empty>
-				<div class="_fullinfo">
-					<img :src="infoImageUrl" draggable="false"/>
-					<div>{{ i18n.ts.noFollowRequests }}</div>
-				</div>
-			</template>
+	<div :key="tab" class="_spacer" style="--MI_SPACER-w: 800px;">
+		<MkPagination :paginator="paginator">
+			<template #empty><MkResult type="empty" :text="i18n.ts.noFollowRequests"/></template>
 			<template #default="{items}">
 				<div class="mk-follow-requests _gaps">
 					<div v-for="req in items" :key="req.id" class="user _panel">
@@ -40,42 +35,57 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import * as Misskey from 'misskey-js';
-import { useTemplateRef, computed, ref } from 'vue';
-import type { Paging } from '@/components/MkPagination.vue';
+import { computed, markRaw, ref, watch } from 'vue';
 import MkPagination from '@/components/MkPagination.vue';
 import MkButton from '@/components/MkButton.vue';
 import { userPage, acct } from '@/filters/user.js';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
-import { infoImageUrl } from '@/instance.js';
 import { $i } from '@/i.js';
+import { Paginator } from '@/utility/paginator.js';
 
-const paginationComponent = useTemplateRef('paginationComponent');
+const tab = ref($i?.isLocked ? 'list' : 'sent');
 
-const pagination = computed<Paging>(() => tab.value === 'list' ? {
-	endpoint: 'following/requests/list',
-	limit: 10,
-} : {
-	endpoint: 'following/requests/sent',
-	limit: 10,
-});
+let paginator: Paginator<'following/requests/list' | 'following/requests/sent'>;
+
+watch(tab, (newTab) => {
+	if (newTab === 'list') {
+		paginator = markRaw(new Paginator('following/requests/list', { limit: 10 }));
+	} else {
+		paginator = markRaw(new Paginator('following/requests/sent', { limit: 10 }));
+	}
+}, { immediate: true });
 
 function accept(user: Misskey.entities.UserLite) {
 	os.apiWithDialog('following/requests/accept', { userId: user.id }).then(() => {
-		paginationComponent.value?.reload();
+		paginator.reload();
 	});
 }
 
-function reject(user: Misskey.entities.UserLite) {
-	os.apiWithDialog('following/requests/reject', { userId: user.id }).then(() => {
-		paginationComponent.value?.reload();
+async function reject(user: Misskey.entities.UserLite) {
+	const { canceled } = await os.confirm({
+		type: 'question',
+		text: i18n.tsx.rejectFollowRequestConfirm({ name: user.name || user.username }),
+	});
+
+	if (canceled) return;
+
+	await os.apiWithDialog('following/requests/reject', { userId: user.id }).then(() => {
+		paginator.reload();
 	});
 }
 
-function cancel(user: Misskey.entities.UserLite) {
-	os.apiWithDialog('following/requests/cancel', { userId: user.id }).then(() => {
-		paginationComponent.value?.reload();
+async function cancel(user: Misskey.entities.UserLite) {
+	const { canceled } = await os.confirm({
+		type: 'question',
+		text: i18n.tsx.cancelFollowRequestConfirm({ name: user.name || user.username }),
+	});
+
+	if (canceled) return;
+
+	await os.apiWithDialog('following/requests/cancel', { userId: user.id }).then(() => {
+		paginator.reload();
 	});
 }
 
@@ -96,8 +106,6 @@ const headerTabs = computed(() => [
 		icon: 'ti ti-upload',
 	},
 ]);
-
-const tab = ref($i?.isLocked ? 'list' : 'sent');
 
 definePage(() => ({
 	title: i18n.ts.followRequests,

@@ -1,0 +1,25 @@
+{
+	"name": "frontend-builder",
+	"type": "module",
+	"scripts": {
+		"eslint": "eslint './**/*.{js,jsx,ts,tsx}'",
+		"typecheck": "tsc --noEmit",
+		"lint": "pnpm typecheck && pnpm eslint"
+	},
+	"exports": {
+		"./*": "./js/*"
+	},
+	"devDependencies": {
+		"@types/estree": "catalog:",
+		"@types/node": "catalog:",
+		"@typescript-eslint/eslint-plugin": "catalog:",
+		"@typescript-eslint/parser": "catalog:",
+		"rollup": "catalog:",
+		"typescript": "catalog:"
+	},
+	"dependencies": {
+		"estree-walker": "catalog:",
+		"magic-string": "catalog:",
+		"vite": "catalog:"
+	}
+}

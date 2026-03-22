@@ -20,9 +20,7 @@ let idbAvailable = typeof window !== 'undefined' ? !!(window.indexedDB && typeof
 // iframe.contentWindow.indexedDB.deleteDatabase() がchromeのバグで使用できないため、indexedDBを無効化している。
 // バグが治って再度有効化するのであれば、cypressのコマンド内のコメントアウトを外すこと
 // see https://github.com/misskey-dev/misskey/issues/13605#issuecomment-2053652123
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-if (window.Cypress) {
+if ('Cypress' in window && window.Cypress) {
 	idbAvailable = false;
 	console.log('Cypress detected. It will use localStorage.');
 }
@@ -40,7 +38,8 @@ if (idbAvailable) {
 
 export async function get(key: string) {
 	if (idbAvailable) return iget(key);
-	return JSON.parse(window.localStorage.getItem(fallbackName(key)));
+	const value = window.localStorage.getItem(fallbackName(key));
+	return value == null ? null : JSON.parse(value);
 }
 
 export async function set(key: string, val: any) {

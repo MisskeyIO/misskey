@@ -17,15 +17,8 @@ export const Default = {
 			},
 			setup() {
 				return {
-					args,
+					props: args,
 				};
-			},
-			computed: {
-				props() {
-					return {
-						...this.args,
-					};
-				},
 			},
 			template: '<MkChatHistories v-bind="props" />',
 		};
@@ -35,7 +28,7 @@ export const Default = {
 		msw: {
 			handlers: [
 				http.post('/api/chat/history', async ({ request }) => {
-					const body = await request.json() as Misskey.entities.ChatHistoryRequest;
+					const body = await request.json() as { room: boolean };
 					action('POST /api/chat/history')(body);
 					return HttpResponse.json([chatMessage(body.room)]);
 				}),

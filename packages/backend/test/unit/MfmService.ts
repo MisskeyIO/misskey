@@ -41,12 +41,7 @@ describe('MfmService', () => {
 		test('additionalAppenders', () => {
 			const input = 'foo';
 			const output = '<p>foo<span class="x">bar</span></p>';
-			assert.equal(mfmService.toHtml(mfm.parse(input), [], [(doc, body) => {
-				const span = doc.createElement('span');
-				span.className = 'x';
-				span.textContent = 'bar';
-				body.appendChild(span);
-			}]), output);
+			assert.equal(mfmService.toHtml(mfm.parse(input), [], [() => '<span class="x">bar</span>']), output);
 		});
 	});
 

@@ -1,8 +1,10 @@
 # syntax = docker/dockerfile:1.4
 
+ARG NODE_VERSION=24.10.0-bookworm
+
 # build assets & compile TypeScript
 
-FROM --platform=$BUILDPLATFORM node:22 AS native-builder
+FROM --platform=$BUILDPLATFORM node:${NODE_VERSION} AS native-builder
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 	--mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -22,10 +24,13 @@ RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
 
 COPY --link ["pnpm-workspace.yaml", "package.json", "./"]
 COPY --link ["scripts", "./scripts"]
+COPY --link ["patches", "./patches"]
 COPY --link ["packages/backend/package.json", "./packages/backend/"]
 COPY --link ["packages/frontend-shared/package.json", "./packages/frontend-shared/"]
 COPY --link ["packages/frontend/package.json", "./packages/frontend/"]
 COPY --link ["packages/frontend-embed/package.json", "./packages/frontend-embed/"]
+COPY --link ["packages/frontend-builder/package.json", "./packages/frontend-builder/"]
+COPY --link ["packages/icons-subsetter/package.json", "./packages/icons-subsetter/"]
 COPY --link ["packages/sw/package.json", "./packages/sw/"]
 COPY --link ["packages/misskey-js/package.json", "./packages/misskey-js/"]
 COPY --link ["packages/misskey-reversi/package.json", "./packages/misskey-reversi/"]
@@ -40,7 +45,7 @@ RUN NODE_ENV=production pnpm build
 
 # build native dependencies for target platform
 
-FROM --platform=$TARGETPLATFORM node:22 AS target-builder
+FROM --platform=$TARGETPLATFORM node:${NODE_VERSION} AS target-builder
 
 RUN apt-get update \
 	&& apt-get install -yqq --no-install-recommends \
@@ -56,6 +61,7 @@ RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
 
 COPY --link ["pnpm-workspace.yaml", "package.json", "./"]
 COPY --link ["scripts", "./scripts"]
+COPY --link ["patches", "./patches"]
 COPY --link ["packages/backend/package.json", "./packages/backend/"]
 COPY --link ["packages/misskey-js/package.json", "./packages/misskey-js/"]
 COPY --link ["packages/misskey-reversi/package.json", "./packages/misskey-reversi/"]
@@ -64,7 +70,7 @@ COPY --link ["packages/misskey-bubble-game/package.json", "./packages/misskey-bu
 RUN pnpm i --frozen-lockfile --aggregate-output --prefer-offline \
 	&& pnpm rebuild -r
 
-FROM --platform=$TARGETPLATFORM node:22-slim AS runner
+FROM --platform=$TARGETPLATFORM node:${NODE_VERSION}-slim AS runner
 
 ARG UID="991"
 ARG GID="991"

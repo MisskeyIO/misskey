@@ -29,7 +29,7 @@ const props = defineProps<{
 
 if (props.movedTo || props.movedFrom) {
 	misskeyApi('users/show', {
-		userId: props.movedTo ?? props.movedFrom
+		userId: props.movedTo ?? props.movedFrom ?? ''
 	}).then(u => user.value = u);
 }
 </script>

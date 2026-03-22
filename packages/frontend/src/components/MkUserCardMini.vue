@@ -4,7 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<div v-adaptive-bg :class="[$style.root, { yellow: user.isSilenced, gray: user.isLimited, red: user.isSuspended }]">
+<div v-adaptive-bg :class="[$style.root, { yellow: userStatus.isSilenced, gray: userStatus.isLimited, red: userStatus.isSuspended }]">
 	<MkAvatar :class="$style.avatar" :user="user" indicator/>
 	<div :class="$style.body">
 		<span :class="$style.name"><MkUserName :user="user"/></span>
@@ -29,6 +29,11 @@ const props = withDefaults(defineProps<{
 });
 
 const chartValues = ref<number[] | null>(null);
+const userStatus = props.user as Misskey.entities.User & {
+	isSilenced?: boolean;
+	isLimited?: boolean;
+	isSuspended?: boolean;
+};
 
 onMounted(() => {
 	if (props.withChart) {

@@ -59,6 +59,7 @@ export const Icon = {
 			{
 				...OneTab.args.tabs[0],
 				icon: 'ti ti-home',
+				title: 'Home',
 			},
 		],
 	},
@@ -71,6 +72,7 @@ export const IconOnly = {
 			{
 				key: Icon.args.tabs[0].key,
 				icon: Icon.args.tabs[0].icon,
+				title: Icon.args.tabs[0].title,
 				iconOnly: true,
 			},
 		],

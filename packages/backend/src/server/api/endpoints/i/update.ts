@@ -7,7 +7,7 @@ import RE2 from 're2';
 import * as mfm from 'mfm-js';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from 'ms';
-import { JSDOM } from 'jsdom';
+import * as htmlParser from 'node-html-parser';
 import { extractCustomEmojisFromMfm } from '@/misc/extract-custom-emojis-from-mfm.js';
 import { extractHashtags } from '@/misc/extract-hashtags.js';
 import * as Acct from '@/misc/acct.js';
@@ -32,7 +32,7 @@ import { AccountUpdateService } from '@/core/AccountUpdateService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { HashtagService } from '@/core/HashtagService.js';
 import { DI } from '@/di-symbols.js';
-import { RolePolicies, RoleService } from '@/core/RoleService.js';
+import { RoleService } from '@/core/RoleService.js';
 import { CacheService } from '@/core/CacheService.js';
 import { RemoteUserResolveService } from '@/core/RemoteUserResolveService.js';
 import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
@@ -256,6 +256,7 @@ export const paramDef = {
 				quote: notificationRecieveConfig,
 				reaction: notificationRecieveConfig,
 				pollEnded: notificationRecieveConfig,
+				scheduledNotePosted: notificationRecieveConfig,
 				receiveFollowRequest: notificationRecieveConfig,
 				followRequestAccepted: notificationRecieveConfig,
 				roleAssigned: notificationRecieveConfig,
@@ -350,6 +351,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const policy = await this.roleService.getUserPolicies(user.id);
 
 			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
+
 			if (ps.name !== undefined) {
 				if (ps.name === null) {
 					updates.name = null;
@@ -369,10 +371,25 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (ps.birthday !== undefined) profileUpdates.birthday = ps.birthday;
 			if (ps.followingVisibility !== undefined) profileUpdates.followingVisibility = ps.followingVisibility;
 			if (ps.followersVisibility !== undefined) profileUpdates.followersVisibility = ps.followersVisibility;
-			// if (ps.chatScope !== undefined) updates.chatScope = ps.chatScope;
-			if (ps.mutedWords !== undefined) {
-				const length = ps.mutedWords.length;
-				if (length > policy.wordMuteLimit) {
+			if (ps.chatScope !== undefined) updates.chatScope = ps.chatScope;
+
+			function checkMuteWordCount(mutedWords: (string[] | string)[], limit: number) {
+				const count = (arr: (string[] | string)[]) => {
+					let length = 0;
+					for (const item of arr) {
+						if (typeof item === 'string') {
+							length += item.length;
+						} else if (Array.isArray(item)) {
+							for (const subItem of item) {
+								length += subItem.length;
+							}
+						}
+					}
+					return length;
+				};
+
+				const length = count(mutedWords);
+				if (length > limit) {
 					throw new ApiError(meta.errors.tooManyMutedWords);
 				}
 
@@ -387,19 +404,26 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					}
 				};
 
-				for (const entry of ps.mutedWords) {
-					if (Array.isArray(entry)) {
-						for (const value of entry) {
-							validateRegex(value);
+				if (ps.mutedWords) {
+					for (const entry of ps.mutedWords) {
+						if (Array.isArray(entry)) {
+							for (const value of entry) {
+								validateRegex(value);
+							}
+						} else {
+							validateRegex(entry);
 						}
-					} else {
-						validateRegex(entry);
 					}
-				}
 
-				profileUpdates.mutedWords = ps.mutedWords;
-				profileUpdates.enableWordMute = ps.mutedWords.length > 0;
+					profileUpdates.mutedWords = ps.mutedWords;
+					profileUpdates.enableWordMute = ps.mutedWords.length > 0;
+				}
 			}
+
+			if (ps.mutedWords !== undefined) {
+				checkMuteWordCount(ps.mutedWords, policy.wordMuteLimit);
+			}
+
 			if (ps.mutedInstances !== undefined) profileUpdates.mutedInstances = ps.mutedInstances;
 			if (ps.notificationRecieveConfig !== undefined) profileUpdates.notificationRecieveConfig = ps.notificationRecieveConfig;
 			if (typeof ps.isLocked === 'boolean') updates.isLocked = ps.isLocked;
@@ -665,16 +689,15 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		try {
 			const html = await this.httpRequestService.getHtml(url);
 
-			const { window } = new JSDOM(html);
-			const doc: Document = window.document as Document;
+			const doc = htmlParser.parse(html);
 
 			const myLink = `${this.config.url}/@${user.username}`;
 
 			const aEls = Array.from(doc.getElementsByTagName('a'));
 			const linkEls = Array.from(doc.getElementsByTagName('link'));
 
-			const includesMyLink = aEls.some(a => a.href === myLink);
-			const includesRelMeLinks = [...aEls, ...linkEls].some(link => link.rel === 'me' && link.href === myLink);
+			const includesMyLink = aEls.some(a => a.attributes.href === myLink);
+			const includesRelMeLinks = [...aEls, ...linkEls].some(link => link.attributes.rel?.split(/\s+/).includes('me') && link.attributes.href === myLink);
 
 			if (includesMyLink || includesRelMeLinks) {
 				await this.userProfilesRepository.createQueryBuilder('profile').update()
@@ -684,8 +707,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					})
 					.execute();
 			}
-
-			window.close();
 		} catch (err) {
 		// なにもしない
 		}

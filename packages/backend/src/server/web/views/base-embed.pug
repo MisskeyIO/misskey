@@ -42,7 +42,7 @@ html(class='embed')
 
 		script.
 			var VERSION = "#{version}";
-			var CLIENT_ENTRY = "#{entry.file}";
+			var CLIENT_ENTRY = !{JSON.stringify(entry.file)};
 
 		script(type='application/json' id='misskey_meta' data-generated-at=now)
 			!= metaJson

@@ -12,7 +12,9 @@ on:
       - packages/backend/**
       - packages/frontend/**
       - packages/frontend-shared/**
+      - packages/frontend-builder/**
       - packages/frontend-embed/**
+      - packages/icons-subsetter/**
       - packages/sw/**
       - packages/misskey-js/**
       - packages/misskey-bubble-game/**
@@ -24,7 +26,9 @@ on:
       - packages/backend/**
       - packages/frontend/**
       - packages/frontend-shared/**
+      - packages/frontend-builder/**
       - packages/frontend-embed/**
+      - packages/icons-subsetter/**
       - packages/sw/**
       - packages/misskey-js/**
       - packages/shared/.eslintrc.js
@@ -39,6 +43,9 @@ permissions:
 jobs:
   pnpm_install:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22.x]
     steps:
     - uses: actions/checkout@v6
       with:
@@ -50,7 +57,7 @@ jobs:
         run_install: false
     - uses: actions/setup-node@v6
       with:
-        node-version-file: '.node-version'
+        node-version: ${{ matrix.node-version }}
         cache: 'pnpm'
     - run: pnpm i --frozen-lockfile
 
@@ -60,11 +67,14 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
+        node-version: [22.x]
         workspace:
         - backend
         - frontend
         - frontend-shared
+        - frontend-builder
         - frontend-embed
+        - icons-subsetter
         - sw
         - misskey-js
         - misskey-bubble-game
@@ -83,7 +93,7 @@ jobs:
         run_install: false
     - uses: actions/setup-node@v6
       with:
-        node-version-file: '.node-version'
+        node-version: ${{ matrix.node-version }}
         cache: 'pnpm'
     - run: pnpm i --frozen-lockfile
     - name: Restore eslint cache
@@ -100,6 +110,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
+        node-version: [22.x]
         workspace:
         - backend
         - sw
@@ -115,7 +126,7 @@ jobs:
         run_install: false
     - uses: actions/setup-node@v6
       with:
-        node-version-file: '.node-version'
+        node-version: ${{ matrix.node-version }}
         cache: 'pnpm'
     - run: pnpm i --frozen-lockfile
     - run: pnpm --filter misskey-reversi --filter misskey-bubble-game --filter misskey-js run build

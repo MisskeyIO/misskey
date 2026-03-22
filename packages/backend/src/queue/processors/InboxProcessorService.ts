@@ -101,7 +101,7 @@ export class InboxProcessorService implements OnApplicationShutdown {
 					if (!err.isRetryable) {
 						throw new Bull.UnrecoverableError(`skip: Ignored deleted actors on both ends ${activity.actor} - ${err.statusCode}`);
 					}
-					throw new Error(`Error in actor ${activity.actor} - ${err.statusCode}`);
+					throw new Error(`Error in actor ${activity.actor} - ${err.statusCode}`, { cause: err });
 				}
 			}
 		}

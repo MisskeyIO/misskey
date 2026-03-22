@@ -61,6 +61,7 @@
     "nodemon": "catalog:",
     "prettier": "catalog:",
     "start-server-and-test": "catalog:",
+    "type-fest": "catalog:",
     "vite-plugin-turbosnap": "catalog:",
     "vue-component-type-helpers": "catalog:",
     "vue-eslint-parser": "catalog:",

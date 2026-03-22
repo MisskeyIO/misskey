@@ -67,13 +67,14 @@ export async function parsePluginMeta(code: string): Promise<AiScriptPluginMeta>
 		throw new Error(`Aiscript version '${lv}' is not supported`);
 	}
 
-	let ast;
-	try {
-		const parser = await getParser();
-		ast = parser.parse(code);
-	} catch (err) {
-		throw new Error('Aiscript syntax error');
-	}
+	const ast = await (async () => {
+		try {
+			const parser = await getParser();
+			return parser.parse(code);
+		} catch (err) {
+			throw new Error('Aiscript syntax error', { cause: err });
+		}
+	})();
 
 	const meta = Interpreter.collectMetadata(ast);
 	if (meta == null) {
@@ -105,8 +106,8 @@ export async function authorizePlugin(plugin: Plugin) {
 	if (plugin.permissions == null || plugin.permissions.length === 0) return;
 	if (Object.hasOwn(store.s.pluginTokens, plugin.installId)) return;
 
-	const token = await new Promise<string>(async (res, rej) => {
-		await os.popup(defineAsyncComponent(() => import('@/components/MkTokenGenerateWindow.vue')), {
+	const token = await new Promise<string>((res) => {
+		void os.popup(defineAsyncComponent(() => import('@/components/MkTokenGenerateWindow.vue')), {
 			title: i18n.ts.tokenRequested,
 			information: i18n.ts.pluginTokenRequestedDescription,
 			initialName: plugin.name,

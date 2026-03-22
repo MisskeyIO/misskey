@@ -7,6 +7,7 @@ import { Injectable } from '@nestjs/common';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
 import type { Packed } from '@/misc/json-schema.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { NoteStreamingHidingService } from '../NoteStreamingHidingService.js';
 import { bindThis } from '@/decorators.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import type { JsonObject } from '@/misc/json-value.js';
@@ -20,7 +21,7 @@ class HashtagChannel extends Channel {
 
 	constructor(
 		private noteEntityService: NoteEntityService,
-
+		private noteStreamingHidingService: NoteStreamingHidingService,
 		id: string,
 		connection: Channel['connection'],
 		dimension?: number | null,
@@ -30,13 +31,19 @@ class HashtagChannel extends Channel {
 	}
 
 	@bindThis
-	public async init(params: JsonObject) {
-		if (!Array.isArray(params.q)) return;
-		if (!params.q.every(x => Array.isArray(x) && x.every(y => typeof y === 'string'))) return;
+	public async init(params: JsonObject): Promise<boolean> {
+		if (!Array.isArray(params.q)) return false;
+		if (!params.q.every((x): x is string[] => (
+			Array.isArray(x) &&
+			x.length >= 1 &&
+			x.every(y => typeof y === 'string')
+		))) return false;
 		this.q = params.q;
 
 		// Subscribe stream
 		this.subscriber.on('notesStream', this.onNote);
+
+		return true;
 	}
 
 	@bindThis
@@ -45,24 +52,31 @@ class HashtagChannel extends Channel {
 		const matched = this.q.some(tags => tags.every(tag => noteTags.includes(normalizeForSearch(tag))));
 		if (!matched) return;
 
+		if (note.user.requireSigninToViewContents && this.user == null) return;
+		if (note.renote && note.renote.user.requireSigninToViewContents && this.user == null) return;
+		if (note.reply && note.reply.user.requireSigninToViewContents && this.user == null) return;
+
+		if (!this.isNoteVisibleForMe(note)) return;
+
 		if (note.reply) {
 			const reply = note.reply;
-			// 自分のフォローしていないユーザーの visibility: followers な投稿への返信は弾く
-			if (reply.visibility === 'followers' && !Object.hasOwn(this.following, reply.userId)) return;
-			// 自分の見ることができないユーザーの visibility: specified な投稿への返信は弾く
-			if (reply.visibility === 'specified' && !reply.visibleUserIds!.includes(this.user!.id)) return;
+			if (!this.isNoteVisibleForMe(reply)) return;
 		}
 
 		if (!this.shouldDeliverByDimension(note)) return;
 
 		if (!(await this.noteEntityService.isLanguageVisibleToMe(note, this.user?.id))) return;
-
 		if (this.isNoteMutedOrBlocked(note)) return;
 
-		if (this.user && isRenotePacked(note) && !isQuotePacked(note)) {
-			if (note.renote && Object.keys(note.renote.reactions).length > 0) {
-				const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
-				note.renote.myReaction = myRenoteReaction;
+		const { shouldSkip } = await this.noteStreamingHidingService.processHiding(note, this.user?.id ?? null);
+		if (shouldSkip) return;
+
+		if (this.user) {
+			if (isRenotePacked(note) && !isQuotePacked(note)) {
+				if (note.renote && Object.keys(note.renote.reactions).length > 0) {
+					const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
+					note.renote.myReaction = myRenoteReaction;
+				}
 			}
 		}
 
@@ -88,6 +102,7 @@ export class HashtagChannelService implements MiChannelService<false> {
 
 	constructor(
 		private noteEntityService: NoteEntityService,
+		private noteStreamingHidingService: NoteStreamingHidingService,
 	) {
 	}
 
@@ -95,6 +110,7 @@ export class HashtagChannelService implements MiChannelService<false> {
 	public create(id: string, connection: Channel['connection'], dimension?: number | null): HashtagChannel {
 		return new HashtagChannel(
 			this.noteEntityService,
+			this.noteStreamingHidingService,
 			id,
 			connection,
 			dimension,

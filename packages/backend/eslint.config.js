@@ -4,7 +4,7 @@ import sharedConfig from '../shared/eslint.config.js';
 export default [
 	...sharedConfig,
 	{
-		ignores: ['**/node_modules', 'built', '@types/**/*', 'migration'],
+		ignores: ['**/node_modules', 'built', '@types/**/*', 'migration', 'test-federation/volumes'],
 	},
 	{
 		files: ['**/*.ts', '**/*.tsx'],

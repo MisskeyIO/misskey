@@ -2178,6 +2178,10 @@ export interface Locale extends ILocale {
      */
     "postingLanguageDescription": string;
     /**
+     * ブラウザーの言語が変更されています。投稿する言語の設定を確認してください。
+     */
+    "postingLanguageBrowserLangChanged": string;
+    /**
      * 投稿と表示する言語
      */
     "postingAndViewingLanguage": string;

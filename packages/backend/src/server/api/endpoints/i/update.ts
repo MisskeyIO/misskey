@@ -32,7 +32,7 @@ import { AccountUpdateService } from '@/core/AccountUpdateService.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { HashtagService } from '@/core/HashtagService.js';
 import { DI } from '@/di-symbols.js';
-import { RolePolicies, RoleService } from '@/core/RoleService.js';
+import { RoleService } from '@/core/RoleService.js';
 import { CacheService } from '@/core/CacheService.js';
 import { RemoteUserResolveService } from '@/core/RemoteUserResolveService.js';
 import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
@@ -351,7 +351,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const policy = await this.roleService.getUserPolicies(user.id);
 
 			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
-			let policies: RolePolicies | null = null;
 
 			if (ps.name !== undefined) {
 				if (ps.name === null) {
@@ -509,7 +508,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			}
 
 			if (ps.avatarDecorations) {
-				policies ??= await this.roleService.getUserPolicies(user.id);
 				const decorations = await this.avatarDecorationService.getAll(true);
 				const myRoles = await this.roleService.getUserRoles(user.id);
 				const allRoles = await this.roleService.getRoles();

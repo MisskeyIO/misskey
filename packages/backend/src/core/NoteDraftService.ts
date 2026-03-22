@@ -141,9 +141,8 @@ export class NoteDraftService {
 		}
 
 		//#region visibleUsers
-		let visibleUsers: MiUser[] = [];
 		if (data.visibleUserIds != null && data.visibleUserIds.length > 0) {
-			visibleUsers = await this.usersRepository.findBy({
+			const visibleUsers = await this.usersRepository.findBy({
 				id: In(data.visibleUserIds),
 			});
 
@@ -154,10 +153,9 @@ export class NoteDraftService {
 		//#endregion
 
 		//#region files
-		let files: MiDriveFile[] = [];
 		const fileIds = data.fileIds ?? null;
 		if (fileIds != null && fileIds.length > 0) {
-			files = await this.driveFilesRepository.createQueryBuilder('file')
+			const files = await this.driveFilesRepository.createQueryBuilder('file')
 				.where('file.userId = :userId AND file.id IN (:...fileIds)', {
 					userId: me.id,
 					fileIds: fileIds,
@@ -173,9 +171,8 @@ export class NoteDraftService {
 		//#endregion
 
 		//#region renote
-		let renote: MiNote | null = null;
 		if (data.renoteId != null) {
-			renote = await this.notesRepository.findOne({
+			const renote = await this.notesRepository.findOne({
 				where: { id: data.renoteId },
 				relations: ['user', 'renote', 'reply'],
 			});
@@ -225,10 +222,9 @@ export class NoteDraftService {
 		//#endregion
 
 		//#region reply
-		let reply: MiNote | null = null;
 		if (data.replyId != null) {
 			// Fetch reply
-			reply = await this.notesRepository.findOneBy({ id: data.replyId });
+			const reply = await this.notesRepository.findOneBy({ id: data.replyId });
 
 			if (reply == null) {
 				throw new IdentifiableError('c4721841-22fc-4bb7-ad3d-897ef1d375b5', 'No such reply');
@@ -256,9 +252,8 @@ export class NoteDraftService {
 		//#endregion
 
 		//#region channel
-		let channel: MiChannel | null = null;
 		if (data.channelId != null) {
-			channel = await this.channelsRepository.findOneBy({ id: data.channelId, isArchived: false });
+			const channel = await this.channelsRepository.findOneBy({ id: data.channelId, isArchived: false });
 
 			if (channel == null) {
 				throw new IdentifiableError('6815399a-6f13-4069-b60d-ed5156249d12', 'No such channel');

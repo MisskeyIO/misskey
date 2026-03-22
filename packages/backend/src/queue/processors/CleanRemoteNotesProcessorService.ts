@@ -214,7 +214,7 @@ export class CleanRemoteNotesProcessorService {
 			//#endregion
 
 			const queryBegin = performance.now();
-			let noteIds = null;
+			let noteIds: { id: MiNote['id'], isRemovable: boolean, isBase: boolean }[];
 
 			try {
 				noteIds = await candidateNotesQuery({ limit: currentLimit }).setParameters(

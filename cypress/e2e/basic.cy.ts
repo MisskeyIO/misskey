@@ -19,7 +19,7 @@ describe('Before setup instance', () => {
   });
 
 	it('setup instance', () => {
-    cy.visitHome();
+		cy.visitHome();
 
 		cy.intercept('POST', '/api/admin/accounts/create').as('signup');
 
@@ -38,8 +38,8 @@ describe('Before setup instance', () => {
 		cy.get('[data-cy-server-name] input').type('Testskey');
 		cy.get('[data-cy-server-setup-wizard-apply]').click();
 
-		cy.wait('@update-meta');
-  });
+		cy.wait('@update-meta').its('response.statusCode').should('eq', 204);
+	});
 });
 
 describe('After setup instance', () => {
@@ -64,6 +64,7 @@ describe('After setup instance', () => {
 		cy.visitHome();
 
 		cy.intercept('POST', '/api/signup').as('signup');
+		cy.intercept('POST', '/api/username/available').as('username-available');
 
 		cy.get('[data-cy-signup]').click();
 		cy.get('[data-cy-signup-rules-continue]').should('be.disabled');
@@ -74,6 +75,7 @@ describe('After setup instance', () => {
 
 		cy.get('[data-cy-signup-submit]').should('be.disabled');
 		cy.get('[data-cy-signup-username] input').type('alice');
+		cy.wait('@username-available').its('response.body.available').should('eq', true);
 		cy.get('[data-cy-signup-submit]').should('be.disabled');
 		cy.get('[data-cy-signup-password] input').type('alice1234');
 		cy.get('[data-cy-signup-submit]').should('be.disabled');
@@ -83,8 +85,8 @@ describe('After setup instance', () => {
 		cy.get('[data-cy-signup-submit]').should('not.be.disabled');
 		cy.get('[data-cy-signup-submit]').click();
 
-		cy.wait('@signup');
-  });
+		cy.wait('@signup').its('response.statusCode').should('eq', 200);
+	});
 
   it('signup with duplicated username', () => {
 		cy.registerUser('alice', 'alice1234');

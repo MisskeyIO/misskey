@@ -146,6 +146,10 @@ export class NoteDraftService {
 			visibleUsers = await this.usersRepository.findBy({
 				id: In(data.visibleUserIds),
 			});
+
+			if (visibleUsers.length !== data.visibleUserIds.length) {
+				throw new IdentifiableError('181b86bb-77d5-45d7-bdb7-4c5495c728a6', 'No such user');
+			}
 		}
 		//#endregion
 
@@ -171,7 +175,10 @@ export class NoteDraftService {
 		//#region renote
 		let renote: MiNote | null = null;
 		if (data.renoteId != null) {
-			renote = await this.notesRepository.findOneBy({ id: data.renoteId });
+			renote = await this.notesRepository.findOne({
+				where: { id: data.renoteId },
+				relations: ['user', 'renote', 'reply'],
+			});
 
 			if (renote == null) {
 				throw new IdentifiableError('64929870-2540-4d11-af41-3b484d78c956', 'No such renote');
@@ -192,7 +199,9 @@ export class NoteDraftService {
 				}
 			}
 
-			if (renote.visibility === 'followers' && renote.userId !== me.id) {
+			if (!await this.noteEntityService.isVisibleForMe(renote, me.id)) {
+				throw new IdentifiableError('81eb8188-aea1-4e35-9a8f-3334a3be9855', 'Cannot Renote Due to Visibility');
+			} else if (renote.visibility === 'followers' && renote.userId !== me.id) {
 				// 他人のfollowers noteはreject
 				throw new IdentifiableError('81eb8188-aea1-4e35-9a8f-3334a3be9855', 'Cannot Renote Due to Visibility');
 			} else if (renote.visibility === 'specified') {

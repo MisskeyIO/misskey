@@ -232,7 +232,6 @@ export class NoteCreateService implements OnApplicationShutdown {
 		return noteVisibilities.includes(visibility as NoteVisibility);
 	}
 
-	// FIXME Check
 	@bindThis
 	public async fetchAndCreate(user: {
 		id: MiUser['id'];

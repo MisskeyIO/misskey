@@ -88,6 +88,12 @@ export const meta = {
 			id: 'b1653923-5453-4edc-b786-7c4f39bb0bbb',
 		},
 
+		noSuchUser: {
+			message: 'No such user.',
+			code: 'NO_SUCH_USER',
+			id: 'c33dc4fa-d64f-4a7a-9a1b-87020211d5a5',
+		},
+
 		youHaveBeenBlocked: {
 			message: 'You have been blocked by this user.',
 			code: 'YOU_HAVE_BEEN_BLOCKED',
@@ -262,6 +268,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 							throw new ApiError(meta.errors.cannotRenoteDueToVisibility);
 						case '6815399a-6f13-4069-b60d-ed5156249d12':
 							throw new ApiError(meta.errors.noSuchChannel);
+						case '181b86bb-77d5-45d7-bdb7-4c5495c728a6':
+							throw new ApiError(meta.errors.noSuchUser);
 						case 'ed1952ac-2d26-4957-8b30-2deda76bedf7':
 							throw new ApiError(meta.errors.cannotRenoteToExternal);
 						case 'c4721841-22fc-4bb7-ad3d-897ef1d375b5':

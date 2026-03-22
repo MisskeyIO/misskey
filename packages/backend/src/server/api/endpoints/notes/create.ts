@@ -114,6 +114,12 @@ export const meta = {
 			id: 'b1653923-5453-4edc-b786-7c4f39bb0bbb',
 		},
 
+		noSuchUser: {
+			message: 'No such user.',
+			code: 'NO_SUCH_USER',
+			id: 'c33dc4fa-d64f-4a7a-9a1b-87020211d5a5',
+		},
+
 		youHaveBeenBlocked: {
 			message: 'You have been blocked by this user.',
 			code: 'YOU_HAVE_BEEN_BLOCKED',
@@ -350,6 +356,11 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				visibleUsers = await this.usersRepository.findBy({
 					id: In(ps.visibleUserIds),
 				});
+
+				if (visibleUsers.length !== ps.visibleUserIds.length) {
+					logger.error('Some visible users are not found.', { missingVisibleUserIds: ps.visibleUserIds.filter(id => !visibleUsers.some(user => user.id === id)) });
+					throw new ApiError(meta.errors.noSuchUser);
+				}
 			}
 
 			let files: MiDriveFile[] = [];
@@ -373,7 +384,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			let renote: MiNote | null = null;
 			if (ps.renoteId != null) {
 				// Fetch renote to note
-				renote = await this.notesRepository.findOne({ where: { id: ps.renoteId }, relations: ['user'] });
+				renote = await this.notesRepository.findOne({ where: { id: ps.renoteId }, relations: ['user', 'renote', 'reply'] });
 
 				if (renote == null) {
 					logger.error('No such renote target.', { renoteId: ps.renoteId });
@@ -397,7 +408,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					}
 				}
 
-				if (renote.visibility === 'followers' && renote.userId !== me.id) {
+				if (!await this.noteEntityService.isVisibleForMe(renote, me.id)) {
+					logger.error('Cannot Renote due to target visibility.', { renoteId: ps.renoteId, renoteVisibility: renote.visibility });
+					throw new ApiError(meta.errors.cannotRenoteDueToVisibility);
+				} else if (renote.visibility === 'followers' && renote.userId !== me.id) {
 					// 他人のfollowers noteはreject
 					logger.error('Cannot Renote due to target visibility.', { renoteId: ps.renoteId, renoteVisibility: renote.visibility });
 					throw new ApiError(meta.errors.cannotRenoteDueToVisibility);

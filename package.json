@@ -93,37 +93,5 @@
   },
   "optionalDependencies": {
     "@tensorflow/tfjs-core": "catalog:"
-  },
-  "pnpm": {
-    "overrides": {
-      "@aiscript-dev/aiscript-languageserver": "-"
-    },
-    "ignoredBuiltDependencies": [
-      "@sentry-internal/node-cpu-profiler",
-      "exifreader"
-    ],
-    "onlyBuiltDependencies": [
-      "@nestjs/core",
-      "@parcel/watcher",
-      "@sentry/profiling-node",
-      "@swc/core",
-      "@tensorflow/tfjs-node",
-      "bufferutil",
-      "canvas",
-      "core-js",
-      "cypress",
-      "esbuild",
-      "libpq",
-      "msgpackr-extract",
-      "msw",
-      "nice-napi",
-      "protobufjs",
-      "re2",
-      "sharp",
-      "unrs-resolver",
-      "utf-8-validate",
-      "v-code-diff",
-      "vue-demi"
-    ]
   }
 }

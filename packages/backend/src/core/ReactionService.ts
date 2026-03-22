@@ -249,7 +249,7 @@ export class ReactionService {
 					},
 				});
 
-		this.globalEventService.publishNoteStream(note.id, 'reacted', {
+		this.globalEventService.publishNoteStream(note, 'reacted', {
 			reaction: decodedReaction.reaction,
 			emoji: customEmoji != null ? {
 				name: customEmoji.host ? `${customEmoji.name}@${customEmoji.host}` : `${customEmoji.name}@.`,
@@ -323,7 +323,7 @@ export class ReactionService {
 				.execute();
 		}
 
-		this.globalEventService.publishNoteStream(note.id, 'unreacted', {
+		this.globalEventService.publishNoteStream(note, 'unreacted', {
 			reaction: this.decodeReaction(exist.reaction).reaction,
 			userId: user.id,
 		});

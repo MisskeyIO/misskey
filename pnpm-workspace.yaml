@@ -75,7 +75,7 @@ catalog:
   '@swc/core-linux-x64-gnu': 1.15.18
   '@swc/core-linux-x64-musl': 1.15.18
   '@swc/core-win32-arm64-msvc': 1.15.18
-  '@swc/core-win32-ia32-msvc': 1.15.18
+  '@swc/core-win32-ia32-msvc': 1.15.21
   '@swc/core-win32-x64-msvc': 1.15.18
   '@swc/jest': 0.2.39
   '@syuilo/aiscript': 1.2.1

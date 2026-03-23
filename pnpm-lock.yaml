@@ -184,8 +184,8 @@ catalogs:
       specifier: 1.15.18
       version: 1.15.18
     '@swc/core-linux-arm64-gnu':
-      specifier: 1.15.18
-      version: 1.15.18
+      specifier: 1.15.21
+      version: 1.15.21
     '@swc/core-linux-arm64-musl':
       specifier: 1.15.18
       version: 1.15.18
@@ -1692,7 +1692,7 @@ importers:
         version: 1.15.18
       '@swc/core-linux-arm64-gnu':
         specifier: 'catalog:'
-        version: 1.15.18
+        version: 1.15.21
       '@swc/core-linux-arm64-musl':
         specifier: 'catalog:'
         version: 1.15.18
@@ -5983,6 +5983,13 @@ packages:
 
   '@swc/core-linux-arm64-gnu@1.15.18':
     resolution: {integrity: sha512-3xnctOBLIq3kj8PxOCgPrGjBLP/kNOddr6f5gukYt/1IZxsITQaU9TDyjeX6jG+FiCIHjCuWuffsyQDL5Ew1bg==}
+    engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@swc/core-linux-arm64-gnu@1.15.21':
+    resolution: {integrity: sha512-QrXlNQnHeXqU2EzLlnsPoWEh8/GtNJLvfMiPsDhk+ht6Xv8+vhvZ5YZ/BokNWSIZiWPKLAqR0M7T92YF5tmD3g==}
     engines: {node: '>=10'}
     cpu: [arm64]
     os: [linux]
@@ -17255,6 +17262,9 @@ snapshots:
     optional: true
 
   '@swc/core-linux-arm64-gnu@1.15.18':
+    optional: true
+
+  '@swc/core-linux-arm64-gnu@1.15.21':
     optional: true
 
   '@swc/core-linux-arm64-musl@1.15.18':

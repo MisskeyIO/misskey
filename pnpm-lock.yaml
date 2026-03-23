@@ -907,8 +907,8 @@ catalogs:
       specifier: 4.21.0
       version: 4.21.0
     type-fest:
-      specifier: 2.19.0
-      version: 2.19.0
+      specifier: 5.5.0
+      version: 5.5.0
     typeorm:
       specifier: 0.3.28
       version: 0.3.28
@@ -2104,7 +2104,7 @@ importers:
         version: 10.3.1(@testing-library/dom@9.3.4)(bufferutil@4.1.0)(prettier@3.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(utf-8-validate@6.0.6)
       type-fest:
         specifier: 'catalog:'
-        version: 2.19.0
+        version: 5.5.0
       vite-plugin-turbosnap:
         specifier: 'catalog:'
         version: 1.0.3
@@ -2276,7 +2276,7 @@ importers:
         version: 2.1.5
       type-fest:
         specifier: 'catalog:'
-        version: 2.19.0
+        version: 5.5.0
       vite-plugin-turbosnap:
         specifier: 'catalog:'
         version: 1.0.3

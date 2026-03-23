@@ -313,7 +313,7 @@ catalog:
   textarea-caret: 3.1.0
   three: 0.183.2
   throttle-debounce: 5.0.2
-  type-fest: 2.19.0
+  type-fest: 5.5.0
   tinycolor2: 1.6.0
   tmp: 0.2.5
   ts-case-convert: 2.1.0

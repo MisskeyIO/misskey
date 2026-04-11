@@ -80,6 +80,17 @@ describe('Note', () => {
 		assert.strictEqual(castAsError(res.body).error.id, 'b6992544-63e7-67f0-fa7f-32444b1b5306');
 	});
 
+	test('visibility: specifiedで存在しないvisibleUserIdを指定すると怒られる', async () => {
+		const res = await api('notes/create', {
+			text: 'test',
+			visibility: 'specified',
+			visibleUserIds: [bob.id, '000000000000000000000000'],
+		}, alice);
+
+		assert.strictEqual(res.status, 400);
+		assert.strictEqual(castAsError(res.body).error.code, 'NO_SUCH_USER');
+	});
+
 	test('不正なファイルIDで怒られる', async () => {
 		const res = await api('notes/create', {
 			fileIds: ['kyoppie'],

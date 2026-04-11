@@ -1,16 +1,17 @@
 {
   "name": "misskey",
-  "version": "2025.4.1-io.13",
+  "version": "2025.11.1-io.0",
   "codename": "nasubi",
   "repository": {
     "type": "git",
     "url": "https://github.com/MisskeyIO/misskey.git"
   },
-  "packageManager": "pnpm@10.32.1+sha512.a706938f0e89ac1456b6563eab4edf1d1faf3368d1191fc5c59790e96dc918e4456ab2e67d613de1043d2e8c81f87303e6b40d4ffeca9df15ef1ad567348f2be",
+  "packageManager": "pnpm@10.28.2+sha512.41872f037ad22f7348e3b1debbaf7e867cfd448f2726d9cf74c08f19507c31d2c8e7a11525b983febc2df640b5438dee6023ebb1f84ed43cc2d654d2bc326264",
   "workspaces": [
     "packages/frontend-shared",
     "packages/frontend",
     "packages/frontend-embed",
+    "packages/icons-subsetter",
     "packages/backend",
     "packages/sw",
     "packages/misskey-js",
@@ -18,6 +19,9 @@
     "packages/misskey-bubble-game"
   ],
   "private": true,
+  "engines": {
+    "node": "^22.21.0 || ^24.0.0"
+  },
   "scripts": {
     "build-pre": "node ./scripts/build-pre.js",
     "build-assets": "node ./scripts/build-assets.mjs",
@@ -26,7 +30,9 @@
     "build-misskey-js-with-types": "pnpm build-pre && pnpm -r build:tsc && pnpm --filter backend... --filter=!misskey-js build && pnpm --filter backend generate-api-json --no-build && ncp packages/backend/built/api.json packages/misskey-js/generator/api.json && pnpm --filter misskey-js update-autogen-code && pnpm --filter misskey-js build && pnpm --filter misskey-js api",
     "start": "cd packages/backend && cross-env-shell \"node ./built/boot/entry.js\"",
     "start:docker": "cd packages/backend && cross-env-shell \"node ${MK_NODE_ARGS:-''} ./built/boot/entry.js\"",
-    "start:test": "ncp ./.github/misskey/test.yml ./.config/test.yml && cd packages/backend && cross-env NODE_ENV=test cross-env-shell \"node $MK_NODE_ARGS ./built/boot/entry.js\"",
+    "start:inspect": "cd packages/backend && node --inspect ./built/boot/entry.js",
+    "start:test": "ncp ./.github/misskey/test.yml ./.config/test.yml && cd packages/backend && cross-env NODE_ENV=test cross-env-shell \"node ${MK_NODE_ARGS:-} ./built/boot/entry.js\"",
+    "cli": "cd packages/backend && pnpm cli",
     "init": "pnpm migrate",
     "migrate": "cd packages/backend && pnpm migrate",
     "revert": "cd packages/backend && pnpm revert",
@@ -71,7 +77,9 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "catalog:",
+    "@eslint/js": "catalog:",
     "@misskey-dev/eslint-plugin": "catalog:",
+    "@types/js-yaml": "catalog:",
     "@types/node": "catalog:",
     "@typescript-eslint/eslint-plugin": "catalog:",
     "@typescript-eslint/parser": "catalog:",

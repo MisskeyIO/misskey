@@ -69,6 +69,12 @@ export const navbarItemDef = reactive({
 			lookup();
 		},
 	},
+	qr: {
+		title: i18n.ts.qr,
+		icon: 'ti ti-qrcode',
+		show: computed(() => $i != null),
+		to: '/qr',
+	},
 	lists: {
 		title: i18n.ts.lists,
 		icon: 'ti ti-list',
@@ -114,7 +120,7 @@ export const navbarItemDef = reactive({
 		to: '/channels',
 	},
 	// chat: {
-	// 	title: i18n.ts.chat,
+	// 	title: i18n.ts.directMessage_short,
 	// 	icon: 'ti ti-messages',
 	// 	to: '/chat',
 	// 	show: computed(() => $i != null && $i.policies.chatAvailability !== 'unavailable'),

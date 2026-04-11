@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <SearchMarker path="/settings/security" :label="i18n.ts.security" :keywords="['security']" icon="ti ti-lock" :inlining="['2fa']">
 	<div class="_gaps_m">
 		<MkFeatureBanner icon="/client-assets/locked_with_key_3d.png" color="#ffbf00">
-			<SearchKeyword>{{ i18n.ts._settings.securityBanner }}</SearchKeyword>
+			<SearchText>{{ i18n.ts._settings.securityBanner }}</SearchText>
 		</MkFeatureBanner>
 
 		<SearchMarker :keywords="['password']">
@@ -15,7 +15,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label><SearchLabel>{{ i18n.ts.password }}</SearchLabel></template>
 
 				<SearchMarker>
-					<MkFolder key="changePasswordKey">
+					<MkFolder :key="changePasswordKey">
 						<template #icon><i class="ti ti-key"></i></template>
 						<template #label>{{ i18n.ts.changePassword }}</template>
 						<div class="_gaps_s">
@@ -29,36 +29,41 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 		<X2fa/>
 
-		<FormSection>
-			<template #label>{{ i18n.ts.signinHistory }}</template>
-			<MkPagination :pagination="pagination" disableAutoLoad>
-				<template #default="{items}">
-					<div>
-						<div v-for="item in items" :key="item.id" v-panel class="timnmucd">
-							<header>
-								<i v-if="item.success" class="ti ti-check icon succ"></i>
-								<i v-else class="ti ti-circle-x icon fail"></i>
-								<code class="ip _monospace">{{ item.ip }}</code>
-								<MkTime :time="item.createdAt" class="time"/>
-							</header>
+		<SearchMarker :keywords="['signin', 'login', 'history', 'log']">
+			<FormSection>
+				<template #label><SearchLabel>{{ i18n.ts.signinHistory }}</SearchLabel></template>
+				<MkPagination :paginator="paginator" withControl>
+					<template #default="{items}">
+						<div>
+							<div v-for="item in items" :key="item.id" v-panel class="timnmucd">
+								<header>
+									<i v-if="item.success" class="ti ti-check icon succ"></i>
+									<i v-else class="ti ti-circle-x icon fail"></i>
+									<code class="ip _monospace">{{ item.ip }}</code>
+									<MkTime :time="item.createdAt" class="time"/>
+								</header>
+							</div>
 						</div>
-					</div>
-				</template>
-			</MkPagination>
-		</FormSection>
+					</template>
+				</MkPagination>
+			</FormSection>
+		</SearchMarker>
 
-		<FormSection>
-			<FormSlot>
-				<MkButton danger @click="regenerateToken"><i class="ti ti-refresh"></i> {{ i18n.ts.regenerateLoginToken }}</MkButton>
-				<template #caption>{{ i18n.ts.regenerateLoginTokenDescription }}</template>
-			</FormSlot>
-		</FormSection>
+		<SearchMarker :keywords="['regenerate', 'refresh', 'reset', 'token']">
+			<FormSection>
+				<FormSlot>
+					<MkButton danger @click="regenerateToken"><i class="ti ti-refresh"></i> <SearchLabel>{{ i18n.ts.regenerateLoginToken }}</SearchLabel></MkButton>
+					<template #caption>{{ i18n.ts.regenerateLoginTokenDescription }}</template>
+				</FormSlot>
+			</FormSection>
+		</SearchMarker>
 	</div>
 </SearchMarker>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, shallowRef } from 'vue';
+import { computed, markRaw, ref, useTemplateRef } from 'vue';
+
 import X2fa from './2fa.vue';
 import FormSection from '@/components/form/section.vue';
 import FormSlot from '@/components/form/slot.vue';
@@ -71,14 +76,14 @@ import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import MkFeatureBanner from '@/components/MkFeatureBanner.vue';
+import { Paginator } from '@/utility/paginator.js';
 
+const newPassword = useTemplateRef('newPassword');
 const changePasswordKey = ref(Date.now());
-const newPassword = shallowRef<InstanceType<typeof MkNewPassword> | null>(null);
 
-const pagination = {
-	endpoint: 'i/signin-history' as const,
+const paginator = markRaw(new Paginator('i/signin-history', {
 	limit: 5,
-};
+}));
 
 async function changePassword() {
 	if (!newPassword.value?.isValid) return;
@@ -86,13 +91,13 @@ async function changePassword() {
 	const auth = await os.authenticateDialog();
 	if (auth.canceled) return;
 
-	os.apiWithDialog('i/change-password', {
+	await os.apiWithDialog('i/change-password', {
 		currentPassword: auth.result.password,
 		token: auth.result.token,
 		newPassword: newPassword.value.password,
-	}).then(() => {
-		changePasswordKey.value = Date.now();
 	});
+
+	changePasswordKey.value = Date.now();
 }
 
 async function regenerateToken() {

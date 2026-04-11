@@ -11,6 +11,10 @@ import { getSoundDuration, playMisskeySfxFile, soundsTypes } from '@/utility/sou
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 
+function isDriveFileSoundStore(sound: SoundStore): sound is Extract<SoundStore, { type: '_driveFile_' }> {
+	return sound.type === '_driveFile_';
+}
+
 export async function soundSettingsButton(soundSetting: Ref<SoundStore>): Promise<void> {
 	function getSoundTypeName(f: SoundType): string {
 		switch (f) {
@@ -29,13 +33,14 @@ export async function soundSettingsButton(soundSetting: Ref<SoundStore>): Promis
 			label: i18n.ts.sound,
 			default: soundSetting.value.type ?? 'none',
 			enum: soundsTypes.map(f => ({
-				value: f ?? 'none', label: getSoundTypeName(f),
+				value: f ?? 'none' as Exclude<SoundType, null> | 'none',
+				label: getSoundTypeName(f),
 			})),
 		},
 		soundFile: {
 			type: 'drive-file',
 			label: i18n.ts.file,
-			defaultFileId: soundSetting.value.type === '_driveFile_' ? soundSetting.value.fileId : null,
+			defaultFileId: isDriveFileSoundStore(soundSetting.value) ? soundSetting.value.fileId : null,
 			hidden: v => v.type !== '_driveFile_',
 			validate: async (file: Misskey.entities.DriveFile) => {
 				if (!file.type.startsWith('audio')) {
@@ -81,16 +86,17 @@ export async function soundSettingsButton(soundSetting: Ref<SoundStore>): Promis
 			},
 		},
 	});
+
 	if (canceled) return;
 
 	const res = buildSoundStore(result);
 	if (res) soundSetting.value = res;
 
-	function buildSoundStore(result: any): SoundStore | null {
-		const type = (result.type === 'none' ? null : result.type) as SoundType;
-		const volume = result.volume as number;
-		const fileId = result.soundFile?.id ?? (soundSetting.value.type === '_driveFile_' ? soundSetting.value.fileId : undefined);
-		const fileUrl = result.soundFile?.url ?? (soundSetting.value.type === '_driveFile_' ? soundSetting.value.fileUrl : undefined);
+	function buildSoundStore(r: NonNullable<typeof result>): SoundStore | null {
+		const type = (r.type === 'none' ? null : r.type);
+		const volume = r.volume;
+		const fileId = r.soundFile?.id ?? (isDriveFileSoundStore(soundSetting.value) ? soundSetting.value.fileId : undefined);
+		const fileUrl = r.soundFile?.url ?? (isDriveFileSoundStore(soundSetting.value) ? soundSetting.value.fileUrl : undefined);
 
 		if (type === '_driveFile_') {
 			if (!fileUrl || !fileId) {

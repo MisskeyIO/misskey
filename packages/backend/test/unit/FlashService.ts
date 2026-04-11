@@ -7,9 +7,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FlashService } from '@/core/FlashService.js';
 import { IdService } from '@/core/IdService.js';
-import { FlashsRepository, MiFlash, MiUser, UserProfilesRepository, UsersRepository } from '@/models/_.js';
+import { FlashLikesRepository, FlashsRepository, MiFlash, MiUser, UserProfilesRepository, UsersRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { GlobalModule } from '@/GlobalModule.js';
+import { CoreModule } from '@/core/CoreModule.js';
 
 describe('FlashService', () => {
 	let app: TestingModule;
@@ -18,6 +19,7 @@ describe('FlashService', () => {
 	// --------------------------------------------------------------------------------------
 
 	let flashsRepository: FlashsRepository;
+	let flashLikesRepository: FlashLikesRepository;
 	let usersRepository: UsersRepository;
 	let userProfilesRepository: UserProfilesRepository;
 	let idService: IdService;
@@ -59,12 +61,21 @@ describe('FlashService', () => {
 		return user;
 	}
 
+	async function createFlashLike(userId: MiUser['id'], flashId: MiFlash['id']) {
+		await flashLikesRepository.insert({
+			id: idService.gen(),
+			userId,
+			flashId,
+		});
+	}
+
 	// --------------------------------------------------------------------------------------
 
 	beforeEach(async () => {
 		app = await Test.createTestingModule({
 			imports: [
 				GlobalModule,
+				CoreModule,
 			],
 			providers: [
 				FlashService,
@@ -75,6 +86,7 @@ describe('FlashService', () => {
 		service = app.get(FlashService);
 
 		flashsRepository = app.get(DI.flashsRepository);
+		flashLikesRepository = app.get(DI.flashLikesRepository);
 		usersRepository = app.get(DI.usersRepository);
 		userProfilesRepository = app.get(DI.userProfilesRepository);
 		idService = app.get(IdService);
@@ -84,11 +96,12 @@ describe('FlashService', () => {
 		bob = await createUser({ username: 'bob', usernameLower: 'bob' });
 	});
 
-	afterEach(async () => {
-		await usersRepository.createQueryBuilder().delete().execute();
-		await userProfilesRepository.createQueryBuilder().delete().execute();
-		await flashsRepository.createQueryBuilder().delete().execute();
-	});
+		afterEach(async () => {
+			await usersRepository.createQueryBuilder().delete().execute();
+			await userProfilesRepository.createQueryBuilder().delete().execute();
+			await flashsRepository.createQueryBuilder().delete().execute();
+			await flashLikesRepository.createQueryBuilder().delete().execute();
+		});
 
 	afterAll(async () => {
 		await app.close();
@@ -147,6 +160,36 @@ describe('FlashService', () => {
 			});
 
 			expect(result).toEqual([flash3, flash2]);
+		});
+	});
+
+	describe('search', () => {
+		test('should require all search words across title and summary', async () => {
+			const bothWords = await createFlash({ title: 'hello', summary: 'world', visibility: 'public' });
+			await createFlash({ title: 'hello', summary: 'summary', visibility: 'public' });
+			await createFlash({ title: 'title', summary: 'world', visibility: 'public' });
+
+			const result = await service.search('hello world', {
+				limit: 10,
+			});
+
+			expect(result).toEqual([bothWords]);
+		});
+	});
+
+	describe('myLikes', () => {
+		test('should require all search words across title and summary in liked flashes', async () => {
+			const bothWords = await createFlash({ title: 'hello', summary: 'world' });
+			const titleOnly = await createFlash({ title: 'hello', summary: 'summary' });
+			await createFlashLike(alice.id, bothWords.id);
+			await createFlashLike(alice.id, titleOnly.id);
+
+			const result = await service.myLikes(alice.id, {
+				limit: 10,
+				search: 'hello world',
+			});
+
+			expect(result.map(like => like.flashId)).toEqual([bothWords.id]);
 		});
 	});
 });

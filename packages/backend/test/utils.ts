@@ -8,10 +8,10 @@ import { createReadStream } from 'node:fs';
 import { basename, isAbsolute } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { inspect } from 'node:util';
+import * as parse5 from 'parse5';
 import WebSocket, { ClientOptions } from 'ws';
 import fetch, { Headers, RequestInit } from 'node-fetch';
 import { DataSource } from 'typeorm';
-import { JSDOM } from 'jsdom';
 import * as Redis from 'ioredis';
 import { type Response } from 'node-fetch';
 import Fastify from 'fastify';
@@ -46,6 +46,34 @@ export const host = new URL(config.url).host;
 
 export const WEBHOOK_HOST = 'http://127.0.0.1:15080';
 export const WEBHOOK_PORT = 15080;
+
+type HtmlNode = {
+	nodeName?: string;
+	attrs?: Array<{ name: string; value: string }>;
+	childNodes?: HtmlNode[];
+};
+
+export function findMetaContent(html: string, key: string, superkey = 'name'): string | undefined {
+	const visit = (node: HtmlNode): string | undefined => {
+		if (node.nodeName === 'meta' && node.attrs) {
+			const attrs = new Map(node.attrs.map(attr => [attr.name, attr.value]));
+			if (attrs.get(superkey) === key) {
+				return attrs.get('content');
+			}
+		}
+
+		for (const child of node.childNodes ?? []) {
+			const result = visit(child);
+			if (result !== undefined) {
+				return result;
+			}
+		}
+
+		return undefined;
+	};
+
+	return visit(parse5.parse(html) as HtmlNode);
+}
 
 export type ApiRequest<E extends keyof misskey.Endpoints, P extends misskey.Endpoints[E]['req'] = misskey.Endpoints[E]['req']> = {
 	endpoint: E,
@@ -434,36 +462,39 @@ export function connectStream<C extends keyof misskey.Channels>(user: UserToken,
 }
 
 export const waitFire = async <C extends keyof misskey.Channels>(user: UserToken, channel: C, trgr: () => any, cond: (msg: Record<string, any>) => boolean, params?: misskey.Channels[C]['params']) => {
-	return new Promise<boolean>(async (res, rej) => {
-		let timer: NodeJS.Timeout | null = null;
+	return new Promise<boolean>((res, rej) => {
+		void (async () => {
+			let timer: NodeJS.Timeout | null = null;
 
-		let ws: WebSocket;
-		try {
-			ws = await connectStream(user, channel, msg => {
-				if (cond(msg)) {
-					ws.close();
-					if (timer) clearTimeout(timer);
-					res(true);
-				}
-			}, { ...params, minimize: false });
-		} catch (e) {
-			rej(e);
-		}
+			let ws: WebSocket;
+			try {
+				ws = await connectStream(user, channel, msg => {
+					if (cond(msg)) {
+						ws.close();
+						if (timer) clearTimeout(timer);
+						res(true);
+					}
+				}, { ...params, minimize: false });
+			} catch (e) {
+				rej(e);
+				return;
+			}
 
-		if (!ws!) return;
+			if (!ws!) return;
 
-		timer = setTimeout(() => {
-			ws.close();
-			res(false);
-		}, 3000);
+			timer = setTimeout(() => {
+				ws.close();
+				res(false);
+			}, 3000);
 
-		try {
-			await trgr();
-		} catch (e) {
-			ws.close();
-			if (timer) clearTimeout(timer);
-			rej(e);
-		}
+			try {
+				await trgr();
+			} catch (e) {
+				ws.close();
+				if (timer) clearTimeout(timer);
+				rej(e);
+			}
+		})();
 	});
 };
 
@@ -483,12 +514,18 @@ export function makeStreamCatcher<T>(
 	extractor: (message: Record<string, any>) => T,
 	timeout = 60 * 1000): Promise<T> {
 	let ws: WebSocket;
-	const p = new Promise<T>(async (resolve) => {
-		ws = await connectStream(user, channel, (msg) => {
-			if (cond(msg)) {
-				resolve(extractor(msg));
+	const p = new Promise<T>((resolve, reject) => {
+		void (async () => {
+			try {
+				ws = await connectStream(user, channel, (msg) => {
+					if (cond(msg)) {
+						resolve(extractor(msg));
+					}
+				});
+			} catch (error) {
+				reject(error);
 			}
-		});
+		})();
 	}).finally(() => {
 		ws.close();
 	});
@@ -498,7 +535,7 @@ export function makeStreamCatcher<T>(
 
 export type SimpleGetResponse = {
 	status: number,
-	body: any | JSDOM | null,
+	body: any | string | null,
 	type: string | null,
 	location: string | null
 };
@@ -529,7 +566,7 @@ export const simpleGet = async (path: string, accept = '*/*', cookie: any = unde
 
 	const body =
 		jsonTypes.includes(res.headers.get('content-type') ?? '') ? await res.json() :
-		htmlTypes.includes(res.headers.get('content-type') ?? '') ? new JSDOM(await res.text()) :
+		htmlTypes.includes(res.headers.get('content-type') ?? '') ? await res.text() :
 		await bodyExtractor(res);
 
 	return {
@@ -645,8 +682,8 @@ export async function initTestDb(justBorrow = false, initEntities?: any[]) {
 		username: config.db.user,
 		password: config.db.pass,
 		database: config.db.db,
-		synchronize: true && !justBorrow,
-		dropSchema: true && !justBorrow,
+		synchronize: !justBorrow,
+		dropSchema: !justBorrow,
 		entities: initEntities ?? entities,
 	});
 
@@ -696,29 +733,33 @@ export async function captureWebhook<T = SystemWebhookPayload>(postAction: () =>
 	const fastify = Fastify();
 
 	let timeoutHandle: NodeJS.Timeout | null = null;
-	const result = await new Promise<string>(async (resolve, reject) => {
-		fastify.all('/', async (req, res) => {
-			timeoutHandle && clearTimeout(timeoutHandle);
+	const result = await new Promise<string>((resolve, reject) => {
+		void (async () => {
+			fastify.all('/', async (req, res) => {
+				if (timeoutHandle) {
+					clearTimeout(timeoutHandle);
+				}
 
-			const body = JSON.stringify(req.body);
-			res.status(200).send('ok');
-			await fastify.close();
-			resolve(body);
-		});
+				const body = JSON.stringify(req.body);
+				res.status(200).send('ok');
+				await fastify.close();
+				resolve(body);
+			});
 
-		await fastify.listen({ port });
+			await fastify.listen({ port });
 
-		timeoutHandle = setTimeout(async () => {
-			await fastify.close();
-			reject(new Error('timeout'));
-		}, 3000);
+			timeoutHandle = setTimeout(async () => {
+				await fastify.close();
+				reject(new Error('timeout'));
+			}, 3000);
 
-		try {
-			await postAction();
-		} catch (e) {
-			await fastify.close();
-			reject(e);
-		}
+			try {
+				await postAction();
+			} catch (e) {
+				await fastify.close();
+				reject(e);
+			}
+		})();
 	});
 
 	await fastify.close();

@@ -5,6 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
+import { In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { NoteReactionsRepository } from '@/models/_.js';
 import type { Packed } from '@/misc/json-schema.js';
@@ -29,11 +30,6 @@ export class NoteReactionEntityService implements OnModuleInit {
 
 		@Inject(DI.noteReactionsRepository)
 		private noteReactionsRepository: NoteReactionsRepository,
-
-		//private userEntityService: UserEntityService,
-		//private noteEntityService: NoteEntityService,
-		//private reactionService: ReactionService,
-		//private idService: IdService,
 	) {
 	}
 
@@ -47,10 +43,8 @@ export class NoteReactionEntityService implements OnModuleInit {
 	@bindThis
 	public async pack(
 		src: MiNoteReaction['id'] | MiNoteReaction,
-		me: { id: MiUser['id'] } | null | undefined,
-		options?: {
-			withNote: boolean;
-		},
+		me?: { id: MiUser['id'] } | null | undefined,
+		options?: object,
 		hints?: {
 			packedUser?: Packed<'UserLite'>
 		},
@@ -78,15 +72,64 @@ export class NoteReactionEntityService implements OnModuleInit {
 	@bindThis
 	public async packMany(
 		reactions: (MiNoteReaction['id'] | MiNoteReaction)[],
-		me: { id: MiUser['id'] } | null | undefined,
-		options?: {
-			withNote: boolean;
-		},
-	) : Promise<Packed<'NoteReaction'>[]> {
-		const opts = { withNote: false, ...options };
+		me?: { id: MiUser['id'] } | null | undefined,
+		options?: object,
+	): Promise<Packed<'NoteReaction'>[]> {
+		const reactionIds = reactions.filter((r): r is MiNoteReaction['id'] => typeof r !== 'object');
 
-		return (await Promise.allSettled(reactions.map(x => this.pack(x, me, opts))))
-			.filter(result => result.status === 'fulfilled')
-			.map(result => (result as PromiseFulfilledResult<Packed<'NoteReaction'>>).value);
+		const fetchedById = reactionIds.length > 0
+			? await this.noteReactionsRepository.findBy({ id: In(reactionIds) })
+			: [];
+		const fetchedMap = new Map(fetchedById.map(r => [r.id, r]));
+
+		const all = reactions.map(r => typeof r === 'object' ? r : fetchedMap.get(r)).filter(r => r != null);
+
+		const users = all.map(({ user, userId }) => user ?? userId);
+		const userMap = await this.userEntityService.packMany(users, me)
+			.then(users => new Map(users.map(u => [u.id, u])));
+
+		return Promise.all(all.map(reaction => this.pack(reaction, me, options, { packedUser: userMap.get(reaction.userId) })));
+	}
+
+	@bindThis
+	public async packWithNote(
+		src: MiNoteReaction['id'] | MiNoteReaction,
+		me?: { id: MiUser['id'] } | null | undefined,
+		options?: object,
+		hints?: {
+			packedUser?: Packed<'UserLite'>
+		},
+	): Promise<Packed<'NoteReactionWithNote'>> {
+		const reaction = typeof src === 'object' ? src : await this.noteReactionsRepository.findOneByOrFail({ id: src });
+
+		return {
+			id: reaction.id,
+			createdAt: this.idService.parse(reaction.id).date.toISOString(),
+			user: hints?.packedUser ?? await this.userEntityService.pack(reaction.user ?? reaction.userId, me),
+			type: this.reactionService.convertLegacyReaction(reaction.reaction),
+			note: await this.noteEntityService.pack(reaction.note ?? reaction.noteId, me),
+		};
+	}
+
+	@bindThis
+	public async packManyWithNote(
+		reactions: (MiNoteReaction['id'] | MiNoteReaction)[],
+		me?: { id: MiUser['id'] } | null | undefined,
+		options?: object,
+	): Promise<Packed<'NoteReactionWithNote'>[]> {
+		const reactionIds = reactions.filter((r): r is MiNoteReaction['id'] => typeof r !== 'object');
+
+		const fetchedById = reactionIds.length > 0
+			? await this.noteReactionsRepository.findBy({ id: In(reactionIds) })
+			: [];
+		const fetchedMap = new Map(fetchedById.map(r => [r.id, r]));
+
+		const all = reactions.map(r => typeof r === 'object' ? r : fetchedMap.get(r)).filter(r => r != null);
+
+		const users = all.map(({ user, userId }) => user ?? userId);
+		const userMap = await this.userEntityService.packMany(users, me)
+			.then(users => new Map(users.map(u => [u.id, u])));
+
+		return Promise.all(all.map(reaction => this.packWithNote(reaction, me, options, { packedUser: userMap.get(reaction.userId) })));
 	}
 }

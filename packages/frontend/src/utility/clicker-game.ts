@@ -23,11 +23,11 @@ let prev = '';
 
 export async function load() {
 	try {
-		saveData.value = await misskeyApi('i/registry/get', {
+		saveData.value = await misskeyApi<SaveData>('i/registry/get', {
 			scope: ['clickerGame'],
 			key: 'saveData',
 		});
-	} catch (err) {
+	} catch (err: any) {
 		if (err.code === 'NO_SUCH_KEY') {
 			saveData.value = {
 				gameVersion: 2,
@@ -42,20 +42,6 @@ export async function load() {
 			return;
 		}
 		throw err;
-	}
-
-	// migration
-	if (saveData.value.gameVersion === 1) {
-		saveData.value = {
-			gameVersion: 2,
-			cookies: saveData.value.cookies,
-			totalCookies: saveData.value.cookies,
-			totalHandmadeCookies: saveData.value.cookies,
-			clicked: saveData.value.clicked,
-			achievements: [],
-			facilities: [],
-		};
-		save();
 	}
 }
 

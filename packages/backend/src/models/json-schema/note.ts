@@ -266,6 +266,10 @@ export const packedNoteSchema = {
 			type: 'number',
 			optional: true, nullable: false,
 		},
+		hasPoll: {
+			type: 'boolean',
+			optional: true, nullable: false,
+		},
 
 		myReaction: {
 			type: 'string',

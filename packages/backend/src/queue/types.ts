@@ -125,6 +125,7 @@ export type EndedPollNotificationJobData = {
 	noteId: MiNote['id'];
 };
 
+// FIXME Check 要確認
 export type ScheduledNoteJobData = {
 	draftId: MiScheduledNote['id'];
 };

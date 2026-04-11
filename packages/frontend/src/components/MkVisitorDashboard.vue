@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<h1 :class="$style.mainTitle">
 				<!-- 背景色によってはロゴが見えなくなるのでとりあえず無効に -->
 				<!-- <img class="logo" v-if="instance.logoImageUrl" :src="instance.logoImageUrl"><span v-else class="text">{{ instanceName }}</span> -->
-				<span>{{ instanceName }}</span>
+				<MkA to="/">{{ instanceName }}</MkA>
 			</h1>
 			<div :class="$style.mainAbout">
 				<!-- eslint-disable-next-line vue/no-v-html -->
@@ -31,7 +31,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 		</div>
 	</div>
-	<div v-if="stats" :class="$style.stats">
+	<div v-if="stats && instance.clientOptions.showActivitiesForVisitor !== false" :class="$style.stats">
 		<div :class="[$style.statsItem, $style.panel]">
 			<div :class="$style.statsItemLabel">{{ i18n.ts.users }}</div>
 			<div :class="$style.statsItemCount"><MkNumber :value="stats.originalUsersCount"/></div>
@@ -41,13 +41,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div :class="$style.statsItemCount"><MkNumber :value="stats.originalNotesCount"/></div>
 		</div>
 	</div>
-	<div v-if="instance.policies.ltlAvailable" :class="[$style.tl, $style.panel]">
+	<div v-if="instance.policies.ltlAvailable && instance.clientOptions.showTimelineForVisitor !== false" :class="[$style.tl, $style.panel]">
 		<div :class="$style.tlHeader">{{ i18n.ts.letsLookAtTimeline }}</div>
 		<div :class="$style.tlBody">
-			<MkTimeline src="local"/>
+			<MkStreamingNotesTimeline src="local"/>
 		</div>
 	</div>
-	<div :class="$style.panel">
+	<div v-if="instance.clientOptions.showActivitiesForVisitor !== false" :class="$style.panel">
 		<XActiveUsersChart/>
 	</div>
 	<div :class="[$style.footer, $style.panel]">
@@ -74,12 +74,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
+import { instanceName } from '@@/js/config.js';
+import type { MenuItem } from '@/types/menu.js';
 import XSigninDialog from '@/components/MkSigninDialog.vue';
 import XSignupDialog from '@/components/MkSignupDialog.vue';
 import MkButton from '@/components/MkButton.vue';
-import MkTimeline from '@/components/MkTimeline.vue';
+import MkStreamingNotesTimeline from '@/components/MkStreamingNotesTimeline.vue';
 import MkInfo from '@/components/MkInfo.vue';
-import { instanceName } from '@@/js/config.js';
 import * as os from '@/os.js';
 import { misskeyApiGet } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
@@ -88,14 +89,15 @@ import { miLocalStorage } from '@/local-storage.js';
 import MkNumber from '@/components/MkNumber.vue';
 import XActiveUsersChart from '@/components/MkVisitorDashboard.ActiveUsersChart.vue';
 import { openInstanceMenu } from '@/ui/_common_/common.js';
-import type { MenuItem } from '@/types/menu.js';
 
 const kawaiiMode = miLocalStorage.getItem('kawaii') === 'true';
 const stats = ref<Misskey.entities.StatsResponse | null>(null);
 
-misskeyApiGet('stats').then((res) => {
-	stats.value = res;
-});
+if (instance.clientOptions.showActivitiesForVisitor !== false) {
+	misskeyApiGet('stats', {}).then((res) => {
+		stats.value = res;
+	});
+}
 
 function signin() {
 	os.popup(XSigninDialog, {

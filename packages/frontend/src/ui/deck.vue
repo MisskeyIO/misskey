@@ -10,9 +10,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div :class="$style.nonTitlebarArea">
 		<XSidebar v-if="!isMobile && prefer.r['deck.navbarPosition'].value === 'left'"/>
 
-		<div :class="[$style.main, { [$style.withWallpaper]: withWallpaper, [$style.withSidebarAndTitlebar]: !isMobile && prefer.r['deck.navbarPosition'].value === 'left' && prefer.r.showTitlebar.value }]" :style="{ backgroundImage: prefer.s['deck.wallpaper'] != null ? `url(${ prefer.s['deck.wallpaper'] })` : null }">
-			<XNavbarH v-if="!isMobile && prefer.r['deck.navbarPosition'].value === 'top'"/>
+		<div :class="[$style.main, { [$style.withWallpaper]: withWallpaper, [$style.withSidebarAndTitlebar]: !isMobile && prefer.r['deck.navbarPosition'].value === 'left' && prefer.r.showTitlebar.value }]" :style="{ backgroundImage: prefer.s['deck.wallpaper'] != null ? `url(${ prefer.s['deck.wallpaper'] })` : '' }">
+			<XNavbarH v-if="!isMobile && prefer.r['deck.navbarPosition'].value === 'top'" :acrylic="withWallpaper"/>
 
+			<XReloadSuggestion v-if="shouldSuggestReload"/>
+			<XPreferenceRestore v-if="shouldSuggestRestoreBackup"/>
 			<XAnnouncements v-if="$i"/>
 			<XStatusBars/>
 			<div :class="$style.columnsWrapper">
@@ -69,7 +71,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 			</div>
 
-			<XNavbarH v-if="!isMobile && prefer.r['deck.navbarPosition'].value === 'bottom'"/>
+			<XNavbarH v-if="!isMobile && prefer.r['deck.navbarPosition'].value === 'bottom'" :acrylic="withWallpaper"/>
 
 			<XMobileFooterMenu v-if="isMobile" v-model:drawerMenuShowing="drawerMenuShowing" v-model:widgetsShowing="widgetsShowing"/>
 		</div>
@@ -81,12 +83,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { defineAsyncComponent, ref, useTemplateRef } from 'vue';
-import { v4 as uuid } from 'uuid';
 import XCommon from './_common_/common.vue';
+import { genId } from '@/utility/id.js';
 import XSidebar from '@/ui/_common_/navbar.vue';
 import XNavbarH from '@/ui/_common_/navbar-h.vue';
 import XMobileFooterMenu from '@/ui/_common_/mobile-footer-menu.vue';
 import XTitlebar from '@/ui/_common_/titlebar.vue';
+import XPreferenceRestore from '@/ui/_common_/PreferenceRestore.vue';
+import XReloadSuggestion from '@/ui/_common_/ReloadSuggestion.vue';
 import * as os from '@/os.js';
 import { $i } from '@/i.js';
 import { i18n } from '@/i18n.js';
@@ -102,9 +106,12 @@ import XWidgetsColumn from '@/ui/deck/widgets-column.vue';
 import XMentionsColumn from '@/ui/deck/mentions-column.vue';
 import XDirectColumn from '@/ui/deck/direct-column.vue';
 import XRoleTimelineColumn from '@/ui/deck/role-timeline-column.vue';
-import XChatColumn from '@/ui/deck/chat-column.vue';
+// FIXME チャット機能が有効になった暁には解除する
+// import XChatColumn from '@/ui/deck/chat-column.vue';
 import { mainRouter } from '@/router.js';
 import { columns, layout, columnTypes, switchProfileMenu, addColumn as addColumnToStore, deleteProfile as deleteProfile_ } from '@/deck.js';
+import { shouldSuggestRestoreBackup } from '@/preferences/utility.js';
+import { shouldSuggestReload } from '@/utility/reload-suggest.js';
 
 const XStatusBars = defineAsyncComponent(() => import('@/ui/_common_/statusbars.vue'));
 const XAnnouncements = defineAsyncComponent(() => import('@/ui/_common_/announcements.vue'));
@@ -120,7 +127,8 @@ const columnComponents = {
 	mentions: XMentionsColumn,
 	direct: XDirectColumn,
 	roleTimeline: XRoleTimelineColumn,
-	chat: XChatColumn,
+	// FIXME チャット機能が有効になった暁には解除する
+	// chat: XChatColumn,
 };
 
 mainRouter.navHook = (path, flag): boolean => {
@@ -162,14 +170,14 @@ const addColumn = async (ev) => {
 	const { canceled, result: column } = await os.select({
 		title: i18n.ts._deck.addColumn,
 		items: columnTypes.map(column => ({
-			value: column, text: i18n.ts._deck._columns[column],
+			value: column, label: i18n.ts._deck._columns[column],
 		})),
 	});
 	if (canceled || column == null) return;
 
 	addColumnToStore({
 		type: column,
-		id: uuid(),
+		id: genId(),
 		name: null,
 		width: 330,
 		soundSetting: { type: null, volume: 1 },

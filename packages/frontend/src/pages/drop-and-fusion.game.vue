@@ -1154,7 +1154,7 @@ useInterval(() => {
 
 onMounted(async () => {
 	try {
-		highScore.value = await misskeyApi('i/registry/get', {
+		highScore.value = await misskeyApi<number>('i/registry/get', {
 			scope: ['dropAndFusionGame'],
 			key: 'highScore:' + props.gameMode,
 		});
@@ -1164,7 +1164,7 @@ onMounted(async () => {
 
 	if (props.gameMode === 'yen') {
 		try {
-			yenTotal.value = await misskeyApi('i/registry/get', {
+			yenTotal.value = await misskeyApi<number>('i/registry/get', {
 				scope: ['dropAndFusionGame'],
 				key: 'yenTotal',
 			});

@@ -59,7 +59,7 @@ const props = defineProps<{
 
 const showingFiles = ref<Set<string>>(new Set());
 
-const files = computed(() => props.note.files.filter(file => !(file.isSensitive && sensitiveContentConsent.value === false)));
+const files = computed(() => (props.note.files ?? []).filter(file => !(file.isSensitive && sensitiveContentConsent.value === false)));
 
 const shouldHide = (file: Misskey.entities.DriveFile): boolean => {
 	if (prefer.s.nsfw === 'force' || (prefer.s.dataSaver.media && file.type.startsWith('image/'))) return true;
@@ -129,6 +129,7 @@ async function showHiddenContent(file: Misskey.entities.DriveFile) {
 	font-size: 0.8em;
 	text-align: center;
 	padding: 8px;
+	border-radius: calc(var(--MI-radius) / 2);
 	box-sizing: border-box;
 	color: #fff;
 	background: rgba(0, 0, 0, 0.5);

@@ -27,7 +27,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 					'updateUserName',
 					'unsetUserAvatar',
 					'unsetUserBanner',
-					'unsetUserMutualLink'
 				].includes(log.type),
 				[$style.logRed]: [
 					'suspend',
@@ -54,7 +53,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<span v-else-if="log.type === 'updateUserName'">: @{{ log.info.userUsername }}{{ log.info.userHost ? '@' + log.info.userHost : '' }}</span>
 		<span v-else-if="log.type === 'unsetUserAvatar'">: @{{ log.info.userUsername }}{{ log.info.userHost ? '@' + log.info.userHost : '' }}</span>
 		<span v-else-if="log.type === 'unsetUserBanner'">: @{{ log.info.userUsername }}{{ log.info.userHost ? '@' + log.info.userHost : '' }}</span>
-		<span v-else-if="log.type === 'unsetUserMutualLink'">: @{{ log.info.userUsername }}{{ log.info.userHost ? '@' + log.info.userHost : '' }}</span>
 		<span v-else-if="log.type === 'suspend'">: @{{ log.info.userUsername }}{{ log.info.userHost ? '@' + log.info.userHost : '' }}</span>
 		<span v-else-if="log.type === 'unsuspend'">: @{{ log.info.userUsername }}{{ log.info.userHost ? '@' + log.info.userHost : '' }}</span>
 		<span v-else-if="log.type === 'resetPassword'">: @{{ log.info.userUsername }}{{ log.info.userHost ? '@' + log.info.userHost : '' }}</span>

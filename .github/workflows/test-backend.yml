@@ -23,6 +23,13 @@ on:
       - pnpm-lock.yaml
       - .github/workflows/test-backend.yml
       - .github/misskey/test.yml
+  workflow_dispatch:
+    inputs:
+      force_ffmpeg_cache_update:
+        description: Force update ffmpeg cache
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -38,7 +45,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:17
+        image: postgres:18
         ports:
           - 54312:5432
         env:
@@ -66,7 +73,7 @@ jobs:
       uses: actions/cache/restore@v5
       with:
         path: /opt/hostedtoolcache/ffmpeg
-        key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-latest
+        key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ github.event_name == 'workflow_dispatch' && inputs.force_ffmpeg_cache_update && github.run_id || 'latest' }}
         restore-keys: |
           ffmpeg-${{ runner.os }}-${{ runner.arch }}-
     - name: Install FFmpeg
@@ -79,7 +86,7 @@ jobs:
       uses: actions/cache/save@v5
       with:
         path: /opt/hostedtoolcache/ffmpeg
-        key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ steps.setup-ffmpeg.outputs.ffmpeg-version }}
+        key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ github.event_name == 'workflow_dispatch' && inputs.force_ffmpeg_cache_update && github.run_id || steps.setup-ffmpeg.outputs.ffmpeg-version }}
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v6
       with:
@@ -110,7 +117,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:17
+        image: postgres:18
         ports:
           - 54312:5432
         env:

@@ -127,7 +127,7 @@ import { userPage } from '@/utils.js';
 import { i18n } from '@/i18n.js';
 
 function getAppearNote(note: Misskey.entities.Note) {
-	return Misskey.note.isPureRenote(note) ? note.renote : note;
+	return Misskey.note.isPureRenote(note) ? (note.renote ?? note) : note;
 }
 
 const props = withDefaults(defineProps<{

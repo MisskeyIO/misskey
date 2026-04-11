@@ -30,7 +30,7 @@ describe('MkMediaImage', () => {
 					comment: null,
 					properties: {},
 					...image,
-				} as DriveFile,
+				} as Misskey.entities.DriveFile,
 			},
 			global: { directives, components },
 		});

@@ -70,7 +70,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, shallowRef } from 'vue';
+import { ref, shallowRef, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkModalWindow from '@/components/MkModalWindow.vue';
 import MkButton from '@/components/MkButton.vue';
@@ -84,29 +84,33 @@ import MkRadios from '@/components/MkRadios.vue';
 import MkUserCardMini from '@/components/MkUserCardMini.vue';
 
 type AdminAnnouncementType = Misskey.entities.AdminAnnouncementsCreateRequest & { id: string; };
+type AdminAnnouncementWithStats = Required<AdminAnnouncementType> & {
+	reads?: number;
+	lastReadAt?: string | null;
+};
 
 const props = defineProps<{
 	user: Misskey.entities.User,
-	announcement?: Required<AdminAnnouncementType>,
+	announcement?: AdminAnnouncementWithStats,
 }>();
 
 const emit = defineEmits<{
-	(ev: 'done', v: { deleted?: boolean; updated?: AdminAnnouncementType; created?: AdminAnnouncementType; }): void,
+	(ev: 'done', v: { deleted?: boolean; updated?: AdminAnnouncementType; created?: Misskey.entities.AdminAnnouncementsCreateResponse; }): void,
 	(ev: 'closed'): void
 }>();
 
-const dialog = ref<InstanceType<typeof MkModalWindow> | null>(null);
+const dialog = useTemplateRef('dialog');
 const title = ref<string>(props.announcement ? props.announcement.title : '');
 const text = ref<string>(props.announcement ? props.announcement.text : '');
-const icon = ref<string>(props.announcement ? props.announcement.icon : 'info');
-const display = ref<string>(props.announcement ? props.announcement.display : 'dialog');
+const icon = ref<AdminAnnouncementType['icon']>(props.announcement ? props.announcement.icon : 'info');
+const display = ref<AdminAnnouncementType['display']>(props.announcement ? props.announcement.display : 'dialog');
 const needConfirmationToRead = ref(props.announcement ? props.announcement.needConfirmationToRead : false);
 const needEnrollmentTutorialToRead = ref(props.announcement ? props.announcement.needEnrollmentTutorialToRead : false);
 const closeDuration = ref<number>(props.announcement ? props.announcement.closeDuration : 0);
 const displayOrder = ref<number>(props.announcement ? props.announcement.displayOrder : 0);
 const silence = ref<boolean>(props.announcement ? props.announcement.silence : false);
-const reads = ref<number>(props.announcement ? props.announcement.reads : 0);
-const lastReadAt = ref<string | null>(props.announcement ? props.announcement.lastReadAt : null);
+const reads = ref<number>(props.announcement?.reads ?? 0);
+const lastReadAt = ref<string | null>(props.announcement?.lastReadAt ?? null);
 
 const announceTitleEl = shallowRef<HTMLInputElement | null>(null);
 
@@ -126,7 +130,6 @@ async function done(): Promise<void> {
 		closeDuration: closeDuration.value,
 		displayOrder: displayOrder.value,
 		silence: silence.value,
-		reads: reads.value,
 		userId: props.user.id,
 	} satisfies Misskey.entities.AdminAnnouncementsCreateRequest;
 
@@ -148,7 +151,7 @@ async function done(): Promise<void> {
 		const created = await os.apiWithDialog('admin/announcements/create', params);
 
 		emit('done', {
-			created: created,
+			created,
 		});
 
 		dialog.value?.close();

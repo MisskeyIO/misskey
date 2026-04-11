@@ -30,7 +30,7 @@ const render = (mutedWords?: (string | string[])[]) => mutedWords?.map(x => {
 	} else {
 		return x;
 	}
-}).join('\n');
+}).join('\n') ?? null;
 
 const mutedWords = ref(render($i?.mutedWords));
 const changed = ref(false);
@@ -40,7 +40,7 @@ watch(mutedWords, () => {
 });
 
 async function save() {
-	const parseMutes = (mutes?: string): (string | string[])[] => {
+	const parseMutes = (mutes?: string | null): (string | string[])[] => {
 		const parsed: (string | string[])[] = [];
 		if (!mutes) return parsed;
 

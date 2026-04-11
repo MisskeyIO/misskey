@@ -7,12 +7,13 @@ import { Inject, Injectable } from '@nestjs/common';
 import { bindThis } from '@/decorators.js';
 import { DI } from '@/di-symbols.js';
 import type Logger from '@/logger.js';
-import type { DriveFilesRepository, NotesRepository, UserProfilesRepository, UsersRepository } from '@/models/_.js';
+import type { DriveFilesRepository, NotesRepository, PagesRepository, UserProfilesRepository, UsersRepository } from '@/models/_.js';
 import type { MiUser } from '@/models/User.js';
 import { DriveService } from '@/core/DriveService.js';
 import { SearchService } from '@/core/SearchService.js';
 import { RoleService } from '@/core/RoleService.js';
 import { QueueService } from '@/core/QueueService.js';
+import { PageService } from '@/core/PageService.js';
 import { QueueLoggerService } from '../QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 import type { DbUserDeleteJobData } from '../types.js';
@@ -34,7 +35,11 @@ export class DeleteAccountProcessorService {
 		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
 
+		@Inject(DI.pagesRepository)
+		private pagesRepository: PagesRepository,
+
 		private driveService: DriveService,
+		private pageService: PageService,
 		private searchService: SearchService,
 		private roleService: RoleService,
 		private queueService: QueueService,
@@ -87,6 +92,31 @@ export class DeleteAccountProcessorService {
 		this.logger.succ('All of files deleted');
 	}
 
+	private async deletePages(user: MiUser) {
+		// delete pages. Necessary for decrementing pageCount of notes.
+		while (true) {
+			const pages = await this.pagesRepository.find({
+				where: {
+					userId: user.id,
+				},
+				take: 100,
+				order: {
+					id: 1,
+				},
+			});
+
+			if (pages.length === 0) {
+				break;
+			}
+
+			for (const page of pages) {
+				await this.pageService.delete(user, page.id);
+			}
+		}
+
+		this.logger.succ('All of pages deleted');
+	}
+
 	@bindThis
 	public async process(job: Bull.Job<DbUserDeleteJobData>): Promise<string | void> {
 		this.logger.info(`Deleting account of ${job.data.user.id} ...`, { userDeleteJobData: job.data });
@@ -112,9 +142,10 @@ export class DeleteAccountProcessorService {
 				this.deleteNotes(user),
 				this.deleteFiles(user),
 			]);
+			await this.deletePages(user);
 		}
 
-		if (user.token) { // Send email notification
+		{ // Send email notification
 			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
 			if (profile.email && profile.emailVerified) {
 				await this.queueService.createSendEmailJob(

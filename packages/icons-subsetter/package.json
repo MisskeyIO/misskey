@@ -1,0 +1,30 @@
+{
+	"name": "icons-subsetter",
+	"version": "0.0.0",
+	"private": true,
+	"description": "Subset tabler-icons webfont",
+	"type": "module",
+	"scripts": {
+		"build": "tsx src/generator.ts",
+		"eslint": "eslint src/**/*.ts",
+		"typecheck": "tsc --noEmit",
+		"lint": "pnpm typecheck && pnpm eslint"
+	},
+	"devDependencies": {
+		"@types/node": "catalog:",
+		"@types/wawoff2": "catalog:",
+		"@typescript-eslint/eslint-plugin": "catalog:",
+		"@typescript-eslint/parser": "catalog:"
+	},
+	"dependencies": {
+		"@tabler/icons-webfont": "catalog:",
+		"harfbuzzjs": "catalog:",
+		"tiny-glob": "catalog:",
+		"tsx": "catalog:",
+		"typescript": "catalog:",
+		"wawoff2": "catalog:"
+	},
+	"files": [
+		"built"
+	]
+}

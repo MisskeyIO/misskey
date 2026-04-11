@@ -8,6 +8,7 @@ import locales from '../../locales/index.js';
 import meta from '../../package.json';
 import packageInfo from './package.json' with { type: 'json' };
 import pluginJson5 from './vite.json5.js';
+import { pluginRemoveUnrefI18n } from '../frontend-builder/rollup-plugin-remove-unref-i18n';
 import { Features } from 'lightningcss';
 
 const url = process.env.NODE_ENV === 'development' ? yaml.load(await fsp.readFile('../../.config/default.yml', 'utf-8')).url : null;
@@ -64,12 +65,20 @@ function toBase62(n: number): string {
 }
 
 export function getConfig(): UserConfig {
+	const localesHash = toBase62(hash(JSON.stringify(locales)));
+
 	return {
 		base: '/embed_vite/',
 
+		// The console is shared with backend, so clearing the console will also clear the backend log.
+		clearScreen: false,
+
 		server: {
-			host,
+			// The backend allows access from any addresses, so vite also allows access from any addresses.
+			host: '0.0.0.0',
+			allowedHosts: host ? [host] : undefined,
 			port: 5174,
+			strictPort: true,
 			hmr: {
 				// バックエンド経由での起動時、Viteは5174経由でアセットを参照していると思い込んでいるが実際は3000から配信される
 				// そのため、バックエンドのWSサーバーにHMRのWSリクエストが吸収されてしまい、正しくHMRが機能しない
@@ -80,6 +89,7 @@ export function getConfig(): UserConfig {
 
 		plugins: [
 			pluginVue(),
+			pluginRemoveUnrefI18n(),
 			pluginJson5(),
 		],
 
@@ -133,15 +143,20 @@ export function getConfig(): UserConfig {
 			manifest: 'manifest.json',
 			rollupOptions: {
 				input: {
-					app: './src/boot.ts',
+					i18n: './src/i18n.ts',
+					entry: './src/boot.ts',
 				},
 				external: externalPackages.map(p => p.match),
+				preserveEntrySignatures: 'allow-extension',
 				output: {
 					manualChunks: {
 						vue: ['vue'],
+						// dependencies of i18n.ts
+						'config': ['@@/js/config.js'],
 					},
-					chunkFileNames: process.env.NODE_ENV === 'production' ? '[hash:8].js' : '[name]-[hash:8].js',
-					assetFileNames: process.env.NODE_ENV === 'production' ? '[hash:8][extname]' : '[name]-[hash:8][extname]',
+					entryFileNames: `scripts/${localesHash}-[hash:8].js`,
+					chunkFileNames: `scripts/${localesHash}-[hash:8].js`,
+					assetFileNames: `assets/${localesHash}-[hash:8][extname]`,
 					sourcemapPathTransform: (relativeSourcePath, sourcemapPath) => {
 						const repoRoot = path.resolve(__dirname, '../..');
 						const absoluteSourcePath = path.isAbsolute(relativeSourcePath)

@@ -72,6 +72,10 @@ export const packedMetaLiteSchema = {
 			type: 'string',
 			optional: false, nullable: true,
 		},
+		clientOptions: {
+			type: 'object',
+			optional: false, nullable: false,
+		},
 		disableRegistration: {
 			type: 'boolean',
 			optional: false, nullable: false,

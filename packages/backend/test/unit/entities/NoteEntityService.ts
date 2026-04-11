@@ -27,7 +27,7 @@ describe('NoteEntityService', () => {
 			name: null,
 			username: 'user',
 			host: null,
-			avatarUrl: null,
+			avatarUrl: 'https://example.com/avatar.png',
 			avatarBlurhash: null,
 			avatarDecorations: [],
 			emojis: {},

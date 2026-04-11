@@ -12,8 +12,8 @@
 		"sourceRoot": "/",
 		"inlineSources": true,
 		"target": "ES2022",
-		"module": "ES2022",
-		"moduleResolution": "bundler",
+		"module": "esnext",
+		"moduleResolution": "Bundler",
 		"removeComments": false,
 		"noLib": false,
 		"strict": true,
@@ -24,10 +24,13 @@
 		"isolatedModules": true,
 		"useDefineForClassFields": true,
 		"verbatimModuleSyntax": true,
+		"skipLibCheck": true,
 		"baseUrl": ".",
 		"paths": {
 			"@/*": ["./src/*"],
-			"@@/*": ["../frontend-shared/*"]
+			"@@/*": ["../frontend-shared/*"],
+			"misskey-bubble-game": ["../misskey-bubble-game/src/index.ts"],
+			"misskey-bubble-game/*": ["../misskey-bubble-game/src/*"]
 		},
 		"typeRoots": [
 			"./@types",
@@ -37,6 +40,7 @@
 		],
 		"types": [
 			"vite/client",
+			"vite-plugin-glsl/ext",
 			"vitest/importMeta"
 		],
 		"lib": [
@@ -55,6 +59,7 @@
 		"./@types/**/*.ts"
 	],
 	"exclude": [
-		".storybook/**/*"
+		"./src/**/*.stories.ts",
+    "./src/pages/chat/**"
 	]
 }

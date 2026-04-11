@@ -75,12 +75,12 @@ export class APIClient {
 
 			let payload: FormData | string = '{}';
 
-			if (mediaType === 'application/json') {
-				payload = JSON.stringify({
-					...(params ?? {}),
-					i: credential !== undefined ? credential : this.credential,
-				});
-			} else if (mediaType === 'multipart/form-data') {
+				if (mediaType === 'application/json') {
+					payload = JSON.stringify({
+						...(this.assertIsRecord(params) ? params : {}),
+						i: credential !== undefined ? credential : this.credential,
+					});
+				} else if (mediaType === 'multipart/form-data') {
 				payload = new FormData();
 				const i = credential !== undefined ? credential : this.credential;
 				if (i != null) {
@@ -106,7 +106,7 @@ export class APIClient {
 			this.fetch(`${this.origin}/api/${endpoint}`, {
 				method: 'POST',
 				body: payload,
-				headers: {
+				headers: mediaType === 'multipart/form-data' ? {} : {
 					'Content-Type': mediaType,
 				},
 				credentials: 'omit',

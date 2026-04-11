@@ -16,27 +16,30 @@ SPDX-License-Identifier: AGPL-3.0-only
 				{{ i18n.ts._2fa.backupCodesExhaustedWarning }}
 			</MkInfo>
 
-			<SearchMarker :keywords="['totp', 'app']">
-				<MkFolder :defaultOpen="true">
-					<template #icon><i class="ti ti-shield-lock"></i></template>
-					<template #label><SearchLabel>{{ i18n.ts.totp }}</SearchLabel></template>
-					<template #caption><SearchKeyword>{{ i18n.ts.totpDescription }}</SearchKeyword></template>
-					<template #suffix><i v-if="$i.twoFactorEnabled" class="ti ti-check" style="color: var(--MI_THEME-success)"></i></template>
+				<SearchMarker :keywords="['totp', 'app']">
+					<MkFolder :defaultOpen="true">
+						<template #icon><i class="ti ti-shield-lock"></i></template>
+						<template #label><SearchLabel>{{ i18n.ts.totp }}</SearchLabel></template>
+						<template #caption><SearchText>{{ i18n.ts.totpDescription }}</SearchText></template>
+						<template #suffix><i v-if="$i.twoFactorEnabled" class="ti ti-check" style="color: var(--MI_THEME-success)"></i></template>
 
 					<div class="_gaps_s">
-				<MkInfo>
-					<Mfm :text="i18n.tsx._2fa.detailedGuide({ link: `[${i18n.ts.here}](https://go.misskey.io/howto-2fa)`})"/>
-				</MkInfo>
-				<MkInfo v-if="$i.securityKeysList.length > 0">{{ i18n.ts._2fa.whyTOTPOnlyRenew }}</MkInfo>
+						<MkInfo>
+							<Mfm :text="i18n.tsx._2fa.detailedGuide({ link: `[${i18n.ts.here}](https://go.misskey.io/howto-2fa)`})"/>
+						</MkInfo>
+						<MkInfo v-if="($i.securityKeysList?.length ?? 0) > 0">{{ i18n.ts._2fa.whyTOTPOnlyRenew }}</MkInfo>
 
-				<div v-if="$i.twoFactorEnabled" class="_gaps_s">
-					<div v-text="i18n.ts._2fa.alreadyRegistered"/>
-					<MkButton v-if="$i.securityKeysList.length > 0" @click="renewTOTP">{{ i18n.ts._2fa.renewTOTP }}</MkButton>
-					<MkButton v-else danger @click="unregisterTOTP">{{ i18n.ts.unregister }}</MkButton>
-				</div>
+						<div v-if="$i.twoFactorEnabled" class="_gaps_s">
+							<div v-text="i18n.ts._2fa.alreadyRegistered"/>
+							<template v-if="$i.securityKeysList!.length > 0">
+								<MkButton @click="renewTOTP">{{ i18n.ts._2fa.renewTOTP }}</MkButton>
+								<MkInfo>{{ i18n.ts._2fa.whyTOTPOnlyRenew }}</MkInfo>
+							</template>
+							<MkButton v-else danger @click="unregisterTOTP">{{ i18n.ts.unregister }}</MkButton>
+						</div>
 
-				<MkButton v-else-if="!$i.twoFactorEnabled" primary gradate @click="registerTOTP">
-					{{ i18n.ts._2fa.registerTOTP }}
+						<MkButton v-else-if="!$i.twoFactorEnabled" primary gradate @click="registerTOTP">
+							{{ i18n.ts._2fa.registerTOTP }}
 						</MkButton>
 					</div>
 				</MkFolder>
@@ -75,9 +78,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</SearchMarker>
 
 			<SearchMarker :keywords="['password', 'less', 'key', 'passkey', 'login', 'signin']">
-				<MkSwitch :disabled="!$i.twoFactorEnabled || $i.securityKeysList.length === 0" :modelValue="usePasswordLessLogin" @update:modelValue="v => updatePasswordLessLogin(v)">
+				<MkSwitch :disabled="!$i.twoFactorEnabled || $i.securityKeysList!.length === 0" :modelValue="usePasswordLessLogin" @update:modelValue="v => updatePasswordLessLogin(v)">
 					<template #label><SearchLabel>{{ i18n.ts.passwordLessLogin }}</SearchLabel></template>
-					<template #caption><SearchKeyword>{{ i18n.ts.passwordLessLoginDescription }}</SearchKeyword></template>
+					<template #caption><SearchText>{{ i18n.ts.passwordLessLoginDescription }}</SearchText></template>
 				</MkSwitch>
 			</SearchMarker>
 		</div>
@@ -88,6 +91,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { defineAsyncComponent, computed } from 'vue';
 import { browserSupportsWebAuthn as webAuthnSupported, startRegistration } from '@simplewebauthn/browser';
+import type { PublicKeyCredentialCreationOptionsJSON } from '@simplewebauthn/browser';
 import MkButton from '@/components/MkButton.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
@@ -213,8 +217,35 @@ async function addSecurityKey() {
 	});
 	if (name.canceled) return;
 
+	const optionsJSON: PublicKeyCredentialCreationOptionsJSON = {
+		challenge: registrationOptions.challenge,
+		user: registrationOptions.user,
+		rp: {
+			id: registrationOptions.rp?.id,
+			name: window.location.host,
+		},
+		attestation: registrationOptions.attestation ?? undefined,
+		authenticatorSelection: registrationOptions.authenticatorSelection ?? undefined,
+		excludeCredentials: registrationOptions.excludeCredentials?.map(credential => ({
+			...credential,
+			type: 'public-key',
+		})),
+		extensions: registrationOptions.extensions ? {
+			appid: registrationOptions.extensions.appid ?? undefined,
+			credProps: registrationOptions.extensions.credProps ?? undefined,
+			hmacCreateSecret: registrationOptions.extensions.hmacCreateSecret ?? undefined,
+		} : undefined,
+		timeout: registrationOptions.timeout ?? undefined,
+		pubKeyCredParams: registrationOptions.pubKeyCredParams.map(param => ({
+			...param,
+			type: 'public-key',
+		})),
+	};
+
 	const credential = await os.promiseDialog(
-		startRegistration({ optionsJSON: registrationOptions }),
+		startRegistration({
+			optionsJSON,
+		}),
 		null,
 		() => {}, // ユーザーのキャンセルはrejectなのでエラーダイアログを出さない
 		i18n.ts._2fa.tapSecurityKey,

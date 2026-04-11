@@ -72,8 +72,9 @@ describe('Note', () => {
 				'uri',
 			]);
 			assert(resolvedNote.replyId != null);
-			strictEqual(resolvedNote.replyUserId, aliceInB.id);
+			strictEqual(Reflect.get(resolvedNote, 'replyUserId'), aliceInB.id);
 			assert(resolvedNote.reply != null);
+			strictEqual(resolvedNote.reply.userId, aliceInB.id);
 			deepStrictEqualWithExcludedFields(replyedNote, resolvedNote.reply, [
 				'id',
 				// TODO: why clippedCount loses consistency?
@@ -107,7 +108,6 @@ describe('Note', () => {
 			deepStrictEqualWithExcludedFields(note, resolvedNote, [
 				'id',
 				'emojis',
-				'reactionAcceptance',
 				'renoteId',
 				'renote',
 				'userId',

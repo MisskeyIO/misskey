@@ -52,15 +52,18 @@ import TestWebGL2 from '@/workers/test-webgl2?worker';
 import { WorkerMultiDispatch } from '@@/js/worker-multi-dispatch.js';
 import { extractAvgColorFromBlurhash } from '@@/js/extract-avg-color-from-blurhash.js';
 
+// テスト環境で Web Worker インスタンスは作成できない
+const isTest = import.meta.env.MODE === 'test' || ('Cypress' in window && window.Cypress != null);
+
 const canvasPromise = new Promise<WorkerMultiDispatch | HTMLCanvasElement>(resolve => {
-	// テスト環境で Web Worker インスタンスは作成できない
-	if (import.meta.env.MODE === 'test') {
+	if (isTest) {
 		const canvas = window.document.createElement('canvas');
 		canvas.width = 64;
 		canvas.height = 64;
 		resolve(canvas);
 		return;
 	}
+
 	const testWorker = new TestWebGL2();
 	testWorker.addEventListener('message', event => {
 		if (event.data.result) {
@@ -82,7 +85,7 @@ const canvasPromise = new Promise<WorkerMultiDispatch | HTMLCanvasElement>(resol
 
 <script lang="ts" setup>
 import { computed, nextTick, onMounted, onUnmounted, useTemplateRef, watch, ref } from 'vue';
-import { v4 as uuid } from 'uuid';
+import { genId } from '@/utility/id.js';
 import { render } from 'buraha';
 import { prefer } from '@/preferences.js';
 
@@ -117,7 +120,7 @@ const props = withDefaults(defineProps<{
 	onlyAvgColor: false,
 });
 
-const viewId = uuid();
+const viewId = genId();
 const canvas = useTemplateRef('canvas');
 const root = useTemplateRef('root');
 const img = useTemplateRef('img');
@@ -189,7 +192,7 @@ function drawAvg() {
 }
 
 async function draw() {
-	if (import.meta.env.MODE === 'test' && props.hash == null) return;
+	if (isTest && props.hash == null) return;
 
 	drawAvg();
 

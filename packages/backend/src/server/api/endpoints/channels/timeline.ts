@@ -4,6 +4,7 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
+import { Brackets } from 'typeorm';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { ChannelsRepository, MiMeta, NotesRepository } from '@/models/_.js';
 import { QueryService } from '@/core/QueryService.js';
@@ -13,6 +14,7 @@ import { DI } from '@/di-symbols.js';
 import { IdService } from '@/core/IdService.js';
 import { FanoutTimelineEndpointService } from '@/core/FanoutTimelineEndpointService.js';
 import { MiLocalUser } from '@/models/User.js';
+import { ChannelMutingService } from '@/core/ChannelMutingService.js';
 import { ApiError } from '../../error.js';
 
 export const meta = {
@@ -71,6 +73,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private queryService: QueryService,
 		private fanoutTimelineEndpointService: FanoutTimelineEndpointService,
 		private activeUsersChart: ActiveUsersChart,
+		private channelMutingService: ChannelMutingService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
@@ -104,6 +107,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				useDbFallback: true,
 				redisTimelines: [`channelTimeline:${channel.id}`],
 				excludePureRenotes: false,
+				ignoreAuthorChannelFromMute: true,
 				dbFallback: async (untilId, sinceId, limit) => {
 					return await this.getFromDb({ untilId, sinceId, limit, channelId: channel.id }, me);
 				},
@@ -127,10 +131,19 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			.leftJoinAndSelect('renote.user', 'renoteUser')
 			.leftJoinAndSelect('note.channel', 'channel');
 
-		this.queryService.generateBlockedHostQueryForNote(query);
+		this.queryService.generateBaseNoteFilteringQuery(query, me);
+
 		if (me) {
-			this.queryService.generateMutedUserQueryForNotes(query, me);
-			this.queryService.generateBlockedUserQueryForNotes(query, me);
+			const mutingChannelIds = await this.channelMutingService
+				.list({ requestUserId: me.id }, { idOnly: true })
+				.then(x => x.map(x => x.id).filter(x => x !== ps.channelId));
+			if (mutingChannelIds.length > 0) {
+				query.andWhere('note.channelId NOT IN (:...mutingChannelIds)', { mutingChannelIds });
+				query.andWhere(new Brackets(qb => {
+					qb.where('note.renoteChannelId IS NULL');
+					qb.orWhere('note.renoteChannelId NOT IN (:...mutingChannelIds)', { mutingChannelIds });
+				}));
+			}
 		}
 		//#endregion
 

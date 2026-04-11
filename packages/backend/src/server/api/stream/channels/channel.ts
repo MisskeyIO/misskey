@@ -9,6 +9,8 @@ import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { bindThis } from '@/decorators.js';
 import { RoleService } from '@/core/RoleService.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
+import { isInstanceMuted } from '@/misc/is-instance-muted.js';
+import { isUserRelated } from '@/misc/is-user-related.js';
 import type { JsonObject } from '@/misc/json-value.js';
 import { NoteStreamingHidingService } from '../NoteStreamingHidingService.js';
 import Channel, { type MiChannelService } from '../channel.js';
@@ -47,6 +49,10 @@ class ChannelChannel extends Channel {
 	@bindThis
 	private async onNote(note: Packed<'Note'>) {
 		if (note.channelId !== this.channelId) return;
+
+		if (note.user.requireSigninToViewContents && this.user == null) return;
+		if (note.renote && note.renote.user.requireSigninToViewContents && this.user == null) return;
+		if (note.reply && note.reply.user.requireSigninToViewContents && this.user == null) return;
 
 		if (note.reply) {
 			const reply = note.reply;
@@ -89,6 +95,35 @@ class ChannelChannel extends Channel {
 		} else {
 			this.send('note', note);
 		}
+	}
+
+	/*
+	 * ミュートとブロックされてるを処理する
+	 */
+	protected override isNoteMutedOrBlocked(note: Packed<'Note'>): boolean {
+		// 流れてきたNoteがインスタンスミュートしたインスタンスが関わる
+		if (isInstanceMuted(note, new Set<string>(this.userProfile?.mutedInstances ?? []))) return true;
+
+		// 流れてきたNoteがミュートしているユーザーが関わる
+		if (isUserRelated(note, this.userIdsWhoMeMuting)) return true;
+		// 流れてきたNoteがブロックされているユーザーが関わる
+		if (isUserRelated(note, this.userIdsWhoBlockingMe)) return true;
+
+		// 流れてきたNoteがリノートをミュートしてるユーザが行ったもの
+		if (isRenotePacked(note) && !isQuotePacked(note) && this.userIdsWhoMeMutingRenotes.has(note.user.id)) return true;
+
+		// このソケットで見ているチャンネルがミュートされていたとしても、チャンネルを直接見ている以上は流すようにしたい
+		// ただし、他のミュートしているチャンネルは流さないようにもしたい
+		// ノート自体のチャンネルIDはonNoteでチェックしているので、ここではリノートのチャンネルIDをチェックする
+		if (
+			(note.renote) &&
+			(note.renote.channelId !== this.channelId) &&
+			(note.renote.channelId && this.mutingChannels.has(note.renote.channelId))
+		) {
+			return true;
+		}
+
+		return false;
 	}
 
 	@bindThis

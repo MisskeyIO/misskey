@@ -17,15 +17,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<img src="/client-assets/reversi/logo.png" style="display: block; max-width: 100%; max-height: 200px; margin: auto;"/>
 				</MkA>
 			</div>
-		</div>
+	</div>
 		<MkPagination v-slot="{items}" :pagination="featuredPagination">
-			<MkChannelPreview v-for="channel in items" :key="channel.id" class="_margin" :channel="channel"/>
+			<MkChannelPreview v-for="channel in (items as Misskey.entities.Channel[])" :key="channel.id" class="_margin" :channel="channel"/>
 		</MkPagination>
 	</div>
 </PageWithHeader>
 </template>
 
 <script lang="ts" setup>
+import * as Misskey from 'misskey-js';
 import { definePage } from '@/page.js';
 import MkPagination from '@/components/MkPagination.vue';
 import MkChannelPreview from '@/components/MkChannelPreview.vue';
@@ -37,6 +38,7 @@ definePage(() => ({
 
 const featuredPagination = {
 	endpoint: 'channels/featured-games' as const,
+	limit: 10,
 	noPaging: true,
 };
 </script>

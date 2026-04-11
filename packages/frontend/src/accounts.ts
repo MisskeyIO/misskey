@@ -11,7 +11,7 @@ import type { MenuButton, MenuItem, MenuUser } from '@/types/menu.js';
 import { showSuspendedDialog } from '@/utility/show-suspended-dialog.js';
 import { i18n } from '@/i18n.js';
 import { miLocalStorage } from '@/local-storage.js';
-import { popup, popupMenu, success, alert } from '@/os.js';
+import { popup, success, alert } from '@/os.js';
 import { unisonReload, reloadChannel } from '@/utility/unison-reload.js';
 import { prefer } from '@/preferences.js';
 import { store } from '@/store.js';
@@ -23,7 +23,7 @@ export async function getAccounts(): Promise<{
 	host: string;
 	id: Misskey.entities.User['id'];
 	username: Misskey.entities.User['username'];
-	user?: Misskey.entities.User | null;
+	user?: Misskey.entities.MeDetailed | null;
 	token: string | null;
 }[]> {
 	const tokens = store.s.accountTokens;
@@ -38,11 +38,10 @@ export async function getAccounts(): Promise<{
 	}));
 }
 
-async function addAccount(host: string, user: Misskey.entities.User, token: AccountWithToken['token']) {
+async function addAccount(host: string, user: Misskey.entities.MeDetailed, token: AccountWithToken['token']) {
 	const key = host + '/' + user.id;
 	store.set('accountTokens', { ...store.s.accountTokens, [key]: token });
 	store.set('accountInfos', { ...store.s.accountInfos, [key]: user });
-
 	if (!prefer.s.accounts.some(x => x[0] === host && x[1].id === user.id)) {
 		prefer.commit('accounts', [...prefer.s.accounts, [host, { id: user.id, username: user.username }]]);
 	}
@@ -222,13 +221,14 @@ export async function switchAccount(host: string, id: string) {
 	}
 }
 
-export async function openAccountMenu(opts: {
+export async function getAccountMenu(opts: {
 	includeCurrentAccount?: boolean;
 	withExtraOperation: boolean;
 	active?: Misskey.entities.User['id'];
 	onChoose?: (account: Misskey.entities.User) => void;
-}, ev: MouseEvent) {
-	if (!$i) return;
+}): Promise<MenuItem[]> {
+	if ($i == null) throw new Error('No current account');
+	const me = $i;
 
 	async function switchAccountByUser(account: Misskey.entities.User) {
 		const storedAccounts = await getAccounts();
@@ -246,7 +246,7 @@ export async function openAccountMenu(opts: {
 		login(token);
 	}
 
-	const storedAccounts = await getAccounts().then(accounts => accounts.filter(x => x.id !== $i.id));
+	const storedAccounts = await getAccounts().then(accounts => accounts.filter(x => x.id !== me.id));
 	const accountsPromise = storedAccounts.length > 0
 		? misskeyApi('users/show', { userIds: storedAccounts.map(x => x.id) })
 		: Promise.resolve([] as Misskey.entities.User[]);
@@ -289,7 +289,7 @@ export async function openAccountMenu(opts: {
 	}));
 
 	if (opts.withExtraOperation) {
-		popupMenu([...[{
+		return [...[{
 			type: 'link' as const,
 			text: i18n.ts.profile,
 			to: `/@${$i.username}`,
@@ -322,13 +322,9 @@ export async function openAccountMenu(opts: {
 			icon: 'ti ti-users',
 			text: i18n.ts.manageAccounts,
 			to: '/settings/accounts',
-		}]], ev.currentTarget ?? ev.target, {
-			align: 'left',
-		});
+		}]];
 	} else {
-		popupMenu([...(opts.includeCurrentAccount ? [createItem($i)] : []), ...accountItemPromises], ev.currentTarget ?? ev.target, {
-			align: 'left',
-		});
+		return [...(opts.includeCurrentAccount ? [createItem($i)] : []), ...accountItemPromises];
 	}
 }
 

@@ -3,17 +3,11 @@
 	<div class="_spacer" style="--MI_SPACER-w: 900px;">
 		<div style="display: flex; flex-direction: column; gap: var(--MI-margin); flex-wrap: wrap;">
 			<div :class="$style.inputs">
-				<MkSelect v-model="from" :class="$style.input">
+				<MkSelect v-model="from" :class="$style.input" :items="serverScopeItems">
 					<template #label>{{ i18n.ts._accountMigration.movedFromServer }}</template>
-					<option value="all">{{ i18n.ts.all }}</option>
-					<option value="remote">{{ i18n.ts.remote }}</option>
-					<option value="local">{{ i18n.ts.local }}</option>
 				</MkSelect>
-				<MkSelect v-model="to" :class="$style.input">
+				<MkSelect v-model="to" :class="$style.input" :items="serverScopeItems">
 					<template #label>{{ i18n.ts._accountMigration.movedToServer }}</template>
-					<option value="all">{{ i18n.ts.all }}</option>
-					<option value="remote">{{ i18n.ts.remote }}</option>
-					<option value="local">{{ i18n.ts.local }}</option>
 				</MkSelect>
 			</div>
 			<div :class="$style.inputs">
@@ -28,7 +22,7 @@
 
 		<MkPagination v-slot="{items}" ref="logs" :pagination="pagination" style="margin-top: var(--MI-margin);">
 			<div class="_gaps_s">
-				<MkFolder v-for="item in items" :key="item.id">
+				<MkFolder v-for="item in (items as unknown as UserAccountMoveLog[])" :key="item.id">
 					<template #label>
 						{{ i18n.tsx.userAccountMoveLogsTitle({
 							from: '@' + item.movedFrom.username + (item.movedFrom.host ? `@${item.movedFrom.host}` : ''),
@@ -56,6 +50,7 @@
 
 <script lang="ts" setup>
 import { computed, shallowRef, ref } from 'vue';
+import * as Misskey from 'misskey-js';
 import MkInput from '@/components/MkInput.vue';
 import MkPagination from '@/components/MkPagination.vue';
 import { i18n } from '@/i18n.js';
@@ -64,12 +59,24 @@ import MkFolder from '@/components/MkFolder.vue';
 import { definePage } from '@/page.js';
 import MkSelect from '@/components/MkSelect.vue';
 
-const logs = shallowRef<InstanceType<typeof MkPagination>>();
+const logs = shallowRef<{ reload: () => void } | null>(null);
+
+type UserAccountMoveLog = {
+	id: string;
+	movedFrom: Misskey.entities.User;
+	movedTo: Misskey.entities.User;
+};
 
 const movedToId = ref('');
 const movedFromId = ref('');
 const from = ref('all');
 const to = ref('all');
+
+const serverScopeItems = [
+	{ label: i18n.ts.all, value: 'all' },
+	{ label: i18n.ts.remote, value: 'remote' },
+	{ label: i18n.ts.local, value: 'local' },
+];
 
 const pagination = {
 	endpoint: 'admin/show-user-account-move-logs' as const,

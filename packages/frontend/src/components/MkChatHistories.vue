@@ -28,9 +28,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 	</MkA>
 </div>
-<div v-if="!initializing && history.length == 0" class="_fullinfo">
-	<div>{{ i18n.ts._chat.noHistory }}</div>
-</div>
+<MkResult v-if="!initializing && history.length == 0" type="empty" :text="i18n.ts._chat.noHistory"/>
 <MkLoading v-if="initializing"/>
 </template>
 
@@ -60,8 +58,8 @@ async function fetchHistory() {
 	fetching.value = true;
 
 	const [userMessages, roomMessages] = await Promise.all([
-		misskeyApi('chat/history', { room: false }),
-		misskeyApi('chat/history', { room: true }),
+		misskeyApi<Misskey.entities.ChatMessage[]>('chat/history', { room: false }),
+		misskeyApi<Misskey.entities.ChatMessage[]>('chat/history', { room: true }),
 	]);
 
 	history.value = [...userMessages, ...roomMessages]

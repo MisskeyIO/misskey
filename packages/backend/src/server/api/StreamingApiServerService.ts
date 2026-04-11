@@ -16,6 +16,7 @@ import { MiLocalUser } from '@/models/User.js';
 import { UserService } from '@/core/UserService.js';
 import { RoleService } from '@/core/RoleService.js';
 import { ChannelFollowingService } from '@/core/ChannelFollowingService.js';
+import { ChannelMutingService } from '@/core/ChannelMutingService.js';
 import { AuthenticateService, AuthenticationError } from './AuthenticateService.js';
 import MainStreamConnection from './stream/Connection.js';
 import { ChannelsService } from './stream/ChannelsService.js';
@@ -44,6 +45,7 @@ export class StreamingApiServerService {
 		private usersService: UserService,
 		private roleService: RoleService,
 		private channelFollowingService: ChannelFollowingService,
+		private channelMutingService: ChannelMutingService,
 	) {
 	}
 
@@ -104,6 +106,7 @@ export class StreamingApiServerService {
 				this.roleService,
 				this.channelFollowingService,
 				this.meta,
+				this.channelMutingService,
 				user, app,
 			);
 

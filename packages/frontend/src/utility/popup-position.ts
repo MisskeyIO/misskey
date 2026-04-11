@@ -29,14 +29,18 @@ export function calcPopupPosition(el: HTMLElement, props: {
 			left = rect.left + window.scrollX + (props.anchorElement.offsetWidth / 2);
 			top = (rect.top + window.scrollY - contentHeight) - props.innerMargin;
 		} else {
-			left = props.x;
-			top = (props.y - contentHeight) - props.innerMargin;
+			left = props.x!;
+			top = (props.y! - contentHeight) - props.innerMargin;
 		}
 
 		left -= (el.offsetWidth / 2);
 
 		if (left + contentWidth - window.scrollX > window.innerWidth) {
 			left = window.innerWidth - contentWidth + window.scrollX - 1;
+		}
+
+		if (left < window.scrollX) {
+			left = window.scrollX;
 		}
 
 		return [left, top];
@@ -50,14 +54,18 @@ export function calcPopupPosition(el: HTMLElement, props: {
 			left = rect.left + window.scrollX + (props.anchorElement.offsetWidth / 2);
 			top = (rect.top + window.scrollY + props.anchorElement.offsetHeight) + props.innerMargin;
 		} else {
-			left = props.x;
-			top = (props.y) + props.innerMargin;
+			left = props.x!;
+			top = (props.y!) + props.innerMargin;
 		}
 
 		left -= (el.offsetWidth / 2);
 
 		if (left + contentWidth - window.scrollX > window.innerWidth) {
 			left = window.innerWidth - contentWidth + window.scrollX - 1;
+		}
+
+		if (left < window.scrollX) {
+			left = window.scrollX;
 		}
 
 		return [left, top];
@@ -71,14 +79,18 @@ export function calcPopupPosition(el: HTMLElement, props: {
 			left = (rect.left + window.scrollX - contentWidth) - props.innerMargin;
 			top = rect.top + window.scrollY + (props.anchorElement.offsetHeight / 2);
 		} else {
-			left = (props.x - contentWidth) - props.innerMargin;
-			top = props.y;
+			left = (props.x! - contentWidth) - props.innerMargin;
+			top = props.y!;
 		}
 
 		top -= (el.offsetHeight / 2);
 
 		if (top + contentHeight - window.scrollY > window.innerHeight) {
 			top = window.innerHeight - contentHeight + window.scrollY - 1;
+		}
+
+		if (left < window.scrollX) {
+			left = window.scrollX;
 		}
 
 		return [left, top];
@@ -95,19 +107,23 @@ export function calcPopupPosition(el: HTMLElement, props: {
 				top = rect.top + window.scrollY;
 				if (props.alignOffset != null) top += props.alignOffset;
 			} else if (props.align === 'bottom') {
-				// TODO
+				top = rect.top + window.scrollY;
 			} else { // center
 				top = rect.top + window.scrollY + (props.anchorElement.offsetHeight / 2);
 				top -= (el.offsetHeight / 2);
 			}
 		} else {
-			left = props.x + props.innerMargin;
-			top = props.y;
+			left = props.x! + props.innerMargin;
+			top = props.y!;
 			top -= (el.offsetHeight / 2);
 		}
 
 		if (top + contentHeight - window.scrollY > window.innerHeight) {
 			top = window.innerHeight - contentHeight + window.scrollY - 1;
+		}
+
+		if (left < window.scrollX) {
+			left = window.scrollX;
 		}
 
 		return [left, top];

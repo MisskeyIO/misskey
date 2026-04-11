@@ -9,6 +9,7 @@ import type { RouteDef } from '@/lib/nirax.js';
 import { $i, iAmModerator } from '@/i.js';
 import MkLoading from '@/pages/_loading_.vue';
 import MkError from '@/pages/_error_.vue';
+import PageTimeline from '@/pages/timeline.vue';
 
 export const page = (loader: AsyncComponentLoader) => defineAsyncComponent({
 	loader: loader,
@@ -16,11 +17,19 @@ export const page = (loader: AsyncComponentLoader) => defineAsyncComponent({
 	errorComponent: MkError,
 });
 
-function chatPage(...args: Parameters<typeof page>) {
-	return $i?.policies.chatAvailability !== 'unavailable' ? page(...args) : page(() => import('@/pages/not-found.vue'));
-}
+// FIXME チャット機能が有効になった暁には解除する
+// function chatPage(...args: Parameters<typeof page>) {
+// 	return $i?.policies.chatAvailability !== 'unavailable' ? page(...args) : page(() => import('@/pages/not-found.vue'));
+// }
 
 export const ROUTE_DEF: RouteDef[] = [{
+	name: 'index',
+	path: '/',
+	component: $i ? PageTimeline : page(() => import('@/pages/welcome.vue')),
+}, {
+	path: '/timeline',
+	component: PageTimeline,
+}, {
 	path: '/@:username/pages/:pageName(*)',
 	component: page(() => import('@/pages/page.vue')),
 }, {
@@ -44,8 +53,9 @@ export const ROUTE_DEF: RouteDef[] = [{
 }, {
 	path: '/clips/:clipId',
 	component: page(() => import('@/pages/clip.vue')),
-}
-// 	{
+},
+// FIXME チャット機能が有効になった暁には解除する
+// {
 // 	path: '/chat',
 // 	component: chatPage(() => import('@/pages/chat/home.vue')),
 // 	loginRequired: true,
@@ -62,7 +72,7 @@ export const ROUTE_DEF: RouteDef[] = [{
 // 	component: chatPage(() => import('@/pages/chat/message.vue')),
 // 	loginRequired: true,
 // },
-, {
+{
 	path: '/instance-info/:host',
 	component: page(() => import('@/pages/instance-info.vue')),
 }, {
@@ -175,6 +185,10 @@ export const ROUTE_DEF: RouteDef[] = [{
 		name: 'preferences',
 		component: page(() => import('@/pages/settings/custom-css.vue')),
 	}, {
+		path: '/profiles',
+		name: 'profiles',
+		component: page(() => import('@/pages/settings/profiles.vue')),
+	}, {
 		path: '/accounts',
 		name: 'accounts',
 		component: page(() => import('@/pages/settings/accounts.vue')),
@@ -196,6 +210,9 @@ export const ROUTE_DEF: RouteDef[] = [{
 }, {
 	path: '/signup-complete/:code',
 	component: page(() => import('@/pages/signup-complete.vue')),
+}, {
+	path: '/verify-email/:code',
+	component: page(() => import('@/pages/verify-email.vue')),
 }, {
 	path: '/announcements',
 	component: page(() => import('@/pages/announcements.vue')),
@@ -493,10 +510,6 @@ export const ROUTE_DEF: RouteDef[] = [{
 		name: 'performance',
 		component: page(() => import('@/pages/admin/performance.vue')),
 	}, {
-		path: '/server-rules',
-		name: 'server-rules',
-		component: page(() => import('@/pages/admin/server-rules.vue')),
-	}, {
 		path: '/invites',
 		name: 'invites',
 		component: page(() => import('@/pages/admin/invites.vue')),
@@ -593,12 +606,13 @@ export const ROUTE_DEF: RouteDef[] = [{
 	component: page(() => import('@/pages/reversi/game.vue')),
 	loginRequired: false,
 }, {
-	path: '/timeline',
-	component: page(() => import('@/pages/timeline.vue')),
+	path: '/qr',
+	component: page(() => import('@/pages/qr.vue')),
+	loginRequired: true,
 }, {
-	name: 'index',
-	path: '/',
-	component: $i ? page(() => import('@/pages/timeline.vue')) : page(() => import('@/pages/welcome.vue')),
+	path: '/debug',
+	component: page(() => import('@/pages/debug.vue')),
+	loginRequired: false,
 }, {
 	// テスト用リダイレクト設定。ログイン中ユーザのプロフィールにリダイレクトする
 	path: '/redirect-test',
@@ -607,4 +621,4 @@ export const ROUTE_DEF: RouteDef[] = [{
 }, {
 	path: '/:(*)',
 	component: page(() => import('@/pages/not-found.vue')),
-}] satisfies RouteDef[];
+}] as const satisfies RouteDef[];

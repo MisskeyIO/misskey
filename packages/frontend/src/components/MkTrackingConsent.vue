@@ -11,7 +11,7 @@
 			<Mfm
 				:text="i18n.tsx.pleaseConsentToTracking({
 					host: instance.name ?? host,
-					privacyPolicyUrl: instance.privacyPolicyUrl,
+					privacyPolicyUrl: instance.privacyPolicyUrl ?? '',
 				})"
 			/>
 		</div>

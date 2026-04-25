@@ -29,19 +29,37 @@ export async function checkWordMute(note: NoteLike, me: UserLike | null | undefi
 
 		if (text === '') return false;
 
-		const acable = mutedWords.filter(filter => Array.isArray(filter) && filter.length === 1).map(filter => filter[0]).sort();
-		const unacable = mutedWords.filter(filter => !Array.isArray(filter) || filter.length !== 1);
-		const acCacheKey = acable.join('\n');
-		const ac = acCache.get(acCacheKey) ?? AhoCorasick.withPatterns(acable);
-		acCache.delete(acCacheKey);
-		for (const obsoleteKeys of acCache.keys()) {
-			if (acCache.size > 1000) {
-				acCache.delete(obsoleteKeys);
+		const normalizeKeywordFilter = (keywords: string[]): string[] => {
+			return keywords
+				.map(keyword => keyword.trim())
+				.filter(keyword => keyword !== '');
+		};
+
+		const normalizedWords = mutedWords
+			.map(filter => {
+				if (!Array.isArray(filter)) return filter;
+				return normalizeKeywordFilter(filter);
+			})
+			.filter((filter): filter is string | string[] => !Array.isArray(filter) || filter.length > 0);
+
+		const acable = normalizedWords
+			.filter((filter): filter is string[] => Array.isArray(filter) && filter.length === 1)
+			.map(filter => filter[0])
+			.sort();
+		const unacable = normalizedWords.filter(filter => !Array.isArray(filter) || filter.length !== 1);
+		if (acable.length > 0) {
+			const acCacheKey = acable.join('\n');
+			const ac = acCache.get(acCacheKey) ?? AhoCorasick.withPatterns(acable);
+			acCache.delete(acCacheKey);
+			for (const obsoleteKeys of acCache.keys()) {
+				if (acCache.size > 1000) {
+					acCache.delete(obsoleteKeys);
+				}
 			}
-		}
-		acCache.set(acCacheKey, ac);
-		if (ac.isMatch(text)) {
-			return true;
+			acCache.set(acCacheKey, ac);
+			if (ac.isMatch(text)) {
+				return true;
+			}
 		}
 
 		const matched = unacable.some(filter => {

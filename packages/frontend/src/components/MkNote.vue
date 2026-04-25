@@ -323,6 +323,7 @@ const hideMutedNotes = prefer.s.hideMutedNotes;
 
 function toggleMute(ev: MouseEvent): void {
 	muted.value = false;
+	hardMuted.value = false;
 	ev.stopPropagation();
 }
 

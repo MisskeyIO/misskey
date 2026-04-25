@@ -10,7 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<span v-if="column.roleId && dimension > 0" :class="$style.dimensionBadge"><i class="ti ti-cube"></i>{{ dimension }}</span>
 	</template>
 <!--	<MkTimeline v-if="column.roleId" ref="timeline" src="role" :role="column.roleId" :dimension="dimension" @note="onNote"/>-->
-	<MkStreamingNotesTimeline v-if="column.roleId" ref="timeline" src="role" :role="column.roleId"/>
+	<MkStreamingNotesTimeline v-if="column.roleId" ref="timeline" src="role" :role="column.roleId" :dimension="dimension"/>
 </XColumn>
 </template>
 

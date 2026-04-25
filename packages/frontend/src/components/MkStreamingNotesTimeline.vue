@@ -337,6 +337,7 @@ function connectChannel() {
 		connections.homeTimeline = stream.useChannel('homeTimeline', {
 			withRenotes: props.withRenotes,
 			withFiles: props.onlyFiles ? true : undefined,
+			dimension: props.dimension,
 		});
 		connections.main = stream.useChannel('main');
 		connections.homeTimeline.on('note', prepend);
@@ -345,6 +346,7 @@ function connectChannel() {
 			withRenotes: props.withRenotes,
 			withReplies: props.withReplies,
 			withFiles: props.onlyFiles ? true : undefined,
+			dimension: props.dimension,
 		});
 		connections.localTimeline.on('note', prepend);
 	} else if (props.src === 'social') {
@@ -352,12 +354,14 @@ function connectChannel() {
 			withRenotes: props.withRenotes,
 			withReplies: props.withReplies,
 			withFiles: props.onlyFiles ? true : undefined,
+			dimension: props.dimension,
 		});
 		connections.hybridTimeline.on('note', prepend);
 	} else if (props.src === 'global') {
 		connections.globalTimeline = stream.useChannel('globalTimeline', {
 			withRenotes: props.withRenotes,
 			withFiles: props.onlyFiles ? true : undefined,
+			dimension: props.dimension,
 		});
 		connections.globalTimeline.on('note', prepend);
 	} else if (props.src === 'mentions') {
@@ -377,18 +381,21 @@ function connectChannel() {
 			withRenotes: props.withRenotes,
 			withFiles: props.onlyFiles ? true : undefined,
 			listId: props.list,
+			dimension: props.dimension,
 		});
 		connections.userList.on('note', prepend);
 	} else if (props.src === 'channel') {
 		if (props.channel == null) return;
 		connections.channel = stream.useChannel('channel', {
 			channelId: props.channel,
+			dimension: props.dimension,
 		});
 		connections.channel.on('note', prepend);
 	} else if (props.src === 'role') {
 		if (props.role == null) return;
 		connections.roleTimeline = stream.useChannel('roleTimeline', {
 			roleId: props.role,
+			dimension: props.dimension,
 		});
 		connections.roleTimeline.on('note', prepend);
 	}

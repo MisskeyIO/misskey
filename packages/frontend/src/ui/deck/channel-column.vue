@@ -15,7 +15,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkButton primary gradate rounded inline small @click="post"><i class="ti ti-pencil"></i></MkButton>
 		</div>
 <!--		FIXME: Dimension-->
-		<MkStreamingNotesTimeline ref="timeline" src="channel" :channel="column.channelId"/>
+		<MkStreamingNotesTimeline ref="timeline" src="channel" :channel="column.channelId" :dimension="dimension"/>
 	</template>
 </XColumn>
 </template>

@@ -39,6 +39,11 @@ describe(checkWordMute, () => {
 		it('should return false when the note is written by me even if text contains muted words', async () => {
 			expect(await checkWordMute({ userId: '1', text: 'foo bar' }, { id: '1' }, [['foo', 'bar']])).toBe(false);
 		});
+		it('should ignore empty keywords in keyword filters', async () => {
+			expect(await checkWordMute({ userId: '1', text: 'foo bar' }, null, [['foo', '']])).toBe(true);
+			expect(await checkWordMute({ userId: '1', text: 'foo bar' }, null, [['', 'bar']])).toBe(true);
+			expect(await checkWordMute({ userId: '1', text: 'foo bar' }, null, [['']])).toBe(false);
+		});
 	});
 	describe('RegExp mode', () => {
 		it('should return false if text does not contain muted words', async () => {

@@ -5,7 +5,7 @@ import type { MiNoteWithDimension } from '@/models/Note.js';
 export function normalizeDimension(value: number | null | undefined, dimensionCount: number): number | null {
 	const count = Math.max(1, dimensionCount);
 	if (typeof value !== 'number' || !Number.isFinite(value) || !Number.isInteger(value)) return null;
-	if (value <= 0 || value >= count) return null;
+	if (value < 0 || value >= count) return null;
 	return value;
 }
 

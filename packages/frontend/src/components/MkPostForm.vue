@@ -1598,7 +1598,10 @@ async function canClose() {
 			okText: i18n.ts.yes,
 			cancelText: i18n.ts.no,
 		});
-		if (canceled) return false;
+		if (canceled) {
+			textAreaReadOnly.value = false;
+			return false;
+		}
 	}
 
 	return true;

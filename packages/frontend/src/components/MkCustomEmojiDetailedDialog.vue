@@ -9,6 +9,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template #default>
 		<div class="_spacer">
 			<div style="display: flex; flex-direction: column; gap: 1em;">
+				<div :class="$style.actions">
+					<button class="_button" :class="$style.closeButton" :aria-label="i18n.ts.close" @click="cancel"><i class="ti ti-x"></i></button>
+				</div>
 				<div :class="$style.emojiImgWrapper">
 					<MkCustomEmoji :name="emoji.name" :normal="true" :useOriginalSize="true" style="height: 100%;"></MkCustomEmoji>
 				</div>
@@ -89,6 +92,19 @@ function cancel() {
   border-radius: var(--MI-radius);
   margin: auto;
   overflow-y: hidden;
+}
+
+.actions {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.closeButton {
+	width: 32px;
+	height: 32px;
+	border-radius: 999px;
+	color: var(--MI_THEME-fg);
+	background: light-dark(rgba(0, 0, 0, 0.04), rgba(255, 255, 255, 0.08));
 }
 
 .aliases {

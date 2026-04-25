@@ -254,6 +254,7 @@ const postingLang = ref<string | null>(null);
 const visibility = ref(props.initialVisibility ?? (prefer.s.rememberNoteVisibility ? store.s.visibility : prefer.s.defaultNoteVisibility));
 const visibleUsers = ref<Misskey.entities.UserDetailed[]>([]);
 const scheduledTime = ref<Date | null>(null);
+const canScheduleNote = computed(() => $i?.policies.canScheduleNote ?? false);
 const scheduledTimeExceededPolicy = computed(() =>
 	scheduledTime.value ? (scheduledTime.value.getTime() - Date.now()) / 86_400_000 > $i!.policies.scheduleNoteMaxDays : false
 );
@@ -821,7 +822,7 @@ function showOtherSettings() {
 			}
 			saveServerDraft();
 		},
-	}, ...($i.policies.scheduledNoteLimit > 0 ? [{
+	}, ...(canScheduleNote.value ? [{
 		icon: 'ti ti-calendar-time',
 		text: i18n.ts.schedulePost + '...',
 		action: () => {
@@ -1148,7 +1149,7 @@ function loadDraft(exactMatch = false) {
 			draftId.value = draft.key.replace(scope, '');
 		}
 
-		scheduledTime.value = draft.value.scheduledAt ? new Date(draft.value.scheduledAt) : null;
+		scheduledTime.value = canScheduleNote.value && draft.value.scheduledAt ? new Date(draft.value.scheduledAt) : null;
 		if (scheduledTime.value && (isNaN(scheduledTime.value.getTime()) || scheduledTime.value.getTime() < Date.now())) {
 			scheduledTime.value = null;
 		}
@@ -1472,6 +1473,8 @@ function showPerUploadItemMenuViaContextmenu(item: UploaderItem, ev: MouseEvent)
 }
 
 async function schedule() {
+	if (!canScheduleNote.value) return;
+
 	const { canceled, result } = await os.inputDatetime({
 		title: i18n.ts.schedulePost,
 	});

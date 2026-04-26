@@ -4,14 +4,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<MkModalWindow ref="dialogEl" @close="cancel()" @closed="emit('closed')">
+<MkModalWindow ref="dialogEl" @close="cancel()" @closed="emit('closed')" >
 	<template #header>:{{ emoji.name }}:</template>
 	<template #default>
 		<div class="_spacer">
 			<div style="display: flex; flex-direction: column; gap: 1em;">
-				<div :class="$style.actions">
-					<button class="_button" :class="$style.closeButton" :aria-label="i18n.ts.close" @click="cancel"><i class="ti ti-x"></i></button>
-				</div>
 				<div :class="$style.emojiImgWrapper">
 					<MkCustomEmoji :name="emoji.name" :normal="true" :useOriginalSize="true" style="height: 100%;"></MkCustomEmoji>
 				</div>

@@ -9,6 +9,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	:width="600"
 	:height="650"
 	:withOkButton="false"
+	:withCloseButton="true"
 	@click="cancel()"
 	@close="cancel()"
 	@closed="emit('closed')"

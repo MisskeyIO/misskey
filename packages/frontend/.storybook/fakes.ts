@@ -332,7 +332,6 @@ export function userDetailed(id = 'someuserid', username = 'miskist', host: enti
 			rateLimitFactor: 0,
 			scheduleNoteLimit: 0,
 			scheduleNoteMaxDays: 0,
-			scheduledNoteLimit: 0,
 			skipNsfwDetection: false,
 			uploadableFileTypes: [],
 			userEachUserListsLimit: 0,

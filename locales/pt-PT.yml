@@ -2052,7 +2052,6 @@ _role:
     uploadableFileTypes_caption: "Especifica tipos MIME permitidos. Múltiplos tipos MIME podem ser especificados separando-os por linha. Curingas podem ser especificados com um asterisco (*). (exemplo, image/*)"
     uploadableFileTypes_caption2: "Alguns tipos de arquivos podem não ser detectados. Para permiti-los, adicione {x} à especificação."
     noteDraftLimit: "Limite de rascunhos possíveis"
-    scheduledNoteLimit: "Número máximo de notas agendadas simultâneas"
     watermarkAvailable: "Disponibilidade da função de marca d'água"
   _condition:
     roleAssignedTo: "Atribuído a cargos manuais"

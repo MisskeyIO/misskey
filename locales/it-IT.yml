@@ -2101,7 +2101,6 @@ _role:
     uploadableFileTypes_caption: "Specifica il tipo MIME. Puoi specificare più valori separandoli andando a capo, oppure indicare caratteri jolly con un asterisco (*). Ad esempio: image/*"
     uploadableFileTypes_caption2: "A seconda del file, il tipo potrebbe non essere determinato. Se si desidera consentire tali file, aggiungere {x} alla specifica."
     noteDraftLimit: "Numero massimo di Note in bozza, lato server"
-    scheduledNoteLimit: "Quantità di Note pianificabili contemporaneamente"
     watermarkAvailable: "Disponibilità della funzione filigrana"
   _condition:
     roleAssignedTo: "Assegnato a ruoli manualmente"

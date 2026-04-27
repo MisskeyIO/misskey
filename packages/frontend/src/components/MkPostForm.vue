@@ -835,14 +835,14 @@ function showOtherSettings() {
 		action: () => {
 			showDraftsDialog();
 		},
-	}, {
+	}, ...(canScheduleNote.value ? [{
 		type: 'button',
 		text: i18n.ts._drafts.listScheduledNotes,
 		icon: 'ti ti-clock-down',
 		action: () => {
 			showScheduledNotesDialog();
 		},
-	}, { type: 'divider' }, {
+	}] : []), { type: 'divider' }, {
 		type: 'switch',
 		icon: 'ti ti-eye',
 		text: i18n.ts.preview,

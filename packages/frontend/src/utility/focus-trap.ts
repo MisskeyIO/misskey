@@ -5,6 +5,9 @@
 import { getHTMLElementOrNull } from '@/utility/get-dom-node-or-null.js';
 
 const focusTrapElements = new Set<HTMLElement>();
+const focusTrapElementOptions = new Map<HTMLElement, {
+	hasInteractionWithOtherFocusTrappedEls: boolean;
+}>();
 const ignoreElements = [
 	'script',
 	'style',
@@ -42,32 +45,41 @@ function getHighestZIndexElement(): { el: HTMLElement; zIndex: number; } | null 
 	};
 }
 
+function canInteractWithSibling(siblingEl: HTMLElement, activeEl: HTMLElement, hasInteractionWithOtherFocusTrappedEls: boolean): boolean {
+	if (siblingEl === activeEl || siblingEl.contains(activeEl)) return true;
+	if (!hasInteractionWithOtherFocusTrappedEls) return false;
+	if (siblingEl.hasAttribute('data-focus-trap-interactable')) return true;
+	if (focusTrapElements.has(siblingEl) || containsFocusTrappedElements(siblingEl)) return true;
+	return false;
+}
+
 function releaseFocusTrap(el: HTMLElement): void {
 	focusTrapElements.delete(el);
+	focusTrapElementOptions.delete(el);
 	if (el.inert === true) {
 		el.inert = false;
 	}
 
 	const highestZIndexElement = getHighestZIndexElement();
+	const highestZIndexElementOptions = highestZIndexElement == null ? null : focusTrapElementOptions.get(highestZIndexElement.el);
+	const highestZIndexElementAllowsInteraction = highestZIndexElementOptions?.hasInteractionWithOtherFocusTrappedEls ?? false;
 
 	if (el.parentElement != null && el !== window.document.body) {
 		el.parentElement.childNodes.forEach((siblingNode) => {
 			const siblingEl = getHTMLElementOrNull(siblingNode);
 			if (!siblingEl) return;
+			if (ignoreElements.includes(siblingEl.tagName.toLowerCase())) return;
 			if (
-				siblingEl !== el &&
 				(
+					siblingEl === el ||
 					highestZIndexElement == null ||
-					siblingEl === highestZIndexElement.el ||
-					siblingEl.contains(highestZIndexElement.el)
+					canInteractWithSibling(siblingEl, highestZIndexElement.el, highestZIndexElementAllowsInteraction)
 				)
 			) {
 				siblingEl.inert = false;
 			} else if (
 				highestZIndexElement != null &&
-				siblingEl !== highestZIndexElement.el &&
-				!siblingEl.contains(highestZIndexElement.el) &&
-				!ignoreElements.includes(siblingEl.tagName.toLowerCase())
+				!canInteractWithSibling(siblingEl, highestZIndexElement.el, highestZIndexElementAllowsInteraction)
 			) {
 				siblingEl.inert = true;
 			} else {
@@ -90,8 +102,14 @@ export function focusTrap(el: HTMLElement, hasInteractionWithOtherFocusTrappedEl
 	// Focus trapping for this element will be done in the release function
 	if (!parent && zIndex < highestZIndex) {
 		focusTrapElements.add(el);
+		focusTrapElementOptions.set(el, {
+			hasInteractionWithOtherFocusTrappedEls,
+		});
 		if (highestZIndexElement) {
-			focusTrap(highestZIndexElement.el, hasInteractionWithOtherFocusTrappedEls);
+			focusTrap(
+				highestZIndexElement.el,
+				focusTrapElementOptions.get(highestZIndexElement.el)?.hasInteractionWithOtherFocusTrappedEls ?? false,
+			);
 		}
 		return {
 			release: () => {
@@ -132,6 +150,9 @@ export function focusTrap(el: HTMLElement, hasInteractionWithOtherFocusTrappedEl
 
 	if (!parent) {
 		focusTrapElements.add(el);
+		focusTrapElementOptions.set(el, {
+			hasInteractionWithOtherFocusTrappedEls,
+		});
 
 		return {
 			release: () => {

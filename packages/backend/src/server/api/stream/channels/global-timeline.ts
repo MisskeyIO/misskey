@@ -63,6 +63,17 @@ class GlobalTimelineChannel extends Channel {
 		if (this.withFiles && (note.fileIds == null || note.fileIds.length === 0)) return;
 		if (this.withFiles && (note.files === undefined || note.files.length === 0)) return;
 
+		// 関係ない返信は除外
+		if (note.reply) {
+			const reply = note.reply;
+			if ((this.following[note.userId]?.withReplies ?? false)) {
+				if (!this.isNoteVisibleForMe(reply)) return;
+			} else {
+				// 「チャンネル接続主への返信」でもなければ、「チャンネル接続主が行った返信」でもなければ、「投稿者の投稿者自身への返信」でもない場合
+				if (reply.userId !== note.userId && (!this.user || (reply.userId !== this.user.id && note.userId !== this.user.id))) return;
+			}
+		}
+
 		// 純粋なリノート（引用リノートでないリノート）の場合
 		if (note.renote && isRenotePacked(note) && !isQuotePacked(note)) {
 			if (!this.withRenotes) return;

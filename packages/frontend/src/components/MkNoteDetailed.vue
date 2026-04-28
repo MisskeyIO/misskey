@@ -331,6 +331,7 @@ function toggleMute(ev: MouseEvent): void {
 	muted.value = false;
 	ev.stopPropagation();
 }
+
 const translation = ref<Misskey.entities.NotesTranslateResponse | null>(null);
 const translating = ref(false);
 const parsed = appearNote.text ? mfm.parse(appearNote.text) : null;

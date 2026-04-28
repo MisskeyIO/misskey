@@ -14,7 +14,7 @@ function createElement(name: string, zIndex: number, interactable = false): HTML
 	el.style.position = 'fixed';
 	el.style.zIndex = zIndex.toString();
 	if (interactable) {
-		el.setAttribute('data-focus-trap-interactable', '');
+		el.dataset.focusTrapInteractable = '';
 	}
 	document.body.appendChild(el);
 	return el;

@@ -48,7 +48,7 @@ function getHighestZIndexElement(): { el: HTMLElement; zIndex: number; } | null 
 function canInteractWithSibling(siblingEl: HTMLElement, activeEl: HTMLElement, hasInteractionWithOtherFocusTrappedEls: boolean): boolean {
 	if (siblingEl === activeEl || siblingEl.contains(activeEl)) return true;
 	if (!hasInteractionWithOtherFocusTrappedEls) return false;
-	if (siblingEl.hasAttribute('data-focus-trap-interactable')) return true;
+	if (siblingEl.dataset.focusTrapInteractable != null) return true;
 	if (focusTrapElements.has(siblingEl) || containsFocusTrappedElements(siblingEl)) return true;
 	return false;
 }
@@ -126,7 +126,7 @@ export function focusTrap(el: HTMLElement, hasInteractionWithOtherFocusTrappedEl
 		el.parentElement.childNodes.forEach((siblingNode) => {
 			const siblingEl = getHTMLElementOrNull(siblingNode);
 			if (!siblingEl) return;
-			const isInteractableSibling = hasInteractionWithOtherFocusTrappedEls && siblingEl.hasAttribute('data-focus-trap-interactable');
+			const isInteractableSibling = hasInteractionWithOtherFocusTrappedEls && siblingEl.dataset.focusTrapInteractable != null;
 			if (
 				siblingEl !== el &&
 				isInteractableSibling

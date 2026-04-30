@@ -72,7 +72,6 @@ function releaseFocusTrap(el: HTMLElement): void {
 			const canInteract = highestZIndexElement != null && canInteractWithSibling(siblingEl, highestZIndexElement.el, highestZIndexElementAllowsInteraction);
 			if (
 				(
-					siblingEl === el ||
 					highestZIndexElement == null ||
 					canInteract
 				)

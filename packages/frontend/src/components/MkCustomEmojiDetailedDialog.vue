@@ -91,19 +91,6 @@ function cancel() {
   overflow-y: hidden;
 }
 
-.actions {
-	display: flex;
-	justify-content: flex-end;
-}
-
-.closeButton {
-	width: 32px;
-	height: 32px;
-	border-radius: 999px;
-	color: var(--MI_THEME-fg);
-	background: light-dark(rgba(0, 0, 0, 0.04), rgba(255, 255, 255, 0.08));
-}
-
 .aliases {
   display: flex;
   flex-wrap: wrap;

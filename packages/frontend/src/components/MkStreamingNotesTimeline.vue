@@ -381,7 +381,6 @@ function connectChannel() {
 			withRenotes: props.withRenotes,
 			withFiles: props.onlyFiles ? true : undefined,
 			listId: props.list,
-			dimension: props.dimension,
 		});
 		connections.userList.on('note', prepend);
 	} else if (props.src === 'channel') {

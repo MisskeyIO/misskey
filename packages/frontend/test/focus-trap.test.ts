@@ -32,7 +32,7 @@ afterEach(() => {
 	for (const release of releases.splice(0).reverse()) {
 		release();
 	}
-	document.body.innerHTML = '';
+	document.body.replaceChildren();
 });
 
 describe('focusTrap', () => {

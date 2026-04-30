@@ -69,17 +69,18 @@ function releaseFocusTrap(el: HTMLElement): void {
 			const siblingEl = getHTMLElementOrNull(siblingNode);
 			if (!siblingEl) return;
 			if (ignoreElements.includes(siblingEl.tagName.toLowerCase())) return;
+			const canInteract = highestZIndexElement != null && canInteractWithSibling(siblingEl, highestZIndexElement.el, highestZIndexElementAllowsInteraction);
 			if (
 				(
 					siblingEl === el ||
 					highestZIndexElement == null ||
-					canInteractWithSibling(siblingEl, highestZIndexElement.el, highestZIndexElementAllowsInteraction)
+					canInteract
 				)
 			) {
 				siblingEl.inert = false;
 			} else if (
 				highestZIndexElement != null &&
-				!canInteractWithSibling(siblingEl, highestZIndexElement.el, highestZIndexElementAllowsInteraction)
+				!canInteract
 			) {
 				siblingEl.inert = true;
 			} else {

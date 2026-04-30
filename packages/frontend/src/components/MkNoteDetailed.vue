@@ -217,7 +217,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 	</div>
 </div>
-<div v-else-if="muted" class="_panel" :class="$style.muted" @click="muted = false">
+<div v-else-if="muted" class="_panel" :class="$style.muted" @click="toggleMute">
 	<small>
 		{{ i18n.tsx.userSaysSomething({ name: '' }) }}
 		<MkA v-user-preview="appearNote.userId" :to="userPage(appearNote.user)">
@@ -326,6 +326,12 @@ const isMyRenote = $i && ($i.id === note.userId);
 const showContent = ref(false);
 const isDeleted = ref(false);
 const muted = ref($i ? checkWordMute(appearNote, $i, $i.mutedWords) : false);
+
+function toggleMute(ev: MouseEvent): void {
+	muted.value = false;
+	ev.stopPropagation();
+}
+
 const translation = ref<Misskey.entities.NotesTranslateResponse | null>(null);
 const translating = ref(false);
 const parsed = appearNote.text ? mfm.parse(appearNote.text) : null;

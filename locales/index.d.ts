@@ -8735,10 +8735,6 @@ export interface Locale extends ILocale {
              */
             "noteDraftLimit": string;
             /**
-             * 予約投稿の同時作成可能数
-             */
-            "scheduledNoteLimit": string;
-            /**
              * アップロード可能なファイル種別
              */
             "uploadableFileTypes": string;

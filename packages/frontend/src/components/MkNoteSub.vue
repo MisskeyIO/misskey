@@ -31,7 +31,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<MkA class="_link" :to="notePage(note)">{{ i18n.ts.continueThread }} <i class="ti ti-chevron-double-right"></i></MkA>
 	</div>
 </div>
-<div v-else :class="$style.muted" @click="muted = false">
+<div v-else :class="$style.muted" @click="toggleMute">
 	<I18n :src="i18n.ts.userSaysSomething" tag="small">
 		<template #name>
 			<MkA v-user-preview="note.userId" :to="userPage(note.user)">
@@ -66,6 +66,11 @@ const props = withDefaults(defineProps<{
 });
 
 const muted = ref(props.note && $i ? checkWordMute(props.note, $i, $i.mutedWords) : false);
+
+function toggleMute(ev: MouseEvent): void {
+	muted.value = false;
+	ev.stopPropagation();
+}
 
 const showContent = ref(false);
 const replies = ref<Misskey.entities.Note[]>([]);

@@ -159,7 +159,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 	</article>
 </div>
-<div v-else :class="$style.muted" :style="hideMutedNotes ? 'display: none' : undefined" @click="muted = false">
+<div v-else :class="$style.muted" :style="hideMutedNotes ? 'display: none' : undefined" @click="toggleMute">
 	<I18n v-if="muted === 'sensitiveMute'" :src="i18n.ts.userSaysSomethingSensitive" tag="small">
 		<template #name>
 			<MkA v-user-preview="appearNote.userId" :to="userPage(appearNote.user)">
@@ -320,6 +320,12 @@ const renoteCollapsed = ref(
 	),
 );
 const hideMutedNotes = prefer.s.hideMutedNotes;
+
+function toggleMute(ev: MouseEvent): void {
+	muted.value = false;
+	hardMuted.value = false;
+	ev.stopPropagation();
+}
 
 const pleaseLoginContext = computed<OpenOnRemoteOptions>(() => ({
 	type: 'lookup',

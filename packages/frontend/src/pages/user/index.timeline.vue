@@ -50,6 +50,7 @@ const notesPaginator = markRaw(new Paginator('users/notes', {
 		userId: props.user.id,
 		withRenotes: tab.value === 'all',
 		withReplies: tab.value === 'all',
+		withChannelNotes: tab.value === 'all',
 		withFiles: tab.value === 'files',
 	})),
 }));

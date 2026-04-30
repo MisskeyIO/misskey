@@ -2234,7 +2234,6 @@ _role:
     chatAvailability: "Allow Chat"
     canSearchUsers: 'User search'
     noteDraftLimit: 'Number of possible drafts of server notes'
-    scheduledNoteLimit: 'Maximum number of simultaneous scheduled notes'
     uploadableFileTypes: 'Uploadable file types'
     uploadableFileTypes_caption: 'Specifies the allowed MIME/file types. Multiple MIME types can be specified by separating them with a new line, and wildcards can be specified with an asterisk (*). (e.g., image/*)'
     uploadableFileTypes_caption2: 'Some files types might fail to be detected. To allow such files, add {x} to the specification.'

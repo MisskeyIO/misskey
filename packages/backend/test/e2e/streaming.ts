@@ -623,14 +623,15 @@ describe('Streaming', () => {
 				assert.strictEqual(fired, false);
 			});
 
-			test('withReplies = falseでフォローしてる人によるリプライが流れない', async () => {
+			// NOTE: globalTimelineには、 withReplies相当のフィルターは存在しないので流れるのが正しいはず。
+			test('withReplies = falseでフォローしてる人によるリプライが流れる', async () => {
 				const fired = await waitFire(
 					ayano, 'globalTimeline',		// ayano:Global
 					() => api('notes/create', { text: 'foo', replyId: kanakoNote.id }, kyoko),	// kyoko posts
 					msg => msg.type === 'note' && msg.body.userId === kyoko.id,	// wait kyoko
 				);
 
-				assert.strictEqual(fired, false);
+				assert.strictEqual(fired, true);
 			});
 		});
 

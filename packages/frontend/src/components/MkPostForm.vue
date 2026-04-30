@@ -15,7 +15,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div :class="$style.headerLeft">
 			<button v-if="!fixed" :class="$style.cancel" class="_button" @click="cancel"><i class="ti ti-x"></i></button>
 			<button ref="accountMenuEl" v-click-anime v-tooltip="i18n.ts.account" :class="$style.account" class="_button" @click="openAccountMenu">
-				<img :class="$style.avatar" :src="(postAccount ?? $i).avatarUrl" style="border-radius: 100%;"/>
+				<MkAvatar :class="$style.avatar" :user="postAccount ?? $i"/>
 			</button>
 		</div>
 		<div :class="$style.headerRight">
@@ -254,6 +254,7 @@ const postingLang = ref<string | null>(null);
 const visibility = ref(props.initialVisibility ?? (prefer.s.rememberNoteVisibility ? store.s.visibility : prefer.s.defaultNoteVisibility));
 const visibleUsers = ref<Misskey.entities.UserDetailed[]>([]);
 const scheduledTime = ref<Date | null>(null);
+const canScheduleNote = computed(() => $i?.policies.canScheduleNote ?? false);
 const scheduledTimeExceededPolicy = computed(() =>
 	scheduledTime.value ? (scheduledTime.value.getTime() - Date.now()) / 86_400_000 > $i!.policies.scheduleNoteMaxDays : false
 );
@@ -785,6 +786,22 @@ function showOtherSettings() {
 	const postingLangCaption = postingLang.value != null
 		? (postingLang.value === 'other' ? i18n.ts.other : langmap[postingLang.value]?.nativeName ?? postingLang.value)
 		: i18n.ts.default;
+	const schedulePostMenuItems: MenuItem[] = canScheduleNote.value ? [{
+		type: 'button',
+		icon: 'ti ti-calendar-time',
+		text: i18n.ts.schedulePost + '...',
+		action: () => {
+			schedule();
+		},
+	}] : [];
+	const scheduledNotesListMenuItems: MenuItem[] = canScheduleNote.value ? [{
+		type: 'button',
+		text: i18n.ts._drafts.listScheduledNotes,
+		icon: 'ti ti-clock-down',
+		action: () => {
+			showScheduledNotesDialog();
+		},
+	}] : [];
 
 	const menuItems = [{
 		type: 'component',
@@ -793,15 +810,18 @@ function showOtherSettings() {
 			textLength: textLength,
 		},
 	}, { type: 'divider' }, {
+		type: 'button',
 		icon: 'ti ti-cube',
 		text: i18n.tsx.dimensionWithNumber({ dimension: dimension.value }),
 		action: pickDimension,
 	}, {
+		type: 'button',
 		icon: 'ti ti-language',
 		text: i18n.ts.postingLanguage,
 		caption: postingLangCaption,
 		action: pickPostingLanguage,
 	}, { type: 'divider' }, {
+		type: 'button',
 		icon: reactionAcceptanceIcon,
 		text: i18n.ts.reactionAcceptance,
 		caption: reactionAcceptanceCaption,
@@ -821,32 +841,20 @@ function showOtherSettings() {
 			}
 			saveServerDraft();
 		},
-	}, ...($i.policies.scheduledNoteLimit > 0 ? [{
-		icon: 'ti ti-calendar-time',
-		text: i18n.ts.schedulePost + '...',
-		action: () => {
-			schedule();
-		},
-	}] : []), { type: 'divider' }, {
+	}, ...schedulePostMenuItems, { type: 'divider' }, {
 		type: 'button',
 		text: i18n.ts._drafts.listDrafts,
 		icon: 'ti ti-cloud-download',
 		action: () => {
 			showDraftsDialog();
 		},
-	}, {
-		type: 'button',
-		text: i18n.ts._drafts.listScheduledNotes,
-		icon: 'ti ti-clock-down',
-		action: () => {
-			showScheduledNotesDialog();
-		},
-	}, { type: 'divider' }, {
+	}, ...scheduledNotesListMenuItems, { type: 'divider' }, {
 		type: 'switch',
 		icon: 'ti ti-eye',
 		text: i18n.ts.preview,
 		ref: showPreview,
 	}, {
+		type: 'button',
 		icon: 'ti ti-trash',
 		text: i18n.ts.reset,
 		danger: true,
@@ -1148,7 +1156,7 @@ function loadDraft(exactMatch = false) {
 			draftId.value = draft.key.replace(scope, '');
 		}
 
-		scheduledTime.value = draft.value.scheduledAt ? new Date(draft.value.scheduledAt) : null;
+		scheduledTime.value = canScheduleNote.value && draft.value.scheduledAt ? new Date(draft.value.scheduledAt) : null;
 		if (scheduledTime.value && (isNaN(scheduledTime.value.getTime()) || scheduledTime.value.getTime() < Date.now())) {
 			scheduledTime.value = null;
 		}
@@ -1472,6 +1480,8 @@ function showPerUploadItemMenuViaContextmenu(item: UploaderItem, ev: MouseEvent)
 }
 
 async function schedule() {
+	if (!canScheduleNote.value) return;
+
 	const { canceled, result } = await os.inputDatetime({
 		title: i18n.ts.schedulePost,
 	});
@@ -1595,7 +1605,10 @@ async function canClose() {
 			okText: i18n.ts.yes,
 			cancelText: i18n.ts.no,
 		});
-		if (canceled) return false;
+		if (canceled) {
+			textAreaReadOnly.value = false;
+			return false;
+		}
 	}
 
 	return true;

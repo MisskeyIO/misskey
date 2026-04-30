@@ -90,7 +90,18 @@ async function setAntenna() {
 }
 
 function editAntenna() {
-	os.pageWindow('my/antennas/' + props.column.antennaId);
+	if (props.column.antennaId == null) return;
+
+	misskeyApi('antennas/show', { antennaId: props.column.antennaId })
+		.then(antenna => os.popupAsyncWithDialog(import('@/components/MkAntennaEditorDialog.vue').then(x => x.default), {
+			antenna,
+		}, {
+			updated: (editedAntenna: MisskeyEntities.Antenna) => {
+				antennasCache.delete();
+				if (editedAntenna.id !== props.column.antennaId) return;
+				updateColumn(props.column.id, { timelineNameCache: editedAntenna.name });
+			},
+		}, 'closed'));
 }
 
 const menu: MenuItem[] = [

@@ -54,7 +54,7 @@ function onPosting() {
 }
 
 function onPostError() {
-	os.post();
+	os.post(props);
 }
 
 async function _close() {

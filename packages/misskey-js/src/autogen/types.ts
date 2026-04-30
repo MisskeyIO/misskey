@@ -4368,6 +4368,11 @@ export type components = {
              * Format: id
              * @example xxxxxxxxxx
              */
+            replyUserId?: string | null;
+            /**
+             * Format: id
+             * @example xxxxxxxxxx
+             */
             renoteId?: string | null;
             reply?: components['schemas']['Note'] | null;
             renote?: components['schemas']['Note'] | null;
@@ -5447,7 +5452,6 @@ export type components = {
             /** @enum {string} */
             chatAvailability: 'available' | 'readonly' | 'unavailable';
             noteDraftLimit: number;
-            scheduledNoteLimit: number;
             watermarkAvailable: boolean;
         };
         ReversiGameLite: {
@@ -11754,7 +11758,7 @@ export interface operations {
                     policies: {
                         id?: string | null;
                         /** @enum {string} */
-                        policy: 'gtlAvailable' | 'ltlAvailable' | 'canPublicNote' | 'canScheduleNote' | 'scheduleNoteLimit' | 'scheduleNoteMaxDays' | 'canInitiateConversation' | 'canCreateContent' | 'canUpdateContent' | 'canDeleteContent' | 'canPurgeAccount' | 'canUpdateAvatar' | 'canUpdateBanner' | 'mentionLimit' | 'canInvite' | 'inviteLimit' | 'inviteLimitCycle' | 'inviteExpirationTime' | 'canManageCustomEmojis' | 'canManageAvatarDecorations' | 'canSearchNotes' | 'canSearchUsers' | 'canUseTranslator' | 'canUseDriveFileInSoundSettings' | 'canUseReaction' | 'canHideAds' | 'driveCapacityMb' | 'maxFileSizeMb' | 'alwaysMarkNsfw' | 'canUpdateBioMedia' | 'skipNsfwDetection' | 'pinLimit' | 'antennaLimit' | 'antennaNotesLimit' | 'wordMuteLimit' | 'webhookLimit' | 'clipLimit' | 'noteEachClipsLimit' | 'userListLimit' | 'userEachUserListsLimit' | 'rateLimitFactor' | 'avatarDecorationLimit' | 'canImportAntennas' | 'canImportBlocking' | 'canImportFollowing' | 'canImportMuting' | 'canImportUserLists' | 'mutualLinkSectionLimit' | 'mutualLinkLimit' | 'chatAvailability' | 'uploadableFileTypes' | 'noteDraftLimit' | 'scheduledNoteLimit' | 'watermarkAvailable';
+                        policy: 'gtlAvailable' | 'ltlAvailable' | 'canPublicNote' | 'canScheduleNote' | 'scheduleNoteLimit' | 'scheduleNoteMaxDays' | 'canInitiateConversation' | 'canCreateContent' | 'canUpdateContent' | 'canDeleteContent' | 'canPurgeAccount' | 'canUpdateAvatar' | 'canUpdateBanner' | 'mentionLimit' | 'canInvite' | 'inviteLimit' | 'inviteLimitCycle' | 'inviteExpirationTime' | 'canManageCustomEmojis' | 'canManageAvatarDecorations' | 'canSearchNotes' | 'canSearchUsers' | 'canUseTranslator' | 'canUseDriveFileInSoundSettings' | 'canUseReaction' | 'canHideAds' | 'driveCapacityMb' | 'maxFileSizeMb' | 'alwaysMarkNsfw' | 'canUpdateBioMedia' | 'skipNsfwDetection' | 'pinLimit' | 'antennaLimit' | 'antennaNotesLimit' | 'wordMuteLimit' | 'webhookLimit' | 'clipLimit' | 'noteEachClipsLimit' | 'userListLimit' | 'userEachUserListsLimit' | 'rateLimitFactor' | 'avatarDecorationLimit' | 'canImportAntennas' | 'canImportBlocking' | 'canImportFollowing' | 'canImportMuting' | 'canImportUserLists' | 'mutualLinkSectionLimit' | 'mutualLinkLimit' | 'chatAvailability' | 'uploadableFileTypes' | 'noteDraftLimit' | 'watermarkAvailable';
                         /**
                          * @default set
                          * @enum {string}

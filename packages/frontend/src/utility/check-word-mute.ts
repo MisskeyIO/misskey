@@ -16,7 +16,9 @@ export function checkWordMute(note: Misskey.entities.Note, me: Misskey.entities.
 		const matched = mutedWords.filter(filter => {
 			if (Array.isArray(filter)) {
 				// Clean up
-				const filteredFilter = filter.filter(keyword => keyword !== '');
+				const filteredFilter = filter
+					.map(keyword => keyword.trim())
+					.filter(keyword => keyword !== '');
 				if (filteredFilter.length === 0) return false;
 
 				return filteredFilter.every(keyword => text.includes(keyword));

@@ -70,12 +70,12 @@ export async function checkWordMute(note: NoteLike, me: UserLike | null | undefi
 			const acCacheKey = acable.join('\n');
 			const ac = acCache.get(acCacheKey) ?? AhoCorasick.withPatterns(acable);
 			acCache.delete(acCacheKey);
-			for (const obsoleteKeys of acCache.keys()) {
-				if (acCache.size > 1000) {
-					acCache.delete(obsoleteKeys);
-				}
-			}
 			acCache.set(acCacheKey, ac);
+			while (acCache.size > 1000) {
+				const obsoleteKey = acCache.keys().next().value;
+				if (obsoleteKey === undefined) break;
+				acCache.delete(obsoleteKey);
+			}
 			if (ac.isMatch(text)) {
 				return true;
 			}

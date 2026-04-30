@@ -42,7 +42,10 @@ describe(checkWordMute, () => {
 		it('should ignore empty keywords in keyword filters', async () => {
 			expect(await checkWordMute({ userId: '1', text: 'foo bar' }, null, [['foo', '']])).toBe(true);
 			expect(await checkWordMute({ userId: '1', text: 'foo bar' }, null, [['', 'bar']])).toBe(true);
+			expect(await checkWordMute({ userId: '1', text: 'foo bar' }, null, [['foo', '   ']])).toBe(true);
+			expect(await checkWordMute({ userId: '1', text: 'foo bar' }, null, [['   ', 'bar']])).toBe(true);
 			expect(await checkWordMute({ userId: '1', text: 'foo bar' }, null, [['']])).toBe(false);
+			expect(await checkWordMute({ userId: '1', text: 'foo bar' }, null, [['   ']])).toBe(false);
 		});
 	});
 	describe('RegExp mode', () => {

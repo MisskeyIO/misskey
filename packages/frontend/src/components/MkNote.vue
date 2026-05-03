@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div
-	v-if="!hardMuted && muted === false"
+	v-if="isNoteVisible"
 	v-show="!isDeleted"
 	ref="rootEl"
 	v-hotkey="keymap"
@@ -159,29 +159,34 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 	</article>
 </div>
-<div v-else :class="$style.muted" :style="hideMutedNotes ? 'display: none' : undefined" @click="toggleMute">
-	<I18n v-if="muted === 'sensitiveMute'" :src="i18n.ts.userSaysSomethingSensitive" tag="small">
+<div v-else-if="isMuteExpandable" :class="$style.muted" @click="toggleMute">
+	<I18n v-if="muteType === 'sensitive'" :src="i18n.ts.userSaysSomethingSensitive" tag="small">
 		<template #name>
 			<MkA v-user-preview="appearNote.userId" :to="userPage(appearNote.user)">
 				<MkUserName :user="appearNote.user"/>
 			</MkA>
 		</template>
 	</I18n>
-	<I18n v-else-if="showSoftWordMutedWord !== true" :src="i18n.ts.userSaysSomething" tag="small">
+	<I18n v-else-if="muteType === 'word' && !showSoftWordMutedWord" :src="i18n.ts.userSaysSomething" tag="small">
 		<template #name>
 			<MkA v-user-preview="appearNote.userId" :to="userPage(appearNote.user)">
 				<MkUserName :user="appearNote.user"/>
 			</MkA>
 		</template>
 	</I18n>
-	<I18n v-else :src="i18n.ts.userSaysSomethingAbout" tag="small">
+	<I18n v-else-if="muteType === 'word'" :src="i18n.ts.userSaysSomethingAbout" tag="small">
 		<template #name>
 			<MkA v-user-preview="appearNote.userId" :to="userPage(appearNote.user)">
 				<MkUserName :user="appearNote.user"/>
 			</MkA>
 		</template>
-		<template #word>
-			{{ Array.isArray(muted) ? muted.map(words => Array.isArray(words) ? words.join() : words).slice(0, 3).join(' ') : muted }}
+		<template #word>{{ mutedWordsDisplay }}</template>
+	</I18n>
+	<I18n v-else :src="i18n.ts.userSaysSomething" tag="small">
+		<template #name>
+			<MkA v-user-preview="appearNote.userId" :to="userPage(appearNote.user)">
+				<MkUserName :user="appearNote.user"/>
+			</MkA>
 		</template>
 	</I18n>
 </div>
@@ -306,9 +311,36 @@ const parsed = computed(() => appearNote.text ? mfm.parse(appearNote.text) : nul
 const urls = computed(() => parsed.value ? extractUrlFromMfm(parsed.value).filter((url) => appearNote.renote?.url !== url && appearNote.renote?.uri !== url) : null);
 const isLong = shouldCollapsed(appearNote, urls.value ?? []);
 const collapsed = ref(appearNote.cw == null && isLong);
+
+// #region Mute Logic
 const muted = ref(checkMute(appearNote, $i?.mutedWords ?? []));
 const hardMuted = ref(props.withHardMute && checkMute(appearNote, $i?.mutedWords ?? [], true));
 const showSoftWordMutedWord = computed(() => prefer.s.showSoftWordMutedWord);
+
+// ノートが表示されるか（ミュートされていない、またはハードミュートで非表示設定でない）
+const isNoteVisible = computed(() => !hardMuted.value && muted.value === false);
+
+// ミュート表示がクリックで展開可能か
+const isMuteExpandable = computed(() => muted.value !== false || (hardMuted.value && !hideMutedNotes));
+
+// 現在のミュート状態の種類
+const muteType = computed(() => {
+	if (hardMuted.value) return 'hard';
+	if (muted.value === 'sensitiveMute') return 'sensitive';
+	if (Array.isArray(muted.value)) return 'word';
+	return 'none';
+});
+
+// ミュートされた単語を表示用に整形
+const mutedWordsDisplay = computed(() => {
+	if (!Array.isArray(muted.value)) return '';
+	return muted.value
+		.map(words => (Array.isArray(words) ? words.join(' ') : words))
+		.slice(0, 3)
+		.join(' ');
+});
+// #endregion
+
 const translation = ref<Misskey.entities.NotesTranslateResponse | null>(null);
 const translating = ref(false);
 const showTicker = (prefer.s.instanceTicker === 'always') || (prefer.s.instanceTicker === 'remote' && appearNote.user.instance);

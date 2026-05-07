@@ -321,7 +321,7 @@ const showSoftWordMutedWord = computed(() => prefer.s.showSoftWordMutedWord);
 const isNoteVisible = computed(() => !hardMuted.value && muted.value === false);
 
 // ミュート表示がクリックで展開可能か
-const isMuteExpandable = computed(() => muted.value !== false || (hardMuted.value && !hideMutedNotes));
+const isMuteExpandable = computed(() => !hideMutedNotes && (muted.value !== false || hardMuted.value !== false));
 
 // 現在のミュート状態の種類
 const muteType = computed(() => {

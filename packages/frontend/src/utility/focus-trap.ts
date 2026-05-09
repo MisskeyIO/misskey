@@ -53,12 +53,13 @@ function canInteractWithSibling(siblingEl: HTMLElement, activeEl: HTMLElement, h
 	return false;
 }
 
+function canInteractWithActiveFocusTrap(el: HTMLElement, activeFocusTrap: { el: HTMLElement; zIndex: number; } | null, hasInteractionWithOtherFocusTrappedEls: boolean): boolean {
+	return activeFocusTrap == null || canInteractWithSibling(el, activeFocusTrap.el, hasInteractionWithOtherFocusTrappedEls);
+}
+
 function releaseFocusTrap(el: HTMLElement): void {
 	focusTrapElements.delete(el);
 	focusTrapElementOptions.delete(el);
-	if (el.inert === true) {
-		el.inert = false;
-	}
 
 	const highestZIndexElement = getHighestZIndexElement();
 	const highestZIndexElementOptions = highestZIndexElement == null ? null : focusTrapElementOptions.get(highestZIndexElement.el);
@@ -69,25 +70,11 @@ function releaseFocusTrap(el: HTMLElement): void {
 			const siblingEl = getHTMLElementOrNull(siblingNode);
 			if (!siblingEl) return;
 			if (ignoreElements.includes(siblingEl.tagName.toLowerCase())) return;
-			const canInteract = highestZIndexElement != null && canInteractWithSibling(siblingEl, highestZIndexElement.el, highestZIndexElementAllowsInteraction);
-			if (
-				(
-					siblingEl === el ||
-					highestZIndexElement == null ||
-					canInteract
-				)
-			) {
-				siblingEl.inert = false;
-			} else if (
-				highestZIndexElement != null &&
-				!canInteract
-			) {
-				siblingEl.inert = true;
-			} else {
-				siblingEl.inert = false;
-			}
+			siblingEl.inert = !canInteractWithActiveFocusTrap(siblingEl, highestZIndexElement, highestZIndexElementAllowsInteraction);
 		});
 		releaseFocusTrap(el.parentElement);
+	} else {
+		el.inert = !canInteractWithActiveFocusTrap(el, highestZIndexElement, highestZIndexElementAllowsInteraction);
 	}
 }
 

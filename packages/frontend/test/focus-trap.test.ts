@@ -78,4 +78,24 @@ describe('focusTrap', () => {
 
 		releaseHigherPriorityModal();
 	});
+
+	test('restores the remaining lower priority trap after a higher priority trap releases', () => {
+		const page = createElement('page', 0);
+		const lowerPriorityModal = createElement('lowerPriorityModal', 100);
+		const higherPriorityModal = createElement('higherPriorityModal', 200);
+
+		const releaseLowerPriorityModal = trackRelease(focusTrap(lowerPriorityModal, false).release);
+		const releaseHigherPriorityModal = trackRelease(focusTrap(higherPriorityModal, false).release);
+
+		assert.strictEqual(page.inert, true);
+		assert.strictEqual(lowerPriorityModal.inert, true);
+		assert.notStrictEqual(higherPriorityModal.inert, true);
+
+		releaseHigherPriorityModal();
+
+		assert.strictEqual(page.inert, true);
+		assert.notStrictEqual(lowerPriorityModal.inert, true);
+
+		releaseLowerPriorityModal();
+	});
 });

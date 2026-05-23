@@ -151,6 +151,172 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</div>
 					</MkFolder>
 				</SearchMarker>
+
+				<SearchMarker v-slot="slotProps" :keywords="['indieauth', 'indie', 'auth', 'clients', 'oauth', 'redirect', 'uris']">
+					<MkFolder :defaultOpen="slotProps.isParentOfTarget">
+						<template #label><SearchLabel>IndieAuth Clients</SearchLabel></template>
+
+						<div class="_gaps">
+							<MkButton primary full @click="indieAuthAddNew"><i class="ti ti-plus"></i> New</MkButton>
+							<MkFolder v-for="(client, index) in indieAuthClients" :key="`${indieAuthTimestamp}-${index}-${client.createdAt ? client.id : 'new'}`" :defaultOpen="!client.createdAt">
+								<template #label>{{ client.name || client.id }}</template>
+								<template #icon>
+									<i v-if="client.id" class="ti ti-key"></i>
+									<i v-else class="ti ti-plus"></i>
+								</template>
+								<template v-if="client.name && client.id" #caption>{{ client.id }}</template>
+
+								<div class="_gaps_m">
+									<SearchMarker :keywords="['client', 'id']">
+										<MkInput v-model="client.id" :disabled="!!client.createdAt">
+											<template #label><SearchLabel>Client ID</SearchLabel></template>
+										</MkInput>
+									</SearchMarker>
+
+									<SearchMarker :keywords="['name']">
+										<MkInput v-model="client.name">
+											<template #label><SearchLabel>Name</SearchLabel></template>
+										</MkInput>
+									</SearchMarker>
+
+									<SearchMarker :keywords="['redirect', 'uris', 'urls']">
+										<MkTextarea v-model="client.redirectUris">
+											<template #label><SearchLabel>Redirect URIs</SearchLabel></template>
+										</MkTextarea>
+									</SearchMarker>
+
+									<div class="buttons _buttons">
+										<MkButton primary @click="indieAuthSave(client)"><i class="ti ti-device-floppy"></i> Save</MkButton>
+										<MkButton v-if="client.createdAt" warn @click="indieAuthDelete(client)"><i class="ti ti-trash"></i> Delete</MkButton>
+									</div>
+								</div>
+							</MkFolder>
+							<MkButton v-if="indieAuthHasMore" :class="$style.more" :disabled="!indieAuthHasMore" primary rounded @click="indieAuthFetch()">
+								<i class="ti ti-reload"></i>{{ i18n.ts.more }}
+							</MkButton>
+						</div>
+					</MkFolder>
+				</SearchMarker>
+
+				<SearchMarker v-slot="slotProps" :keywords="['single sign-on', 'sso', 'service', 'providers', 'jwt', 'saml']">
+					<MkFolder :defaultOpen="slotProps.isParentOfTarget">
+						<template #label><SearchLabel>Single Sign-On Service Providers</SearchLabel></template>
+
+						<div class="_gaps">
+							<MkButton primary full @click="ssoServiceAddNew"><i class="ti ti-plus"></i> New</MkButton>
+							<MkFolder v-for="(service, index) in ssoServices" :key="`${ssoServiceTimestamp}-${index}-${service.createdAt ? service.id : 'new'}`" :defaultOpen="!service.createdAt">
+								<template #label>{{ service.name || service.id }}</template>
+								<template #icon>
+									<i v-if="service.id" class="ti ti-key"></i>
+									<i v-else class="ti ti-plus"></i>
+								</template>
+								<template v-if="service.name && service.id" #caption>{{ service.id }}</template>
+
+								<div class="_gaps_m">
+									<SearchMarker :keywords="['service', 'id']">
+										<MkInput v-model="service.id" disabled>
+											<template #label><SearchLabel>Service ID</SearchLabel></template>
+										</MkInput>
+									</SearchMarker>
+
+									<SearchMarker :keywords="['name']">
+										<MkInput v-model="service.name">
+											<template #label><SearchLabel>Name</SearchLabel></template>
+										</MkInput>
+									</SearchMarker>
+
+									<SearchMarker :keywords="['type', 'jwt', 'saml']">
+										<MkRadios v-model="service.type" :disabled="!!service.createdAt">
+											<option value="jwt">JWT</option>
+											<option value="saml">SAML</option>
+										</MkRadios>
+									</SearchMarker>
+
+									<SearchMarker :keywords="['issuer']">
+										<MkInput v-model="service.issuer">
+											<template #label><SearchLabel>Issuer</SearchLabel></template>
+										</MkInput>
+									</SearchMarker>
+
+									<SearchMarker :keywords="['audience']">
+										<MkTextarea v-model="service.audience">
+											<template #label><SearchLabel>Audience</SearchLabel></template>
+										</MkTextarea>
+									</SearchMarker>
+
+									<SearchMarker :keywords="['binding', 'post', 'redirect']">
+										<MkRadios v-model="service.binding">
+											<option value="post">POST</option>
+											<option value="redirect">Redirect</option>
+										</MkRadios>
+									</SearchMarker>
+
+									<SearchMarker :keywords="['assertion', 'consumer', 'service', 'url', 'acs']">
+										<MkInput v-model="service.acsUrl">
+											<template #label><SearchLabel>Assertion Consumer Service URL</SearchLabel></template>
+										</MkInput>
+									</SearchMarker>
+
+									<SearchMarker :keywords="['public', 'key', 'secret']">
+										<MkTextarea v-model="service.publicKey">
+											<template #label><SearchLabel>{{ service.useCertificate ? 'Public Key' : 'Secret' }}</SearchLabel></template>
+										</MkTextarea>
+									</SearchMarker>
+
+									<SearchMarker :keywords="['signature', 'algorithm']">
+										<MkInput v-model="service.signatureAlgorithm">
+											<template #label><SearchLabel>Signature Algorithm</SearchLabel></template>
+										</MkInput>
+									</SearchMarker>
+
+									<SearchMarker :keywords="['cipher', 'algorithm']">
+										<MkInput v-model="service.cipherAlgorithm">
+											<template #label><SearchLabel>Cipher Algorithm</SearchLabel></template>
+										</MkInput>
+									</SearchMarker>
+
+									<SearchMarker :keywords="['authn', 'requests', 'signed']">
+										<MkSwitch v-model="service.wantAuthnRequestsSigned">
+											<template #label><SearchLabel>Want Authn Requests Signed</SearchLabel></template>
+										</MkSwitch>
+									</SearchMarker>
+
+									<SearchMarker :keywords="['assertions', 'signed']">
+										<MkSwitch v-model="service.wantAssertionsSigned">
+											<template #label><SearchLabel>Want Assertions Signed</SearchLabel></template>
+										</MkSwitch>
+									</SearchMarker>
+
+									<SearchMarker :keywords="['email', 'address', 'normalized']">
+										<MkSwitch v-model="service.wantEmailAddressNormalized">
+											<template #label><SearchLabel>Want Email Address Normalized</SearchLabel></template>
+										</MkSwitch>
+									</SearchMarker>
+
+									<SearchMarker :keywords="['certificate']">
+										<MkSwitch v-model="service.useCertificate" :disabled="!!service.createdAt">
+											<template #label><SearchLabel>Use Certificate</SearchLabel></template>
+										</MkSwitch>
+									</SearchMarker>
+
+									<SearchMarker v-if="service.useCertificate" :keywords="['regenerate', 'certificate']">
+										<MkSwitch v-model="service.regenerateCertificate">
+											<template #label><SearchLabel>Regenerate Certificate</SearchLabel></template>
+										</MkSwitch>
+									</SearchMarker>
+
+									<div class="buttons _buttons">
+										<MkButton primary @click="ssoServiceSave(service)"><i class="ti ti-device-floppy"></i> Save</MkButton>
+										<MkButton v-if="service.createdAt" warn @click="ssoServiceDelete(service)"><i class="ti ti-trash"></i> Delete</MkButton>
+									</div>
+								</div>
+							</MkFolder>
+							<MkButton v-if="ssoServiceHasMore" :class="$style.more" :disabled="!ssoServiceHasMore" primary rounded @click="ssoServiceFetch()">
+								<i class="ti ti-reload"></i>{{ i18n.ts.more }}
+							</MkButton>
+						</div>
+					</MkFolder>
+				</SearchMarker>
 			</div>
 		</SearchMarker>
 
@@ -178,18 +344,6 @@ import MkButton from '@/components/MkButton.vue';
 
 const meta = await misskeyApi('admin/meta');
 
-const sensitiveMediaDetection = ref<string>('none');
-const sensitiveMediaDetectionSensitivity = ref<number>(0);
-const setSensitiveFlagAutomatically = ref<boolean>(false);
-const enableSensitiveMediaDetectionForVideos = ref<boolean>(false);
-const enableIpLogging = ref<boolean>(false);
-const enableActiveEmailValidation = ref<boolean>(false);
-const enableVerifymailApi = ref<boolean>(false);
-const verifymailAuthKey = ref<string | null>(null);
-const enableTruemailApi = ref<boolean>(false);
-const truemailInstance = ref<string | null>(null);
-const truemailAuthKey = ref<string | null>(null);
-const bannedEmailDomains = ref<string>('');
 const indieAuthClients = ref<any[]>([]);
 const indieAuthTimestamp = ref(0);
 const indieAuthOffset = ref(0);

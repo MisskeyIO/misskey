@@ -72,7 +72,6 @@ html
 		script.
 			var VERSION = "#{version}";
 			var CLIENT_ENTRY = !{JSON.stringify(entry.file)};
-			var LANGS = !{JSON.stringify(langs)};
 
 		script(type='application/json' id='misskey_meta' data-generated-at=now)
 			!= metaJson
@@ -83,10 +82,6 @@ html
 		script(src=`/assets/boot.${version}.js`)
 
 		| !{extraHead}
-
-
-		script
-			include ../boot.js
 
 	body
 		noscript: p

@@ -37,7 +37,7 @@ const props = defineProps<{
 	id?: string;
 }>();
 
-type RoleLike = Pick<Misskey.entities.Role, 'name' | 'description' | 'isAdministrator' | 'isModerator' | 'color' | 'iconUrl' | 'target' | 'isPublic' | 'isExplorable' | 'asBadge' | 'canEditMembersByModerator' | 'displayOrder' | 'preserveAssignmentOnMoveAccount'> & {
+type RoleLike = Pick<Misskey.entities.Role, 'name' | 'description' | 'isAdministrator' | 'isModerator' | 'color' | 'iconUrl' | 'target' | 'isPublic' | 'isExplorable' | 'asBadge' | 'badgeBehavior' | 'canEditMembersByModerator' | 'displayOrder' | 'preserveAssignmentOnMoveAccount'> & {
 	condFormula: any;
 	policies: any;
 };
@@ -64,6 +64,7 @@ if (props.id) {
 		isPublic: false,
 		isExplorable: false,
 		asBadge: false,
+		badgeBehavior: null,
 		canEditMembersByModerator: false,
 		displayOrder: 0,
 		preserveAssignmentOnMoveAccount: false,

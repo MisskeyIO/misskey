@@ -18,7 +18,6 @@ import type { DownloadedFileResult, FileResolveResult, FileServerFileResolver } 
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
 type ProxySource = DownloadedFileResult | FileResolveResult;
-type CleanupableFile = ProxySource & { cleanup: () => void };
 type AvailableFile = Exclude<ProxySource, { kind: 'not-found' | 'unavailable' }>;
 type ProxyQuery = {
 	emoji?: string;
@@ -29,6 +28,7 @@ type ProxyQuery = {
 	origin?: string;
 	url?: string;
 };
+type ProxyParams = { url: string; type?: string; };
 
 export class FileServerProxyHandler {
 	constructor(
@@ -38,8 +38,8 @@ export class FileServerProxyHandler {
 		private imageProcessingService: ImageProcessingService,
 	) {}
 
-	public async handle(request: FastifyRequest<{ Params: { url: string }; Querystring: ProxyQuery }>, reply: FastifyReply) {
-		const url = 'url' in request.query ? request.query.url : 'https://' + request.params.url;
+	public async handle(request: FastifyRequest<{ Params: ProxyParams; Querystring: ProxyQuery }>, reply: FastifyReply) {
+		const url = this.getUrl(request);
 
 		if (typeof url !== 'string') {
 			reply.code(400);
@@ -95,18 +95,26 @@ export class FileServerProxyHandler {
 	 * 外部メディアプロキシにリダイレクトする
 	 */
 	private async redirectToExternalProxy(
-		request: FastifyRequest<{ Params: { url: string }; Querystring: ProxyQuery }>,
+		request: FastifyRequest<{ Params: ProxyParams; Querystring: ProxyQuery }>,
 		reply: FastifyReply,
 	) {
 		reply.header('Cache-Control', 'public, max-age=259200'); // 3 days
 
-		const url = new URL(`${this.config.mediaProxy}/${request.params.url || ''}`);
+		const requestUrl = this.getUrl(request);
+		if (typeof requestUrl !== 'string') {
+			reply.code(400);
+			return;
+		}
 
-		for (const [key, value] of Object.entries(request.query)) {
+		const type = this.getProxyType(request) ?? 'redirect';
+		const url = new URL(`${this.config.mediaProxy}/${type}/${encodeURIComponent(requestUrl.replace(/^https:\/\//i, ''))}`);
+
+		for (const [key, value] of Object.entries(this.getTransformQuery(request))) {
+			if (key === 'url') continue;
 			url.searchParams.append(key, value);
 		}
 
-		return reply.redirect(url.toString(), 301);
+		return reply.redirect(url.toString(), 302);
 	}
 
 	/**
@@ -126,10 +134,10 @@ export class FileServerProxyHandler {
 	 */
 	private async processImage(
 		file: AvailableFile,
-		request: FastifyRequest<{ Params: { url: string }; Querystring: ProxyQuery }>,
+		request: FastifyRequest<{ Params: ProxyParams; Querystring: ProxyQuery }>,
 		reply: FastifyReply,
 	): Promise<IImageStreamable> {
-		const query = request.query;
+		const query = this.getTransformQuery(request);
 
 		const requiresImageConversion = 'emoji' in query || 'avatar' in query || 'static' in query || 'preview' in query || 'badge' in query;
 		const isConvertibleImage = isMimeImage(file.mime, 'sharp-convertible-image-with-bmp');
@@ -162,6 +170,49 @@ export class FileServerProxyHandler {
 		}
 
 		return this.createDefaultStream(file, request, reply);
+	}
+
+	private getUrl(request: FastifyRequest<{ Params: ProxyParams; Querystring: ProxyQuery }>): string | undefined {
+		if ('url' in request.query) return request.query.url;
+
+		const rawUrl = request.params.url;
+		if (!rawUrl) return undefined;
+		const urlPart = this.getPathUrlPart(request);
+
+		let url: string;
+		try {
+			url = decodeURIComponent(urlPart);
+		} catch {
+			throw new StatusError('Invalid proxy URL', 400, 'Invalid proxy URL');
+		}
+		if (/^https?:\/\//i.test(url)) return url;
+		return `https://${url}`;
+	}
+
+	private getTransformQuery(request: FastifyRequest<{ Params: ProxyParams; Querystring: ProxyQuery }>): ProxyQuery {
+		const query: ProxyQuery = { ...request.query };
+		const type = this.getProxyType(request);
+		if (type === 'static') query.static = query.static ?? '1';
+		if (type === 'avatar') query.avatar = query.avatar ?? '1';
+		if (type === 'emoji') query.emoji = query.emoji ?? '1';
+		if (type === 'preview') query.preview = query.preview ?? '1';
+		if (type === 'badge') query.badge = query.badge ?? '1';
+		return query;
+	}
+
+	private getProxyType(request: FastifyRequest<{ Params: ProxyParams; Querystring: ProxyQuery }>): string | undefined {
+		if (request.params.type && ['image', 'static', 'avatar', 'emoji', 'preview', 'badge', 'svg', 'redirect'].includes(request.params.type)) return request.params.type;
+		if (!request.params.url) return undefined;
+		const [type] = request.params.url.split('/');
+		if (['image', 'static', 'avatar', 'emoji', 'preview', 'badge', 'svg', 'redirect'].includes(type)) return type;
+		return undefined;
+	}
+
+	private getPathUrlPart(request: FastifyRequest<{ Params: ProxyParams; Querystring: ProxyQuery }>): string {
+		if (request.params.type) return request.params.url;
+		const type = this.getProxyType(request);
+		if (!type) return request.params.url;
+		return request.params.url.slice(type.length + 1);
 	}
 
 	/**

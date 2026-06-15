@@ -61,16 +61,20 @@ describe('Note', () => {
 			strictEqual(replyedNote.repliesCount, 1);
 
 			const resolvedNote = await resolveRemoteNote('a.test', note.id, bob);
-			deepStrictEqualWithExcludedFields(note, resolvedNote, [
+			type NoteWithReplyUserId = typeof note & { replyUserId?: string | null };
+			deepStrictEqualWithExcludedFields(note as NoteWithReplyUserId, resolvedNote as NoteWithReplyUserId, [
 				'id',
 				'emojis',
 				'replyId',
+				'replyUserId',
 				'reply',
 				'userId',
 				'user',
 				'uri',
 			]);
+			const resolvedNoteWithReplyUserId = resolvedNote as NoteWithReplyUserId;
 			assert(resolvedNote.replyId != null);
+			strictEqual(resolvedNoteWithReplyUserId.replyUserId, aliceInB.id);
 			assert(resolvedNote.reply != null);
 			deepStrictEqualWithExcludedFields(replyedNote, resolvedNote.reply, [
 				'id',
@@ -195,10 +199,10 @@ describe('Note', () => {
 					const note = (await bob.client.request('notes/create', { text: 'I\'m Bob.' })).createdNote;
 					const noteInA = await resolveRemoteNote('b.test', note.id, alice);
 					await alice.client.request('notes/create', { text: 'Hello Bob!', replyId: noteInA.id });
-					await sleep();
+					await sleep(3000);
 
 					await bob.client.request('notes/delete', { noteId: note.id });
-					await sleep();
+					await sleep(3000);
 
 					await rejects(
 						async () => await alice.client.request('notes/show', { noteId: noteInA.id }),
@@ -366,11 +370,11 @@ describe('Note', () => {
 			});
 
 			test('A vote in Bob\'s server is delivered to Bob\'s remote followers', async () => {
-				const note = (await bob.client.request('notes/create', { poll: { choices: ['inu', 'neko'] } })).createdNote;
+				const note = (await bob.client.request('notes/create', { poll: { choices: ['takenoko', 'kinoko'] } })).createdNote;
 				// NOTE: resolve before voting
 				const noteInA = await resolveRemoteNote('b.test', note.id, bobRemoteFollower);
 				await localVoter.client.request('notes/polls/vote', { noteId: note.id, choice: 0 });
-				await sleep();
+				await sleep(1000);
 
 				const noteAfterVote = await bobRemoteFollower.client.request('notes/show', { noteId: noteInA.id });
 				assert(noteAfterVote.poll != null);

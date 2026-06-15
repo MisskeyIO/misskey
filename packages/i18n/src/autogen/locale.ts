@@ -1461,6 +1461,14 @@ export interface Locale extends ILocale {
      */
     "displayOfSensitiveMedia": string;
     /**
+     * 成人向けの広告の表示
+     */
+    "displayOfSensitiveAds": string;
+    /**
+     * このファイルをドライブに保存する
+     */
+    "saveThisFile": string;
+    /**
      * サーバーとの接続が失われたとき
      */
     "whenServerDisconnected": string;
@@ -1873,9 +1881,41 @@ export interface Locale extends ILocale {
      */
     "addModerationNote": string;
     /**
+     * アカウント統計
+     */
+    "accountStats": string;
+    /**
+     * セキュリティ情報
+     */
+    "securityInfo": string;
+    /**
+     * 二要素認証
+     */
+    "twoFactorEnabled": string;
+    /**
+     * セキュリティキー
+     */
+    "securityKeys": string;
+    /**
      * モデログ
      */
     "moderationLogs": string;
+    /**
+     * アカウント移行使用ログ
+     */
+    "userAccountMoveLogs": string;
+    /**
+     * {from} が {to} にアカウントを移行しました
+     */
+    "userAccountMoveLogsTitle": ParameterizedString<"from" | "to">;
+    /**
+     * 移行先のアカウントのID
+     */
+    "movedToId": string;
+    /**
+     * 移行元のアカウントのID
+     */
+    "moveFromId": string;
     /**
      * {n}人が投稿
      */
@@ -2065,6 +2105,10 @@ export interface Locale extends ILocale {
      */
     "strongPassword": string;
     /**
+     * このパスワードは他のサービスで{n}回以上流出しています
+     */
+    "leakedPassword": ParameterizedString<"n">;
+    /**
      * 一致しました
      */
     "passwordMatched": string;
@@ -2092,6 +2136,30 @@ export interface Locale extends ILocale {
      * UIの表示言語
      */
     "uiLanguage": string;
+    /**
+     * 投稿する言語
+     */
+    "postingLanguage": string;
+    /**
+     * 表示する言語
+     */
+    "viewingLanguages": string;
+    /**
+     * 言語が不明な投稿を表示
+     */
+    "includeUnknownLanguage": string;
+    /**
+     * リモート投稿を表示
+     */
+    "includeRemoteLanguage": string;
+    /**
+     * メディア付き投稿はすべての言語で表示
+     */
+    "showMediaInAllLanguages": string;
+    /**
+     * ハッシュタグ付き投稿はすべての言語で表示
+     */
+    "showHashtagsInAllLanguages": string;
     /**
      * {x}について
      */
@@ -2244,6 +2312,26 @@ export interface Locale extends ILocale {
      * 日数
      */
     "numberOfDays": string;
+    /**
+     * 次元
+     */
+    "dimension": string;
+    /**
+     * {dimension}次元
+     */
+    "dimensionWithNumber": ParameterizedString<"dimension">;
+    /**
+     * {min}〜{max} の整数を入力してください
+     */
+    "dimensionRange": ParameterizedString<"min" | "max">;
+    /**
+     * 0以上の整数を入力してください
+     */
+    "dimensionInvalid": string;
+    /**
+     * {min}〜{max} の整数を入力してください
+     */
+    "dimensionOutOfRange": ParameterizedString<"min" | "max">;
     /**
      * このノートを非表示
      */
@@ -3237,6 +3325,34 @@ export interface Locale extends ILocale {
      */
     "clearCache": string;
     /**
+     * タイムラインのキャッシュ
+     */
+    "timelineCache": string;
+    /**
+     * 自分のタイムライン、リスト、アンテナのキャッシュを削除します。
+     */
+    "timelineCacheDescription": string;
+    /**
+     * ホームタイムラインのキャッシュを削除
+     */
+    "purgeHomeTimelineCache": string;
+    /**
+     * ユーザータイムラインのキャッシュを削除
+     */
+    "purgeUserTimelineCache": string;
+    /**
+     * リストタイムラインのキャッシュを削除
+     */
+    "purgeUserListTimelineCache": string;
+    /**
+     * アンテナタイムラインのキャッシュを削除
+     */
+    "purgeAntennaTimelineCache": string;
+    /**
+     * 選択したタイムラインのキャッシュを削除しますか？
+     */
+    "purgeTimelineCacheConfirm": string;
+    /**
      * {n}人がオンライン
      */
     "onlineUsersCount": ParameterizedString<"n">;
@@ -3764,6 +3880,13 @@ export interface Locale extends ILocale {
      * アカウントが削除されます。よろしいですか？
      */
     "deleteAccountConfirm": string;
+    /**
+     * アカウントが削除されます。
+     * 削除リクエスト後に再ログインすると
+     * アカウントの削除が中断されてしまいますのでご注意ください。
+     * よろしいですか？
+     */
+    "deleteAccountConfirmAndWarn": string;
     /**
      * パスワードが間違っています。
      */
@@ -4437,6 +4560,10 @@ export interface Locale extends ILocale {
      */
     "license": string;
     /**
+     * 申請者
+     */
+    "requestedBy": string;
+    /**
      * お気に入り解除しますか？
      */
     "unfavoriteConfirm": string;
@@ -4692,6 +4819,14 @@ export interface Locale extends ILocale {
      * ロールは公開ロールである必要があります。
      */
     "rolesThatCanBeUsedThisEmojiAsReactionPublicRoleWarn": string;
+    /**
+     * リアクションとして使えないロール
+     */
+    "rolesThatCanNotBeUsedThisEmojiAsReaction": string;
+    /**
+     * ロールの指定が一つもない場合、リアクションを禁止するロールはありません。
+     */
+    "rolesThatCanNotBeUsedThisEmojiAsReactionEmptyDescription": string;
     /**
      * リアクションを取り消しますか？
      */
@@ -4949,6 +5084,17 @@ export interface Locale extends ILocale {
      */
     "externalServices": string;
     /**
+     * 外部サイトへ移動します
+     */
+    "warningRedirectingExternalWebsiteTitle": string;
+    /**
+     * 別のサイトにジャンプしようとしています。
+     * リンク先の安全性を十分に確認した上で進んでください。
+     *
+     * {url}
+     */
+    "warningRedirectingExternalWebsiteDescription": ParameterizedString<"url">;
+    /**
      * ソースコード
      */
     "sourceCode": string;
@@ -5197,6 +5343,10 @@ export interface Locale extends ILocale {
      */
     "alwaysConfirmFollow": string;
     /**
+     * 通報の種類
+     */
+    "abuseReportCategory": string;
+    /**
      * お問い合わせ
      */
     "inquiry": string;
@@ -5212,6 +5362,76 @@ export interface Locale extends ILocale {
      * センシティブなメディアです。表示しますか？
      */
     "sensitiveMediaRevealConfirm": string;
+    /**
+     * 成人向けの可能性があるコンテンツ
+     */
+    "sensitiveContentConsentTitle": string;
+    /**
+     * このコンテンツは成人向けのコンテンツである可能性があります。
+     *
+     * <center>$[x2 あなたは18歳以上ですか？]</center>
+     */
+    "sensitiveContentConsentAreYouOver18": string;
+    /**
+     * 表示するコンテンツ設定
+     */
+    "displayedContentSettings": string;
+    /**
+     * Misskeyの明日を作るために、
+     * データ収集にご協力ください！
+     */
+    "helpUsImproveUserExperience": string;
+    /**
+     * {host}は[プライバシーポリシー]({privacyPolicyUrl})に基づき、サービスの提供・運営・ユーザー体験の向上のためにご利用中のIPアドレス、利用状況、デバイス情報等、個人情報を含む可能性のある情報を収集することがあります。
+     *
+     * 収集されたデータは今後の機能の開発、運営の方針の決定、サービスの改善点の特定に利用されます。
+     */
+    "pleaseConsentToTracking": ParameterizedString<"host" | "privacyPolicyUrl">;
+    /**
+     * 必須項目のみ許可
+     */
+    "consentEssential": string;
+    /**
+     * 全て許可
+     */
+    "consentAll": string;
+    /**
+     * 選択した項目のみ許可
+     */
+    "consentSelected": string;
+    /**
+     * データ収集とプライバシー設定
+     */
+    "gtagConsentCustomize": string;
+    /**
+     * {host}が収集するデータの範囲をカスタマイズできます。
+     * ただし、認証機能、不正行為防止、その他のユーザー保護など、セキュリティに関連する情報の収集は無効化できません。
+     */
+    "gtagConsentCustomizeDescription": ParameterizedString<"host">;
+    /**
+     * 統計情報の収集
+     */
+    "gtagConsentAnalytics": string;
+    /**
+     * サイトの滞在時間など、分析に関連する情報の保存（Cookie など）を有効にします。
+     */
+    "gtagConsentAnalyticsDescription": string;
+    /**
+     * 機能・設定の利用状況の収集
+     */
+    "gtagConsentFunctionality": string;
+    /**
+     * 言語設定など、ウェブサイトやアプリの機能をサポートする情報の保存を有効にします。
+     */
+    "gtagConsentFunctionalityDescription": string;
+    /**
+     * パーソナライズされた情報の収集
+     */
+    "gtagConsentPersonalization": string;
+    /**
+     * おすすめの投稿など、パーソナライズに関連する情報の保存を有効にします。
+     */
+    "gtagConsentPersonalizationDescription": string;
     /**
      * 作成したリスト
      */
@@ -6082,6 +6302,10 @@ export interface Locale extends ILocale {
          */
         "notificationsBanner": string;
         /**
+         * 投稿、フォロー、リアクション、ドライブ使用量、公開されるセキュリティ状態など、アカウントに関する統計を確認できます。
+         */
+        "accountStatsBanner": string;
+        /**
          * API
          */
         "api": string;
@@ -6354,6 +6578,105 @@ export interface Locale extends ILocale {
          */
         "notesOlderThanSpecifiedDateAndTime": string;
     };
+    "_abuseReportCategory": {
+        /**
+         * NSFWガイドラインに反するセンシティブなコンテンツ
+         */
+        "nsfw": string;
+        /**
+         * NSFW(閲覧注意・センシティブ)フラグのないメディア投稿、CW(内容を隠す)で隠されていないテキスト投稿、実写の性器が写り込んでいるメディア等
+         */
+        "nsfw_description": string;
+        /**
+         * スパム
+         */
+        "spam": string;
+        /**
+         * 不審なウェブサイト(一般的でない通販サイトやアダルトサイト等)の宣伝・誘導、短時間でリノート(再投稿)や投稿を繰り返し行いタイムラインを埋める行為等
+         */
+        "spam_description": string;
+        /**
+         * 暴力もしくは攻撃的な安全にかかわる行為
+         */
+        "explicit": string;
+        /**
+         * 攻撃的・脅迫・暴力など、悪意のある過激な投稿、他ユーザーの利用を妨げる行為等
+         */
+        "explicit_description": string;
+        /**
+         * フィッシングもしくは詐欺行為
+         */
+        "phishing": string;
+        /**
+         * 偽のウェブサイトやメッセージで個人情報を盗む試み、または金銭詐取の試み
+         */
+        "phishing_description": string;
+        /**
+         * 本人もしくは他人の個人情報の漏えい
+         */
+        "personalInfoLeak": string;
+        /**
+         * 住所、電話番号、メールアドレスなどの個人情報の無断公開
+         */
+        "personalInfoLeak_description": string;
+        /**
+         * 自殺もしくは自害など生命に関わる問題
+         */
+        "selfHarm": string;
+        /**
+         * 自傷行為、自殺を示唆する投稿、またはその他の生命に関わる危険行為
+         */
+        "selfHarm_description": string;
+        /**
+         * 重大な規約違反
+         */
+        "criticalBreach": string;
+        /**
+         * 重大な影響を及ぼす規約違反行為
+         */
+        "criticalBreach_description": string;
+        /**
+         * その他の規約違反
+         */
+        "otherBreach": string;
+        /**
+         * 明確に分類されないその他の規約違反行為
+         */
+        "otherBreach_description": string;
+        /**
+         * 権利侵害やなりすまし（侵害を受けた権利者本人によるご申告）
+         */
+        "violationRights": string;
+        /**
+         * 権利者本人の著作権、商標権、またはその他の権利を侵害する投稿及びなりすまし行為
+         */
+        "violationRights_description": string;
+        /**
+         * 権利侵害（第三者による通報）
+         */
+        "violationRightsOther": string;
+        /**
+         * 他人の著作権、商標権、またはその他の権利を侵害する行為
+         * 第三者による通報の場合、法律で定められた非親告罪の範囲外のケースには対応できないことがあります
+         */
+        "violationRightsOther_description": string;
+        /**
+         * この人が気に入らない
+         */
+        "notLike": string;
+        /**
+         * 個人的な理由で不快と感じるユーザーや投稿
+         */
+        "notLike_description": string;
+        /**
+         * その他
+         */
+        "other": string;
+        /**
+         * 上記のいずれにも該当しないその他の問題
+         */
+        "other_description": string;
+    };
     "_abuseUserReport": {
         /**
          * 転送
@@ -6488,6 +6811,30 @@ export interface Locale extends ILocale {
          * 有効にすると、このお知らせを既読にする際に確認ダイアログが表示されます。また、一括既読操作の対象になりません。
          */
         "needConfirmationToReadDescription": string;
+        /**
+         * チュートリアルの受講が必要
+         */
+        "needEnrollmentTutorialToRead": string;
+        /**
+         * 有効にすると、このお知らせを既読にするためにはチュートリアルの受講が必要です。
+         */
+        "needEnrollmentTutorialToReadDescription": string;
+        /**
+         * 既読ボタンの待ち時間
+         */
+        "closeDuration": string;
+        /**
+         * ダイアログなどで既読ボタンを押せるようになるまでの秒数です。0にすると待ち時間はありません。
+         */
+        "closeDurationDescription": string;
+        /**
+         * 表示順
+         */
+        "displayOrder": string;
+        /**
+         * 数値が大きいほど先に表示されます。
+         */
+        "displayOrderDescription": string;
         /**
          * お知らせを終了
          */
@@ -7074,6 +7421,14 @@ export interface Locale extends ILocale {
          * 移行先のアカウント:
          */
         "movedTo": string;
+        /**
+         * 移行先のサーバー
+         */
+        "movedToServer": string;
+        /**
+         * 移行元のサーバー
+         */
+        "movedFromServer": string;
     };
     "_achievements": {
         /**
@@ -7897,6 +8252,58 @@ export interface Locale extends ILocale {
                  */
                 "description": string;
             };
+            "_sensitiveContentConsentResponded": {
+                /**
+                 * あなたは18歳以上ですか？
+                 */
+                "title": string;
+                /**
+                 * 年齢確認に応答した
+                 */
+                "description": string;
+            };
+            "_postingLanguageConfigured": {
+                /**
+                 * ここではMisskeyの言葉で話せ
+                 */
+                "title": string;
+                /**
+                 * 投稿する言語を設定した
+                 */
+                "description": string;
+                /**
+                 * 日本語でおk
+                 */
+                "flavor": string;
+            };
+            "_viewingLanguagesConfigured": {
+                /**
+                 * 読める、読めるぞ…！
+                 */
+                "title": string;
+                /**
+                 * 表示する言語を設定した
+                 */
+                "description": string;
+                /**
+                 * わからんもんは、わからん
+                 */
+                "flavor": string;
+            };
+            "_dimensionConfigured": {
+                /**
+                 * 次元の狭間
+                 */
+                "title": string;
+                /**
+                 * タイムラインの次元を設定した
+                 */
+                "description": string;
+                /**
+                 * 「0」が$[ruby 過去 全体]で 「1」が$[ruby 未来 雑談]
+                 */
+                "flavor": string;
+            };
             "_bubbleGameExplodingHead": {
                 /**
                  * 🤯
@@ -8023,6 +8430,10 @@ export interface Locale extends ILocale {
          */
         "descriptionOfAsBadge": string;
         /**
+         * バッジの挙動
+         */
+        "badgeBehavior": string;
+        /**
          * ユーザーを見つけやすくする
          */
         "isExplorable": string;
@@ -8086,6 +8497,22 @@ export interface Locale extends ILocale {
              */
             "canPublicNote": string;
             /**
+             * 予約投稿の許可
+             */
+            "canScheduleNote": string;
+            /**
+             * 予約投稿の最大日数
+             */
+            "scheduleNoteMaxDays": string;
+            /**
+             * コンテンツの作成
+             */
+            "canCreateContent": string;
+            /**
+             * コンテンツの削除
+             */
+            "canDeleteContent": string;
+            /**
              * ノート内の最大メンション数
              */
             "mentionMax": string;
@@ -8130,9 +8557,21 @@ export interface Locale extends ILocale {
              */
             "alwaysMarkNsfw": string;
             /**
+             * AIのNSFW判定を無視
+             */
+            "canIgnoreAiNsfw": string;
+            /**
              * アイコンとバナーの更新を許可
              */
             "canUpdateBioMedia": string;
+            /**
+             * アイコンの変更
+             */
+            "canUpdateAvatar": string;
+            /**
+             * バナーの変更
+             */
+            "canUpdateBanner": string;
             /**
              * ノートのピン留めの最大数
              */
@@ -8141,6 +8580,10 @@ export interface Locale extends ILocale {
              * アンテナの作成可能数
              */
             "antennaMax": string;
+            /**
+             * アンテナに保持するノートの最大数
+             */
+            "antennaNotesLimit": string;
             /**
              * ワードミュートの最大文字数
              */
@@ -8190,6 +8633,10 @@ export interface Locale extends ILocale {
              */
             "canUseTranslator": string;
             /**
+             * リアクションの利用
+             */
+            "canUseReaction": string;
+            /**
              * チャンネルの作成
              */
             "canCreateChannel": string;
@@ -8233,6 +8680,10 @@ export interface Locale extends ILocale {
              * ファイルによっては種別を判定できないことがあります。そのようなファイルを許可する場合は {x} を指定に追加してください。
              */
             "uploadableFileTypes_caption2": ParameterizedString<"x">;
+            /**
+             * サウンド設定でドライブのファイルを利用
+             */
+            "canUseDriveFileInSoundSettings": string;
             /**
              * サーバーサイドのノートの下書きの作成可能数
              */
@@ -8688,6 +9139,20 @@ export interface Locale extends ILocale {
          * 常にメディアを隠す
          */
         "force": string;
+    };
+    "_displayOfSensitiveAds": {
+        /**
+         * 隠す（クリックで表示）
+         */
+        "hidden": string;
+        /**
+         * 常に表示する
+         */
+        "always": string;
+        /**
+         * 表示しない
+         */
+        "filtered": string;
     };
     "_instanceTicker": {
         /**
@@ -9337,6 +9802,21 @@ export interface Locale extends ILocale {
          */
         "backupCodesExhaustedWarning": string;
         /**
+         * バックアップコードを保存しましたか？
+         */
+        "backupCodesSavedConfirmTitle": string;
+        /**
+         * 二要素認証アプリとバックアップコードの両方を紛失した場合、アカウントにアクセスできなくなります。
+         * 誰とも共有せず、適切な方法で保管してください。
+         *
+         * $[x2 二要素認証設定は自分以外の誰にも変更できませんので、$[fg.color=red 運営チームも無効化することはできません。]]
+         */
+        "backupCodesSavedConfirmDescription": string;
+        /**
+         * バックアップコードを保存しました
+         */
+        "backupCodesSavedConfirmChecked": string;
+        /**
          * 詳細なガイドはこちら
          */
         "moreDetailedGuideHere": string;
@@ -9909,9 +10389,13 @@ export interface Locale extends ILocale {
          */
         "clicker": string;
         /**
-         * もうすぐ誕生日のユーザー
+         * 今日誕生日のユーザー
          */
         "birthdayFollowings": string;
+        /**
+         * もうすぐ誕生日のユーザー
+         */
+        "birthdaySoon": string;
         /**
          * ダイレクトメッセージ
          */
@@ -10368,6 +10852,107 @@ export interface Locale extends ILocale {
          * フォローを承認制にしている場合、フォローリクエストを許可した時に表示されます。
          */
         "followedMessageDescriptionForLockedAccount": string;
+        /**
+         * 相互リンクを編集
+         */
+        "mutualLinksEdit": string;
+        /**
+         * 相互リンクを設定すると、あなたのプロフィールにバナーが表示されます。
+         */
+        "mutualLinksDescription": string;
+        /**
+         * セクションを追加
+         */
+        "addMutualLinkSection": string;
+        /**
+         * セクション名
+         */
+        "sectionName": string;
+        /**
+         * 相互リンクを追加
+         */
+        "addMutualLink": string;
+        /**
+         * リンク先のURL
+         */
+        "mutualLinksUrl": string;
+        /**
+         * リンク名
+         */
+        "mutualLinksName": string;
+        /**
+         * 画像を選択
+         */
+        "selectMutualLinkBanner": string;
+        /**
+         * 現在の支援プランの表示上限({max}個)を超えているため、この項目は表示されません。
+         * [ここ](https://go.misskey.io/donate)からプランをアップグレードできます。
+         */
+        "policyDisplayLimitExceeded": ParameterizedString<"max">;
+    };
+    "_skebStatus": {
+        /**
+         * ステータスを表示
+         */
+        "show": string;
+        /**
+         * 募集中
+         */
+        "seeking": string;
+        /**
+         * 停止中
+         */
+        "stopped": string;
+        /**
+         * クライアント
+         */
+        "client": string;
+        /**
+         * Skebステータスを取得できませんでした。
+         */
+        "unavailable": string;
+        /**
+         * 納品実績 {n}件
+         */
+        "nWorks": ParameterizedString<"n">;
+        /**
+         * 取引実績 {n}件
+         */
+        "nRequests": ParameterizedString<"n">;
+        /**
+         * {x}円
+         */
+        "yenX": ParameterizedString<"x">;
+        "_genres": {
+            /**
+             * イラスト
+             */
+            "art": string;
+            /**
+             * コミック
+             */
+            "comic": string;
+            /**
+             * ボイス
+             */
+            "voice": string;
+            /**
+             * テキスト
+             */
+            "novel": string;
+            /**
+             * ムービー
+             */
+            "video": string;
+            /**
+             * ミュージック
+             */
+            "music": string;
+            /**
+             * アドバイス
+             */
+            "correction": string;
+        };
     };
     "_exportOrImport": {
         /**
@@ -11307,6 +11892,100 @@ export interface Locale extends ILocale {
          */
         "testRemarks": string;
     };
+    "_abuse": {
+        "_resolver": {
+            /**
+             * 一時間
+             */
+            "1hour": string;
+            /**
+             * 半日
+             */
+            "12hours": string;
+            /**
+             * 一日
+             */
+            "1day": string;
+            /**
+             * 一週間
+             */
+            "1week": string;
+            /**
+             * 一ヶ月
+             */
+            "1month": string;
+            /**
+             * 三ヶ月
+             */
+            "3months": string;
+            /**
+             * 六ヶ月
+             */
+            "6months": string;
+            /**
+             * 一年
+             */
+            "1year": string;
+            /**
+             * 無期限
+             */
+            "indefinitely": string;
+            /**
+             * この条件の有効期限
+             */
+            "expiresAt": string;
+            /**
+             * 通報先のパターン
+             */
+            "targetUserPattern": string;
+            /**
+             * 通報元のパターン
+             */
+            "reporterPattern": string;
+            /**
+             * 通報内容のパターン
+             */
+            "reportContentPattern": string;
+        };
+        /**
+         * 一覧
+         */
+        "list": string;
+        /**
+         * リソルバー
+         */
+        "resolver": string;
+        "_systemEvents": {
+            /**
+             * ユーザーから通報があったとき
+             */
+            "abuseReport": string;
+            /**
+             * ユーザーからの通報を処理したとき
+             */
+            "abuseReportResolved": string;
+            /**
+             * ユーザーが作成されたとき
+             */
+            "userCreated": string;
+            /**
+             * モデレーターが一定期間非アクティブになったとき
+             */
+            "inactiveModeratorsWarning": string;
+            /**
+             * モデレーターが一定期間非アクティブだったため、システムにより招待制へと変更されたとき
+             */
+            "inactiveModeratorsInvitationOnlyChanged": string;
+        };
+        /**
+         * Webhookを削除しますか？
+         */
+        "deleteConfirm": string;
+        /**
+         * スイッチの右にあるボタンをクリックするとダミーのデータを使用したテスト用Webhookを送信できます。
+         */
+        "testRemarks": string;
+    };
     "_abuseReport": {
         "_notificationRecipient": {
             /**
@@ -11990,6 +12669,26 @@ export interface Locale extends ILocale {
          * URLプレビューを有効にする
          */
         "enable": string;
+        /**
+         * URLプレビューと外部サイトの安全性
+         */
+        "externalWebsiteSafety": string;
+        /**
+         * 警告を表示しない外部サイト
+         */
+        "wellKnownWebsites": string;
+        /**
+         * 信頼できる外部サイトのホストを改行で区切って設定します。
+         */
+        "wellKnownWebsitesDescription": string;
+        /**
+         * URLプレビューのサムネイルを隠す条件
+         */
+        "urlPreviewDenyList": string;
+        /**
+         * センシティブとして扱うURLのホストを改行で区切って設定します。
+         */
+        "urlPreviewDenyListDescription": string;
         /**
          * プレビュー先のリダイレクトを許可
          */

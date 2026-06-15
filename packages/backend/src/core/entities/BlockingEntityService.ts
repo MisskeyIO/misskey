@@ -53,6 +53,8 @@ export class BlockingEntityService {
 		const _blockees = blockings.map(({ blockee, blockeeId }) => blockee ?? blockeeId);
 		const _userMap = await this.userEntityService.packMany(_blockees, me, { schema: 'UserDetailedNotMe' })
 			.then(users => new Map(users.map(u => [u.id, u])));
-		return Promise.all(blockings.map(blocking => this.pack(blocking, me, { blockee: _userMap.get(blocking.blockeeId) })));
+		return (await Promise.allSettled(blockings.map(blocking => this.pack(blocking, me, { blockee: _userMap.get(blocking.blockeeId) }))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => result.value);
 	}
 }

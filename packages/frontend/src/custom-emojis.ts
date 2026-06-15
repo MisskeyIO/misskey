@@ -9,7 +9,8 @@ import { misskeyApi, misskeyApiGet } from '@/utility/misskey-api.js';
 import { get, set } from '@/utility/idb-proxy.js';
 
 const storageCache = await get('emojis');
-export const customEmojis = shallowRef<Misskey.entities.EmojiSimple[]>(Array.isArray(storageCache) ? storageCache : []);
+let emojiCacheExist = Array.isArray(storageCache);
+export const customEmojis = shallowRef<Misskey.entities.EmojiSimple[]>(emojiCacheExist ? storageCache : []);
 export const customEmojiCategories = computed<[ ...string[], null ]>(() => {
 	const categories = new Set<string>();
 	for (const emoji of customEmojis.value) {
@@ -51,12 +52,13 @@ export async function fetchCustomEmojis(force = false) {
 		res = await misskeyApi('emojis', {});
 	} else {
 		const lastFetchedAt = await get('lastEmojisFetchedAt');
-		if (lastFetchedAt && (now - lastFetchedAt) < 1000 * 60 * 60) return;
+		if (emojiCacheExist && lastFetchedAt && (now - lastFetchedAt) < 1000 * 60 * 60) return;
 		res = await misskeyApiGet('emojis', {});
 	}
 
 	customEmojis.value = res.emojis;
 	set('emojis', res.emojis);
+	emojiCacheExist = true;
 	set('lastEmojisFetchedAt', now);
 }
 

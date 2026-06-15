@@ -133,6 +133,7 @@ describe('FileServerService', () => {
 			src: null,
 			folderId: null,
 			isSensitive: false,
+			isSensitiveByModerator: false,
 			maybeSensitive: false,
 			maybePorn: false,
 			isLink: params.isLink,
@@ -527,7 +528,7 @@ describe('FileServerService', () => {
 			expect(res.headers['cache-control']).toBe('max-age=31536000, immutable');
 		});
 
-		test('GET /files/:key thumbnail は mediaProxy/static.webp にリダイレクトする', async () => {
+		test('GET /files/:key thumbnail は mediaProxy/static にリダイレクトする', async () => {
 			const accessKey = randomString();
 			const thumbnailKey = randomString();
 			await insertDriveFile({
@@ -546,11 +547,12 @@ describe('FileServerService', () => {
 
 			expect(res.statusCode).toBe(301);
 			expect(res.headers['cache-control']).toBe('max-age=31536000, immutable');
-			expect(res.headers.location).toContain(`${config.mediaProxy}/static.webp`);
+			expect(res.headers.location).toContain(`${config.mediaProxy}/static/`);
+			expect(res.headers.location).not.toContain('url=');
 			expect(res.headers.location).toContain('static=1');
 		});
 
-		test('GET /files/:key webpublic svg は mediaProxy/svg.webp にリダイレクトする', async () => {
+		test('GET /files/:key webpublic svg は mediaProxy/svg にリダイレクトする', async () => {
 			const accessKey = randomString();
 			const webpublicKey = randomString();
 			await insertDriveFile({
@@ -570,7 +572,8 @@ describe('FileServerService', () => {
 
 			expect(res.statusCode).toBe(301);
 			expect(res.headers['cache-control']).toBe('max-age=31536000, immutable');
-			expect(res.headers.location).toContain(`${config.mediaProxy}/svg.webp`);
+			expect(res.headers.location).toContain(`${config.mediaProxy}/svg/`);
+			expect(res.headers.location).not.toContain('url=');
 		});
 	});
 
@@ -594,10 +597,11 @@ describe('FileServerService', () => {
 				url: '/proxy/path-part?url=https%3A%2F%2Fexample.com%2Fimg.png&static=1',
 			});
 
-			expect(res.statusCode).toBe(301);
+			expect(res.statusCode).toBe(302);
 			expect(res.headers['cache-control']).toBe('public, max-age=259200');
 			expect(res.headers.location).toContain('https://media-proxy.test/');
-			expect(res.headers.location).toContain('url=https%3A%2F%2Fexample.com%2Fimg.png');
+			expect(res.headers.location).toContain('/redirect/example.com%2Fimg.png');
+			expect(res.headers.location).not.toContain('url=');
 			expect(res.headers.location).toContain('static=1');
 			expect(res.headers['content-security-policy']).toBe('default-src \'none\'; img-src \'self\'; media-src \'self\'; style-src \'unsafe-inline\'');
 		});
@@ -699,6 +703,18 @@ describe('FileServerService', () => {
 			expect(res.headers['content-type']).toBe('image/webp');
 			expect(res.headers['cache-control']).toBe('max-age=31536000, immutable');
 			expect(res.headers['content-disposition'] ?? '').toContain('dummy.png.webp');
+		});
+
+		test('GET /proxy/:type/:url* path-style で外部メディアプロキシへリダイレクトする', async () => {
+			const res = await externalFastify.inject({
+				method: 'GET',
+				url: '/proxy/static/example.com%2Fimg.png',
+			});
+
+			expect(res.statusCode).toBe(302);
+			expect(res.headers['cache-control']).toBe('public, max-age=259200');
+			expect(res.headers.location).toContain('https://media-proxy.test/static/example.com%2Fimg.png');
+			expect(res.headers.location).toContain('static=1');
 		});
 
 		test('GET /proxy/:url* preview で webp を返す', async () => {

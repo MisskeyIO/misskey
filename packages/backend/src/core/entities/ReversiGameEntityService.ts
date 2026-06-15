@@ -5,13 +5,12 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
-import type { ReversiGamesRepository } from '@/models/_.js';
+import type { MiUser, ReversiGamesRepository } from '@/models/_.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { Packed } from '@/misc/json-schema.js';
 import type { } from '@/models/Blocking.js';
 import type { MiReversiGame } from '@/models/ReversiGame.js';
 import { bindThis } from '@/decorators.js';
-import { IdService } from '@/core/IdService.js';
 import { UserEntityService } from './UserEntityService.js';
 
 function assertBw(bw: string): bw is Packed<'ReversiGameDetailed'>['bw'] {
@@ -25,7 +24,6 @@ export class ReversiGameEntityService {
 		private reversiGamesRepository: ReversiGamesRepository,
 
 		private userEntityService: UserEntityService,
-		private idService: IdService,
 	) {
 	}
 
@@ -38,15 +36,14 @@ export class ReversiGameEntityService {
 		},
 	): Promise<Packed<'ReversiGameDetailed'>> {
 		const game = typeof src === 'object' ? src : await this.reversiGamesRepository.findOneByOrFail({ id: src });
-
-		const user1 = hint?.packedUser1 ?? await this.userEntityService.pack(game.user1 ?? game.user1Id);
-		const user2 = hint?.packedUser2 ?? await this.userEntityService.pack(game.user2 ?? game.user2Id);
+		const user1 = hint?.packedUser1 ?? await this.userEntityService.pack(game.user1 ?? game.user1Id, null);
+		const user2 = hint?.packedUser2 ?? await this.userEntityService.pack(game.user2 ?? game.user2Id, null);
 
 		return await awaitAll({
 			id: game.id,
-			createdAt: this.idService.parse(game.id).date.toISOString(),
-			startedAt: game.startedAt && game.startedAt.toISOString(),
-			endedAt: game.endedAt && game.endedAt.toISOString(),
+			createdAt: game.createdAt.toISOString(),
+			startedAt: game.startedAt?.toISOString() ?? null,
+			endedAt: game.endedAt?.toISOString() ?? null,
 			isStarted: game.isStarted,
 			isEnded: game.isEnded,
 			form1: game.form1,
@@ -79,16 +76,15 @@ export class ReversiGameEntityService {
 	) {
 		const _user1s = games.map(({ user1, user1Id }) => user1 ?? user1Id);
 		const _user2s = games.map(({ user2, user2Id }) => user2 ?? user2Id);
-		const _userMap = await this.userEntityService.packMany([..._user1s, ..._user2s])
+		const _userMap = await this.userEntityService.packMany([..._user1s, ..._user2s], null)
 			.then(users => new Map(users.map(u => [u.id, u])));
-		return Promise.all(
-			games.map(game => {
-				return this.packDetail(game, {
-					packedUser1: _userMap.get(game.user1Id),
-					packedUser2: _userMap.get(game.user2Id),
-				});
-			}),
-		);
+
+		return (await Promise.allSettled(games.map(game => this.packDetail(game, {
+			packedUser1: _userMap.get(game.user1Id),
+			packedUser2: _userMap.get(game.user2Id),
+		}))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'ReversiGameDetailed'>>).value);
 	}
 
 	@bindThis
@@ -101,14 +97,14 @@ export class ReversiGameEntityService {
 	): Promise<Packed<'ReversiGameLite'>> {
 		const game = typeof src === 'object' ? src : await this.reversiGamesRepository.findOneByOrFail({ id: src });
 
-		const user1 = hint?.packedUser1 ?? await this.userEntityService.pack(game.user1 ?? game.user1Id);
-		const user2 = hint?.packedUser2 ?? await this.userEntityService.pack(game.user2 ?? game.user2Id);
+		const user1 = hint?.packedUser1 ?? await this.userEntityService.pack(game.user1 ?? game.user1Id, null);
+		const user2 = hint?.packedUser2 ?? await this.userEntityService.pack(game.user2 ?? game.user2Id, null);
 
 		return await awaitAll({
 			id: game.id,
-			createdAt: this.idService.parse(game.id).date.toISOString(),
-			startedAt: game.startedAt && game.startedAt.toISOString(),
-			endedAt: game.endedAt && game.endedAt.toISOString(),
+			createdAt: game.createdAt.toISOString(),
+			startedAt: game.startedAt?.toISOString() ?? null,
+			endedAt: game.endedAt?.toISOString() ?? null,
 			isStarted: game.isStarted,
 			isEnded: game.isEnded,
 			user1Id: game.user1Id,
@@ -135,16 +131,13 @@ export class ReversiGameEntityService {
 	) {
 		const _user1s = games.map(({ user1, user1Id }) => user1 ?? user1Id);
 		const _user2s = games.map(({ user2, user2Id }) => user2 ?? user2Id);
-		const _userMap = await this.userEntityService.packMany([..._user1s, ..._user2s])
+		const _userMap = await this.userEntityService.packMany([..._user1s, ..._user2s], null)
 			.then(users => new Map(users.map(u => [u.id, u])));
-		return Promise.all(
-			games.map(game => {
-				return this.packLite(game, {
-					packedUser1: _userMap.get(game.user1Id),
-					packedUser2: _userMap.get(game.user2Id),
-				});
-			}),
-		);
+		return (await Promise.allSettled(games.map(game => this.packLite(game, {
+			packedUser1: _userMap.get(game.user1Id),
+			packedUser2: _userMap.get(game.user2Id),
+		}))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => (result as PromiseFulfilledResult<Packed<'ReversiGameLite'>>).value);
 	}
 }
-

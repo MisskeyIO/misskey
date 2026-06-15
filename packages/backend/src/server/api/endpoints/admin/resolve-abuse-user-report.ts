@@ -33,6 +33,7 @@ export const paramDef = {
 	properties: {
 		reportId: { type: 'string', format: 'misskey:id' },
 		resolvedAs: { type: 'string', enum: ['accept', 'reject', null], nullable: true },
+		forward: { type: 'boolean', default: false },
 	},
 	required: ['reportId'],
 } as const;
@@ -50,7 +51,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw new ApiError(meta.errors.noSuchAbuseReport);
 			}
 
-			await this.abuseReportService.resolve([{ reportId: report.id, resolvedAs: ps.resolvedAs ?? null }], me);
+			await this.abuseReportService.resolve([{ reportId: report.id, forward: ps.forward, resolvedAs: ps.resolvedAs ?? null }], me);
 		});
 	}
 }

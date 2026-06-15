@@ -19,6 +19,7 @@ import type { MiAntenna } from '@/models/Antenna.js';
 import type { MiNote } from '@/models/Note.js';
 import type { MiUser } from '@/models/User.js';
 import { CacheService } from './CacheService.js';
+import { RoleService } from './RoleService.js';
 import type { OnApplicationShutdown } from '@nestjs/common';
 
 @Injectable()
@@ -40,6 +41,7 @@ export class AntennaService implements OnApplicationShutdown {
 		private userListMembershipsRepository: UserListMembershipsRepository,
 
 		private cacheService: CacheService,
+		private roleService: RoleService,
 		private utilityService: UtilityService,
 		private globalEventService: GlobalEventService,
 		private fanoutTimelineService: FanoutTimelineService,
@@ -103,7 +105,8 @@ export class AntennaService implements OnApplicationShutdown {
 		const redisPipeline = this.redisForTimelines.pipeline();
 
 		for (const antenna of matchedAntennas) {
-			this.fanoutTimelineService.push(`antennaTimeline:${antenna.id}`, note.id, 200, redisPipeline);
+			const policies = await this.roleService.getUserPolicies(antenna.userId);
+			this.fanoutTimelineService.push(`antennaTimeline:${antenna.id}`, note.id, policies.antennaNotesLimit, redisPipeline);
 			this.globalEventService.publishAntennaStream(antenna.id, 'note', note);
 		}
 

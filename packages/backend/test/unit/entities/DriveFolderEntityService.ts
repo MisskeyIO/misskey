@@ -63,6 +63,7 @@ describe('DriveFolderEntityService', () => {
 			src: null,
 			folderId,
 			isSensitive: false,
+			isSensitiveByModerator: false,
 			maybeSensitive: false,
 			maybePorn: false,
 			isLink: false,

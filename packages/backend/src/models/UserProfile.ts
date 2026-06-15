@@ -10,6 +10,17 @@ import { MiUser } from './User.js';
 import { MiPage } from './Page.js';
 import { MiUserList } from './UserList.js';
 
+export type UserProfileMutualLinkSection = {
+	id?: string;
+	name?: string;
+	mutualLinks: {
+		id: string;
+		name?: string;
+		url?: string;
+		avatarUrl?: string;
+	}[];
+};
+
 // TODO: このテーブルで管理している情報すべてレジストリで管理するようにしても良いかも
 //       ただ、「emailVerified が true なユーザーを find する」のようなクエリは書けなくなるからウーン
 @Entity('user_profile')
@@ -57,6 +68,11 @@ export class MiUserProfile {
 		name: string;
 		value: string;
 	}[];
+
+	@Column('jsonb', {
+		default: [],
+	})
+	public mutualLinkSections: UserProfileMutualLinkSection[];
 
 	@Column('varchar', {
 		array: true,
@@ -373,6 +389,10 @@ export const ACHIEVEMENT_TYPES = [
 	'brainDiver',
 	'smashTestNotificationButton',
 	'tutorialCompleted',
+	'sensitiveContentConsentResponded',
+	'postingLanguageConfigured',
+	'viewingLanguagesConfigured',
+	'dimensionConfigured',
 	'bubbleGameExplodingHead',
 	'bubbleGameDoubleExplodingHead',
 ] as const;

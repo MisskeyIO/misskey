@@ -36,7 +36,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</div>
 				</div>
 				<div v-if="$i && !announcement.silence && !announcement.isRead" :class="$style.footer">
-					<MkButton primary @click="read(announcement)"><i class="ti ti-check"></i> {{ i18n.ts.gotIt }}</MkButton>
+					<MkButton primary :disabled="remainingCloseDuration > 0" @click="read(announcement)"><i class="ti ti-check"></i> {{ readButtonText }}</MkButton>
 				</div>
 			</div>
 			<MkError v-else-if="error" @retry="_fetch_()"/>
@@ -47,9 +47,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
+import { computed, onUnmounted, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@/components/MkButton.vue';
+import MkTutorialDialog from '@/components/MkTutorialDialog.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
@@ -62,22 +63,39 @@ const props = defineProps<{
 	announcementId: string;
 }>();
 
-const announcement = ref<Misskey.entities.Announcement | null>(null);
+type AnnouncementWithReadGate = Misskey.entities.Announcement & {
+	closeDuration?: number | null;
+	needEnrollmentTutorialToRead?: boolean;
+};
+
+const announcement = ref<AnnouncementWithReadGate | null>(null);
 const error = ref<any>(null);
 const path = computed(() => props.announcementId);
+const remainingCloseDuration = ref(0);
+let closeDurationTimer: number | null = null;
+
+const readButtonText = computed(() => {
+	if (!announcement.value) return i18n.ts.gotIt;
+
+	const label = announcement.value.needEnrollmentTutorialToRead ? i18n.ts._initialTutorial.launchTutorial : i18n.ts.gotIt;
+	return remainingCloseDuration.value > 0 ? `${label} (${remainingCloseDuration.value}s)` : label;
+});
 
 function _fetch_() {
 	announcement.value = null;
 	misskeyApi('announcements/show', {
 		announcementId: props.announcementId,
-	}).then(async _announcement => {
+	}).then(async (_announcement: AnnouncementWithReadGate) => {
 		announcement.value = _announcement;
+		startCloseDurationCountdown(_announcement.closeDuration ?? 0);
 	}).catch(err => {
 		error.value = err;
 	});
 }
 
-async function read(target: Misskey.entities.Announcement): Promise<void> {
+async function read(target: AnnouncementWithReadGate): Promise<void> {
+	if (remainingCloseDuration.value > 0) return;
+
 	if (target.needConfirmationToRead) {
 		const confirm = await os.confirm({
 			type: 'question',
@@ -85,6 +103,11 @@ async function read(target: Misskey.entities.Announcement): Promise<void> {
 			text: i18n.tsx._announcement.readConfirmText({ title: target.title }),
 		});
 		if (confirm.canceled) return;
+	}
+
+	if (target.needEnrollmentTutorialToRead) {
+		const done = await waitTutorialDone();
+		if (!done) return;
 	}
 
 	target.isRead = true;
@@ -96,7 +119,45 @@ async function read(target: Misskey.entities.Announcement): Promise<void> {
 	}
 }
 
+function startCloseDurationCountdown(seconds: number): void {
+	if (closeDurationTimer != null) {
+		window.clearInterval(closeDurationTimer);
+		closeDurationTimer = null;
+	}
+
+	remainingCloseDuration.value = Math.max(0, seconds);
+	if (remainingCloseDuration.value === 0) return;
+
+	closeDurationTimer = window.setInterval(() => {
+		remainingCloseDuration.value = Math.max(0, remainingCloseDuration.value - 1);
+		if (remainingCloseDuration.value === 0 && closeDurationTimer != null) {
+			window.clearInterval(closeDurationTimer);
+			closeDurationTimer = null;
+		}
+	}, 1000);
+}
+
+function waitTutorialDone(): Promise<boolean> {
+	return new Promise(resolve => {
+		let resolved = false;
+		const { dispose } = os.popup(MkTutorialDialog, {}, {
+			done: () => {
+				resolved = true;
+				resolve(true);
+			},
+			closed: () => {
+				dispose();
+				if (!resolved) resolve(false);
+			},
+		});
+	});
+}
+
 watch(() => path.value, _fetch_, { immediate: true });
+
+onUnmounted(() => {
+	if (closeDurationTimer != null) window.clearInterval(closeDurationTimer);
+});
 
 const headerActions = computed(() => []);
 

@@ -12,7 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<MkPostForm v-if="prefer.r.showFixedPostForm.value" :class="$style.postForm" class="_panel" fixed style="margin-bottom: var(--MI-margin);"/>
 		<MkStreamingNotesTimeline
 			ref="tlComponent"
-			:key="src + withRenotes + withReplies + onlyFiles + withSensitive"
+			:key="src + withRenotes + withReplies + onlyFiles + withSensitive + dimension"
 			:class="$style.tl"
 			:src="(src.split(':')[0] as (BasicTimelineType | 'list'))"
 			:list="src.split(':')[1]"
@@ -20,6 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			:withReplies="withReplies"
 			:withSensitive="withSensitive"
 			:onlyFiles="onlyFiles"
+			:dimension="dimension"
 			:sound="true"
 		/>
 	</div>
@@ -30,7 +31,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, watch, provide, useTemplateRef, ref, onMounted, onActivated } from 'vue';
 import type { Tab } from '@/components/global/MkPageHeader.tabs.vue';
 import type { MenuItem } from '@/types/menu.js';
-import type { BasicTimelineType } from '@/timelines.js';
+import type { BasicTimelineType, TimelinePageSrc } from '@/timelines.js';
 import type { PageHeaderItem } from '@/types/page-header.js';
 import MkStreamingNotesTimeline from '@/components/MkStreamingNotesTimeline.vue';
 import MkPostForm from '@/components/MkPostForm.vue';
@@ -43,17 +44,21 @@ import { antennasCache, userListsCache, favoritedChannelsCache } from '@/cache.j
 import { deviceKind } from '@/utility/device-kind.js';
 import { deepMerge } from '@/utility/merge.js';
 import { miLocalStorage } from '@/local-storage.js';
-import { availableBasicTimelines, hasWithReplies, isAvailableBasicTimeline, isBasicTimeline, basicTimelineIconClass } from '@/timelines.js';
+import { availableBasicTimelines, hasDimension, hasWithReplies, isAvailableBasicTimeline, isBasicTimeline, basicTimelineIconClass } from '@/timelines.js';
 import { prefer } from '@/preferences.js';
+import { selectDimension } from '@/utility/dimension.js';
+import { claimAchievement } from '@/utility/achievements.js';
 
 const tlComponent = useTemplateRef('tlComponent');
-
-type TimelinePageSrc = BasicTimelineType | `list:${string}`;
 
 const srcWhenNotSignin = ref<'local' | 'global'>(isAvailableBasicTimeline('local') ? 'local' : 'global');
 const src = computed<TimelinePageSrc>({
 	get: () => ($i ? store.r.tl.value.src : srcWhenNotSignin.value),
 	set: (x) => saveSrc(x),
+});
+const dimension = computed<number>({
+	get: () => store.r.tl.value.dimensionBySrc?.[src.value] ?? prefer.s.dimension,
+	set: (x) => saveTlDimension(x),
 });
 const withRenotes = computed<boolean>({
 	get: () => store.r.tl.value.filter.withRenotes,
@@ -102,6 +107,11 @@ watch([withReplies, onlyFiles], ([withRepliesTo, onlyFilesTo]) => {
 const withSensitive = computed<boolean>({
 	get: () => store.r.tl.value.filter.withSensitive,
 	set: (x) => saveTlFilter('withSensitive', x),
+});
+
+watch(dimension, (value, previous) => {
+	if (value === previous) return;
+	claimAchievement('dimensionConfigured');
 });
 
 const showFixedPostForm = prefer.model('showFixedPostForm');
@@ -191,6 +201,21 @@ function saveTlFilter(key: keyof typeof store.s.tl.filter, newValue: boolean) {
 	}
 }
 
+function saveTlDimension(newValue: number): void {
+	const dimensionBySrc = {
+		...(store.s.tl.dimensionBySrc ?? {}),
+		[src.value]: newValue,
+	};
+	const out = deepMerge({ dimensionBySrc }, store.s.tl);
+	store.set('tl', out);
+}
+
+async function pickDimension(): Promise<void> {
+	const selected = await selectDimension(dimension.value);
+	if (selected === undefined) return;
+	dimension.value = selected;
+}
+
 function switchTlIfNeeded() {
 	if (isBasicTimeline(src.value) && !isAvailableBasicTimeline(src.value)) {
 		src.value = availableBasicTimelines()[0];
@@ -208,12 +233,22 @@ const headerActions = computed<PageHeaderItem[]>(() => {
 	const items: PageHeaderItem[] = [{
 		icon: 'ti ti-dots',
 		text: i18n.ts.options,
-		handler: (ev) => {
-			const menuItems: MenuItem[] = [];
+			handler: (ev) => {
+				const menuItems: MenuItem[] = [];
 
-			menuItems.push({
-				type: 'switch',
-				icon: 'ti ti-repeat',
+				if (hasDimension(src.value)) {
+					menuItems.push({
+						icon: 'ti ti-cube',
+						text: i18n.tsx.dimensionWithNumber({ dimension: dimension.value }),
+						action: pickDimension,
+					}, {
+						type: 'divider',
+					});
+				}
+
+				menuItems.push({
+					type: 'switch',
+					icon: 'ti ti-repeat',
 				text: i18n.ts.showRenotes,
 				ref: withRenotes,
 			});
@@ -259,6 +294,14 @@ const headerActions = computed<PageHeaderItem[]>(() => {
 				tlComponent.value?.reloadTimeline();
 			},
 		});
+
+		if (hasDimension(src.value)) {
+			items.unshift({
+				icon: 'ti ti-cube',
+				text: i18n.tsx.dimensionWithNumber({ dimension: dimension.value }),
+				handler: pickDimension,
+			});
+		}
 	}
 
 	return items;

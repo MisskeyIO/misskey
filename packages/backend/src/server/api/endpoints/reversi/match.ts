@@ -13,7 +13,7 @@ import { GetterService } from '../../GetterService.js';
 export const meta = {
 	requireCredential: true,
 
-	kind: 'write:account',
+	kind: 'read:account',
 
 	errors: {
 		noSuchUser: {

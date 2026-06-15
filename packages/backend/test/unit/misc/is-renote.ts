@@ -14,6 +14,7 @@ const base: MiNote = {
 	renoteId: null,
 	renote: null,
 	threadId: null,
+	dimension: 0,
 	text: null,
 	name: null,
 	cw: null,

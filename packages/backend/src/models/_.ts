@@ -8,6 +8,7 @@ import {
 	ObjectLiteral,
 	Repository,
 } from 'typeorm';
+import { MiAbuseReportResolver } from '@/models/AbuseReportResolver.js';
 import { MiAbuseReportNotificationRecipient } from '@/models/AbuseReportNotificationRecipient.js';
 import { MiAbuseUserReport } from '@/models/AbuseUserReport.js';
 import { MiAccessToken } from '@/models/AccessToken.js';
@@ -23,7 +24,7 @@ import { MiBubbleGameRecord } from '@/models/BubbleGameRecord.js';
 import { MiChannel } from '@/models/Channel.js';
 import { MiChannelFavorite } from '@/models/ChannelFavorite.js';
 import { MiChannelFollowing } from '@/models/ChannelFollowing.js';
-import { MiChannelMuting } from "@/models/ChannelMuting.js";
+import { MiChannelMuting } from '@/models/ChannelMuting.js';
 import { MiChatApproval } from '@/models/ChatApproval.js';
 import { MiChatMessage } from '@/models/ChatMessage.js';
 import { MiChatRoom } from '@/models/ChatRoom.js';
@@ -42,12 +43,15 @@ import { MiFollowRequest } from '@/models/FollowRequest.js';
 import { MiGalleryLike } from '@/models/GalleryLike.js';
 import { MiGalleryPost } from '@/models/GalleryPost.js';
 import { MiHashtag } from '@/models/Hashtag.js';
+import { MiIndieAuthClient } from '@/models/IndieAuthClient.js';
 import { MiInstance } from '@/models/Instance.js';
 import { MiMeta } from '@/models/Meta.js';
 import { MiModerationLog } from '@/models/ModerationLog.js';
 import { MiMuting } from '@/models/Muting.js';
 import { MiNote } from '@/models/Note.js';
 import { MiNoteDraft } from '@/models/NoteDraft.js';
+import { MiNoteLanguage } from '@/models/NoteLanguage.js';
+import { MiScheduledNote } from '@/models/ScheduledNote.js';
 import { MiNoteFavorite } from '@/models/NoteFavorite.js';
 import { MiNoteReaction } from '@/models/NoteReaction.js';
 import { MiNoteThreadMuting } from '@/models/NoteThreadMuting.js';
@@ -67,6 +71,7 @@ import { MiReversiGame } from '@/models/ReversiGame.js';
 import { MiRole } from '@/models/Role.js';
 import { MiRoleAssignment } from '@/models/RoleAssignment.js';
 import { MiSignin } from '@/models/Signin.js';
+import { MiSingleSignOnServiceProvider } from '@/models/SingleSignOnServiceProvider.js';
 import { MiSwSubscription } from '@/models/SwSubscription.js';
 import { MiSystemAccount } from '@/models/SystemAccount.js';
 import { MiSystemWebhook } from '@/models/SystemWebhook.js';
@@ -74,9 +79,12 @@ import { MiUsedUsername } from '@/models/UsedUsername.js';
 import { MiUser } from '@/models/User.js';
 import { MiUserIp } from '@/models/UserIp.js';
 import { MiUserKeypair } from '@/models/UserKeypair.js';
+import { MiUserLanguage } from '@/models/UserLanguage.js';
 import { MiUserList } from '@/models/UserList.js';
 import { MiUserListFavorite } from '@/models/UserListFavorite.js';
 import { MiUserListMembership } from '@/models/UserListMembership.js';
+import { MiUserAccountMoveLog } from '@/models/UserAccountMoveLog.js';
+import { MiUserInlinePolicy } from '@/models/UserInlinePolicy.js';
 import { MiUserMemo } from '@/models/UserMemo.js';
 import { MiUserNotePining } from '@/models/UserNotePining.js';
 import { MiUserPending } from '@/models/UserPending.js';
@@ -97,6 +105,7 @@ export const miRepository = {
 } satisfies MiRepository<ObjectLiteral>;
 
 export {
+	MiAbuseReportResolver,
 	MiAbuseUserReport,
 	MiAbuseReportNotificationRecipient,
 	MiAccessToken,
@@ -122,6 +131,7 @@ export {
 	MiGalleryLike,
 	MiGalleryPost,
 	MiHashtag,
+	MiIndieAuthClient,
 	MiInstance,
 	MiMeta,
 	MiModerationLog,
@@ -129,6 +139,8 @@ export {
 	MiRenoteMuting,
 	MiNote,
 	MiNoteDraft,
+	MiNoteLanguage,
+	MiScheduledNote,
 	MiNoteFavorite,
 	MiNoteReaction,
 	MiNoteThreadMuting,
@@ -143,15 +155,19 @@ export {
 	MiRegistryItem,
 	MiRelay,
 	MiSignin,
+	MiSingleSignOnServiceProvider,
 	MiSwSubscription,
 	MiSystemAccount,
 	MiUsedUsername,
 	MiUser,
 	MiUserIp,
 	MiUserKeypair,
+	MiUserLanguage,
 	MiUserList,
 	MiUserListFavorite,
 	MiUserListMembership,
+	MiUserAccountMoveLog,
+	MiUserInlinePolicy,
 	MiUserNotePining,
 	MiUserPending,
 	MiUserProfile,
@@ -175,6 +191,7 @@ export {
 	MiReversiGame,
 };
 
+export type AbuseReportResolversRepository = Repository<MiAbuseReportResolver> & MiRepository<MiAbuseReportResolver>;
 export type AbuseUserReportsRepository = Repository<MiAbuseUserReport> & MiRepository<MiAbuseUserReport>;
 export type AbuseReportNotificationRecipientRepository =
 	Repository<MiAbuseReportNotificationRecipient>
@@ -202,6 +219,7 @@ export type FollowRequestsRepository = Repository<MiFollowRequest> & MiRepositor
 export type GalleryLikesRepository = Repository<MiGalleryLike> & MiRepository<MiGalleryLike>;
 export type GalleryPostsRepository = Repository<MiGalleryPost> & MiRepository<MiGalleryPost>;
 export type HashtagsRepository = Repository<MiHashtag> & MiRepository<MiHashtag>;
+export type IndieAuthClientsRepository = Repository<MiIndieAuthClient> & MiRepository<MiIndieAuthClient>;
 export type InstancesRepository = Repository<MiInstance> & MiRepository<MiInstance>;
 export type MetasRepository = Repository<MiMeta> & MiRepository<MiMeta>;
 export type ModerationLogsRepository = Repository<MiModerationLog> & MiRepository<MiModerationLog>;
@@ -209,6 +227,8 @@ export type MutingsRepository = Repository<MiMuting> & MiRepository<MiMuting>;
 export type RenoteMutingsRepository = Repository<MiRenoteMuting> & MiRepository<MiRenoteMuting>;
 export type NotesRepository = Repository<MiNote> & MiRepository<MiNote>;
 export type NoteDraftsRepository = Repository<MiNoteDraft> & MiRepository<MiNoteDraft>;
+export type NoteLanguagesRepository = Repository<MiNoteLanguage> & MiRepository<MiNoteLanguage>;
+export type ScheduledNotesRepository = Repository<MiScheduledNote> & MiRepository<MiScheduledNote>;
 export type NoteFavoritesRepository = Repository<MiNoteFavorite> & MiRepository<MiNoteFavorite>;
 export type NoteReactionsRepository = Repository<MiNoteReaction> & MiRepository<MiNoteReaction>;
 export type NoteThreadMutingsRepository = Repository<MiNoteThreadMuting> & MiRepository<MiNoteThreadMuting>;
@@ -223,15 +243,19 @@ export type RegistrationTicketsRepository = Repository<MiRegistrationTicket> & M
 export type RegistryItemsRepository = Repository<MiRegistryItem> & MiRepository<MiRegistryItem>;
 export type RelaysRepository = Repository<MiRelay> & MiRepository<MiRelay>;
 export type SigninsRepository = Repository<MiSignin> & MiRepository<MiSignin>;
+export type SingleSignOnServiceProvidersRepository = Repository<MiSingleSignOnServiceProvider> & MiRepository<MiSingleSignOnServiceProvider>;
 export type SwSubscriptionsRepository = Repository<MiSwSubscription> & MiRepository<MiSwSubscription>;
 export type SystemAccountsRepository = Repository<MiSystemAccount> & MiRepository<MiSystemAccount>;
 export type UsedUsernamesRepository = Repository<MiUsedUsername> & MiRepository<MiUsedUsername>;
 export type UsersRepository = Repository<MiUser> & MiRepository<MiUser>;
 export type UserIpsRepository = Repository<MiUserIp> & MiRepository<MiUserIp>;
 export type UserKeypairsRepository = Repository<MiUserKeypair> & MiRepository<MiUserKeypair>;
+export type UserLanguagesRepository = Repository<MiUserLanguage> & MiRepository<MiUserLanguage>;
 export type UserListsRepository = Repository<MiUserList> & MiRepository<MiUserList>;
 export type UserListFavoritesRepository = Repository<MiUserListFavorite> & MiRepository<MiUserListFavorite>;
 export type UserListMembershipsRepository = Repository<MiUserListMembership> & MiRepository<MiUserListMembership>;
+export type UserAccountMoveLogsRepository = Repository<MiUserAccountMoveLog> & MiRepository<MiUserAccountMoveLog>;
+export type UserInlinePoliciesRepository = Repository<MiUserInlinePolicy> & MiRepository<MiUserInlinePolicy>;
 export type UserNotePiningsRepository = Repository<MiUserNotePining> & MiRepository<MiUserNotePining>;
 export type UserPendingsRepository = Repository<MiUserPending> & MiRepository<MiUserPending>;
 export type UserProfilesRepository = Repository<MiUserProfile> & MiRepository<MiUserProfile>;

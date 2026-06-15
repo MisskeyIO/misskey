@@ -7,7 +7,7 @@ import fs from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import micromatch from 'micromatch';
-import main from './main.js';
+import { config } from './storybook-config.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
@@ -74,7 +74,7 @@ await fs.readFile(
 	}
 	const stories = micromatch(
 		Array.from(modules),
-		main.stories.map((story) => `./${path.relative('..', story)}`)
+		config.stories.map((story) => `./${path.relative('..', story)}`)
 	);
 	if (stories.length) {
 		for (const story of stories) {

@@ -9,41 +9,46 @@ export const packedNoteDraftSchema = {
 		id: {
 			type: 'string',
 			optional: false, nullable: false,
-			format: 'id',
+			format: 'misskey:id',
 			example: 'xxxxxxxxxx',
 		},
 		createdAt: {
 			type: 'string',
-			optional: false, nullable: false,
+			optional: true, nullable: false,
+			format: 'date-time',
+		},
+		updatedAt: {
+			type: 'string',
+			optional: true, nullable: false,
 			format: 'date-time',
 		},
 		text: {
 			type: 'string',
-			optional: false, nullable: true,
+			optional: true, nullable: true,
 		},
 		cw: {
 			type: 'string',
-			optional: false, nullable: true,
+			optional: true, nullable: true,
 		},
 		userId: {
 			type: 'string',
-			optional: false, nullable: false,
-			format: 'id',
+			optional: true, nullable: false,
+			format: 'misskey:id',
 		},
 		user: {
 			type: 'object',
 			ref: 'UserLite',
-			optional: false, nullable: false,
+			optional: true, nullable: false,
 		},
 		replyId: {
 			type: 'string',
-			optional: false, nullable: true,
-			format: 'id',
+			optional: true, nullable: true,
+			format: 'misskey:id',
 		},
 		renoteId: {
 			type: 'string',
-			optional: false, nullable: true,
-			format: 'id',
+			optional: true, nullable: true,
+			format: 'misskey:id',
 		},
 		reply: {
 			type: 'object',
@@ -57,25 +62,25 @@ export const packedNoteDraftSchema = {
 		},
 		visibility: {
 			type: 'string',
-			optional: false, nullable: false,
+			optional: true, nullable: false,
 			enum: ['public', 'home', 'followers', 'specified'],
 		},
 		visibleUserIds: {
 			type: 'array',
-			optional: false, nullable: false,
+			optional: true, nullable: false,
 			items: {
 				type: 'string',
 				optional: false, nullable: false,
-				format: 'id',
+				format: 'misskey:id',
 			},
 		},
 		fileIds: {
 			type: 'array',
-			optional: false, nullable: false,
+			optional: true, nullable: false,
 			items: {
 				type: 'string',
 				optional: false, nullable: false,
-				format: 'id',
+				format: 'misskey:id',
 			},
 		},
 		files: {
@@ -89,11 +94,11 @@ export const packedNoteDraftSchema = {
 		},
 		hashtag: {
 			type: 'string',
-			optional: false, nullable: true,
+			optional: true, nullable: true,
 		},
 		poll: {
 			type: 'object',
-			optional: false, nullable: true,
+			optional: true, nullable: true,
 			properties: {
 				expiresAt: {
 					type: 'string',
@@ -120,8 +125,8 @@ export const packedNoteDraftSchema = {
 		},
 		channelId: {
 			type: 'string',
-			optional: false, nullable: true,
-			format: 'id',
+			optional: true, nullable: true,
+			format: 'misskey:id',
 		},
 		channel: {
 			type: 'object',
@@ -130,6 +135,7 @@ export const packedNoteDraftSchema = {
 				id: {
 					type: 'string',
 					optional: false, nullable: false,
+					format: 'misskey:id',
 				},
 				name: {
 					type: 'string',
@@ -137,38 +143,59 @@ export const packedNoteDraftSchema = {
 				},
 				color: {
 					type: 'string',
-					optional: false, nullable: false,
+					optional: true, nullable: false,
 				},
 				isSensitive: {
 					type: 'boolean',
-					optional: false, nullable: false,
+					optional: true, nullable: false,
 				},
 				allowRenoteToExternal: {
 					type: 'boolean',
-					optional: false, nullable: false,
+					optional: true, nullable: false,
 				},
 				userId: {
 					type: 'string',
-					optional: false, nullable: true,
+					optional: true, nullable: true,
+					format: 'misskey:id',
 				},
 			},
 		},
 		localOnly: {
 			type: 'boolean',
-			optional: false, nullable: false,
+			optional: true, nullable: false,
 		},
 		reactionAcceptance: {
 			type: 'string',
-			optional: false, nullable: true,
+			optional: true, nullable: true,
 			enum: ['likeOnly', 'likeOnlyForRemote', 'nonSensitiveOnly', 'nonSensitiveOnlyForLocalLikeOnlyForRemote', null],
 		},
 		scheduledAt: {
 			type: 'number',
-			optional: false, nullable: true,
+			optional: true, nullable: true,
 		},
 		isActuallyScheduled: {
 			type: 'boolean',
-			optional: false, nullable: false,
+			optional: true, nullable: false,
+		},
+		reason: {
+			type: 'string',
+			optional: true, nullable: false,
+		},
+		data: {
+			type: 'object',
+			optional: true, nullable: false,
+			properties: {
+				text: { type: 'string', optional: false, nullable: true },
+				useCw: { type: 'boolean', optional: false, nullable: false },
+				cw: { type: 'string', optional: false, nullable: true },
+				visibility: { type: 'string', optional: false, nullable: false, enum: ['public', 'home', 'followers', 'specified'] },
+				localOnly: { type: 'boolean', optional: false, nullable: false },
+				lang: { type: 'string', optional: true, nullable: true },
+				dimension: { type: 'integer', optional: true, nullable: true },
+				files: { type: 'array', optional: false, nullable: false, items: { type: 'object', optional: false, nullable: false, ref: 'DriveFile' } },
+				poll: { type: 'object', optional: false, nullable: true },
+				visibleUserIds: { type: 'array', optional: true, nullable: false, items: { type: 'string', optional: false, nullable: false, format: 'misskey:id' } },
+			},
 		},
 	},
 } as const;

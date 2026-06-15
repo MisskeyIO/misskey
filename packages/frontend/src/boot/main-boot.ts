@@ -31,6 +31,16 @@ import { migrateOldSettings } from '@/pref-migrate.js';
 import { unisonReload } from '@/utility/unison-reload.js';
 import { isBirthday } from '@/utility/is-birthday.js';
 
+export const TrackingConsentPopup = defineAsyncComponent(() => import('@/components/MkTrackingConsent.vue'));
+
+export function showTrackingConsentIfNeeded(): void {
+	if (!instance.googleAnalyticsMeasurementId || miLocalStorage.getItem('gaConsent') !== null) return;
+
+	const { dispose } = popup(TrackingConsentPopup, {}, {
+		closed: () => dispose(),
+	});
+}
+
 export async function mainBoot() {
 	const { isClientUpdated, lastVersion } = await common(async () => {
 		let uiStyle = ui;
@@ -64,6 +74,7 @@ export async function mainBoot() {
 
 	reactionPicker.init();
 	emojiPicker.init();
+	showTrackingConsentIfNeeded();
 
 	if (isClientUpdated && $i) {
 		const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkUpdated.vue')), {}, {
@@ -115,7 +126,7 @@ export async function mainBoot() {
 			}
 		});
 
-		for (const announcement of ($i.unreadAnnouncements ?? []).filter(x => x.display === 'dialog')) {
+		for (const announcement of ($i.unreadAnnouncements ?? []).filter(x => x.display === 'dialog').toSorted((a, b) => getAnnouncementDisplayOrder(b) - getAnnouncementDisplayOrder(a))) {
 			const { dispose } = popup(defineAsyncComponent(() => import('@/components/MkAnnouncementDialog.vue')), {
 				announcement,
 			}, {
@@ -408,4 +419,8 @@ export async function mainBoot() {
 	window.document.addEventListener('keydown', makeHotkey(keymap), { passive: false });
 
 	initializeSw();
+}
+
+function getAnnouncementDisplayOrder(announcement: Misskey.entities.Announcement & { displayOrder?: number }): number {
+	return announcement.displayOrder ?? 0;
 }

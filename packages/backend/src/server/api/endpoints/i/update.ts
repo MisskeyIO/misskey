@@ -11,12 +11,12 @@ import * as htmlParser from 'node-html-parser';
 import { extractCustomEmojisFromMfm } from '@/misc/extract-custom-emojis-from-mfm.js';
 import { extractHashtags } from '@/misc/extract-hashtags.js';
 import * as Acct from '@/misc/acct.js';
-import type { UsersRepository, DriveFilesRepository, MiMeta, UserProfilesRepository, PagesRepository } from '@/models/_.js';
+import type { UsersRepository, DriveFilesRepository, MiMeta, UserLanguagesRepository, UserProfilesRepository, PagesRepository } from '@/models/_.js';
 import type { MiLocalUser, MiUser } from '@/models/User.js';
 import { birthdaySchema, descriptionSchema, followedMessageSchema, locationSchema, nameSchema } from '@/models/User.js';
-import type { MiUserProfile } from '@/models/UserProfile.js';
+import type { MiUserProfile, UserProfileMutualLinkSection } from '@/models/UserProfile.js';
 import { normalizeForSearch } from '@/misc/normalize-for-search.js';
-import { langmap } from '@/misc/langmap.js';
+import { langmap, postingLangCodes, viewingLangCodes } from '@/misc/langmap.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
@@ -33,7 +33,7 @@ import { HttpRequestService } from '@/core/HttpRequestService.js';
 import type { Config } from '@/config.js';
 import { safeForSql } from '@/misc/safe-for-sql.js';
 import { AvatarDecorationService } from '@/core/AvatarDecorationService.js';
-import { notificationRecieveConfig } from '@/models/json-schema/user.js';
+import { mutualLinkSectionsSchema, notificationRecieveConfig } from '@/models/json-schema/user.js';
 import { ApiLoggerService } from '../../ApiLoggerService.js';
 import { ApiError } from '../../error.js';
 
@@ -136,6 +136,22 @@ const muteWords = { type: 'array', items: { oneOf: [
 	{ type: 'string' },
 ] } } as const;
 
+export const mutualLinkSectionLimit = 16;
+export const mutualLinkLimit = 16;
+
+export function normalizeMutualLinkSections(sections: UserProfileMutualLinkSection[]): UserProfileMutualLinkSection[] {
+	return sections.slice(0, mutualLinkSectionLimit).map(section => ({
+		...(section.id !== undefined ? { id: section.id.trim() } : {}),
+		...(section.name !== undefined ? { name: section.name.trim() } : {}),
+		mutualLinks: section.mutualLinks.slice(0, mutualLinkLimit).map(link => ({
+			id: link.id.trim(),
+			...(link.name !== undefined ? { name: link.name.trim() } : {}),
+			...(link.url !== undefined ? { url: link.url.trim() } : {}),
+			...(link.avatarUrl !== undefined ? { avatarUrl: link.avatarUrl.trim() } : {}),
+		})).filter(link => link.id !== ''),
+	})).filter(section => section.mutualLinks.length > 0 || section.name !== undefined);
+}
+
 export const paramDef = {
 	type: 'object',
 	properties: {
@@ -145,6 +161,10 @@ export const paramDef = {
 		location: { ...locationSchema, nullable: true },
 		birthday: { ...birthdaySchema, nullable: true },
 		lang: { type: 'string', enum: [null, ...Object.keys(langmap)] as string[], nullable: true },
+		postingLang: { type: 'string', enum: [null, ...postingLangCodes], nullable: true },
+		viewingLangs: { type: 'array', uniqueItems: true, items: { type: 'string', enum: viewingLangCodes } },
+		showMediaInAllLanguages: { type: 'boolean' },
+		showHashtagsInAllLanguages: { type: 'boolean' },
 		avatarId: { type: 'string', format: 'misskey:id', nullable: true },
 		avatarDecorations: { type: 'array', maxItems: 16, items: {
 			type: 'object',
@@ -171,6 +191,7 @@ export const paramDef = {
 				required: ['name', 'value'],
 			},
 		},
+		mutualLinkSections: mutualLinkSectionsSchema,
 		isLocked: { type: 'boolean' },
 		isExplorable: { type: 'boolean' },
 		hideOnlineStatus: { type: 'boolean' },
@@ -247,6 +268,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
 
+		@Inject(DI.userLanguagesRepository)
+		private userLanguagesRepository: UserLanguagesRepository,
+
 		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
 
@@ -273,6 +297,12 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			const updates = {} as Partial<MiUser>;
 			const profileUpdates = {} as Partial<MiUserProfile>;
+			const userLanguageUpdates: {
+				postingLang?: string | null;
+				viewingLangs?: string[];
+				showMediaInAllLanguages?: boolean;
+				showHashtagsInAllLanguages?: boolean;
+			} = {};
 
 			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
 			let policies: RolePolicies | null = null;
@@ -288,6 +318,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (ps.description !== undefined) profileUpdates.description = ps.description;
 			if (ps.followedMessage !== undefined) profileUpdates.followedMessage = ps.followedMessage;
 			if (ps.lang !== undefined) profileUpdates.lang = ps.lang;
+			if (ps.postingLang !== undefined) userLanguageUpdates.postingLang = ps.postingLang;
+			if (ps.viewingLangs !== undefined) userLanguageUpdates.viewingLangs = ps.viewingLangs;
+			if (ps.showMediaInAllLanguages !== undefined) userLanguageUpdates.showMediaInAllLanguages = ps.showMediaInAllLanguages;
+			if (ps.showHashtagsInAllLanguages !== undefined) userLanguageUpdates.showHashtagsInAllLanguages = ps.showHashtagsInAllLanguages;
 			if (ps.location !== undefined) profileUpdates.location = ps.location;
 			if (ps.birthday !== undefined) profileUpdates.birthday = ps.birthday;
 			if (ps.followingVisibility !== undefined) profileUpdates.followingVisibility = ps.followingVisibility;
@@ -370,7 +404,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (ps.avatarId) {
 				policies ??= await this.roleService.getUserPolicies(user.id);
-				if (!policies.canUpdateBioMedia) throw new ApiError(meta.errors.restrictedByRole);
+				if (!policies.canUpdateBioMedia || !policies.canUpdateAvatar) throw new ApiError(meta.errors.restrictedByRole);
 
 				const avatar = await this.driveFilesRepository.findOneBy({ id: ps.avatarId });
 
@@ -388,7 +422,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (ps.bannerId) {
 				policies ??= await this.roleService.getUserPolicies(user.id);
-				if (!policies.canUpdateBioMedia) throw new ApiError(meta.errors.restrictedByRole);
+				if (!policies.canUpdateBioMedia || !policies.canUpdateBanner) throw new ApiError(meta.errors.restrictedByRole);
 
 				const banner = await this.driveFilesRepository.findOneBy({ id: ps.bannerId });
 
@@ -440,6 +474,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					.map(x => {
 						return { name: x.name.trim(), value: x.value.trim() };
 					});
+			}
+			if (ps.mutualLinkSections) {
+				profileUpdates.mutualLinkSections = normalizeMutualLinkSections(ps.mutualLinkSections);
 			}
 
 			if (ps.alsoKnownAs) {
@@ -533,6 +570,13 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				...profileUpdates,
 				verifiedLinks: [],
 			});
+
+			if (Object.keys(userLanguageUpdates).length > 0) {
+				await this.userLanguagesRepository.upsert({
+					userId: user.id,
+					...userLanguageUpdates,
+				}, ['userId']);
+			}
 
 			const iObj = await this.userEntityService.pack(user.id, user, {
 				schema: 'MeDetailed',

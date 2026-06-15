@@ -8,6 +8,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { MetricsTime, type JobType } from 'bullmq';
 import type { IActivity } from '@/core/activitypub/type.js';
 import type { MiDriveFile } from '@/models/DriveFile.js';
+import type { MiLocalUser } from '@/models/User.js';
 import type { MiWebhook, WebhookEventTypes } from '@/models/Webhook.js';
 import type { MiSystemWebhook, SystemWebhookEventType } from '@/models/SystemWebhook.js';
 import type { Config } from '@/config.js';
@@ -223,10 +224,11 @@ export class QueueService {
 	}
 
 	@bindThis
-	public inbox(activity: IActivity, signature: httpSignature.IParsedSignature) {
+	public inbox(recipient: MiLocalUser | null, activity: IActivity, signature: httpSignature.IParsedSignature) {
 		const data = {
 			activity: activity,
 			signature,
+			recipientId: recipient?.id,
 		};
 
 		const label = (activity.id ?? '').replace('https://', '').replace('/activity', '');
@@ -652,6 +654,20 @@ export class QueueService {
 		});
 	}
 
+	@bindThis
+	public createCleanBlockedRemoteCustomEmojisJob(blockedRemoteCustomEmojis: string[]) {
+		return this.systemQueue.add('cleanBlockedRemoteCustomEmojis', { blockedRemoteCustomEmojis }, {
+			removeOnComplete: {
+				age: 3600 * 24 * 7,
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7,
+				count: 100,
+			},
+		});
+	}
+
 	/**
 	 * @see UserWebhookDeliverJobData
 	 * @see UserWebhookDeliverProcessorService
@@ -767,6 +783,15 @@ export class QueueService {
 	public async queuePromoteJobs(queueType: typeof QUEUE_TYPES[number]) {
 		const queue = this.getQueue(queueType);
 		await queue.promoteJobs();
+	}
+
+	@bindThis
+	public async queuePromoteJob(queueType: typeof QUEUE_TYPES[number], jobId: string) {
+		const queue = this.getQueue(queueType);
+		const job = await queue.getJob(jobId);
+		if (job != null) {
+			await job.promote();
+		}
 	}
 
 	@bindThis

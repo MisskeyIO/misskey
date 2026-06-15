@@ -8,9 +8,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div class="_spacer" :style="{ '--MI_SPACER-w': narrow ? '800px' : '1100px' }">
 		<div ref="rootEl" class="ftskorzw" :class="{ wide: !narrow }" style="container-type: inline-size;">
 			<div class="main _gaps">
-				<!-- TODO -->
-				<!-- <div class="punished" v-if="user.isSuspended"><i class="ti ti-alert-triangle" style="margin-right: 8px;"></i> {{ i18n.ts.userSuspended }}</div> -->
-				<!-- <div class="punished" v-if="user.isSilenced"><i class="ti ti-alert-triangle" style="margin-right: 8px;"></i> {{ i18n.ts.userSilenced }}</div> -->
+				<div v-if="user.isSuspended" class="punished"><i class="ti ti-alert-triangle" style="margin-right: 8px;"></i> {{ i18n.ts.userSuspended }}</div>
+				<div v-if="user.isSilenced" class="punished"><i class="ti ti-alert-triangle" style="margin-right: 8px;"></i> {{ i18n.ts.userSilenced }}</div>
 
 				<div class="profile _gaps">
 					<MkAccountMoved v-if="user.movedTo" :movedTo="user.movedTo"/>
@@ -101,7 +100,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<dd class="value">{{ dateString(user.createdAt) }} (<MkTime :time="user.createdAt"/>)</dd>
 							</dl>
 						</div>
-						<div v-if="user.fields.length > 0" class="fields">
+						<div v-if="featureUser.mutualLinkSections && featureUser.mutualLinkSections.length > 0" class="mutualLinkSections">
+							<div v-for="(section, index) in displayedMutualLinkSections" :key="section.id ?? index" class="mutualLinkSection">
+								<div v-if="section.name" class="mutualLinkSectionName">{{ section.name }}</div>
+								<div class="mutualLinks">
+									<MkLink v-for="link in section.mutualLinks" :key="link.id" :url="link.url ?? ''" class="mutualLink">
+										<img v-if="link.avatarUrl" class="mutualLinkImg" :src="link.avatarUrl" :alt="link.name ?? ''">
+										<span v-else>{{ link.name ?? link.url }}</span>
+									</MkLink>
+								</div>
+							</div>
+						</div>
+						<div v-if="user.fields.length > 0 || user.host == null" class="fields">
 							<dl v-for="(field, i) in user.fields" :key="i" class="field">
 								<dt class="name">
 									<Mfm :text="field.name" :author="user" :plain="true" :colored="false" class="_selectable"/>
@@ -109,6 +119,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<dd class="value">
 									<Mfm :text="field.value" :author="user" :colored="false" class="_selectable"/>
 									<i v-if="user.verifiedLinks.includes(field.value)" v-tooltip:dialog="i18n.ts.verifiedLink" class="ti ti-circle-check" :class="$style.verifiedLink"></i>
+								</dd>
+							</dl>
+							<dl v-if="user.host == null" class="field">
+								<dt class="name">Skeb</dt>
+								<dd class="value">
+									<button class="_button skebButton" @click="showSkebStatus">
+										<i class="ti ti-external-link"></i> {{ skebStatusI18n.show }}
+									</button>
 								</dd>
 							</dl>
 						</div>
@@ -162,11 +180,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { defineAsyncComponent, computed, onMounted, onUnmounted, onActivated, onDeactivated, nextTick, watch, ref, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import { getScrollContainer } from '@@/js/scroll.js';
+import { apiUrl } from '@@/js/config.js';
 import MkNote from '@/components/MkNote.vue';
 import MkFollowButton from '@/components/MkFollowButton.vue';
 import MkAccountMoved from '@/components/MkAccountMoved.vue';
 import MkFukidashi from '@/components/MkFukidashi.vue';
 import MkRemoteCaution from '@/components/MkRemoteCaution.vue';
+import MkLink from '@/components/MkLink.vue';
+import MkSkebStatusPopup from '@/components/MkSkebStatusPopup.vue';
+import type { SkebStatus } from '@/components/MkSkebStatusPopup.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
 import MkOmit from '@/components/MkOmit.vue';
 import MkInfo from '@/components/MkInfo.vue';
@@ -207,6 +229,34 @@ const XFiles = defineAsyncComponent(() => import('./index.files.vue'));
 const XActivity = defineAsyncComponent(() => import('./index.activity.vue'));
 const XTimeline = defineAsyncComponent(() => import('./index.timeline.vue'));
 
+type MutualLink = {
+	id: string;
+	name?: string;
+	url?: string;
+	avatarUrl?: string;
+};
+
+type MutualLinkSection = {
+	id?: string;
+	name?: string;
+	mutualLinks: MutualLink[];
+};
+
+type FeatureUser = Misskey.entities.UserDetailed & {
+	mutualLinkSections?: MutualLinkSection[];
+};
+
+type FeatureEndpointRequest = Record<string, unknown>;
+
+type SkebStatusLocale = {
+	show: string;
+};
+
+const DEFAULT_MUTUAL_LINK_SECTION_LIMIT = 16;
+const DEFAULT_MUTUAL_LINK_LIMIT = 16;
+
+const skebStatusI18n = (i18n.ts as typeof i18n.ts & { _skebStatus: SkebStatusLocale })._skebStatus;
+
 const props = withDefaults(defineProps<{
 	user: Misskey.entities.UserDetailed;
 	/** Test only; MkNotesTimeline currently causes problems in vitest */
@@ -222,6 +272,7 @@ const emit = defineEmits<{
 const router = useRouter();
 
 const user = ref(props.user);
+const featureUser = computed(() => user.value as FeatureUser);
 const narrow = ref<null | boolean>(null);
 const rootEl = useTemplateRef('rootEl');
 const bannerEl = useTemplateRef('bannerEl');
@@ -230,6 +281,21 @@ const memoDraft = ref(props.user.memo);
 const isEditingMemo = ref(false);
 const moderationNote = ref(props.user.moderationNote ?? '');
 const editModerationNote = ref(false);
+const skebStatus = ref<SkebStatus | null>(null);
+const skebStatusLoading = ref(false);
+const skebStatusErrorMessage = ref<string | null>(null);
+
+const displayedMutualLinkSections = computed(() => {
+	return (featureUser.value.mutualLinkSections ?? [])
+		.slice(0, DEFAULT_MUTUAL_LINK_SECTION_LIMIT)
+		.map(section => ({
+			...section,
+			mutualLinks: section.mutualLinks
+				.slice(0, DEFAULT_MUTUAL_LINK_LIMIT)
+				.filter(link => link.url != null && link.url !== ''),
+		}))
+		.filter(section => section.name != null || section.mutualLinks.length > 0);
+});
 
 watch(moderationNote, async () => {
 	await misskeyApi('admin/update-user-note', { userId: props.user.id, text: moderationNote.value });
@@ -276,6 +342,64 @@ async function updateMemo() {
 		userId: props.user.id,
 	});
 	isEditingMemo.value = false;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === 'object' && value !== null;
+}
+
+async function featureApi<Res>(endpoint: string, data: FeatureEndpointRequest): Promise<Res> {
+	const body: FeatureEndpointRequest = { ...data };
+	if ($i != null) body.i = $i.token;
+	const res = await window.fetch(`${apiUrl}/${endpoint}`, {
+		method: 'POST',
+		body: JSON.stringify(body),
+		credentials: 'omit',
+		cache: 'no-cache',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+	});
+	const responseBody: unknown = res.status === 204 ? undefined : await res.json();
+	if (res.ok) return responseBody as Res;
+
+	if (isRecord(responseBody) && isRecord(responseBody.error) && typeof responseBody.error.message === 'string') {
+		throw new Error(responseBody.error.message);
+	}
+
+	throw new Error(`API request failed: ${endpoint}`);
+}
+
+async function fetchSkebStatus() {
+	skebStatusLoading.value = true;
+	skebStatusErrorMessage.value = null;
+	try {
+		skebStatus.value = await featureApi<SkebStatus>('users/get-skeb-status', { userId: user.value.id });
+	} catch (err) {
+		skebStatus.value = null;
+		skebStatusErrorMessage.value = err instanceof Error ? err.message : i18n.ts.somethingHappened;
+	} finally {
+		skebStatusLoading.value = false;
+	}
+}
+
+function showSkebStatus(ev: MouseEvent) {
+	const source = ev.currentTarget;
+	if (!(source instanceof HTMLElement)) return;
+	const showing = ref(true);
+	const { dispose } = os.popup(MkSkebStatusPopup, {
+		showing,
+		loading: skebStatusLoading,
+		status: skebStatus,
+		errorMessage: skebStatusErrorMessage,
+		source,
+	}, {
+		closed: () => {
+			showing.value = false;
+			dispose();
+		},
+	});
+	if (skebStatus.value == null) void fetchSkebStatus();
 }
 
 watch([props.user], () => {
@@ -609,6 +733,44 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 					}
 				}
 
+				> .mutualLinkSections {
+					padding: 24px;
+					border-top: solid 0.5px var(--MI_THEME-divider);
+					font-size: 0.9em;
+
+					> .mutualLinkSection:not(:last-child) {
+						margin-bottom: 12px;
+					}
+
+					.mutualLinkSectionName {
+						margin-bottom: 8px;
+						font-weight: bold;
+					}
+
+					.mutualLinks {
+						display: flex;
+						flex-wrap: wrap;
+						gap: 8px;
+					}
+
+					.mutualLink {
+						display: inline-flex;
+						align-items: center;
+						justify-content: center;
+						min-height: 32px;
+						padding: 4px 8px;
+						border: solid 1px var(--MI_THEME-divider);
+						border-radius: var(--MI-radius);
+						background: var(--MI_THEME-panel);
+					}
+
+					.mutualLinkImg {
+						max-width: 120px;
+						max-height: 32px;
+						object-fit: contain;
+					}
+				}
+
 				> .status {
 					display: flex;
 					padding: 24px;
@@ -635,6 +797,10 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 							font-size: 70%;
 						}
 					}
+				}
+
+				.skebButton {
+					color: var(--MI_THEME-link);
 				}
 			}
 		}
@@ -717,6 +883,15 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 
 				> .fields {
 					padding: 16px;
+				}
+
+				> .mutualLinkSections {
+					padding: 16px;
+					text-align: center;
+
+					.mutualLinks {
+						justify-content: center;
+					}
 				}
 
 				> .status {

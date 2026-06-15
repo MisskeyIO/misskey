@@ -12,6 +12,7 @@ process.env.NODE_ENV = 'test';
 
 import * as assert from 'assert';
 import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
+import type { DataSource, Repository } from 'typeorm';
 import {
 	AuthorizationCode,
 	type AuthorizationTokenConfig,
@@ -22,10 +23,12 @@ import {
 import pkceChallenge from 'pkce-challenge';
 import * as htmlParser from 'node-html-parser';
 import Fastify, { type FastifyInstance, type FastifyReply } from 'fastify';
-import { api, port, sendEnvUpdateRequest, signup } from '../utils.js';
+import { api, initTestDb, origin, port, sendEnvUpdateRequest, signup } from '../utils.js';
 import type * as misskey from 'misskey-js';
+import { MiIndieAuthClient } from '@/models/IndieAuthClient.js';
 
 const host = `http://127.0.0.1:${port}`;
+const originHostname = new URL(origin).hostname;
 
 const clientPort = port + 1;
 const redirect_uri = `http://127.0.0.1:${clientPort}/redirect`;
@@ -132,6 +135,24 @@ async function fetchAuthorizationCode(user: misskey.entities.SignupResponse, sco
 	return { client, code };
 }
 
+async function fetchAccessToken(user: misskey.entities.SignupResponse, scope = 'read:account'): Promise<string> {
+	const { code_challenge, code_verifier } = await pkceChallenge(128);
+	const { client, code } = await fetchAuthorizationCode(user, scope, code_challenge);
+
+	const token = await client.getToken({
+		code,
+		redirect_uri,
+		code_verifier,
+	} as AuthorizationTokenConfigExtended);
+
+	const accessToken = token.token.access_token;
+	if (typeof accessToken !== 'string') {
+		throw new Error('OAuth access token was not returned.');
+	}
+
+	return accessToken;
+}
+
 function assertIndirectError(response: Response, error: string): void {
 	assert.strictEqual(response.status, 302);
 
@@ -142,7 +163,7 @@ function assertIndirectError(response: Response, error: string): void {
 	assert.strictEqual(location.searchParams.get('error'), error);
 
 	// https://datatracker.ietf.org/doc/html/rfc9207#name-response-parameter-iss
-	assert.strictEqual(location.searchParams.get('iss'), 'http://misskey.local');
+	assert.strictEqual(location.searchParams.get('iss'), origin);
 	// https://datatracker.ietf.org/doc/html/rfc6749.html#section-4.1.2.1
 	assert.ok(location.searchParams.has('state'));
 }
@@ -156,6 +177,8 @@ async function assertDirectError(response: Response, status: number, error: stri
 
 describe('OAuth', () => {
 	let fastify: FastifyInstance;
+	let db: DataSource;
+	let indieAuthClientsRepository: Repository<MiIndieAuthClient>;
 
 	let alice: misskey.entities.SignupResponse;
 	let bob: misskey.entities.SignupResponse;
@@ -171,10 +194,14 @@ describe('OAuth', () => {
 			sender(reply);
 		});
 		await fastify.listen({ port: clientPort });
+
+		db = await initTestDb(true);
+		indieAuthClientsRepository = db.getRepository(MiIndieAuthClient);
 	}, 1000 * 60 * 2);
 
 	beforeEach(async () => {
 		await sendEnvUpdateRequest({ key: 'MISSKEY_TEST_CHECK_IP_RANGE', value: '' });
+		await indieAuthClientsRepository.delete({ id: clientConfig.client.id });
 		sender = (reply): void => {
 			reply.send(`
 				<!DOCTYPE html>
@@ -185,6 +212,8 @@ describe('OAuth', () => {
 	});
 
 	afterAll(async () => {
+		await indieAuthClientsRepository.delete({ id: clientConfig.client.id });
+		await db.destroy();
 		await fastify.close();
 	});
 
@@ -219,7 +248,7 @@ describe('OAuth', () => {
 		assert.ok(location.searchParams.has('code'));
 		assert.strictEqual(location.searchParams.get('state'), 'state');
 		// https://datatracker.ietf.org/doc/html/rfc9207#name-response-parameter-iss
-		assert.strictEqual(location.searchParams.get('iss'), 'http://misskey.local');
+		assert.strictEqual(location.searchParams.get('iss'), origin);
 
 		const code = new URL(location).searchParams.get('code');
 		assert.ok(code);
@@ -706,11 +735,160 @@ describe('OAuth', () => {
 		const response = await fetch(new URL('.well-known/oauth-authorization-server', host));
 		assert.strictEqual(response.status, 200);
 
-		const body = await response.json() as any;
-		assert.strictEqual(body.issuer, 'http://misskey.local');
+		const body = await response.json() as Record<string, unknown>;
+		assert.strictEqual(body.issuer, origin);
+		assert.strictEqual(body.userinfo_endpoint, `${origin}/oauth/api/userinfo`);
+		assert.strictEqual(body.introspection_endpoint, `${origin}/oauth/token/introspect`);
+		assert.ok(Array.isArray(body.scopes_supported));
 		assert.ok(body.scopes_supported.includes('write:notes'));
 	});
 
+	test('Registered IndieAuth client data is used without remote discovery', async () => {
+		let remoteDiscoveryRequests = 0;
+		sender = (reply): void => {
+			remoteDiscoveryRequests++;
+			reply.code(500).send('remote discovery should not be requested');
+		};
+
+		await indieAuthClientsRepository.save({
+			id: clientConfig.client.id,
+			name: 'Registered Misklient',
+			redirectUris: [redirect_uri2],
+		});
+
+		const client = new AuthorizationCode(clientConfig);
+		const response = await fetch(client.authorizeURL({
+			redirect_uri: redirect_uri2,
+			scope: 'write:notes',
+			state: 'state',
+			code_challenge: 'code',
+			code_challenge_method: 'S256',
+		} as AuthorizationParamsExtended));
+		assert.strictEqual(response.status, 200);
+
+		const meta = getMeta(await response.text());
+		assert.strictEqual(meta.clientName, 'Registered Misklient');
+		assert.strictEqual(meta.clientLogo, undefined);
+		assert.strictEqual(remoteDiscoveryRequests, 0);
+	});
+
+	describe('Userinfo endpoint', () => {
+		test('requires a valid bearer token', async () => {
+			const missing = await fetch(new URL('/oauth/api/userinfo', host));
+			assert.strictEqual(missing.status, 401);
+
+			const invalid = await fetch(new URL('/oauth/api/userinfo', host), {
+				headers: {
+					Authorization: 'Bearer invalid-token',
+				},
+			});
+			assert.strictEqual(invalid.status, 401);
+		});
+
+		test('returns OIDC-style fields for a valid bearer token', async () => {
+			const accessToken = await fetchAccessToken(alice);
+			const response = await fetch(new URL('/oauth/api/userinfo', host), {
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+				},
+			});
+			assert.strictEqual(response.status, 200);
+
+			const body = await response.json() as Record<string, unknown>;
+			assert.strictEqual(body.sub, alice.id);
+			assert.strictEqual(body.name, '@alice');
+			assert.strictEqual(body.preferred_username, 'alice');
+			assert.strictEqual(body.profile, `${origin}/@alice`);
+			assert.strictEqual(body.email, `alice@${originHostname}`);
+			assert.strictEqual(body.email_verified, false);
+			assert.strictEqual(body.mfa_enabled, false);
+			assert.strictEqual(typeof body.updated_at, 'number');
+		});
+	});
+
+	describe('Token introspection endpoint', () => {
+		test('requires caller bearer authentication', async () => {
+			const response = await fetch(new URL('/oauth/token/introspect', host), {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ token: 'target-token' }),
+			});
+			assert.strictEqual(response.status, 401);
+
+			const invalid = await fetch(new URL('/oauth/token/introspect', host), {
+				method: 'POST',
+				headers: {
+					Authorization: 'Bearer invalid-token',
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ token: 'target-token' }),
+			});
+			assert.strictEqual(invalid.status, 401);
+		});
+
+		test('validates target token and returns JSON introspection metadata', async () => {
+			const callerToken = await fetchAccessToken(alice);
+			const targetToken = await fetchAccessToken(bob, 'read:account write:notes');
+
+			const missingTarget = await fetch(new URL('/oauth/token/introspect', host), {
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${callerToken}`,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({}),
+			});
+			assert.strictEqual(missingTarget.status, 400);
+
+			const unknownTarget = await fetch(new URL('/oauth/token/introspect', host), {
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${callerToken}`,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ token: 'unknown-target-token' }),
+			});
+			assert.strictEqual(unknownTarget.status, 200);
+			assert.deepStrictEqual(await unknownTarget.json(), { active: false });
+
+			const activeTarget = await fetch(new URL('/oauth/token/introspect', host), {
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${callerToken}`,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ token: targetToken }),
+			});
+			assert.strictEqual(activeTarget.status, 200);
+			const activeBody = await activeTarget.json() as Record<string, unknown>;
+			assert.strictEqual(activeBody.active, true);
+			assert.strictEqual(activeBody.me, `${origin}/@bob`);
+			assert.strictEqual(activeBody.scope, 'read:account write:notes');
+			assert.strictEqual(activeBody.client_id, clientConfig.client.id);
+			assert.strictEqual(activeBody.user_id, bob.id);
+			assert.strictEqual(activeBody.token_type, 'Bearer');
+		});
+
+		test('supports URL-encoded target token bodies', async () => {
+			const callerToken = await fetchAccessToken(alice);
+			const targetToken = await fetchAccessToken(bob);
+			const response = await fetch(new URL('/oauth/token/introspect', host), {
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${callerToken}`,
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				body: new URLSearchParams({ token: targetToken }),
+			});
+			assert.strictEqual(response.status, 200);
+
+			const body = await response.json() as Record<string, unknown>;
+			assert.strictEqual(body.active, true);
+			assert.strictEqual(body.user_id, bob.id);
+		});
+	});
 	// Any error on decision endpoint is solely on Misskey side and nothing to do with the client.
 	// Do not use indirect error here.
 	describe('Decision endpoint', () => {

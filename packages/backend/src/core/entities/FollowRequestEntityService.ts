@@ -50,13 +50,15 @@ export class FollowRequestEntityService {
 		const _followees = requests.map(({ followee, followeeId }) => followee ?? followeeId);
 		const _userMap = await this.userEntityService.packMany([..._followers, ..._followees], me)
 			.then(users => new Map(users.map(u => [u.id, u])));
-		return Promise.all(
+		return (await Promise.allSettled(
 			requests.map(req => {
 				const packedFollower = _userMap.get(req.followerId);
 				const packedFollowee = _userMap.get(req.followeeId);
 				return this.pack(req, me, { packedFollower, packedFollowee });
 			}),
-		);
+		))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => result.value);
 	}
 }
 

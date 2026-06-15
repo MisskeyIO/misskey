@@ -7,7 +7,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import type { DriveFilesRepository } from '@/models/_.js';
 import { DriveService } from '@/core/DriveService.js';
-import { GlobalEventService } from '@/core/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
 import { RoleService } from '@/core/RoleService.js';
 import { ApiError } from '../../../error.js';
@@ -16,6 +15,7 @@ export const meta = {
 	tags: ['drive'],
 
 	requireCredential: true,
+	requiredRolePolicy: 'canDeleteContent',
 
 	kind: 'write:drive',
 
@@ -52,7 +52,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 		private driveService: DriveService,
 		private roleService: RoleService,
-		private globalEventService: GlobalEventService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const file = await this.driveFilesRepository.findOneBy({ id: ps.fileId });

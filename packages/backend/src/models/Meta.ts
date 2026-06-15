@@ -76,12 +76,22 @@ export class MiMeta {
 	@Column('varchar', {
 		length: 1024, array: true, default: '{}',
 	})
+	public featuredGameChannels: string[];
+
+	@Column('varchar', {
+		length: 1024, array: true, default: '{}',
+	})
 	public hiddenTags: string[];
 
 	@Column('varchar', {
 		length: 1024, array: true, default: '{}',
 	})
 	public blockedHosts: string[];
+
+	@Column('varchar', {
+		length: 1024, array: true, default: '{}',
+	})
+	public blockedRemoteCustomEmojis: string[];
 
 	@Column('varchar', {
 		length: 1024, array: true, default: '{}',
@@ -604,6 +614,11 @@ export class MiMeta {
 	})
 	public perUserListTimelineCacheMax: number;
 
+	@Column('integer', {
+		default: 10000,
+	})
+	public dimensions: number;
+
 	@Column('boolean', {
 		default: false,
 	})
@@ -638,6 +653,20 @@ export class MiMeta {
 		default: false,
 	})
 	public urlPreviewRequireContentLength: boolean;
+
+	@Column('varchar', {
+		length: 1024,
+		array: true,
+		default: '{}',
+	})
+	public urlPreviewDenyList: string[];
+
+	@Column('varchar', {
+		length: 1024,
+		array: true,
+		default: '{}',
+	})
+	public wellKnownWebsites: string[];
 
 	@Column('varchar', {
 		length: 1024,

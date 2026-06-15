@@ -76,6 +76,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkSwitch v-model="announcement.needConfirmationToRead" :helpText="i18n.ts._announcement.needConfirmationToReadDescription">
 							{{ i18n.ts._announcement.needConfirmationToRead }}
 						</MkSwitch>
+						<MkSwitch v-model="announcement.needEnrollmentTutorialToRead" :helpText="i18n.ts._announcement.needEnrollmentTutorialToReadDescription">
+							{{ i18n.ts._announcement.needEnrollmentTutorialToRead }}
+						</MkSwitch>
+						<MkInput v-model="announcement.closeDuration" type="number" :min="0">
+							<template #label>{{ i18n.ts._announcement.closeDuration }}</template>
+							<template #caption>{{ i18n.ts._announcement.closeDurationDescription }}</template>
+						</MkInput>
+						<MkInput v-model="announcement.displayOrder" type="number">
+							<template #label>{{ i18n.ts._announcement.displayOrder }}</template>
+							<template #caption>{{ i18n.ts._announcement.displayOrderDescription }}</template>
+						</MkInput>
 						<p v-if="announcement.reads">{{ i18n.tsx.nUsersRead({ n: announcement.reads }) }}</p>
 					</div>
 				</MkFolder>
@@ -121,22 +132,41 @@ const {
 const loading = ref(true);
 const loadingMore = ref(false);
 
-const announcements = ref<(Omit<Misskey.entities.AdminAnnouncementsListResponse[number], 'id' | 'createdAt' | 'updatedAt' | 'reads' | 'isActive'> & {
+type AnnouncementListItem = Omit<Misskey.entities.AdminAnnouncementsListResponse[number], 'id' | 'createdAt' | 'updatedAt' | 'reads' | 'isActive'> & {
 	id: string | null;
 	_id?: string;
 	isActive?: Misskey.entities.AdminAnnouncementsListResponse[number]['isActive'];
 	reads?: Misskey.entities.AdminAnnouncementsListResponse[number]['reads'];
-})[]>([]);
+	closeDuration: number;
+	displayOrder: number;
+	needEnrollmentTutorialToRead: boolean;
+};
+type AnnouncementListResponseItem = Misskey.entities.AdminAnnouncementsListResponse[number] & {
+	closeDuration?: number | null;
+	displayOrder?: number;
+	needEnrollmentTutorialToRead?: boolean;
+};
+
+const announcements = ref<AnnouncementListItem[]>([]);
 
 watch(announcementsStatus, (to) => {
 	loading.value = true;
 	misskeyApi('admin/announcements/list', {
 		status: to,
 	}).then(announcementResponse => {
-		announcements.value = announcementResponse;
+		announcements.value = announcementResponse.map(normalizeAnnouncement);
 		loading.value = false;
 	});
 }, { immediate: true });
+
+function normalizeAnnouncement(announcement: AnnouncementListResponseItem): AnnouncementListItem {
+	return {
+		...announcement,
+		closeDuration: announcement.closeDuration ?? 0,
+		displayOrder: announcement.displayOrder ?? 0,
+		needEnrollmentTutorialToRead: announcement.needEnrollmentTutorialToRead ?? false,
+	};
+}
 
 function add() {
 	announcements.value.unshift({
@@ -150,6 +180,9 @@ function add() {
 		forExistingUsers: false,
 		silence: false,
 		needConfirmationToRead: false,
+		needEnrollmentTutorialToRead: false,
+		closeDuration: 0,
+		displayOrder: 0,
 		userId: null,
 	});
 }
@@ -208,7 +241,7 @@ function more() {
 		status: announcementsStatus.value,
 		untilId: announcements.value.reduce((acc, announcement) => announcement.id != null ? announcement : acc).id!,
 	}).then(announcementResponse => {
-		announcements.value = announcements.value.concat(announcementResponse);
+		announcements.value = announcements.value.concat(announcementResponse.map(normalizeAnnouncement));
 		loadingMore.value = false;
 	});
 }
@@ -218,7 +251,7 @@ function refresh() {
 	misskeyApi('admin/announcements/list', {
 		status: announcementsStatus.value,
 	}).then(announcementResponse => {
-		announcements.value = announcementResponse;
+		announcements.value = announcementResponse.map(normalizeAnnouncement);
 		loading.value = false;
 	});
 }

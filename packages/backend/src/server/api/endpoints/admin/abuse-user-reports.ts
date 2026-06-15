@@ -39,6 +39,10 @@ export const meta = {
 					type: 'string',
 					nullable: false, optional: false,
 				},
+				category: {
+					type: 'string',
+					nullable: false, optional: false,
+				},
 				resolved: {
 					type: 'boolean',
 					nullable: false, optional: false,
@@ -103,6 +107,8 @@ export const paramDef = {
 		state: { type: 'string', nullable: true, default: null },
 		reporterOrigin: { type: 'string', enum: ['combined', 'local', 'remote'], default: 'combined' },
 		targetUserOrigin: { type: 'string', enum: ['combined', 'local', 'remote'], default: 'combined' },
+		forwarded: { type: 'boolean', default: false },
+		category: { type: 'string', nullable: true, default: null },
 	},
 	required: [],
 } as const;
@@ -116,7 +122,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private abuseUserReportEntityService: AbuseUserReportEntityService,
 		private queryService: QueryService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+		super(meta, paramDef, async (ps) => {
 			const query = this.queryService.makePaginationQuery(this.abuseUserReportsRepository.createQueryBuilder('report'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate);
 
 			switch (ps.state) {
@@ -132,6 +138,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			switch (ps.targetUserOrigin) {
 				case 'local': query.andWhere('report.targetUserHost IS NULL'); break;
 				case 'remote': query.andWhere('report.targetUserHost IS NOT NULL'); break;
+			}
+
+			if (ps.forwarded) {
+				query.andWhere('report.forwarded = TRUE');
+			}
+
+			if (ps.category != null) {
+				query.andWhere('report.category = :category', { category: ps.category });
 			}
 
 			const reports = await query.limit(ps.limit).getMany();

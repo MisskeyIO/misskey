@@ -29,6 +29,9 @@ import { FeedService } from './web/FeedService.js';
 import { UrlPreviewService } from './web/UrlPreviewService.js';
 import { ClientLoggerService } from './web/ClientLoggerService.js';
 import { OAuth2ProviderService } from './oauth/OAuth2ProviderService.js';
+import { JWTIdentifyProviderService } from './sso/JWTIdentifyProviderService.js';
+import { SAMLIdentifyProviderService } from './sso/SAMLIdentifyProviderService.js';
+import { SsoRuntimeService } from './sso/SsoRuntimeService.js';
 
 import MainStreamConnection from '@/server/api/stream/Connection.js';
 import { MainChannel } from './api/stream/channels/main.js';
@@ -102,6 +105,9 @@ import { SigninWithPasskeyApiService } from './api/SigninWithPasskeyApiService.j
 		NoteStreamingHidingService,
 		OpenApiServerService,
 		OAuth2ProviderService,
+		JWTIdentifyProviderService,
+		SAMLIdentifyProviderService,
+		SsoRuntimeService,
 	],
 	exports: [
 		ServerService,

@@ -103,15 +103,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</div>
 								<div :class="$style.draftFooter">
 									<div :class="$style.draftVisibility">
-										<span :title="i18n.ts._visibility[draft.visibility]">
-											<i v-if="draft.visibility === 'public'" class="ti ti-world"></i>
-											<i v-else-if="draft.visibility === 'home'" class="ti ti-home"></i>
-											<i v-else-if="draft.visibility === 'followers'" class="ti ti-lock"></i>
-											<i v-else-if="draft.visibility === 'specified'" class="ti ti-mail"></i>
+										<span :title="getDraftVisibilityTitle(draft)">
+											<i v-if="getDraftVisibility(draft) === 'public'" class="ti ti-world"></i>
+											<i v-else-if="getDraftVisibility(draft) === 'home'" class="ti ti-home"></i>
+											<i v-else-if="getDraftVisibility(draft) === 'followers'" class="ti ti-lock"></i>
+											<i v-else-if="getDraftVisibility(draft) === 'specified'" class="ti ti-mail"></i>
 										</span>
 										<span v-if="draft.localOnly" :title="i18n.ts._visibility['disableFederation']"><i class="ti ti-rocket-off"></i></span>
 									</div>
-									<MkTime :time="draft.createdAt" :class="$style.draftCreatedAt" mode="detail" colored/>
+									<MkTime :time="getDraftCreatedAt(draft)" :class="$style.draftCreatedAt" mode="detail" colored/>
 								</div>
 							</div>
 
@@ -204,6 +204,20 @@ const currentDraftsCount = ref(0);
 misskeyApi('notes/drafts/count').then((count) => {
 	currentDraftsCount.value = count;
 });
+
+type DraftVisibility = NonNullable<Misskey.entities.NoteDraft['visibility']>;
+
+function getDraftVisibility(draft: Misskey.entities.NoteDraft): DraftVisibility {
+	return draft.visibility ?? 'public';
+}
+
+function getDraftVisibilityTitle(draft: Misskey.entities.NoteDraft): string {
+	return i18n.ts._visibility[getDraftVisibility(draft)];
+}
+
+function getDraftCreatedAt(draft: Misskey.entities.NoteDraft): string | number | Date | null {
+	return draft.createdAt ?? draft.scheduledAt ?? null;
+}
 
 const dialogEl = shallowRef<InstanceType<typeof MkModalWindow>>();
 

@@ -171,13 +171,15 @@ export class NoteDraftEntityService implements OnModuleInit {
 		const packedUsers = await this.userEntityService.packMany(users, me)
 			.then(users => new Map(users.map(u => [u.id, u])));
 
-		return await Promise.all(noteDrafts.map(n => this.pack(n, me, {
+		return (await Promise.allSettled(noteDrafts.map(n => this.pack(n, me, {
 			...options,
 			_hint_: {
 				packedFiles,
 				packedUsers,
 			},
-		})));
+		}))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => result.value);
 	}
 
 	@bindThis

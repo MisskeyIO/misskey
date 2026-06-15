@@ -158,6 +158,8 @@ import { checkDragDataType, getDragData } from '@/drag-and-drop.js';
 import { useUploader } from '@/composables/use-uploader.js';
 import { startTour } from '@/utility/tour.js';
 import { closeTip } from '@/tips.js';
+import { getPostingLanguageLabel, normalizePostingLang, selectPostingLanguage } from '@/utility/posting-language.js';
+import type { PostingLangCode } from '@/utility/posting-language.js';
 
 const $i = ensureSignin();
 
@@ -176,7 +178,9 @@ const props = withDefaults(defineProps<PostFormProps & {
 provide(DI.mock, props.mock);
 
 const emit = defineEmits<{
+	(ev: 'posting'): void;
 	(ev: 'posted'): void;
+	(ev: 'postError'): void;
 	(ev: 'cancel'): void;
 	(ev: 'esc'): void;
 
@@ -212,6 +216,7 @@ if (props.initialVisibleUsers) {
 }
 const reactionAcceptance = ref(store.s.reactionAcceptance);
 const scheduledAt = ref<number | null>(null);
+const postingLang = ref<PostingLangCode | null>(normalizePostingLang($i.postingLang));
 const draghover = ref(false);
 const quoteId = ref<string | null>(null);
 const hasNotSpecifiedMentions = ref(false);
@@ -438,6 +443,7 @@ function watchForDraft() {
 	watch(quoteId, () => saveDraft());
 	watch(reactionAcceptance, () => saveDraft());
 	watch(scheduledAt, () => saveDraft());
+	watch(postingLang, () => saveDraft());
 }
 
 function checkMissingMention() {
@@ -607,6 +613,12 @@ async function toggleReactionAcceptance() {
 	reactionAcceptance.value = select.result;
 }
 
+async function setPostingLanguage() {
+	const selected = await selectPostingLanguage(postingLang.value);
+	if (selected === undefined) return;
+	postingLang.value = normalizePostingLang(selected);
+}
+
 //#region その他の設定メニューpopup
 function showOtherSettings() {
 	let reactionAcceptanceIcon = 'ti ti-icons';
@@ -650,6 +662,13 @@ function showOtherSettings() {
 			toggleReactionAcceptance();
 		},
 	}, { type: 'divider' }, {
+		icon: 'ti ti-language',
+		text: i18n.ts.postingLanguage,
+		caption: getPostingLanguageLabel(postingLang.value),
+		action: () => {
+			setPostingLanguage();
+		},
+	}, {
 		type: 'button',
 		text: i18n.ts._drafts.saveToDraft,
 		icon: 'ti ti-cloud-upload',
@@ -719,6 +738,7 @@ function clear() {
 	poll.value = null;
 	quoteId.value = null;
 	scheduledAt.value = null;
+	postingLang.value = normalizePostingLang($i.postingLang);
 }
 
 function onKeydown(ev: KeyboardEvent) {
@@ -875,6 +895,7 @@ type StoredDrafts = {
 			quoteId: string | null;
 			reactionAcceptance: 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote' | null;
 			scheduledAt: number | null;
+			postingLang: string | null;
 		};
 	};
 };
@@ -898,6 +919,7 @@ function saveDraft() {
 			quoteId: quoteId.value,
 			reactionAcceptance: reactionAcceptance.value,
 			scheduledAt: scheduledAt.value,
+			postingLang: postingLang.value,
 		},
 	};
 
@@ -975,8 +997,18 @@ async function post(ev?: PointerEvent) {
 			}
 		}
 
-		await postAsScheduled();
-		clear();
+		posting.value = true;
+		emit('posting');
+		try {
+			await postAsScheduled();
+			clear();
+			emit('posted');
+		} catch (err) {
+			console.error(err);
+			emit('postError');
+		} finally {
+			posting.value = false;
+		}
 		return;
 	}
 
@@ -1030,6 +1062,7 @@ async function post(ev?: PointerEvent) {
 		visibility: visibility.value,
 		visibleUserIds: visibility.value === 'specified' ? visibleUsers.value.map(u => u.id) : undefined,
 		reactionAcceptance: reactionAcceptance.value,
+		lang: postingLang.value,
 	};
 
 	if (withHashtags.value && hashtags.value && hashtags.value.trim() !== '') {
@@ -1076,6 +1109,7 @@ async function post(ev?: PointerEvent) {
 	}
 
 	posting.value = true;
+	emit('posting');
 	misskeyApi('notes/create', postData, token).then((res) => {
 		if (props.freezeAfterPosted) {
 			posted.value = true;
@@ -1083,7 +1117,9 @@ async function post(ev?: PointerEvent) {
 			clear();
 		}
 
-		globalEvents.emit('notePosted', res.createdNote);
+		if (res.createdNote != null) {
+			globalEvents.emit('notePosted', res.createdNote);
+		}
 
 		nextTick(() => {
 			deleteDraft();
@@ -1142,21 +1178,23 @@ async function post(ev?: PointerEvent) {
 				misskeyApi('notes/drafts/delete', { draftId: serverDraftId.value });
 			}
 		});
-	}).catch(err => {
+	}).catch((err: unknown) => {
 		posting.value = false;
+		const message = err instanceof Error ? err.message : String(err);
+		const id = typeof err === 'object' && err !== null && 'id' in err ? String(err.id) : '';
 		os.alert({
 			type: 'error',
-			text: err.message + '\n' + (err as any).id,
+			text: id === '' ? message : `${message}\n${id}`,
 		});
+		emit('postError');
 	});
 }
 
 async function postAsScheduled() {
 	if (props.mock) return;
 
-	await saveServerDraft({
-		isActuallyScheduled: true,
-	});
+	await saveServerDraft({ isActuallyScheduled: true });
+	deleteDraft();
 }
 
 function cancel() {
@@ -1261,7 +1299,7 @@ async function openAccountMenu(ev: PointerEvent) {
 				text.value = draft.text ?? '';
 				useCw.value = draft.cw != null;
 				cw.value = draft.cw ?? null;
-				visibility.value = draft.visibility;
+				visibility.value = draft.visibility ?? visibility.value;
 				localOnly.value = draft.localOnly ?? false;
 				files.value = draft.files ?? [];
 				hashtags.value = draft.hashtag ?? '';
@@ -1286,8 +1324,9 @@ async function openAccountMenu(ev: PointerEvent) {
 				quoteId.value = draft.renoteId ?? null;
 				renoteTargetNote.value = draft.renote;
 				replyTargetNote.value = draft.reply;
-				reactionAcceptance.value = draft.reactionAcceptance;
+				reactionAcceptance.value = draft.reactionAcceptance ?? null;
 				scheduledAt.value = draft.scheduledAt ?? null;
+				postingLang.value = normalizePostingLang(draft.data?.lang) ?? normalizePostingLang($i.postingLang);
 				if (draft.channel) targetChannel.value = draft.channel as unknown as Misskey.entities.Channel;
 
 				visibleUsers.value = [];
@@ -1435,10 +1474,11 @@ onMounted(() => {
 						users.forEach(u => pushVisibleUser(u));
 					});
 				}
-				quoteId.value = draft.data.quoteId;
-				reactionAcceptance.value = draft.data.reactionAcceptance;
-				scheduledAt.value = draft.data.scheduledAt ?? null;
-			}
+			quoteId.value = draft.data.quoteId;
+			reactionAcceptance.value = draft.data.reactionAcceptance;
+			scheduledAt.value = draft.data.scheduledAt ?? null;
+			postingLang.value = normalizePostingLang(draft.data.postingLang) ?? normalizePostingLang($i.postingLang);
+		}
 		}
 
 		// 削除して編集

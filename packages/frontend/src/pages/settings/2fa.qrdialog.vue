@@ -120,6 +120,12 @@ import MkLink from '@/components/MkLink.vue';
 import { confetti } from '@/utility/confetti.js';
 import { ensureSignin } from '@/i.js';
 
+type BackupCodesSavedConfirmLocale = {
+	backupCodesSavedConfirmTitle: string;
+	backupCodesSavedConfirmDescription: string;
+	backupCodesSavedConfirmChecked: string;
+};
+
 const $i = ensureSignin();
 
 defineProps<{
@@ -167,7 +173,20 @@ function downloadBackupCodes() {
 	}
 }
 
-function allDone() {
+async function allDone() {
+	const confirmLocale = i18n.ts._2fa as typeof i18n.ts._2fa & BackupCodesSavedConfirmLocale;
+	const { canceled } = await os.confirm({
+		type: 'warning',
+		title: confirmLocale.backupCodesSavedConfirmTitle,
+		text: confirmLocale.backupCodesSavedConfirmDescription,
+		switchLabel: confirmLocale.backupCodesSavedConfirmChecked,
+		okText: i18n.ts.gotIt,
+		okWaitInitiate: 'switch',
+		okWaitDuration: 5,
+	});
+
+	if (canceled) return;
+
 	dialog.value?.close();
 }
 </script>

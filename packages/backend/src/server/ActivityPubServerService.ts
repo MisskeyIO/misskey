@@ -106,12 +106,13 @@ export class ActivityPubServerService {
 	}
 
 	@bindThis
-	private inbox(request: FastifyRequest, reply: FastifyReply) {
+	private async inbox(request: FastifyRequest, reply: FastifyReply) {
 		if (this.meta.federation === 'none') {
 			reply.code(403);
 			return;
 		}
 
+		const userId = (request.params as { user: string; } | undefined)?.user;
 		let signature;
 
 		try {
@@ -174,7 +175,26 @@ export class ActivityPubServerService {
 			}
 		}
 
-		this.queueService.inbox(request.body as IActivity, signature);
+		let user: MiLocalUser | null = null;
+		if (userId != null) {
+			const found = await this.usersRepository.findOneBy({
+				id: userId,
+				host: IsNull(),
+			});
+			if (found == null || !this.userEntityService.isLocalUser(found)) {
+				reply.code(404);
+				return;
+			}
+			user = found;
+		}
+
+		const activity = request.body as IActivity;
+		if (!activity.type || !signature.keyId) {
+			reply.code(400);
+			return;
+		}
+
+		this.queueService.inbox(user, activity, signature);
 
 		reply.code(202);
 	}

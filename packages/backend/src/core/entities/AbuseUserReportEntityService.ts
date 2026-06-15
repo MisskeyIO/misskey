@@ -32,13 +32,14 @@ export class AbuseUserReportEntityService {
 			packedTargetUser?: Packed<'UserDetailedNotMe'>,
 			packedAssignee?: Packed<'UserDetailedNotMe'>,
 		},
-	) {
+	): Promise<Packed<'AbuseUserReport'>> {
 		const report = typeof src === 'object' ? src : await this.abuseUserReportsRepository.findOneByOrFail({ id: src });
 
 		return await awaitAll({
 			id: report.id,
-			createdAt: this.idService.parse(report.id).date.toISOString(),
+			createdAt: report.createdAt?.toISOString() ?? this.idService.parse(report.id).date.toISOString(),
 			comment: report.comment,
+			category: report.category,
 			resolved: report.resolved,
 			reporterId: report.reporterId,
 			targetUserId: report.targetUserId,
@@ -61,7 +62,7 @@ export class AbuseUserReportEntityService {
 	@bindThis
 	public async packMany(
 		reports: MiAbuseUserReport[],
-	) {
+	): Promise<Packed<'AbuseUserReport'>[]> {
 		const _reporters = reports.map(({ reporter, reporterId }) => reporter ?? reporterId);
 		const _targetUsers = reports.map(({ targetUser, targetUserId }) => targetUser ?? targetUserId);
 		const _assignees = reports.map(({ assignee, assigneeId }) => assignee ?? assigneeId).filter(x => x != null);
@@ -70,13 +71,15 @@ export class AbuseUserReportEntityService {
 			null,
 			{ schema: 'UserDetailedNotMe' },
 		).then(users => new Map(users.map(u => [u.id, u])));
-		return Promise.all(
+		return (await Promise.allSettled(
 			reports.map(report => {
 				const packedReporter = _userMap.get(report.reporterId);
 				const packedTargetUser = _userMap.get(report.targetUserId);
 				const packedAssignee = report.assigneeId != null ? _userMap.get(report.assigneeId) : undefined;
 				return this.pack(report, { packedReporter, packedTargetUser, packedAssignee });
 			}),
-		);
+		))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => result.value);
 	}
 }

@@ -121,12 +121,14 @@ import { NoteEntityService } from './entities/NoteEntityService.js';
 import { NoteFavoriteEntityService } from './entities/NoteFavoriteEntityService.js';
 import { NoteReactionEntityService } from './entities/NoteReactionEntityService.js';
 import { NoteDraftEntityService } from './entities/NoteDraftEntityService.js';
+import { ScheduledNoteEntityService } from './entities/ScheduledNoteEntityService.js';
 import { NotificationEntityService } from './entities/NotificationEntityService.js';
 import { PageEntityService } from './entities/PageEntityService.js';
 import { PageLikeEntityService } from './entities/PageLikeEntityService.js';
 import { SigninEntityService } from './entities/SigninEntityService.js';
 import { UserEntityService } from './entities/UserEntityService.js';
 import { UserListEntityService } from './entities/UserListEntityService.js';
+import { UserAccountMoveLogEntityService } from './entities/UserAccountMoveLogEntityService.js';
 import { FlashEntityService } from './entities/FlashEntityService.js';
 import { FlashLikeEntityService } from './entities/FlashLikeEntityService.js';
 import { RoleEntityService } from './entities/RoleEntityService.js';
@@ -278,6 +280,7 @@ const $PageLikeEntityService: Provider = { provide: 'PageLikeEntityService', use
 const $SigninEntityService: Provider = { provide: 'SigninEntityService', useExisting: SigninEntityService };
 const $UserEntityService: Provider = { provide: 'UserEntityService', useExisting: UserEntityService };
 const $UserListEntityService: Provider = { provide: 'UserListEntityService', useExisting: UserListEntityService };
+const $UserAccountMoveLogEntityService: Provider = { provide: 'UserAccountMoveLogEntityService', useExisting: UserAccountMoveLogEntityService };
 const $FlashEntityService: Provider = { provide: 'FlashEntityService', useExisting: FlashEntityService };
 const $FlashLikeEntityService: Provider = { provide: 'FlashLikeEntityService', useExisting: FlashLikeEntityService };
 const $RoleEntityService: Provider = { provide: 'RoleEntityService', useExisting: RoleEntityService };
@@ -425,12 +428,14 @@ const $ApQuestionService: Provider = { provide: 'ApQuestionService', useExisting
 		NoteFavoriteEntityService,
 		NoteReactionEntityService,
 		NoteDraftEntityService,
+		ScheduledNoteEntityService,
 		NotificationEntityService,
 		PageEntityService,
 		PageLikeEntityService,
 		SigninEntityService,
 		UserEntityService,
 		UserListEntityService,
+		UserAccountMoveLogEntityService,
 		FlashEntityService,
 		FlashLikeEntityService,
 		RoleEntityService,
@@ -581,6 +586,7 @@ const $ApQuestionService: Provider = { provide: 'ApQuestionService', useExisting
 		$SigninEntityService,
 		$UserEntityService,
 		$UserListEntityService,
+		$UserAccountMoveLogEntityService,
 		$FlashEntityService,
 		$FlashLikeEntityService,
 		$RoleEntityService,
@@ -724,12 +730,14 @@ const $ApQuestionService: Provider = { provide: 'ApQuestionService', useExisting
 		NoteFavoriteEntityService,
 		NoteReactionEntityService,
 		NoteDraftEntityService,
+		ScheduledNoteEntityService,
 		NotificationEntityService,
 		PageEntityService,
 		PageLikeEntityService,
 		SigninEntityService,
 		UserEntityService,
 		UserListEntityService,
+		UserAccountMoveLogEntityService,
 		FlashEntityService,
 		FlashLikeEntityService,
 		RoleEntityService,
@@ -878,6 +886,7 @@ const $ApQuestionService: Provider = { provide: 'ApQuestionService', useExisting
 		$SigninEntityService,
 		$UserEntityService,
 		$UserListEntityService,
+		$UserAccountMoveLogEntityService,
 		$FlashEntityService,
 		$FlashLikeEntityService,
 		$RoleEntityService,

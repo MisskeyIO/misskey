@@ -12,7 +12,7 @@ import type { Packed } from '@/misc/json-schema.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { MiUser } from '@/models/User.js';
 import type { MiDriveFile } from '@/models/DriveFile.js';
-import { appendQuery, query } from '@/misc/prelude/url.js';
+import { appendQuery, omitHttps, query } from '@/misc/prelude/url.js';
 import { deepClone } from '@/misc/clone.js';
 import { bindThis } from '@/decorators.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
@@ -79,13 +79,10 @@ export class DriveFileEntityService {
 
 	@bindThis
 	private getProxiedUrl(url: string, mode?: 'static' | 'avatar'): string {
-		return appendQuery(
-			`${this.config.mediaProxy}/${mode ?? 'image'}.webp`,
-			query({
-				url,
-				...(mode ? { [mode]: '1' } : {}),
-			}),
-		);
+		const proxyMode = mode ?? 'image';
+		const baseUrl = `${this.config.mediaProxy}/${proxyMode}/${encodeURIComponent(omitHttps(url))}`;
+		const proxyQuery = query(mode ? { [mode]: '1' } : {});
+		return proxyQuery ? appendQuery(baseUrl, proxyQuery) : baseUrl;
 	}
 
 	@bindThis
@@ -207,6 +204,9 @@ export class DriveFileEntityService {
 			md5: file.md5,
 			size: file.size,
 			isSensitive: file.isSensitive,
+			...(opts.detail ? {
+				isSensitiveByModerator: file.isSensitiveByModerator,
+			} : {}),
 			blurhash: file.blurhash,
 			properties: opts.self ? file.properties : this.getPublicProperties(file),
 			url: opts.self ? file.url : this.getPublicUrl(file),
@@ -246,6 +246,9 @@ export class DriveFileEntityService {
 			md5: file.md5,
 			size: file.size,
 			isSensitive: file.isSensitive,
+			...(opts.detail ? {
+				isSensitiveByModerator: file.isSensitiveByModerator,
+			} : {}),
 			blurhash: file.blurhash,
 			properties: opts.self ? file.properties : this.getPublicProperties(file),
 			url: opts.self ? file.url : this.getPublicUrl(file),
@@ -291,14 +294,16 @@ export class DriveFileEntityService {
 			folderMap = new Map(packedFolders.map(folder => [folder.id, folder]));
 		}
 
-		const items = await Promise.all(files.map(f => this.packNullable(
+		const items = (await Promise.allSettled(files.map(f => this.packNullable(
 			f,
 			options,
 			{
 				packedUser: f.userId ? userMap?.get(f.userId) : undefined,
 				packedFolder: f.folderId ? folderMap?.get(f.folderId) : undefined,
 			},
-		)));
+		))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => result.value);
 
 		return items.filter(x => x != null);
 	}

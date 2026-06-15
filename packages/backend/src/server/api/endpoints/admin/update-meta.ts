@@ -9,6 +9,7 @@ import type { MiMeta } from '@/models/Meta.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { MetaService } from '@/core/MetaService.js';
+import { QueueService } from '@/core/QueueService.js';
 
 export const meta = {
 	tags: ['admin'],
@@ -27,12 +28,27 @@ export const paramDef = {
 				type: 'string',
 			},
 		},
+		featuredGameChannels: {
+			type: 'array', nullable: true, items: {
+				type: 'string',
+			},
+		},
 		hiddenTags: {
 			type: 'array', nullable: true, items: {
 				type: 'string',
 			},
 		},
 		blockedHosts: {
+			type: 'array', nullable: true, items: {
+				type: 'string',
+			},
+		},
+		blockedRemoteCustomEmojis: {
+			type: 'array', nullable: true, items: {
+				type: 'string',
+			},
+		},
+		wellKnownWebsites: {
 			type: 'array', nullable: true, items: {
 				type: 'string',
 			},
@@ -105,6 +121,7 @@ export const paramDef = {
 				type: 'string',
 			},
 		},
+		dimensions: { type: 'integer', minimum: 1 },
 		deeplAuthKey: { type: 'string', nullable: true },
 		deeplIsPro: { type: 'boolean' },
 		enableEmail: { type: 'boolean' },
@@ -185,6 +202,11 @@ export const paramDef = {
 		urlPreviewRequireContentLength: { type: 'boolean' },
 		urlPreviewUserAgent: { type: 'string', nullable: true },
 		urlPreviewSummaryProxyUrl: { type: 'string', nullable: true },
+		urlPreviewDenyList: {
+			type: 'array', nullable: true, items: {
+				type: 'string',
+			},
+		},
 		federation: {
 			type: 'string',
 			enum: ['all', 'none', 'specified'],
@@ -229,6 +251,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private serverSettings: MiMeta,
 
 		private metaService: MetaService,
+		private queueService: QueueService,
 		private moderationLogService: ModerationLogService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
@@ -242,12 +265,22 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				set.pinnedUsers = ps.pinnedUsers.filter(Boolean);
 			}
 
+			if (Array.isArray(ps.featuredGameChannels)) {
+				set.featuredGameChannels = ps.featuredGameChannels.filter(Boolean);
+			}
+
 			if (Array.isArray(ps.hiddenTags)) {
 				set.hiddenTags = ps.hiddenTags.filter(Boolean);
 			}
 
 			if (Array.isArray(ps.blockedHosts)) {
 				set.blockedHosts = ps.blockedHosts.filter(Boolean).map(x => x.toLowerCase());
+			}
+			if (Array.isArray(ps.blockedRemoteCustomEmojis)) {
+				set.blockedRemoteCustomEmojis = [...new Set(ps.blockedRemoteCustomEmojis.map(x => x.trim().toLowerCase()).filter(x => x !== ''))];
+			}
+			if (Array.isArray(ps.wellKnownWebsites)) {
+				set.wellKnownWebsites = ps.wellKnownWebsites.map(x => x.trim().toLowerCase()).filter(x => x !== '');
 			}
 
 			if (Array.isArray(ps.sensitiveWords)) {
@@ -446,6 +479,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (Array.isArray(ps.langs)) {
 				set.langs = ps.langs.filter(Boolean);
+			}
+
+			if (ps.dimensions !== undefined) {
+				set.dimensions = ps.dimensions;
 			}
 
 			if (ps.enableEmail !== undefined) {
@@ -714,6 +751,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				set.urlPreviewSummaryProxyUrl = value === '' ? null : value;
 			}
 
+			if (Array.isArray(ps.urlPreviewDenyList)) {
+				set.urlPreviewDenyList = ps.urlPreviewDenyList.map(x => x.trim().toLowerCase()).filter(x => x !== '');
+			}
+
 			if (ps.federation !== undefined) {
 				set.federation = ps.federation;
 			}
@@ -765,6 +806,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const before = await this.metaService.fetch(true);
 
 			await this.metaService.update(set);
+			if (set.blockedRemoteCustomEmojis) {
+				await this.queueService.createCleanBlockedRemoteCustomEmojisJob(set.blockedRemoteCustomEmojis);
+			}
 
 			const after = await this.metaService.fetch(true);
 

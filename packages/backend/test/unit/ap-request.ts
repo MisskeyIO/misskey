@@ -12,7 +12,7 @@ import { ApRequestCreator } from '@/core/activitypub/ApRequestService.js';
 import { assertActivityMatchesUrl, FetchAllowSoftFailMask } from '@/core/activitypub/misc/check-against-url.js';
 import { IObject } from '@/core/activitypub/type.js';
 
-export const buildParsedSignature = (signingString: string, signature: string, algorithm: string) => {
+const buildParsedSignature = (signingString: string, signature: string, algorithm: string) => {
 	return {
 		scheme: 'Signature',
 		params: {

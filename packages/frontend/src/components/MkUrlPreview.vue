@@ -44,8 +44,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 </template>
 <div v-else>
-	<component :is="self ? 'MkA' : 'a'" :class="[$style.link, { [$style.compact]: compact }]" :[attr]="maybeRelativeUrl" rel="nofollow noopener" :target="target" :title="url">
-		<div v-if="thumbnail && !sensitive" :class="$style.thumbnail" :style="prefer.s.dataSaver.urlPreviewThumbnail ? '' : { backgroundImage: `url('${thumbnail}')` }">
+	<component :is="self ? 'MkA' : 'a'" :class="[$style.link, { [$style.compact]: compact }]" :[attr]="maybeRelativeUrl" rel="nofollow noopener" :target="target" :title="url" @click="onClick">
+		<div v-if="thumbnail" :class="[$style.thumbnail, { [$style.thumbnailBlur]: sensitive }]" :style="prefer.s.dataSaver.urlPreviewThumbnail ? '' : { backgroundImage: `url('${thumbnail}')` }">
 		</div>
 		<article :class="$style.body">
 			<header :class="$style.header">
@@ -95,6 +95,7 @@ import { transformPlayerUrl } from '@/utility/url-preview.js';
 import { store } from '@/store.js';
 import { prefer } from '@/preferences.js';
 import { maybeMakeRelative } from '@@/js/url.js';
+import { warningExternalWebsite } from '@/utility/warning-external-website.js';
 
 const props = withDefaults(defineProps<{
 	url: string;
@@ -132,6 +133,10 @@ const tweetExpanded = ref(props.detail);
 const embedId = `embed${Math.random().toString().replace(/\D/, '')}`;
 const tweetHeight = ref(150);
 const unknownUrl = ref(false);
+
+function onClick(ev: MouseEvent): void {
+	void warningExternalWebsite(ev, props.url);
+}
 
 onDeactivated(() => {
 	playerEnabled.value = false;
@@ -331,6 +336,11 @@ onUnmounted(() => {
 	gap: 6px;
 	flex-wrap: wrap;
 	margin-top: 6px;
+}
+
+.thumbnailBlur {
+	filter: blur(16px);
+	clip-path: inset(0);
 }
 
 @container (max-width: 400px) {

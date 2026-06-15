@@ -1,0 +1,50 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import { Inject, Injectable } from '@nestjs/common';
+import { Endpoint } from '@/server/api/endpoint-base.js';
+import { DI } from '@/di-symbols.js';
+import { ApiError } from '@/server/api/error.js';
+import type { AbuseReportResolversRepository } from '@/models/_.js';
+
+export const meta = {
+	tags: ['admin'],
+
+	requireCredential: true,
+	requireModerator: true,
+	secure: true,
+	kind: 'write:admin:abuse-report-resolvers',
+
+	errors: {
+		resolverNotFound: {
+			message: 'Resolver not found.',
+			code: 'RESOLVER_NOT_FOUND',
+			id: '121fbea9-3e49-4456-998a-d4095c7ac5c5',
+		},
+	},
+} as const;
+
+export const paramDef = {
+	type: 'object',
+	properties: {
+		resolverId: { type: 'string', format: 'misskey:id' },
+	},
+	required: ['resolverId'],
+} as const;
+
+@Injectable()
+export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
+	constructor(
+		@Inject(DI.abuseReportResolversRepository)
+		private abuseReportResolversRepository: AbuseReportResolversRepository,
+	) {
+		super(meta, paramDef, async (ps) => {
+			const resolver = await this.abuseReportResolversRepository.findOneBy({ id: ps.resolverId });
+			if (resolver == null) throw new ApiError(meta.errors.resolverNotFound);
+
+			await this.abuseReportResolversRepository.delete(ps.resolverId);
+		});
+	}
+}

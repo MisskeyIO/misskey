@@ -45,6 +45,46 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</template>
 		</XFolder>
 
+		<XFolder v-if="matchQuery([i18n.ts._role._options.canScheduleNote, 'canScheduleNote'])" v-model:policyMeta="policyMetaModel.canScheduleNote" :isBaseRole="isBaseRole" :readonly="readonly">
+			<template #label>{{ i18n.ts._role._options.canScheduleNote }}</template>
+			<template #valueText>{{ valuesModel.canScheduleNote ? i18n.ts.yes : i18n.ts.no }}</template>
+			<template #default="{ disabled }">
+				<MkSwitch v-model="valuesModel.canScheduleNote" :disabled="disabled">
+					<template #label>{{ i18n.ts.enable }}</template>
+				</MkSwitch>
+			</template>
+		</XFolder>
+
+		<XFolder v-if="matchQuery([i18n.ts._role._options.scheduleNoteMaxDays, 'scheduleNoteMaxDays'])" v-model:policyMeta="policyMetaModel.scheduleNoteMaxDays" :isBaseRole="isBaseRole" :readonly="readonly">
+			<template #label>{{ i18n.ts._role._options.scheduleNoteMaxDays }}</template>
+			<template #valueText>{{ valuesModel.scheduleNoteMaxDays + i18n.ts._time.day }}</template>
+			<template #default="{ disabled }">
+				<MkInput v-model="valuesModel.scheduleNoteMaxDays" type="number" :disabled="disabled" :min="0">
+					<template #suffix>{{ i18n.ts._time.day }}</template>
+				</MkInput>
+			</template>
+		</XFolder>
+
+		<XFolder v-if="matchQuery([i18n.ts._role._options.canCreateContent, 'canCreateContent'])" v-model:policyMeta="policyMetaModel.canCreateContent" :isBaseRole="isBaseRole" :readonly="readonly">
+			<template #label>{{ i18n.ts._role._options.canCreateContent }}</template>
+			<template #valueText>{{ valuesModel.canCreateContent ? i18n.ts.yes : i18n.ts.no }}</template>
+			<template #default="{ disabled }">
+				<MkSwitch v-model="valuesModel.canCreateContent" :disabled="disabled">
+					<template #label>{{ i18n.ts.enable }}</template>
+				</MkSwitch>
+			</template>
+		</XFolder>
+
+		<XFolder v-if="matchQuery([i18n.ts._role._options.canDeleteContent, 'canDeleteContent'])" v-model:policyMeta="policyMetaModel.canDeleteContent" :isBaseRole="isBaseRole" :readonly="readonly">
+			<template #label>{{ i18n.ts._role._options.canDeleteContent }}</template>
+			<template #valueText>{{ valuesModel.canDeleteContent ? i18n.ts.yes : i18n.ts.no }}</template>
+			<template #default="{ disabled }">
+				<MkSwitch v-model="valuesModel.canDeleteContent" :disabled="disabled">
+					<template #label>{{ i18n.ts.enable }}</template>
+				</MkSwitch>
+			</template>
+		</XFolder>
+
 		<XFolder v-if="matchQuery([i18n.ts._role._options.chatAvailability, 'chatAvailability'])" v-model:policyMeta="policyMetaModel.chatAvailability" :isBaseRole="isBaseRole" :readonly="readonly">
 			<template #label>{{ i18n.ts._role._options.chatAvailability }}</template>
 			<template #valueText>{{ valuesModel.chatAvailability === 'available' ? i18n.ts.yes : valuesModel.chatAvailability === 'readonly' ? i18n.ts.readonly : i18n.ts.no }}</template>
@@ -161,6 +201,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</template>
 		</XFolder>
 
+		<XFolder v-if="matchQuery([i18n.ts._role._options.canUseReaction, 'canUseReaction'])" v-model:policyMeta="policyMetaModel.canUseReaction" :isBaseRole="isBaseRole" :readonly="readonly">
+			<template #label>{{ i18n.ts._role._options.canUseReaction }}</template>
+			<template #valueText>{{ valuesModel.canUseReaction ? i18n.ts.yes : i18n.ts.no }}</template>
+			<template #default="{ disabled }">
+				<MkSwitch v-model="valuesModel.canUseReaction" :disabled="disabled">
+					<template #label>{{ i18n.ts.enable }}</template>
+				</MkSwitch>
+			</template>
+		</XFolder>
+
 		<XFolder v-if="matchQuery([i18n.ts._role._options.canCreateChannel, 'canCreateChannel'])" v-model:policyMeta="policyMetaModel.canCreateChannel" :isBaseRole="isBaseRole" :readonly="readonly">
 			<template #label>{{ i18n.ts._role._options.canCreateChannel }}</template>
 			<template #valueText>{{ valuesModel.canCreateChannel ? i18n.ts.yes : i18n.ts.no }}</template>
@@ -217,11 +267,41 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</template>
 		</XFolder>
 
+		<XFolder v-if="matchQuery([i18n.ts._role._options.canIgnoreAiNsfw, 'canIgnoreAiNsfw'])" v-model:policyMeta="policyMetaModel.canIgnoreAiNsfw" :isBaseRole="isBaseRole" :readonly="readonly">
+			<template #label>{{ i18n.ts._role._options.canIgnoreAiNsfw }}</template>
+			<template #valueText>{{ valuesModel.canIgnoreAiNsfw ? i18n.ts.yes : i18n.ts.no }}</template>
+			<template #default="{ disabled }">
+				<MkSwitch v-model="valuesModel.canIgnoreAiNsfw" :disabled="disabled">
+					<template #label>{{ i18n.ts.enable }}</template>
+				</MkSwitch>
+			</template>
+		</XFolder>
+
 		<XFolder v-if="matchQuery([i18n.ts._role._options.canUpdateBioMedia, 'canUpdateBioMedia'])" v-model:policyMeta="policyMetaModel.canUpdateBioMedia" :isBaseRole="isBaseRole" :readonly="readonly">
 			<template #label>{{ i18n.ts._role._options.canUpdateBioMedia }}</template>
 			<template #valueText>{{ valuesModel.canUpdateBioMedia ? i18n.ts.yes : i18n.ts.no }}</template>
 			<template #default="{ disabled }">
 				<MkSwitch v-model="valuesModel.canUpdateBioMedia" :disabled="disabled">
+					<template #label>{{ i18n.ts.enable }}</template>
+				</MkSwitch>
+			</template>
+		</XFolder>
+
+		<XFolder v-if="matchQuery([i18n.ts._role._options.canUpdateAvatar, 'canUpdateAvatar'])" v-model:policyMeta="policyMetaModel.canUpdateAvatar" :isBaseRole="isBaseRole" :readonly="readonly">
+			<template #label>{{ i18n.ts._role._options.canUpdateAvatar }}</template>
+			<template #valueText>{{ valuesModel.canUpdateAvatar ? i18n.ts.yes : i18n.ts.no }}</template>
+			<template #default="{ disabled }">
+				<MkSwitch v-model="valuesModel.canUpdateAvatar" :disabled="disabled">
+					<template #label>{{ i18n.ts.enable }}</template>
+				</MkSwitch>
+			</template>
+		</XFolder>
+
+		<XFolder v-if="matchQuery([i18n.ts._role._options.canUpdateBanner, 'canUpdateBanner'])" v-model:policyMeta="policyMetaModel.canUpdateBanner" :isBaseRole="isBaseRole" :readonly="readonly">
+			<template #label>{{ i18n.ts._role._options.canUpdateBanner }}</template>
+			<template #valueText>{{ valuesModel.canUpdateBanner ? i18n.ts.yes : i18n.ts.no }}</template>
+			<template #default="{ disabled }">
+				<MkSwitch v-model="valuesModel.canUpdateBanner" :disabled="disabled">
 					<template #label>{{ i18n.ts.enable }}</template>
 				</MkSwitch>
 			</template>
@@ -241,6 +321,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template #valueText>{{ valuesModel.antennaLimit }}</template>
 			<template #default="{ disabled }">
 				<MkInput v-model="valuesModel.antennaLimit" type="number" :disabled="disabled">
+				</MkInput>
+			</template>
+		</XFolder>
+
+		<XFolder v-if="matchQuery([i18n.ts._role._options.antennaNotesLimit, 'antennaNotesLimit'])" v-model:policyMeta="policyMetaModel.antennaNotesLimit" :isBaseRole="isBaseRole" :readonly="readonly">
+			<template #label>{{ i18n.ts._role._options.antennaNotesLimit }}</template>
+			<template #valueText>{{ valuesModel.antennaNotesLimit }}</template>
+			<template #default="{ disabled }">
+				<MkInput v-model="valuesModel.antennaNotesLimit" type="number" :disabled="disabled">
 				</MkInput>
 			</template>
 		</XFolder>
@@ -364,6 +453,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template #valueText>{{ valuesModel.canImportUserLists ? i18n.ts.yes : i18n.ts.no }}</template>
 			<template #default="{ disabled }">
 				<MkSwitch v-model="valuesModel.canImportUserLists" :disabled="disabled">
+					<template #label>{{ i18n.ts.enable }}</template>
+				</MkSwitch>
+			</template>
+		</XFolder>
+
+		<XFolder v-if="matchQuery([i18n.ts._role._options.canUseDriveFileInSoundSettings, 'canUseDriveFileInSoundSettings'])" v-model:policyMeta="policyMetaModel.canUseDriveFileInSoundSettings" :isBaseRole="isBaseRole" :readonly="readonly">
+			<template #label>{{ i18n.ts._role._options.canUseDriveFileInSoundSettings }}</template>
+			<template #valueText>{{ valuesModel.canUseDriveFileInSoundSettings ? i18n.ts.yes : i18n.ts.no }}</template>
+			<template #default="{ disabled }">
+				<MkSwitch v-model="valuesModel.canUseDriveFileInSoundSettings" :disabled="disabled">
 					<template #label>{{ i18n.ts.enable }}</template>
 				</MkSwitch>
 			</template>

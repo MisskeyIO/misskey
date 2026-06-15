@@ -48,6 +48,18 @@ export const packedAnnouncementSchema = {
 			type: 'boolean',
 			optional: false, nullable: false,
 		},
+		needEnrollmentTutorialToRead: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
+		closeDuration: {
+			type: 'number',
+			optional: false, nullable: false,
+		},
+		displayOrder: {
+			type: 'number',
+			optional: false, nullable: false,
+		},
 		silence: {
 			type: 'boolean',
 			optional: false, nullable: false,

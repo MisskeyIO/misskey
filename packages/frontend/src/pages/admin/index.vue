@@ -143,11 +143,6 @@ const menuDef = computed<SuperMenuDef[]>(() => [{
 		active: currentPage.value?.route.name === 'federation',
 	}, {
 		icon: 'ti ti-clock-play',
-		text: i18n.ts.federationJobs,
-		to: '/admin/federation-job-queue',
-		active: currentPage.value?.route.name === 'federationJobQueue',
-	}, {
-		icon: 'ti ti-clock-play',
 		text: i18n.ts.jobQueue,
 		to: '/admin/job-queue',
 		active: currentPage.value?.route.name === 'jobQueue',
@@ -176,6 +171,11 @@ const menuDef = computed<SuperMenuDef[]>(() => [{
 		text: i18n.ts.moderationLogs,
 		to: '/admin/modlog',
 		active: currentPage.value?.route.name === 'modlog',
+	}, {
+		icon: 'ti ti-plane-departure',
+		text: i18n.ts.userAccountMoveLogs,
+		to: '/admin/user-account-move-logs',
+		active: currentPage.value?.route.name === 'user-account-move-logs',
 	}],
 }, {
 	title: i18n.ts.settings,

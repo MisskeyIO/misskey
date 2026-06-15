@@ -46,6 +46,18 @@ export const meta = {
 				type: 'string',
 				optional: false, nullable: true,
 			},
+			needEnrollmentTutorialToRead: {
+				type: 'boolean',
+				optional: false, nullable: false,
+			},
+			closeDuration: {
+				type: 'number',
+				optional: false, nullable: false,
+			},
+			displayOrder: {
+				type: 'number',
+				optional: false, nullable: false,
+			},
 		},
 	},
 } as const;
@@ -61,6 +73,9 @@ export const paramDef = {
 		forExistingUsers: { type: 'boolean', default: false },
 		silence: { type: 'boolean', default: false },
 		needConfirmationToRead: { type: 'boolean', default: false },
+		needEnrollmentTutorialToRead: { type: 'boolean', default: false },
+		closeDuration: { type: 'integer', default: 0 },
+		displayOrder: { type: 'integer', default: 0 },
 		userId: { type: 'string', format: 'misskey:id', nullable: true, default: null },
 	},
 	required: ['title', 'text', 'imageUrl'],
@@ -83,6 +98,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				forExistingUsers: ps.forExistingUsers,
 				silence: ps.silence,
 				needConfirmationToRead: ps.needConfirmationToRead,
+				needEnrollmentTutorialToRead: ps.needEnrollmentTutorialToRead,
+				closeDuration: ps.closeDuration,
+				displayOrder: ps.displayOrder,
 				userId: ps.userId,
 			}, me);
 

@@ -22,6 +22,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 		<header v-if="title" :class="$style.title" class="_selectable"><Mfm :text="title"/></header>
 		<div v-if="text" :class="$style.text" class="_selectable"><Mfm :text="text"/></div>
+		<details v-if="detailsText" :class="$style.details" class="_selectable">
+			<summary>{{ i18n.ts.details }}</summary>
+			<pre>{{ detailsText }}</pre>
+		</details>
 		<MkInput v-if="input" v-model="inputValue" autofocus :type="input.type || 'text'" :placeholder="input.placeholder || undefined" :autocomplete="input.autocomplete" @keydown="onInputKeydown">
 			<template v-if="input.type === 'password'" #prefix><i class="ti ti-lock"></i></template>
 			<template #caption>
@@ -30,8 +34,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</template>
 		</MkInput>
 		<MkSelect v-if="select" v-model="selectedValue" :items="selectDef" autofocus></MkSelect>
+		<MkSwitch v-if="switchLabel" v-model="switchValue" style="display: flex; margin: 1em 0; justify-content: center;">{{ switchLabel }}</MkSwitch>
 		<div v-if="(showOkButton || showCancelButton) && !actions" :class="$style.buttons">
-			<MkButton v-if="showOkButton" data-cy-modal-dialog-ok inline primary rounded :autofocus="!input && !select" :disabled="okButtonDisabledReason != null" @click="ok">{{ okText ?? ((showCancelButton || input || select) ? i18n.ts.ok : i18n.ts.gotIt) }}</MkButton>
+			<MkButton v-if="showOkButton" data-cy-modal-dialog-ok inline primary rounded :autofocus="!input && !select" :disabled="okDisabled || okButtonDisabledReason != null" @click="ok">{{ okText ?? ((showCancelButton || input || select) ? i18n.ts.ok : i18n.ts.gotIt) }}<span v-if="okDisabled && okWaitInitiated"> ({{ sec }})</span></MkButton>
 			<MkButton v-if="showCancelButton || input || select" data-cy-modal-dialog-cancel inline rounded @click="cancel">{{ cancelText ?? i18n.ts.cancel }}</MkButton>
 		</div>
 		<div v-if="actions" :class="$style.buttons">
@@ -47,11 +52,12 @@ export type MkDialogReturnType<T = Result> = { canceled: true, result: undefined
 </script>
 
 <script lang="ts" setup>
-import { ref, useTemplateRef, computed } from 'vue';
+import { ref, useTemplateRef, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import MkModal from '@/components/MkModal.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
 import MkSelect from '@/components/MkSelect.vue';
+import MkSwitch from '@/components/MkSwitch.vue';
 import type { MkSelectItem } from '@/components/MkSelect.vue';
 import type { OptionValue } from '@/types/option-value.js';
 import { useMkSelect } from '@/composables/use-mkselect.js';
@@ -75,8 +81,10 @@ const props = withDefaults(defineProps<{
 	type?: 'success' | 'error' | 'warning' | 'info' | 'question' | 'waiting';
 	title?: string;
 	text?: string;
+	details?: unknown;
 	input?: Input;
 	select?: Select;
+	switchLabel?: string | null;
 	icon?: string;
 	actions?: {
 		text: string;
@@ -88,12 +96,18 @@ const props = withDefaults(defineProps<{
 	showCancelButton?: boolean;
 	cancelableByBgClick?: boolean;
 	okText?: string;
+	okWaitInitiate?: 'dialog' | 'input' | 'switch';
+	okWaitDuration?: number;
 	cancelText?: string;
 }>(), {
 	type: 'info',
+	details: undefined,
+	switchLabel: undefined,
 	showOkButton: true,
 	showCancelButton: false,
 	cancelableByBgClick: true,
+	okWaitInitiate: undefined,
+	okWaitDuration: 0,
 });
 
 const emit = defineEmits<{
@@ -104,6 +118,32 @@ const emit = defineEmits<{
 const modal = useTemplateRef('modal');
 
 const inputValue = ref<string | number | null>(props.input?.default ?? null);
+const switchValue = ref(false);
+
+const sec = ref(props.okWaitDuration);
+const okWaitInitiated = computed(() => {
+	if (props.okWaitInitiate === 'dialog') return true;
+	if (props.okWaitInitiate === 'input') return inputValue.value !== null;
+	if (props.okWaitInitiate === 'switch') return switchValue.value;
+	return false;
+});
+const okDisabled = computed(() => (props.okWaitInitiate != null && !okWaitInitiated.value) || sec.value > 0);
+
+function stringifyDetails(details: unknown): string {
+	if (details == null) return '';
+	if (typeof details === 'string') return details;
+	if (details instanceof Error) return `${details.name}: ${details.message}${details.stack ? `\n${details.stack}` : ''}`;
+	try {
+		const json = JSON.stringify(details, null, 2);
+		if (typeof json === 'string') return json;
+		return String(details);
+	} catch (error) {
+		const reason = error instanceof Error ? error.message : String(error);
+		return `${String(details)}\n${reason}`;
+	}
+}
+
+const detailsText = computed(() => stringifyDetails(props.details));
 
 const okButtonDisabledReason = computed<null | 'charactersExceeded' | 'charactersBelow'>(() => {
 	if (props.input) {
@@ -141,6 +181,7 @@ function done(canceled: boolean, result?: Result): void { // eslint-disable-line
 
 async function ok() {
 	if (!props.showOkButton) return;
+	if (okDisabled.value) return;
 
 	const result =
 		props.input ? inputValue.value :
@@ -153,13 +194,37 @@ function cancel() {
 	done(true);
 }
 
+let waitTimer: number | undefined;
+
+watch(okWaitInitiated, () => {
+	sec.value = props.okWaitDuration;
+});
+
+onMounted(() => {
+	sec.value = props.okWaitDuration;
+	if (sec.value > 0) {
+		waitTimer = window.setInterval(() => {
+			if (!okWaitInitiated.value) return;
+			if (sec.value <= 0) {
+				if (waitTimer !== undefined) window.clearInterval(waitTimer);
+				return;
+			}
+			sec.value = sec.value - 1;
+		}, 1000);
+	}
+});
+
+onBeforeUnmount(() => {
+	if (waitTimer !== undefined) window.clearInterval(waitTimer);
+});
+
 /*
 function onBgClick() {
 	if (props.cancelableByBgClick) cancel();
 }
 */
 function onInputKeydown(evt: KeyboardEvent) {
-	if (evt.key === 'Enter' && okButtonDisabledReason.value === null) {
+	if (evt.key === 'Enter' && !okDisabled.value && okButtonDisabledReason.value === null) {
 		evt.preventDefault();
 		evt.stopPropagation();
 		ok();
@@ -205,6 +270,26 @@ function onInputKeydown(evt: KeyboardEvent) {
 
 .text {
 	margin: 16px 0 0 0;
+}
+
+.details {
+	margin: 16px 0 0 0;
+	text-align: left;
+
+	> summary {
+		cursor: pointer;
+	}
+
+	> pre {
+		overflow: auto;
+		max-height: 200px;
+		margin: 8px 0 0 0;
+		padding: 12px;
+		background: var(--MI_THEME-bg);
+		border-radius: 8px;
+		font-size: 0.9em;
+		white-space: pre-wrap;
+	}
 }
 
 .buttons {

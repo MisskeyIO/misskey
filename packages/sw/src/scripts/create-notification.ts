@@ -242,6 +242,20 @@ async function composeNotification(data: PushNotificationDataMap[keyof PushNotif
 						data,
 					}];
 
+				case 'scheduledNotePosted':
+					return [i18n.ts._notification.scheduledNotePosted, {
+						body: data.body.note.text ?? '',
+						badge: iconUrl('circle-check'),
+						data,
+					}];
+
+				case 'scheduledNotePostFailed':
+					return [i18n.ts._notification.scheduledNotePostFailed, {
+						body: data.body.noteDraft.text ?? '',
+						badge: iconUrl('bell'),
+						data,
+					}];
+
 				case 'app':
 					return [data.body.header ?? data.body.body, {
 						body: data.body.header ? data.body.body : '',

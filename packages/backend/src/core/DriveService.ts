@@ -9,7 +9,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import sharp from 'sharp';
 import { sharpBmp } from '@misskey-dev/sharp-read-bmp';
 import { In, IsNull } from 'typeorm';
-import { DeleteObjectCommandInput, PutObjectCommandInput, NoSuchKey } from '@aws-sdk/client-s3';
+import { DeleteObjectCommandInput, PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { DI } from '@/di-symbols.js';
 import type { DriveFilesRepository, UsersRepository, DriveFoldersRepository, UserProfilesRepository, MiMeta } from '@/models/_.js';
 import type { Config } from '@/config.js';
@@ -147,25 +147,26 @@ export class DriveService {
 	 */
 	@bindThis
 	private async save(file: MiDriveFile, path: string, name: string, type: string, hash: string, size: number): Promise<MiDriveFile> {
-	// thunbnail, webpublic を必要なら生成
-		const alts = await this.generateAlts(path, type, !file.uri);
+		const fileType = type.replace(/;.*/, '').trim();
+		// thunbnail, webpublic を必要なら生成
+		const alts = await this.generateAlts(path, fileType, !file.uri);
 
 		if (this.meta.useObjectStorage) {
 		//#region ObjectStorage params
 			let [ext] = (name.match(/\.([a-zA-Z0-9_-]+)$/) ?? ['']);
 
 			if (ext === '') {
-				if (type === 'image/jpeg') ext = '.jpg';
-				if (type === 'image/png') ext = '.png';
-				if (type === 'image/webp') ext = '.webp';
-				if (type === 'image/avif') ext = '.avif';
-				if (type === 'image/apng') ext = '.apng';
-				if (type === 'image/vnd.mozilla.apng') ext = '.apng';
+				if (fileType === 'image/jpeg') ext = '.jpg';
+				if (fileType === 'image/png') ext = '.png';
+				if (fileType === 'image/webp') ext = '.webp';
+				if (fileType === 'image/avif') ext = '.avif';
+				if (fileType === 'image/apng') ext = '.apng';
+				if (fileType === 'image/vnd.mozilla.apng') ext = '.apng';
 			}
 
 			// 拡張子からContent-Typeを設定してそうな挙動を示すオブジェクトストレージ (upcloud?) も存在するので、
 			// 許可されているファイル形式でしかURLに拡張子をつけない
-			if (!FILE_TYPE_BROWSERSAFE.includes(type)) {
+			if (!FILE_TYPE_BROWSERSAFE.includes(fileType)) {
 				ext = '';
 			}
 
@@ -187,7 +188,7 @@ export class DriveService {
 			//#region Uploads
 			this.registerLogger.info(`uploading original: ${key}`);
 			const uploads = [
-				this.upload(key, fs.createReadStream(path), type, null, name),
+				this.upload(key, fs.createReadStream(path), fileType, null, name),
 			];
 
 			if (alts.webpublic) {
@@ -217,7 +218,7 @@ export class DriveService {
 			file.webpublicAccessKey = webpublicKey;
 			file.webpublicType = alts.webpublic?.type ?? null;
 			file.name = name;
-			file.type = type;
+			file.type = fileType;
 			file.md5 = hash;
 			file.size = size;
 			file.storedInternal = false;
@@ -252,7 +253,7 @@ export class DriveService {
 			file.webpublicAccessKey = webpublicAccessKey;
 			file.webpublicType = alts.webpublic?.type ?? null;
 			file.name = name;
-			file.type = type;
+			file.type = fileType;
 			file.md5 = hash;
 			file.size = size;
 
@@ -313,8 +314,8 @@ export class DriveService {
 				type !== 'image/svg+xml' && // security reason
 				type !== 'image/avif' && // not supported by Mastodon and MS Edge
 			!(metadata.exif ?? metadata.iptc ?? metadata.xmp ?? metadata.tifftagPhotoshop) &&
-			metadata.width && metadata.width <= 2048 &&
-			metadata.height && metadata.height <= 2048
+				metadata.width && metadata.width <= 4096 &&
+				metadata.height && metadata.height <= 4096
 			);
 		} catch (err) {
 			this.registerLogger.warn(`sharp failed: ${err}`);
@@ -332,9 +333,9 @@ export class DriveService {
 
 			try {
 				if (['image/jpeg', 'image/webp', 'image/avif'].includes(type)) {
-					webpublic = await this.imageProcessingService.convertSharpToWebp(img, 2048, 2048);
+					webpublic = await this.imageProcessingService.convertSharpToWebp(img, 4096, 4096);
 				} else if (['image/png', 'image/bmp', 'image/svg+xml'].includes(type)) {
-					webpublic = await this.imageProcessingService.convertSharpToPng(img, 2048, 2048);
+					webpublic = await this.imageProcessingService.convertSharpToPng(img, 4096, 4096);
 				} else {
 					this.registerLogger.debug('web image not created (not an required image)');
 				}
@@ -373,6 +374,7 @@ export class DriveService {
 	 */
 	@bindThis
 	private async upload(key: string, stream: fs.ReadStream | Buffer, type: string, ext?: string | null, filename?: string) {
+		type = type.replace(/;.*/, '').trim();
 		if (type === 'image/apng') type = 'image/png';
 		if (!FILE_TYPE_BROWSERSAFE.includes(type)) type = 'application/octet-stream';
 
@@ -404,6 +406,7 @@ export class DriveService {
 			.catch(
 				err => {
 					this.registerLogger.error(`Upload Failed: key = ${key}, filename = ${filename}`, err);
+					throw err;
 				},
 			);
 	}
@@ -458,10 +461,12 @@ export class DriveService {
 		ext = null,
 	}: AddFileArgs): Promise<MiDriveFile> {
 		let skipNsfwCheck = false;
-		const userRoleNSFW = user && (await this.roleService.getUserPolicies(user.id)).alwaysMarkNsfw;
+		const userPolicies = user ? await this.roleService.getUserPolicies(user.id) : null;
+		const userRoleNSFW = userPolicies?.alwaysMarkNsfw ?? false;
+		const canIgnoreAiNsfw = userPolicies?.canIgnoreAiNsfw ?? false;
 		if (user == null) {
 			skipNsfwCheck = true;
-		} else if (userRoleNSFW) {
+		} else if (userRoleNSFW || canIgnoreAiNsfw) {
 			skipNsfwCheck = true;
 		}
 		if (this.meta.sensitiveMediaDetection === 'none') skipNsfwCheck = true;
@@ -480,6 +485,7 @@ export class DriveService {
 			sensitiveThresholdForPorn: 0.75,
 			enableSensitiveMediaDetectionForVideos: this.meta.enableSensitiveMediaDetectionForVideos,
 		});
+		const fileType = info.type.mime.replace(/;.*/, '').trim();
 		this.registerLogger.info(`${JSON.stringify(info)}`);
 
 		// 現状 false positive が多すぎて実用に耐えない
@@ -526,11 +532,11 @@ export class DriveService {
 				const allowedMimeTypes = policies.uploadableFileTypes;
 				const isAllowed = allowedMimeTypes.some((mimeType) => {
 					if (mimeType === '*' || mimeType === '*/*') return true;
-					if (mimeType.endsWith('/*')) return info.type.mime.startsWith(mimeType.slice(0, -1));
-					return info.type.mime === mimeType;
+					if (mimeType.endsWith('/*')) return fileType.startsWith(mimeType.slice(0, -1));
+					return fileType === mimeType;
 				});
 				if (!isAllowed) {
-					throw new IdentifiableError('bd71c601-f9b0-4808-9137-a330647ced9b', `Unallowed file type: ${info.type.mime}`);
+					throw new IdentifiableError('bd71c601-f9b0-4808-9137-a330647ced9b', `Unallowed file type: ${fileType}`);
 				}
 
 				const driveCapacity = 1024 * 1024 * policies.driveCapacityMb;
@@ -568,7 +574,7 @@ export class DriveService {
 				userId: user ? user.id : IsNull(),
 			});
 
-			if (driveFolder == null) throw new Error('folder-not-found');
+			if (driveFolder == null) throw new DriveService.NoSuchFolderError();
 
 			return driveFolder;
 		};
@@ -635,7 +641,7 @@ export class DriveService {
 				file.size = 0;
 				file.md5 = info.md5;
 				file.name = detectedName;
-				file.type = info.type.mime;
+				file.type = fileType;
 				file.storedInternal = false;
 
 				file = await this.driveFilesRepository.insertOne(file);
@@ -654,7 +660,7 @@ export class DriveService {
 				}
 			}
 		} else {
-			file = await (this.save(file, path, detectedName, info.type.mime, info.md5, info.size));
+			file = await (this.save(file, path, detectedName, fileType, info.md5, info.size));
 		}
 
 		this.registerLogger.succ(`drive file has been created ${file.id}`);
@@ -683,13 +689,15 @@ export class DriveService {
 	@bindThis
 	public async updateFile(file: MiDriveFile, values: Partial<MiDriveFile>, updater: MiUser) {
 		const alwaysMarkNsfw = (await this.roleService.getUserPolicies(file.userId)).alwaysMarkNsfw;
+		const isModerator = await this.roleService.isModerator(updater);
 
 		if (values.name != null && !this.driveFileEntityService.validateFileName(values.name)) {
 			throw new DriveService.InvalidFileNameError();
 		}
 
-		if (values.isSensitive !== undefined && values.isSensitive !== file.isSensitive && alwaysMarkNsfw && !values.isSensitive) {
-			throw new DriveService.CannotUnmarkSensitiveError();
+		if (values.isSensitive !== undefined && values.isSensitive !== file.isSensitive && !values.isSensitive) {
+			if (alwaysMarkNsfw) throw new DriveService.CannotUnmarkSensitiveError();
+			if (file.isSensitiveByModerator && (file.userId === updater.id)) throw new DriveService.CannotUnmarkSensitiveError();
 		}
 
 		if (values.folderId != null) {
@@ -703,6 +711,10 @@ export class DriveService {
 			}
 		}
 
+		if (isModerator && file.userId !== updater.id && values.isSensitive !== undefined) {
+			values.isSensitiveByModerator = values.isSensitive;
+		}
+
 		await this.driveFilesRepository.update(file.id, values);
 
 		const fileObj = await this.driveFileEntityService.pack(file.id, { self: true });
@@ -712,7 +724,7 @@ export class DriveService {
 			this.globalEventService.publishDriveStream(file.userId, 'fileUpdated', fileObj);
 		}
 
-		if (await this.roleService.isModerator(updater) && (file.userId !== updater.id)) {
+		if (isModerator && (file.userId !== updater.id)) {
 			if (values.isSensitive !== undefined && values.isSensitive !== file.isSensitive) {
 				const user = file.userId ? await this.usersRepository.findOneByOrFail({ id: file.userId }) : null;
 				if (values.isSensitive) {

@@ -9,19 +9,19 @@ import { join } from 'node:path';
 import * as stream from 'node:stream/promises';
 import { Injectable } from '@nestjs/common';
 import { FSWatcher } from 'chokidar';
-import * as fileType from 'file-type';
+import { fileTypeFromFile } from 'file-type';
 import FFmpeg from 'fluent-ffmpeg';
 import isSvg from 'is-svg';
 import probeImageSize from 'probe-image-size';
+import { type PredictionType } from 'nsfwjs';
 import { sharpBmp } from '@misskey-dev/sharp-read-bmp';
-import * as blurhash from 'blurhash';
+import { encode } from 'blurhash';
 import { createTempDir } from '@/misc/create-temp.js';
 import { AiService } from '@/core/AiService.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import type Logger from '@/logger.js';
 import { bindThis } from '@/decorators.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
-import type { PredictionType } from 'nsfwjs';
 
 export type FileInfo = {
 	size: number;
@@ -296,16 +296,16 @@ export class FileInfoService {
 	}
 
 	private async *asyncIterateFrames(cwd: string, command: FFmpeg.FfmpegCommand): AsyncGenerator<string, void> {
-		const watcher = new FSWatcher({
-			cwd,
-		});
+		const watcher = new FSWatcher({ cwd });
 		let finished = false;
 		command.once('end', () => {
 			finished = true;
 			watcher.close();
 		});
 		command.run();
-		for (let i = 1; true; i++) { // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+		let i = 0;
+		while (true) {
+			i++;
 			const current = `${i}.png`;
 			const next = `${i + 1}.png`;
 			const framePath = join(cwd, current);
@@ -393,7 +393,7 @@ export class FileInfoService {
 			return TYPE_OCTET_STREAM;
 		}
 
-		const type = await fileType.fileTypeFromFile(path);
+		const type = await fileTypeFromFile(path);
 
 		if (type) {
 		// XMLはSVGかもしれない
@@ -486,11 +486,12 @@ export class FileInfoService {
 	@bindThis
 	private async getBlurhash(path: string, type: string): Promise<string> {
 		const sharp = await sharpBmp(path, type);
-		const { data: buffer, info } = await sharp
-			.raw()
-			.ensureAlpha()
+		const { data, info } = await sharp
 			.resize(64, 64, { fit: 'inside' })
+			.ensureAlpha()
+			.raw()
 			.toBuffer({ resolveWithObject: true });
-		return blurhash.encode(new Uint8ClampedArray(buffer), info.width, info.height, 5, 5);
+
+		return encode(new Uint8ClampedArray(data), info.width, info.height, 5, 5);
 	}
 }

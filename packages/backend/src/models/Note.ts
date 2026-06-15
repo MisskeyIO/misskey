@@ -179,6 +179,11 @@ export class MiNote {
 	})
 	public mentionedRemoteUsers: string;
 
+	@Column('integer', {
+		default: 0,
+	})
+	public dimension: number;
+
 	@Column('varchar', {
 		length: 1024, array: true, default: '{}',
 	})
@@ -271,3 +276,5 @@ export type IMentionedRemoteUsers = {
 	username: string;
 	host: string;
 }[];
+
+export type MiNoteWithDimension = Partial<Pick<MiNote, 'dimension' | 'replyId' | 'renoteId'>>;

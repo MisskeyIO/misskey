@@ -581,6 +581,73 @@ describe('Endpoints', () => {
 		});
 	});
 
+	describe('i/registry/set', () => {
+		const driveFileSoundValue = {
+			type: '_driveFile_',
+			fileId: 'sound-file-id',
+			fileUrl: 'https://example.test/sound.mp3',
+			volume: 1,
+		};
+		const syncedDriveFileSoundValue = [[{}, driveFileSoundValue]];
+		const syncedBuiltInSoundValue = [[{}, { type: 'syuilo/n-aec', volume: 1 }]];
+
+		test('組み込み音源のサウンド設定はロール制限なしで設定できる', async () => {
+			const res = await api('i/registry/set', {
+				scope: ['client', 'preferences', 'sync'],
+				key: 'default:sound.on.notification',
+				value: syncedBuiltInSoundValue,
+			}, bob);
+
+			assert.strictEqual(res.status, 204);
+		});
+
+		test('canUseDriveFileInSoundSettings がデフォルトの false の場合はドライブファイル音源を設定できない', async () => {
+			const res = await api('i/registry/set', {
+				scope: ['client', 'preferences', 'sync'],
+				key: 'default:sound.on.notification',
+				value: syncedDriveFileSoundValue,
+			}, bob);
+
+			assert.strictEqual(res.status, 400);
+			if (res.body == null) assert.fail('Expected an error response body.');
+			assert.strictEqual(castAsError(res.body).error.code, 'RESTRICTED_BY_ROLE');
+		});
+
+		test('canUseDriveFileInSoundSettings が true の場合はドライブファイル音源を設定できる', async () => {
+			const createdRole = await role(alice, {}, {
+				canUseDriveFileInSoundSettings: {
+					useDefault: false,
+					priority: 1,
+					value: true,
+				},
+			});
+			const assign = await api('admin/roles/assign', {
+				userId: bob.id,
+				roleId: createdRole.id,
+			}, alice);
+			assert.strictEqual(assign.status, 204);
+
+			try {
+				const res = await api('i/registry/set', {
+					scope: ['client', 'preferences', 'sync'],
+					key: 'default:sound.on.notification',
+					value: syncedDriveFileSoundValue,
+				}, bob);
+
+				assert.strictEqual(res.status, 204);
+			} finally {
+				await api('admin/roles/unassign', {
+					userId: bob.id,
+					roleId: createdRole.id,
+				}, alice);
+
+				await api('admin/roles/delete', {
+					roleId: createdRole.id,
+				}, alice);
+			}
+		});
+	});
+
 	describe('drive/files/create', () => {
 		const assignRole = async (userId: string, policies: Record<string, unknown>) => {
 			const createdRole = await role(alice, {}, policies);
@@ -808,6 +875,58 @@ describe('Endpoints', () => {
 			}, bob);
 
 			assert.strictEqual(res.status, 400);
+		});
+
+		test('モデレーターがセンシティブ指定したファイルは所有者が解除できない', async () => {
+			const moderatorRole = await role(alice, { isModerator: true, name: 'Moderator Role' });
+			const assign = await api('admin/roles/assign', {
+				userId: carol.id,
+				roleId: moderatorRole.id,
+			}, alice);
+			assert.strictEqual(assign.status, 204);
+
+			try {
+				const file = (await uploadFile(bob)).body!;
+
+				const moderatorMark = await api('drive/files/update', {
+					fileId: file.id,
+					isSensitive: true,
+				}, carol);
+				assert.strictEqual(moderatorMark.status, 200);
+				assert.strictEqual(moderatorMark.body.isSensitive, true);
+
+				const markedFile = await api('drive/files/show', { fileId: file.id }, bob);
+				assert.strictEqual(markedFile.status, 200);
+				assert.strictEqual(markedFile.body.isSensitive, true);
+				assert.strictEqual(markedFile.body.isSensitiveByModerator, true);
+
+				const ownerClear = await api('drive/files/update', {
+					fileId: file.id,
+					isSensitive: false,
+				}, bob);
+				assert.strictEqual(ownerClear.status, 400);
+				assert.strictEqual(castAsError(ownerClear.body).error.code, 'RESTRICTED_BY_ADMINISTRATOR');
+
+				const moderatorClear = await api('drive/files/update', {
+					fileId: file.id,
+					isSensitive: false,
+				}, carol);
+				assert.strictEqual(moderatorClear.status, 200);
+				assert.strictEqual(moderatorClear.body.isSensitive, false);
+
+				const clearedFile = await api('drive/files/show', { fileId: file.id }, bob);
+				assert.strictEqual(clearedFile.status, 200);
+				assert.strictEqual(clearedFile.body.isSensitive, false);
+				assert.strictEqual(clearedFile.body.isSensitiveByModerator, false);
+			} finally {
+				await api('admin/roles/unassign', {
+					userId: carol.id,
+					roleId: moderatorRole.id,
+				}, alice);
+				await api('admin/roles/delete', {
+					roleId: moderatorRole.id,
+				}, alice);
+			}
 		});
 
 		test('親フォルダを更新できる', async () => {

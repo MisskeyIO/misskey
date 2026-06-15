@@ -6,17 +6,25 @@ on:
       - master
       - develop
 
+permissions:
+  contents: read
+
 jobs:
   check-changelog:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout head
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
+        with:
+          run_install: false
       - name: Setup Node.js
-        uses: actions/setup-node@v6.4.0
+        uses: actions/setup-node@v6
         with:
           node-version-file: '.node-version'
+          cache: 'pnpm'
 
       - name: Checkout base
         run: |
@@ -35,9 +43,10 @@ jobs:
         run: diff -u CHANGELOG-base.md CHANGELOG-head.md
         working-directory: scripts/changelog-checker
 
-      - name: Setup Checker
-        run: npm install
-        working-directory: scripts/changelog-checker
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Check pnpm-lock.yaml
+        run: git diff --exit-code pnpm-lock.yaml
       - name: Run Checker
-        run: npm run run
+        run: pnpm run run
         working-directory: scripts/changelog-checker

@@ -30,10 +30,12 @@ import type {
 	MiFollowing,
 	MiMeta,
 	MiUserNotePining,
+	MiUserLanguage,
 	MiUserProfile,
 	MutingsRepository,
 	RenoteMutingsRepository,
 	UserMemoRepository,
+	UserLanguagesRepository,
 	UserNotePiningsRepository,
 	UserProfilesRepository,
 	UserSecurityKeysRepository,
@@ -137,6 +139,9 @@ export class UserEntityService implements OnModuleInit {
 
 		@Inject(DI.userMemosRepository)
 		private userMemosRepository: UserMemoRepository,
+
+		@Inject(DI.userLanguagesRepository)
+		private userLanguagesRepository: UserLanguagesRepository,
 	) {
 	}
 
@@ -412,6 +417,7 @@ export class UserEntityService implements OnModuleInit {
 			userRelations?: Map<MiUser['id'], UserRelation>,
 			userMemos?: Map<MiUser['id'], string | null>,
 			pinNotes?: Map<MiUser['id'], MiUserNotePining[]>,
+			userLanguages?: Map<MiUser['id'], MiUserLanguage | null>,
 		},
 	): Promise<Packed<S>> {
 		const opts = Object.assign({
@@ -481,6 +487,9 @@ export class UserEntityService implements OnModuleInit {
 			})) : null;
 
 		const notificationsInfo = isMe && isDetailed ? await this.getNotificationsInfo(user.id) : null;
+		const userLanguage = isDetailed && isMe
+			? (opts.userLanguages?.get(user.id) ?? await this.userLanguagesRepository.findOneBy({ userId: user.id }))
+			: null;
 
 		// TODO: 例えば avatarUrl: true など間違った型を設定しても型エラーにならないのをどうにかする(ジェネリクス使わない方法で実装するしかなさそう？)
 		const packed = {
@@ -521,6 +530,7 @@ export class UserEntityService implements OnModuleInit {
 					name: r.name,
 					iconUrl: r.iconUrl,
 					displayOrder: r.displayOrder,
+					behavior: r.badgeBehavior ?? undefined,
 				})),
 			) : undefined,
 
@@ -545,6 +555,7 @@ export class UserEntityService implements OnModuleInit {
 				birthday: profile!.birthday,
 				lang: profile!.lang,
 				fields: profile!.fields,
+				mutualLinkSections: profile!.mutualLinkSections,
 				verifiedLinks: profile!.verifiedLinks,
 				followersCount: followersCount ?? 0,
 				followingCount: followingCount ?? 0,
@@ -585,6 +596,10 @@ export class UserEntityService implements OnModuleInit {
 			...(isDetailed && isMe ? {
 				avatarId: user.avatarId,
 				bannerId: user.bannerId,
+				postingLang: userLanguage?.postingLang ?? null,
+				viewingLangs: userLanguage?.viewingLangs ?? [],
+				showMediaInAllLanguages: userLanguage?.showMediaInAllLanguages ?? true,
+				showHashtagsInAllLanguages: userLanguage?.showHashtagsInAllLanguages ?? true,
 				followedMessage: profile!.followedMessage,
 				isModerator: isModerator,
 				isAdmin: isAdmin,
@@ -682,6 +697,7 @@ export class UserEntityService implements OnModuleInit {
 		let userRelations: Map<MiUser['id'], UserRelation> = new Map();
 		let userMemos: Map<MiUser['id'], string | null> = new Map();
 		let pinNotes: Map<MiUser['id'], MiUserNotePining[]> = new Map();
+		let userLanguages: Map<MiUser['id'], MiUserLanguage | null> = new Map();
 
 		if (options?.schema !== 'UserLite') {
 			profilesMap = await this.userProfilesRepository.findBy({ userId: In(_userIds) })
@@ -689,6 +705,11 @@ export class UserEntityService implements OnModuleInit {
 
 			const meId = me ? me.id : null;
 			if (meId) {
+				if (_userIds.includes(meId)) {
+					userLanguages = await this.userLanguagesRepository.findBy({ userId: In(_userIds) })
+						.then(languages => new Map(languages.map(language => [language.userId, language])));
+				}
+
 				userMemos = await this.userMemosRepository.findBy({ userId: meId })
 					.then(memos => new Map(memos.map(memo => [memo.targetUserId, memo.memo])));
 
@@ -715,7 +736,7 @@ export class UserEntityService implements OnModuleInit {
 			}
 		}
 
-		return Promise.all(
+		return (await Promise.allSettled(
 			_users.map(u => this.pack(
 				u,
 				me,
@@ -725,8 +746,11 @@ export class UserEntityService implements OnModuleInit {
 					userRelations: userRelations,
 					userMemos: userMemos,
 					pinNotes: pinNotes,
+					userLanguages: userLanguages,
 				},
 			)),
-		);
+		))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => result.value);
 	}
 }

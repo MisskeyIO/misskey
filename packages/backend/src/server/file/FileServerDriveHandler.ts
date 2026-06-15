@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import * as fs from 'node:fs';
 import rename from 'rename';
 import type { Config } from '@/config.js';
 import type { IImageStreamable } from '@/core/ImageProcessingService.js';
 import { contentDisposition } from '@/misc/content-disposition.js';
 import { correctFilename } from '@/misc/correct-filename.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
+import { omitHttps } from '@/misc/prelude/url.js';
 import { VideoProcessingService } from '@/core/VideoProcessingService.js';
-import { attachStreamCleanup, handleRangeRequest, setFileResponseHeaders, getSafeContentType, needsCleanup } from './FileServerUtils.js';
+import { attachStreamCleanup, handleRangeRequest, setFileResponseHeaders, getSafeContentType } from './FileServerUtils.js';
 import type { FileServerFileResolver } from './FileServerFileResolver.js';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
@@ -47,8 +47,7 @@ export class FileServerDriveHandler {
 					if (isMimeImage(file.mime, 'sharp-convertible-image-with-bmp')) {
 						reply.header('Cache-Control', 'max-age=31536000, immutable');
 
-						const url = new URL(`${this.config.mediaProxy}/static.webp`);
-						url.searchParams.set('url', file.url);
+						const url = new URL(`${this.config.mediaProxy}/static/${encodeURIComponent(omitHttps(file.url))}`);
 						url.searchParams.set('static', '1');
 
 						file.cleanup();
@@ -68,8 +67,7 @@ export class FileServerDriveHandler {
 					if (['image/svg+xml'].includes(file.mime)) {
 						reply.header('Cache-Control', 'max-age=31536000, immutable');
 
-						const url = new URL(`${this.config.mediaProxy}/svg.webp`);
-						url.searchParams.set('url', file.url);
+						const url = new URL(`${this.config.mediaProxy}/svg/${encodeURIComponent(omitHttps(file.url))}`);
 
 						file.cleanup();
 						return await reply.redirect(url.toString(), 301);

@@ -27,6 +27,12 @@ export function extractDomain(url: string) {
 	return match ? match[1] : null;
 }
 
+export function omitHttps(url: string): string {
+	if (url.startsWith('https://')) return url.slice(8);
+	if (url.startsWith('https%3A%2F%2F')) return url.slice(14);
+	return url;
+}
+
 export function maybeMakeRelative(urlStr: string, baseStr: string): string {
 	try {
 		const baseObj = new URL(baseStr);

@@ -153,6 +153,10 @@ export const ROUTE_DEF = [{
 		name: 'account-data',
 		component: page(() => import('@/pages/settings/account-data.vue')),
 	}, {
+		path: '/account-stats',
+		name: 'account-stats',
+		component: page(() => import('@/pages/settings/account-stats.vue')),
+	}, {
 		path: '/mute-block',
 		name: 'mute-block',
 		component: page(() => import('@/pages/settings/mute-block.vue')),
@@ -298,6 +302,9 @@ export const ROUTE_DEF = [{
 	path: '/oauth/authorize',
 	component: page(() => import('@/pages/oauth.vue')),
 }, {
+	path: '/sso/:kind/:serviceId',
+	component: page(() => import('@/pages/sso.vue')),
+}, {
 	path: '/tags/:tag',
 	component: page(() => import('@/pages/tag.vue')),
 }, {
@@ -407,10 +414,6 @@ export const ROUTE_DEF = [{
 		name: 'avatarDecorations',
 		component: page(() => import('@/pages/avatar-decorations.vue')),
 	}, {
-		path: '/federation-job-queue',
-		name: 'federationJobQueue',
-		component: page(() => import('@/pages/admin/federation-job-queue.vue')),
-	}, {
 		path: '/job-queue',
 		name: 'jobQueue',
 		component: page(() => import('@/pages/admin/job-queue.vue')),
@@ -458,6 +461,10 @@ export const ROUTE_DEF = [{
 		path: '/modlog',
 		name: 'modlog',
 		component: page(() => import('@/pages/admin/modlog.vue')),
+	}, {
+		path: '/user-account-move-logs',
+		name: 'user-account-move-logs',
+		component: page(() => import('@/pages/admin/user-account-move-logs.vue')),
 	}, {
 		path: '/settings',
 		name: 'settings',

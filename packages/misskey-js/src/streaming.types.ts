@@ -71,6 +71,7 @@ export type Channels = {
 		params: {
 			withRenotes?: boolean;
 			withFiles?: boolean;
+			dimension?: number;
 		};
 		events: {
 			note: (payload: Note) => void;
@@ -82,6 +83,7 @@ export type Channels = {
 			withRenotes?: boolean;
 			withReplies?: boolean;
 			withFiles?: boolean;
+			dimension?: number;
 		};
 		events: {
 			note: (payload: Note) => void;
@@ -93,6 +95,7 @@ export type Channels = {
 			withRenotes?: boolean;
 			withReplies?: boolean;
 			withFiles?: boolean;
+			dimension?: number;
 		};
 		events: {
 			note: (payload: Note) => void;
@@ -103,6 +106,7 @@ export type Channels = {
 		params: {
 			withRenotes?: boolean;
 			withFiles?: boolean;
+			dimension?: number;
 		};
 		events: {
 			note: (payload: Note) => void;
@@ -114,6 +118,7 @@ export type Channels = {
 			listId: string;
 			withFiles?: boolean;
 			withRenotes?: boolean;
+			dimension?: number;
 		};
 		events: {
 			note: (payload: Note) => void;
@@ -132,6 +137,7 @@ export type Channels = {
 	roleTimeline: {
 		params: {
 			roleId: string;
+			dimension?: number;
 		};
 		events: {
 			note: (payload: Note) => void;
@@ -150,6 +156,7 @@ export type Channels = {
 	channel: {
 		params: {
 			channelId: string;
+			dimension?: number;
 		};
 		events: {
 			note: (payload: Note) => void;

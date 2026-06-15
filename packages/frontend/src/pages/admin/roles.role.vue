@@ -40,6 +40,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 										<div>Assigned: <MkTime :time="item.createdAt" mode="detail"/></div>
 										<div v-if="item.expiresAt">Period: {{ new Date(item.expiresAt).toLocaleString() }}</div>
 										<div v-else>Period: {{ i18n.ts.indefinitely }}</div>
+										<div v-if="item.memo">{{ i18n.ts.memo }}: {{ item.memo }}</div>
 									</div>
 								</div>
 							</div>
@@ -137,7 +138,12 @@ async function assign() {
 		: period === 'oneMonth' ? Date.now() + (1000 * 60 * 60 * 24 * 30)
 		: null;
 
-	await os.apiWithDialog('admin/roles/assign', { roleId: role.id, userId: user.id, expiresAt });
+	const { canceled: canceled3, result: memo } = await os.inputText({
+		title: i18n.ts.memo,
+	});
+	if (canceled3) return;
+
+	await os.apiWithDialog('admin/roles/assign', { roleId: role.id, userId: user.id, expiresAt, memo: memo ?? null });
 	//role.users.push(user);
 	usersPaginator.reload();
 }

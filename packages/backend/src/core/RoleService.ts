@@ -11,8 +11,10 @@ import type {
 	MiMeta,
 	MiRole,
 	MiRoleAssignment,
+	MiUserInlinePolicy,
 	RoleAssignmentsRepository,
 	RolesRepository,
+	UserInlinePoliciesRepository,
 	UsersRepository,
 } from '@/models/_.js';
 import { MemoryKVCache, MemorySingleCache } from '@/misc/cache.js';
@@ -29,6 +31,7 @@ import { ModerationLogService } from '@/core/ModerationLogService.js';
 import type { Packed } from '@/misc/json-schema.js';
 import { FanoutTimelineService } from '@/core/FanoutTimelineService.js';
 import { NotificationService } from '@/core/NotificationService.js';
+import { getDeliverTargetDimensions } from '@/misc/dimension.js';
 import type { OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
 
 // misskey-js の rolePolicies と同期すべし
@@ -36,6 +39,10 @@ export type RolePolicies = {
 	gtlAvailable: boolean;
 	ltlAvailable: boolean;
 	canPublicNote: boolean;
+	canScheduleNote: boolean;
+	scheduleNoteMaxDays: number;
+	canCreateContent: boolean;
+	canDeleteContent: boolean;
 	mentionLimit: number;
 	canInvite: boolean;
 	inviteLimit: number;
@@ -46,14 +53,19 @@ export type RolePolicies = {
 	canSearchNotes: boolean;
 	canSearchUsers: boolean;
 	canUseTranslator: boolean;
+	canUseReaction: boolean;
 	canHideAds: boolean;
 	canCreateChannel: boolean;
 	driveCapacityMb: number;
 	maxFileSizeMb: number;
 	alwaysMarkNsfw: boolean;
+	canIgnoreAiNsfw: boolean;
 	canUpdateBioMedia: boolean;
+	canUpdateAvatar: boolean;
+	canUpdateBanner: boolean;
 	pinLimit: number;
 	antennaLimit: number;
+	antennaNotesLimit: number;
 	wordMuteLimit: number;
 	webhookLimit: number;
 	clipLimit: number;
@@ -69,15 +81,27 @@ export type RolePolicies = {
 	canImportUserLists: boolean;
 	chatAvailability: 'available' | 'readonly' | 'unavailable';
 	uploadableFileTypes: string[];
+	canUseDriveFileInSoundSettings: boolean;
 	noteDraftLimit: number;
 	scheduledNoteLimit: number;
 	watermarkAvailable: boolean;
+};
+
+export type RoleBadge = {
+	name: string;
+	iconUrl: string | null;
+	displayOrder: number;
+	behavior?: string;
 };
 
 export const DEFAULT_POLICIES: RolePolicies = {
 	gtlAvailable: true,
 	ltlAvailable: true,
 	canPublicNote: true,
+	canScheduleNote: true,
+	scheduleNoteMaxDays: 365,
+	canCreateContent: true,
+	canDeleteContent: true,
 	mentionLimit: 20,
 	canInvite: false,
 	inviteLimit: 0,
@@ -88,14 +112,19 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	canSearchNotes: false,
 	canSearchUsers: true,
 	canUseTranslator: true,
+	canUseReaction: true,
 	canHideAds: false,
 	canCreateChannel: true,
 	driveCapacityMb: 100,
 	maxFileSizeMb: 30,
 	alwaysMarkNsfw: false,
+	canIgnoreAiNsfw: false,
 	canUpdateBioMedia: true,
+	canUpdateAvatar: true,
+	canUpdateBanner: true,
 	pinLimit: 5,
 	antennaLimit: 5,
+	antennaNotesLimit: 200,
 	wordMuteLimit: 200,
 	webhookLimit: 3,
 	clipLimit: 10,
@@ -117,6 +146,7 @@ export const DEFAULT_POLICIES: RolePolicies = {
 		'video/*',
 		'audio/*',
 	],
+	canUseDriveFileInSoundSettings: false,
 	noteDraftLimit: 10,
 	scheduledNoteLimit: 1,
 	watermarkAvailable: true,
@@ -126,6 +156,7 @@ export const DEFAULT_POLICIES: RolePolicies = {
 export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	private rolesCache: MemorySingleCache<MiRole[]>;
 	private roleAssignmentByUserIdCache: MemoryKVCache<MiRoleAssignment[]>;
+	private inlinePoliciesByUserIdCache: MemoryKVCache<MiUserInlinePolicy[]>;
 	private notificationService: NotificationService;
 
 	public static AlreadyAssignedError = class extends Error {};
@@ -152,6 +183,9 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		@Inject(DI.roleAssignmentsRepository)
 		private roleAssignmentsRepository: RoleAssignmentsRepository,
 
+		@Inject(DI.userInlinePoliciesRepository)
+		private userInlinePoliciesRepository: UserInlinePoliciesRepository,
+
 		private cacheService: CacheService,
 		private userEntityService: UserEntityService,
 		private globalEventService: GlobalEventService,
@@ -161,6 +195,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	) {
 		this.rolesCache = new MemorySingleCache<MiRole[]>(1000 * 60 * 60); // 1h
 		this.roleAssignmentByUserIdCache = new MemoryKVCache<MiRoleAssignment[]>(1000 * 60 * 5); // 5m
+		this.inlinePoliciesByUserIdCache = new MemoryKVCache<MiUserInlinePolicy[]>(1000 * 60 * 5);
 
 		this.redisForSub.on('message', this.onMessage);
 	}
@@ -225,6 +260,10 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 					if (cached) {
 						this.roleAssignmentByUserIdCache.set(body.userId, cached.filter(x => x.id !== body.id));
 					}
+					break;
+				}
+				case 'userInlinePoliciesUpdated': {
+					this.inlinePoliciesByUserIdCache.delete(body.userId);
 					break;
 				}
 				default:
@@ -338,6 +377,11 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
+	public getUserInlinePolicies(userId: MiUser['id']): Promise<MiUserInlinePolicy[]> {
+		return this.inlinePoliciesByUserIdCache.fetch(userId, () => this.userInlinePoliciesRepository.findBy({ userId }));
+	}
+
+	@bindThis
 	public async getUserRoles(userId: MiUser['id']) {
 		const roles = await this.rolesCache.fetch(() => this.rolesRepository.findBy({}));
 		const assigns = await this.getUserAssigns(userId);
@@ -350,8 +394,10 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	/**
 	 * 指定ユーザーのバッジロール一覧取得
 	 */
+	public async getUserBadgeRoles(userId: MiUser['id']): Promise<MiRole[]>;
+	public async getUserBadgeRoles(userId: MiUser['id'], publicOnly: boolean): Promise<RoleBadge[]>;
 	@bindThis
-	public async getUserBadgeRoles(userId: MiUser['id']) {
+	public async getUserBadgeRoles(userId: MiUser['id'], publicOnly?: boolean): Promise<MiRole[] | RoleBadge[]> {
 		const now = Date.now();
 		let assigns = await this.roleAssignmentByUserIdCache.fetch(userId, () => this.roleAssignmentsRepository.findBy({ userId }));
 		// 期限切れのロールを除外
@@ -360,13 +406,29 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		const assignedRoles = roles.filter(r => assigns.map(x => x.roleId).includes(r.id));
 		const assignedBadgeRoles = assignedRoles.filter(r => r.asBadge);
 		const badgeCondRoles = roles.filter(r => r.asBadge && (r.target === 'conditional'));
+		let badgeRoles: MiRole[];
 		if (badgeCondRoles.length > 0) {
 			const user = roles.some(r => r.target === 'conditional') ? await this.cacheService.findUserById(userId) : null;
 			const matchedBadgeCondRoles = badgeCondRoles.filter(r => this.evalCond(user!, assignedRoles, r.condFormula));
-			return [...assignedBadgeRoles, ...matchedBadgeCondRoles];
+			badgeRoles = [...assignedBadgeRoles, ...matchedBadgeCondRoles];
 		} else {
-			return assignedBadgeRoles;
+			badgeRoles = assignedBadgeRoles;
 		}
+
+		return publicOnly == null ? badgeRoles : this.sortAndMapBadgeRoles(badgeRoles, publicOnly);
+	}
+
+	@bindThis
+	private sortAndMapBadgeRoles(roles: MiRole[], publicOnly: boolean): RoleBadge[] {
+		return roles
+			.filter((r) => r.isPublic || !publicOnly)
+			.sort((a, b) => b.displayOrder - a.displayOrder)
+			.map((r) => ({
+				name: r.name,
+				iconUrl: r.iconUrl,
+				displayOrder: r.displayOrder,
+				behavior: r.badgeBehavior ?? undefined,
+			}));
 	}
 
 	@bindThis
@@ -376,6 +438,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		if (userId == null) return basePolicies;
 
 		const roles = await this.getUserRoles(userId);
+		const inlinePolicies = (await this.getUserInlinePolicies(userId)).sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
 		function calc<T extends keyof RolePolicies>(name: T, aggregate: (values: RolePolicies[T][]) => RolePolicies[T]) {
 			if (roles.length === 0) return basePolicies[name];
@@ -397,10 +460,14 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			return 'unavailable';
 		}
 
-		return {
+		const aggregated = {
 			gtlAvailable: calc('gtlAvailable', vs => vs.some(v => v === true)),
 			ltlAvailable: calc('ltlAvailable', vs => vs.some(v => v === true)),
 			canPublicNote: calc('canPublicNote', vs => vs.some(v => v === true)),
+			canScheduleNote: calc('canScheduleNote', vs => vs.some(v => v === true)),
+			scheduleNoteMaxDays: calc('scheduleNoteMaxDays', vs => Math.max(...vs)),
+			canCreateContent: calc('canCreateContent', vs => vs.some(v => v === true)),
+			canDeleteContent: calc('canDeleteContent', vs => vs.some(v => v === true)),
 			mentionLimit: calc('mentionLimit', vs => Math.max(...vs)),
 			canInvite: calc('canInvite', vs => vs.some(v => v === true)),
 			inviteLimit: calc('inviteLimit', vs => Math.max(...vs)),
@@ -411,14 +478,19 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			canSearchNotes: calc('canSearchNotes', vs => vs.some(v => v === true)),
 			canSearchUsers: calc('canSearchUsers', vs => vs.some(v => v === true)),
 			canUseTranslator: calc('canUseTranslator', vs => vs.some(v => v === true)),
+			canUseReaction: calc('canUseReaction', vs => vs.some(v => v === true)),
 			canHideAds: calc('canHideAds', vs => vs.some(v => v === true)),
 			canCreateChannel: calc('canCreateChannel', vs => vs.some(v => v === true)),
 			driveCapacityMb: calc('driveCapacityMb', vs => Math.max(...vs)),
 			maxFileSizeMb: calc('maxFileSizeMb', vs => Math.max(...vs)),
 			alwaysMarkNsfw: calc('alwaysMarkNsfw', vs => vs.some(v => v === true)),
+			canIgnoreAiNsfw: calc('canIgnoreAiNsfw', vs => vs.some(v => v === true)),
 			canUpdateBioMedia: calc('canUpdateBioMedia', vs => vs.some(v => v === true)),
+			canUpdateAvatar: calc('canUpdateAvatar', vs => vs.some(v => v === true)),
+			canUpdateBanner: calc('canUpdateBanner', vs => vs.some(v => v === true)),
 			pinLimit: calc('pinLimit', vs => Math.max(...vs)),
 			antennaLimit: calc('antennaLimit', vs => Math.max(...vs)),
+			antennaNotesLimit: calc('antennaNotesLimit', vs => Math.max(...vs)),
 			wordMuteLimit: calc('wordMuteLimit', vs => Math.max(...vs)),
 			webhookLimit: calc('webhookLimit', vs => Math.max(...vs)),
 			clipLimit: calc('clipLimit', vs => Math.max(...vs)),
@@ -443,10 +515,61 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				}
 				return [...set];
 			}),
+			canUseDriveFileInSoundSettings: calc('canUseDriveFileInSoundSettings', vs => vs.some(v => v === true)),
 			noteDraftLimit: calc('noteDraftLimit', vs => Math.max(...vs)),
 			scheduledNoteLimit: calc('scheduledNoteLimit', vs => Math.max(...vs)),
 			watermarkAvailable: calc('watermarkAvailable', vs => vs.some(v => v === true)),
 		};
+
+		return this.applyInlinePolicies(aggregated, inlinePolicies);
+	}
+
+	@bindThis
+	private applyInlinePolicies(current: RolePolicies, inlinePolicies: MiUserInlinePolicy[]): RolePolicies {
+		if (inlinePolicies.length === 0) return current;
+		const updated = { ...current };
+
+		for (const inline of inlinePolicies) {
+			if (!this.isRolePolicyName(inline.policy)) continue;
+			this.applyInlinePolicyValue(updated, inline.policy, inline);
+		}
+
+		return updated;
+	}
+
+	@bindThis
+	private isRolePolicyName(policy: string): policy is keyof RolePolicies {
+		return Object.hasOwn(DEFAULT_POLICIES, policy);
+	}
+
+	@bindThis
+	private applyInlinePolicyValue<T extends keyof RolePolicies>(updated: RolePolicies, policyName: T, inline: MiUserInlinePolicy): void {
+		const currentValue = updated[policyName];
+
+		if (inline.operation === 'increment') {
+			if (typeof currentValue === 'number' && typeof inline.value === 'number' && Number.isFinite(inline.value)) {
+				updated[policyName] = (currentValue + inline.value) as RolePolicies[T];
+			}
+			return;
+		}
+
+		if (this.isSamePolicyValueType(currentValue, inline.value)) {
+			updated[policyName] = inline.value as RolePolicies[T];
+		}
+	}
+
+	@bindThis
+	private isSamePolicyValueType(currentValue: RolePolicies[keyof RolePolicies], value: MiUserInlinePolicy['value']): boolean {
+		if (value === null) return false;
+		if (Array.isArray(currentValue)) {
+			return Array.isArray(value) && value.every(item => typeof item === 'string');
+		}
+		return !Array.isArray(value) && typeof value === typeof currentValue;
+	}
+
+	@bindThis
+	public clearInlinePolicyCache(userId: MiUser['id']): void {
+		this.inlinePoliciesByUserIdCache.delete(userId);
 	}
 
 	@bindThis
@@ -549,9 +672,20 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		return users;
 	}
 
+	public async assign(userId: MiUser['id'], roleId: MiRole['id'], expiresAt?: Date | null, moderator?: MiUser): Promise<void>;
+	public async assign(userId: MiUser['id'], roleId: MiRole['id'], memo?: string | null, expiresAt?: Date | null, moderator?: MiUser): Promise<void>;
 	@bindThis
-	public async assign(userId: MiUser['id'], roleId: MiRole['id'], expiresAt: Date | null = null, moderator?: MiUser): Promise<void> {
+	public async assign(userId: MiUser['id'], roleId: MiRole['id'], memoOrExpiresAt: string | Date | null = null, expiresAtOrModerator: Date | MiUser | null = null, moderator?: MiUser): Promise<void> {
 		const now = Date.now();
+		const memo = typeof memoOrExpiresAt === 'string' ? memoOrExpiresAt : null;
+		const expiresAt = memoOrExpiresAt instanceof Date
+			? memoOrExpiresAt
+			: expiresAtOrModerator instanceof Date
+				? expiresAtOrModerator
+				: null;
+		const logModerator = expiresAtOrModerator instanceof Date || expiresAtOrModerator == null
+			? moderator
+			: expiresAtOrModerator;
 
 		const role = await this.rolesRepository.findOneByOrFail({ id: roleId });
 
@@ -560,46 +694,61 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			userId: userId,
 		});
 
+		let created: MiRoleAssignment | undefined;
+		let assignmentUpdated = false;
 		if (existing) {
 			if (existing.expiresAt && (existing.expiresAt.getTime() < now)) {
 				await this.roleAssignmentsRepository.delete({
 					roleId: roleId,
 					userId: userId,
 				});
+			} else if (existing.expiresAt?.getTime() !== expiresAt?.getTime() || existing.memo !== memo) {
+				await this.roleAssignmentsRepository.update(existing.id, {
+					expiresAt: expiresAt,
+					memo: memo,
+				});
+				this.roleAssignmentByUserIdCache.delete(userId);
+				assignmentUpdated = true;
 			} else {
 				throw new RoleService.AlreadyAssignedError();
 			}
 		}
 
-		const created = await this.roleAssignmentsRepository.insertOne({
-			id: this.idService.gen(now),
-			expiresAt: expiresAt,
-			roleId: roleId,
-			userId: userId,
-		});
+		if (!assignmentUpdated) {
+			created = await this.roleAssignmentsRepository.insertOne({
+				id: this.idService.gen(now),
+				expiresAt: expiresAt,
+				roleId: roleId,
+				userId: userId,
+				memo: memo,
+			});
+		}
 
 		this.rolesRepository.update(roleId, {
 			lastUsedAt: new Date(),
 		});
 
-		this.globalEventService.publishInternalEvent('userRoleAssigned', created);
-
 		const user = await this.usersRepository.findOneByOrFail({ id: userId });
 
-		if (role.isPublic && user.host === null) {
+		if (created) {
+			this.globalEventService.publishInternalEvent('userRoleAssigned', created);
+		}
+
+		if (created && role.isPublic && user.host === null) {
 			this.notificationService.createNotification(userId, 'roleAssigned', {
 				roleId: roleId,
 			});
 		}
 
-		if (moderator) {
-			this.moderationLogService.log(moderator, 'assignRole', {
+		if (logModerator) {
+			this.moderationLogService.log(logModerator, 'assignRole', {
 				roleId: roleId,
 				roleName: role.name,
 				userId: userId,
 				userUsername: user.username,
 				userHost: user.host,
 				expiresAt: expiresAt ? expiresAt.toISOString() : null,
+				memo: memo,
 			});
 		}
 	}
@@ -645,11 +794,15 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	@bindThis
 	public async addNoteToRoleTimeline(note: Packed<'Note'>): Promise<void> {
 		const roles = await this.getUserRoles(note.userId);
+		const deliverTargetDimensions = await getDeliverTargetDimensions(note, async () => null);
 
 		const redisPipeline = this.redisForTimelines.pipeline();
 
 		for (const role of roles) {
 			this.fanoutTimelineService.push(`roleTimeline:${role.id}`, note.id, 1000, redisPipeline);
+			for (const dimension of deliverTargetDimensions) {
+				this.fanoutTimelineService.pushDimension(`roleTimeline:${role.id}`, note.id, dimension, redisPipeline);
+			}
 			this.globalEventService.publishRoleTimelineStream(role.id, 'note', note);
 		}
 
@@ -674,6 +827,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			isModerator: values.isModerator,
 			isExplorable: values.isExplorable,
 			asBadge: values.asBadge,
+			badgeBehavior: values.badgeBehavior,
 			preserveAssignmentOnMoveAccount: values.preserveAssignmentOnMoveAccount,
 			canEditMembersByModerator: values.canEditMembersByModerator,
 			displayOrder: values.displayOrder,
@@ -729,6 +883,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	public dispose(): void {
 		this.redisForSub.off('message', this.onMessage);
 		this.roleAssignmentByUserIdCache.dispose();
+		this.inlinePoliciesByUserIdCache.dispose();
 	}
 
 	@bindThis

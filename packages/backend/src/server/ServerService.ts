@@ -31,6 +31,8 @@ import { HealthServerService } from './HealthServerService.js';
 import { ClientServerService } from './web/ClientServerService.js';
 import { OpenApiServerService } from './api/openapi/OpenApiServerService.js';
 import { OAuth2ProviderService } from './oauth/OAuth2ProviderService.js';
+import { JWTIdentifyProviderService } from './sso/JWTIdentifyProviderService.js';
+import { SAMLIdentifyProviderService } from './sso/SAMLIdentifyProviderService.js';
 
 const _dirname = fileURLToPath(new URL('.', import.meta.url));
 
@@ -68,6 +70,8 @@ export class ServerService implements OnApplicationShutdown {
 		private globalEventService: GlobalEventService,
 		private loggerService: LoggerService,
 		private oauth2ProviderService: OAuth2ProviderService,
+		private jwtIdentifyProviderService: JWTIdentifyProviderService,
+		private samlIdentifyProviderService: SAMLIdentifyProviderService,
 	) {
 		this.logger = this.loggerService.getLogger('server', 'gray');
 	}
@@ -146,8 +150,13 @@ export class ServerService implements OnApplicationShutdown {
 		fastify.register(this.activityPubServerService.createServer);
 		fastify.register(this.nodeinfoServerService.createServer);
 		fastify.register(this.wellKnownServerService.createServer);
-		fastify.register(this.oauth2ProviderService.createServer, { prefix: '/oauth' });
+		fastify.register(this.oauth2ProviderService.createApiServer, { prefix: '/oauth/api' });
+		fastify.register(this.oauth2ProviderService.createIntrospectionServer, { prefix: '/oauth/token/introspect' });
 		fastify.register(this.oauth2ProviderService.createTokenServer, { prefix: '/oauth/token' });
+		fastify.register(this.oauth2ProviderService.createServer, { prefix: '/oauth' });
+		fastify.register(this.jwtIdentifyProviderService.createApiServer, { prefix: '/sso/jwt/api' });
+		fastify.register(this.jwtIdentifyProviderService.createServer, { prefix: '/sso/jwt' });
+		fastify.register(this.samlIdentifyProviderService.createServer, { prefix: '/sso/saml' });
 		fastify.register(this.healthServerService.createServer, { prefix: '/healthz' });
 
 		fastify.get<{ Params: { path: string }; Querystring: { static?: any; badge?: any; }; }>('/emoji/:path(.*)', async (request, reply) => {

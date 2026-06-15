@@ -49,6 +49,7 @@ function doSucceeded(fileId: string, to: boolean) {
 const exampleNote = reactive<Misskey.entities.Note>({
 	id: '0000000000',
 	createdAt: '2019-04-14T17:30:49.181Z',
+	lang: 'unknown',
 	userId: '0000000001',
 	user: $i!,
 	text: i18n.ts._initialTutorial._howToMakeAttachmentsSensitive._exampleNote.note,
@@ -62,6 +63,7 @@ const exampleNote = reactive<Misskey.entities.Note>({
 	reactions: {},
 	reactionEmojis: {},
 	fileIds: ['0000000002'],
+	dimension: 0,
 	files: [{
 		id: '0000000002',
 		createdAt: '2019-04-14T17:30:49.181Z',

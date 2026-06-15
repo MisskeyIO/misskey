@@ -37,6 +37,7 @@ export class RoleTimelineChannel extends Channel {
 	public async init(params: JsonObject) {
 		if (typeof params.roleId !== 'string') return;
 		this.roleId = params.roleId;
+		this.setViewerDimension(params);
 
 		this.subscriber.on(`roleTimelineStream:${this.roleId}`, this.onEvent);
 	}
@@ -53,6 +54,8 @@ export class RoleTimelineChannel extends Channel {
 			if (note.user.requireSigninToViewContents && this.user == null) return;
 			if (note.renote && note.renote.user.requireSigninToViewContents && this.user == null) return;
 			if (note.reply && note.reply.user.requireSigninToViewContents && this.user == null) return;
+			if (!this.shouldDeliverByDimension(note)) return;
+			if (!(await this.noteEntityService.isLanguageVisibleToMe(note, this.user?.id))) return;
 
 			if (this.isNoteMutedOrBlocked(note)) return;
 

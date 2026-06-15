@@ -10,19 +10,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, watch, ref, onMounted, shallowRef, onUnmounted } from 'vue';
+import { watch, onMounted, ref, shallowRef, onUnmounted } from 'vue';
 import * as Misskey from 'misskey-js';
 import GameSetting from './game.setting.vue';
 import GameBoard from './game.board.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { definePage } from '@/page.js';
 import { useStream } from '@/stream.js';
-import { $i } from '@/i.js';
+import { ensureSignin } from '@/i.js';
+import { prefer } from '@/preferences.js';
 import { useRouter } from '@/router.js';
 import * as os from '@/os.js';
 import { url } from '@@/js/config.js';
 import { i18n } from '@/i18n.js';
 import { useInterval } from '@@/js/use-interval.js';
+
+const $i = ensureSignin();
 
 const router = useRouter();
 
@@ -45,6 +48,7 @@ function start(_game: Misskey.entities.ReversiGameDetailed) {
 		misskeyApi('notes/create', {
 			text: `${i18n.ts._reversi.iStartedAGame}\n${url}/reversi/g/${props.gameId}`,
 			visibility: 'home',
+			noCreatedNote: true,
 		});
 	}
 
@@ -72,7 +76,7 @@ async function fetchGame() {
 		connection.value.on('canceled', x => {
 			connection.value?.dispose();
 
-			if (x.userId !== $i?.id) {
+			if (x.userId !== $i.id) {
 				os.alert({
 					type: 'warning',
 					text: i18n.ts._reversi.gameCanceled,

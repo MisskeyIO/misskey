@@ -36,11 +36,13 @@ export class FlashLikeEntityService {
 	}
 
 	@bindThis
-	public packMany(
+	public async packMany(
 		likes: any[],
 		me: { id: MiUser['id'] },
 	) {
-		return Promise.all(likes.map(x => this.pack(x, me)));
+		return (await Promise.allSettled(likes.map(x => this.pack(x, me))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => result.value);
 	}
 }
 

@@ -30,6 +30,7 @@ export type DeliverJobData = {
 export type InboxJobData = {
 	activity: IActivity;
 	signature: httpSignature.IParsedSignature;
+	recipientId?: MiUser['id'];
 };
 
 export type RelationshipJobData = {
@@ -110,7 +111,8 @@ export type EndedPollNotificationJobData = {
 };
 
 export type PostScheduledNoteJobData = {
-	noteDraftId: string;
+	scheduledNoteId?: string;
+	noteDraftId?: string;
 };
 
 export type SystemWebhookDeliverJobData<T extends SystemWebhookEventType = SystemWebhookEventType> = {

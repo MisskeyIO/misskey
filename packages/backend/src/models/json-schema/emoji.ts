@@ -44,6 +44,15 @@ export const packedEmojiSimpleSchema = {
 				format: 'id',
 			},
 		},
+		roleIdsThatCanNotBeUsedThisEmojiAsReaction: {
+			type: 'array',
+			optional: true, nullable: false,
+			items: {
+				type: 'string',
+				optional: false, nullable: false,
+				format: 'id',
+			},
+		},
 	},
 } as const;
 
@@ -54,6 +63,16 @@ export const packedEmojiDetailedSchema = {
 			type: 'string',
 			optional: false, nullable: false,
 			format: 'id',
+		},
+		createdAt: {
+			type: 'string',
+			optional: true, nullable: false,
+			format: 'date-time',
+		},
+		updatedAt: {
+			type: 'string',
+			optional: true, nullable: true,
+			format: 'date-time',
 		},
 		aliases: {
 			type: 'array',
@@ -93,9 +112,26 @@ export const packedEmojiDetailedSchema = {
 			type: 'boolean',
 			optional: false, nullable: false,
 		},
+		requestedBy: {
+			type: 'string',
+			optional: true, nullable: true,
+		},
+		memo: {
+			type: 'string',
+			optional: true, nullable: true,
+		},
 		roleIdsThatCanBeUsedThisEmojiAsReaction: {
 			type: 'array',
-			optional: false, nullable: false,
+			optional: true, nullable: false,
+			items: {
+				type: 'string',
+				optional: false, nullable: false,
+				format: 'id',
+			},
+		},
+		roleIdsThatCanNotBeUsedThisEmojiAsReaction: {
+			type: 'array',
+			optional: true, nullable: false,
 			items: {
 				type: 'string',
 				optional: false, nullable: false,
@@ -168,6 +204,14 @@ export const packedEmojiDetailedAdminSchema = {
 			type: 'boolean',
 			optional: false, nullable: false,
 		},
+		requestedBy: {
+			type: 'string',
+			optional: false, nullable: true,
+		},
+		memo: {
+			type: 'string',
+			optional: false, nullable: false,
+		},
 		roleIdsThatCanBeUsedThisEmojiAsReaction: {
 			type: 'array',
 			items: {
@@ -183,6 +227,14 @@ export const packedEmojiDetailedAdminSchema = {
 						optional: false, nullable: false,
 					},
 				},
+			},
+		},
+		roleIdsThatCanNotBeUsedThisEmojiAsReaction: {
+			type: 'array',
+			items: {
+				type: 'string',
+				optional: false, nullable: false,
+				format: 'id',
 			},
 		},
 	},

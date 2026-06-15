@@ -9,7 +9,7 @@ import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { HttpRequestService } from '@/core/HttpRequestService.js';
 import type Logger from '@/logger.js';
-import { query } from '@/misc/prelude/url.js';
+import { isHttpUrl, query } from '@/misc/prelude/url.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import { bindThis } from '@/decorators.js';
 import { ApiError } from '@/server/api/error.js';
@@ -53,6 +53,9 @@ export class UrlPreviewService {
 			reply.code(400);
 			return;
 		}
+		if (!isHttpUrl(url)) {
+			return this.failed(reply);
+		}
 
 		const lang = request.query.lang;
 		if (Array.isArray(lang)) {
@@ -82,12 +85,16 @@ export class UrlPreviewService {
 
 			this.logger.succ(`Got preview of ${url}: ${summary.title}`);
 
-			if (!(summary.url.startsWith('http://') || summary.url.startsWith('https://'))) {
+			if (!isHttpUrl(summary.url)) {
 				throw new Error('unsupported schema included');
 			}
 
-			if (summary.player.url && !(summary.player.url.startsWith('http://') || summary.player.url.startsWith('https://'))) {
+			if (summary.player.url && !isHttpUrl(summary.player.url)) {
 				throw new Error('unsupported schema included');
+			}
+
+			if (this.includesDenyList(summary.url)) {
+				summary.sensitive = true;
 			}
 
 			summary.icon = this.wrap(summary.icon);
@@ -99,17 +106,21 @@ export class UrlPreviewService {
 			return summary;
 		} catch (err) {
 			this.logger.warn(`Failed to get preview of ${url}: ${err}`);
-
-			reply.code(422);
-			reply.header('Cache-Control', 'max-age=86400, immutable');
-			return {
-				error: new ApiError({
-					message: 'Failed to get preview',
-					code: 'URL_PREVIEW_FAILED',
-					id: '09d01cb5-53b9-4856-82e5-38a50c290a3b',
-				}),
-			};
+			return this.failed(reply);
 		}
+	}
+
+	@bindThis
+	private failed(reply: FastifyReply): object {
+		reply.code(422);
+		reply.header('Cache-Control', 'max-age=86400, immutable');
+		return {
+			error: new ApiError({
+				message: 'Failed to get preview',
+				code: 'URL_PREVIEW_FAILED',
+				id: '09d01cb5-53b9-4856-82e5-38a50c290a3b',
+			}),
+		};
 	}
 
 	private async fetchSummary(url: string, meta: MiMeta, lang?: string): Promise<SummalyResult> {
@@ -146,5 +157,15 @@ export class UrlPreviewService {
 		});
 
 		return this.httpRequestService.getJson<SummalyResult>(`${proxy}?${queryStr}`, 'application/json, */*', undefined, true);
+	}
+
+	@bindThis
+	private includesDenyList(url: string): boolean {
+		const { hostname } = new URL(url);
+		const normalizedHost = hostname.toLowerCase();
+		return this.meta.urlPreviewDenyList.some(host => {
+			const normalizedFilter = host.trim().toLowerCase();
+			return normalizedFilter !== '' && `.${normalizedHost}`.endsWith(`.${normalizedFilter}`);
+		});
 	}
 }

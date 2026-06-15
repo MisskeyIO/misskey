@@ -197,6 +197,7 @@ import * as Misskey from 'misskey-js';
 import { DropAndFusionGame } from 'misskey-bubble-game';
 import { useInterval } from '@@/js/use-interval.js';
 import { apiUrl } from '@@/js/config.js';
+import { generateClientTransactionId } from '@/utility/misskey-api.js';
 import type { Mono } from 'misskey-bubble-game';
 import { definePage } from '@/page.js';
 import MkRippleEffect from '@/components/MkRippleEffect.vue';
@@ -623,7 +624,7 @@ function loadMonoTextures() {
 		// Matter-js内にキャッシュがある場合はスキップ
 		if (renderer.textures[mono.img]) return;
 
-		let src = mono.img;
+		let src: string;
 
 		if (monoTextureUrls[mono.img]) {
 			src = monoTextureUrls[mono.img];
@@ -674,7 +675,7 @@ function tick() {
 }
 
 function tickReplay() {
-	let hasNextTick;
+	let hasNextTick = false;
 	for (let i = 0; i < replayPlaybackRate.value; i++) {
 		const log = logs!.find(x => x.frame === game.frame);
 		if (log) {
@@ -907,13 +908,17 @@ function getGameImageDriveFile() {
 				formData.append('file', blob);
 				formData.append('name', `bubble-game-${Date.now()}.png`);
 				formData.append('isSensitive', 'false');
-				formData.append('i', $i.token);
 				if (prefer.s.uploadFolder) {
 					formData.append('folderId', prefer.s.uploadFolder);
 				}
 
 				window.fetch(apiUrl + '/drive/files/create', {
 					method: 'POST',
+					headers: {
+						'Authorization': `Bearer ${$i!.token}`,
+						'X-Client-Transaction-Id': generateClientTransactionId('bubble-game-share'),
+					},
+					credentials: 'include',
 					body: formData,
 				})
 					.then(response => response.json())
@@ -1009,17 +1014,12 @@ function attachGameEvents() {
 		const domY = rect.top + (y * viewScale);
 		const scoreUnit = getScoreUnit(props.gameMode);
 
-		{
-			const { dispose } = os.popup(MkRippleEffect, { x: domX, y: domY }, {
-				end: () => dispose(),
-			});
-		}
-
-		{
-			const { dispose } = os.popup(MkPlusOneEffect, { x: domX, y: domY, value: scoreDelta + (scoreUnit === 'pt' ? '' : scoreUnit) }, {
-				end: () => dispose(),
-			});
-		}
+		const ripple = os.popup(MkRippleEffect, { x: domX, y: domY }, {
+			end: () => ripple.dispose(),
+		});
+		const plusOne = os.popup(MkPlusOneEffect, { x: domX, y: domY, value: scoreDelta + (scoreUnit === 'pt' ? '' : scoreUnit) }, {
+			end: () => plusOne.dispose(),
+		});
 
 		if (nextMono) {
 			const def = monoDefinitions.value.find(x => x.id === nextMono.id)!;
@@ -1042,10 +1042,10 @@ function attachGameEvents() {
 					});
 				}
 			}
-		} else {
-			if (!props.mute) {
-				// TODO: 融合後のモノがない場合でも何らかの効果音を再生
-			}
+		//} else {
+		//	if (!props.mute) {
+		//		// TODO: 融合後のモノがない場合でも何らかの効果音を再生
+		//	}
 		}
 	});
 

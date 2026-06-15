@@ -4,7 +4,30 @@
  */
 
 import * as Misskey from 'misskey-js';
-import { query } from './url.js';
+import { appendQuery, omitHttps, query } from './url.js';
+
+function decodeProxyTarget(target: string): string {
+	try {
+		return decodeURIComponent(target);
+	} catch (err) {
+		console.warn(err);
+		return target;
+	}
+}
+
+function extractPathStyleProxyTarget(imageUrl: string, proxyBase: string): string | null {
+	if (!imageUrl.startsWith(`${proxyBase}/`)) return null;
+
+	const proxiedPath = imageUrl.slice(proxyBase.length + 1).split(/[?#]/, 1)[0];
+	const target = proxiedPath.match(/^(?:preview|image|static)\/(.+)$/)?.[1];
+	if (target == null) return null;
+
+	return decodeProxyTarget(target);
+}
+
+function appendQueryIfNeeded(url: string, queryString: string): string {
+	return queryString === '' ? url : appendQuery(url, queryString);
+}
 
 export class MediaProxy {
 	private serverMetadata: Misskey.entities.MetaDetailed;
@@ -21,18 +44,22 @@ export class MediaProxy {
 
 		if (imageUrl.startsWith(this.serverMetadata.mediaProxy + '/') || imageUrl.startsWith('/proxy/') || imageUrl.startsWith(localProxy + '/')) {
 			// もう既にproxyっぽそうだったらurlを取り出す
-			_imageUrl = (new URL(imageUrl)).searchParams.get('url') ?? imageUrl;
+			const url = imageUrl.startsWith('/proxy/') ? new URL(imageUrl, this.url) : new URL(imageUrl);
+			const queryUrl = url.searchParams.get('url');
+			const pathUrl = extractPathStyleProxyTarget(url.href, this.serverMetadata.mediaProxy)
+				?? extractPathStyleProxyTarget(url.href, localProxy)
+				?? extractPathStyleProxyTarget(url.pathname, '/proxy');
+			_imageUrl = queryUrl ?? pathUrl ?? imageUrl;
 		}
 
-		return `${mustOrigin ? localProxy : this.serverMetadata.mediaProxy}/${
-			type === 'preview' ? 'preview.webp'
-			: 'image.webp'
-		}?${query({
-			url: _imageUrl,
+		return appendQueryIfNeeded(`${mustOrigin ? localProxy : this.serverMetadata.mediaProxy}/${
+			type === 'preview' ? 'preview'
+			: 'image'
+		}/${encodeURIComponent(omitHttps(_imageUrl))}`, query({
 			...(!noFallback ? { 'fallback': '1' } : {}),
 			...(type ? { [type]: '1' } : {}),
 			...(mustOrigin ? { origin: '1' } : {}),
-		})}`;
+		}));
 	}
 
 	public getProxiedImageUrlNullable(imageUrl: string | null | undefined, type?: 'preview'): string | null {
@@ -55,9 +82,9 @@ export class MediaProxy {
 			return u.href;
 		}
 
-		return `${this.serverMetadata.mediaProxy}/static.webp?${query({
-			url: u.href,
-			static: '1',
-		})}`;
+		return appendQuery(
+			`${this.serverMetadata.mediaProxy}/static/${encodeURIComponent(omitHttps(u.href))}`,
+			query({ static: '1' }),
+		);
 	}
 }

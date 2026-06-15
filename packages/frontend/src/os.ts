@@ -38,17 +38,85 @@ import { focusParent } from '@/utility/focus.js';
 export const openingWindowsCount = ref(0);
 
 export type ApiWithDialogCustomErrors = Record<string, { title?: string; text: string; }>;
+type ApiWithDialogSuccessCallback<E extends keyof Misskey.Endpoints> = (res: Misskey.api.SwitchCaseResponseType<E, Misskey.Endpoints[E]['req']>) => void;
+type ApiWithDialogFailureCallback = (err: Misskey.api.APIError) => void;
+type ApiWithDialogOptions<E extends keyof Misskey.Endpoints> = {
+	onSuccess?: ApiWithDialogSuccessCallback<E> | null;
+	onFailure?: ApiWithDialogFailureCallback | null;
+	customErrors?: ApiWithDialogCustomErrors;
+};
+type ApiWithDialogFourthArgument<E extends keyof Misskey.Endpoints> =
+	| ApiWithDialogCustomErrors
+	| ApiWithDialogOptions<E>
+	| ApiWithDialogSuccessCallback<E>
+	| null
+	| undefined;
+
+function isApiWithDialogOptions<E extends keyof Misskey.Endpoints>(value: ApiWithDialogFourthArgument<E>): value is ApiWithDialogOptions<E> {
+	return value != null && typeof value === 'object' && ('onSuccess' in value || 'onFailure' in value || 'customErrors' in value);
+}
+
+function isMisskeyApiError(err: unknown): err is Misskey.api.APIError {
+	return err != null && typeof err === 'object' &&
+		'id' in err && typeof err.id === 'string' &&
+		'code' in err && typeof err.code === 'string' &&
+		'message' in err && typeof err.message === 'string';
+}
+
+function getErrorMessage(err: unknown): string {
+	if (err instanceof Error) return err.message;
+	if (typeof err === 'string') return err;
+	if (err != null && typeof err === 'object' && 'message' in err && typeof err.message === 'string') return err.message;
+	return String(err);
+}
+
+function getErrorStatusCode(err: unknown): number | undefined {
+	if (err != null && typeof err === 'object' && 'statusCode' in err && typeof err.statusCode === 'number') return err.statusCode;
+	return undefined;
+}
+
+function getErrorDetails(err: unknown): unknown {
+	if (isMisskeyApiError(err)) return err.info;
+	return err;
+}
+
 export const apiWithDialog = (<E extends keyof Misskey.Endpoints>(
 	endpoint: E,
 	data: Misskey.Endpoints[E]['req'],
 	token?: string | null | undefined,
+	customErrorsOrOnSuccessOrOptions?: ApiWithDialogFourthArgument<E>,
+	onFailure?: ApiWithDialogFailureCallback | null,
 	customErrors?: ApiWithDialogCustomErrors,
-) => {
+): Promise<Misskey.api.SwitchCaseResponseType<E, Misskey.Endpoints[E]['req']>> => {
+	let onSuccess: ApiWithDialogSuccessCallback<E> | null | undefined;
+	let resolvedOnFailure = onFailure;
+	let resolvedCustomErrors: ApiWithDialogCustomErrors | undefined = customErrors;
+
+	if (typeof customErrorsOrOnSuccessOrOptions === 'function') {
+		onSuccess = customErrorsOrOnSuccessOrOptions;
+	} else if (isApiWithDialogOptions(customErrorsOrOnSuccessOrOptions)) {
+		onSuccess = customErrorsOrOnSuccessOrOptions.onSuccess;
+		resolvedOnFailure = customErrorsOrOnSuccessOrOptions.onFailure;
+		resolvedCustomErrors = customErrorsOrOnSuccessOrOptions.customErrors;
+	} else if (customErrorsOrOnSuccessOrOptions != null) {
+		resolvedCustomErrors = customErrorsOrOnSuccessOrOptions;
+	}
+
 	const promise = misskeyApi(endpoint, data, token);
-	promiseDialog(promise, null, async (err) => {
-		let title: string | undefined;
-		let text = err.message + '\n' + err.id;
-		if (err.code === 'INTERNAL_ERROR') {
+	promiseDialog(promise, onSuccess, resolvedOnFailure ?? (err => apiErrorHandler(err, endpoint, resolvedCustomErrors)));
+
+	return promise;
+});
+
+export async function apiErrorHandler(err: unknown, endpoint?: string, customErrors?: ApiWithDialogCustomErrors): Promise<void> {
+	let title: string | undefined;
+	let text = getErrorMessage(err);
+	const apiError = isMisskeyApiError(err) ? err : undefined;
+
+	if (apiError) {
+		text = `${apiError.message}\n${apiError.id}`;
+
+		if (apiError.code === 'INTERNAL_ERROR') {
 			title = i18n.ts.internalServerError;
 			text = i18n.ts.internalServerErrorDescription;
 			const date = new Date().toISOString();
@@ -56,6 +124,7 @@ export const apiWithDialog = (<E extends keyof Misskey.Endpoints>(
 				type: 'error',
 				title,
 				text,
+				details: apiError.info,
 				actions: [{
 					value: 'ok',
 					text: i18n.ts.gotIt,
@@ -66,37 +135,46 @@ export const apiWithDialog = (<E extends keyof Misskey.Endpoints>(
 				}],
 			});
 			if (result === 'copy') {
-				copyToClipboard(`Endpoint: ${endpoint}\nInfo: ${JSON.stringify(err.info)}\nDate: ${date}`);
+				copyToClipboard(`Endpoint: ${endpoint ?? 'unknown'}\nInfo: ${JSON.stringify(apiError.info)}\nDate: ${date}`);
+				success();
 			}
 			return;
-		} else if (err.code === 'RATE_LIMIT_EXCEEDED') {
+		} else if (apiError.code === 'RATE_LIMIT_EXCEEDED') {
 			title = i18n.ts.cannotPerformTemporary;
 			text = i18n.ts.cannotPerformTemporaryDescription;
-		} else if (err.code === 'INVALID_PARAM') {
+		} else if (apiError.code === 'INVALID_PARAM') {
 			title = i18n.ts.invalidParamError;
 			text = i18n.ts.invalidParamErrorDescription;
-		} else if (err.code === 'ROLE_PERMISSION_DENIED') {
+		} else if (apiError.code === 'ROLE_PERMISSION_DENIED' || apiError.code === 'PERMISSION_DENIED') {
 			title = i18n.ts.permissionDeniedError;
 			text = i18n.ts.permissionDeniedErrorDescription;
-		} else if (err.code.startsWith('TOO_MANY')) { // TODO: バックエンドに kind: client/contentsLimitExceeded みたいな感じで送るように統一してもらってそれで判定する
+		} else if (apiError.code.startsWith('TOO_MANY_')) { // TODO: バックエンドに kind: client/contentsLimitExceeded みたいな感じで送るように統一してもらってそれで判定する
 			title = i18n.ts.youCannotCreateAnymore;
-			text = `${i18n.ts.error}: ${err.id}`;
-		} else if (err.message.startsWith('Unexpected token')) {
+			text = `${i18n.ts.error}: ${apiError.id}`;
+		} else if (apiError.message.startsWith('Unexpected token')) {
 			title = i18n.ts.gotInvalidResponseError;
 			text = i18n.ts.gotInvalidResponseErrorDescription;
-		} else if (customErrors && customErrors[err.id] != null) {
-			title = customErrors[err.id].title;
-			text = customErrors[err.id].text;
+		} else if (customErrors?.[apiError.id] != null) {
+			title = customErrors[apiError.id].title;
+			text = customErrors[apiError.id].text;
 		}
-		alert({
-			type: 'error',
-			title,
-			text,
-		});
-	});
+	} else if ((getErrorStatusCode(err) ?? 0) > 499) {
+		title = i18n.ts.gotInvalidResponseError;
+		text = i18n.ts.gotInvalidResponseErrorDescription;
+	} else if (text.startsWith('Unexpected token')) {
+		title = i18n.ts.gotInvalidResponseError;
+		text = i18n.ts.gotInvalidResponseErrorDescription;
+	}
 
-	return promise;
-});
+	title ??= i18n.ts.somethingHappened;
+
+	alert({
+		type: 'error',
+		title,
+		text,
+		details: getErrorDetails(err),
+	});
+}
 
 export function promiseDialog<T extends Promise<any>>(
 	promise: T,
@@ -263,6 +341,10 @@ export function alert(props: {
 	type?: 'error' | 'info' | 'success' | 'warning' | 'waiting' | 'question';
 	title?: string;
 	text?: string;
+	switchLabel?: string | null;
+	details?: unknown;
+	okWaitInitiate?: 'dialog' | 'input' | 'switch';
+	okWaitDuration?: number;
 }): Promise<void> {
 	return new Promise(resolve => {
 		const { dispose } = popup(MkDialog, props, {
@@ -278,7 +360,10 @@ export function confirm(props: {
 	type: 'error' | 'info' | 'success' | 'warning' | 'waiting' | 'question';
 	title?: string;
 	text?: string;
+	switchLabel?: string | null;
 	okText?: string;
+	okWaitInitiate?: 'dialog' | 'input' | 'switch';
+	okWaitDuration?: number;
 	cancelText?: string;
 }): Promise<{ canceled: boolean }> {
 	return new Promise(resolve => {
@@ -305,6 +390,7 @@ export function actions<const T extends ActionsAction[]>(props: {
 	type: 'error' | 'info' | 'success' | 'warning' | 'waiting' | 'question';
 	title?: string;
 	text?: string;
+	details?: unknown;
 	actions: T;
 }): Promise<MkDialogReturnType<T[number]['value']>> {
 	return new Promise(resolve => {

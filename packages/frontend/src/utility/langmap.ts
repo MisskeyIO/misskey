@@ -669,3 +669,5 @@ export const langmap = {
 		nativeName: 'isiZulu',
 	},
 };
+
+export const postingLangCodes = [...Object.keys(langmap) as (keyof typeof langmap)[], 'other'] as const;

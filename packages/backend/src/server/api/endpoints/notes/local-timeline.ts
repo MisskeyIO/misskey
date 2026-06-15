@@ -15,6 +15,7 @@ import { IdService } from '@/core/IdService.js';
 import { QueryService } from '@/core/QueryService.js';
 import { MiLocalUser } from '@/models/User.js';
 import { FanoutTimelineEndpointService } from '@/core/FanoutTimelineEndpointService.js';
+import { FanoutTimelineName } from '@/core/FanoutTimelineService.js';
 import { ChannelMutingService } from '@/core/ChannelMutingService.js';
 import { ApiError } from '../../error.js';
 
@@ -58,6 +59,7 @@ export const paramDef = {
 		allowPartial: { type: 'boolean', default: false }, // true is recommended but for compatibility false by default
 		sinceDate: { type: 'integer' },
 		untilDate: { type: 'integer' },
+		dimension: { type: 'integer', minimum: 0, nullable: true },
 	},
 	required: [],
 } as const;
@@ -79,9 +81,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private queryService: QueryService,
 		private channelMutingService: ChannelMutingService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+			super(meta, paramDef, async (ps, me) => {
 			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
 			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
+			const viewerDimension = ps.dimension ?? 0;
 
 			const policies = await this.roleService.getUserPolicies(me ? me.id : null);
 			if (!policies.ltlAvailable) {
@@ -105,7 +108,18 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					}
 				});
 
-				return await this.noteEntityService.packMany(timeline, me);
+				return await this.noteEntityService.packMany(timeline, me, { viewerDimension });
+			}
+
+			let timelineConfig: FanoutTimelineName[];
+			if (ps.withFiles) {
+				timelineConfig = ['localTimelineWithFiles'];
+			} else if (ps.withReplies) {
+				timelineConfig = ['localTimeline', 'localTimelineWithReplies'];
+			} else if (me) {
+				timelineConfig = ['localTimeline', `localTimelineWithReplyTo:${me.id}`];
+			} else {
+				timelineConfig = ['localTimeline'];
 			}
 
 			const timeline = await this.fanoutTimelineEndpointService.timeline({
@@ -114,12 +128,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				limit: ps.limit,
 				allowPartial: ps.allowPartial,
 				me,
+				viewerDimension,
 				useDbFallback: this.serverSettings.enableFanoutTimelineDbFallback,
-				redisTimelines:
-					ps.withFiles ? ['localTimelineWithFiles']
-					: ps.withReplies ? ['localTimeline', 'localTimelineWithReplies']
-					: me ? ['localTimeline', `localTimelineWithReplyTo:${me.id}`]
-					: ['localTimeline'],
+				redisTimelines: timelineConfig,
 				alwaysIncludeMyNotes: true,
 				excludePureRenotes: !ps.withRenotes,
 				dbFallback: async (untilId, sinceId, limit) => await this.getFromDb({

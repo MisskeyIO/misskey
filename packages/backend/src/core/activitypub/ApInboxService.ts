@@ -26,7 +26,7 @@ import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { QueueService } from '@/core/QueueService.js';
 import type { UsersRepository, NotesRepository, FollowingsRepository, AbuseUserReportsRepository, FollowRequestsRepository, MiMeta } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
-import type { MiRemoteUser } from '@/models/User.js';
+import type { MiLocalUser, MiRemoteUser } from '@/models/User.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
 import { AbuseReportService } from '@/core/AbuseReportService.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
@@ -90,7 +90,7 @@ export class ApInboxService {
 	}
 
 	@bindThis
-	public async performActivity(actor: MiRemoteUser, activity: IObject, resolver?: Resolver): Promise<string | void> {
+	public async performActivity(actor: MiRemoteUser, activity: IObject, resolver?: Resolver, additionalCc?: MiLocalUser['id']): Promise<string | void> {
 		let result = undefined as string | void;
 		if (isCollectionOrOrderedCollection(activity)) {
 			const results = [] as [string, string | void][];
@@ -109,7 +109,7 @@ export class ApInboxService {
 					continue;
 				}
 				try {
-					results.push([getApId(item), await this.performOneActivity(actor, act, resolver)]);
+					results.push([getApId(item), await this.performOneActivity(actor, act, resolver, additionalCc)]);
 				} catch (err) {
 					if (err instanceof Error || typeof err === 'string') {
 						this.logger.error(err);
@@ -124,7 +124,7 @@ export class ApInboxService {
 				result = results.map(([id, reason]) => `${id}: ${reason}`).join('\n');
 			}
 		} else {
-			result = await this.performOneActivity(actor, activity, resolver);
+			result = await this.performOneActivity(actor, activity, resolver, additionalCc);
 		}
 
 		// ついでにリモートユーザーの情報が古かったら更新しておく
@@ -140,15 +140,15 @@ export class ApInboxService {
 	}
 
 	@bindThis
-	public async performOneActivity(actor: MiRemoteUser, activity: IObject, resolver?: Resolver): Promise<string | void> {
+	public async performOneActivity(actor: MiRemoteUser, activity: IObject, resolver?: Resolver, additionalCc?: MiLocalUser['id']): Promise<string | void> {
 		if (actor.isSuspended) return;
 
 		if (isCreate(activity)) {
-			return await this.create(actor, activity, resolver);
+			return await this.create(actor, activity, resolver, additionalCc);
 		} else if (isDelete(activity)) {
 			return await this.delete(actor, activity);
 		} else if (isUpdate(activity)) {
-			return await this.update(actor, activity, resolver);
+			return await this.update(actor, activity, resolver, additionalCc);
 		} else if (isFollow(activity)) {
 			return await this.follow(actor, activity);
 		} else if (isAccept(activity)) {
@@ -391,7 +391,7 @@ export class ApInboxService {
 	}
 
 	@bindThis
-	private async create(actor: MiRemoteUser, activity: ICreate, resolver?: Resolver): Promise<string | void> {
+	private async create(actor: MiRemoteUser, activity: ICreate, resolver?: Resolver, additionalCc?: MiLocalUser['id']): Promise<string | void> {
 		const uri = getApId(activity);
 
 		this.logger.info(`Create: ${uri}`);
@@ -425,14 +425,14 @@ export class ApInboxService {
 		});
 
 		if (isPost(object)) {
-			await this.createNote(resolver, actor, object, false, activity);
+			return await this.createNote(resolver, actor, object, false, activity, additionalCc);
 		} else {
 			return `Unknown type: ${getApType(object)}`;
 		}
 	}
 
 	@bindThis
-	private async createNote(resolver: Resolver, actor: MiRemoteUser, note: IObject, silent = false, activity?: ICreate): Promise<string> {
+	private async createNote(resolver: Resolver, actor: MiRemoteUser, note: IObject, silent = false, activity?: ICreate, additionalCc?: MiLocalUser['id']): Promise<string> {
 		const uri = getApId(note);
 
 		if (typeof note === 'object') {
@@ -453,9 +453,19 @@ export class ApInboxService {
 
 		try {
 			const exist = await this.apNoteService.fetchNote(note);
-			if (exist) return 'skip: note exists';
+			if (exist) {
+				if (additionalCc && !await this.noteEntityService.isVisibleForMe(exist, additionalCc)) {
+					await this.noteCreateService.appendNoteVisibleUser(actor, exist, additionalCc);
+					return 'ok: note visible user appended';
+				}
+				return 'skip: note exists';
+			}
 
-			await this.apNoteService.createNote(note, actor, resolver, silent);
+			const createdNote = await this.apNoteService.createNote(note, actor, resolver, silent);
+			if (createdNote && additionalCc && !await this.noteEntityService.isVisibleForMe(createdNote, additionalCc)) {
+				await this.noteCreateService.appendNoteVisibleUser(actor, createdNote, additionalCc);
+				return 'ok: note visible user appended';
+			}
 			return 'ok';
 		} catch (err) {
 			if (err instanceof StatusError && !err.isRetryable) {
@@ -777,7 +787,7 @@ export class ApInboxService {
 	}
 
 	@bindThis
-	private async update(actor: MiRemoteUser, activity: IUpdate, resolver?: Resolver): Promise<string> {
+	private async update(actor: MiRemoteUser, activity: IUpdate, resolver?: Resolver, additionalCc?: MiLocalUser['id']): Promise<string> {
 		if (actor.uri !== getApId(activity.actor)) {
 			return 'skip: invalid actor';
 		}
@@ -798,6 +808,13 @@ export class ApInboxService {
 		} else if (getApType(object) === 'Question') {
 			await this.apQuestionService.updateQuestion(object, actor, resolver).catch(err => console.error(err));
 			return 'ok: Question updated';
+		} else if (additionalCc && isPost(object)) {
+			const exist = await this.apNoteService.fetchNote(object);
+			if (exist && !await this.noteEntityService.isVisibleForMe(exist, additionalCc)) {
+				await this.noteCreateService.appendNoteVisibleUser(actor, exist, additionalCc);
+				return 'ok: note visible user appended';
+			}
+			return 'skip: nothing to do';
 		} else {
 			return `skip: Unknown type: ${getApType(object)}`;
 		}

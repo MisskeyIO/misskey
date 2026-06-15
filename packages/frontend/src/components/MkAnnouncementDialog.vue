@@ -16,32 +16,39 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<span :class="$style.title">{{ announcement.title }}</span>
 		</div>
 		<div :class="$style.text"><Mfm :text="announcement.text"/></div>
+		<img v-if="announcement.imageUrl" :class="$style.image" :src="announcement.imageUrl"/>
 		<div ref="bottomEl"></div>
 		<div :class="$style.footer">
 			<MkButton
 				primary
 				full
-				:disabled="!hasReachedBottom"
+				:disabled="!canRead"
 				@click="ok"
-			>{{ hasReachedBottom ? i18n.ts.close : i18n.ts.scrollToClose }}</MkButton>
+			>{{ readButtonText }}</MkButton>
 		</div>
 	</div>
 </MkModal>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, useTemplateRef } from 'vue';
+import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import MkModal from '@/components/MkModal.vue';
 import MkButton from '@/components/MkButton.vue';
+import MkTutorialDialog from '@/components/MkTutorialDialog.vue';
 import { i18n } from '@/i18n.js';
 import { $i } from '@/i.js';
 import { updateCurrentAccountPartial } from '@/accounts.js';
 
+type AnnouncementWithReadGate = Misskey.entities.Announcement & {
+	closeDuration?: number | null;
+	needEnrollmentTutorialToRead?: boolean;
+};
+
 const props = defineProps<{
-	announcement: Misskey.entities.Announcement;
+	announcement: AnnouncementWithReadGate;
 }>();
 
 const emit = defineEmits<{
@@ -51,8 +58,21 @@ const emit = defineEmits<{
 const rootEl = useTemplateRef('rootEl');
 const bottomEl = useTemplateRef('bottomEl');
 const modal = useTemplateRef('modal');
+const hasReachedBottom = ref(false);
+const remainingCloseDuration = ref(Math.max(0, props.announcement.closeDuration ?? 0));
+let closeDurationTimer: number | null = null;
+
+const canRead = computed(() => hasReachedBottom.value && remainingCloseDuration.value === 0);
+const readButtonText = computed(() => {
+	if (!hasReachedBottom.value) return i18n.ts.scrollToClose;
+
+	const label = props.announcement.needEnrollmentTutorialToRead ? i18n.ts._initialTutorial.launchTutorial : i18n.ts.close;
+	return remainingCloseDuration.value > 0 ? `${label} (${remainingCloseDuration.value}s)` : label;
+});
 
 async function ok() {
+	if (!canRead.value) return;
+
 	if (props.announcement.needConfirmationToRead) {
 		const confirm = await os.confirm({
 			type: 'question',
@@ -62,10 +82,31 @@ async function ok() {
 		if (confirm.canceled) return;
 	}
 
+	if (props.announcement.needEnrollmentTutorialToRead) {
+		const done = await waitTutorialDone();
+		if (!done) return;
+	}
+
 	modal.value?.close();
 	misskeyApi('i/read-announcement', { announcementId: props.announcement.id });
 	updateCurrentAccountPartial({
 		unreadAnnouncements: $i!.unreadAnnouncements.filter(a => a.id !== props.announcement.id),
+	});
+}
+
+function waitTutorialDone(): Promise<boolean> {
+	return new Promise(resolve => {
+		let resolved = false;
+		const { dispose } = os.popup(MkTutorialDialog, {}, {
+			done: () => {
+				resolved = true;
+				resolve(true);
+			},
+			closed: () => {
+				dispose();
+				if (!resolved) resolve(false);
+			},
+		});
 	});
 }
 
@@ -84,9 +125,17 @@ function onBgClick() {
 	});
 }
 
-const hasReachedBottom = ref(false);
-
 onMounted(() => {
+	if (remainingCloseDuration.value > 0) {
+		closeDurationTimer = window.setInterval(() => {
+			remainingCloseDuration.value = Math.max(0, remainingCloseDuration.value - 1);
+			if (remainingCloseDuration.value === 0 && closeDurationTimer != null) {
+				window.clearInterval(closeDurationTimer);
+				closeDurationTimer = null;
+			}
+		}, 1000);
+	}
+
 	if (bottomEl.value && rootEl.value) {
 		const bottomElRect = bottomEl.value.getBoundingClientRect();
 		const rootElRect = rootEl.value.getBoundingClientRect();
@@ -112,6 +161,10 @@ onMounted(() => {
 
 		observer.observe(bottomEl.value);
 	}
+});
+
+onUnmounted(() => {
+	if (closeDurationTimer != null) window.clearInterval(closeDurationTimer);
 });
 </script>
 
@@ -143,6 +196,13 @@ onMounted(() => {
 }
 
 .text {
+	margin: 1em 0;
+}
+
+.image {
+	display: block;
+	max-height: 300px;
+	max-width: 100%;
 	margin: 1em 0;
 }
 

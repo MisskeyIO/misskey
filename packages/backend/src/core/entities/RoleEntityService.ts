@@ -68,6 +68,7 @@ export class RoleEntityService {
 			isModerator: role.isModerator,
 			isExplorable: role.isExplorable,
 			asBadge: role.asBadge,
+			badgeBehavior: role.badgeBehavior,
 			preserveAssignmentOnMoveAccount: role.preserveAssignmentOnMoveAccount,
 			canEditMembersByModerator: role.canEditMembersByModerator,
 			displayOrder: role.displayOrder,
@@ -77,11 +78,12 @@ export class RoleEntityService {
 	}
 
 	@bindThis
-	public packMany(
+	public async packMany(
 		roles: any[],
 		me: { id: MiUser['id'] },
 	) {
-		return Promise.all(roles.map(x => this.pack(x, me)));
+		return (await Promise.allSettled(roles.map(x => this.pack(x, me))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => result.value);
 	}
 }
-

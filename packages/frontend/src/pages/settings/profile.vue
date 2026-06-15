@@ -102,6 +102,79 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</FormSlot>
 		</SearchMarker>
 
+		<SearchMarker :label="profileI18n.mutualLinksEdit" :keywords="['mutual', 'link', 'links']">
+			<FormSlot>
+				<MkFolder>
+					<template #icon><i class="ti ti-link"></i></template>
+					<template #label><SearchLabel>{{ profileI18n.mutualLinksEdit }}</SearchLabel></template>
+					<template #footer>
+						<div class="_buttons">
+							<MkButton primary @click="saveMutualLinks"><i class="ti ti-check"></i> {{ i18n.ts.save }}</MkButton>
+							<MkButton :disabled="mutualLinkSections.length >= mutualLinkSectionLimit" @click="addMutualLinkSection"><i class="ti ti-plus"></i> {{ profileI18n.addMutualLinkSection }}</MkButton>
+							<MkButton v-if="!mutualLinkEditMode" :disabled="mutualLinkSections.length === 0" danger @click="mutualLinkEditMode = !mutualLinkEditMode"><i class="ti ti-trash"></i> {{ i18n.ts.delete }}</MkButton>
+							<MkButton v-else @click="mutualLinkEditMode = !mutualLinkEditMode"><i class="ti ti-arrows-sort"></i> {{ i18n.ts.rearrange }}</MkButton>
+						</div>
+					</template>
+
+					<div :class="$style.metadataRoot" class="_gaps_s">
+						<MkInfo>{{ profileI18n.mutualLinksDescription }}</MkInfo>
+						<MkInfo v-if="mutualLinkSections.length > mutualLinkSectionLimit" warn>{{ profileI18nX.policyDisplayLimitExceeded({ max: mutualLinkSectionLimit }) }}</MkInfo>
+
+						<MkDraggable
+							v-model="mutualLinkSections"
+							direction="vertical"
+							withGaps
+							manualDragStart
+						>
+							<template #default="{ item: section, dragStart }">
+								<div v-panel :class="$style.mutualLinkSectionDragItem">
+									<button v-if="!mutualLinkEditMode" class="_button" :class="$style.dragItemHandle" tabindex="-1" :draggable="true" @dragstart.stop="dragStart"><i class="ti ti-menu"></i></button>
+									<button v-if="mutualLinkEditMode" class="_button" :class="$style.dragItemRemove" @click="deleteMutualLinkSection(section.id)"><i class="ti ti-x"></i></button>
+
+									<div :class="$style.dragItemForm" class="_gaps_s">
+										<MkInput v-model="section.name" small :placeholder="profileI18n.sectionName">
+											<template #label>{{ profileI18n.sectionName }}</template>
+										</MkInput>
+
+										<MkButton :disabled="section.mutualLinks.length >= mutualLinkLimit" @click="addMutualLink(section.id)"><i class="ti ti-plus"></i> {{ profileI18n.addMutualLink }}</MkButton>
+										<MkInfo v-if="section.mutualLinks.length > mutualLinkLimit" warn>{{ profileI18nX.policyDisplayLimitExceeded({ max: mutualLinkLimit }) }}</MkInfo>
+
+										<MkDraggable
+											v-model="section.mutualLinks"
+											direction="vertical"
+											withGaps
+											manualDragStart
+										>
+											<template #default="{ item: link, dragStart: dragStartLink }">
+												<div v-panel :class="$style.mutualLinkDragItem">
+													<button v-if="!mutualLinkEditMode" class="_button" :class="$style.dragItemHandle" tabindex="-1" :draggable="true" @dragstart.stop="dragStartLink"><i class="ti ti-menu"></i></button>
+													<button v-if="mutualLinkEditMode" class="_button" :class="$style.dragItemRemove" @click="deleteMutualLink(section.id, link.id)"><i class="ti ti-x"></i></button>
+
+													<div :class="$style.dragItemForm" class="_gaps_s">
+														<MkInput v-model="link.url" small type="url">
+															<template #label>{{ profileI18n.mutualLinksUrl }}</template>
+														</MkInput>
+														<MkInput v-model="link.name" small>
+															<template #label>{{ profileI18n.mutualLinksName }}</template>
+														</MkInput>
+														<div :class="$style.mutualLinkBannerRow">
+															<img v-if="link.avatarUrl" :class="$style.mutualLinkImg" :src="link.avatarUrl" :alt="link.name">
+															<MkButton @click="changeMutualLinkFile(section.id, link.id)"><i class="ti ti-photo"></i> {{ profileI18n.selectMutualLinkBanner }}</MkButton>
+														</div>
+													</div>
+												</div>
+											</template>
+										</MkDraggable>
+									</div>
+								</div>
+							</template>
+						</MkDraggable>
+					</div>
+				</MkFolder>
+				<template #caption>{{ profileI18n.mutualLinksDescription }}</template>
+			</FormSlot>
+		</SearchMarker>
+
 		<SearchMarker :keywords="['follow', 'message']">
 			<MkInput v-model="profile.followedMessage" :max="200" manualSave :mfmPreview="false">
 				<template #label><SearchLabel>{{ i18n.ts._profile.followedMessage }}</SearchLabel></template>
@@ -164,6 +237,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, reactive, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
+import { apiUrl } from '@@/js/config.js';
 import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
@@ -186,6 +260,68 @@ import MkTextarea from '@/components/MkTextarea.vue';
 import { genId } from '@/utility/id.js';
 
 const $i = ensureSignin();
+
+type MutualLink = {
+	id: string;
+	name?: string;
+	url?: string;
+	avatarUrl?: string;
+};
+
+type MutualLinkSection = {
+	id?: string;
+	name?: string;
+	mutualLinks: MutualLink[];
+};
+
+type EditableMutualLink = {
+	id: string;
+	name: string;
+	url: string;
+	avatarUrl: string;
+};
+type EditableMutualLinkSection = {
+	id: string;
+	name: string;
+	mutualLinks: EditableMutualLink[];
+};
+
+type FeaturePolicies = typeof $i.policies & {
+	mutualLinkSectionLimit?: number;
+	mutualLinkLimit?: number;
+};
+
+type FeatureAccount = typeof $i & {
+	mutualLinkSections?: MutualLinkSection[];
+	policies: FeaturePolicies;
+};
+
+type FeatureEndpointRequest = Record<string, unknown>;
+
+type ProfileLocale = typeof i18n.ts._profile & {
+	mutualLinksEdit: string;
+	addMutualLinkSection: string;
+	mutualLinksDescription: string;
+	sectionName: string;
+	addMutualLink: string;
+	mutualLinksUrl: string;
+	mutualLinksName: string;
+	selectMutualLinkBanner: string;
+};
+
+type ProfileLocaleX = typeof i18n.tsx._profile & {
+	policyDisplayLimitExceeded: (args: { max: number }) => string;
+};
+
+const featureAccount = $i as FeatureAccount;
+const DEFAULT_MUTUAL_LINK_SECTION_LIMIT = 16;
+const DEFAULT_MUTUAL_LINK_LIMIT = 16;
+
+const profileI18n = i18n.ts._profile as ProfileLocale;
+const profileI18nX = i18n.tsx._profile as ProfileLocaleX;
+
+const mutualLinkSectionLimit = computed(() => featureAccount.policies.mutualLinkSectionLimit ?? DEFAULT_MUTUAL_LINK_SECTION_LIMIT);
+const mutualLinkLimit = computed(() => featureAccount.policies.mutualLinkLimit ?? DEFAULT_MUTUAL_LINK_LIMIT);
 
 const reactionAcceptance = store.model('reactionAcceptance');
 
@@ -212,6 +348,93 @@ watch(() => profile, () => {
 
 const fields = ref($i.fields.map(field => ({ id: genId(), name: field.name, value: field.value })) ?? []);
 const fieldEditMode = ref(false);
+const mutualLinkSections = ref<EditableMutualLinkSection[]>(normalizeMutualLinkSections(featureAccount.mutualLinkSections));
+const mutualLinkEditMode = ref(false);
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === 'object' && value !== null;
+}
+
+async function featureApi<Res>(endpoint: string, data: FeatureEndpointRequest): Promise<Res> {
+	const body: FeatureEndpointRequest = {
+		...data,
+		i: $i.token,
+	};
+	const res = await window.fetch(`${apiUrl}/${endpoint}`, {
+		method: 'POST',
+		body: JSON.stringify(body),
+		credentials: 'omit',
+		cache: 'no-cache',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+	});
+	const responseBody: unknown = res.status === 204 ? undefined : await res.json();
+	if (res.ok) return responseBody as Res;
+
+	if (isRecord(responseBody) && isRecord(responseBody.error) && typeof responseBody.error.message === 'string') {
+		throw new Error(responseBody.error.message);
+	}
+
+	throw new Error(`API request failed: ${endpoint}`);
+}
+
+function normalizeMutualLinkSections(sections: MutualLinkSection[] | undefined): EditableMutualLinkSection[] {
+	return (sections ?? []).map(section => ({
+		id: genId(),
+		name: section.name ?? '',
+		mutualLinks: section.mutualLinks.map(link => ({
+			id: link.id,
+			name: link.name ?? '',
+			url: link.url ?? '',
+			avatarUrl: link.avatarUrl ?? '',
+		})),
+	}));
+}
+
+function addMutualLinkSection() {
+	mutualLinkSections.value.push({
+		id: genId(),
+		name: '',
+		mutualLinks: [],
+	});
+}
+
+function addMutualLink(sectionId: string) {
+	const section = mutualLinkSections.value.find(item => item.id === sectionId);
+	if (section == null) return;
+	section.mutualLinks.push({
+		id: genId(),
+		url: '',
+		name: '',
+		avatarUrl: '',
+	});
+}
+
+function deleteMutualLinkSection(sectionId: string) {
+	mutualLinkSections.value = mutualLinkSections.value.filter(section => section.id !== sectionId);
+}
+
+function deleteMutualLink(sectionId: string, linkId: string) {
+	const section = mutualLinkSections.value.find(item => item.id === sectionId);
+	if (section == null) return;
+	section.mutualLinks = section.mutualLinks.filter(link => link.id !== linkId);
+}
+
+function createMutualLinkPayload(): MutualLinkSection[] {
+	return mutualLinkSections.value.slice(0, mutualLinkSectionLimit.value).map(section => {
+		const name = section.name.trim();
+		return {
+			...(name !== '' ? { name } : {}),
+			mutualLinks: section.mutualLinks.slice(0, mutualLinkLimit.value).map(link => ({
+				id: link.id,
+				...(link.name.trim() !== '' ? { name: link.name.trim() } : {}),
+				...(link.url.trim() !== '' ? { url: link.url.trim() } : {}),
+				...(link.avatarUrl.trim() !== '' ? { avatarUrl: link.avatarUrl.trim() } : {}),
+			})).filter(link => link.url !== undefined || link.name !== undefined || link.avatarUrl !== undefined),
+		};
+	}).filter(section => section.name !== undefined || section.mutualLinks.length > 0);
+}
 
 function addField() {
 	fields.value.push({
@@ -233,6 +456,27 @@ function saveFields() {
 	os.apiWithDialog('i/update', {
 		fields: fields.value.filter(field => field.name !== '' && field.value !== '').map(field => ({ name: field.name, value: field.value })),
 	});
+}
+
+async function saveMutualLinks() {
+	const payload = createMutualLinkPayload();
+	await os.promiseDialog(featureApi<FeatureAccount>('i/update', {
+		mutualLinkSections: payload,
+	}));
+	featureAccount.mutualLinkSections = payload;
+	mutualLinkSections.value = normalizeMutualLinkSections(payload);
+}
+
+async function changeMutualLinkFile(sectionId: string, linkId: string) {
+	const section = mutualLinkSections.value.find(item => item.id === sectionId);
+	const link = section?.mutualLinks.find(item => item.id === linkId);
+	if (link == null) return;
+
+	const files = await chooseDriveFile({ multiple: false });
+	const file = files[0];
+	if (file == null) return;
+
+	link.avatarUrl = file.url;
 }
 
 function save() {
@@ -417,6 +661,34 @@ definePage(() => ({
 	@container (max-width: 452px) {
 		align-items: center;
 	}
+}
+
+.mutualLinkSectionDragItem {
+	display: flex;
+	padding: 10px;
+	align-items: flex-start;
+	border-radius: 6px;
+}
+
+.mutualLinkDragItem {
+	display: flex;
+	padding: 10px;
+	align-items: flex-start;
+	border-radius: 6px;
+}
+
+.mutualLinkBannerRow {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.mutualLinkImg {
+	max-width: 200px;
+	max-height: 40px;
+	object-fit: contain;
+	border-radius: var(--MI-radius);
 }
 
 .dragItemHandle {

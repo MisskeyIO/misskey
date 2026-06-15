@@ -73,6 +73,7 @@ export class FileServerService {
 
 	@bindThis
 	public createServer(fastify: FastifyInstance, options: FastifyPluginOptions, done: (err?: Error) => void) {
+		void options;
 		fastify.addHook('onRequest', (request, reply, done) => {
 			reply.header('Content-Security-Policy', 'default-src \'none\'; img-src \'self\'; media-src \'self\'; style-src \'unsafe-inline\'');
 			if (process.env.NODE_ENV === 'development') {
@@ -82,8 +83,9 @@ export class FileServerService {
 		});
 
 		fastify.register((fastify, options, done) => {
+			void options;
 			fastify.addHook('onRequest', handleRequestRedirectToOmitSearch);
-			fastify.get('/files/app-default.jpg', (request, reply) => {
+			fastify.get('/files/app-default.jpg', (_request, reply) => {
 				const file = fs.createReadStream(`${this.assets}/dummy.png`);
 				reply.header('Content-Type', 'image/jpeg');
 				reply.header('Cache-Control', 'max-age=31536000, immutable');
@@ -101,9 +103,16 @@ export class FileServerService {
 		});
 
 		fastify.get<{
-			Params: { url: string; };
+			Params: { type: string; url: string; };
 			Querystring: { url?: string; };
-		}>('/proxy/:url*', async (request, reply) => {
+		}>('/proxy/:type/:url(.*)', async (request, reply) => {
+			return await this.proxyHandler.handle(request, reply)
+				.catch(err => this.errorHandler(request, reply, err));
+		});
+		fastify.get<{
+			Params: { url: string; type?: string; };
+			Querystring: { url?: string; };
+		}>('/proxy/:url(.*)', async (request, reply) => {
 			return await this.proxyHandler.handle(request, reply)
 				.catch(err => this.errorHandler(request, reply, err));
 		});

@@ -5,12 +5,13 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import { In } from 'typeorm';
+import { EntityNotFoundError, In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { FollowRequestsRepository, NotesRepository, MiUser, UsersRepository } from '@/models/_.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
 import type { MiGroupedNotification, MiNotification } from '@/models/Notification.js';
 import type { MiNote } from '@/models/Note.js';
+import type { MiNoteDraft } from '@/models/NoteDraft.js';
 import type { Packed } from '@/misc/json-schema.js';
 import { bindThis } from '@/decorators.js';
 import { FilterUnionByProperty, groupedNotificationTypes } from '@/types.js';
@@ -20,6 +21,7 @@ import { ChatEntityService } from './ChatEntityService.js';
 import type { OnModuleInit } from '@nestjs/common';
 import type { UserEntityService } from './UserEntityService.js';
 import type { NoteEntityService } from './NoteEntityService.js';
+import type { NoteDraftEntityService } from './NoteDraftEntityService.js';
 
 const NOTE_REQUIRED_NOTIFICATION_TYPES = new Set([
 	'note',
@@ -38,6 +40,7 @@ const NOTE_REQUIRED_NOTIFICATION_TYPES = new Set([
 export class NotificationEntityService implements OnModuleInit {
 	private userEntityService: UserEntityService;
 	private noteEntityService: NoteEntityService;
+	private noteDraftEntityService: NoteDraftEntityService;
 	private roleEntityService: RoleEntityService;
 	private chatEntityService: ChatEntityService;
 
@@ -60,8 +63,18 @@ export class NotificationEntityService implements OnModuleInit {
 	onModuleInit() {
 		this.userEntityService = this.moduleRef.get('UserEntityService');
 		this.noteEntityService = this.moduleRef.get('NoteEntityService');
+		this.noteDraftEntityService = this.moduleRef.get('NoteDraftEntityService');
 		this.roleEntityService = this.moduleRef.get('RoleEntityService');
 		this.chatEntityService = this.moduleRef.get('ChatEntityService');
+	}
+
+	async #packNoteDraft(noteDraftId: MiNoteDraft['id'], meId: MiUser['id']): Promise<Packed<'NoteDraft'> | null> {
+		try {
+			return await this.noteDraftEntityService.pack(noteDraftId, { id: meId });
+		} catch (err) {
+			if (err instanceof EntityNotFoundError) return null;
+			throw err;
+		}
 	}
 
 	/**
@@ -93,6 +106,10 @@ export class NotificationEntityService implements OnModuleInit {
 		// if the note has been deleted, don't show this notification
 		if (needsNote && !noteIfNeed) return null;
 
+		const needsNoteDraft = notification.type === 'scheduledNotePostFailed';
+		const noteDraftIfNeed = needsNoteDraft ? await this.#packNoteDraft(notification.noteDraftId, meId) : undefined;
+		if (needsNoteDraft && noteDraftIfNeed == null) return null;
+
 		const needsUser = 'notifierId' in notification;
 		const userIfNeed = needsUser ? (
 			hint?.packedUsers != null
@@ -104,7 +121,7 @@ export class NotificationEntityService implements OnModuleInit {
 
 		//#region Grouped notifications
 		if (notification.type === 'reaction:grouped') {
-			const reactions = (await Promise.all(notification.reactions.map(async reaction => {
+			const reactions = (await Promise.allSettled(notification.reactions.map(async reaction => {
 				const user = hint?.packedUsers != null
 					? hint.packedUsers.get(reaction.userId)!
 					: await this.userEntityService.pack(reaction.userId, { id: meId });
@@ -112,7 +129,10 @@ export class NotificationEntityService implements OnModuleInit {
 					user,
 					reaction: reaction.reaction,
 				};
-			}))).filter(r => r.user != null);
+			})))
+				.filter(result => result.status === 'fulfilled')
+				.map(result => result.value)
+				.filter(r => r.user != null);
 			// if all users have been deleted, don't show this notification
 			if (reactions.length === 0) {
 				return null;
@@ -126,14 +146,17 @@ export class NotificationEntityService implements OnModuleInit {
 				reactions,
 			});
 		} else if (notification.type === 'renote:grouped') {
-			const users = (await Promise.all(notification.userIds.map(userId => {
+			const users = (await Promise.allSettled(notification.userIds.map(userId => {
 				const packedUser = hint?.packedUsers != null ? hint.packedUsers.get(userId) : null;
 				if (packedUser) {
 					return packedUser;
 				}
 
 				return this.userEntityService.pack(userId, { id: meId });
-			}))).filter(x => x != null);
+			})))
+				.filter(result => result.status === 'fulfilled')
+				.map(result => result.value)
+				.filter(x => x != null);
 			// if all users have been deleted, don't show this notification
 			if (users.length === 0) {
 				return null;
@@ -170,6 +193,7 @@ export class NotificationEntityService implements OnModuleInit {
 			userId: 'notifierId' in notification ? notification.notifierId : undefined,
 			...(userIfNeed != null ? { user: userIfNeed } : {}),
 			...(noteIfNeed != null ? { note: noteIfNeed } : {}),
+			...(noteDraftIfNeed != null ? { noteDraft: noteDraftIfNeed } : {}),
 			...(notification.type === 'reaction' ? {
 				reaction: notification.reaction,
 			} : {}),
@@ -249,7 +273,10 @@ export class NotificationEntityService implements OnModuleInit {
 			);
 		});
 
-		return (await Promise.all(packPromises)).filter(x => x != null);
+		return (await Promise.allSettled(packPromises))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => result.value)
+			.filter(x => x != null);
 	}
 
 	@bindThis
@@ -336,10 +363,13 @@ export class NotificationEntityService implements OnModuleInit {
 			where: { id: In(notifierIds) },
 		}) : [];
 
-		const filteredNotifications = ((await Promise.all(notifications.map(async (notification) => {
+		const filteredNotifications = (await Promise.allSettled(notifications.map(async (notification) => {
 			const isValid = this.#validateNotifier(notification, userIdsWhoMeMuting, userMutedInstances, notifiers);
 			return isValid ? notification : null;
-		}))) as [T | null] ).filter(x => x != null);
+		})))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => result.value)
+			.filter(x => x != null);
 
 		return filteredNotifications;
 	}

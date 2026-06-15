@@ -47,6 +47,30 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</div>
 					</MkFolder>
 				</SearchMarker>
+
+				<SearchMarker v-slot="slotProps" :keywords="['url', 'preview', 'external', 'website']">
+					<MkFolder :defaultOpen="slotProps.isParentOfTarget">
+						<template #label><SearchLabel>{{ i18n.ts._urlPreviewSetting.externalWebsiteSafety }}</SearchLabel></template>
+
+						<div class="_gaps_m">
+							<SearchMarker>
+								<MkTextarea v-model="wellKnownWebsites">
+									<template #label><SearchLabel>{{ i18n.ts._urlPreviewSetting.wellKnownWebsites }}</SearchLabel></template>
+									<template #caption>{{ i18n.ts._urlPreviewSetting.wellKnownWebsitesDescription }}</template>
+								</MkTextarea>
+							</SearchMarker>
+
+							<SearchMarker>
+								<MkTextarea v-model="urlPreviewDenyList">
+									<template #label><SearchLabel>{{ i18n.ts._urlPreviewSetting.urlPreviewDenyList }}</SearchLabel></template>
+									<template #caption>{{ i18n.ts._urlPreviewSetting.urlPreviewDenyListDescription }}</template>
+								</MkTextarea>
+							</SearchMarker>
+
+							<MkButton primary @click="save_urlSafety">Save</MkButton>
+						</div>
+					</MkFolder>
+				</SearchMarker>
 			</div>
 		</SearchMarker>
 	</div>
@@ -56,6 +80,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
 import MkInput from '@/components/MkInput.vue';
+import MkTextarea from '@/components/MkTextarea.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import * as os from '@/os.js';
@@ -70,6 +95,8 @@ const meta = await misskeyApi('admin/meta');
 const deeplAuthKey = ref(meta.deeplAuthKey ?? '');
 const deeplIsPro = ref(meta.deeplIsPro);
 const googleAnalyticsMeasurementId = ref(meta.googleAnalyticsMeasurementId ?? '');
+const wellKnownWebsites = ref((meta.wellKnownWebsites ?? []).join('\n'));
+const urlPreviewDenyList = ref((meta.urlPreviewDenyList ?? []).join('\n'));
 
 function save_deepl() {
 	os.apiWithDialog('admin/update-meta', {
@@ -83,6 +110,15 @@ function save_deepl() {
 function save_googleAnalytics() {
 	os.apiWithDialog('admin/update-meta', {
 		googleAnalyticsMeasurementId: googleAnalyticsMeasurementId.value,
+	}).then(() => {
+		fetchInstance(true);
+	});
+}
+
+function save_urlSafety() {
+	os.apiWithDialog('admin/update-meta', {
+		wellKnownWebsites: wellKnownWebsites.value.split('\n'),
+		urlPreviewDenyList: urlPreviewDenyList.value.split('\n'),
 	}).then(() => {
 		fetchInstance(true);
 	});

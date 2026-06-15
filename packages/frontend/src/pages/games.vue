@@ -18,17 +18,28 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</MkA>
 			</div>
 		</div>
+		<MkPagination v-slot="{items}" :paginator="featuredPaginator">
+			<MkChannelPreview v-for="channel in items" :key="channel.id" class="_margin" :channel="channel"/>
+		</MkPagination>
 	</div>
 </PageWithHeader>
 </template>
 
 <script lang="ts" setup>
-import { i18n } from '@/i18n.js';
+import { markRaw } from 'vue';
 import { definePage } from '@/page.js';
+import MkPagination from '@/components/MkPagination.vue';
+import MkChannelPreview from '@/components/MkChannelPreview.vue';
+import { Paginator } from '@/utility/paginator.js';
 
 definePage(() => ({
 	title: 'Misskey Games',
 	icon: 'ti ti-device-gamepad',
+}));
+
+const featuredPaginator = markRaw(new Paginator('channels/featured-games', {
+	limit: 10,
+	noPaging: true,
 }));
 </script>
 

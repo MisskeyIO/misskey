@@ -101,15 +101,36 @@ type GridItem = {
 	category: string;
 	aliases: string;
 	license: string;
+	requestedBy: string;
+	memo: string;
 	isSensitive: boolean;
 	localOnly: boolean;
 	roleIdsThatCanBeUsedThisEmojiAsReaction: { id: string, name: string }[];
+	roleIdsThatCanNotBeUsedThisEmojiAsReaction: { id: string, name: string }[];
 	fileId?: string;
 	updatedAt: string | null;
 	publicUrl?: string | null;
 	originalUrl?: string | null;
 	type: string | null;
 };
+
+type EmojiDetailedAdminWithFeature10Fields = Misskey.entities.EmojiDetailedAdmin & {
+	requestedBy?: string | null;
+	memo?: string | null;
+	roleIdsThatCanNotBeUsedThisEmojiAsReaction?: { id: string, name: string }[];
+};
+
+type AdminEmojiUpdateRequestWithFeature10Fields = Misskey.entities.AdminEmojiUpdateRequest & {
+	requestedBy: string | null;
+	memo: string | null;
+	roleIdsThatCanNotBeUsedThisEmojiAsReaction: string[];
+};
+
+const rolesThatCanNotBeUsedThisEmojiAsReactionLabel = typeof i18n.ts.rolesThatCanNotBeUsedThisEmojiAsReaction === 'string' ? i18n.ts.rolesThatCanNotBeUsedThisEmojiAsReaction : 'rolesThatCanNotBeUsedThisEmojiAsReaction';
+const rolesThatCanNotBeUsedThisEmojiAsReactionEmptyDescription = typeof i18n.ts.rolesThatCanNotBeUsedThisEmojiAsReactionEmptyDescription === 'string' ? i18n.ts.rolesThatCanNotBeUsedThisEmojiAsReactionEmptyDescription : '';
+const rolesThatCanBeUsedThisEmojiAsReactionLabel = typeof i18n.ts.rolesThatCanBeUsedThisEmojiAsReaction === 'string' ? i18n.ts.rolesThatCanBeUsedThisEmojiAsReaction : 'rolesThatCanBeUsedThisEmojiAsReaction';
+const requestedByLabel = typeof i18n.ts.requestedBy === 'string' ? i18n.ts.requestedBy : 'requestedBy';
+const memoLabel = typeof i18n.ts.memo === 'string' ? i18n.ts.memo : 'memo';
 
 function setupGrid(): GridSetting {
 	const $style = useCssModule();
@@ -192,10 +213,12 @@ function setupGrid(): GridSetting {
 			{ bindTo: 'category', title: 'category', type: 'text', editable: true, width: 140 },
 			{ bindTo: 'aliases', title: 'aliases', type: 'text', editable: true, width: 140 },
 			{ bindTo: 'license', title: 'license', type: 'text', editable: true, width: 140 },
+			{ bindTo: 'requestedBy', title: requestedByLabel, type: 'text', editable: true, width: 140 },
+			{ bindTo: 'memo', title: memoLabel, type: 'text', editable: true, width: 140 },
 			{ bindTo: 'isSensitive', title: 'sensitive', type: 'boolean', editable: true, width: 90 },
 			{ bindTo: 'localOnly', title: 'localOnly', type: 'boolean', editable: true, width: 90 },
 			{
-				bindTo: 'roleIdsThatCanBeUsedThisEmojiAsReaction', title: 'role', type: 'text', editable: true, width: 140,
+				bindTo: 'roleIdsThatCanBeUsedThisEmojiAsReaction', title: rolesThatCanBeUsedThisEmojiAsReactionLabel, type: 'text', editable: true, width: 180,
 				valueTransformer(row) {
 					// バックエンドからからはIDと名前のペア配列で受け取るが、表示にIDがあると煩雑なので名前だけにする
 					return gridItems.value[row.index].roleIdsThatCanBeUsedThisEmojiAsReaction
@@ -225,6 +248,40 @@ function setupGrid(): GridSetting {
 					delete(cell) {
 						// デフォルトはundefinedになるが、このプロパティは空配列にしたい
 						gridItems.value[cell.row.index].roleIdsThatCanBeUsedThisEmojiAsReaction = [];
+					},
+				},
+			},
+			{
+				bindTo: 'roleIdsThatCanNotBeUsedThisEmojiAsReaction', title: rolesThatCanNotBeUsedThisEmojiAsReactionLabel, type: 'text', editable: true, width: 180,
+				valueTransformer(row) {
+					// バックエンドからからはIDと名前のペア配列で受け取るが、表示にIDがあると煩雑なので名前だけにする
+					return gridItems.value[row.index].roleIdsThatCanNotBeUsedThisEmojiAsReaction
+						.map((it) => it.name)
+						.join(',');
+				},
+				async customValueEditor(row) {
+					// ID直記入は体験的に最悪なのでモーダルを使って入力する
+					const current = gridItems.value[row.index].roleIdsThatCanNotBeUsedThisEmojiAsReaction;
+					const result = await os.selectRole({
+						initialRoleIds: current.map(it => it.id),
+						title: rolesThatCanNotBeUsedThisEmojiAsReactionLabel,
+						infoMessage: rolesThatCanNotBeUsedThisEmojiAsReactionEmptyDescription,
+						publicOnly: true,
+					});
+					if (result.canceled) {
+						return current;
+					}
+
+					const transform = result.result.map(it => ({ id: it.id, name: it.name }));
+					gridItems.value[row.index].roleIdsThatCanNotBeUsedThisEmojiAsReaction = transform;
+
+					return transform;
+				},
+				events: {
+					paste: roleIdsParser,
+					delete(cell) {
+						// デフォルトはundefinedになるが、このプロパティは空配列にしたい
+						gridItems.value[cell.row.index].roleIdsThatCanNotBeUsedThisEmojiAsReaction = [];
 					},
 				},
 			},
@@ -273,7 +330,7 @@ function setupGrid(): GridSetting {
 
 const loadingHandler = useLoading();
 
-const customEmojis = ref<Misskey.entities.EmojiDetailedAdmin[]>([]);
+const customEmojis = ref<EmojiDetailedAdminWithFeature10Fields[]>([]);
 const allPages = ref<number>(0);
 const currentPage = ref<number>(0);
 
@@ -331,24 +388,30 @@ async function onUpdateButtonClicked() {
 	}
 
 	const action = () => {
-		return updatedItems.map(item =>
-			misskeyApi(
+		return updatedItems.map(item => {
+			const params = {
+				// eslint-disable-next-line
+				id: item.id!,
+				name: item.name,
+				category: emptyStrToNull(item.category),
+				aliases: emptyStrToEmptyArray(item.aliases),
+				license: emptyStrToNull(item.license),
+				requestedBy: emptyStrToNull(item.requestedBy),
+				memo: emptyStrToNull(item.memo),
+				isSensitive: item.isSensitive,
+				localOnly: item.localOnly,
+				roleIdsThatCanBeUsedThisEmojiAsReaction: item.roleIdsThatCanBeUsedThisEmojiAsReaction.map(it => it.id),
+				roleIdsThatCanNotBeUsedThisEmojiAsReaction: item.roleIdsThatCanNotBeUsedThisEmojiAsReaction.map(it => it.id),
+				fileId: item.fileId,
+			} satisfies AdminEmojiUpdateRequestWithFeature10Fields;
+
+			return misskeyApi(
 				'admin/emoji/update',
-				{
-					// eslint-disable-next-line
-					id: item.id!,
-					name: item.name,
-					category: emptyStrToNull(item.category),
-					aliases: emptyStrToEmptyArray(item.aliases),
-					license: emptyStrToNull(item.license),
-					isSensitive: item.isSensitive,
-					localOnly: item.localOnly,
-					roleIdsThatCanBeUsedThisEmojiAsReaction: item.roleIdsThatCanBeUsedThisEmojiAsReaction.map(it => it.id),
-					fileId: item.fileId,
-				})
+				params,
+			)
 				.then(() => ({ item, success: true, err: undefined }))
-				.catch(err => ({ item, success: false, err })),
-		);
+				.catch(err => ({ item, success: false, err }));
+		});
 	};
 
 	const result = await os.promiseDialog(Promise.all(action()));
@@ -506,9 +569,12 @@ function refreshGridItems() {
 		category: it.category ?? '',
 		aliases: it.aliases.join(' '),
 		license: it.license ?? '',
+		requestedBy: it.requestedBy ?? '',
+		memo: it.memo ?? '',
 		isSensitive: it.isSensitive,
 		localOnly: it.localOnly,
 		roleIdsThatCanBeUsedThisEmojiAsReaction: it.roleIdsThatCanBeUsedThisEmojiAsReaction,
+		roleIdsThatCanNotBeUsedThisEmojiAsReaction: it.roleIdsThatCanNotBeUsedThisEmojiAsReaction ?? [],
 		updatedAt: it.updatedAt,
 		publicUrl: it.publicUrl,
 		originalUrl: it.originalUrl,

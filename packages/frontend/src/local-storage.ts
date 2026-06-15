@@ -14,8 +14,12 @@ export type Keys = (
 	'neverShowLocalOnlyInfo' |
 	'modifiedVersionMustProminentlyOfferInAgplV3Section13Read' |
 	'lastUsed' |
+	'id' |
 	'lang' |
 	'drafts' |
+	'sensitiveContentConsent' |
+	'gaConsent' |
+	'gtagConsent' |
 	'hashtags' |
 	'colorScheme' |
 	'useSystemFont' |
@@ -33,6 +37,7 @@ export type Keys = (
 	'preferences' |
 	'latestPreferencesUpdate' |
 	'hidePreferencesRestoreSuggestion' |
+	`languagePreferencesInitialized:${string}` |
 	'isSafeMode' |
 	`miux:${string}` |
 	`ui:folder:${string}` |

@@ -37,6 +37,7 @@ export class HomeTimelineChannel extends Channel {
 	public async init(params: JsonObject) {
 		this.withRenotes = !!(params.withRenotes ?? true);
 		this.withFiles = !!(params.withFiles ?? false);
+		this.setViewerDimension(params);
 
 		this.subscriber.on('notesStream', this.onNote);
 	}
@@ -58,6 +59,8 @@ export class HomeTimelineChannel extends Channel {
 		}
 
 		if (!this.isNoteVisibleForMe(note)) return;
+		if (!this.shouldDeliverByDimension(note)) return;
+		if (!(await this.noteEntityService.isLanguageVisibleToMe(note, this.user?.id))) return;
 
 		if (note.reply) {
 			const reply = note.reply;

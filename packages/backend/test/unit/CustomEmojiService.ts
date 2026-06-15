@@ -15,13 +15,16 @@ import { DI } from '@/di-symbols.js';
 import { GlobalModule } from '@/GlobalModule.js';
 import { EmojisRepository } from '@/models/_.js';
 import { MiEmoji } from '@/models/Emoji.js';
+import { MiMeta } from '@/models/Meta.js';
 
 describe('CustomEmojiService', () => {
 	let app: TestingModule;
 	let service: CustomEmojiService;
+	let emojiEntityService: EmojiEntityService;
 
 	let emojisRepository: EmojisRepository;
 	let idService: IdService;
+	let meta: MiMeta;
 
 	beforeAll(async () => {
 		app = await Test
@@ -42,8 +45,10 @@ describe('CustomEmojiService', () => {
 		app.enableShutdownHooks();
 
 		service = app.get<CustomEmojiService>(CustomEmojiService);
+		emojiEntityService = app.get<EmojiEntityService>(EmojiEntityService);
 		emojisRepository = app.get<EmojisRepository>(DI.emojisRepository);
 		idService = app.get<IdService>(IdService);
+		meta = app.get<MiMeta>(DI.meta);
 	});
 
 	describe('fetchEmojis', () => {
@@ -80,13 +85,17 @@ describe('CustomEmojiService', () => {
 				license: 'CC0',
 				isSensitive: false,
 				localOnly: false,
+				requestedBy: null,
+				memo: '',
 				roleIdsThatCanBeUsedThisEmojiAsReaction: [],
+				roleIdsThatCanNotBeUsedThisEmojiAsReaction: [],
 				...override,
 			};
 		}
 
 		afterEach(async () => {
 			await emojisRepository.createQueryBuilder().delete().execute();
+			meta.blockedRemoteCustomEmojis = [];
 		});
 
 		describe('単独', () => {
@@ -811,6 +820,70 @@ describe('CustomEmojiService', () => {
 					expect(actual.emojis[1].name).toBe('emoji002');
 					expect(actual.emojis[2].name).toBe('emoji003');
 				});
+			});
+		});
+
+		describe('blockedRemoteCustomEmojis', () => {
+			test('populateEmoji returns null when remote emoji is blocked', async () => {
+				await insert([
+					defaultData('001', {
+						name: 'blockedone',
+						host: 'remote.example',
+					}),
+				]);
+
+				meta.blockedRemoteCustomEmojis = ['blockedone@remote.example'];
+
+				const actual = await service.populateEmoji('blockedone@remote.example', 'remote.example');
+
+				expect(actual).toBeNull();
+			});
+
+			test('removeBlockedRemoteCustomEmojis removes matching remote emojis only', async () => {
+				await insert([
+					defaultData('001', {
+						name: 'blockedone',
+						host: 'remote.example',
+					}),
+					defaultData('002', {
+						name: 'allowed',
+						host: 'remote.example',
+					}),
+					defaultData('003', {
+						name: 'blockedone',
+						host: null,
+					}),
+				]);
+
+				await service.removeBlockedRemoteCustomEmojis(['blockedone@remote.example']);
+
+				const remaining = await emojisRepository.find({ order: { name: 'ASC', host: 'ASC' } });
+
+				expect(remaining.map(emoji => `${emoji.name}@${emoji.host ?? '.'}`)).toStrictEqual([
+					'allowed@remote.example',
+					'blockedone@.',
+				]);
+			});
+		});
+
+		describe('packInternal', () => {
+			test('includes admin fields', async () => {
+				await insert([
+					defaultData('001', {
+						requestedBy: 'alice',
+						memo: '申請理由メモ',
+						roleIdsThatCanBeUsedThisEmojiAsReaction: ['role-allow'],
+						roleIdsThatCanNotBeUsedThisEmojiAsReaction: ['role-deny'],
+					}),
+				]);
+
+				const emoji = await emojisRepository.findOneByOrFail({ name: 'emoji001' });
+				const actual = await emojiEntityService.packInternal(emoji);
+
+				expect(actual.requestedBy).toBe('alice');
+				expect(actual.memo).toBe('申請理由メモ');
+				expect(actual.roleIdsThatCanBeUsedThisEmojiAsReaction).toStrictEqual(['role-allow']);
+				expect(actual.roleIdsThatCanNotBeUsedThisEmojiAsReaction).toStrictEqual(['role-deny']);
 			});
 		});
 	});

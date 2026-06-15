@@ -16,6 +16,8 @@ import { bindThis } from '@/decorators.js';
 import { DebounceLoader } from '@/misc/loader.js';
 import { IdService } from '@/core/IdService.js';
 import { shouldHideNoteByTime } from '@/misc/should-hide-note-by-time.js';
+import { shouldDeliverByDimension } from '@/misc/dimension.js';
+import { isNoteLanguageVisible, resolveNoteLang } from '@/misc/langmap.js';
 import { ReactionsBufferingService } from '@/core/ReactionsBufferingService.js';
 import { CacheService } from '@/core/CacheService.js';
 import type { OnModuleInit } from '@nestjs/common';
@@ -23,6 +25,7 @@ import type { CustomEmojiService } from '../CustomEmojiService.js';
 import type { ReactionService } from '../ReactionService.js';
 import type { UserEntityService } from './UserEntityService.js';
 import type { DriveFileEntityService } from './DriveFileEntityService.js';
+import type { MiNoteLanguage, NoteLanguagesRepository, UserLanguagesRepository } from '@/models/_.js';
 
 // is-renote.tsとよしなにリンク
 function isPureRenote(note: MiNote): note is MiNote & { renoteId: MiNote['id']; renote: MiNote } {
@@ -96,6 +99,12 @@ export class NoteEntityService implements OnModuleInit {
 
 		@Inject(DI.channelsRepository)
 		private channelsRepository: ChannelsRepository,
+
+		@Inject(DI.noteLanguagesRepository)
+		private noteLanguagesRepository: NoteLanguagesRepository,
+
+		@Inject(DI.userLanguagesRepository)
+		private userLanguagesRepository: UserLanguagesRepository,
 
 		//private userEntityService: UserEntityService,
 		//private driveFileEntityService: DriveFileEntityService,
@@ -351,7 +360,8 @@ export class NoteEntityService implements OnModuleInit {
 				bufferedReactions: Map<MiNote['id'], { deltas: Record<string, number>; pairs: ([MiUser['id'], string])[] }> | null;
 				myReactions: Map<MiNote['id'], string | null>;
 				packedFiles: Map<MiNote['fileIds'][number], Packed<'DriveFile'> | null>;
-				packedUsers: Map<MiUser['id'], Packed<'UserLite'>>
+				packedUsers: Map<MiUser['id'], Packed<'UserLite'>>;
+				noteLanguages: Map<MiNote['id'], MiNoteLanguage>;
 			};
 		},
 	): Promise<Packed<'Note'>> {
@@ -391,10 +401,13 @@ export class NoteEntityService implements OnModuleInit {
 			.map(x => this.reactionService.decodeReaction(x).reaction.replaceAll(':', ''));
 		const packedFiles = options?._hint_?.packedFiles;
 		const packedUsers = options?._hint_?.packedUsers;
+		const noteLanguage = options?._hint_?.noteLanguages.get(note.id)
+			?? await this.noteLanguagesRepository.findOneBy({ noteId: note.id });
 
 		const packed: Packed<'Note'> = await awaitAll({
 			id: note.id,
 			createdAt: this.idService.parse(note.id).date.toISOString(),
+			lang: resolveNoteLang(noteLanguage?.lang, note.userHost != null),
 			userId: note.userId,
 			user: packedUsers?.get(note.userId) ?? this.userEntityService.pack(note.user ?? note.userId, me),
 			text: text,
@@ -428,6 +441,7 @@ export class NoteEntityService implements OnModuleInit {
 			hasPoll: note.hasPoll || undefined,
 			uri: note.uri ?? undefined,
 			url: note.url ?? undefined,
+			dimension: note.dimension,
 
 			...(opts.detail ? {
 				clippedCount: note.clippedCount,
@@ -470,12 +484,26 @@ export class NoteEntityService implements OnModuleInit {
 	}
 
 	@bindThis
+	public async isLanguageVisibleToMe(note: Packed<'Note'>, meId: MiUser['id'] | null | undefined): Promise<boolean> {
+		if (meId == null || meId === note.userId) return true;
+
+		const preference = await this.userLanguagesRepository.findOneBy({ userId: meId });
+		return isNoteLanguageVisible({
+			noteLang: note.lang,
+			isRemote: note.user.host != null,
+			hasMedia: (note.fileIds?.length ?? 0) > 0,
+			hasTags: (note.tags?.length ?? 0) > 0,
+		}, preference);
+	}
+
+	@bindThis
 	public async packMany(
 		notes: MiNote[],
 		me?: { id: MiUser['id'] } | null | undefined,
 		options?: {
 			detail?: boolean;
 			skipHide?: boolean;
+			viewerDimension?: number | null;
 		},
 	) {
 		if (notes.length === 0) return [];
@@ -549,16 +577,34 @@ export class NoteEntityService implements OnModuleInit {
 		];
 		const packedUsers = await this.userEntityService.packMany(users, me)
 			.then(users => new Map(users.map(u => [u.id, u])));
+		const noteIds = notes.map(note => note.id);
+		const noteLanguages = await this.noteLanguagesRepository.findBy({ noteId: In(noteIds) })
+			.then(languages => new Map(languages.map(language => [language.noteId, language])));
+		const userLanguage = meId == null ? null : await this.userLanguagesRepository.findOneBy({ userId: meId });
 
-		return await Promise.all(notes.map(n => this.pack(n, me, {
+		const packedNotes = (await Promise.allSettled(notes.map(n => this.pack(n, me, {
 			...options,
 			_hint_: {
 				bufferedReactions,
 				myReactions: myReactionsMap,
 				packedFiles,
 				packedUsers,
+				noteLanguages,
 			},
-		})));
+		}))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => result.value);
+
+		const languageFilteredNotes = packedNotes.filter(note => meId === note.userId || isNoteLanguageVisible({
+			noteLang: note.lang,
+			isRemote: note.user.host != null,
+			hasMedia: (note.fileIds?.length ?? 0) > 0,
+			hasTags: (note.tags?.length ?? 0) > 0,
+		}, userLanguage));
+
+		if (options?.viewerDimension === undefined) return languageFilteredNotes;
+
+		return languageFilteredNotes.filter(note => shouldDeliverByDimension(note, options.viewerDimension, meId));
 	}
 
 	@bindThis

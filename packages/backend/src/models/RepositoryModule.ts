@@ -6,6 +6,7 @@
 import { Module } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import {
+	MiAbuseReportResolver,
 	MiAbuseReportNotificationRecipient,
 	MiAbuseUserReport,
 	MiAccessToken,
@@ -35,15 +36,18 @@ import {
 	MiGalleryLike,
 	MiGalleryPost,
 	MiHashtag,
+	MiIndieAuthClient,
 	MiInstance,
 	MiMeta,
 	MiModerationLog,
 	MiMuting,
 	MiNote,
+	MiNoteLanguage,
 	MiNoteFavorite,
 	MiNoteReaction,
 	MiNoteThreadMuting,
 	MiNoteDraft,
+	MiScheduledNote,
 	MiPage,
 	MiPageLike,
 	MiPasswordResetRequest,
@@ -62,16 +66,20 @@ import {
 	MiRole,
 	MiRoleAssignment,
 	MiSignin,
+	MiSingleSignOnServiceProvider,
 	MiSwSubscription,
 	MiSystemAccount,
 	MiSystemWebhook,
 	MiUsedUsername,
 	MiUser,
+	MiUserInlinePolicy,
 	MiUserIp,
 	MiUserKeypair,
+	MiUserLanguage,
 	MiUserList,
 	MiUserListFavorite,
 	MiUserListMembership,
+	MiUserAccountMoveLog,
 	MiUserMemo,
 	MiUserNotePining,
 	MiUserPending,
@@ -97,6 +105,12 @@ const $usersRepository: Provider = {
 const $notesRepository: Provider = {
 	provide: DI.notesRepository,
 	useFactory: (db: DataSource) => db.getRepository(MiNote).extend(miRepository as MiRepository<MiNote>),
+	inject: [DI.db],
+};
+
+const $noteLanguagesRepository: Provider = {
+	provide: DI.noteLanguagesRepository,
+	useFactory: (db: DataSource) => db.getRepository(MiNoteLanguage).extend(miRepository as MiRepository<MiNoteLanguage>),
 	inject: [DI.db],
 };
 
@@ -148,6 +162,12 @@ const $noteDraftsRepository: Provider = {
 	inject: [DI.db],
 };
 
+const $scheduledNotesRepository: Provider = {
+	provide: DI.scheduledNotesRepository,
+	useFactory: (db: DataSource) => db.getRepository(MiScheduledNote).extend(miRepository as MiRepository<MiScheduledNote>),
+	inject: [DI.db],
+};
+
 const $pollsRepository: Provider = {
 	provide: DI.pollsRepository,
 	useFactory: (db: DataSource) => db.getRepository(MiPoll).extend(miRepository as MiRepository<MiPoll>),
@@ -163,6 +183,12 @@ const $pollVotesRepository: Provider = {
 const $userProfilesRepository: Provider = {
 	provide: DI.userProfilesRepository,
 	useFactory: (db: DataSource) => db.getRepository(MiUserProfile).extend(miRepository as MiRepository<MiUserProfile>),
+	inject: [DI.db],
+};
+
+const $userLanguagesRepository: Provider = {
+	provide: DI.userLanguagesRepository,
+	useFactory: (db: DataSource) => db.getRepository(MiUserLanguage).extend(miRepository as MiRepository<MiUserLanguage>),
 	inject: [DI.db],
 };
 
@@ -304,9 +330,21 @@ const $hashtagsRepository: Provider = {
 	inject: [DI.db],
 };
 
+const $indieAuthClientsRepository: Provider = {
+	provide: DI.indieAuthClientsRepository,
+	useFactory: (db: DataSource) => db.getRepository(MiIndieAuthClient).extend(miRepository as MiRepository<MiIndieAuthClient>),
+	inject: [DI.db],
+};
+
 const $abuseUserReportsRepository: Provider = {
 	provide: DI.abuseUserReportsRepository,
 	useFactory: (db: DataSource) => db.getRepository(MiAbuseUserReport).extend(miRepository as MiRepository<MiAbuseUserReport>),
+	inject: [DI.db],
+};
+
+const $abuseReportResolversRepository: Provider = {
+	provide: DI.abuseReportResolversRepository,
+	useFactory: (db: DataSource) => db.getRepository(MiAbuseReportResolver).extend(miRepository as MiRepository<MiAbuseReportResolver>),
 	inject: [DI.db],
 };
 
@@ -337,6 +375,12 @@ const $accessTokensRepository: Provider = {
 const $signinsRepository: Provider = {
 	provide: DI.signinsRepository,
 	useFactory: (db: DataSource) => db.getRepository(MiSignin).extend(miRepository as MiRepository<MiSignin>),
+	inject: [DI.db],
+};
+
+const $singleSignOnServiceProvidersRepository: Provider = {
+	provide: DI.singleSignOnServiceProvidersRepository,
+	useFactory: (db: DataSource) => db.getRepository(MiSingleSignOnServiceProvider).extend(miRepository as MiRepository<MiSingleSignOnServiceProvider>),
 	inject: [DI.db],
 };
 
@@ -496,9 +540,21 @@ const $roleAssignmentsRepository: Provider = {
 	inject: [DI.db],
 };
 
+const $userInlinePoliciesRepository: Provider = {
+	provide: DI.userInlinePoliciesRepository,
+	useFactory: (db: DataSource) => db.getRepository(MiUserInlinePolicy).extend(miRepository as MiRepository<MiUserInlinePolicy>),
+	inject: [DI.db],
+};
+
 const $userMemosRepository: Provider = {
 	provide: DI.userMemosRepository,
 	useFactory: (db: DataSource) => db.getRepository(MiUserMemo).extend(miRepository as MiRepository<MiUserMemo>),
+	inject: [DI.db],
+};
+
+const $userAccountMoveLogsRepository: Provider = {
+	provide: DI.userAccountMoveLogsRepository,
+	useFactory: (db: DataSource) => db.getRepository(MiUserAccountMoveLog).extend(miRepository as MiRepository<MiUserAccountMoveLog>),
 	inject: [DI.db],
 };
 
@@ -549,6 +605,7 @@ const $reversiGamesRepository: Provider = {
 	providers: [
 		$usersRepository,
 		$notesRepository,
+		$noteLanguagesRepository,
 		$announcementsRepository,
 		$announcementReadsRepository,
 		$appsRepository,
@@ -557,9 +614,11 @@ const $reversiGamesRepository: Provider = {
 		$noteThreadMutingsRepository,
 		$noteReactionsRepository,
 		$noteDraftsRepository,
+		$scheduledNotesRepository,
 		$pollsRepository,
 		$pollVotesRepository,
 		$userProfilesRepository,
+		$userLanguagesRepository,
 		$userKeypairsRepository,
 		$userPendingsRepository,
 		$userSecurityKeysRepository,
@@ -583,12 +642,15 @@ const $reversiGamesRepository: Provider = {
 		$swSubscriptionsRepository,
 		$systemAccountsRepository,
 		$hashtagsRepository,
+		$indieAuthClientsRepository,
+		$abuseReportResolversRepository,
 		$abuseUserReportsRepository,
 		$abuseReportNotificationRecipientRepository,
 		$registrationTicketsRepository,
 		$authSessionsRepository,
 		$accessTokensRepository,
 		$signinsRepository,
+		$singleSignOnServiceProvidersRepository,
 		$pagesRepository,
 		$pageLikesRepository,
 		$galleryPostsRepository,
@@ -613,9 +675,11 @@ const $reversiGamesRepository: Provider = {
 		$retentionAggregationsRepository,
 		$rolesRepository,
 		$roleAssignmentsRepository,
+		$userInlinePoliciesRepository,
 		$flashsRepository,
 		$flashLikesRepository,
 		$userMemosRepository,
+		$userAccountMoveLogsRepository,
 		$chatMessagesRepository,
 		$chatRoomsRepository,
 		$chatRoomMembershipsRepository,
@@ -627,6 +691,7 @@ const $reversiGamesRepository: Provider = {
 	exports: [
 		$usersRepository,
 		$notesRepository,
+		$noteLanguagesRepository,
 		$announcementsRepository,
 		$announcementReadsRepository,
 		$appsRepository,
@@ -635,9 +700,11 @@ const $reversiGamesRepository: Provider = {
 		$noteThreadMutingsRepository,
 		$noteReactionsRepository,
 		$noteDraftsRepository,
+		$scheduledNotesRepository,
 		$pollsRepository,
 		$pollVotesRepository,
 		$userProfilesRepository,
+		$userLanguagesRepository,
 		$userKeypairsRepository,
 		$userPendingsRepository,
 		$userSecurityKeysRepository,
@@ -661,12 +728,15 @@ const $reversiGamesRepository: Provider = {
 		$swSubscriptionsRepository,
 		$systemAccountsRepository,
 		$hashtagsRepository,
+		$indieAuthClientsRepository,
+		$abuseReportResolversRepository,
 		$abuseUserReportsRepository,
 		$abuseReportNotificationRecipientRepository,
 		$registrationTicketsRepository,
 		$authSessionsRepository,
 		$accessTokensRepository,
 		$signinsRepository,
+		$singleSignOnServiceProvidersRepository,
 		$pagesRepository,
 		$pageLikesRepository,
 		$galleryPostsRepository,
@@ -691,9 +761,11 @@ const $reversiGamesRepository: Provider = {
 		$retentionAggregationsRepository,
 		$rolesRepository,
 		$roleAssignmentsRepository,
+		$userInlinePoliciesRepository,
 		$flashsRepository,
 		$flashLikesRepository,
 		$userMemosRepository,
+		$userAccountMoveLogsRepository,
 		$chatMessagesRepository,
 		$chatRoomsRepository,
 		$chatRoomMembershipsRepository,

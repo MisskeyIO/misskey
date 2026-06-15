@@ -6,7 +6,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <MkContainer :style="`height: ${widgetProps.height}px;`" :showHeader="widgetProps.showHeader" :scrollable="true" class="mkw-bdayfollowings">
 	<template #icon><i class="ti ti-cake"></i></template>
-	<template #header>{{ i18n.ts._widgets.birthdayFollowings }}</template>
+	<template v-if="widgetProps.period === 'today'" #header>{{ i18n.ts._widgets.birthdayFollowings }}</template>
+	<template v-else #header>{{ i18n.ts._widgets.birthdaySoon }}</template>
 	<template #func="{ buttonStyleClass }"><button class="_button" :class="buttonStyleClass" @click="fetch"><i class="ti ti-refresh"></i></button></template>
 
 	<MkPagination v-slot="{ items }" :paginator="birthdayUsersPaginator">

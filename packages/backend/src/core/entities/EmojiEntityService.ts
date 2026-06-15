@@ -10,6 +10,7 @@ import type { EmojisRepository, MiRole, RolesRepository } from '@/models/_.js';
 import type { Packed } from '@/misc/json-schema.js';
 import type { MiEmoji } from '@/models/Emoji.js';
 import { bindThis } from '@/decorators.js';
+import { IdService } from '@/core/IdService.js';
 
 @Injectable()
 export class EmojiEntityService {
@@ -18,6 +19,8 @@ export class EmojiEntityService {
 		private emojisRepository: EmojisRepository,
 		@Inject(DI.rolesRepository)
 		private rolesRepository: RolesRepository,
+
+		private idService: IdService,
 	) {
 	}
 
@@ -36,14 +39,16 @@ export class EmojiEntityService {
 			localOnly: emoji.localOnly ? true : undefined,
 			isSensitive: emoji.isSensitive ? true : undefined,
 			roleIdsThatCanBeUsedThisEmojiAsReaction: emoji.roleIdsThatCanBeUsedThisEmojiAsReaction.length > 0 ? emoji.roleIdsThatCanBeUsedThisEmojiAsReaction : undefined,
+			roleIdsThatCanNotBeUsedThisEmojiAsReaction: emoji.roleIdsThatCanNotBeUsedThisEmojiAsReaction.length > 0 ? emoji.roleIdsThatCanNotBeUsedThisEmojiAsReaction : undefined,
 		};
 	}
 
 	@bindThis
-	public packSimpleMany(
+	public async packSimpleMany(
 		emojis: (MiEmoji['id'] | MiEmoji)[],
-	) {
-		return Promise.all(emojis.map(x => this.packSimple(x)));
+	): Promise<Packed<'EmojiSimple'>[]> {
+		const results = await Promise.allSettled(emojis.map(x => this.packSimple(x)));
+		return results.flatMap(result => result.status === 'fulfilled' ? [result.value] : []);
 	}
 
 	@bindThis
@@ -64,14 +69,41 @@ export class EmojiEntityService {
 			isSensitive: emoji.isSensitive,
 			localOnly: emoji.localOnly,
 			roleIdsThatCanBeUsedThisEmojiAsReaction: emoji.roleIdsThatCanBeUsedThisEmojiAsReaction,
+			roleIdsThatCanNotBeUsedThisEmojiAsReaction: emoji.roleIdsThatCanNotBeUsedThisEmojiAsReaction,
 		};
 	}
 
 	@bindThis
-	public packDetailedMany(
+	public async packDetailedMany(
 		emojis: (MiEmoji['id'] | MiEmoji)[],
 	): Promise<Packed<'EmojiDetailed'>[]> {
-		return Promise.all(emojis.map(x => this.packDetailed(x)));
+		const results = await Promise.allSettled(emojis.map(x => this.packDetailed(x)));
+		return results.flatMap(result => result.status === 'fulfilled' ? [result.value] : []);
+	}
+
+	@bindThis
+	public async packInternal(
+		src: MiEmoji['id'] | MiEmoji,
+	): Promise<Packed<'EmojiDetailed'>> {
+		const emoji = typeof src === 'object' ? src : await this.emojisRepository.findOneByOrFail({ id: src });
+
+		return {
+			id: emoji.id,
+			createdAt: this.idService.parse(emoji.id).date.toISOString(),
+			updatedAt: emoji.updatedAt?.toISOString() ?? null,
+			aliases: emoji.aliases,
+			name: emoji.name,
+			category: emoji.category,
+			host: emoji.host,
+			url: emoji.publicUrl || emoji.originalUrl,
+			license: emoji.license,
+			isSensitive: emoji.isSensitive,
+			localOnly: emoji.localOnly,
+			requestedBy: emoji.requestedBy,
+			memo: emoji.memo,
+			roleIdsThatCanBeUsedThisEmojiAsReaction: emoji.roleIdsThatCanBeUsedThisEmojiAsReaction,
+			roleIdsThatCanNotBeUsedThisEmojiAsReaction: emoji.roleIdsThatCanNotBeUsedThisEmojiAsReaction,
+		};
 	}
 
 	@bindThis
@@ -121,7 +153,10 @@ export class EmojiEntityService {
 			license: emoji.license,
 			localOnly: emoji.localOnly,
 			isSensitive: emoji.isSensitive,
+			requestedBy: emoji.requestedBy,
+			memo: emoji.memo,
 			roleIdsThatCanBeUsedThisEmojiAsReaction: roles.map(it => ({ id: it.id, name: it.name })),
+			roleIdsThatCanNotBeUsedThisEmojiAsReaction: emoji.roleIdsThatCanNotBeUsedThisEmojiAsReaction,
 		};
 	}
 
@@ -153,7 +188,15 @@ export class EmojiEntityService {
 			hintRoles = new Map(roles.map(x => [x.id, x]));
 		}
 
-		return Promise.all(emojis.map(x => this.packDetailedAdmin(x, { roles: hintRoles })));
+		const results = await Promise.allSettled(emojis.map(x => this.packDetailedAdmin(x, { roles: hintRoles })));
+		return results.flatMap(result => result.status === 'fulfilled' ? [result.value] : []);
+	}
+
+	@bindThis
+	public async packInternalMany(
+		emojis: (MiEmoji['id'] | MiEmoji)[],
+	): Promise<Packed<'EmojiDetailed'>[]> {
+		const results = await Promise.allSettled(emojis.map(x => this.packInternal(x)));
+		return results.flatMap(result => result.status === 'fulfilled' ? [result.value] : []);
 	}
 }
-

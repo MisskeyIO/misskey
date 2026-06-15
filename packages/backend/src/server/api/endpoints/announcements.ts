@@ -3,13 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { Brackets } from 'typeorm';
+import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { QueryService } from '@/core/QueryService.js';
 import { AnnouncementEntityService } from '@/core/entities/AnnouncementEntityService.js';
-import { DI } from '@/di-symbols.js';
-import type { AnnouncementsRepository } from '@/models/_.js';
+import { AnnouncementService } from '@/core/AnnouncementService.js';
 
 export const meta = {
 	tags: ['meta'],
@@ -43,19 +41,13 @@ export const paramDef = {
 @Injectable()
 export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
 	constructor(
-		@Inject(DI.announcementsRepository)
-		private announcementsRepository: AnnouncementsRepository,
-
 		private queryService: QueryService,
 		private announcementEntityService: AnnouncementEntityService,
+		private announcementService: AnnouncementService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.announcementsRepository.createQueryBuilder('announcement'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-				.andWhere('announcement.isActive = :isActive', { isActive: ps.isActive })
-				.andWhere(new Brackets(qb => {
-					if (me) qb.orWhere('announcement.userId = :meId', { meId: me.id });
-					qb.orWhere('announcement.userId IS NULL');
-				}));
+			const query = this.queryService.makePaginationQuery(this.announcementService.createVisibleAnnouncementsQuery(me, ps.isActive), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate);
+			this.announcementService.orderByDisplayOrder(query, ps);
 
 			const announcements = await query.limit(ps.limit).getMany();
 

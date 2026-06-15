@@ -7,7 +7,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 <MkModal
 	ref="modal"
 	:preferType="'dialog'"
-	@click="onBgClick()"
+	:hasInteractionWithOtherFocusTrappedEls="true"
+	@click="_close()"
 	@closed="onModalClosed()"
 	@esc="onEsc"
 >
@@ -18,7 +19,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		v-bind="props"
 		autofocus
 		freezeAfterPosted
-		@posted="onPosted"
+		@posting="onPosting"
+		@postError="onPostError"
 		@cancel="_close()"
 		@esc="_close()"
 	/>
@@ -30,6 +32,7 @@ import { useTemplateRef } from 'vue';
 import type { PostFormProps } from '@/types/post-form.js';
 import MkModal from '@/components/MkModal.vue';
 import MkPostForm from '@/components/MkPostForm.vue';
+import * as os from '@/os.js';
 
 const props = withDefaults(defineProps<PostFormProps & {
 	instant?: boolean;
@@ -46,7 +49,7 @@ const emit = defineEmits<{
 const modal = useTemplateRef('modal');
 const form = useTemplateRef('form');
 
-function onPosted() {
+function onPosting() {
 	modal.value?.close({
 		useSendAnimation: true,
 	});
@@ -63,8 +66,8 @@ function onEsc() {
 	_close();
 }
 
-function onBgClick() {
-	_close();
+function onPostError() {
+	os.post();
 }
 
 function onModalClosed() {

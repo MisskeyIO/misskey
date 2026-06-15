@@ -21,10 +21,11 @@ import { HttpRequestService } from '@/core/HttpRequestService.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
-import type { AccessTokensRepository, UsersRepository } from '@/models/_.js';
+import type { AccessTokensRepository, IndieAuthClientsRepository, UserProfilesRepository, UsersRepository } from '@/models/_.js';
 import { IdService } from '@/core/IdService.js';
 import { CacheService } from '@/core/CacheService.js';
 import type { MiLocalUser } from '@/models/User.js';
+import type { MiAccessToken } from '@/models/AccessToken.js';
 import { MemoryKVCache } from '@/misc/cache.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import Logger from '@/logger.js';
@@ -314,10 +315,14 @@ export class OAuth2ProviderService {
 		private config: Config,
 		private httpRequestService: HttpRequestService,
 		@Inject(DI.accessTokensRepository)
-		accessTokensRepository: AccessTokensRepository,
-		idService: IdService,
+		private accessTokensRepository: AccessTokensRepository,
+		@Inject(DI.indieAuthClientsRepository)
+		private indieAuthClientsRepository: IndieAuthClientsRepository,
+		private idService: IdService,
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
+		@Inject(DI.userProfilesRepository)
+		private userProfilesRepository: UserProfilesRepository,
 		private cacheService: CacheService,
 		loggerService: LoggerService,
 		private htmlTemplateService: HtmlTemplateService,
@@ -385,7 +390,7 @@ export class OAuth2ProviderService {
 					grantCodeCache.delete(code);
 					granted.revoked = true;
 					if (granted.grantedToken) {
-						await accessTokensRepository.delete({ token: granted.grantedToken });
+						await this.accessTokensRepository.delete({ token: granted.grantedToken });
 					}
 					return;
 				}
@@ -403,8 +408,8 @@ export class OAuth2ProviderService {
 				const now = new Date();
 
 				// NOTE: we don't have a setup for automatic token expiration
-				await accessTokensRepository.insert({
-					id: idService.gen(now.getTime()),
+				await this.accessTokensRepository.insert({
+					id: this.idService.gen(now.getTime()),
 					lastUsedAt: now,
 					userId: granted.userId,
 					token: accessToken,
@@ -415,7 +420,7 @@ export class OAuth2ProviderService {
 
 				if (granted.revoked) {
 					this.#logger.info('Canceling the token as the authorization code was revoked in parallel during the process.');
-					await accessTokensRepository.delete({ token: accessToken });
+					await this.accessTokensRepository.delete({ token: accessToken });
 					return;
 				}
 
@@ -434,6 +439,8 @@ export class OAuth2ProviderService {
 			issuer: this.config.url,
 			authorization_endpoint: new URL('/oauth/authorize', this.config.url),
 			token_endpoint: new URL('/oauth/token', this.config.url),
+			introspection_endpoint: new URL('/oauth/token/introspect', this.config.url),
+			userinfo_endpoint: new URL('/oauth/api/userinfo', this.config.url),
 			scopes_supported: kinds,
 			response_types_supported: ['code'],
 			grant_types_supported: ['authorization_code'],
@@ -441,6 +448,49 @@ export class OAuth2ProviderService {
 			code_challenge_methods_supported: ['S256'],
 			authorization_response_iss_parameter_supported: true,
 		};
+	}
+
+	@bindThis
+	private async findAccessToken(token: string, relations?: string[]): Promise<MiAccessToken | null> {
+		return await this.accessTokensRepository.findOne({
+			where: [{
+				hash: token.toLowerCase(),
+			}, {
+				token,
+			}],
+			relations,
+		});
+	}
+
+	@bindThis
+	private async authenticateBearerToken(authorization: string | undefined): Promise<MiAccessToken | null> {
+		const token = authorization?.startsWith('Bearer ')
+			? authorization.slice(7)
+			: null;
+		if (!token) return null;
+
+		const accessToken = await this.findAccessToken(token);
+		if (accessToken) {
+			await this.accessTokensRepository.update(accessToken.id, {
+				lastUsedAt: new Date(),
+			});
+		}
+		return accessToken;
+	}
+
+	@bindThis
+	private async getClientInformation(clientUrl: URL): Promise<ClientInformation> {
+		const registeredClient = await this.indieAuthClientsRepository.findOneBy({ id: clientUrl.href });
+		if (registeredClient) {
+			return {
+				id: registeredClient.id,
+				name: registeredClient.name ?? registeredClient.id,
+				redirectUris: registeredClient.redirectUris,
+				logo: null,
+			};
+		}
+
+		return await discoverClientInformation(this.#logger, this.httpRequestService, clientUrl.href);
 	}
 
 	@bindThis
@@ -487,8 +537,7 @@ export class OAuth2ProviderService {
 					}
 				}
 
-				// Find client information from the remote.
-				const clientInfo = await discoverClientInformation(this.#logger, this.httpRequestService, clientUrl.href);
+				const clientInfo = await this.getClientInformation(clientUrl);
 
 				// Require the redirect URI to be included in an explicit list, per
 				// https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics#section-4.1.3
@@ -529,7 +578,7 @@ export class OAuth2ProviderService {
 		fastify.use('/decision', this.#server.decision((req, done) => {
 			const { body } = req as OAuth2DecisionRequest;
 			this.#logger.info(`Received the decision. Cancel: ${!!body.cancel}`);
-			req.user = body.login_token;
+			if (!body.cancel) req.user = body.login_token;
 			done(null, undefined);
 		}));
 		fastify.use('/decision', this.#server.errorHandler());
@@ -550,6 +599,83 @@ export class OAuth2ProviderService {
 	}
 
 	@bindThis
+	public async createApiServer(fastify: FastifyInstance): Promise<void> {
+		fastify.register(fastifyCors);
+
+		fastify.get('/userinfo', async (request, reply) => {
+			const accessToken = await this.authenticateBearerToken(request.headers.authorization);
+			if (!accessToken) {
+				reply.code(401);
+				return;
+			}
+
+			const user = await this.usersRepository.findOneBy({ id: accessToken.userId });
+			if (!user) {
+				reply.code(401);
+				return;
+			}
+
+			const profile = await this.userProfilesRepository.findOneBy({ userId: user.id });
+			if (!profile) {
+				reply.code(401);
+				return;
+			}
+
+			const emailVerified = profile.emailVerified && profile.email != null;
+			const updatedAt = user.updatedAt ?? this.idService.parse(user.id).date;
+
+			reply.code(200);
+			return {
+				sub: user.id,
+				name: user.name ? `${user.name} (@${user.username})` : `@${user.username}`,
+				preferred_username: user.username,
+				profile: `${this.config.url}/@${user.username}`,
+				picture: user.avatarUrl ?? undefined,
+				email: emailVerified ? profile.email : `${user.username}@${this.config.hostname}`,
+				email_verified: emailVerified,
+				mfa_enabled: profile.twoFactorEnabled,
+				updated_at: Math.floor(updatedAt.getTime() / 1000),
+			};
+		});
+	}
+
+	@bindThis
+	public async createIntrospectionServer(fastify: FastifyInstance): Promise<void> {
+		fastify.register(fastifyCors);
+		fastify.addContentTypeParser('application/x-www-form-urlencoded', { parseAs: 'string' }, (_request, body, done) => {
+			const formBody = Buffer.isBuffer(body) ? body.toString('utf8') : body;
+			done(null, Object.fromEntries(new URLSearchParams(formBody)));
+		});
+
+		fastify.post<{ Body: Record<string, unknown> | undefined }>('', async (request, reply) => {
+			const callerToken = await this.authenticateBearerToken(request.headers.authorization);
+			if (!callerToken) {
+				reply.code(401);
+				return;
+			}
+
+			const token = request.body?.['token'];
+			if (typeof token !== 'string') {
+				reply.code(400);
+				return;
+			}
+
+			const accessToken = await this.findAccessToken(token, ['user']);
+			reply.code(200);
+
+			if (!accessToken) return { active: false };
+			return {
+				active: true,
+				me: accessToken.user ? `${this.config.url}/@${accessToken.user.username}` : undefined,
+				scope: accessToken.permission.join(' '),
+				client_id: accessToken.name,
+				user_id: accessToken.userId,
+				token_type: 'Bearer',
+			};
+		});
+	}
+
+	@bindThis
 	public async createTokenServer(fastify: FastifyInstance): Promise<void> {
 		fastify.register(fastifyCors);
 		fastify.post('', async () => { });
@@ -558,6 +684,7 @@ export class OAuth2ProviderService {
 		// Clients may use JSON or urlencoded
 		fastify.use('', bodyParser.urlencoded({ extended: false }));
 		fastify.use('', bodyParser.json({ strict: true }));
+
 		fastify.use('', this.#server.token());
 		fastify.use('', this.#server.errorHandler());
 	}

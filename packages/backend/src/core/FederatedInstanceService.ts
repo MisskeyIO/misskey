@@ -89,6 +89,12 @@ export class FederatedInstanceService implements OnApplicationShutdown {
 	}
 
 	@bindThis
+	public async invalidate(host: string): Promise<void> {
+		host = this.utilityService.toPuny(host);
+		await this.federatedInstanceCache.delete(host);
+	}
+
+	@bindThis
 	public async update(id: MiInstance['id'], data: Partial<MiInstance>): Promise<void> {
 		const result = await this.instancesRepository.createQueryBuilder().update()
 			.set(data)

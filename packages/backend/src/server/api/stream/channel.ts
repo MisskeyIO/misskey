@@ -8,6 +8,7 @@ import { isInstanceMuted } from '@/misc/is-instance-muted.js';
 import { isUserRelated } from '@/misc/is-user-related.js';
 import { isQuotePacked, isRenotePacked } from '@/misc/is-renote.js';
 import { isChannelRelated } from '@/misc/is-channel-related.js';
+import { normalizeDimension, shouldDeliverByDimension as shouldDeliverNoteByDimension } from '@/misc/dimension.js';
 import type { Awaitable } from '@/types.js';
 import type { Packed } from '@/misc/json-schema.js';
 import type { JsonObject, JsonValue } from '@/misc/json-value.js';
@@ -24,6 +25,7 @@ export default abstract class Channel {
 	public static readonly shouldShare: boolean;
 	public static readonly requireCredential: boolean;
 	public static readonly kind: string | null;
+	private viewerDimension: number | null = null;
 
 	protected get user() {
 		return this.connection.user;
@@ -121,6 +123,17 @@ export default abstract class Channel {
 		if (isChannelRelated(note, this.mutingChannels)) return true;
 
 		return false;
+	}
+
+	protected setViewerDimension(params: JsonObject): void {
+		this.viewerDimension = normalizeDimension(
+			typeof params.dimension === 'number' ? params.dimension : 0,
+			Number.MAX_SAFE_INTEGER,
+		);
+	}
+
+	protected shouldDeliverByDimension(note: Packed<'Note'>): boolean {
+		return shouldDeliverNoteByDimension(note, this.viewerDimension, this.user?.id);
 	}
 
 	constructor(request: ChannelRequest) {

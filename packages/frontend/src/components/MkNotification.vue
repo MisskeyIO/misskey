@@ -121,7 +121,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				{{ notification.invitation.room.name }}
 			</div>
 			<MkA v-else-if="notification.type === 'achievementEarned'" :class="$style.text" to="/my/achievements">
-				{{ i18n.ts._achievements._types[`_${notification.achievement}`].title }}
+				{{ achievementTypeLocales[`_${notification.achievement}`].title }}
 			</MkA>
 			<MkA v-else-if="notification.type === 'exportCompleted'" :class="$style.text" :to="`/my/drive/file/${notification.fileId}`">
 				{{ i18n.ts.showFile }}
@@ -188,6 +188,7 @@ import { misskeyApi } from '@/utility/misskey-api.js';
 import { ensureSignin } from '@/i.js';
 
 const $i = ensureSignin();
+const achievementTypeLocales = i18n.ts._achievements._types as Record<string, { title: string }>;
 
 const props = withDefaults(defineProps<{
 	notification: Misskey.entities.Notification;

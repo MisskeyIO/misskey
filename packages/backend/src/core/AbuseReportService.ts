@@ -4,10 +4,11 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
-import { In } from 'typeorm';
+import RE2 from 're2';
+import { In, IsNull, MoreThan } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
-import type { AbuseUserReportsRepository, MiAbuseUserReport, MiUser, UsersRepository } from '@/models/_.js';
+import type { AbuseReportResolversRepository, AbuseUserReportsRepository, MiAbuseReportResolver, MiAbuseUserReport, MiUser, UsersRepository } from '@/models/_.js';
 import { AbuseReportNotificationService } from '@/core/AbuseReportNotificationService.js';
 import { QueueService } from '@/core/QueueService.js';
 import { ApRendererService } from '@/core/activitypub/ApRendererService.js';
@@ -20,6 +21,9 @@ export class AbuseReportService {
 	constructor(
 		@Inject(DI.abuseUserReportsRepository)
 		private abuseUserReportsRepository: AbuseUserReportsRepository,
+
+		@Inject(DI.abuseReportResolversRepository)
+		private abuseReportResolversRepository: AbuseReportResolversRepository,
 
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
@@ -49,6 +53,7 @@ export class AbuseReportService {
 		reporterId: MiAbuseUserReport['reporterId'],
 		reporterHost: MiAbuseUserReport['reporterHost'],
 		comment: string,
+		category?: MiAbuseUserReport['category'],
 	}[]) {
 		const entities = params.map(param => {
 			return {
@@ -58,12 +63,15 @@ export class AbuseReportService {
 				reporterId: param.reporterId,
 				reporterHost: param.reporterHost,
 				comment: param.comment,
+				category: param.category ?? 'other',
 			};
 		});
 
 		const reports = Array.of<MiAbuseUserReport>();
 		for (const entity of entities) {
-			const report = await this.abuseUserReportsRepository.insertOne(entity);
+			let report = await this.abuseUserReportsRepository.insertOne(entity);
+			await this.resolveByResolver(report);
+			report = await this.abuseUserReportsRepository.findOneByOrFail({ id: report.id });
 			reports.push(report);
 		}
 
@@ -86,9 +94,10 @@ export class AbuseReportService {
 	public async resolve(
 		params: {
 			reportId: string;
-			resolvedAs: MiAbuseUserReport['resolvedAs'];
+			resolvedAs?: MiAbuseUserReport['resolvedAs'];
+			forward?: boolean;
 		}[],
-		moderator: MiUser,
+		moderator: MiUser | null,
 	) {
 		const paramsMap = new Map(params.map(it => [it.reportId, it]));
 		const reports = await this.abuseUserReportsRepository.findBy({
@@ -99,18 +108,22 @@ export class AbuseReportService {
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			const ps = paramsMap.get(report.id)!;
 
+			if (ps.forward === true && report.targetUserHost !== null) await this.forward(report.id, moderator);
+
 			await this.abuseUserReportsRepository.update(report.id, {
 				resolved: true,
-				assigneeId: moderator.id,
-				resolvedAs: ps.resolvedAs,
+				assigneeId: moderator?.id ?? null,
+				resolvedAs: ps.resolvedAs ?? null,
 			});
 
-			this.moderationLogService
-				.log(moderator, 'resolveAbuseReport', {
+			if (moderator != null) {
+				this.moderationLogService.log(moderator, 'resolveAbuseReport', {
 					reportId: report.id,
 					report: report,
-					resolvedAs: ps.resolvedAs,
+					forwarded: ps.forward === true && report.targetUserHost != null,
+					resolvedAs: ps.resolvedAs ?? null,
 				});
+			}
 		}
 
 		return this.abuseUserReportsRepository.findBy({ id: In(reports.map(it => it.id)) })
@@ -120,7 +133,7 @@ export class AbuseReportService {
 	@bindThis
 	public async forward(
 		reportId: MiAbuseUserReport['id'],
-		moderator: MiUser,
+		moderator: MiUser | null,
 	) {
 		const report = await this.abuseUserReportsRepository.findOneByOrFail({ id: reportId });
 
@@ -143,11 +156,63 @@ export class AbuseReportService {
 		const contextAssignedFlag = this.apRendererService.addContext(flag);
 		this.queueService.deliver(actor, contextAssignedFlag, targetUser.inbox, false);
 
-		this.moderationLogService
-			.log(moderator, 'forwardAbuseReport', {
+		if (moderator != null) {
+			this.moderationLogService.log(moderator, 'forwardAbuseReport', {
 				reportId: report.id,
 				report: report,
 			});
+		}
+	}
+
+	@bindThis
+	private async resolveByResolver(report: MiAbuseUserReport): Promise<void> {
+		const resolver = await this.findMatchingResolver(report);
+		if (resolver == null) return;
+
+		await this.resolve([{ reportId: report.id, forward: resolver.forward, resolvedAs: null }], null);
+	}
+
+	@bindThis
+	private async findMatchingResolver(report: MiAbuseUserReport): Promise<MiAbuseReportResolver | null> {
+		const resolvers = await this.abuseReportResolversRepository.find({
+			where: [
+				{ expirationDate: MoreThan(new Date()) },
+				{ expirationDate: IsNull() },
+			],
+			order: { createdAt: 'ASC' },
+		});
+
+		if (resolvers.length === 0) return null;
+
+		const [targetUser, reporter] = await Promise.all([
+			this.usersRepository.findOneBy({ id: report.targetUserId }),
+			this.usersRepository.findOneBy({ id: report.reporterId }),
+		]);
+		const targetUserValue = targetUser == null ? report.targetUserId : this.formatAcct(targetUser);
+		const reporterValue = reporter == null ? report.reporterId : this.formatAcct(reporter);
+
+		return resolvers.find(resolver => {
+			return this.matchesResolverPattern(resolver.targetUserPattern, targetUserValue)
+				&& this.matchesResolverPattern(resolver.reporterPattern, reporterValue)
+				&& this.matchesResolverPattern(resolver.reportContentPattern, report.comment);
+		}) ?? null;
+	}
+
+	@bindThis
+	private matchesResolverPattern(pattern: string | null, value: string): boolean {
+		if (pattern == null || pattern.length === 0) return true;
+
+		try {
+			return new RE2(pattern).test(value);
+		} catch (err) {
+			if (err instanceof Error) return false;
+			throw err;
+		}
+	}
+
+	@bindThis
+	private formatAcct(user: MiUser): string {
+		return user.host == null ? `@${user.username}` : `@${user.username}@${user.host}`;
 	}
 
 	@bindThis

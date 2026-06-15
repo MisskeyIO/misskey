@@ -36,7 +36,7 @@ export const paramDef = {
 		startsAt: { type: 'integer' },
 		imageUrl: { type: 'string', minLength: 1 },
 		dayOfWeek: { type: 'integer' },
-		isSensitive: { type: 'boolean' },
+		isSensitive: { type: 'boolean', default: false },
 	},
 	required: ['url', 'memo', 'place', 'priority', 'ratio', 'expiresAt', 'startsAt', 'imageUrl', 'dayOfWeek'],
 } as const;
@@ -56,7 +56,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				expiresAt: new Date(ps.expiresAt),
 				startsAt: new Date(ps.startsAt),
 				dayOfWeek: ps.dayOfWeek,
-				isSensitive: ps.isSensitive,
+				isSensitive: ps.isSensitive ?? false,
 				url: ps.url,
 				imageUrl: ps.imageUrl,
 				priority: ps.priority,

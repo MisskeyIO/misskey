@@ -64,11 +64,13 @@ export class InstanceEntityService {
 	}
 
 	@bindThis
-	public packMany(
+	public async packMany(
 		instances: MiInstance[],
 		me?: { id: MiUser['id']; } | null | undefined,
 	) {
-		return Promise.all(instances.map(x => this.pack(x, me)));
+		return (await Promise.allSettled(instances.map(x => this.pack(x, me))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => result.value);
 	}
 }
 

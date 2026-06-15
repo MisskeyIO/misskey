@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import * as fs from 'node:fs';
+import { createHash } from 'node:crypto';
+import { pipeline } from 'node:stream/promises';
+import * as Redis from 'ioredis';
 import ms from 'ms';
 import { Inject, Injectable } from '@nestjs/common';
 import { DB_MAX_IMAGE_COMMENT_LENGTH } from '@/const.js';
@@ -10,14 +14,17 @@ import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
 import { DriveService } from '@/core/DriveService.js';
-import { MiMeta } from '@/models/_.js';
+import type { DriveFilesRepository, MiMeta } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '../../../error.js';
+
+const IDEMPOTENCY_PROCESSING = '_';
 
 export const meta = {
 	tags: ['drive'],
 
 	requireCredential: true,
+	requiredRolePolicy: 'canCreateContent',
 
 	prohibitMoved: true,
 
@@ -39,6 +46,19 @@ export const meta = {
 	},
 
 	errors: {
+		invalidParam: {
+			message: 'Invalid param.',
+			code: 'INVALID_PARAM',
+			id: 'b2da4a73-a9d2-44e5-a81b-28e796874fc3',
+		},
+
+		processing: {
+			message: 'We are processing your request. Please wait a moment.',
+			code: 'PROCESSING',
+			id: 'b495d816-b077-4dc1-b135-7fde73fcca5e',
+			httpStatusCode: 202,
+		},
+
 		invalidFileName: {
 			message: 'Invalid file name.',
 			code: 'INVALID_FILE_NAME',
@@ -69,6 +89,18 @@ export const meta = {
 			code: 'UNALLOWED_FILE_TYPE',
 			id: '4becd248-7f2c-48c4-a9f0-75edc4f9a1ea',
 		},
+
+		noSuchFolder: {
+			message: 'No such folder.',
+			code: 'NO_SUCH_FOLDER',
+			id: '31ca6cdb-44f7-4b9d-bf03-4c8067dd7a1a',
+		},
+
+		failedToCreateDriveFile: {
+			message: 'Failed to create drive file.',
+			code: 'FAILED_TO_CREATE_DRIVE_FILE',
+			id: '6708863c-6791-4487-aa01-2d682c6e7db0',
+		},
 	},
 } as const;
 
@@ -87,6 +119,12 @@ export const paramDef = {
 @Injectable()
 export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
 	constructor(
+		@Inject(DI.redis)
+		private redisClient: Redis.Redis,
+
+		@Inject(DI.driveFilesRepository)
+		private driveFilesRepository: DriveFilesRepository,
+
 		@Inject(DI.meta)
 		private serverSettings: MiMeta,
 
@@ -94,24 +132,62 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private driveService: DriveService,
 	) {
 		super(meta, paramDef, async (ps, me, _, file, cleanup, ip, headers) => {
-			// Get 'name' parameter
-			let name = ps.name ?? file!.name ?? null;
-			if (name != null) {
-				name = name.trim();
-				if (name.length === 0) {
-					name = null;
-				} else if (name === 'blob') {
-					name = null;
-				} else if (!this.driveFileEntityService.validateFileName(name)) {
-					throw new ApiError(meta.errors.invalidFileName);
-				}
+			if (file == null) {
+				throw new ApiError(meta.errors.invalidParam);
 			}
 
+			let idempotencyKey: string | null = null;
+			let idempotencyLocked = false;
+
+			// Get 'name' parameter
 			try {
+				const calcHash = createHash('sha256');
+				calcHash.update(JSON.stringify([ps.folderId, ps.name, ps.isSensitive]));
+				await pipeline(fs.createReadStream(file.path, { start: 0, end: 1024 * 1024 }), calcHash);
+				const hash = calcHash.digest('base64url');
+				idempotencyKey = `drive:files:create:idempotent:${me.id}:${hash}`;
+
+				const existing = await this.redisClient.get(idempotencyKey);
+				if (existing === IDEMPOTENCY_PROCESSING) {
+					throw new ApiError(meta.errors.processing);
+				}
+				if (existing != null) {
+					const driveFile = await this.driveFilesRepository.findOneBy({ id: existing });
+					if (driveFile != null) {
+						return await this.driveFileEntityService.pack(driveFile, { self: true });
+					}
+					await this.redisClient.del(idempotencyKey);
+				}
+
+				const locked = await this.redisClient.set(idempotencyKey, IDEMPOTENCY_PROCESSING, 'EX', 30, 'NX');
+				if (locked !== 'OK') {
+					const latest = await this.redisClient.get(idempotencyKey);
+					if (latest != null && latest !== IDEMPOTENCY_PROCESSING) {
+						const driveFile = await this.driveFilesRepository.findOneBy({ id: latest });
+						if (driveFile != null) {
+							return await this.driveFileEntityService.pack(driveFile, { self: true });
+						}
+					}
+					throw new ApiError(meta.errors.processing);
+				}
+				idempotencyLocked = true;
+
+				let name = ps.name ?? file.name ?? null;
+				if (name != null) {
+					name = name.trim();
+					if (name.length === 0) {
+						name = null;
+					} else if (name === 'blob') {
+						name = null;
+					} else if (!this.driveFileEntityService.validateFileName(name)) {
+						throw new ApiError(meta.errors.invalidFileName);
+					}
+				}
+
 				// Create file
 				const driveFile = await this.driveService.addFile({
 					user: me,
-					path: file!.path,
+					path: file.path,
 					name,
 					comment: ps.comment,
 					folderId: ps.folderId,
@@ -120,8 +196,18 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					requestIp: this.serverSettings.enableIpLogging ? ip : null,
 					requestHeaders: this.serverSettings.enableIpLogging ? headers : null,
 				});
+				await this.redisClient.set(idempotencyKey, driveFile.id, 'EX', 60);
+				idempotencyLocked = false;
 				return await this.driveFileEntityService.pack(driveFile, { self: true });
 			} catch (err) {
+				if (idempotencyKey != null && idempotencyLocked) {
+					await this.deleteProcessingIdempotencyKey(idempotencyKey);
+				}
+
+				if (err instanceof ApiError) {
+					throw err;
+				}
+
 				if (err instanceof Error || typeof err === 'string') {
 					console.error(err);
 				}
@@ -131,10 +217,22 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					if (err.id === 'f9e4e5f3-4df4-40b5-b400-f236945f7073') throw new ApiError(meta.errors.maxFileSizeExceeded);
 					if (err.id === 'bd71c601-f9b0-4808-9137-a330647ced9b') throw new ApiError(meta.errors.unallowedFileType);
 				}
-				throw new ApiError();
+				if (err instanceof DriveService.NoSuchFolderError) throw new ApiError(meta.errors.noSuchFolder);
+				throw new ApiError(meta.errors.failedToCreateDriveFile, {
+					message: err instanceof Error ? err.message : String(err),
+				});
 			} finally {
-				cleanup!();
+				cleanup?.();
 			}
 		});
+	}
+
+	private async deleteProcessingIdempotencyKey(key: string): Promise<void> {
+		await this.redisClient.eval(
+			'if redis.call("get", KEYS[1]) == ARGV[1] then return redis.call("del", KEYS[1]) else return 0 end',
+			1,
+			key,
+			IDEMPOTENCY_PROCESSING,
+		);
 	}
 }

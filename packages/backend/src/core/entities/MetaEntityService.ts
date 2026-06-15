@@ -77,6 +77,7 @@ export class MetaEntityService {
 			uri: this.config.url,
 			description: instance.description,
 			langs: instance.langs,
+			dimensions: instance.dimensions,
 			tosUrl: instance.termsOfServiceUrl,
 			repositoryUrl: instance.repositoryUrl,
 			feedbackUrl: instance.feedbackUrl,
@@ -126,6 +127,7 @@ export class MetaEntityService {
 			translatorAvailable: instance.deeplAuthKey != null,
 
 			serverRules: instance.serverRules,
+			wellKnownWebsites: instance.wellKnownWebsites,
 
 			policies: { ...DEFAULT_POLICIES, ...instance.policies },
 
@@ -135,6 +137,7 @@ export class MetaEntityService {
 			noteSearchableScope: (this.config.fulltextSearch?.provider === 'meilisearch' && this.config.meilisearch?.scope === 'local') ? 'local' : 'global',
 			maxFileSize: this.config.maxFileSize,
 			federation: this.meta.federation,
+			blockedRemoteCustomEmojis: instance.blockedRemoteCustomEmojis,
 		};
 
 		return packed;
@@ -175,4 +178,3 @@ export class MetaEntityService {
 		return packDetailed;
 	}
 }
-

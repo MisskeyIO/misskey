@@ -100,6 +100,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkButton v-if="user.host == null" inline style="margin-right: 8px;" @click="resetPassword"><i class="ti ti-key"></i> {{ i18n.ts.resetPassword }}</MkButton>
 					</div>
 
+					<div class="_buttons">
+						<MkButton v-if="iAmModerator" inline @click="updateUserName"><i class="ti ti-pencil"></i> {{ i18n.ts.rename }}</MkButton>
+						<MkButton v-if="$i.isAdmin" inline danger @click="regenerateUserToken"><i class="ti ti-refresh"></i> {{ i18n.ts.regenerateLoginToken }}</MkButton>
+						<MkButton v-if="iAmModerator" inline danger @click="unsetUserMutualLink"><i class="ti ti-link-off"></i> {{ i18n.ts.remove }} {{ i18n.ts.mutualFollow }}</MkButton>
+					</div>
+
 					<MkFolder>
 						<template #icon><i class="ti ti-license"></i></template>
 						<template #label>{{ i18n.ts._role.policies }}</template>
@@ -342,6 +348,61 @@ async function resetPassword() {
 			text: i18n.tsx.newPasswordIs({ password }),
 		});
 	}
+}
+
+async function updateUserName() {
+	const input = await os.inputText({
+		title: i18n.ts.name,
+		default: user.value.name ?? '',
+		maxLength: 50,
+	});
+	if (input.canceled) return;
+
+	const confirm = await os.confirm({
+		type: 'warning',
+		title: `${i18n.ts.rename}: ${i18n.ts.name}`,
+		text: `${user.value.name ?? user.value.username} → ${input.result === '' ? i18n.ts.none : input.result}`,
+	});
+	if (confirm.canceled) return;
+
+	await os.apiWithDialog('admin/update-user-name', {
+		userId: user.value.id,
+		name: input.result,
+	});
+	await refreshUser();
+}
+
+async function regenerateUserToken() {
+	const confirm = await os.confirm({
+		type: 'warning',
+		title: i18n.ts.regenerateLoginToken,
+		text: i18n.ts.regenerateLoginTokenDescription,
+	});
+	if (confirm.canceled) return;
+
+	await os.apiWithDialog('admin/regenerate-user-token', {
+		userId: user.value.id,
+	});
+}
+
+async function unsetUserMutualLink() {
+	const input = await os.inputText({
+		title: `${i18n.ts.mutualFollow} ${i18n.ts.link} ID`,
+		minLength: 1,
+	});
+	if (input.canceled) return;
+
+	const confirm = await os.confirm({
+		type: 'warning',
+		text: i18n.ts.areYouSure,
+	});
+	if (confirm.canceled) return;
+
+	await os.apiWithDialog('admin/unset-user-mutual-link', {
+		userId: user.value.id,
+		itemId: input.result,
+	});
+	await refreshUser();
 }
 
 async function toggleSuspend(v: boolean) {

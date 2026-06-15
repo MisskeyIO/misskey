@@ -3,13 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { StoryObj } from '@storybook/vue3';
+import type { StoryObj } from '@storybook/vue3-vite';
 import { http, HttpResponse } from 'msw';
 import { action } from 'storybook/actions';
 import { commonHandlers } from '../../../.storybook/mocks.js';
 import overview_ap_requests from './overview.ap-requests.vue';
+
+type Story = StoryObj<typeof overview_ap_requests>;
+
 export const Default = {
-	render(args) {
+	render(args: Story['args']) {
 		return {
 			components: {
 				overview_ap_requests,
@@ -38,4 +41,4 @@ export const Default = {
 			],
 		},
 	},
-} satisfies StoryObj<typeof overview_ap_requests>;
+} satisfies Story;

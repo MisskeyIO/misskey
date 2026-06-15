@@ -68,6 +68,10 @@ export const PREF_DEF = definePreferences({
 		accountDependent: true,
 		default: [] as Misskey.entities.UserList[],
 	},
+	dimension: {
+		accountDependent: true,
+		default: 0,
+	},
 	uploadFolder: {
 		accountDependent: true,
 		default: null as string | null,
@@ -210,6 +214,9 @@ export const PREF_DEF = definePreferences({
 	nsfw: {
 		default: 'respect' as 'respect' | 'force' | 'ignore',
 	},
+	displayOfSensitiveAds: {
+		default: 'hidden' as 'hidden' | 'always' | 'filtered',
+	},
 	highlightSensitiveMedia: {
 		default: false,
 	},
@@ -260,6 +267,9 @@ export const PREF_DEF = definePreferences({
 	},
 	showFixedPostFormInChannel: {
 		default: false,
+	},
+	trustedExternalWebsites: {
+		default: [] as string[],
 	},
 	enableInfiniteScroll: {
 		default: true,

@@ -53,6 +53,7 @@ export const store = markRaw(new Pizzax('base', {
 		default: {
 			src: 'home' as 'home' | 'local' | 'social' | 'global' | `list:${string}`,
 			userList: null as Misskey.entities.UserList | null,
+			dimensionBySrc: {} as Partial<Record<'home' | 'local' | 'social' | 'global' | `list:${string}` | `channel:${string}` | `role:${string}`, number>>,
 			filter: {
 				withReplies: true,
 				withRenotes: true,

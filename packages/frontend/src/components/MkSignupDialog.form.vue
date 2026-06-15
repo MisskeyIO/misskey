@@ -45,23 +45,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<span v-else-if="emailState === 'error'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.error }}</span>
 				</template>
 			</MkInput>
-			<MkInput v-model="password" type="password" autocomplete="new-password" required data-cy-signup-password @update:modelValue="onChangePassword">
-				<template #label>{{ i18n.ts.password }}</template>
-				<template #prefix><i class="ti ti-lock"></i></template>
-				<template #caption>
-					<span v-if="passwordStrength == 'low'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.weakPassword }}</span>
-					<span v-if="passwordStrength == 'medium'" style="color: var(--MI_THEME-warn)"><i class="ti ti-check ti-fw"></i> {{ i18n.ts.normalPassword }}</span>
-					<span v-if="passwordStrength == 'high'" style="color: var(--MI_THEME-success)"><i class="ti ti-check ti-fw"></i> {{ i18n.ts.strongPassword }}</span>
-				</template>
-			</MkInput>
-			<MkInput v-model="retypedPassword" type="password" autocomplete="new-password" required data-cy-signup-password-retype @update:modelValue="onChangePasswordRetype">
-				<template #label>{{ i18n.ts.password }} ({{ i18n.ts.retype }})</template>
-				<template #prefix><i class="ti ti-lock"></i></template>
-				<template #caption>
-					<span v-if="passwordRetypeState == 'match'" style="color: var(--MI_THEME-success)"><i class="ti ti-check ti-fw"></i> {{ i18n.ts.passwordMatched }}</span>
-					<span v-if="passwordRetypeState == 'not-match'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ i18n.ts.passwordNotMatched }}</span>
-				</template>
-			</MkInput>
+			<MkNewPassword ref="newPassword" :label="i18n.ts.password" :retypeLabel="`${i18n.ts.password} (${i18n.ts.retype})`" with-signup-data-cy/>
 			<MkCaptcha v-if="instance.enableHcaptcha" ref="hcaptcha" v-model="hCaptchaResponse" :class="$style.captcha" provider="hcaptcha" :sitekey="instance.hcaptchaSiteKey"/>
 			<MkCaptcha v-if="instance.enableMcaptcha" ref="mcaptcha" v-model="mCaptchaResponse" :class="$style.captcha" provider="mcaptcha" :sitekey="instance.mcaptchaSiteKey" :instanceUrl="instance.mcaptchaInstanceUrl"/>
 			<MkCaptcha v-if="instance.enableRecaptcha" ref="recaptcha" v-model="reCaptchaResponse" :class="$style.captcha" provider="recaptcha" :sitekey="instance.recaptchaSiteKey"/>
@@ -85,6 +69,7 @@ import * as Misskey from 'misskey-js';
 import * as config from '@@/js/config.js';
 import MkButton from './MkButton.vue';
 import MkInput from './MkInput.vue';
+import MkNewPassword from './MkNewPassword.vue';
 import type { Captcha } from '@/components/MkCaptcha.vue';
 import MkCaptcha from '@/components/MkCaptcha.vue';
 import * as os from '@/os.js';
@@ -111,16 +96,13 @@ const mcaptcha = ref<Captcha | undefined>();
 const recaptcha = ref<Captcha | undefined>();
 const turnstile = ref<Captcha | undefined>();
 const testcaptcha = ref<Captcha | undefined>();
+const newPassword = ref<InstanceType<typeof MkNewPassword> | null>(null);
 
 const username = ref<string>('');
-const password = ref<string>('');
-const retypedPassword = ref<string>('');
 const invitationCode = ref<string>('');
 const email = ref('');
 const usernameState = ref<null | 'wait' | 'ok' | 'unavailable' | 'error' | 'invalid-format' | 'min-range' | 'max-range'>(null);
 const emailState = ref<null | 'wait' | 'ok' | 'unavailable:used' | 'unavailable:format' | 'unavailable:disposable' | 'unavailable:banned' | 'unavailable:mx' | 'unavailable:smtp' | 'unavailable' | 'error'>(null);
-const passwordStrength = ref<'' | 'low' | 'medium' | 'high'>('');
-const passwordRetypeState = ref<null | 'match' | 'not-match'>(null);
 const submitting = ref<boolean>(false);
 const hCaptchaResponse = ref<string | null>(null);
 const mCaptchaResponse = ref<string | null>(null);
@@ -140,32 +122,8 @@ const shouldDisableSubmitting = computed((): boolean => {
 		instance.emailRequiredForSignup && emailState.value !== 'ok' ||
 		instance.disableRegistration && invitationCode.value === '' ||
 		usernameState.value !== 'ok' ||
-		passwordRetypeState.value !== 'match';
+		newPassword.value?.isValid !== true;
 });
-
-function getPasswordStrength(source: string): number {
-	let strength = 0;
-	let power = 0.018;
-
-	// 英数字
-	if (/[a-zA-Z]/.test(source) && /[0-9]/.test(source)) {
-		power += 0.020;
-	}
-
-	// 大文字と小文字が混ざってたら
-	if (/[a-z]/.test(source) && /[A-Z]/.test(source)) {
-		power += 0.015;
-	}
-
-	// 記号が混ざってたら
-	if (/[!\x22\#$%&@'()*+,-./_]/.test(source)) {
-		power += 0.02;
-	}
-
-	strength = power * source.length;
-
-	return Math.max(0, Math.min(1, strength));
-}
 
 function onChangeUsername(): void {
 	if (username.value === '') {
@@ -233,32 +191,14 @@ function onChangeEmail(): void {
 	});
 }
 
-function onChangePassword(): void {
-	if (password.value === '') {
-		passwordStrength.value = '';
-		return;
-	}
-
-	const strength = getPasswordStrength(password.value);
-	passwordStrength.value = strength > 0.7 ? 'high' : strength > 0.3 ? 'medium' : 'low';
-}
-
-function onChangePasswordRetype(): void {
-	if (retypedPassword.value === '') {
-		passwordRetypeState.value = null;
-		return;
-	}
-
-	passwordRetypeState.value = password.value === retypedPassword.value ? 'match' : 'not-match';
-}
-
 async function onSubmit(): Promise<void> {
 	if (submitting.value) return;
+	if (newPassword.value?.isValid !== true) return;
 	submitting.value = true;
 
 	const signupPayload: Misskey.entities.SignupRequest = {
 		username: username.value,
-		password: password.value,
+		password: newPassword.value.password,
 		emailAddress: email.value,
 		invitationCode: invitationCode.value,
 		'hcaptcha-response': hCaptchaResponse.value,

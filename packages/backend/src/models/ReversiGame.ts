@@ -12,6 +12,13 @@ export class MiReversiGame {
 	@PrimaryColumn(id())
 	public id: string;
 
+	@Index()
+	@Column('timestamp with time zone', {
+		comment: 'The created date of the ReversiGame.',
+		default: () => 'CURRENT_TIMESTAMP',
+	})
+	public createdAt: Date;
+
 	@Column('timestamp with time zone', {
 		nullable: true,
 		comment: 'The started date of the ReversiGame.',

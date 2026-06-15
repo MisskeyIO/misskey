@@ -18,7 +18,8 @@
 		"packages/sw",
 		"packages/backend",
 		"packages/frontend",
-		"packages/frontend-embed"
+		"packages/frontend-embed",
+		"scripts/changelog-checker"
 	],
 	"private": true,
 	"scripts": {
@@ -50,36 +51,37 @@
 		"test-and-coverage": "pnpm -r test-and-coverage",
 		"clean": "node scripts/clean.mjs",
 		"clean-all": "node scripts/clean-all.mjs",
-		"cleanall": "pnpm clean-all"
+		"cleanall": "pnpm clean-all",
+		"enforce-catalog": "node ./scripts/enforce-catalog.mjs"
 	},
 	"dependencies": {
-		"cssnano": "8.0.0",
-		"esbuild": "0.28.0",
-		"execa": "9.6.1",
-		"ignore-walk": "8.0.0",
-		"js-yaml": "4.1.1",
-		"postcss": "8.5.14",
-		"tar": "7.5.14",
-		"terser": "5.47.1"
+		"cssnano": "catalog:",
+		"esbuild": "catalog:",
+		"execa": "catalog:",
+		"ignore-walk": "catalog:",
+		"js-yaml": "catalog:",
+		"postcss": "catalog:",
+		"tar": "catalog:",
+		"terser": "catalog:"
 	},
 	"devDependencies": {
-		"@eslint/js": "9.39.4",
-		"@misskey-dev/eslint-plugin": "2.1.0",
-		"@types/js-yaml": "4.0.9",
-		"@types/node": "24.12.2",
-		"@typescript-eslint/eslint-plugin": "8.59.2",
-		"@typescript-eslint/parser": "8.59.2",
-		"@typescript/native-preview": "7.0.0-dev.20260426.1",
-		"cross-env": "10.1.0",
-		"cypress": "15.14.2",
-		"eslint": "9.39.4",
-		"globals": "17.6.0",
-		"ncp": "2.0.0",
-		"pnpm": "11.1.2",
-		"start-server-and-test": "3.0.2",
-		"typescript": "5.9.3"
+		"@eslint/js": "catalog:",
+		"@misskey-dev/eslint-plugin": "catalog:",
+		"@types/js-yaml": "catalog:",
+		"@types/node": "catalog:",
+		"@typescript-eslint/eslint-plugin": "catalog:",
+		"@typescript-eslint/parser": "catalog:",
+		"@typescript/native-preview": "catalog:",
+		"cross-env": "catalog:",
+		"cypress": "catalog:",
+		"eslint": "catalog:",
+		"globals": "catalog:",
+		"ncp": "catalog:",
+		"pnpm": "catalog:",
+		"start-server-and-test": "catalog:",
+		"typescript": "catalog:"
 	},
 	"optionalDependencies": {
-		"@tensorflow/tfjs-core": "4.22.0"
+		"@tensorflow/tfjs-core": "catalog:"
 	}
 }

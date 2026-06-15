@@ -47,6 +47,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 					{{ i18n.ts._announcement.needConfirmationToRead }}
 					<template #caption>{{ i18n.ts._announcement.needConfirmationToReadDescription }}</template>
 				</MkSwitch>
+				<MkSwitch v-model="needEnrollmentTutorialToRead">
+					{{ i18n.ts._announcement.needEnrollmentTutorialToRead }}
+					<template #caption>{{ i18n.ts._announcement.needEnrollmentTutorialToReadDescription }}</template>
+				</MkSwitch>
+				<MkInput v-model="closeDuration" type="number" :min="0">
+					<template #label>{{ i18n.ts._announcement.closeDuration }}</template>
+					<template #caption>{{ i18n.ts._announcement.closeDurationDescription }}</template>
+				</MkInput>
+				<MkInput v-model="displayOrder" type="number">
+					<template #label>{{ i18n.ts._announcement.displayOrder }}</template>
+					<template #caption>{{ i18n.ts._announcement.displayOrderDescription }}</template>
+				</MkInput>
 				<MkButton v-if="announcement" danger @click="del()"><i class="ti ti-trash"></i> {{ i18n.ts.delete }}</MkButton>
 			</div>
 		</div>
@@ -70,11 +82,21 @@ import MkTextarea from '@/components/MkTextarea.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import MkRadios from '@/components/MkRadios.vue';
 
-type AdminAnnouncementType = Misskey.entities.AdminAnnouncementsCreateRequest & { id: string; };
+type AnnouncementGateFields = {
+	closeDuration?: number | null;
+	displayOrder?: number;
+	needEnrollmentTutorialToRead?: boolean;
+};
+type AnnouncementEditPayload = Misskey.entities.AdminAnnouncementsCreateRequest & {
+	closeDuration: number;
+	displayOrder: number;
+	needEnrollmentTutorialToRead: boolean;
+};
+type AdminAnnouncementType = Misskey.entities.AdminAnnouncementsCreateRequest & AnnouncementGateFields & { id: string; };
 
 const props = defineProps<{
 	user: Misskey.entities.User,
-	announcement?: Required<AdminAnnouncementType>,
+	announcement?: AdminAnnouncementType,
 }>();
 
 const emit = defineEmits<{
@@ -85,9 +107,12 @@ const emit = defineEmits<{
 const dialog = useTemplateRef('dialog');
 const title = ref(props.announcement ? props.announcement.title : '');
 const text = ref(props.announcement ? props.announcement.text : '');
-const icon = ref(props.announcement ? props.announcement.icon : 'info');
-const display = ref(props.announcement ? props.announcement.display : 'dialog');
-const needConfirmationToRead = ref(props.announcement ? props.announcement.needConfirmationToRead : false);
+const icon = ref<Misskey.entities.Announcement['icon']>(props.announcement?.icon ?? 'info');
+const display = ref<Misskey.entities.Announcement['display']>(props.announcement?.display ?? 'dialog');
+const needConfirmationToRead = ref<boolean>(props.announcement?.needConfirmationToRead ?? false);
+const needEnrollmentTutorialToRead = ref<boolean>(props.announcement?.needEnrollmentTutorialToRead ?? false);
+const closeDuration = ref(props.announcement?.closeDuration ?? 0);
+const displayOrder = ref(props.announcement?.displayOrder ?? 0);
 
 async function done() {
 	const params = {
@@ -97,8 +122,11 @@ async function done() {
 		imageUrl: null,
 		display: display.value,
 		needConfirmationToRead: needConfirmationToRead.value,
+		needEnrollmentTutorialToRead: needEnrollmentTutorialToRead.value,
+		closeDuration: closeDuration.value,
+		displayOrder: displayOrder.value,
 		userId: props.user.id,
-	} satisfies Misskey.entities.AdminAnnouncementsCreateRequest;
+	} satisfies AnnouncementEditPayload;
 
 	if (props.announcement) {
 		await os.apiWithDialog('admin/announcements/update', {

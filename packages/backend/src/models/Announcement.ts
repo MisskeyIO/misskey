@@ -54,6 +54,22 @@ export class MiAnnouncement {
 	})
 	public needConfirmationToRead: boolean;
 
+	@Column('boolean', {
+		default: false,
+	})
+	public needEnrollmentTutorialToRead: boolean;
+
+	@Column('integer', {
+		default: 0,
+	})
+	public closeDuration: number;
+
+	@Index()
+	@Column('integer', {
+		default: 0,
+	})
+	public displayOrder: number;
+
 	@Index()
 	@Column('boolean', {
 		default: true,

@@ -49,6 +49,10 @@ export const packedMetaLiteSchema = {
 				optional: false, nullable: false,
 			},
 		},
+		dimensions: {
+			type: 'number',
+			optional: false, nullable: false,
+		},
 		tosUrl: {
 			type: 'string',
 			optional: false, nullable: true,
@@ -258,6 +262,14 @@ export const packedMetaLiteSchema = {
 			type: 'boolean',
 			optional: false, nullable: false,
 		},
+		wellKnownWebsites: {
+			type: 'array',
+			optional: false, nullable: false,
+			items: {
+				type: 'string',
+				optional: false, nullable: false,
+			},
+		},
 		backgroundImageUrl: {
 			type: 'string',
 			optional: false, nullable: true,
@@ -308,6 +320,14 @@ export const packedMetaLiteSchema = {
 			type: 'string',
 			enum: ['all', 'specified', 'none'],
 			optional: false, nullable: false,
+		},
+		blockedRemoteCustomEmojis: {
+			type: 'array',
+			optional: false, nullable: false,
+			items: {
+				type: 'string',
+				optional: false, nullable: false,
+			},
 		},
 	},
 } as const;

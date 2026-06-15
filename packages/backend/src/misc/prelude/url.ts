@@ -21,3 +21,16 @@ export function query(obj: Record<string, unknown>): string {
 export function appendQuery(url: string, query: string): string {
 	return `${url}${/\?/.test(url) ? url.endsWith('?') ? '' : '&' : '?'}${query}`;
 }
+
+export function isHttpUrl(url: string): boolean {
+	try {
+		const parsed = new URL(url);
+		return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+	} catch {
+		return false;
+	}
+}
+
+export function omitHttps(url: string): string {
+	return url.replace(/^https:\/\//i, '').replace(/^https%3A%2F%2F/i, '');
+}

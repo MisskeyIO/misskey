@@ -669,3 +669,35 @@ export const langmap = {
 		nativeName: 'isiZulu',
 	},
 };
+
+export const postingLangCodes = [...Object.keys(langmap), 'other'];
+
+export const viewingLangCodes = [
+	...postingLangCodes,
+	'unknown',
+	'remote',
+];
+
+export type NoteLanguagePreference = {
+	viewingLangs: string[];
+	showMediaInAllLanguages: boolean;
+	showHashtagsInAllLanguages: boolean;
+};
+
+export function resolveNoteLang(noteLang: string | null | undefined, isRemote: boolean): string {
+	return noteLang ?? (isRemote ? 'remote' : 'unknown');
+}
+
+export function isNoteLanguageVisible(params: {
+	noteLang: string | null | undefined;
+	isRemote: boolean;
+	hasMedia: boolean;
+	hasTags: boolean;
+}, preference: NoteLanguagePreference | null | undefined): boolean {
+	if (preference == null || preference.viewingLangs.length === 0) return true;
+	if (params.isRemote && preference.viewingLangs.includes('remote')) return true;
+	if (params.hasMedia && preference.showMediaInAllLanguages) return true;
+	if (params.hasTags && preference.showHashtagsInAllLanguages) return true;
+
+	return preference.viewingLangs.includes(resolveNoteLang(params.noteLang, params.isRemote));
+}

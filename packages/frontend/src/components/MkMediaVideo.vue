@@ -5,6 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div
+	v-if="!blocked"
 	ref="playerEl"
 	v-hotkey="keymap"
 	tabindex="0"
@@ -19,7 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	@contextmenu.stop
 	@keydown.stop
 >
-	<button v-if="hide" :class="$style.hidden" @click="reveal">
+	<button v-if="hide" :class="$style.hidden" @click="showHiddenContent">
 		<div :class="$style.hiddenTextWrapper">
 			<b v-if="video.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ i18n.ts.sensitive }}{{ prefer.s.dataSaver.media ? ` (${i18n.ts.video}${video.size ? ' ' + bytes(video.size) : ''})` : '' }}</b>
 			<b v-else style="display: block;"><i class="ti ti-movie"></i> {{ prefer.s.dataSaver.media && video.size ? bytes(video.size) : i18n.ts.video }}</b>
@@ -35,6 +36,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			:title="video.comment ?? undefined"
 			:alt="video.comment"
 			preload="metadata"
+			crossorigin="anonymous"
 			controls
 			@keydown.prevent
 		>
@@ -55,40 +57,42 @@ SPDX-License-Identifier: AGPL-3.0-only
 			:title="video.comment ?? undefined"
 			:alt="video.comment"
 			preload="metadata"
+			crossorigin="anonymous"
 			playsinline
 			@keydown.prevent
 			@click.self="togglePlayPause"
 		>
 			<source :src="video.url">
 		</video>
-		<button v-if="isReady && !isPlaying" class="_button" :class="$style.videoOverlayPlayButton" @click="togglePlayPause"><i class="ti ti-player-play-filled"></i></button>
+		<button v-if="isReady && !isPlaying" class="_button" :class="$style.videoOverlayPlayButton" @click="togglePlayPause"><i class="ti-filled ti-filled-player-play"></i></button>
 		<div v-else-if="!isActuallyPlaying" :class="$style.videoLoading">
 			<MkLoading/>
 		</div>
-		<i class="ti ti-eye-off" :class="$style.hide" @click="hide = true"></i>
 		<div :class="$style.indicators">
 			<div v-if="video.comment" :class="$style.indicator">ALT</div>
 			<div v-if="video.isSensitive" :class="$style.indicator" style="color: var(--MI_THEME-warn);" :title="i18n.ts.sensitive"><i class="ti ti-eye-exclamation"></i></div>
 		</div>
-		<div :class="$style.videoControls" @click.self="togglePlayPause">
+		<button v-if="!videoControls" :class="$style.menu" class="_button" @click.prevent.stop="showMenu"><i class="ti ti-dots" style="vertical-align: middle;"></i></button>
+		<i class="ti ti-eye-off" :class="$style.hide" @click.prevent.stop="hide = true"></i>
+		<div v-if="videoControls" :class="$style.videoControls" @click.self="togglePlayPause">
 			<div :class="[$style.controlsChild, $style.controlsLeft]">
-				<button class="_button" :class="$style.controlButton" @click="togglePlayPause">
-					<i v-if="isPlaying" class="ti ti-player-pause-filled"></i>
-					<i v-else class="ti ti-player-play-filled"></i>
+				<button class="_button" :class="$style.controlButton" @click.prevent.stop="togglePlayPause">
+					<i v-if="isPlaying" class="ti-filled ti-filled-player-pause"></i>
+					<i v-else class="ti-filled ti-filled-player-play"></i>
 				</button>
 			</div>
 			<div :class="[$style.controlsChild, $style.controlsRight]">
-				<button class="_button" :class="$style.controlButton" @click="showMenu">
+				<button class="_button" :class="$style.controlButton" @click.prevent.stop="showMenu">
 					<i class="ti ti-settings"></i>
 				</button>
-				<button class="_button" :class="$style.controlButton" @click="toggleFullscreen">
+				<button class="_button" :class="$style.controlButton" @click.prevent.stop="toggleFullscreen">
 					<i v-if="isFullscreen" class="ti ti-arrows-minimize"></i>
 					<i v-else class="ti ti-arrows-maximize"></i>
 				</button>
 			</div>
 			<div :class="[$style.controlsChild, $style.controlsTime]">{{ hms(elapsedTimeMs) }}</div>
 			<div :class="[$style.controlsChild, $style.controlsVolume]">
-				<button class="_button" :class="$style.controlButton" @click="toggleMute">
+				<button class="_button" :class="$style.controlButton" @click.prevent.stop="toggleMute">
 					<i v-if="volume === 0" class="ti ti-volume-3"></i>
 					<i v-else class="ti ti-volume"></i>
 				</button>
@@ -122,13 +126,19 @@ import * as os from '@/os.js';
 import { exitFullscreen, requestFullscreen } from '@/utility/fullscreen.js';
 import hasAudio from '@/utility/media-has-audio.js';
 import MkMediaRange from '@/components/MkMediaRange.vue';
+import { pleaseLogin } from '@/utility/please-login.js';
+import { sensitiveContentConsent, requestSensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 import { $i, iAmModerator } from '@/i.js';
 import { prefer } from '@/preferences.js';
-import { shouldHideFileByDefault, canRevealFile } from '@/utility/sensitive-file.js';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
 	video: Misskey.entities.DriveFile;
-}>();
+	videoControls?: boolean;
+}>(), {
+	videoControls: true,
+});
+
+const blocked = computed(() => props.video.isSensitive && sensitiveContentConsent.value === false);
 
 const keymap = {
 	'up': {
@@ -176,16 +186,13 @@ function hasFocus() {
 	return playerEl.value === window.document.activeElement || playerEl.value.contains(window.document.activeElement);
 }
 
-// eslint-disable-next-line vue/no-setup-props-reactivity-loss
-const hide = ref(shouldHideFileByDefault(props.video));
-
-async function reveal() {
-	if (!(await canRevealFile(props.video))) {
-		return;
-	}
-
-	hide.value = false;
+function calcHide(): boolean {
+	if (prefer.s.nsfw === 'force' || prefer.s.dataSaver.media) return true;
+	if (props.video.isSensitive && sensitiveContentConsent.value !== true) return true;
+	return props.video.isSensitive && prefer.s.nsfw !== 'ignore';
 }
+
+const hide = ref(calcHide());
 
 // Menu
 const menuShowing = ref(false);
@@ -244,6 +251,12 @@ function showMenu(ev: PointerEvent) {
 		},
 	];
 
+	if ($i?.id === props.video.userId || iAmModerator) {
+		menu.push({
+			type: 'divider',
+		});
+	}
+
 	if (iAmModerator) {
 		menu.push({
 			text: props.video.isSensitive ? i18n.ts.unmarkAsSensitive : i18n.ts.markAsSensitive,
@@ -251,6 +264,15 @@ function showMenu(ev: PointerEvent) {
 			danger: true,
 			action: () => toggleSensitive(props.video),
 		});
+
+		if ($i?.id !== props.video.userId) {
+			menu.push({
+				type: 'link' as const,
+				text: i18n.ts._fileViewer.title,
+				icon: 'ti ti-info-circle',
+				to: `/admin/file/${props.video.id}`,
+			});
+		}
 	}
 
 	const details: MenuItem[] = [];
@@ -293,6 +315,33 @@ function showMenu(ev: PointerEvent) {
 			menuShowing.value = false;
 		},
 	});
+}
+
+async function showHiddenContent(ev: MouseEvent) {
+	if (!hide.value) return;
+
+	ev.preventDefault();
+	ev.stopPropagation();
+
+	if (props.video.isSensitive && !$i) {
+		await pleaseLogin();
+		return;
+	}
+
+	if (props.video.isSensitive && sensitiveContentConsent.value !== true) {
+		const allowed = await requestSensitiveContentConsent();
+		if (!allowed) return;
+	}
+
+	if (props.video.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
+		const { canceled } = await os.confirm({
+			type: 'question',
+			text: i18n.ts.sensitiveMediaRevealConfirm,
+		});
+		if (canceled) return;
+	}
+
+	hide.value = false;
 }
 
 async function toggleSensitive(file: Misskey.entities.DriveFile) {
@@ -530,7 +579,7 @@ onDeactivated(() => {
 	elapsedTimeMs.value = 0;
 	durationMs.value = 0;
 	bufferedEnd.value = 0;
-	hide.value = (prefer.s.nsfw === 'force' || prefer.s.dataSaver.media) ? true : (props.video.isSensitive && prefer.s.nsfw !== 'ignore');
+	hide.value = calcHide();
 	stopVideoElWatch();
 	onceInit = false;
 	if (mediaTickFrameId) {
@@ -616,7 +665,6 @@ onDeactivated(() => {
 	font: inherit;
 	color: inherit;
 	cursor: pointer;
-	padding: 60px 0;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -626,6 +674,22 @@ onDeactivated(() => {
 	text-align: center;
 	font-size: 0.8em;
 	color: #fff;
+}
+
+.menu {
+	display: block;
+	position: absolute;
+	border-radius: 999px;
+	background-color: rgba(0, 0, 0, 0.3);
+	-webkit-backdrop-filter: var(--MI-blur, blur(15px));
+	backdrop-filter: var(--MI-blur, blur(15px));
+	color: #fff;
+	font-size: 0.8em;
+	width: 28px;
+	height: 28px;
+	text-align: center;
+	bottom: 10px;
+	right: 10px;
 }
 
 .videoRoot {

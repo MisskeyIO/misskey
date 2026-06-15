@@ -5,6 +5,26 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <SearchMarker path="/settings/security" :label="i18n.ts.security" :keywords="['security']" icon="ti ti-lock" :inlining="['2fa']">
+	<MkModalWindow
+		v-if="isChangePasswordDialogOpen"
+		ref="changePasswordDialog"
+		:width="450"
+		@close="closeChangePasswordDialog"
+		@closed="isChangePasswordDialogOpen = false"
+	>
+		<template #header>{{ i18n.ts.changePassword }}</template>
+
+		<div class="_spacer" style="--MI_SPACER-min: 20px; --MI_SPACER-max: 32px;">
+			<form class="_gaps_m" @submit.prevent="submitNewPassword">
+				<MkNewPassword ref="newPassword"/>
+				<MkButton type="submit" primary rounded :disabled="newPassword?.isValid !== true || changingPassword" style="margin: 0 auto;">
+					<MkLoading v-if="changingPassword" :em="true" :colored="false"/>
+					<template v-else>{{ i18n.ts.save }}</template>
+				</MkButton>
+			</form>
+		</div>
+	</MkModalWindow>
+
 	<div class="_gaps_m">
 		<MkFeatureBanner icon="/client-assets/locked_with_key_3d.png" color="#ffbf00">
 			<SearchText>{{ i18n.ts._settings.securityBanner }}</SearchText>
@@ -57,12 +77,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, markRaw } from 'vue';
+import { computed, markRaw, ref } from 'vue';
 import X2fa from './2fa.vue';
 import FormSection from '@/components/form/section.vue';
 import FormSlot from '@/components/form/slot.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkPagination from '@/components/MkPagination.vue';
+import MkNewPassword from '@/components/MkNewPassword.vue';
+import MkModalWindow from '@/components/MkModalWindow.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
@@ -74,37 +96,38 @@ const paginator = markRaw(new Paginator('i/signin-history', {
 	limit: 5,
 }));
 
+const isChangePasswordDialogOpen = ref(false);
+const changingPassword = ref(false);
+const changePasswordDialog = ref<InstanceType<typeof MkModalWindow> | null>(null);
+const newPassword = ref<InstanceType<typeof MkNewPassword> | null>(null);
+
 async function change() {
-	const { canceled: canceled2, result: newPassword } = await os.inputText({
-		title: i18n.ts.newPassword,
-		type: 'password',
-		autocomplete: 'new-password',
-	});
-	if (canceled2 || newPassword == null) return;
+	isChangePasswordDialogOpen.value = true;
+}
 
-	const { canceled: canceled3, result: newPassword2 } = await os.inputText({
-		title: i18n.ts.newPasswordRetype,
-		type: 'password',
-		autocomplete: 'new-password',
-	});
-	if (canceled3 || newPassword2 == null) return;
+function closeChangePasswordDialog() {
+	if (changingPassword.value) return;
+	changePasswordDialog.value?.close();
+}
 
-	if (newPassword !== newPassword2) {
-		os.alert({
-			type: 'error',
-			text: i18n.ts.retypedNotMatch,
-		});
-		return;
-	}
+async function submitNewPassword() {
+	if (changingPassword.value) return;
+	if (newPassword.value?.isValid !== true) return;
 
 	const auth = await os.authenticateDialog();
 	if (auth.canceled) return;
 
-	os.apiWithDialog('i/change-password', {
-		currentPassword: auth.result.password,
-		token: auth.result.token,
-		newPassword,
-	});
+	changingPassword.value = true;
+	try {
+		await os.apiWithDialog('i/change-password', {
+			currentPassword: auth.result.password,
+			token: auth.result.token,
+			newPassword: newPassword.value.password,
+		});
+		changePasswordDialog.value?.close();
+	} finally {
+		changingPassword.value = false;
+	}
 }
 
 async function regenerateToken() {

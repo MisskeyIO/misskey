@@ -68,7 +68,9 @@ export class GalleryPostEntityService {
 		const _users = posts.map(({ user, userId }) => user ?? userId);
 		const _userMap = await this.userEntityService.packMany(_users, me)
 			.then(users => new Map(users.map(u => [u.id, u])));
-		return Promise.all(posts.map(post => this.pack(post, me, { packedUser: _userMap.get(post.userId) })));
+		return (await Promise.allSettled(posts.map(post => this.pack(post, me, { packedUser: _userMap.get(post.userId) }))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => result.value);
 	}
 }
 

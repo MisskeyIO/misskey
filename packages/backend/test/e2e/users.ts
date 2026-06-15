@@ -8,7 +8,7 @@ process.env.NODE_ENV = 'test';
 import * as assert from 'assert';
 import { beforeAll, beforeEach, describe, test } from 'vitest';
 import { inspect } from 'node:util';
-import { api, post, role, signup, successfulApiCall, uploadFile } from '../utils.js';
+import { api, castAsError, post, role, signup, successfulApiCall, uploadFile } from '../utils.js';
 import type * as misskey from 'misskey-js';
 import { DEFAULT_POLICIES } from '@/core/RoleService.js';
 
@@ -309,7 +309,7 @@ describe('ユーザー', () => {
 		assert.strictEqual(response.name, null);
 		assert.strictEqual(response.username, 'zoe');
 		assert.strictEqual(response.host, null);
-		response.avatarUrl && assert.match(response.avatarUrl, /^[-a-zA-Z0-9@:%._\+~#&?=\/]+$/);
+		if (response.avatarUrl) assert.match(response.avatarUrl, /^[-a-zA-Z0-9@:%._\+~#&?=\/]+$/);
 		assert.strictEqual(response.avatarBlurhash, null);
 		assert.deepStrictEqual(response.avatarDecorations, []);
 		assert.strictEqual(response.isBot, false);
@@ -508,6 +508,26 @@ describe('ユーザー', () => {
 		assert.deepStrictEqual(response2, expected2, inspect(parameters));
 	});
 
+	test('canUpdateAvatar が false の場合はアバターを更新できない', async () => {
+		const avatarRestricted = await signup({ username: 'avatarRestricted' });
+		const restrictedRole = await role(root, { name: 'Avatar Restricted Role' }, {
+			canUpdateBioMedia: { priority: 1, useDefault: false, value: true },
+			canUpdateAvatar: { priority: 1, useDefault: false, value: false },
+		});
+		await api('admin/roles/assign', { userId: avatarRestricted.id, roleId: restrictedRole.id }, root);
+
+		try {
+			const avatarFile = (await uploadFile(avatarRestricted)).body;
+			const response = await api('i/update', { avatarId: avatarFile!.id }, avatarRestricted);
+
+			assert.strictEqual(response.status, 400);
+			assert.strictEqual(castAsError(response.body).error.code, 'RESTRICTED_BY_ROLE');
+		} finally {
+			await api('admin/roles/unassign', { userId: avatarRestricted.id, roleId: restrictedRole.id }, root);
+			await api('admin/roles/delete', { roleId: restrictedRole.id }, root);
+		}
+	});
+
 	test('を書き換えることができる(Banner)', async () => {
 		const aliceFile = (await uploadFile(alice)).body;
 		const parameters = { bannerId: aliceFile!.id };
@@ -531,6 +551,26 @@ describe('ユーザー', () => {
 			bannerUrl: null,
 		};
 		assert.deepStrictEqual(response2, expected2, inspect(parameters));
+	});
+
+	test('canUpdateBanner が false の場合はバナーを更新できない', async () => {
+		const bannerRestricted = await signup({ username: 'bannerRestricted' });
+		const restrictedRole = await role(root, { name: 'Banner Restricted Role' }, {
+			canUpdateBioMedia: { priority: 1, useDefault: false, value: true },
+			canUpdateBanner: { priority: 1, useDefault: false, value: false },
+		});
+		await api('admin/roles/assign', { userId: bannerRestricted.id, roleId: restrictedRole.id }, root);
+
+		try {
+			const bannerFile = (await uploadFile(bannerRestricted)).body;
+			const response = await api('i/update', { bannerId: bannerFile!.id }, bannerRestricted);
+
+			assert.strictEqual(response.status, 400);
+			assert.strictEqual(castAsError(response.body).error.code, 'RESTRICTED_BY_ROLE');
+		} finally {
+			await api('admin/roles/unassign', { userId: bannerRestricted.id, roleId: restrictedRole.id }, root);
+			await api('admin/roles/delete', { roleId: restrictedRole.id }, root);
+		}
 	});
 
 	//#endregion

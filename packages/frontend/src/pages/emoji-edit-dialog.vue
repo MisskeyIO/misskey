@@ -46,23 +46,46 @@ SPDX-License-Identifier: AGPL-3.0-only
 						{{ i18n.ts.setMultipleBySeparatingWithSpace }}
 					</template>
 				</MkInput>
-				<MkInput v-model="license" :mfmAutocomplete="true">
+				<MkTextarea v-model="license" :mfmAutocomplete="true">
 					<template #label>{{ i18n.ts.license }}</template>
+				</MkTextarea>
+				<MkInput v-model="requestedBy" autocapitalize="off">
+					<template #label>{{ i18n.ts.requestedBy }}</template>
 				</MkInput>
+				<MkTextarea v-model="memo" :mfmAutocomplete="true">
+					<template #label>{{ i18n.ts.memo }}</template>
+				</MkTextarea>
 				<MkFolder>
 					<template #label>{{ i18n.ts.rolesThatCanBeUsedThisEmojiAsReaction }}</template>
 					<template #suffix>{{ rolesThatCanBeUsedThisEmojiAsReaction.length === 0 ? i18n.ts.all : rolesThatCanBeUsedThisEmojiAsReaction.length }}</template>
 
 					<div class="_gaps">
-						<MkButton rounded @click="addRole"><i class="ti ti-plus"></i> {{ i18n.ts.add }}</MkButton>
+						<MkButton rounded @click="addRole('allow')"><i class="ti ti-plus"></i> {{ i18n.ts.add }}</MkButton>
 
 						<div v-for="role in rolesThatCanBeUsedThisEmojiAsReaction" :key="role.id" :class="$style.roleItem">
 							<MkRolePreview :class="$style.role" :role="role" :forModeration="true" :detailed="false" style="pointer-events: none;"/>
-							<button v-if="role.target === 'manual'" class="_button" :class="$style.roleUnassign" @click="removeRole(role)"><i class="ti ti-x"></i></button>
+							<button v-if="role.target === 'manual'" class="_button" :class="$style.roleUnassign" @click="removeRole('allow', role)"><i class="ti ti-x"></i></button>
 							<button v-else class="_button" :class="$style.roleUnassign" disabled><i class="ti ti-ban"></i></button>
 						</div>
 
 						<MkInfo>{{ i18n.ts.rolesThatCanBeUsedThisEmojiAsReactionEmptyDescription }}</MkInfo>
+						<MkInfo warn>{{ i18n.ts.rolesThatCanBeUsedThisEmojiAsReactionPublicRoleWarn }}</MkInfo>
+					</div>
+				</MkFolder>
+				<MkFolder>
+					<template #label>{{ i18n.ts.rolesThatCanNotBeUsedThisEmojiAsReaction }}</template>
+					<template #suffix>{{ rolesThatCanNotBeUsedThisEmojiAsReaction.length === 0 ? i18n.ts.none : rolesThatCanNotBeUsedThisEmojiAsReaction.length }}</template>
+
+					<div class="_gaps">
+						<MkButton rounded @click="addRole('deny')"><i class="ti ti-plus"></i> {{ i18n.ts.add }}</MkButton>
+
+						<div v-for="role in rolesThatCanNotBeUsedThisEmojiAsReaction" :key="role.id" :class="$style.roleItem">
+							<MkRolePreview :class="$style.role" :role="role" :forModeration="true" :detailed="false" style="pointer-events: none;"/>
+							<button v-if="role.target === 'manual'" class="_button" :class="$style.roleUnassign" @click="removeRole('deny', role)"><i class="ti ti-x"></i></button>
+							<button v-else class="_button" :class="$style.roleUnassign" disabled><i class="ti ti-ban"></i></button>
+						</div>
+
+						<MkInfo>{{ i18n.ts.rolesThatCanNotBeUsedThisEmojiAsReactionEmptyDescription }}</MkInfo>
 						<MkInfo warn>{{ i18n.ts.rolesThatCanBeUsedThisEmojiAsReactionPublicRoleWarn }}</MkInfo>
 					</div>
 				</MkFolder>
@@ -84,6 +107,7 @@ import * as Misskey from 'misskey-js';
 import MkWindow from '@/components/MkWindow.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
+import MkTextarea from '@/components/MkTextarea.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import * as os from '@/os.js';
@@ -94,8 +118,20 @@ import MkSwitch from '@/components/MkSwitch.vue';
 import { selectFile } from '@/utility/drive.js';
 import MkRolePreview from '@/components/MkRolePreview.vue';
 
+type EmojiDetailedWithFeature10Fields = Misskey.entities.EmojiDetailed & {
+	requestedBy?: string | null;
+	memo?: string | null;
+	roleIdsThatCanNotBeUsedThisEmojiAsReaction?: string[];
+};
+
+type AdminEmojiMutationRequestWithFeature10Fields = Misskey.entities.AdminEmojiUpdateRequest & {
+	requestedBy: string | null;
+	memo: string | null;
+	roleIdsThatCanNotBeUsedThisEmojiAsReaction: string[];
+};
+
 const props = defineProps<{
-	emoji?: Misskey.entities.EmojiDetailed,
+	emoji?: EmojiDetailedWithFeature10Fields,
 }>();
 
 const emit = defineEmits<{
@@ -108,14 +144,22 @@ const name = ref<string>(props.emoji ? props.emoji.name : '');
 const category = ref<string>(props.emoji?.category ? props.emoji.category : '');
 const aliases = ref<string>(props.emoji ? props.emoji.aliases.join(' ') : '');
 const license = ref<string>(props.emoji?.license ? props.emoji.license : '');
+const requestedBy = ref<string>(props.emoji?.requestedBy ?? '');
+const memo = ref<string>(props.emoji?.memo ?? '');
 const isSensitive = ref(props.emoji ? props.emoji.isSensitive : false);
 const localOnly = ref(props.emoji ? props.emoji.localOnly : false);
-const roleIdsThatCanBeUsedThisEmojiAsReaction = ref(props.emoji ? props.emoji.roleIdsThatCanBeUsedThisEmojiAsReaction : []);
+const roleIdsThatCanBeUsedThisEmojiAsReaction = ref<string[]>(props.emoji?.roleIdsThatCanBeUsedThisEmojiAsReaction ?? []);
 const rolesThatCanBeUsedThisEmojiAsReaction = ref<Misskey.entities.Role[]>([]);
+const roleIdsThatCanNotBeUsedThisEmojiAsReaction = ref<string[]>(props.emoji?.roleIdsThatCanNotBeUsedThisEmojiAsReaction ?? []);
+const rolesThatCanNotBeUsedThisEmojiAsReaction = ref<Misskey.entities.Role[]>([]);
 const file = ref<Misskey.entities.DriveFile>();
 
 watch(roleIdsThatCanBeUsedThisEmojiAsReaction, async () => {
 	rolesThatCanBeUsedThisEmojiAsReaction.value = (await Promise.all(roleIdsThatCanBeUsedThisEmojiAsReaction.value.map((id) => misskeyApi('admin/roles/show', { roleId: id }).catch(() => null)))).filter(x => x != null);
+}, { immediate: true });
+
+watch(roleIdsThatCanNotBeUsedThisEmojiAsReaction, async () => {
+	rolesThatCanNotBeUsedThisEmojiAsReaction.value = (await Promise.all(roleIdsThatCanNotBeUsedThisEmojiAsReaction.value.map((id) => misskeyApi('admin/roles/show', { roleId: id }).catch(() => null)))).filter(x => x != null);
 }, { immediate: true });
 
 const imgUrl = computed(() => file.value ? file.value.url : props.emoji ? props.emoji.url : null);
@@ -131,20 +175,24 @@ async function changeImage(ev: PointerEvent) {
 	}
 }
 
-async function addRole() {
+async function addRole(type: 'allow' | 'deny') {
 	const roles = await misskeyApi('admin/roles/list');
-	const currentRoleIds = rolesThatCanBeUsedThisEmojiAsReaction.value.map(x => x.id);
+	const targetRoles = type === 'allow' ? rolesThatCanBeUsedThisEmojiAsReaction : rolesThatCanNotBeUsedThisEmojiAsReaction;
+	const currentRoleIds = targetRoles.value.map(x => x.id);
 
 	const { canceled, result: roleId } = await os.select({
 		items: roles.filter(r => r.isPublic).filter(r => !currentRoleIds.includes(r.id)).map(r => ({ label: r.name, value: r.id })),
 	});
 	if (canceled || roleId == null) return;
 
-	rolesThatCanBeUsedThisEmojiAsReaction.value.push(roles.find(r => r.id === roleId)!);
+	const selectedRole = roles.find(r => r.id === roleId);
+	if (selectedRole == null) return;
+	targetRoles.value.push(selectedRole);
 }
 
-async function removeRole(role: Misskey.entities.RoleLite) {
-	rolesThatCanBeUsedThisEmojiAsReaction.value = rolesThatCanBeUsedThisEmojiAsReaction.value.filter(x => x.id !== role.id);
+async function removeRole(type: 'allow' | 'deny', role: Misskey.entities.RoleLite) {
+	const targetRoles = type === 'allow' ? rolesThatCanBeUsedThisEmojiAsReaction : rolesThatCanNotBeUsedThisEmojiAsReaction;
+	targetRoles.value = targetRoles.value.filter(x => x.id !== role.id);
 }
 
 async function done() {
@@ -153,11 +201,14 @@ async function done() {
 		category: category.value === '' ? null : category.value,
 		aliases: aliases.value.split(' ').filter(x => x !== ''),
 		license: license.value === '' ? null : license.value,
+		requestedBy: requestedBy.value === '' ? null : requestedBy.value,
+		memo: memo.value === '' ? null : memo.value,
 		isSensitive: isSensitive.value,
 		localOnly: localOnly.value,
 		roleIdsThatCanBeUsedThisEmojiAsReaction: rolesThatCanBeUsedThisEmojiAsReaction.value.map(x => x.id),
+		roleIdsThatCanNotBeUsedThisEmojiAsReaction: rolesThatCanNotBeUsedThisEmojiAsReaction.value.map(x => x.id),
 		fileId: file.value ? file.value.id : undefined,
-	} satisfies Misskey.entities.AdminEmojiUpdateRequest;
+	} satisfies AdminEmojiMutationRequestWithFeature10Fields;
 
 	if (props.emoji) {
 		const emojiDetailed = {
@@ -168,10 +219,13 @@ async function done() {
 			host: props.emoji.host,
 			url: file.value ? file.value.url : props.emoji.url,
 			license: params.license,
+			requestedBy: params.requestedBy,
+			memo: params.memo,
 			isSensitive: params.isSensitive,
 			localOnly: params.localOnly,
 			roleIdsThatCanBeUsedThisEmojiAsReaction: params.roleIdsThatCanBeUsedThisEmojiAsReaction,
-		} satisfies Misskey.entities.EmojiDetailed;
+			roleIdsThatCanNotBeUsedThisEmojiAsReaction: params.roleIdsThatCanNotBeUsedThisEmojiAsReaction,
+		} satisfies EmojiDetailedWithFeature10Fields;
 
 		await os.apiWithDialog('admin/emoji/update', {
 			id: props.emoji.id,

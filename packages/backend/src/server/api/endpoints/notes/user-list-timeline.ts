@@ -61,6 +61,7 @@ export const paramDef = {
 			default: false,
 			description: 'Only show notes that have attached files.',
 		},
+		dimension: { type: 'integer', minimum: 0, nullable: true },
 	},
 	required: ['listId'],
 } as const;
@@ -87,9 +88,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private queryService: QueryService,
 		private channelMutingService: ChannelMutingService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
+			super(meta, paramDef, async (ps, me) => {
 			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
 			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
+			const viewerDimension = ps.dimension ?? 0;
 
 			const list = await this.userListsRepository.findOneBy({
 				id: ps.listId,
@@ -114,7 +116,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 				this.activeUsersChart.read(me);
 
-				return await this.noteEntityService.packMany(timeline, me);
+				return await this.noteEntityService.packMany(timeline, me, { viewerDimension });
 			}
 
 			const timeline = await this.fanoutTimelineEndpointService.timeline({
@@ -123,6 +125,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				limit: ps.limit,
 				allowPartial: ps.allowPartial,
 				me,
+				viewerDimension,
 				useDbFallback: this.serverSettings.enableFanoutTimelineDbFallback,
 				redisTimelines: ps.withFiles ? [`userListTimelineWithFiles:${list.id}`] : [`userListTimeline:${list.id}`],
 				alwaysIncludeMyNotes: true,
@@ -164,7 +167,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			.leftJoinAndSelect('reply.user', 'replyUser')
 			.leftJoinAndSelect('renote.user', 'renoteUser')
 			.andWhere('userListMemberships.userListId = :userListId', { userListId: list.id })
-			.andWhere('note.channelId IS NULL') // チャンネルノートではない
+			.andWhere('note.channelId IS NULL')
 			.andWhere(new Brackets(qb => {
 				qb
 					.where('note.replyId IS NULL') // 返信ではない

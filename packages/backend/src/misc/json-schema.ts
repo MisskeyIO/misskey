@@ -69,6 +69,8 @@ import {
 import { packedUserWebhookSchema } from '@/models/json-schema/user-webhook.js';
 import { packedSystemWebhookSchema } from '@/models/json-schema/system-webhook.js';
 import { packedAbuseReportNotificationRecipientSchema } from '@/models/json-schema/abuse-report-notification-recipient.js';
+import { packedAbuseUserReportSchema } from '@/models/json-schema/abuse-user-report.js';
+import { packedUserAccountMoveLogSchema } from '@/models/json-schema/user-account-move-log.js';
 import { packedChatMessageSchema, packedChatMessageLiteSchema, packedChatMessageLiteForRoomSchema, packedChatMessageLiteFor1on1Schema } from '@/models/json-schema/chat-message.js';
 import { packedChatRoomSchema } from '@/models/json-schema/chat-room.js';
 import { packedChatRoomInvitationSchema } from '@/models/json-schema/chat-room-invitation.js';
@@ -140,6 +142,8 @@ export const refs = {
 	UserWebhook: packedUserWebhookSchema,
 	SystemWebhook: packedSystemWebhookSchema,
 	AbuseReportNotificationRecipient: packedAbuseReportNotificationRecipientSchema,
+	AbuseUserReport: packedAbuseUserReportSchema,
+	UserAccountMoveLog: packedUserAccountMoveLogSchema,
 	ChatMessage: packedChatMessageSchema,
 	ChatMessageLite: packedChatMessageLiteSchema,
 	ChatMessageLiteFor1on1: packedChatMessageLiteFor1on1Schema,

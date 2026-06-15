@@ -16,7 +16,7 @@ import components from '@/components/index.js';
 import { themeManager } from '@/theme.js';
 import { isDeviceDarkmode } from '@/utility/is-device-darkmode.js';
 import { i18n } from '@/i18n.js';
-import { refreshCurrentAccount, login } from '@/accounts.js';
+import { refreshCurrentAccount, login, updateCurrentAccountPartial } from '@/accounts.js';
 import { store } from '@/store.js';
 import { fetchInstance, instance } from '@/instance.js';
 import { updateDeviceKind } from '@/utility/device-kind.js';
@@ -24,12 +24,43 @@ import { reloadChannel } from '@/utility/unison-reload.js';
 import { getUrlWithoutLoginId } from '@/utility/login-id.js';
 import { getAccountFromId } from '@/utility/get-account-from-id.js';
 import { deckStore } from '@/ui/deck/deck-store.js';
-import { analytics, initAnalytics } from '@/analytics.js';
+import { sendInitialAnalyticsPageView } from '@/analytics.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { fetchCustomEmojis } from '@/custom-emojis.js';
 import { prefer } from '@/preferences.js';
 import { $i } from '@/i.js';
 import { launchPlugins } from '@/plugin.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
+import { getAutoPostingLang, getDefaultViewingLangs, normalizePostingLang, normalizeViewingLangs } from '@/utility/posting-language.js';
+
+async function initializeLanguagePreferences() {
+	if (!$i) return;
+
+	const initializedKey = `languagePreferencesInitialized:${$i.id}` as const;
+	if (miLocalStorage.getItem(initializedKey) === 'true') return;
+
+	const postingLang = normalizePostingLang($i.postingLang) ?? getAutoPostingLang(navigator.language);
+	const currentViewingLangs = normalizeViewingLangs($i.viewingLangs);
+	const viewingLangs = currentViewingLangs.length > 0 ? currentViewingLangs : getDefaultViewingLangs(postingLang);
+
+	try {
+		const i = await misskeyApi('i/update', {
+			postingLang,
+			viewingLangs,
+			showMediaInAllLanguages: $i.showMediaInAllLanguages ?? true,
+			showHashtagsInAllLanguages: $i.showHashtagsInAllLanguages ?? true,
+		});
+		updateCurrentAccountPartial({
+			postingLang: i.postingLang,
+			viewingLangs: i.viewingLangs,
+			showMediaInAllLanguages: i.showMediaInAllLanguages,
+			showHashtagsInAllLanguages: i.showHashtagsInAllLanguages,
+		});
+		miLocalStorage.setItem(initializedKey, 'true');
+	} catch (err) {
+		console.error(err);
+	}
+}
 
 export async function common(createVue: () => Promise<App<Element>>) {
 	console.info(`Misskey v${version}`);
@@ -237,7 +268,8 @@ export async function common(createVue: () => Promise<App<Element>>) {
 			console.log('account cache found. refreshing...');
 		}
 
-		refreshCurrentAccount();
+		await refreshCurrentAccount();
+		await initializeLanguagePreferences();
 	}
 	//#endregion
 
@@ -247,15 +279,7 @@ export async function common(createVue: () => Promise<App<Element>>) {
 
 	// analytics
 	fetchInstanceMetaPromise.then(async () => {
-		await initAnalytics(instance);
-
-		if ($i) {
-			analytics.identify($i.id);
-		}
-
-		analytics.page({
-			path: window.location.pathname,
-		});
+		await sendInitialAnalyticsPageView(instance, $i?.id, window.location.pathname);
 	});
 
 	const app = await createVue();

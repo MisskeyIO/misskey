@@ -260,7 +260,7 @@ async function promoteJob() {
 	});
 	if (canceled) return;
 
-	os.apiWithDialog('admin/queue/retry-job', { queue: props.queueType, jobId: props.job.id });
+	os.apiWithDialog('admin/queue/promote', { queue: props.queueType, jobId: props.job.id });
 }
 
 async function removeJob() {

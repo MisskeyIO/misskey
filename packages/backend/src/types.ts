@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { MiIndieAuthClient } from '@/models/IndieAuthClient.js';
+import type { MiSingleSignOnServiceProvider } from '@/models/SingleSignOnServiceProvider.js';
+
 /**
  * note - 通知オンにしているユーザーが投稿した
  * follow - フォローされた
@@ -84,6 +87,7 @@ export const moderationLogTypes = [
 	'suspend',
 	'unsuspend',
 	'updateUserNote',
+	'updateInlinePolicies',
 	'addCustomEmoji',
 	'updateCustomEmoji',
 	'deleteCustomEmoji',
@@ -111,6 +115,9 @@ export const moderationLogTypes = [
 	'resolveAbuseReport',
 	'forwardAbuseReport',
 	'updateAbuseReportNote',
+	'regenerateUserToken',
+	'updateUserName',
+	'unsetUserMutualLink',
 	'createInvitation',
 	'createAd',
 	'updateAd',
@@ -126,6 +133,12 @@ export const moderationLogTypes = [
 	'createAbuseReportNotificationRecipient',
 	'updateAbuseReportNotificationRecipient',
 	'deleteAbuseReportNotificationRecipient',
+	'createIndieAuthClient',
+	'updateIndieAuthClient',
+	'deleteIndieAuthClient',
+	'createSSOServiceProvider',
+	'updateSSOServiceProvider',
+	'deleteSSOServiceProvider',
 	'deleteAccount',
 	'deletePage',
 	'deleteFlash',
@@ -156,6 +169,25 @@ export type ModerationLogPayloads = {
 		before: string | null;
 		after: string | null;
 	};
+	updateInlinePolicies: {
+		userId: string;
+		userUsername: string;
+		userHost: string | null;
+		before: Array<{
+			id: string;
+			policy: string;
+			operation: 'set' | 'increment';
+			value: boolean | number | string | string[] | null;
+			memo: string | null;
+		}>;
+		after: Array<{
+			id: string;
+			policy: string;
+			operation: 'set' | 'increment';
+			value: boolean | number | string | string[] | null;
+			memo: string | null;
+		}>;
+	};
 	addCustomEmoji: {
 		emojiId: string;
 		emoji: any;
@@ -176,6 +208,7 @@ export type ModerationLogPayloads = {
 		roleId: string;
 		roleName: string;
 		expiresAt: string | null;
+		memo: string | null;
 	};
 	unassignRole: {
 		userId: string;
@@ -294,6 +327,24 @@ export type ModerationLogPayloads = {
 		before: string;
 		after: string;
 	};
+	regenerateUserToken: {
+		userId: string;
+		userUsername: string;
+		userHost: string | null;
+	};
+	updateUserName: {
+		userId: string;
+		userUsername: string;
+		userHost: string | null;
+		before: string | null;
+		after: string | null;
+	};
+	unsetUserMutualLink: {
+		userId: string;
+		userUsername: string;
+		userHost: string | null;
+		userMutualLinkSections: any;
+	};
 	createInvitation: {
 		invitations: any[];
 	};
@@ -360,6 +411,32 @@ export type ModerationLogPayloads = {
 	deleteAbuseReportNotificationRecipient: {
 		recipientId: string;
 		recipient: any;
+	};
+	createIndieAuthClient: {
+		clientId: string;
+		client: MiIndieAuthClient;
+	};
+	updateIndieAuthClient: {
+		clientId: string;
+		before: MiIndieAuthClient;
+		after: MiIndieAuthClient;
+	};
+	deleteIndieAuthClient: {
+		clientId: string;
+		client: MiIndieAuthClient;
+	};
+	createSSOServiceProvider: {
+		providerId: string;
+		provider: MiSingleSignOnServiceProvider;
+	};
+	updateSSOServiceProvider: {
+		providerId: string;
+		before: MiSingleSignOnServiceProvider;
+		after: MiSingleSignOnServiceProvider;
+	};
+	deleteSSOServiceProvider: {
+		providerId: string;
+		provider: MiSingleSignOnServiceProvider;
 	};
 	deleteAccount: {
 		userId: string;

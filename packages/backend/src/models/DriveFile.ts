@@ -158,6 +158,12 @@ export class MiDriveFile {
 	@Index()
 	@Column('boolean', {
 		default: false,
+	})
+	public isSensitiveByModerator: boolean;
+
+	@Index()
+	@Column('boolean', {
+		default: false,
 		comment: 'Whether the DriveFile is NSFW. (predict)',
 	})
 	public maybeSensitive: boolean;

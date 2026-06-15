@@ -87,6 +87,7 @@ export class DropAndFusionGame extends EventEmitter<{
 			case 'square': return SQUARE_MONOS;
 			case 'sweets': return SWEETS_MONOS;
 			case 'space': return NORAML_MONOS;
+			default: throw new Error('unrecognized game mode');
 		}
 	}
 
@@ -186,7 +187,7 @@ export class DropAndFusionGame extends EventEmitter<{
 	}
 
 	private createBody(mono: Mono, x: number, y: number) {
-		const options = {
+		const options: Matter.IChamferableBodyDefinition = {
 			label: mono.id,
 			density: this.gameMode === 'space' ? 0.01 : ((mono.sizeX * mono.sizeY) / 10000),
 			restitution: this.gameMode === 'space' ? 0.5 : 0.2,
@@ -306,7 +307,6 @@ export class DropAndFusionGame extends EventEmitter<{
 					this.gameOver();
 					break;
 				}
-				continue;
 			}
 		}
 	}

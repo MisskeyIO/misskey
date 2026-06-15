@@ -122,9 +122,10 @@ export class ReactionService {
 			throw new IdentifiableError('12c35529-3c79-4327-b1cc-e2cf63a71925', 'You cannot react to Renote.');
 		}
 
+		const policies = await this.roleService.getUserPolicies(user.id);
 		let reaction = _reaction ?? FALLBACK;
 
-		if (note.reactionAcceptance === 'likeOnly' || ((note.reactionAcceptance === 'likeOnlyForRemote' || note.reactionAcceptance === 'nonSensitiveOnlyForLocalLikeOnlyForRemote') && (user.host != null))) {
+		if (note.reactionAcceptance === 'likeOnly' || !policies.canUseReaction || ((note.reactionAcceptance === 'likeOnlyForRemote' || note.reactionAcceptance === 'nonSensitiveOnlyForLocalLikeOnlyForRemote') && (user.host != null))) {
 			reaction = '\u2764';
 		} else if (_reaction != null) {
 			const custom = reaction.match(isCustomEmojiRegexp);
@@ -140,7 +141,12 @@ export class ReactionService {
 					});
 
 				if (emoji) {
-					if (emoji.roleIdsThatCanBeUsedThisEmojiAsReaction.length === 0 || (await this.roleService.getUserRoles(user.id)).some(r => emoji.roleIdsThatCanBeUsedThisEmojiAsReaction.includes(r.id))) {
+					const roleIdsThatCanBeUsed = emoji.roleIdsThatCanBeUsedThisEmojiAsReaction;
+					const roleIdsThatCanNotBeUsed = emoji.roleIdsThatCanNotBeUsedThisEmojiAsReaction;
+					const roles = roleIdsThatCanBeUsed.length > 0 || roleIdsThatCanNotBeUsed.length > 0 ? await this.roleService.getUserRoles(user.id) : [];
+					const canUse = roleIdsThatCanBeUsed.length === 0 || roles.some(r => roleIdsThatCanBeUsed.includes(r.id));
+					const canNotUse = roles.some(r => roleIdsThatCanNotBeUsed.includes(r.id));
+					if (canUse && !canNotUse) {
 						reaction = reacterHost ? `:${name}@${reacterHost}:` : `:${name}:`;
 
 						// センシティブ

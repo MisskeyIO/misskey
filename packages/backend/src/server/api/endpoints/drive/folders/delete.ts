@@ -14,6 +14,7 @@ export const meta = {
 	tags: ['drive'],
 
 	requireCredential: true,
+	requiredRolePolicy: 'canDeleteContent',
 
 	kind: 'write:drive',
 

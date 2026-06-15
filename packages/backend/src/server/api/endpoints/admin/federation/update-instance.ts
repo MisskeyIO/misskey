@@ -40,7 +40,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private moderationLogService: ModerationLogService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
-			const instance = await this.instancesRepository.findOneBy({ host: this.utilityService.toPuny(ps.host) });
+			const host = this.utilityService.toPuny(ps.host);
+
+			if (ps.isSuspended == null && ps.moderationNote == null) {
+				await this.federatedInstanceService.invalidate(host);
+				return;
+			}
+
+			const instance = await this.instancesRepository.findOneBy({ host });
 
 			if (instance == null) {
 				throw new Error('instance not found');

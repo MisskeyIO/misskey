@@ -114,13 +114,15 @@ export class FollowingEntityService {
 		const _followers = opts?.populateFollower ? followings.map(({ follower, followerId }) => follower ?? followerId) : [];
 		const _userMap = await this.userEntityService.packMany([..._followees, ..._followers], me, { schema: 'UserDetailedNotMe' })
 			.then(users => new Map(users.map(u => [u.id, u])));
-		return Promise.all(
+		return (await Promise.allSettled(
 			followings.map(following => {
 				const packedFollowee = opts?.populateFollowee ? _userMap.get(following.followeeId) : undefined;
 				const packedFollower = opts?.populateFollower ? _userMap.get(following.followerId) : undefined;
 				return this.pack(following, me, opts, { packedFollowee, packedFollower });
 			}),
-		);
+		))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => result.value);
 	}
 }
 

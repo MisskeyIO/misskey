@@ -46,6 +46,7 @@ export const paramDef = {
 		untilId: { type: 'string', format: 'misskey:id' },
 		sinceDate: { type: 'integer' },
 		untilDate: { type: 'integer' },
+		dimension: { type: 'integer', minimum: 0, nullable: true },
 	},
 	required: [],
 } as const;
@@ -105,7 +106,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				}
 			});
 
-			return await this.noteEntityService.packMany(timeline, me);
+			return await this.noteEntityService.packMany(timeline, me, { viewerDimension: ps.dimension ?? 0 });
 		});
 	}
 }

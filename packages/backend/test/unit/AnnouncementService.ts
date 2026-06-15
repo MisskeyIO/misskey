@@ -159,6 +159,29 @@ describe('AnnouncementService', () => {
 			expect(result.some(a => a.title === announcementBefore.title)).toBe(false);
 			expect(result.some(a => a.title === announcementBefore2.title)).toBe(true);
 		});
+
+		test('displayOrderの降順で並ぶ', async () => {
+			const user = await createUser();
+			await createAnnouncement({
+				title: 'low',
+				createdAt: new Date(Date.now() - 1000),
+				displayOrder: 1,
+			});
+			await createAnnouncement({
+				title: 'high-old',
+				createdAt: new Date(Date.now() - 2000),
+				displayOrder: 10,
+			});
+			await createAnnouncement({
+				title: 'high-new',
+				createdAt: new Date(Date.now() - 500),
+				displayOrder: 10,
+			});
+
+			const result = await announcementService.getUnreadAnnouncements(user);
+
+			expect(result.map(announcement => announcement.title)).toEqual(['high-new', 'high-old', 'low']);
+		});
 	});
 
 	describe('create', () => {
@@ -167,10 +190,19 @@ describe('AnnouncementService', () => {
 			const result = await announcementService.create({
 				title: 'Title',
 				text: 'Text',
+				needEnrollmentTutorialToRead: true,
+				closeDuration: 3600,
+				displayOrder: 5,
 			}, me);
 
 			expect(result.raw.title).toBe('Title');
 			expect(result.packed.title).toBe('Title');
+			expect(result.raw.needEnrollmentTutorialToRead).toBe(true);
+			expect(result.raw.closeDuration).toBe(3600);
+			expect(result.raw.displayOrder).toBe(5);
+			expect(result.packed.needEnrollmentTutorialToRead).toBe(true);
+			expect(result.packed.closeDuration).toBe(3600);
+			expect(result.packed.displayOrder).toBe(5);
 
 			expect(globalEventService.publishBroadcastStream).toHaveBeenCalled();
 			expect(globalEventService.publishBroadcastStream.mock.lastCall![0]).toBe('announcementCreated');
@@ -199,8 +231,30 @@ describe('AnnouncementService', () => {
 		});
 	});
 
+	describe('update', () => {
+		test('追加フィールドを更新できる', async () => {
+			const me = await createUser();
+			const announcement = await createAnnouncement({
+				needEnrollmentTutorialToRead: false,
+				closeDuration: 0,
+				displayOrder: 0,
+			});
+
+			await announcementService.update(announcement, {
+				needEnrollmentTutorialToRead: true,
+				closeDuration: 7200,
+				displayOrder: 12,
+			}, me);
+
+			const updated = await announcementsRepository.findOneByOrFail({ id: announcement.id });
+			expect(updated.needEnrollmentTutorialToRead).toBe(true);
+			expect(updated.closeDuration).toBe(7200);
+			expect(updated.displayOrder).toBe(12);
+			expect(moderationLogService.log).toHaveBeenCalled();
+		});
+	});
+
 	describe.todo('read', () => {
 		// TODO
 	});
 });
-

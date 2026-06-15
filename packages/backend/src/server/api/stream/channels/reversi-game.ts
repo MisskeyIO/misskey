@@ -17,8 +17,8 @@ import { REQUEST } from '@nestjs/core';
 @Injectable({ scope: Scope.TRANSIENT })
 export class ReversiGameChannel extends Channel {
 	public readonly chName = 'reversiGame';
-	public static shouldShare = false;
-	public static requireCredential = false as const;
+	public static readonly shouldShare = false;
+	public static readonly requireCredential = false as const;
 	private gameId: MiReversiGame['id'] | null = null;
 
 	constructor(
@@ -107,4 +107,3 @@ export class ReversiGameChannel extends Channel {
 		this.subscriber.off(`reversiGameStream:${this.gameId}`, this.send);
 	}
 }
-

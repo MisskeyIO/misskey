@@ -13,14 +13,17 @@ import { Test } from '@nestjs/testing';
 import * as lolex from '@sinonjs/fake-timers';
 import type { TestingModule } from '@nestjs/testing';
 import { GlobalModule } from '@/GlobalModule.js';
-import { RoleService } from '@/core/RoleService.js';
+import { DEFAULT_POLICIES, RoleService } from '@/core/RoleService.js';
+import { RoleEntityService } from '@/core/entities/RoleEntityService.js';
 import {
 	MiMeta,
 	MiRole,
 	MiRoleAssignment,
 	MiUser,
+	MiUserInlinePolicy,
 	RoleAssignmentsRepository,
 	RolesRepository,
+	UserInlinePoliciesRepository,
 	UsersRepository,
 } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
@@ -40,6 +43,8 @@ describe('RoleService', () => {
 	let usersRepository: UsersRepository;
 	let rolesRepository: RolesRepository;
 	let roleAssignmentsRepository: RoleAssignmentsRepository;
+	let userInlinePoliciesRepository: UserInlinePoliciesRepository;
+	let roleEntityService: RoleEntityService;
 	let meta: Mocked<MiMeta>;
 	let notificationService: Mocked<NotificationService>;
 	let clock: lolex.Clock;
@@ -96,6 +101,22 @@ describe('RoleService', () => {
 		return await roleAssignmentsRepository.findOneByOrFail({ id });
 	}
 
+	async function createInlinePolicy(data: Partial<MiUserInlinePolicy>) {
+		const id = genAidx(Date.now());
+		if (data.userId == null) throw new Error('userId is required to create inline policy');
+
+		await userInlinePoliciesRepository.insert({
+			id,
+			userId: data.userId,
+			policy: data.policy ?? 'driveCapacityMb',
+			operation: data.operation ?? 'set',
+			value: data.value ?? null,
+			memo: data.memo ?? null,
+		});
+
+		return await userInlinePoliciesRepository.findOneByOrFail({ id });
+	}
+
 	function aidx() {
 		return genAidx(Date.now());
 	}
@@ -114,6 +135,7 @@ describe('RoleService', () => {
 			],
 			providers: [
 				RoleService,
+				RoleEntityService,
 				CacheService,
 				IdService,
 				GlobalEventService,
@@ -143,9 +165,11 @@ describe('RoleService', () => {
 		app.enableShutdownHooks();
 
 		roleService = app.get<RoleService>(RoleService);
+		roleEntityService = app.get<RoleEntityService>(RoleEntityService);
 		usersRepository = app.get<UsersRepository>(DI.usersRepository);
 		rolesRepository = app.get<RolesRepository>(DI.rolesRepository);
 		roleAssignmentsRepository = app.get<RoleAssignmentsRepository>(DI.roleAssignmentsRepository);
+		userInlinePoliciesRepository = app.get<UserInlinePoliciesRepository>(DI.userInlinePoliciesRepository);
 
 		meta = app.get<MiMeta>(DI.meta) as Mocked<MiMeta>;
 		notificationService = app.get<NotificationService>(NotificationService) as Mocked<NotificationService>;
@@ -162,6 +186,7 @@ describe('RoleService', () => {
 		 */
 		await app.get(DI.metasRepository).createQueryBuilder().delete().execute();
 		await roleAssignmentsRepository.createQueryBuilder().delete().execute();
+		await userInlinePoliciesRepository.createQueryBuilder().delete().execute();
 		await Promise.all([
 			usersRepository.createQueryBuilder().delete().execute(),
 			rolesRepository.createQueryBuilder().delete().execute(),
@@ -205,6 +230,33 @@ describe('RoleService', () => {
 			expect(assigns.some(a => a.roleId === roleNoExpiry.id)).toBe(true);
 			expect(assigns.some(a => a.roleId === roleNotExpired.id)).toBe(true);
 			expect(assigns.some(a => a.roleId === roleExpired.id)).toBe(false);
+		});
+
+		test('アサイン時のメモを保持して取得できる', async () => {
+			const user = await createUser();
+			const role = await createRole({ name: 'memo role' });
+			const memo = 'temporary support escalation';
+
+			await roleService.assign(user.id, role.id, memo);
+
+			const stored = await roleAssignmentsRepository.findOneByOrFail({ userId: user.id, roleId: role.id });
+			expect(stored.memo).toBe(memo);
+
+			const assigns = await roleService.getUserAssigns(user.id);
+			expect(assigns.find(a => a.roleId === role.id)?.memo).toBe(memo);
+		});
+	});
+
+	describe('pack', () => {
+		test('ロールのバッジ挙動をシリアライズできる', async () => {
+			const role = await createRole({
+				name: 'animated badge',
+				asBadge: true,
+				badgeBehavior: 'sparkle',
+			});
+
+			const packed = await roleEntityService.pack(role);
+			expect(packed.badgeBehavior).toBe('sparkle');
 		});
 	});
 
@@ -365,6 +417,141 @@ describe('RoleService', () => {
 			// roleWithoutPolicy は default 値 (5) を使い、roleWithPolicy の 10 と比較して大きい方が採用される
 			expect(result.pinLimit).toBe(10);
 		});
+
+		test('canIgnoreAiNsfw defaults to false and can be enabled by role policy', async () => {
+			const defaultUser = await createUser();
+			const roleUser = await createUser();
+			meta.policies = {
+				canIgnoreAiNsfw: false,
+			};
+
+			const role = await createRole({
+				name: 'canIgnoreAiNsfw',
+				policies: {
+					canIgnoreAiNsfw: {
+						useDefault: false,
+						priority: 0,
+						value: true,
+					},
+				},
+			});
+
+			const defaults = await roleService.getUserPolicies(defaultUser.id);
+			expect(defaults.canIgnoreAiNsfw).toBe(false);
+
+			await roleService.assign(roleUser.id, role.id);
+
+			const withRole = await roleService.getUserPolicies(roleUser.id);
+			expect(withRole.canIgnoreAiNsfw).toBe(true);
+		});
+
+		test('canUseReaction defaults to true and can be disabled by role policy', async () => {
+			const defaultUser = await createUser();
+			const roleUser = await createUser();
+			meta.policies = {
+				canUseReaction: true,
+			};
+
+			const role = await createRole({
+				name: 'cannot use reactions',
+				policies: {
+					canUseReaction: {
+						useDefault: false,
+						priority: 0,
+						value: false,
+					},
+				},
+			});
+
+			const defaults = await roleService.getUserPolicies(defaultUser.id);
+			expect(defaults.canUseReaction).toBe(true);
+
+			await roleService.assign(roleUser.id, role.id);
+
+			const withRole = await roleService.getUserPolicies(roleUser.id);
+			expect(withRole.canUseReaction).toBe(false);
+		});
+
+		test('schedule/content/antenna policies default and aggregate by role policy', async () => {
+			const defaultUser = await createUser();
+			const roleUser = await createUser();
+			meta.policies = {
+				canScheduleNote: false,
+				scheduleNoteMaxDays: 7,
+				antennaNotesLimit: 50,
+				canCreateContent: false,
+				canDeleteContent: false,
+			};
+
+			const role = await createRole({
+				name: 'schedule content antenna policy',
+				policies: {
+					canScheduleNote: {
+						useDefault: false,
+						priority: 0,
+						value: true,
+					},
+					scheduleNoteMaxDays: {
+						useDefault: false,
+						priority: 0,
+						value: 30,
+					},
+					antennaNotesLimit: {
+						useDefault: false,
+						priority: 0,
+						value: 500,
+					},
+					canCreateContent: {
+						useDefault: false,
+						priority: 0,
+						value: true,
+					},
+					canDeleteContent: {
+						useDefault: false,
+						priority: 0,
+						value: true,
+					},
+				},
+			});
+
+			const defaults = await roleService.getUserPolicies(defaultUser.id);
+			expect(defaults.canScheduleNote).toBe(false);
+			expect(defaults.scheduleNoteMaxDays).toBe(7);
+			expect(defaults.antennaNotesLimit).toBe(50);
+			expect(defaults.canCreateContent).toBe(false);
+			expect(defaults.canDeleteContent).toBe(false);
+
+			await roleService.assign(roleUser.id, role.id);
+
+			const withRole = await roleService.getUserPolicies(roleUser.id);
+			expect(withRole.canScheduleNote).toBe(true);
+			expect(withRole.scheduleNoteMaxDays).toBe(30);
+			expect(withRole.antennaNotesLimit).toBe(500);
+			expect(withRole.canCreateContent).toBe(true);
+			expect(withRole.canDeleteContent).toBe(true);
+		});
+
+		test('inline policies set and increment aggregated role policies', async () => {
+			const user = await createUser();
+
+			await createInlinePolicy({
+				userId: user.id,
+				policy: 'canHideAds',
+				operation: 'set',
+				value: true,
+			});
+			await createInlinePolicy({
+				userId: user.id,
+				policy: 'driveCapacityMb',
+				operation: 'increment',
+				value: 50,
+			});
+
+			const result = await roleService.getUserPolicies(user.id);
+
+			expect(result.canHideAds).toBe(true);
+			expect(result.driveCapacityMb).toBe(DEFAULT_POLICIES.driveCapacityMb + 50);
+		});
 	});
 
 	describe('getUserBadgeRoles', () => {
@@ -379,6 +566,40 @@ describe('RoleService', () => {
 			const roles = await roleService.getUserBadgeRoles(user.id);
 			expect(roles.some(r => r.id === badgeRole.id)).toBe(true);
 			expect(roles.some(r => r.id === normalRole.id)).toBe(false);
+		});
+
+		test('既存の呼び出しはMiRoleを返し、公開限定マッピングではバッジ挙動を含める', async () => {
+			const user = await createUser();
+			const publicRole = await createRole({
+				name: 'public badge',
+				iconUrl: 'https://example.test/public.png',
+				asBadge: true,
+				isPublic: true,
+				displayOrder: 10,
+				badgeBehavior: 'sparkle',
+			});
+			const privateRole = await createRole({
+				name: 'private badge',
+				asBadge: true,
+				isPublic: false,
+				displayOrder: 20,
+				badgeBehavior: 'internal',
+			});
+
+			await roleService.assign(user.id, publicRole.id);
+			await roleService.assign(user.id, privateRole.id);
+
+			const entityRoles = await roleService.getUserBadgeRoles(user.id);
+			expect(entityRoles.some(r => r.id === publicRole.id)).toBe(true);
+			expect(entityRoles.some(r => r.id === privateRole.id)).toBe(true);
+
+			const mappedRoles = await roleService.getUserBadgeRoles(user.id, true);
+			expect(mappedRoles).toEqual([{
+				name: publicRole.name,
+				iconUrl: publicRole.iconUrl,
+				displayOrder: publicRole.displayOrder,
+				behavior: 'sparkle',
+			}]);
 		});
 
 		test('コンディショナルなバッジロールが条件一致で返る', async () => {

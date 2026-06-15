@@ -9,6 +9,7 @@ on:
       - packages/backend/**
       # for permissions
       - packages/misskey-js/**
+      - pnpm-lock.yaml
       - .github/workflows/test-backend.yml
       - .github/misskey/test.yml
   pull_request:
@@ -16,6 +17,7 @@ on:
       - packages/backend/**
       # for permissions
       - packages/misskey-js/**
+      - pnpm-lock.yaml
       - .github/workflows/test-backend.yml
       - .github/misskey/test.yml
   workflow_dispatch:
@@ -25,6 +27,9 @@ on:
         required: false
         default: false
         type: boolean
+
+permissions:
+  contents: read
 
 jobs:
   unit:
@@ -57,11 +62,13 @@ jobs:
           MEILI_ENV: development
 
     steps:
-    - uses: actions/checkout@v6.0.2
+    - uses: actions/checkout@v6
       with:
         submodules: true
     - name: Setup pnpm
-      uses: pnpm/action-setup@v6.0.3
+      uses: pnpm/action-setup@v5
+      with:
+        run_install: false
     - name: Get current date
       id: current-date
       run: echo "today=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
@@ -93,7 +100,7 @@ jobs:
           fi
         done
     - name: Use Node.js
-      uses: actions/setup-node@v6.4.0
+      uses: actions/setup-node@v6
       with:
         node-version-file: ${{ matrix.node-version-file }}
         cache: 'pnpm'
@@ -136,13 +143,15 @@ jobs:
           - 56312:6379
 
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6.0.3
+        uses: pnpm/action-setup@v5
+        with:
+          run_install: false
       - name: Use Node.js
-        uses: actions/setup-node@v6.4.0
+        uses: actions/setup-node@v6
         with:
           node-version-file: ${{ matrix.node-version-file }}
           cache: 'pnpm'
@@ -180,16 +189,18 @@ jobs:
           POSTGRES_HOST_AUTH_METHOD: trust
 
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6.0.3
+        uses: pnpm/action-setup@v5
+        with:
+          run_install: false
       - name: Get current date
         id: current-date
         run: echo "today=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
       - name: Use Node.js
-        uses: actions/setup-node@v6.4.0
+        uses: actions/setup-node@v6
         with:
           node-version-file: ${{ matrix.node-version-file }}
           cache: 'pnpm'

@@ -49,6 +49,36 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</MkFolder>
 			</SearchMarker>
 
+			<SearchMarker :keywords="['timeline', 'cache']">
+				<MkFolder>
+					<template #icon><SearchIcon><i class="ti ti-database"></i></SearchIcon></template>
+					<template #label><SearchLabel>{{ i18n.ts.timelineCache }}</SearchLabel></template>
+
+					<div class="_gaps_m">
+						<div>{{ i18n.ts.timelineCacheDescription }}</div>
+
+						<div class="_gaps_s">
+							<MkButton @click="purgeTimelineCache('home')"><i class="ti ti-trash"></i> {{ i18n.ts.purgeHomeTimelineCache }}</MkButton>
+							<MkButton @click="purgeTimelineCache('user')"><i class="ti ti-trash"></i> {{ i18n.ts.purgeUserTimelineCache }}</MkButton>
+						</div>
+
+						<div class="_gaps_s">
+							<MkSelect v-model="selectedListId" :items="userListSelectDef" :disabled="userLists.length === 0">
+								<template #label>{{ i18n.ts.selectList }}</template>
+							</MkSelect>
+							<MkButton :disabled="selectedListId == null" @click="purgeTimelineCache('list', selectedListId)"><i class="ti ti-trash"></i> {{ i18n.ts.purgeUserListTimelineCache }}</MkButton>
+						</div>
+
+						<div class="_gaps_s">
+							<MkSelect v-model="selectedAntennaId" :items="antennaSelectDef" :disabled="antennas.length === 0">
+								<template #label>{{ i18n.ts.selectAntenna }}</template>
+							</MkSelect>
+							<MkButton :disabled="selectedAntennaId == null" @click="purgeTimelineCache('antenna', selectedAntennaId)"><i class="ti ti-trash"></i> {{ i18n.ts.purgeAntennaTimelineCache }}</MkButton>
+						</div>
+					</div>
+				</MkFolder>
+			</SearchMarker>
+
 			<SearchMarker :keywords="['roles']">
 				<MkFolder>
 					<template #icon><SearchIcon><i class="ti ti-badges"></i></SearchIcon></template>
@@ -155,7 +185,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
+import * as Misskey from 'misskey-js';
 import XMigration from './migration.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import FormLink from '@/components/form/link.vue';
@@ -163,8 +194,10 @@ import MkFolder from '@/components/MkFolder.vue';
 import FormInfo from '@/components/MkInfo.vue';
 import MkKeyValue from '@/components/MkKeyValue.vue';
 import MkButton from '@/components/MkButton.vue';
+import MkSelect from '@/components/MkSelect.vue';
 import FormSlot from '@/components/form/slot.vue';
 import * as os from '@/os.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 import { enableStoragePersistence, getStoragePersistenceStatusRef, storagePersistenceSupported } from '@/utility/storage.js';
 import { ensureSignin } from '@/i.js';
 import { i18n } from '@/i18n.js';
@@ -177,6 +210,7 @@ import { migrateOldSettings } from '@/pref-migrate.js';
 import { hideAllTips as _hideAllTips, resetAllTips as _resetAllTips } from '@/tips.js';
 import { suggestReload } from '@/utility/reload-suggest.js';
 import { cloudBackup } from '@/preferences/utility.js';
+import { useMkSelect } from '@/composables/use-mkselect.js';
 
 const $i = ensureSignin();
 
@@ -190,16 +224,55 @@ const stackingRouterView = prefer.model('experimental.stackingRouterView');
 const enableFolderPageView = prefer.model('experimental.enableFolderPageView');
 const enableHapticFeedback = prefer.model('experimental.enableHapticFeedback');
 const enableWebTranslatorApi = prefer.model('experimental.enableWebTranslatorApi');
+const userLists = ref<Misskey.entities.UserList[]>([]);
+const antennas = ref<Misskey.entities.Antenna[]>([]);
+const {
+	model: selectedListId,
+	def: userListSelectDef,
+} = useMkSelect({
+	items: computed(() => [{
+		value: null,
+		label: i18n.ts.notSet,
+	}, ...userLists.value.map(list => ({
+		value: list.id,
+		label: list.name,
+	}))]),
+	initialValue: null,
+});
+const {
+	model: selectedAntennaId,
+	def: antennaSelectDef,
+} = useMkSelect({
+	items: computed(() => [{
+		value: null,
+		label: i18n.ts.notSet,
+	}, ...antennas.value.map(antenna => ({
+		value: antenna.id,
+		label: antenna.name,
+	}))]),
+	initialValue: null,
+});
 
 watch(skipNoteRender, () => {
 	suggestReload();
+});
+
+onMounted(async () => {
+	try {
+		userLists.value = await misskeyApi('users/lists/list', {});
+		antennas.value = await misskeyApi('antennas/list', {});
+	} catch (error) {
+		console.error('Failed to load timeline cache purge targets', error);
+	}
 });
 
 async function deleteAccount() {
 	{
 		const { canceled } = await os.confirm({
 			type: 'warning',
-			text: i18n.ts.deleteAccountConfirm,
+			text: i18n.ts.deleteAccountConfirmAndWarn,
+			okWaitInitiate: 'dialog',
+			okWaitDuration: 5,
 		});
 		if (canceled) return;
 	}
@@ -217,6 +290,21 @@ async function deleteAccount() {
 	});
 
 	await signout();
+}
+
+async function purgeTimelineCache(type: 'home' | 'user' | 'list' | 'antenna', targetId?: string | null) {
+	const { canceled } = await os.confirm({
+		type: 'warning',
+		title: i18n.ts.timelineCache,
+		text: i18n.ts.purgeTimelineCacheConfirm,
+	});
+	if (canceled) return;
+
+	await os.apiWithDialog('i/purge-timeline-cache', {
+		type,
+		listId: type === 'list' ? targetId : undefined,
+		antennaId: type === 'antenna' ? targetId : undefined,
+	});
 }
 
 function migrate() {

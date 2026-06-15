@@ -19,6 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<XGallery v-else-if="tab === 'gallery'" :user="user"/>
 		<XRaw v-else-if="tab === 'raw'" :user="user"/>
 	</div>
+	<MkUserNotFound v-else-if="userStatus === 'notfound'"/>
 	<MkError v-else-if="error" @retry="fetchUser()"/>
 	<MkLoading v-else/>
 </PageWithHeader>
@@ -33,6 +34,7 @@ import { definePage } from '@/page.js';
 import { i18n } from '@/i18n.js';
 import { $i } from '@/i.js';
 import { serverContext, assertServerContext } from '@/server-context.js';
+import MkUserNotFound from '@/components/MkUserNotFound.vue';
 
 const XHome = defineAsyncComponent(() => import('./home.vue'));
 const XNotes = defineAsyncComponent(() => import('./notes.vue'));
@@ -59,11 +61,21 @@ const props = withDefaults(defineProps<{
 
 const tab = ref(props.page);
 
+type UserStatus = 'notfound' | null;
+
 const user = ref<null | Misskey.entities.UserDetailed>(CTX_USER);
-const error = ref<any>(null);
+const error = ref<unknown | null>(null);
+const userStatus = ref<UserStatus>(null);
+
+function hasErrorCode(err: unknown, code: string): boolean {
+	return typeof err === 'object' && err !== null && 'code' in err && err.code === code;
+}
 
 function fetchUser(): void {
 	if (props.acct == null) return;
+
+	error.value = null;
+	userStatus.value = null;
 
 	const { username, host } = Misskey.acct.parse(props.acct);
 
@@ -79,6 +91,11 @@ function fetchUser(): void {
 	}).then(u => {
 		user.value = u;
 	}).catch(err => {
+		if (hasErrorCode(err, 'NO_SUCH_USER')) {
+			userStatus.value = 'notfound';
+			return;
+		}
+
 		error.value = err;
 	});
 }

@@ -53,7 +53,9 @@ export class ModerationLogEntityService {
 		const _users = reports.map(({ user, userId }) => user ?? userId);
 		const _userMap = await this.userEntityService.packMany(_users, null, { schema: 'UserDetailedNotMe' })
 			.then(users => new Map(users.map(u => [u.id, u])));
-		return Promise.all(reports.map(report => this.pack(report, { packedUser: _userMap.get(report.userId) })));
+		return (await Promise.allSettled(reports.map(report => this.pack(report, { packedUser: _userMap.get(report.userId) }))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => result.value);
 	}
 }
 

@@ -10,7 +10,7 @@ import { ReversiService } from '@/core/ReversiService.js';
 export const meta = {
 	requireCredential: true,
 
-	kind: 'write:account',
+	kind: 'read:account',
 
 	errors: {
 	},
@@ -32,7 +32,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		super(meta, paramDef, async (ps, me) => {
 			if (ps.userId) {
 				await this.reversiService.matchSpecificUserCancel(me, ps.userId);
-				return;
 			} else {
 				await this.reversiService.matchAnyUserCancel(me);
 			}

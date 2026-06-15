@@ -17,6 +17,7 @@ services:
       - ./.config/docker.env
     environment:
       - NODE_ENV=production
+      - FORCE_IGNORE_IDEMPOTENCY_FOR_TESTING=true
     volumes:
       - type: bind
         source: ../../../built

@@ -6,7 +6,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { CustomEmojiService } from '@/core/CustomEmojiService.js';
-import type { DriveFilesRepository, MiEmoji } from '@/models/_.js';
+import { EmojiEntityService } from '@/core/entities/EmojiEntityService.js';
+import type { DriveFilesRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '../../../error.js';
 
@@ -33,6 +34,11 @@ export const meta = {
 			code: 'SAME_NAME_EMOJI_EXISTS',
 			id: '7180fe9d-1ee3-bff9-647d-fe9896d2ffb8',
 		},
+	},
+
+	res: {
+		type: 'object',
+		ref: 'EmojiDetailed',
 	},
 } as const;
 
@@ -71,8 +77,15 @@ export const paramDef = {
 				license: { type: 'string', nullable: true },
 				isSensitive: { type: 'boolean' },
 				localOnly: { type: 'boolean' },
+				requestedBy: { type: 'string', nullable: true },
+				memo: { type: 'string', nullable: true },
 				roleIdsThatCanBeUsedThisEmojiAsReaction: { type: 'array', items: {
 					type: 'string',
+					format: 'misskey:id',
+				} },
+				roleIdsThatCanNotBeUsedThisEmojiAsReaction: { type: 'array', items: {
+					type: 'string',
+					format: 'misskey:id',
 				} },
 			},
 		},
@@ -86,6 +99,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private driveFilesRepository: DriveFilesRepository,
 
 		private customEmojiService: CustomEmojiService,
+		private emojiEntityService: EmojiEntityService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			let driveFile;
@@ -108,16 +122,22 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				license: ps.license,
 				isSensitive: ps.isSensitive,
 				localOnly: ps.localOnly,
+				requestedBy: ps.requestedBy ?? null,
+				memo: ps.memo ?? null,
 				roleIdsThatCanBeUsedThisEmojiAsReaction: ps.roleIdsThatCanBeUsedThisEmojiAsReaction,
+				roleIdsThatCanNotBeUsedThisEmojiAsReaction: ps.roleIdsThatCanNotBeUsedThisEmojiAsReaction,
 			}, me);
 
 			switch (error) {
-				case null: return;
+				case null: {
+					if ('id' in ps) return this.emojiEntityService.packInternal(ps.id);
+					const emoji = await this.customEmojiService.getEmojiByName(ps.name);
+					if (emoji == null) throw new ApiError(meta.errors.noSuchEmoji);
+					return this.emojiEntityService.packInternal(emoji);
+				}
 				case 'NO_SUCH_EMOJI': throw new ApiError(meta.errors.noSuchEmoji);
 				case 'SAME_NAME_EMOJI_EXISTS': throw new ApiError(meta.errors.sameNameEmojiExists);
 			}
-			// 網羅性チェック
-			const _mustBeNever: never = error;
 		});
 	}
 }

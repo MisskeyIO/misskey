@@ -62,10 +62,20 @@ export const paramDef = {
 		license: { type: 'string', nullable: true },
 		isSensitive: { type: 'boolean' },
 		localOnly: { type: 'boolean' },
+		requestedBy: { type: 'string', nullable: true },
+		memo: { type: 'string', nullable: true },
 		roleIdsThatCanBeUsedThisEmojiAsReaction: {
 			type: 'array',
 			items: {
 				type: 'string',
+				format: 'misskey:id',
+			},
+		},
+		roleIdsThatCanNotBeUsedThisEmojiAsReaction: {
+			type: 'array',
+			items: {
+				type: 'string',
+				format: 'misskey:id',
 			},
 		},
 	},
@@ -100,10 +110,13 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				license: ps.license ?? null,
 				isSensitive: ps.isSensitive ?? false,
 				localOnly: ps.localOnly ?? false,
+				requestedBy: ps.requestedBy ?? null,
+				memo: ps.memo ?? null,
 				roleIdsThatCanBeUsedThisEmojiAsReaction: ps.roleIdsThatCanBeUsedThisEmojiAsReaction ?? [],
+				roleIdsThatCanNotBeUsedThisEmojiAsReaction: ps.roleIdsThatCanNotBeUsedThisEmojiAsReaction ?? [],
 			}, me);
 
-			return this.emojiEntityService.packDetailed(emoji);
+			return this.emojiEntityService.packInternal(emoji);
 		});
 	}
 }

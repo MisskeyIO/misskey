@@ -6,7 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <div v-if="$i" :class="$style.root">
 	<MkA
-		v-for="announcement in $i.unreadAnnouncements.filter(x => x.display === 'banner')"
+		v-for="announcement in bannerAnnouncements"
 		:key="announcement.id"
 		:class="$style.item"
 		:to="`/announcements/${announcement.id}`"
@@ -24,7 +24,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue';
+import * as Misskey from 'misskey-js';
 import { $i } from '@/i.js';
+
+const bannerAnnouncements = computed(() => ($i?.unreadAnnouncements ?? [])
+	.filter(x => x.display === 'banner')
+	.toSorted((a, b) => getDisplayOrder(b) - getDisplayOrder(a)));
+
+function getDisplayOrder(announcement: Misskey.entities.Announcement & { displayOrder?: number }): number {
+	return announcement.displayOrder ?? 0;
+}
 </script>
 
 <style lang="scss" module>

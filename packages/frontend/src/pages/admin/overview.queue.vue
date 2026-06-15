@@ -38,10 +38,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { markRaw, onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import XChart from './overview.queue.chart.vue';
-import type { ApQueueDomain } from '@/pages/admin/federation-job-queue.vue';
 import number from '@/filters/number.js';
 import { useStream } from '@/stream.js';
 import { genId } from '@/utility/id.js';
+
+type QueueDomain = 'deliver' | 'inbox';
 
 const connection = markRaw(useStream().useChannel('queueStats'));
 
@@ -55,7 +56,7 @@ const chartDelayed = useTemplateRef('chartDelayed');
 const chartWaiting = useTemplateRef('chartWaiting');
 
 const props = defineProps<{
-	domain: ApQueueDomain;
+	domain: QueueDomain;
 }>();
 
 function onStats(stats: Misskey.entities.QueueStats) {
@@ -71,10 +72,10 @@ function onStats(stats: Misskey.entities.QueueStats) {
 }
 
 function onStatsLog(statsLog: Misskey.entities.QueueStatsLog) {
-	const dataProcess: Misskey.entities.QueueStats[ApQueueDomain]['activeSincePrevTick'][] = [];
-	const dataActive: Misskey.entities.QueueStats[ApQueueDomain]['active'][] = [];
-	const dataDelayed: Misskey.entities.QueueStats[ApQueueDomain]['delayed'][] = [];
-	const dataWaiting: Misskey.entities.QueueStats[ApQueueDomain]['waiting'][] = [];
+	const dataProcess: Misskey.entities.QueueStats[QueueDomain]['activeSincePrevTick'][] = [];
+	const dataActive: Misskey.entities.QueueStats[QueueDomain]['active'][] = [];
+	const dataDelayed: Misskey.entities.QueueStats[QueueDomain]['delayed'][] = [];
+	const dataWaiting: Misskey.entities.QueueStats[QueueDomain]['waiting'][] = [];
 
 	for (const stats of [...statsLog].reverse()) {
 		dataProcess.push(stats[props.domain].activeSincePrevTick);

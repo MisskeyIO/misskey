@@ -167,6 +167,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
+	(ev: 'done'): void;
 	(ev: 'closed'): void;
 }>();
 
@@ -192,6 +193,10 @@ async function close(skip: boolean) {
 			text: i18n.ts._initialTutorial.skipAreYouSure,
 		});
 		if (canceled) return;
+	}
+
+	if (!skip) {
+		emit('done');
 	}
 
 	dialog.value?.close();

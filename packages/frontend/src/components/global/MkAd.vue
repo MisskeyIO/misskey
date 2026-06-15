@@ -14,20 +14,35 @@ SPDX-License-Identifier: AGPL-3.0-only
 			[$style.form_vertical]: chosen.place === 'vertical',
 		}]"
 	>
-		<component
-			:is="self ? 'MkA' : 'a'"
-			:class="$style.link"
-			v-bind="self ? {
-				to: chosen.url.substring(local.length),
-			} : {
-				href: chosen.url,
-				rel: 'nofollow noopener',
-				target: '_blank',
-			}"
+		<template v-if="!hidesSensitiveAd">
+			<component
+				:is="self ? 'MkA' : 'a'"
+				:class="$style.link"
+				v-bind="self ? {
+					to: chosen.url.substring(local.length),
+				} : {
+					href: chosen.url,
+					rel: 'nofollow noopener',
+					target: '_blank',
+				}"
+			>
+				<img :src="chosen.imageUrl" :class="$style.img">
+				<button class="_button" :class="$style.i" @click.prevent.stop="toggleMenu"><i :class="$style.iIcon" class="ti ti-info-circle"></i></button>
+			</component>
+		</template>
+		<div
+			v-else
+			:class="$style.sensitiveHidden"
+			:role="canRevealSensitiveAd ? 'button' : undefined"
+			:tabindex="canRevealSensitiveAd ? 0 : undefined"
+			@click="showSensitiveAd"
+			@keydown.enter="showSensitiveAd"
+			@keydown.space.prevent="showSensitiveAd"
 		>
-			<img :src="chosen.imageUrl" :class="$style.img">
+			<b><i class="ti ti-eye-exclamation" :class="$style.sensitiveIcon"></i> {{ i18n.ts.sensitive }}</b>
+			<span v-if="canRevealSensitiveAd">{{ i18n.ts.clickToShow }}</span>
 			<button class="_button" :class="$style.i" @click.prevent.stop="toggleMenu"><i :class="$style.iIcon" class="ti ti-info-circle"></i></button>
-		</component>
+		</div>
 	</div>
 	<div v-else :class="$style.menu">
 		<div>Ads by {{ host }}</div>
@@ -48,6 +63,7 @@ import { store } from '@/store.js';
 import * as os from '@/os.js';
 import { $i } from '@/i.js';
 import { prefer } from '@/preferences.js';
+import { sensitiveContentConsent, requestSensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 
 type Ad = (typeof instance)['ads'][number];
 
@@ -61,6 +77,10 @@ const toggleMenu = (): void => {
 	showMenu.value = !showMenu.value;
 };
 
+function shouldFilterSensitiveAd(ad: Ad): boolean {
+	return ad.isSensitive === true && (prefer.s.displayOfSensitiveAds === 'filtered' || sensitiveContentConsent.value === false);
+}
+
 const choseAd = (): Ad | null => {
 	if (props.specify) {
 		return props.specify;
@@ -69,7 +89,7 @@ const choseAd = (): Ad | null => {
 	const allAds = instance.ads.map(ad => store.s.mutedAds.includes(ad.id) ? {
 		...ad,
 		ratio: 0,
-	} : ad);
+	} : ad).filter(ad => !shouldFilterSensitiveAd(ad));
 
 	let ads = props.preferForms ? allAds.filter(ad => props.preferForms!.includes(ad.place)) : allAds;
 
@@ -108,6 +128,28 @@ const chosen = ref(choseAd());
 const self = computed(() => chosen.value?.url.startsWith(local));
 
 const shouldHide = ref(!prefer.s.forceShowAds && $i && $i.policies.canHideAds && (props.specify == null));
+const sensitiveAdRevealed = ref(false);
+
+const canRevealSensitiveAd = computed(() => chosen.value?.isSensitive === true && prefer.s.displayOfSensitiveAds === 'hidden' && sensitiveContentConsent.value !== false);
+const hidesSensitiveAd = computed(() => {
+	if (chosen.value?.isSensitive !== true) return false;
+	if (sensitiveContentConsent.value === false) return true;
+	if (prefer.s.displayOfSensitiveAds === 'always') return false;
+	if (prefer.s.displayOfSensitiveAds === 'hidden') return !sensitiveAdRevealed.value;
+	return true;
+});
+
+async function showSensitiveAd(ev: MouseEvent | KeyboardEvent): Promise<void> {
+	if (!canRevealSensitiveAd.value) return;
+
+	ev.preventDefault();
+	ev.stopPropagation();
+
+	const allowed = await requestSensitiveContentConsent();
+	if (!allowed) return;
+
+	sensitiveAdRevealed.value = true;
+}
 
 function reduceFrequency(): void {
 	if (chosen.value == null) return;
@@ -115,6 +157,7 @@ function reduceFrequency(): void {
 	store.push('mutedAds', chosen.value.id);
 	os.success();
 	chosen.value = choseAd();
+	sensitiveAdRevealed.value = false;
 	showMenu.value = false;
 }
 </script>
@@ -125,6 +168,7 @@ function reduceFrequency(): void {
 
 	&.form_square {
 		> .link,
+		> .sensitiveHidden,
 		> .link > .img {
 			max-width: min(300px, 100%);
 			max-height: 300px;
@@ -133,6 +177,7 @@ function reduceFrequency(): void {
 
 	&.form_horizontal {
 		> .link,
+		> .sensitiveHidden,
 		> .link > .img {
 			max-width: min(600px, 100%);
 			max-height: 80px;
@@ -141,6 +186,7 @@ function reduceFrequency(): void {
 
 	&.form_horizontalBig {
 		> .link,
+		> .sensitiveHidden,
 		> .link > .img {
 			max-width: min(600px, 100%);
 			max-height: 250px;
@@ -149,8 +195,13 @@ function reduceFrequency(): void {
 
 	&.form_vertical {
 		> .link,
+		> .sensitiveHidden,
 		> .link > .img {
 			max-width: min(100px, 100%);
+		}
+
+		> .sensitiveHidden {
+			min-height: 100px;
 		}
 	}
 }
@@ -172,6 +223,32 @@ function reduceFrequency(): void {
 	object-fit: contain;
 	margin: auto;
 	border-radius: 5px;
+}
+
+.sensitiveHidden {
+	box-sizing: border-box;
+	display: inline-flex;
+	position: relative;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	gap: 4px;
+	padding: 16px;
+	border: solid 1px var(--MI_THEME-divider);
+	border-radius: 5px;
+	background: var(--MI_THEME-panel);
+	color: var(--MI_THEME-fg);
+	font-size: 0.8em;
+	overflow: hidden;
+	vertical-align: bottom;
+
+	&[role='button'] {
+		cursor: pointer;
+	}
+}
+
+.sensitiveIcon {
+	color: var(--MI_THEME-warn);
 }
 
 .i {

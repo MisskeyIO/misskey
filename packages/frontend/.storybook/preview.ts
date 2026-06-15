@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { FORCE_RE_RENDER, FORCE_REMOUNT } from '@storybook/core-events';
-import { addons } from '@storybook/preview-api';
-import { type Preview, setup } from '@storybook/vue3';
+import { FORCE_RE_RENDER, FORCE_REMOUNT } from 'storybook/internal/core-events';
+import { addons } from 'storybook/preview-api';
+import { type Preview, setup } from '@storybook/vue3-vite';
 import isChromatic from 'chromatic/isChromatic';
 import { initialize, mswLoader } from 'msw-storybook-addon';
 import { userDetailed } from './fakes.js';

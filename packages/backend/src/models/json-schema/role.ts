@@ -180,6 +180,22 @@ export const packedRolePoliciesSchema = {
 			type: 'boolean',
 			optional: false, nullable: false,
 		},
+		canScheduleNote: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
+		scheduleNoteMaxDays: {
+			type: 'integer',
+			optional: false, nullable: false,
+		},
+		canCreateContent: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
+		canDeleteContent: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
 		mentionLimit: {
 			type: 'integer',
 			optional: false, nullable: false,
@@ -220,6 +236,10 @@ export const packedRolePoliciesSchema = {
 			type: 'boolean',
 			optional: false, nullable: false,
 		},
+		canUseReaction: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
 		canHideAds: {
 			type: 'boolean',
 			optional: false, nullable: false,
@@ -248,7 +268,19 @@ export const packedRolePoliciesSchema = {
 			type: 'boolean',
 			optional: false, nullable: false,
 		},
+		canIgnoreAiNsfw: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
 		canUpdateBioMedia: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
+		canUpdateAvatar: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
+		canUpdateBanner: {
 			type: 'boolean',
 			optional: false, nullable: false,
 		},
@@ -257,6 +289,10 @@ export const packedRolePoliciesSchema = {
 			optional: false, nullable: false,
 		},
 		antennaLimit: {
+			type: 'integer',
+			optional: false, nullable: false,
+		},
+		antennaNotesLimit: {
 			type: 'integer',
 			optional: false, nullable: false,
 		},
@@ -316,6 +352,10 @@ export const packedRolePoliciesSchema = {
 			type: 'string',
 			optional: false, nullable: false,
 			enum: ['available', 'readonly', 'unavailable'],
+		},
+		canUseDriveFileInSoundSettings: {
+			type: 'boolean',
+			optional: false, nullable: false,
 		},
 		noteDraftLimit: {
 			type: 'integer',
@@ -421,6 +461,10 @@ export const packedRoleSchema = {
 					type: 'boolean',
 					optional: false, nullable: false,
 					example: false,
+				},
+				badgeBehavior: {
+					type: 'string',
+					optional: false, nullable: true,
 				},
 				preserveAssignmentOnMoveAccount: {
 					type: 'boolean',

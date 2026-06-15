@@ -38,7 +38,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<!-- スマホ・タブレットの場合、キーボードが表示されると投稿が見づらくなるので、デスクトップ場合のみ自動でフォーカスを当てる -->
 			<MkPostForm v-if="$i && prefer.r.showFixedPostFormInChannel.value" :channel="channel" class="post-form _panel" fixed :autofocus="deviceKind === 'desktop'"/>
 
-			<MkStreamingNotesTimeline :key="channelId" src="channel" :channel="channelId"/>
+			<MkStreamingNotesTimeline :key="channelId + dimension" src="channel" :channel="channelId" :dimension="dimension"/>
 		</div>
 		<div v-else-if="tab === 'featured'">
 			<MkNotesTimeline :paginator="featuredPaginator"/>
@@ -75,6 +75,7 @@ import { computed, watch, ref, markRaw, shallowRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import { url } from '@@/js/config.js';
 import { useInterval } from '@@/js/use-interval.js';
+import type { TimelineDimensionSrc } from '@/timelines.js';
 import type { PageHeaderItem } from '@/types/page-header.js';
 import MkPostForm from '@/components/MkPostForm.vue';
 import MkStreamingNotesTimeline from '@/components/MkStreamingNotesTimeline.vue';
@@ -99,6 +100,10 @@ import { notesSearchAvailable } from '@/utility/check-permissions.js';
 import { miLocalStorage } from '@/local-storage.js';
 import { useRouter } from '@/router.js';
 import { Paginator } from '@/utility/paginator.js';
+import { store } from '@/store.js';
+import { deepMerge } from '@/utility/merge.js';
+import { selectDimension } from '@/utility/dimension.js';
+import { claimAchievement } from '@/utility/achievements.js';
 
 const router = useRouter();
 
@@ -113,6 +118,11 @@ const favorited = ref(false);
 const searchQuery = ref('');
 const searchPaginator = shallowRef();
 const searchKey = ref('');
+const dimensionSrc = computed<TimelineDimensionSrc>(() => `channel:${props.channelId}`);
+const dimension = computed<number>({
+	get: () => store.r.tl.value.dimensionBySrc?.[dimensionSrc.value] ?? prefer.s.dimension,
+	set: (x) => saveDimension(x),
+});
 const featuredPaginator = markRaw(new Paginator('notes/featured', {
 	limit: 10,
 	computedParams: computed(() => ({
@@ -149,6 +159,11 @@ watch(() => props.channelId, async () => {
 
 	channel.value = _channel;
 }, { immediate: true });
+
+watch(dimension, (value, previous) => {
+	if (value === previous) return;
+	claimAchievement('dimensionConfigured');
+});
 
 function edit() {
 	router.push('/channels/:channelId/edit', {
@@ -238,6 +253,21 @@ async function unmute() {
 	});
 }
 
+function saveDimension(newValue: number): void {
+	const dimensionBySrc = {
+		...(store.s.tl.dimensionBySrc ?? {}),
+		[dimensionSrc.value]: newValue,
+	};
+	const out = deepMerge({ dimensionBySrc }, store.s.tl);
+	store.set('tl', out);
+}
+
+async function pickDimension(): Promise<void> {
+	const selected = await selectDimension(dimension.value);
+	if (selected === undefined) return;
+	dimension.value = selected;
+}
+
 async function search() {
 	if (!channel.value) return;
 
@@ -259,6 +289,14 @@ async function search() {
 const headerActions = computed(() => {
 	if (channel.value) {
 		const headerItems: PageHeaderItem[] = [];
+
+		if (tab.value === 'timeline') {
+			headerItems.push({
+				icon: 'ti ti-cube',
+				text: i18n.tsx.dimensionWithNumber({ dimension: dimension.value }),
+				handler: pickDimension,
+			});
+		}
 
 		headerItems.push({
 			icon: 'ti ti-link',

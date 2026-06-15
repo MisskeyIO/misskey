@@ -158,6 +158,11 @@ const menuDef = computed<SuperMenuDef[]>(() => [{
 		to: '/settings/account-data',
 		active: currentPage.value?.route.name === 'account-data',
 	}, {
+		icon: 'ti ti-chart-bar',
+		text: i18n.ts.accountStats,
+		to: '/settings/account-stats',
+		active: currentPage.value?.route.name === 'account-stats',
+	}, {
 		icon: 'ti ti-dots',
 		text: i18n.ts.other,
 		to: '/settings/other',

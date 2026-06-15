@@ -46,6 +46,7 @@ import MkInfo from '@/components/MkInfo.vue';
 const exampleCWNote = reactive<Misskey.entities.Note>({
 	id: '0000000000',
 	createdAt: '2019-04-14T17:30:49.181Z',
+	lang: 'unknown',
 	userId: '0000000001',
 	user: {
 		id: '0000000001',
@@ -75,6 +76,7 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	files: [],
 	replyId: null,
 	renoteId: null,
+	dimension: 0,
 });
 </script>
 

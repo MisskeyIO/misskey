@@ -34,7 +34,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</MkA>
 					</div>
 					<div v-if="tab !== 'past' && $i != null && !announcement.silence && !announcement.isRead" :class="$style.footer">
-						<MkButton primary @click="read(announcement)"><i class="ti ti-check"></i> {{ i18n.ts.gotIt }}</MkButton>
+						<MkButton primary :disabled="getRemainingCloseDuration(announcement) > 0" @click="read(announcement)"><i class="ti ti-check"></i> {{ getReadButtonText(announcement) }}</MkButton>
 					</div>
 				</section>
 			</MkPagination>
@@ -44,11 +44,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, markRaw } from 'vue';
+import { computed, markRaw, onUnmounted, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkPagination from '@/components/MkPagination.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkInfo from '@/components/MkInfo.vue';
+import MkTutorialDialog from '@/components/MkTutorialDialog.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
@@ -56,6 +57,11 @@ import { definePage } from '@/page.js';
 import { $i } from '@/i.js';
 import { updateCurrentAccountPartial } from '@/accounts.js';
 import { Paginator } from '@/utility/paginator.js';
+
+type AnnouncementWithReadGate = Misskey.entities.Announcement & {
+	closeDuration?: number | null;
+	needEnrollmentTutorialToRead?: boolean;
+};
 
 const paginator = markRaw(new Paginator('announcements', {
 	limit: 10,
@@ -65,9 +71,12 @@ const paginator = markRaw(new Paginator('announcements', {
 }));
 
 const tab = ref('current');
+const remainingCloseDurations = ref<Record<string, number>>({});
+const closeDurationTimers = new Map<string, number>();
 
-async function read(target: Misskey.entities.Announcement) {
+async function read(target: AnnouncementWithReadGate) {
 	if ($i == null) return;
+	if (getRemainingCloseDuration(target) > 0) return;
 
 	if (target.needConfirmationToRead) {
 		const confirm = await os.confirm({
@@ -76,6 +85,11 @@ async function read(target: Misskey.entities.Announcement) {
 			text: i18n.tsx._announcement.readConfirmText({ title: target.title }),
 		});
 		if (confirm.canceled) return;
+	}
+
+	if (target.needEnrollmentTutorialToRead) {
+		const done = await waitTutorialDone();
+		if (!done) return;
 	}
 
 	paginator.updateItem(target.id, a => ({
@@ -87,6 +101,68 @@ async function read(target: Misskey.entities.Announcement) {
 		unreadAnnouncements: $i.unreadAnnouncements.filter(a => a.id !== target.id),
 	});
 }
+
+function getRemainingCloseDuration(target: AnnouncementWithReadGate): number {
+	return remainingCloseDurations.value[target.id] ?? Math.max(0, target.closeDuration ?? 0);
+}
+
+function getReadButtonText(target: AnnouncementWithReadGate): string {
+	const label = target.needEnrollmentTutorialToRead ? i18n.ts._initialTutorial.launchTutorial : i18n.ts.gotIt;
+	const remaining = getRemainingCloseDuration(target);
+	return remaining > 0 ? `${label} (${remaining}s)` : label;
+}
+
+function startCloseDurationCountdown(target: AnnouncementWithReadGate): void {
+	if (remainingCloseDurations.value[target.id] != null) return;
+
+	const seconds = Math.max(0, target.closeDuration ?? 0);
+	remainingCloseDurations.value = {
+		...remainingCloseDurations.value,
+		[target.id]: seconds,
+	};
+	if (seconds === 0) return;
+
+	const timer = window.setInterval(() => {
+		const next = Math.max(0, (remainingCloseDurations.value[target.id] ?? 0) - 1);
+		remainingCloseDurations.value = {
+			...remainingCloseDurations.value,
+			[target.id]: next,
+		};
+		if (next === 0) {
+			window.clearInterval(timer);
+			closeDurationTimers.delete(target.id);
+		}
+	}, 1000);
+	closeDurationTimers.set(target.id, timer);
+}
+
+function waitTutorialDone(): Promise<boolean> {
+	return new Promise(resolve => {
+		let resolved = false;
+		const { dispose } = os.popup(MkTutorialDialog, {}, {
+			done: () => {
+				resolved = true;
+				resolve(true);
+			},
+			closed: () => {
+				dispose();
+				if (!resolved) resolve(false);
+			},
+		});
+	});
+}
+
+watch(paginator.items, items => {
+	for (const item of items) {
+		startCloseDurationCountdown(item);
+	}
+}, { immediate: true });
+
+onUnmounted(() => {
+	for (const timer of closeDurationTimers.values()) {
+		window.clearInterval(timer);
+	}
+});
 
 const headerActions = computed(() => []);
 

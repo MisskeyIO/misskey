@@ -65,6 +65,7 @@ export class InboxProcessorService implements OnApplicationShutdown {
 	@bindThis
 	public async process(job: Bull.Job<InboxJobData>): Promise<string> {
 		const signature = job.data.signature;	// HTTP-signature
+		const recipientId = job.data.recipientId;
 		let activity = job.data.activity;
 
 		//#region Log
@@ -250,7 +251,7 @@ export class InboxProcessorService implements OnApplicationShutdown {
 
 		// アクティビティを処理
 		try {
-			const result = await this.apInboxService.performActivity(authUser.user, activity);
+			const result = await this.apInboxService.performActivity(authUser.user, activity, undefined, recipientId);
 			if (result && !result.startsWith('ok')) {
 				this.logger.warn(`inbox activity ignored (maybe): id=${activity.id} reason=${result}`);
 				return result;

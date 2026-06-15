@@ -70,6 +70,16 @@ export class ApRendererService {
 	) {
 	}
 
+	private remapDriveFileUrlForActivityPub(url: string): string {
+		for (const { target, replacement } of this.config.remapDriveFileUrlForActivityPub ?? []) {
+			if (url.startsWith(target)) {
+				return replacement + url.slice(target.length);
+			}
+		}
+
+		return url;
+	}
+
 	@bindThis
 	public renderAccept(object: string | IObject, user: { id: MiUser['id']; host: null }): IAccept {
 		return {
@@ -93,8 +103,8 @@ export class ApRendererService {
 	public renderAnnounce(object: string | IObject, note: MiNote): IAnnounce {
 		const attributedTo = this.userEntityService.genLocalUserUri(note.userId);
 
-		let to: string[] = [];
-		let cc: string[] = [];
+		let to: string[];
+		let cc: string[];
 
 		if (note.visibility === 'public') {
 			to = ['https://www.w3.org/ns/activitystreams#Public'];
@@ -170,7 +180,7 @@ export class ApRendererService {
 		return {
 			type: 'Document',
 			mediaType: file.webpublicType ?? file.type,
-			url: this.driveFileEntityService.getPublicUrl(file),
+			url: this.remapDriveFileUrlForActivityPub(this.driveFileEntityService.getPublicUrl(file)),
 			name: file.comment,
 			sensitive: file.isSensitive,
 		};
@@ -187,7 +197,7 @@ export class ApRendererService {
 				type: 'Image',
 				mediaType: emoji.type ?? 'image/png',
 				// || emoji.originalUrl してるのは後方互換性のため（publicUrlはstringなので??はだめ）
-				url: emoji.publicUrl || emoji.originalUrl,
+				url: this.remapDriveFileUrlForActivityPub(emoji.publicUrl || emoji.originalUrl),
 			},
 			_misskey_license: {
 				freeText: emoji.license,
@@ -253,7 +263,7 @@ export class ApRendererService {
 	public renderImage(file: MiDriveFile): IApImage {
 		return {
 			type: 'Image',
-			url: this.driveFileEntityService.getPublicUrl(file),
+			url: this.remapDriveFileUrlForActivityPub(this.driveFileEntityService.getPublicUrl(file)),
 			sensitive: file.isSensitive,
 			name: file.comment,
 		};
@@ -360,7 +370,7 @@ export class ApRendererService {
 			return ids.map(id => items.find(item => item.id === id)).filter(x => x != null);
 		};
 
-		let inReplyTo;
+		let inReplyTo: string | IPost | null = null;
 		let inReplyToNote: MiNote | null;
 
 		if (note.replyId) {
@@ -381,11 +391,9 @@ export class ApRendererService {
 					}
 				}
 			}
-		} else {
-			inReplyTo = null;
 		}
 
-		let quote: string | undefined;
+		let quote: string | null = null;
 
 		if (note.renoteId) {
 			const renote = await this.notesRepository.findOneBy({ id: note.renoteId });
@@ -413,6 +421,7 @@ export class ApRendererService {
 			cc = mentions;
 		} else {
 			to = mentions;
+			cc = [];
 		}
 
 		const mentionedUsers = note.mentions.length > 0 ? await this.usersRepository.findBy({
@@ -479,12 +488,12 @@ export class ApRendererService {
 					mediaType: 'text/x.misskeymarkdown',
 				},
 			}),
-			_misskey_quote: quote,
-			quoteUrl: quote,
+			_misskey_quote: quote ?? undefined,
+			quoteUrl: quote ?? undefined,
 			published: this.idService.parse(note.id).date.toISOString(),
 			to,
 			cc,
-			inReplyTo,
+			inReplyTo: inReplyTo ?? undefined,
 			attachment: files.map(x => this.renderDocument(x)),
 			sensitive: note.cw != null || files.some(file => file.isSensitive),
 			tag,
@@ -520,13 +529,23 @@ export class ApRendererService {
 			}
 		};
 
-		const attachment = profile.fields.map(field => ({
+		const profileFields = profile.fields.map(field => ({
 			type: 'PropertyValue',
 			name: field.name,
 			value: (field.value.startsWith('http://') || field.value.startsWith('https://'))
 				? tryRewriteUrl(field.value)
 				: field.value,
 		}));
+
+		const mutualLinks = profile.mutualLinkSections.flatMap(section =>
+			section.mutualLinks.map(link => ({
+				type: 'PropertyValue',
+				name: section.name ?? link.name ?? 'Link',
+				value: `<a href="${link.url}" target="_blank">${link.name ?? link.url}</a>`,
+			})),
+		);
+
+		const attachment = mutualLinks.concat(profileFields);
 
 		const emojis = await this.getEmojis(user.emojis);
 		const apemojis = emojis.filter(emoji => !emoji.localOnly).map(emoji => this.renderEmoji(emoji));

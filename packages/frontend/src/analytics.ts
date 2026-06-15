@@ -5,6 +5,7 @@
 
 import * as Misskey from 'misskey-js';
 import type { AnalyticsInstance, AnalyticsPlugin } from 'analytics';
+import { miLocalStorage } from '@/local-storage.js';
 
 /**
  * analytics moduleを読み込まなくても動作するようにするためのラッパー
@@ -71,17 +72,21 @@ class AnalyticsProxy implements AnalyticsInstance {
 
 	public get plugins() {
 		return this.analytics?.plugins ?? {
-			enable: (p, c) => Promise.resolve(c ? c() : void 0),
-			disable: (p, c) => Promise.resolve(c ? c() : void 0),
+			enable: (_pluginName, c) => Promise.resolve(c ? c() : void 0),
+			disable: (_pluginName, c) => Promise.resolve(c ? c() : void 0),
 		};
 	}
 }
 
 export const analytics = new AnalyticsProxy();
 
+export function hasTrackingConsent(): boolean {
+	return miLocalStorage.getItem('gaConsent') === 'true';
+}
+
 export async function initAnalytics(instance: Misskey.entities.MetaDetailed) {
 	// アナリティクスプロバイダに関する設定がひとつもない場合は、アナリティクスモジュールを読み込まない
-	if (!instance.googleAnalyticsMeasurementId) {
+	if (!hasTrackingConsent() || !instance.googleAnalyticsMeasurementId) {
 		return;
 	}
 
@@ -90,7 +95,6 @@ export async function initAnalytics(instance: Misskey.entities.MetaDetailed) {
 
 	// Google Analytics
 	if (instance.googleAnalyticsMeasurementId) {
-		//@ts-expect-error Dynamic import
 		const { default: googleAnalytics } = await import('@analytics/google-analytics');
 
 		plugins.push(googleAnalytics({
@@ -105,4 +109,18 @@ export async function initAnalytics(instance: Misskey.entities.MetaDetailed) {
 		debug: _DEV_,
 		plugins,
 	}));
+}
+
+export async function sendInitialAnalyticsPageView(instance: Misskey.entities.MetaDetailed, userId: string | undefined, path: string): Promise<void> {
+	if (!hasTrackingConsent()) return;
+
+	await initAnalytics(instance);
+
+	if (userId) {
+		await analytics.identify(userId);
+	}
+
+	await analytics.page({
+		path,
+	});
 }

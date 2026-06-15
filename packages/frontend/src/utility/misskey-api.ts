@@ -9,6 +9,10 @@ import { apiUrl } from '@@/js/config.js';
 import { $i } from '@/i.js';
 export const pendingApiRequestsCount = ref(0);
 
+export function generateClientTransactionId(prefix: string): string {
+	return `${prefix}-${crypto.randomUUID()}`;
+}
+
 // Implements Misskey.api.ApiClient.request
 export function misskeyApi<
 	ResT = void,

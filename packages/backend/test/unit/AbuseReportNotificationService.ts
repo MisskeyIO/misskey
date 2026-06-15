@@ -364,18 +364,20 @@ describe('AbuseReportNotificationService', () => {
 			});
 
 			const reports: MiAbuseUserReport[] = [
-				{
-					id: idService.gen(),
-					targetUserId: alice.id,
+			{
+				id: idService.gen(),
+				createdAt: new Date(),
+				targetUserId: alice.id,
 					targetUser: alice,
 					reporterId: bob.id,
 					reporter: bob,
 					assigneeId: null,
 					assignee: null,
-					resolved: false,
-					forwarded: false,
-					comment: 'test',
-					moderationNote: '',
+				resolved: false,
+				forwarded: false,
+				comment: 'test',
+				category: 'other',
+				moderationNote: '',
 					resolvedAs: null,
 					targetUserHost: null,
 					reporterHost: null,

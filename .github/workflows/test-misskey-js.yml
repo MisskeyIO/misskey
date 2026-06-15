@@ -8,12 +8,17 @@ on:
     branches: [ develop ]
     paths:
       - packages/misskey-js/**
+      - pnpm-lock.yaml
       - .github/workflows/test-misskey-js.yml
   pull_request:
     branches: [ develop ]
     paths:
       - packages/misskey-js/**
+      - pnpm-lock.yaml
       - .github/workflows/test-misskey-js.yml
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Unit tests (misskey.js)
@@ -22,13 +27,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6.0.3
+        uses: pnpm/action-setup@v5
+        with:
+          run_install: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6.4.0
+        uses: actions/setup-node@v6
         with:
           node-version-file: '.node-version'
           cache: 'pnpm'

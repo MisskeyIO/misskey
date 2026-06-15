@@ -348,8 +348,14 @@ export class ApPersonService implements OnModuleInit {
 			throw new Error('Refusing to create person without id');
 		}
 
-		if (url && !checkHttps(url)) {
-			throw new Error('unexpected schema of person url: ' + url);
+		if (url != null) {
+			if (!checkHttps(url)) {
+				throw new Error('unexpected schema of person url: ' + url);
+			}
+
+			if (this.utilityService.punyHost(url) !== this.utilityService.punyHost(person.id)) {
+				throw new Error(`person url <> uri host mismatch: ${url} <> ${person.id}`);
+			}
 		}
 
 		// Create user
@@ -555,6 +561,8 @@ export class ApPersonService implements OnModuleInit {
 			}
 		}
 
+		const policy = await this.roleService.getUserPolicies(exist.id);
+
 		const updates = {
 			lastFetchedAt: new Date(),
 			inbox: person.inbox,
@@ -570,7 +578,11 @@ export class ApPersonService implements OnModuleInit {
 			movedToUri: person.movedTo ?? null,
 			alsoKnownAs: person.alsoKnownAs ? toArray(person.alsoKnownAs) : null,
 			isExplorable: person.discoverable,
-			...(await this.resolveAvatarAndBanner(exist, person.icon, person.image).catch(() => ({}))),
+			...((policy.canUpdateAvatar || policy.canUpdateBanner) ? await this.resolveAvatarAndBanner(
+				exist,
+				policy.canUpdateAvatar ? person.icon : null,
+				policy.canUpdateBanner ? person.image : null,
+			).catch(() => ({})) : {}),
 		} as Partial<MiRemoteUser> & Pick<MiRemoteUser, 'isBot' | 'isCat' | 'isLocked' | 'movedToUri' | 'alsoKnownAs' | 'isExplorable'>;
 
 		const moving = ((): boolean => {
@@ -757,10 +769,7 @@ export class ApPersonService implements OnModuleInit {
 		// まずサーバー内で検索して様子見
 		let dst = await this.fetchPerson(src.movedToUri);
 
-		if (dst && this.userEntityService.isLocalUser(dst)) {
-			// targetがローカルユーザーだった場合データベースから引っ張ってくる
-			dst = await this.usersRepository.findOneByOrFail({ uri: src.movedToUri }) as MiLocalUser;
-		} else if (dst) {
+		if (dst) {
 			if (movePreventUris.includes(src.movedToUri)) return 'skip: circular move';
 
 			// targetを見つけたことがあるならtargetをupdatePersonする
@@ -777,13 +786,15 @@ export class ApPersonService implements OnModuleInit {
 			dst = await this.resolvePerson(src.movedToUri);
 		}
 
-		if (dst.movedToUri === dst.uri) return 'skip: movedTo itself (dst)'; // ？？？
-		if (src.movedToUri !== dst.uri) return 'skip: missmatch uri'; // ？？？
-		if (dst.movedToUri === src.uri) return 'skip: dst.movedToUri === src.uri';
+		const dstUri = this.userEntityService.getUserUri(dst);
+		const srcUri = this.userEntityService.getUserUri(src);
+		if (dst.movedToUri === dstUri) return 'skip: movedTo itself (dst)'; // ？？？
+		if (src.movedToUri !== dstUri) return 'skip: missmatch uri'; // ？？？
+		if (dst.movedToUri === srcUri) return 'skip: dst.movedToUri === src.uri';
 		if (!dst.alsoKnownAs || dst.alsoKnownAs.length === 0) {
 			return 'skip: dst.alsoKnownAs is empty';
 		}
-		if (!dst.alsoKnownAs.includes(src.uri)) {
+		if (!dst.alsoKnownAs.includes(srcUri)) {
 			return 'skip: alsoKnownAs does not include from.uri';
 		}
 

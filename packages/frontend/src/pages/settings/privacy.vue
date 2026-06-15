@@ -207,16 +207,43 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 			</FormSection>
 		</SearchMarker>
+
+		<SearchMarker :label="i18n.ts.gtagConsentCustomize" :keywords="['analytics', 'privacy']">
+			<FormSection v-if="instance.googleAnalyticsMeasurementId">
+				<MkFolder :defaultOpen="true">
+					<template #icon><i class="ti ti-lock-square"></i></template>
+					<template #label>{{ i18n.ts.gtagConsentCustomize }}</template>
+					<div class="_gaps_s">
+						<MkInfo>{{ i18n.tsx.gtagConsentCustomizeDescription({ host: instance.name ?? host }) }}</MkInfo>
+						<MkSwitch v-model="gtagConsentAnalytics">
+							{{ i18n.ts.gtagConsentAnalytics }}
+							<template #caption>{{ i18n.ts.gtagConsentAnalyticsDescription }}</template>
+						</MkSwitch>
+						<MkSwitch v-model="gtagConsentFunctionality">
+							{{ i18n.ts.gtagConsentFunctionality }}
+							<template #caption>{{ i18n.ts.gtagConsentFunctionalityDescription }}</template>
+						</MkSwitch>
+						<MkSwitch v-model="gtagConsentPersonalization">
+							{{ i18n.ts.gtagConsentPersonalization }}
+							<template #caption>{{ i18n.ts.gtagConsentPersonalizationDescription }}</template>
+						</MkSwitch>
+					</div>
+				</MkFolder>
+			</FormSection>
+		</SearchMarker>
 	</div>
 </SearchMarker>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue';
+import { host } from '@@/js/config.js';
+import type { GtagConsentParams } from '@/types/gtag.js';
 import type { MkSelectItem } from '@/components/MkSelect.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import MkSelect from '@/components/MkSelect.vue';
 import FormSection from '@/components/form/section.vue';
+import MkFolder from '@/components/MkFolder.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { instance } from '@/instance.js';
@@ -227,9 +254,12 @@ import { formatDateTimeString } from '@/utility/format-time-string.js';
 import { useMkSelect } from '@/composables/use-mkselect.js';
 import MkInput from '@/components/MkInput.vue';
 import * as os from '@/os.js';
+import { miLocalStorage } from '@/local-storage.js';
+import { unisonReload } from '@/utility/unison-reload.js';
 import MkDisableSection from '@/components/MkDisableSection.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import MkFeatureBanner from '@/components/MkFeatureBanner.vue';
+import { updateGtagConsent } from '@/utility/gtag.js';
 
 const $i = ensureSignin();
 
@@ -381,6 +411,86 @@ const makeNotesHiddenBefore_customMonths = computed({
 	set(value) {
 		if (value != null && value > 0) makeNotesHiddenBefore.value = -Math.abs(Math.floor(Number(value))) * 30 * 24 * 60 * 60;
 	},
+});
+
+const gaConsentInternal = ref(miLocalStorage.getItem('gaConsent') === 'true');
+const gaConsent = computed({
+	get: () => gaConsentInternal.value,
+	set: (value: boolean) => {
+		miLocalStorage.setItem('gaConsent', value ? 'true' : 'false');
+		gaConsentInternal.value = value;
+	},
+});
+const defaultGtagConsentParams: Required<GtagConsentParams> = {
+	ad_storage: 'denied',
+	ad_user_data: 'denied',
+	ad_personalization: 'denied',
+	analytics_storage: 'denied',
+	functionality_storage: 'denied',
+	personalization_storage: 'denied',
+	security_storage: 'granted',
+	wait_for_update: 0,
+	region: [],
+};
+
+const gtagConsentInternal = ref<GtagConsentParams>({
+	...defaultGtagConsentParams,
+	...miLocalStorage.getItemAsJson('gtagConsent') as GtagConsentParams | undefined,
+});
+const gtagConsentParams = computed({
+	get: () => gtagConsentInternal.value,
+	set: (value: GtagConsentParams) => {
+		miLocalStorage.setItemAsJson('gtagConsent', value);
+		gtagConsentInternal.value = value;
+	},
+});
+const gtagConsentAnalytics = computed({
+	get: () => gtagConsentParams.value.analytics_storage === 'granted',
+	set: (value: boolean) => {
+		gtagConsentParams.value = {
+			...gtagConsentParams.value,
+			ad_storage: value ? 'granted' : 'denied',
+			ad_user_data: value ? 'granted' : 'denied',
+			analytics_storage: value ? 'granted' : 'denied',
+		};
+	},
+});
+const gtagConsentFunctionality = computed({
+	get: () => gtagConsentParams.value.functionality_storage === 'granted',
+	set: (value: boolean) => {
+		gtagConsentParams.value = {
+			...gtagConsentParams.value,
+			functionality_storage: value ? 'granted' : 'denied',
+		};
+	},
+});
+const gtagConsentPersonalization = computed({
+	get: () => gtagConsentParams.value.personalization_storage === 'granted',
+	set: (value: boolean) => {
+		gtagConsentParams.value = {
+			...gtagConsentParams.value,
+			ad_personalization: value ? 'granted' : 'denied',
+			personalization_storage: value ? 'granted' : 'denied',
+		};
+	},
+});
+
+async function reloadAsk() {
+	const { canceled } = await os.confirm({
+		type: 'info',
+		text: i18n.ts.reloadToApplySetting,
+	});
+	if (canceled) return;
+
+	unisonReload();
+}
+
+watch(gaConsent, async () => {
+	await reloadAsk();
+});
+
+watch(gtagConsentParams, async () => {
+	updateGtagConsent(gtagConsentParams.value);
 });
 
 watch([makeNotesFollowersOnlyBefore, makeNotesHiddenBefore], () => {

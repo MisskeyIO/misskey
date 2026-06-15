@@ -96,10 +96,13 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				license: emoji.license,
 				isSensitive: emoji.isSensitive,
 				localOnly: emoji.localOnly,
+				requestedBy: emoji.requestedBy,
+				memo: emoji.memo,
 				roleIdsThatCanBeUsedThisEmojiAsReaction: emoji.roleIdsThatCanBeUsedThisEmojiAsReaction,
+				roleIdsThatCanNotBeUsedThisEmojiAsReaction: emoji.roleIdsThatCanNotBeUsedThisEmojiAsReaction,
 			}, me);
 
-			return this.emojiEntityService.packDetailed(addedEmoji);
+			return this.emojiEntityService.packInternal(addedEmoji);
 		});
 	}
 }

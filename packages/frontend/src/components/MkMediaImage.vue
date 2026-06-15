@@ -4,10 +4,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<div :class="[hide ? $style.hidden : $style.visible, (image.isSensitive && prefer.s.highlightSensitiveMedia) && $style.sensitive]" @click="reveal" @contextmenu.stop="onContextmenu">
+<div v-if="!blocked" :class="[hide ? $style.hidden : $style.visible, (image.isSensitive && prefer.s.highlightSensitiveMedia) && $style.sensitive]" @click="showHiddenContent" @contextmenu.stop="onContextmenu">
 	<component
-		:is="disableImageLink ? 'div' : 'a'"
-		v-bind="disableImageLink ? {
+		:is="(image.isSensitive && !$i) || disableImageLink ? 'div' : 'a'"
+		v-bind="(image.isSensitive && !$i) || disableImageLink ? {
 			title: image.name,
 			class: $style.imageContainer,
 		} : {
@@ -20,7 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<MkImgWithBlurhash
 			v-if="prefer.s.enableHighQualityImagePlaceholders"
 			:hash="image.blurhash"
-			:src="(prefer.s.dataSaver.media && hide) ? null : url"
+			:src="(image.isSensitive && !$i) || (prefer.s.dataSaver.media && hide) ? null : url"
 			:forceBlurhash="hide"
 			:cover="hide || cover"
 			:alt="image.comment || image.name"
@@ -59,8 +59,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div v-if="image.comment" :class="$style.indicator">ALT</div>
 			<div v-if="image.isSensitive" :class="$style.indicator" style="color: var(--MI_THEME-warn);" :title="i18n.ts.sensitive"><i class="ti ti-eye-exclamation"></i></div>
 		</div>
-		<button :class="$style.menu" class="_button" @click.stop="showMenu"><i class="ti ti-dots" style="vertical-align: middle;"></i></button>
-		<i class="ti ti-eye-off" :class="$style.hide" @click.stop="hide = true"></i>
+		<button :class="$style.menu" class="_button" @click.prevent.stop="showMenu"><i class="ti ti-dots" style="vertical-align: middle;"></i></button>
+		<i class="ti ti-eye-off" :class="$style.hide" @click.prevent.stop="hide = true"></i>
 	</template>
 </div>
 </template>
@@ -75,9 +75,12 @@ import bytes from '@/filters/bytes.js';
 import MkImgWithBlurhash from '@/components/MkImgWithBlurhash.vue';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
+import { pleaseLogin } from '@/utility/please-login.js';
+import { sensitiveContentConsent, requestSensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 import { $i, iAmModerator } from '@/i.js';
 import { prefer } from '@/preferences.js';
-import { shouldHideFileByDefault, canRevealFile } from '@/utility/sensitive-file.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
+import { selectDriveFolder } from '@/utility/drive.js';
 
 const props = withDefaults(defineProps<{
 	image: Misskey.entities.DriveFile;
@@ -91,7 +94,15 @@ const props = withDefaults(defineProps<{
 	controls: true,
 });
 
-const hide = ref(true);
+function calcHide(): boolean {
+	if (prefer.s.nsfw === 'force' || prefer.s.dataSaver.media) return true;
+	if (props.image.isSensitive && sensitiveContentConsent.value !== true) return true;
+	return props.image.isSensitive && prefer.s.nsfw !== 'ignore';
+}
+
+const hide = ref(calcHide());
+
+const blocked = computed(() => props.image.isSensitive && sensitiveContentConsent.value === false);
 
 const url = computed(() => (props.raw || prefer.s.loadRawImages)
 	? props.image.url
@@ -100,28 +111,9 @@ const url = computed(() => (props.raw || prefer.s.loadRawImages)
 		: props.image.thumbnailUrl!,
 );
 
-async function reveal(ev: PointerEvent) {
-	if (!props.controls) {
-		return;
-	}
-
-	if (hide.value) {
-		ev.stopPropagation();
-		if (!(await canRevealFile(props.image))) {
-			return;
-		}
-
-		hide.value = false;
-	}
+function showMenu(ev: MouseEvent) {
+	os.popupMenu(getMenu(), (ev.currentTarget ?? ev.target ?? undefined) as HTMLElement | undefined);
 }
-
-// Plugin:register_note_view_interruptor を使って書き換えられる可能性があるためwatchする
-watch(() => props.image, (newImage) => {
-	hide.value = shouldHideFileByDefault(newImage);
-}, {
-	deep: true,
-	immediate: true,
-});
 
 function getMenu() {
 	const menuItems: MenuItem[] = [];
@@ -134,31 +126,50 @@ function getMenu() {
 		},
 	});
 
-	if (iAmModerator) {
+	if ($i && $i.id !== props.image.userId) {
 		menuItems.push({
-			text: props.image.isSensitive ? i18n.ts.unmarkAsSensitive : i18n.ts.markAsSensitive,
-			icon: 'ti ti-eye-exclamation',
-			danger: true,
-			action: async () => {
-				const { canceled } = await os.confirm({
-					type: 'warning',
-					text: props.image.isSensitive ? i18n.ts.unmarkAsSensitiveConfirm : i18n.ts.markAsSensitiveConfirm,
-				});
-
-				if (canceled) return;
-
-				os.apiWithDialog('drive/files/update', {
-					fileId: props.image.id,
-					isSensitive: !props.image.isSensitive,
+			text: i18n.ts.saveThisFile,
+			icon: 'ti ti-cloud-upload',
+			action: () => {
+				selectDriveFolder(null).then(async ({ canceled, folders }) => {
+					if (canceled) return;
+					misskeyApi('drive/files/upload-from-url', {
+						url: props.image.url,
+						folderId: folders[0]?.id,
+					});
 				});
 			},
 		});
 	}
 
+	if ($i?.id === props.image.userId || iAmModerator) {
+		menuItems.push({
+			type: 'divider',
+		});
+	}
+
+	if (iAmModerator) {
+		menuItems.push({
+			text: props.image.isSensitive ? i18n.ts.unmarkAsSensitive : i18n.ts.markAsSensitive,
+			icon: props.image.isSensitive ? 'ti ti-eye' : 'ti ti-eye-exclamation',
+			danger: true,
+			action: () => toggleSensitive(props.image),
+		});
+
+		if ($i?.id !== props.image.userId) {
+			menuItems.push({
+				type: 'link' as const,
+				text: i18n.ts._fileViewer.title,
+				icon: 'ti ti-info-circle',
+				to: `/admin/file/${props.image.id}`,
+			});
+		}
+	}
+
 	const details: MenuItem[] = [];
 	if ($i?.id === props.image.userId) {
 		details.push({
-			type: 'link',
+			type: 'link' as const,
 			text: i18n.ts._fileViewer.title,
 			icon: 'ti ti-info-circle',
 			to: `/my/drive/file/${props.image.id}`,
@@ -191,13 +202,53 @@ function getMenu() {
 	return menuItems;
 }
 
-function showMenu(ev: PointerEvent) {
-	os.popupMenu(getMenu(), (ev.currentTarget ?? ev.target ?? undefined) as HTMLElement | undefined);
-}
-
 function onContextmenu(ev: PointerEvent) {
 	os.contextMenu(getMenu(), ev);
 }
+
+async function showHiddenContent(ev: MouseEvent) {
+	if (!props.controls || !hide.value) {
+		return;
+	}
+
+	ev.preventDefault();
+	ev.stopPropagation();
+
+	if (props.image.isSensitive && !$i) {
+		await pleaseLogin();
+		return;
+	}
+
+	if (props.image.isSensitive && sensitiveContentConsent.value !== true) {
+		const allowed = await requestSensitiveContentConsent();
+		if (!allowed) return;
+	}
+
+	if (props.image.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
+		const { canceled } = await os.confirm({
+			type: 'question',
+			text: i18n.ts.sensitiveMediaRevealConfirm,
+		});
+		if (canceled) return;
+	}
+
+	hide.value = false;
+}
+
+function toggleSensitive(file: Misskey.entities.DriveFile) {
+	os.apiWithDialog('drive/files/update', {
+		fileId: file.id,
+		isSensitive: !file.isSensitive,
+	});
+}
+
+// Plugin:register_note_view_interruptor を使って書き換えられる可能性があるためwatchする
+watch(() => props.image, () => {
+	hide.value = calcHide();
+}, {
+	deep: true,
+	immediate: true,
+});
 </script>
 
 <style lang="scss" module>

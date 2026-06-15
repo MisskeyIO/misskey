@@ -154,6 +154,13 @@ export const meta = {
 					type: 'string',
 				},
 			},
+			featuredGameChannels: {
+				type: 'array',
+				optional: false, nullable: false,
+				items: {
+					type: 'string',
+				},
+			},
 			hiddenTags: {
 				type: 'array',
 				optional: false, nullable: false,
@@ -162,6 +169,20 @@ export const meta = {
 				},
 			},
 			blockedHosts: {
+				type: 'array',
+				optional: false, nullable: false,
+				items: {
+					type: 'string',
+				},
+			},
+			blockedRemoteCustomEmojis: {
+				type: 'array',
+				optional: false, nullable: false,
+				items: {
+					type: 'string',
+				},
+			},
+			wellKnownWebsites: {
 				type: 'array',
 				optional: false, nullable: false,
 				items: {
@@ -374,6 +395,7 @@ export const meta = {
 			policies: {
 				type: 'object',
 				optional: false, nullable: false,
+				ref: 'RolePolicies',
 			},
 			enableFanoutTimeline: {
 				type: 'boolean',
@@ -528,6 +550,14 @@ export const meta = {
 				type: 'string',
 				optional: false, nullable: true,
 			},
+			urlPreviewDenyList: {
+				type: 'array',
+				optional: false, nullable: false,
+				items: {
+					type: 'string',
+					optional: false, nullable: false,
+				},
+			},
 			federation: {
 				type: 'string',
 				enum: ['all', 'specified', 'none'],
@@ -630,6 +660,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				uri: this.config.url,
 				description: instance.description,
 				langs: instance.langs,
+				dimensions: instance.dimensions,
 				tosUrl: instance.termsOfServiceUrl,
 				repositoryUrl: instance.repositoryUrl,
 				feedbackUrl: instance.feedbackUrl,
@@ -670,8 +701,11 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				cacheRemoteFiles: instance.cacheRemoteFiles,
 				cacheRemoteSensitiveFiles: instance.cacheRemoteSensitiveFiles,
 				pinnedUsers: instance.pinnedUsers,
+				featuredGameChannels: instance.featuredGameChannels,
 				hiddenTags: instance.hiddenTags,
 				blockedHosts: instance.blockedHosts,
+				blockedRemoteCustomEmojis: instance.blockedRemoteCustomEmojis,
+				wellKnownWebsites: instance.wellKnownWebsites,
 				silencedHosts: instance.silencedHosts,
 				mediaSilencedHosts: instance.mediaSilencedHosts,
 				sensitiveWords: instance.sensitiveWords,
@@ -740,6 +774,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				urlPreviewRequireContentLength: instance.urlPreviewRequireContentLength,
 				urlPreviewUserAgent: instance.urlPreviewUserAgent,
 				urlPreviewSummaryProxyUrl: instance.urlPreviewSummaryProxyUrl,
+				urlPreviewDenyList: instance.urlPreviewDenyList,
 				federation: instance.federation,
 				federationHosts: instance.federationHosts,
 				deliverSuspendedSoftware: instance.deliverSuspendedSoftware,

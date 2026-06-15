@@ -12,18 +12,23 @@ on:
     paths:
       - packages/backend/**
       - .github/workflows/validate-api-json.yml
+permissions:
+  contents: read
+
 jobs:
   validate-api-json:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v6.0.2
+    - uses: actions/checkout@v6
       with:
         submodules: true
     - name: Setup pnpm
-      uses: pnpm/action-setup@v6.0.3
+      uses: pnpm/action-setup@v5
+      with:
+        run_install: false
     - name: Use Node.js
-      uses: actions/setup-node@v6.4.0
+      uses: actions/setup-node@v6
       with:
         node-version-file: '.node-version'
         cache: 'pnpm'

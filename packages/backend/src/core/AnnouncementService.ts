@@ -5,6 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { Brackets, EntityNotFoundError } from 'typeorm';
+import type { SelectQueryBuilder } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { MiUser } from '@/models/User.js';
 import type { AnnouncementReadsRepository, AnnouncementsRepository, MiAnnouncement, MiAnnouncementRead, UsersRepository } from '@/models/_.js';
@@ -14,6 +15,13 @@ import { IdService } from '@/core/IdService.js';
 import { AnnouncementEntityService } from '@/core/entities/AnnouncementEntityService.js';
 import { GlobalEventService } from '@/core/GlobalEventService.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
+
+type AnnouncementPagination = {
+	sinceId?: string | null;
+	untilId?: string | null;
+	sinceDate?: number | null;
+	untilDate?: number | null;
+};
 
 @Injectable()
 export class AnnouncementService {
@@ -43,6 +51,45 @@ export class AnnouncementService {
 
 	@bindThis
 	public async getUnreadAnnouncements(user: MiUser): Promise<MiAnnouncement[]> {
+		return this.orderByDisplayOrder(this.createUnreadAnnouncementsQuery(user), {}).getMany();
+	}
+
+	@bindThis
+	public async countUnreadAnnouncements(user: MiUser): Promise<number> {
+		return this.createUnreadAnnouncementsQuery(user).getCount();
+	}
+
+	@bindThis
+	public createVisibleAnnouncementsQuery(me: MiUser | null, isActive: boolean): SelectQueryBuilder<MiAnnouncement> {
+		const query = this.announcementsRepository.createQueryBuilder('announcement')
+			.where('announcement.isActive = :isActive', { isActive })
+			.andWhere(new Brackets(qb => {
+				if (me) qb.orWhere('announcement.userId = :meId', { meId: me.id });
+				qb.orWhere('announcement.userId IS NULL');
+			}));
+
+		if (me) {
+			query.andWhere(new Brackets(qb => {
+				qb.orWhere('announcement.forExistingUsers = false');
+				qb.orWhere('announcement.id > :meId', { meId: me.id });
+			}));
+		} else {
+			query.andWhere('announcement.forExistingUsers = false');
+		}
+
+		return query;
+	}
+
+	@bindThis
+	public orderByDisplayOrder<T extends MiAnnouncement>(query: SelectQueryBuilder<T>, pagination: AnnouncementPagination): SelectQueryBuilder<T> {
+		const idOrder = pagination.sinceId || pagination.sinceDate ? 'ASC' : 'DESC';
+		return query
+			.orderBy(`${query.alias}.displayOrder`, 'DESC')
+			.addOrderBy(`${query.alias}.id`, idOrder);
+	}
+
+	@bindThis
+	private createUnreadAnnouncementsQuery(user: MiUser): SelectQueryBuilder<MiAnnouncement> {
 		const readsQuery = this.announcementReadsRepository.createQueryBuilder('read')
 			.select('read.announcementId')
 			.where('read.userId = :userId', { userId: user.id });
@@ -62,7 +109,7 @@ export class AnnouncementService {
 
 		q.setParameters(readsQuery.getParameters());
 
-		return q.getMany();
+		return q;
 	}
 
 	@bindThis
@@ -78,6 +125,9 @@ export class AnnouncementService {
 			forExistingUsers: values.forExistingUsers,
 			silence: values.silence,
 			needConfirmationToRead: values.needConfirmationToRead,
+			needEnrollmentTutorialToRead: values.needEnrollmentTutorialToRead,
+			closeDuration: values.closeDuration,
+			displayOrder: values.displayOrder,
 			userId: values.userId,
 		});
 
@@ -130,6 +180,9 @@ export class AnnouncementService {
 			forExistingUsers: values.forExistingUsers,
 			silence: values.silence,
 			needConfirmationToRead: values.needConfirmationToRead,
+			needEnrollmentTutorialToRead: values.needEnrollmentTutorialToRead,
+			closeDuration: values.closeDuration,
+			displayOrder: values.displayOrder,
 			isActive: values.isActive,
 		});
 
@@ -217,7 +270,7 @@ export class AnnouncementService {
 			});
 		}
 
-		if ((await this.getUnreadAnnouncements(user)).length === 0) {
+		if ((await this.countUnreadAnnouncements(user)) === 0) {
 			this.globalEventService.publishMainStream(user.id, 'readAllAnnouncements');
 		}
 	}

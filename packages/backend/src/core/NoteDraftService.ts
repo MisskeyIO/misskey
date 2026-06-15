@@ -16,6 +16,8 @@ import { isRenote, isQuote } from '@/misc/is-renote.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { QueueService } from '@/core/QueueService.js';
 
+const SCHEDULE_NOTE_MAX_DAYS_MS = 1000 * 60 * 60 * 24;
+
 export type NoteDraftOptions = Omit<MiNoteDraft, 'id' | 'userId' | 'user' | 'reply' | 'renote' | 'channel'>;
 
 @Injectable()
@@ -69,6 +71,10 @@ export class NoteDraftService {
 		}
 
 		if (data.isActuallyScheduled) {
+			if (!policies.canScheduleNote || policies.scheduledNoteLimit <= 0) {
+				throw new IdentifiableError('d11dcfae-e1f1-4b69-b596-4d1dc2860161', 'Scheduled notes are not allowed');
+			}
+
 			const currentScheduledCount = await this.noteDraftsRepository.countBy({
 				userId: me.id,
 				isActuallyScheduled: true,
@@ -108,7 +114,14 @@ export class NoteDraftService {
 		//#region check draft limit
 		const policies = await this.roleService.getUserPolicies(me.id);
 
-		if (!draft.isActuallyScheduled && data.isActuallyScheduled) {
+		const nextIsActuallyScheduled = data.isActuallyScheduled ?? draft.isActuallyScheduled;
+		const nextScheduledAt = data.scheduledAt ?? draft.scheduledAt;
+
+		if (nextIsActuallyScheduled && (!policies.canScheduleNote || policies.scheduledNoteLimit <= 0)) {
+			throw new IdentifiableError('d11dcfae-e1f1-4b69-b596-4d1dc2860161', 'Scheduled notes are not allowed');
+		}
+
+		if (!draft.isActuallyScheduled && nextIsActuallyScheduled) {
 			const currentScheduledCount = await this.noteDraftsRepository.countBy({
 				userId: me.id,
 				isActuallyScheduled: true,
@@ -119,7 +132,11 @@ export class NoteDraftService {
 		}
 		//#endregion
 
-		await this.validate(me, data);
+		await this.validate(me, {
+			...data,
+			isActuallyScheduled: nextIsActuallyScheduled,
+			scheduledAt: nextScheduledAt,
+		});
 
 		const updatedDraft = await this.noteDraftsRepository.createQueryBuilder().update()
 			.set(data)
@@ -173,10 +190,21 @@ export class NoteDraftService {
 		data: Partial<NoteDraftOptions>,
 	): Promise<void> {
 		if (data.isActuallyScheduled) {
+			const now = Date.now();
+			const policies = await this.roleService.getUserPolicies(me.id);
+
 			if (data.scheduledAt == null) {
 				throw new IdentifiableError('94a89a43-3591-400a-9c17-dd166e71fdfa', 'scheduledAt is required when isActuallyScheduled is true');
-			} else if (data.scheduledAt.getTime() < Date.now()) {
+			} else if (data.scheduledAt.getTime() < now) {
 				throw new IdentifiableError('b34d0c1b-996f-4e34-a428-c636d98df457', 'scheduledAt must be in the future');
+			}
+
+			if (!policies.canScheduleNote || policies.scheduledNoteLimit <= 0) {
+				throw new IdentifiableError('d11dcfae-e1f1-4b69-b596-4d1dc2860161', 'Scheduled notes are not allowed');
+			}
+
+			if (data.scheduledAt.getTime() > now + (policies.scheduleNoteMaxDays * SCHEDULE_NOTE_MAX_DAYS_MS)) {
+				throw new IdentifiableError('a78787e5-6a63-47b8-a4e7-104485a22fb2', 'scheduledAt exceeds maximum schedule window');
 			}
 		}
 

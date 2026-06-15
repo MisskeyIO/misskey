@@ -4,7 +4,7 @@
  */
 
 import { AISCRIPT_VERSION } from '@syuilo/aiscript';
-import type { entities } from 'misskey-js'
+import type { entities } from 'misskey-js';
 import { date, imageDataUrl, text } from "./fake-utils.js";
 
 export function abuseUserReport() {
@@ -125,7 +125,7 @@ export function galleryPost(isSensitive = false) {
 		isSensitive,
 		likedCount: 0,
 		isLiked: false,
-	}
+	};
 }
 
 export function file(isSensitive = false): entities.DriveFile {
@@ -229,6 +229,7 @@ export function note(id = 'somenoteid'): entities.Note {
 	return {
 		id,
 		createdAt: '2016-12-28T22:49:51.000Z',
+		lang: 'unknown',
 		deletedAt: null,
 		text: 'some note',
 		cw: null,
@@ -242,6 +243,7 @@ export function note(id = 'somenoteid'): entities.Note {
 		reactionCount: 0,
 		renoteCount: 0,
 		repliesCount: 0,
+		dimension: 0,
 	};
 }
 
@@ -276,6 +278,7 @@ export function userDetailed(id = 'someuserid', username = 'miskist', host: enti
 				value: 'https://misskey-hub.net',
 			},
 		],
+		mutualLinkSections: [],
 		verifiedLinks: [],
 		followersCount: 1024,
 		followingCount: 16,
@@ -321,13 +324,13 @@ export function userDetailed(id = 'someuserid', username = 'miskist', host: enti
 export function inviteCode(isUsed = false, hasExpiration = false, isExpired = false, isCreatedBySystem = false) {
 	const date = new Date();
 	const createdAt = new Date();
-	createdAt.setDate(date.getDate() - 1)
+	createdAt.setDate(date.getDate() - 1);
 	const expiresAt = new Date();
 
 	if (isExpired) {
-		expiresAt.setHours(date.getHours() - 1)
+		expiresAt.setHours(date.getHours() - 1);
 	} else {
-		expiresAt.setHours(date.getHours() + 1)
+		expiresAt.setHours(date.getHours() + 1);
 	}
 
 	return {
@@ -339,7 +342,7 @@ export function inviteCode(isUsed = false, hasExpiration = false, isExpired = fa
 		usedBy: isUsed ? userDetailed('3i3r2znx1v') : null,
 		usedAt: isUsed ? date.toISOString() : null,
 		used: isUsed,
-	}
+	};
 }
 
 export function role(params: {
@@ -357,6 +360,7 @@ export function role(params: {
 	isPublic?: boolean,
 	isExplorable?: boolean,
 	asBadge?: boolean,
+	badgeBehavior?: string | null,
 	canEditMembersByModerator?: boolean,
 	usersCount?: number,
 }, seed?: string): entities.Role {
@@ -380,6 +384,7 @@ export function role(params: {
 		isPublic: params.isPublic ?? true,
 		isExplorable: params.isExplorable ?? true,
 		asBadge: params.asBadge ?? true,
+		badgeBehavior: params.badgeBehavior ?? null,
 		canEditMembersByModerator: params.canEditMembersByModerator ?? false,
 		usersCount: params.usersCount ?? 10,
 		preserveAssignmentOnMoveAccount: false,
@@ -389,7 +394,7 @@ export function role(params: {
 			values: []
 		},
 		policies: {},
-	}
+	};
 }
 
 export function emoji(params?: {
@@ -403,9 +408,12 @@ export function emoji(params?: {
 	aliases?: string[],
 	category?: string,
 	license?: string,
+	requestedBy?: string,
+	memo?: string,
 	isSensitive?: boolean,
 	localOnly?: boolean,
-	roleIdsThatCanBeUsedThisEmojiAsReaction?: {id:string, name:string}[],
+	roleIdsThatCanBeUsedThisEmojiAsReaction?: { id: string, name: string }[],
+	roleIdsThatCanNotBeUsedThisEmojiAsReaction?: string[],
 	updatedAt?: string,
 }, seed?: string): entities.EmojiDetailedAdmin {
 	const _seed = seed ?? (params?.id ?? "DEFAULT_SEED");
@@ -413,7 +421,7 @@ export function emoji(params?: {
 	const name = params?.name ?? text(8, _seed);
 	const updatedAt = params?.updatedAt ?? date({}, _seed).toISOString();
 
-	const image = imageDataUrl({}, _seed)
+	const image = imageDataUrl({}, _seed);
 
 	return {
 		id: id,
@@ -426,9 +434,12 @@ export function emoji(params?: {
 		aliases: params?.aliases ?? [`alias1-${name}`, `alias2-${name}`],
 		category: params?.category ?? null,
 		license: params?.license ?? null,
+		requestedBy: params?.requestedBy ?? null,
+		memo: params?.memo ?? '',
 		isSensitive: params?.isSensitive ?? false,
 		localOnly: params?.localOnly ?? false,
 		roleIdsThatCanBeUsedThisEmojiAsReaction: params?.roleIdsThatCanBeUsedThisEmojiAsReaction ?? [],
+		roleIdsThatCanNotBeUsedThisEmojiAsReaction: params?.roleIdsThatCanNotBeUsedThisEmojiAsReaction ?? [],
 		updatedAt: updatedAt,
-	}
+	};
 }

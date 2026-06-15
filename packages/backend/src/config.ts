@@ -20,6 +20,15 @@ type RedisOptionsSource = Partial<RedisOptions> & {
 	prefix?: string;
 };
 
+type SkebStatusConfig = {
+	endpoint: string;
+	method?: string;
+	headers?: Record<string, string>;
+	parameters?: Record<string, string>;
+	userIdParameterName?: string;
+	roleId?: string;
+};
+
 /**
  * 設定ファイルの型
  */
@@ -103,6 +112,11 @@ type Source = {
 
 	mediaProxy?: string;
 	videoThumbnailGenerator?: string;
+	remapDriveFileUrlForActivityPub?: {
+		target: string;
+		replacement: string;
+	}[];
+	skebStatus?: SkebStatusConfig;
 
 	perChannelMaxNoteCacheCount?: number;
 	perUserNotificationsMaxCount?: number;
@@ -194,8 +208,18 @@ export type Config = {
 	frontendEmbedManifestExists: boolean;
 	rootDir: string;
 	mediaProxy: string;
+	remapDriveFileUrlForActivityPub: {
+		target: string;
+		replacement: string;
+	}[] | undefined;
 	externalMediaProxyEnabled: boolean;
 	videoThumbnailGenerator: string | null;
+	skebStatus: (SkebStatusConfig & {
+		method: string;
+		headers: Record<string, string>;
+		parameters: Record<string, string>;
+		userIdParameterName: string;
+	}) | undefined;
 	redis: RedisOptions & RedisOptionsSource;
 	redisForPubsub: RedisOptions & RedisOptionsSource;
 	redisForJobQueue: RedisOptions & RedisOptionsSource;
@@ -327,10 +351,18 @@ export function loadConfig(): Config {
 		deliverJobMaxAttempts: config.deliverJobMaxAttempts,
 		inboxJobMaxAttempts: config.inboxJobMaxAttempts,
 		mediaProxy: externalMediaProxy ?? internalMediaProxy,
+		remapDriveFileUrlForActivityPub: config.remapDriveFileUrlForActivityPub,
 		externalMediaProxyEnabled: externalMediaProxy !== null && externalMediaProxy !== internalMediaProxy,
 		videoThumbnailGenerator: config.videoThumbnailGenerator ?
 			config.videoThumbnailGenerator.endsWith('/') ? config.videoThumbnailGenerator.substring(0, config.videoThumbnailGenerator.length - 1) : config.videoThumbnailGenerator
 			: null,
+		skebStatus: config.skebStatus ? {
+			...config.skebStatus,
+			method: config.skebStatus.method ?? 'GET',
+			headers: config.skebStatus.headers ?? {},
+			parameters: config.skebStatus.parameters ?? {},
+			userIdParameterName: config.skebStatus.userIdParameterName ?? 'userId',
+		} : undefined,
 		userAgent: `Misskey/${version} (${config.url})`,
 		frontendManifestExists: frontendManifestExists,
 		frontendEmbedManifestExists: frontendEmbedManifestExists,

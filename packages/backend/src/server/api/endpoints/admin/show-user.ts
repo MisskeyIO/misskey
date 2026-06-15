@@ -10,7 +10,7 @@ import { DI } from '@/di-symbols.js';
 import { RoleService } from '@/core/RoleService.js';
 import { RoleEntityService } from '@/core/entities/RoleEntityService.js';
 import { IdService } from '@/core/IdService.js';
-import { notificationRecieveConfig } from '@/models/json-schema/user.js';
+import { mutualLinkSectionsSchema, notificationRecieveConfig } from '@/models/json-schema/user.js';
 
 export const meta = {
 	tags: ['admin'],
@@ -91,6 +91,7 @@ export const meta = {
 					type: 'string',
 				},
 			},
+			mutualLinkSections: mutualLinkSectionsSchema,
 			notificationRecieveConfig: {
 				type: 'object',
 				optional: false, nullable: false,
@@ -244,6 +245,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				receiveAnnouncementEmail: profile.receiveAnnouncementEmail,
 				mutedWords: profile.mutedWords,
 				mutedInstances: profile.mutedInstances,
+				mutualLinkSections: profile.mutualLinkSections,
 				notificationRecieveConfig: profile.notificationRecieveConfig,
 				isModerator: isModerator,
 				isSilenced: isSilenced,

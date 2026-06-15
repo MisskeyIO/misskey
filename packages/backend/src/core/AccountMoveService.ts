@@ -9,7 +9,7 @@ import { IsNull, In, MoreThan, Not } from 'typeorm';
 import { bindThis } from '@/decorators.js';
 import { DI } from '@/di-symbols.js';
 import type { MiLocalUser, MiRemoteUser, MiUser } from '@/models/User.js';
-import type { BlockingsRepository, FollowingsRepository, InstancesRepository, MiMeta, MutingsRepository, UserListMembershipsRepository, UsersRepository } from '@/models/_.js';
+import type { BlockingsRepository, FollowingsRepository, InstancesRepository, MiMeta, MutingsRepository, UserAccountMoveLogsRepository, UserListMembershipsRepository, UsersRepository } from '@/models/_.js';
 import type { RelationshipJobData, ThinUser } from '@/queue/types.js';
 
 import { IdService } from '@/core/IdService.js';
@@ -48,6 +48,9 @@ export class AccountMoveService {
 		@Inject(DI.userListMembershipsRepository)
 		private userListMembershipsRepository: UserListMembershipsRepository,
 
+		@Inject(DI.userAccountMoveLogsRepository)
+		private userAccountMoveLogsRepository: UserAccountMoveLogsRepository,
+
 		@Inject(DI.instancesRepository)
 		private instancesRepository: InstancesRepository,
 
@@ -75,7 +78,6 @@ export class AccountMoveService {
 	 */
 	@bindThis
 	public async moveFromLocal(src: MiLocalUser, dst: MiLocalUser | MiRemoteUser): Promise<unknown> {
-		const _srcUri = this.userEntityService.getUserUri(src);
 		const dstUri = this.userEntityService.getUserUri(dst);
 
 		// add movedToUri to indicate that the user has moved
@@ -112,6 +114,11 @@ export class AccountMoveService {
 		})), process.env.NODE_ENV === 'test' ? 10000 : 1000 * 60 * 60 * 24);
 
 		await this.postMoveProcess(src, dst);
+		await this.userAccountMoveLogsRepository.insertOne({
+			id: this.idService.gen(),
+			movedFromId: src.id,
+			movedToId: dst.id,
+		});
 
 		return iObj;
 	}
@@ -225,7 +232,7 @@ export class AccountMoveService {
 			if (!role.preserveAssignmentOnMoveAccount) continue;
 
 			try {
-				await this.roleService.assign(dst.id, role.id, oldRoleAssignment.expiresAt);
+				await this.roleService.assign(dst.id, role.id, oldRoleAssignment.memo, oldRoleAssignment.expiresAt);
 			} catch (e) {
 				if (e instanceof RoleService.AlreadyAssignedError) continue;
 				throw e;

@@ -85,6 +85,7 @@ const props = withDefaults(defineProps<{
 	antenna?: string;
 	channel?: string;
 	role?: string;
+	dimension?: number;
 	sound?: boolean;
 	customSound?: SoundStore | null;
 	withRenotes?: boolean;
@@ -102,9 +103,11 @@ const props = withDefaults(defineProps<{
 
 provide('inTimeline', true);
 provide('tl_withSensitive', computed(() => props.withSensitive));
+provide('tl_dimension', computed(() => props.dimension ?? prefer.s.dimension));
 provide(DI.inChannel, computed(() => props.src === 'channel' ? props.channel ?? null : null));
 
 let paginator: IPaginator<Misskey.entities.Note>;
+const timelineDimension = computed(() => props.dimension ?? prefer.s.dimension);
 
 if (props.src === 'antenna') {
 	paginator = markRaw(new Paginator('antennas/notes', {
@@ -118,6 +121,7 @@ if (props.src === 'antenna') {
 		computedParams: computed(() => ({
 			withRenotes: props.withRenotes,
 			withFiles: props.onlyFiles ? true : undefined,
+			dimension: timelineDimension.value,
 		})),
 		useShallowRef: true,
 	}));
@@ -127,6 +131,7 @@ if (props.src === 'antenna') {
 			withRenotes: props.withRenotes,
 			withReplies: props.withReplies,
 			withFiles: props.onlyFiles ? true : undefined,
+			dimension: timelineDimension.value,
 		})),
 		useShallowRef: true,
 	}));
@@ -136,6 +141,7 @@ if (props.src === 'antenna') {
 			withRenotes: props.withRenotes,
 			withReplies: props.withReplies,
 			withFiles: props.onlyFiles ? true : undefined,
+			dimension: timelineDimension.value,
 		})),
 		useShallowRef: true,
 	}));
@@ -144,6 +150,7 @@ if (props.src === 'antenna') {
 		computedParams: computed(() => ({
 			withRenotes: props.withRenotes,
 			withFiles: props.onlyFiles ? true : undefined,
+			dimension: timelineDimension.value,
 		})),
 		useShallowRef: true,
 	}));
@@ -164,6 +171,7 @@ if (props.src === 'antenna') {
 			withRenotes: props.withRenotes,
 			withFiles: props.onlyFiles ? true : undefined,
 			listId: props.list!,
+			dimension: timelineDimension.value,
 		})),
 		useShallowRef: true,
 	}));
@@ -171,6 +179,7 @@ if (props.src === 'antenna') {
 	paginator = markRaw(new Paginator('channels/timeline', {
 		computedParams: computed(() => ({
 			channelId: props.channel!,
+			dimension: timelineDimension.value,
 		})),
 		useShallowRef: true,
 	}));
@@ -178,6 +187,7 @@ if (props.src === 'antenna') {
 	paginator = markRaw(new Paginator('roles/notes', {
 		computedParams: computed(() => ({
 			roleId: props.role!,
+			dimension: timelineDimension.value,
 		})),
 		useShallowRef: true,
 	}));
@@ -324,6 +334,7 @@ function connectChannel() {
 		connections.homeTimeline = stream.useChannel('homeTimeline', {
 			withRenotes: props.withRenotes,
 			withFiles: props.onlyFiles ? true : undefined,
+			dimension: timelineDimension.value,
 		});
 		connections.main = stream.useChannel('main');
 		connections.homeTimeline.on('note', prepend);
@@ -332,6 +343,7 @@ function connectChannel() {
 			withRenotes: props.withRenotes,
 			withReplies: props.withReplies,
 			withFiles: props.onlyFiles ? true : undefined,
+			dimension: timelineDimension.value,
 		});
 		connections.localTimeline.on('note', prepend);
 	} else if (props.src === 'social') {
@@ -339,12 +351,14 @@ function connectChannel() {
 			withRenotes: props.withRenotes,
 			withReplies: props.withReplies,
 			withFiles: props.onlyFiles ? true : undefined,
+			dimension: timelineDimension.value,
 		});
 		connections.hybridTimeline.on('note', prepend);
 	} else if (props.src === 'global') {
 		connections.globalTimeline = stream.useChannel('globalTimeline', {
 			withRenotes: props.withRenotes,
 			withFiles: props.onlyFiles ? true : undefined,
+			dimension: timelineDimension.value,
 		});
 		connections.globalTimeline.on('note', prepend);
 	} else if (props.src === 'mentions') {
@@ -363,18 +377,21 @@ function connectChannel() {
 			withRenotes: props.withRenotes,
 			withFiles: props.onlyFiles ? true : undefined,
 			listId: props.list,
+			dimension: timelineDimension.value,
 		});
 		connections.userList.on('note', prepend);
 	} else if (props.src === 'channel') {
 		if (props.channel == null) return;
 		connections.channel = stream.useChannel('channel', {
 			channelId: props.channel,
+			dimension: timelineDimension.value,
 		});
 		connections.channel.on('note', prepend);
 	} else if (props.src === 'role') {
 		if (props.role == null) return;
 		connections.roleTimeline = stream.useChannel('roleTimeline', {
 			roleId: props.role,
+			dimension: timelineDimension.value,
 		});
 		connections.roleTimeline.on('note', prepend);
 	}
@@ -394,7 +411,7 @@ if (store.s.realtimeMode) {
 	connectChannel();
 }
 
-watch(() => [props.list, props.antenna, props.channel, props.role, props.withRenotes], () => {
+watch(() => [props.list, props.antenna, props.channel, props.role, props.withRenotes, props.withReplies, props.onlyFiles, props.dimension], () => {
 	if (store.s.realtimeMode) {
 		disconnectChannel();
 		connectChannel();

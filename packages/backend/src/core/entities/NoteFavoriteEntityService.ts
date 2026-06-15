@@ -40,10 +40,12 @@ export class NoteFavoriteEntityService {
 	}
 
 	@bindThis
-	public packMany(
+	public async packMany(
 		favorites: any[],
 		me: { id: MiUser['id'] },
 	) {
-		return Promise.all(favorites.map(x => this.pack(x, me)));
+		return (await Promise.allSettled(favorites.map(x => this.pack(x, me))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => result.value);
 	}
 }

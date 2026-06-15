@@ -55,7 +55,9 @@ export class MutingEntityService {
 		const _mutees = mutings.map(({ mutee, muteeId }) => mutee ?? muteeId);
 		const _userMap = await this.userEntityService.packMany(_mutees, me, { schema: 'UserDetailedNotMe' })
 			.then(users => new Map(users.map(u => [u.id, u])));
-		return Promise.all(mutings.map(muting => this.pack(muting, me, { packedMutee: _userMap.get(muting.muteeId) })));
+		return (await Promise.allSettled(mutings.map(muting => this.pack(muting, me, { packedMutee: _userMap.get(muting.muteeId) }))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => result.value);
 	}
 }
 

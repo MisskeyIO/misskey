@@ -191,13 +191,15 @@ export class ChannelEntityService {
 			})
 			.then(it => new Map(it.map(it => [it.id, it])));
 
-		return Promise.all(channels.map(it => this.pack(it, me, detailed, {
+		return (await Promise.allSettled(channels.map(it => this.pack(it, me, detailed, {
 			bannerFiles,
 			followings,
 			favorites,
 			muting,
 			pinnedNotes,
-		})));
+		}))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => result.value);
 	}
 }
 

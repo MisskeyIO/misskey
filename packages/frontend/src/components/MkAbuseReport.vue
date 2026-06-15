@@ -44,6 +44,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template #icon><i class="ti ti-message-2"></i></template>
 			<template #label>{{ i18n.ts.details }}</template>
 			<div class="_gaps_s">
+				<MkKeyValue oneline>
+					<template #key>{{ i18n.ts.abuseReportCategory }}</template>
+					<template #value>{{ categoryLabel }}</template>
+				</MkKeyValue>
+				<MkKeyValue oneline>
+					<template #key>{{ i18n.ts.createdAt }}</template>
+					<template #value><MkTime :time="report.createdAt" mode="detail"/></template>
+				</MkKeyValue>
 				<Mfm :text="report.comment" :linkNavigationBehavior="'window'"/>
 			</div>
 		</MkFolder>
@@ -78,14 +86,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { provide, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@/components/MkButton.vue';
-import MkSwitch from '@/components/MkSwitch.vue';
 import MkKeyValue from '@/components/MkKeyValue.vue';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
-import { dateString } from '@/filters/date.js';
 import MkFolder from '@/components/MkFolder.vue';
 import RouterView from '@/components/global/RouterView.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
@@ -106,6 +112,30 @@ const reporterRouter = createRouter(`/admin/user/${props.report.reporterId}`);
 reporterRouter.init();
 
 const moderationNote = ref(props.report.moderationNote ?? '');
+const abuseReportCategories = ['nsfw', 'spam', 'explicit', 'phishing', 'personalInfoLeak', 'selfHarm', 'criticalBreach', 'otherBreach', 'violationRights', 'violationRightsOther', 'other'] as const;
+type AbuseReportCategory = typeof abuseReportCategories[number];
+
+const abuseReportCategoryLabels = {
+	nsfw: i18n.ts._abuseReportCategory.nsfw,
+	spam: i18n.ts._abuseReportCategory.spam,
+	explicit: i18n.ts._abuseReportCategory.explicit,
+	phishing: i18n.ts._abuseReportCategory.phishing,
+	personalInfoLeak: i18n.ts._abuseReportCategory.personalInfoLeak,
+	selfHarm: i18n.ts._abuseReportCategory.selfHarm,
+	criticalBreach: i18n.ts._abuseReportCategory.criticalBreach,
+	otherBreach: i18n.ts._abuseReportCategory.otherBreach,
+	violationRights: i18n.ts._abuseReportCategory.violationRights,
+	violationRightsOther: i18n.ts._abuseReportCategory.violationRightsOther,
+	other: i18n.ts._abuseReportCategory.other,
+} satisfies Record<AbuseReportCategory, string>;
+
+const categoryLabel = computed(() => {
+	return isAbuseReportCategory(props.report.category) ? abuseReportCategoryLabels[props.report.category] : props.report.category;
+});
+
+function isAbuseReportCategory(category: string): category is AbuseReportCategory {
+	return abuseReportCategories.includes(category as AbuseReportCategory);
+}
 
 watch(moderationNote, async () => {
 	os.apiWithDialog('admin/update-abuse-user-report', {

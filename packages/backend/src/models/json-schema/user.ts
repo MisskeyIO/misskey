@@ -1,7 +1,74 @@
 /*
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
- */
+*/
+
+import { postingLangCodes, viewingLangCodes } from '@/misc/langmap.js';
+
+export const mutualLinkSectionsSchema = {
+	type: 'array',
+	nullable: false,
+	optional: false,
+	maxItems: 16,
+	items: {
+		type: 'object',
+		nullable: false,
+		optional: false,
+		properties: {
+			id: {
+				type: 'string',
+				nullable: false,
+				optional: true,
+				maxLength: 128,
+			},
+			name: {
+				type: 'string',
+				nullable: false,
+				optional: true,
+				maxLength: 256,
+			},
+			mutualLinks: {
+				type: 'array',
+				nullable: false,
+				optional: false,
+				maxItems: 16,
+				items: {
+					type: 'object',
+					nullable: false,
+					optional: false,
+					properties: {
+						id: {
+							type: 'string',
+							nullable: false,
+							optional: false,
+							maxLength: 128,
+						},
+						name: {
+							type: 'string',
+							nullable: false,
+							optional: true,
+							maxLength: 256,
+						},
+						url: {
+							type: 'string',
+							nullable: false,
+							optional: true,
+							maxLength: 2048,
+						},
+						avatarUrl: {
+							type: 'string',
+							nullable: false,
+							optional: true,
+							maxLength: 2048,
+						},
+					},
+					required: ['id'],
+				},
+			},
+		},
+		required: ['mutualLinks'],
+	},
+} as const;
 
 export const notificationRecieveConfig = {
 	type: 'object',
@@ -188,6 +255,10 @@ export const packedUserLiteSchema = {
 						type: 'number',
 						nullable: false, optional: false,
 					},
+					behavior: {
+						type: 'string',
+						nullable: false, optional: true,
+					},
 				},
 			},
 		},
@@ -296,6 +367,7 @@ export const packedUserDetailedNotMeOnlySchema = {
 				},
 			},
 		},
+		mutualLinkSections: mutualLinkSectionsSchema,
 		verifiedLinks: {
 			type: 'array',
 			nullable: false, optional: false,
@@ -458,6 +530,28 @@ export const packedMeDetailedOnlySchema = {
 			type: 'string',
 			nullable: true, optional: false,
 			format: 'id',
+		},
+		postingLang: {
+			type: 'string',
+			enum: [null, ...postingLangCodes],
+			nullable: true, optional: false,
+		},
+		viewingLangs: {
+			type: 'array',
+			nullable: false, optional: false,
+			items: {
+				type: 'string',
+				enum: viewingLangCodes,
+				nullable: false, optional: false,
+			},
+		},
+		showMediaInAllLanguages: {
+			type: 'boolean',
+			nullable: false, optional: false,
+		},
+		showHashtagsInAllLanguages: {
+			type: 'boolean',
+			nullable: false, optional: false,
 		},
 		followedMessage: {
 			type: 'string',

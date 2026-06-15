@@ -8,6 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	:is="self ? 'MkA' : 'a'" ref="el" :class="$style.root" class="_link" :[attr]="maybeRelativeUrl" :rel="rel ?? 'nofollow noopener'" :target="target"
 	:behavior="props.navigationBehavior"
 	@contextmenu.stop="() => {}"
+	@click="onClick"
 >
 	<template v-if="!self">
 		<span :class="$style.schema">{{ schema }}//</span>
@@ -33,6 +34,7 @@ import type { MkABehavior } from '@/components/global/MkA.vue';
 import * as os from '@/os.js';
 import { useTooltip } from '@/composables/use-tooltip.js';
 import { isEnabledUrlPreview } from '@/utility/url-preview.js';
+import { warningExternalWebsite } from '@/utility/warning-external-website.js';
 
 function safeURIDecode(str: string): string {
 	try {
@@ -56,6 +58,10 @@ const self = maybeRelativeUrl !== props.url;
 const url = new URL(props.url);
 if (!['http:', 'https:'].includes(url.protocol)) throw new Error('invalid url');
 const el = ref();
+
+function onClick(ev: MouseEvent): void {
+	void warningExternalWebsite(ev, props.url);
+}
 
 if (props.showUrlPreview && isEnabledUrlPreview.value) {
 	useTooltip(el, (showing) => {

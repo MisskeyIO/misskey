@@ -16,6 +16,7 @@ import { toArray, toSingle, unique } from '@/misc/prelude/array.js';
 import type { MiEmoji } from '@/models/Emoji.js';
 import type { MiDriveFile } from '@/models/DriveFile.js';
 import { NoteCreateService } from '@/core/NoteCreateService.js';
+import { CustomEmojiService } from '@/core/CustomEmojiService.js';
 import type Logger from '@/logger.js';
 import { IdService } from '@/core/IdService.js';
 import { PollService } from '@/core/PollService.js';
@@ -73,6 +74,7 @@ export class ApNoteService {
 		private apQuestionService: ApQuestionService,
 		private pollService: PollService,
 		private noteCreateService: NoteCreateService,
+		private customEmojiService: CustomEmojiService,
 		private apDbResolverService: ApDbResolverService,
 		private apLoggerService: ApLoggerService,
 	) {
@@ -157,8 +159,14 @@ export class ApNoteService {
 
 		const url = getOneApHrefNullable(note.url);
 
-		if (url && !checkHttps(url)) {
-			throw new Error('unexpected schema of note url: ' + url);
+		if (url != null) {
+			if (!checkHttps(url)) {
+				throw new Error('unexpected schema of note url: ' + url);
+			}
+
+			if (this.utilityService.punyHost(note.id) !== this.utilityService.punyHost(url)) {
+				throw new Error(`note id and url host mismatch: ${note.id} - ${url}`);
+			}
 		}
 
 		this.logger.info(`Creating the Note: ${note.id}`);
@@ -225,11 +233,14 @@ export class ApNoteService {
 			}
 		}
 
+		const isSensitiveMediaHost = this.utilityService.isMediaSilencedHost(this.meta.mediaSilencedHosts, this.utilityService.extractDbHost(note.id ?? entryUri));
+
 		// 添付ファイル
 		const files: MiDriveFile[] = [];
 
 		for (const attach of toArray(note.attachment)) {
 			attach.sensitive ??= note.sensitive;
+			attach.sensitive ||= isSensitiveMediaHost;
 			const file = await this.apImageService.resolveImage(actor, attach);
 			if (file) files.push(file);
 		}
@@ -384,7 +395,9 @@ export class ApNoteService {
 		// eslint-disable-next-line no-param-reassign
 		host = this.utilityService.toPuny(host);
 
-		const eomjiTags = toArray(tags).filter(isEmoji);
+		const eomjiTags = toArray(tags)
+			.filter(isEmoji)
+			.filter(tag => !this.customEmojiService.isBlockedRemoteEmoji({ name: tag.name.replaceAll(':', ''), host }));
 
 		const existingEmojis = await this.emojisRepository.findBy({
 			host,

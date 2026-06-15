@@ -15,6 +15,10 @@ export const basicTimelineTypes = [
 
 export type BasicTimelineType = typeof basicTimelineTypes[number];
 
+export type TimelinePageSrc = BasicTimelineType | `list:${string}`;
+
+export type TimelineDimensionSrc = TimelinePageSrc | `channel:${string}` | `role:${string}`;
+
 export function isBasicTimeline(timeline: string): timeline is BasicTimelineType {
 	return basicTimelineTypes.includes(timeline as BasicTimelineType);
 }
@@ -53,4 +57,10 @@ export function availableBasicTimelines(): BasicTimelineType[] {
 
 export function hasWithReplies(timeline: BasicTimelineType | undefined | null): boolean {
 	return timeline === 'local' || timeline === 'social';
+}
+
+export function hasDimension(timeline: string | undefined | null): boolean {
+	if (timeline == null) return false;
+	if (basicTimelineTypes.includes(timeline as BasicTimelineType)) return true;
+	return timeline.startsWith('list:') || timeline === 'list' || timeline.startsWith('channel:') || timeline === 'channel' || timeline.startsWith('role:') || timeline === 'role';
 }

@@ -239,6 +239,7 @@ export interface InternalEventTypes {
 	roleUpdated: MiRole;
 	userRoleAssigned: MiRoleAssignment;
 	userRoleUnassigned: MiRoleAssignment;
+	userInlinePoliciesUpdated: { userId: MiUser['id']; };
 	webhookCreated: MiWebhook;
 	webhookDeleted: MiWebhook;
 	webhookUpdated: MiWebhook;

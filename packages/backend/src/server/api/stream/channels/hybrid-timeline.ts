@@ -5,7 +5,6 @@
 
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import type { Packed } from '@/misc/json-schema.js';
-import { MetaService } from '@/core/MetaService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { NoteStreamingHidingService } from '../NoteStreamingHidingService.js';
 import { bindThis } from '@/decorators.js';
@@ -29,7 +28,6 @@ export class HybridTimelineChannel extends Channel {
 		@Inject(REQUEST)
 		request: ChannelRequest,
 
-		private metaService: MetaService,
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
 		private noteStreamingHidingService: NoteStreamingHidingService,
@@ -46,6 +44,7 @@ export class HybridTimelineChannel extends Channel {
 		this.withRenotes = !!(params.withRenotes ?? true);
 		this.withReplies = !!(params.withReplies ?? false);
 		this.withFiles = !!(params.withFiles ?? false);
+		this.setViewerDimension(params);
 
 		// Subscribe events
 		this.subscriber.on('notesStream', this.onNote);
@@ -78,6 +77,8 @@ export class HybridTimelineChannel extends Channel {
 		}
 
 		if (!this.isNoteVisibleForMe(note)) return;
+		if (!this.shouldDeliverByDimension(note)) return;
+		if (!(await this.noteEntityService.isLanguageVisibleToMe(note, this.user?.id))) return;
 		if (this.isNoteMutedOrBlocked(note)) return;
 
 		if (note.reply) {

@@ -23,13 +23,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 			<div :class="$style.body">
 				<div :class="$style.header">
-					<span :class="$style.title">{{ i18n.ts._achievements._types[`_${achievement.name}`].title }}</span>
+					<span :class="$style.title">{{ achievementTypeLocales[`_${achievement.name}`].title }}</span>
 					<span :class="$style.time">
 						<time v-tooltip="new Date(achievement.unlockedAt).toLocaleString()">{{ new Date(achievement.unlockedAt).getFullYear() }}/{{ new Date(achievement.unlockedAt).getMonth() + 1 }}/{{ new Date(achievement.unlockedAt).getDate() }}</time>
 					</span>
 				</div>
-				<div :class="$style.description">{{ withDescription ? i18n.ts._achievements._types[`_${achievement.name}`].description : '???' }}</div>
-				<div v-if="'flavor' in i18n.ts._achievements._types[`_${achievement.name}`] && withDescription" :class="$style.flavor">{{ (i18n.ts._achievements._types[`_${achievement.name}`] as { flavor: string; }).flavor }}</div>
+				<div :class="$style.description">{{ withDescription ? achievementTypeLocales[`_${achievement.name}`].description : '???' }}</div>
+				<div v-if="achievementTypeLocales[`_${achievement.name}`].flavor && withDescription" :class="$style.flavor">{{ achievementTypeLocales[`_${achievement.name}`].flavor }}</div>
 			</div>
 		</div>
 		<template v-if="withLocked">
@@ -58,6 +58,12 @@ import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { ACHIEVEMENT_TYPES, ACHIEVEMENT_BADGES, claimAchievement } from '@/utility/achievements.js';
 
+type AchievementTypeLocale = {
+	title: string;
+	description: string;
+	flavor?: string;
+};
+
 const props = withDefaults(defineProps<{
 	user: Misskey.entities.User;
 	withLocked?: boolean;
@@ -69,6 +75,7 @@ const props = withDefaults(defineProps<{
 
 const achievements = ref<Misskey.entities.UsersAchievementsResponse | null>(null);
 const lockedAchievements = computed(() => ACHIEVEMENT_TYPES.filter(x => !(achievements.value ?? []).some(a => a.name === x)));
+const achievementTypeLocales = i18n.ts._achievements._types as Record<`_${typeof ACHIEVEMENT_TYPES[number]}`, AchievementTypeLocale>;
 
 function _fetch_() {
 	misskeyApi('users/achievements', { userId: props.user.id }).then(res => {

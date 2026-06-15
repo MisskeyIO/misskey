@@ -7,21 +7,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 <PageWithHeader :actions="headerActions" :tabs="headerTabs">
 	<div v-if="token" class="_spacer" style="--MI_SPACER-w: 700px; --MI_SPACER-min: 16px; --MI_SPACER-max: 32px;">
 		<div class="_gaps_m">
-			<MkInput v-model="password" type="password">
-				<template #prefix><i class="ti ti-lock"></i></template>
-				<template #label>{{ i18n.ts.newPassword }}</template>
-			</MkInput>
+			<MkNewPassword ref="newPassword"/>
 
-			<MkButton primary @click="save">{{ i18n.ts.save }}</MkButton>
+			<MkButton primary :disabled="newPassword?.isValid !== true" @click="save">{{ i18n.ts.save }}</MkButton>
 		</div>
 	</div>
 </PageWithHeader>
 </template>
 
 <script lang="ts" setup>
-import { defineAsyncComponent, onMounted, ref, computed } from 'vue';
-import MkInput from '@/components/MkInput.vue';
+import { onMounted, ref, computed } from 'vue';
 import MkButton from '@/components/MkButton.vue';
+import MkNewPassword from '@/components/MkNewPassword.vue';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
@@ -31,13 +28,15 @@ const props = defineProps<{
 	token?: string;
 }>();
 
-const password = ref('');
+const newPassword = ref<InstanceType<typeof MkNewPassword> | null>(null);
 
 async function save() {
 	if (props.token == null) return;
+	if (newPassword.value?.isValid !== true) return;
+
 	await os.apiWithDialog('reset-password', {
 		token: props.token,
-		password: password.value,
+		password: newPassword.value.password,
 	});
 	mainRouter.push('/');
 }

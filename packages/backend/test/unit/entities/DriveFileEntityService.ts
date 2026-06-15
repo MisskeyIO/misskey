@@ -7,8 +7,6 @@ process.env.NODE_ENV = 'test';
 
 import { afterAll, beforeAll, beforeEach, describe, expect, vi, test } from 'vitest';
 import { Test } from '@nestjs/testing';
-import type { TestingModule } from '@nestjs/testing';
-import type { DriveFilesRepository, DriveFoldersRepository, UsersRepository } from '@/models/_.js';
 import { GlobalModule } from '@/GlobalModule.js';
 import { CoreModule } from '@/core/CoreModule.js';
 import { DriveFileEntityService } from '@/core/entities/DriveFileEntityService.js';
@@ -17,6 +15,9 @@ import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
 import { genAidx } from '@/misc/id/aidx.js';
 import { secureRndstr } from '@/misc/secure-rndstr.js';
+import type { Config } from '@/config.js';
+import type { DriveFilesRepository, DriveFoldersRepository, UsersRepository } from '@/models/_.js';
+import type { TestingModule } from '@nestjs/testing';
 
 const describeBenchmark = process.env.RUN_BENCHMARKS === '1' ? describe : describe.skip;
 
@@ -27,6 +28,7 @@ describe('DriveFileEntityService', () => {
 	let driveFilesRepository: DriveFilesRepository;
 	let driveFoldersRepository: DriveFoldersRepository;
 	let usersRepository: UsersRepository;
+	let config: Config;
 	let idCounter = 0;
 
 	const userEntityServiceMock = {
@@ -93,6 +95,7 @@ describe('DriveFileEntityService', () => {
 			src: null,
 			folderId,
 			isSensitive: false,
+			isSensitiveByModerator: false,
 			maybeSensitive: false,
 			maybePorn: false,
 			isLink: false,
@@ -117,6 +120,7 @@ describe('DriveFileEntityService', () => {
 		driveFilesRepository = app.get<DriveFilesRepository>(DI.driveFilesRepository);
 		driveFoldersRepository = app.get<DriveFoldersRepository>(DI.driveFoldersRepository);
 		usersRepository = app.get<UsersRepository>(DI.usersRepository);
+		config = app.get<Config>(DI.config);
 	});
 
 	beforeEach(() => {
@@ -146,9 +150,25 @@ describe('DriveFileEntityService', () => {
 			const child = await createFolder('pack-child', folder.id);
 			const file = await createFile(child.id, null);
 
+			file.isSensitiveByModerator = true;
+			await driveFilesRepository.update(file.id, { isSensitiveByModerator: true });
+
 			const packed = await service.pack(file, { detail: true, self: true }) as any;
+			expect(packed.isSensitiveByModerator).toBe(true);
 			expect(packed.folder?.id).toBe(child.id);
 			expect(packed.folder?.parent?.id).toBe(folder.id);
+		});
+	});
+
+	describe('getPublicUrl', () => {
+		test('avatar proxy URL uses path-style media proxy URL', async () => {
+			const file = await createFile(null, null);
+
+			const url = service.getPublicUrl(file, 'avatar');
+
+			expect(url).toContain('/avatar/');
+			expect(url).toContain('avatar=1');
+			expect(url).not.toContain('url=');
 		});
 	});
 
@@ -167,6 +187,30 @@ describe('DriveFileEntityService', () => {
 			});
 			expect(packed?.user?.id).toBe(user.id);
 			expect(packed?.user?.username).toBe('hint');
+		});
+	});
+
+	describe('public URL', () => {
+		test('external media proxy URL uses path-style target without an empty query', async () => {
+			const originalMediaProxy = config.mediaProxy;
+			const originalExternalMediaProxyEnabled = config.externalMediaProxyEnabled;
+
+			try {
+				config.mediaProxy = 'https://media-proxy.test';
+				config.externalMediaProxyEnabled = true;
+
+				const file = await createFile(null, null);
+				file.uri = 'https://remote.example/files/a.png';
+				file.url = file.uri;
+				file.userHost = 'remote.example';
+
+				const packed = await service.pack(file, { self: false });
+
+				expect(packed.url).toBe('https://media-proxy.test/image/remote.example%2Ffiles%2Fa.png');
+			} finally {
+				config.mediaProxy = originalMediaProxy;
+				config.externalMediaProxyEnabled = originalExternalMediaProxyEnabled;
+			}
 		});
 	});
 

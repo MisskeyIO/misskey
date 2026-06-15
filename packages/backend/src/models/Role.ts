@@ -233,6 +233,11 @@ export class MiRole {
 	})
 	public asBadge: boolean;
 
+	@Column('varchar', {
+		length: 256, nullable: true,
+	})
+	public badgeBehavior: string | null;
+
 	@Column('boolean', {
 		default: false,
 	})

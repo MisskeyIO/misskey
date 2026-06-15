@@ -38,6 +38,9 @@ export const paramDef = {
 		forExistingUsers: { type: 'boolean' },
 		silence: { type: 'boolean' },
 		needConfirmationToRead: { type: 'boolean' },
+		needEnrollmentTutorialToRead: { type: 'boolean' },
+		closeDuration: { type: 'integer' },
+		displayOrder: { type: 'integer' },
 		isActive: { type: 'boolean' },
 	},
 	required: ['id'],
@@ -67,6 +70,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				forExistingUsers: ps.forExistingUsers,
 				silence: ps.silence,
 				needConfirmationToRead: ps.needConfirmationToRead,
+				needEnrollmentTutorialToRead: ps.needEnrollmentTutorialToRead,
+				closeDuration: ps.closeDuration,
+				displayOrder: ps.displayOrder,
 				isActive: ps.isActive,
 			}, me);
 		});

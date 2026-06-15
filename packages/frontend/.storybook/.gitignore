@@ -3,5 +3,6 @@
 /preload-locale.js
 /locale.ts
 /main.js
+/storybook-config.js
 /preload-theme.js
 /themes.ts

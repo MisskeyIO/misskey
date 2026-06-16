@@ -6,12 +6,14 @@ on:
       - master
       - develop
   pull_request:
+  workflow_dispatch:
 
 env:
   NODE_ENV: production
 
 permissions:
   contents: read
+  security-events: write
 
 jobs:
   production:
@@ -21,6 +23,7 @@ jobs:
     steps:
     - uses: actions/checkout@v6
       with:
+        fetch-depth: 0
         submodules: true
     - name: Setup pnpm
       uses: pnpm/action-setup@v5
@@ -38,3 +41,16 @@ jobs:
       run: cp .github/misskey/test.yml .config/default.yml
     - name: Build
       run: pnpm build
+    - name: Run Snyk to check for vulnerabilities
+      uses: snyk/actions/node@master
+      continue-on-error: true
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --all-projects --severity-threshold=medium --sarif-file-output=snyk.sarif
+    - name: Upload result to GitHub Code Scanning
+      uses: github/codeql-action/upload-sarif@v4
+      continue-on-error: true
+      with:
+        category: Snyk Node.js Vulnerability Scan Result
+        sarif_file: snyk.sarif

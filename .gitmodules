@@ -1,0 +1,3 @@
+[submodule "packages/emojis"]
+	path = packages/emojis
+	url = https://github.com/MisskeyIO/emojis.git

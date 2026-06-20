@@ -19,7 +19,7 @@
 		"@analytics/google-analytics": "catalog:",
 		"@mcaptcha/core-glue": "catalog:",
 		"@misskey-dev/browser-image-resizer": "catalog:",
-		"@misskey-dev/emoji-data": "catalog:",
+		"@misskey-dev/emoji-data": "workspace:*",
 		"@sentry/vue": "catalog:",
 		"@simplewebauthn/browser": "catalog:",
 		"@syuilo/aiscript": "catalog:",
@@ -71,7 +71,7 @@
 		"wanakana": "catalog:"
 	},
 	"devDependencies": {
-		"@misskey-dev/emoji-assets": "catalog:",
+		"@misskey-dev/emoji-assets": "workspace:*",
 		"@misskey-dev/summaly": "catalog:",
 		"@rollup/plugin-json": "catalog:",
 		"@rollup/pluginutils": "catalog:",

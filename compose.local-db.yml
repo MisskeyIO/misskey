@@ -1,17 +1,13 @@
 # このconfigは、 dockerでMisskey本体を起動せず、 redisとpostgresql などだけを起動します
 
 services:
-  redis:
+  valkey:
     restart: always
-    image: redis:7-alpine
+    image: valkey/valkey:8-alpine
     ports:
       - "6379:6379"
     volumes:
-      - ./redis:/data
-    healthcheck:
-      test: "redis-cli ping"
-      interval: 5s
-      retries: 20
+      - ./data/valkey:/data
 
   db:
     restart: always
@@ -21,7 +17,7 @@ services:
     env_file:
       - .config/docker.env
     volumes:
-      - ./db:/var/lib/postgresql
+      - ./data/db:/var/lib/postgresql
     healthcheck:
       test: "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"
       interval: 5s
@@ -36,5 +32,4 @@ services:
 #    env_file:
 #      - .config/meilisearch.env
 #    volumes:
-#      - ./meili_data:/meili_data
-
+#      - ./data/meili_data:/meili_data

@@ -15,6 +15,8 @@ import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
 import { unisonReload } from '@/utility/unison-reload.js';
 
+const kawaiiMode = miLocalStorage.getItem('kawaii') === 'true';
+
 export const navbarItemDef = reactive<{
 	[key: string]: {
 		title: string;
@@ -192,6 +194,22 @@ export const navbarItemDef = reactive<{
 		icon: 'ti ti-user',
 		show: computed(() => $i != null),
 		to: `/@${$i?.username}`,
+	},
+	kawaii: {
+		title: kawaiiMode ? 'no uwu plz' : 'uwu?',
+		icon: kawaiiMode ? 'ti ti-mood-smile' : 'ti ti-mood-wink',
+		action: () => {
+			if (kawaiiMode) miLocalStorage.removeItem('kawaii');
+			else miLocalStorage.setItem('kawaii', 'true');
+			window.location.reload();
+		},
+	},
+	support: {
+		title: i18n.ts._aboutMisskey.donate,
+		icon: 'ti ti-pig-money',
+		action: () => {
+			window.open('https://go.misskey.io/donate', '_blank', 'noopener');
+		},
 	},
 	cacheClear: {
 		title: i18n.ts.clearCache,

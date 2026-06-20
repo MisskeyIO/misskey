@@ -148,7 +148,6 @@ import { deepClone } from '@/utility/clone.js';
 import MkRippleEffect from '@/components/MkRippleEffect.vue';
 import { miLocalStorage } from '@/local-storage.js';
 import { claimAchievement } from '@/utility/achievements.js';
-import { emojiPicker } from '@/utility/emoji-picker.js';
 import { mfmFunctionPicker } from '@/utility/mfm-function-picker.js';
 import { prefer } from '@/preferences.js';
 import { getPluginHandlers } from '@/plugin.js';
@@ -1209,36 +1208,10 @@ function insertMention() {
 }
 
 async function insertEmoji(ev: PointerEvent) {
-	textAreaReadOnly.value = true;
-	const target = ev.currentTarget ?? ev.target;
-	if (target == null) return;
-
-	// emojiPickerはダイアログが閉じずにtextareaとやりとりするので、
-	// focustrapをかけているとinsertTextAtCursorが効かない
-	// そのため、投稿フォームのテキストに直接注入する
-	// See: https://github.com/misskey-dev/misskey/pull/14282
-	//      https://github.com/misskey-dev/misskey/issues/14274
-
-	let pos = textareaEl.value?.selectionStart ?? 0;
-	let posEnd = textareaEl.value?.selectionEnd ?? text.value.length;
-	emojiPicker.show(
-		target as HTMLElement,
-		emoji => {
-			const textBefore = text.value.substring(0, pos);
-			const textAfter = text.value.substring(posEnd);
-			text.value = textBefore + emoji + textAfter;
-			pos += emoji.length;
-			posEnd += emoji.length;
-		},
-		() => {
-			textAreaReadOnly.value = false;
-			nextTick(() => {
-				if (textareaEl.value) {
-					textareaEl.value.focus();
-					textareaEl.value.setSelectionRange(pos, posEnd);
-				}
-			});
-		},
+	os.openEmojiPicker(
+		(ev.currentTarget ?? ev.target) as HTMLElement,
+		{ asReactionPicker: false },
+		textareaEl.value ?? null,
 	);
 }
 

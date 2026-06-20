@@ -3,8 +3,11 @@ name: Upload Sentry sourcemaps
 on:
   push:
     branches:
-      - master
-      - develop
+      - main
+      - next
+      - beta
+      - io
+      - host
     tags:
       - '**-mhq.*'
       - '**-io.*'
@@ -19,22 +22,26 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository == 'MisskeyIO/misskey'
 
+    strategy:
+      matrix:
+        node-version: [22.x]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          submodules: true
+          submodules: recursive
 
-      - name: Setup pnpm
+      - name: Install pnpm
         uses: pnpm/action-setup@v5
         with:
           run_install: false
 
-      - name: Use Node.js
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v6
         with:
-          node-version-file: '.node-version'
+          node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
 
       - name: Install dependencies

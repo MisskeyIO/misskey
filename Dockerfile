@@ -23,6 +23,8 @@ COPY --link ["packages/backend/package.json", "./packages/backend/"]
 COPY --link ["packages/frontend-shared/package.json", "./packages/frontend-shared/"]
 COPY --link ["packages/frontend/package.json", "./packages/frontend/"]
 COPY --link ["packages/frontend-embed/package.json", "./packages/frontend-embed/"]
+COPY --link ["packages/emojis/packages/emoji-assets/package.json", "./packages/emojis/packages/emoji-assets/"]
+COPY --link ["packages/emojis/packages/emoji-data/package.json", "./packages/emojis/packages/emoji-data/"]
 COPY --link ["packages/frontend-builder/package.json", "./packages/frontend-builder/"]
 COPY --link ["packages/i18n/package.json", "./packages/i18n/"]
 COPY --link ["packages/icons-subsetter/package.json", "./packages/icons-subsetter/"]
@@ -40,7 +42,7 @@ RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
 
 COPY --link . ./
 
-RUN git submodule update --init
+RUN git submodule update --init --recursive
 RUN pnpm build
 RUN rm -rf .git/
 
@@ -58,6 +60,8 @@ COPY --link ["pnpm-lock.yaml", "pnpm-workspace.yaml", "package.json", "./"]
 COPY --link ["scripts", "./scripts"]
 COPY --link ["patches", "./patches"]
 COPY --link ["packages/backend/package.json", "./packages/backend/"]
+COPY --link ["packages/emojis/packages/emoji-assets/package.json", "./packages/emojis/packages/emoji-assets/"]
+COPY --link ["packages/emojis/packages/emoji-data/package.json", "./packages/emojis/packages/emoji-data/"]
 COPY --link ["packages/misskey-js/package.json", "./packages/misskey-js/"]
 COPY --link ["packages/misskey-reversi/package.json", "./packages/misskey-reversi/"]
 COPY --link ["packages/misskey-bubble-game/package.json", "./packages/misskey-bubble-game/"]

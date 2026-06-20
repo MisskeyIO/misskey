@@ -4,6 +4,8 @@ packages:
   - packages/frontend
   - packages/frontend-builder
   - packages/frontend-embed
+  - packages/emojis/packages/emoji-assets
+  - packages/emojis/packages/emoji-data
   - packages/i18n
   - packages/icons-subsetter
   - packages/sw
@@ -11,7 +13,7 @@ packages:
   - packages/misskey-js/generator
   - packages/misskey-reversi
   - packages/misskey-bubble-game
-  - scripts/changelog-checker
+
 catalog:
   "@analytics/google-analytics": 1.1.0
   "@authenio/samlify-node-xmllint": 2.0.0
@@ -29,11 +31,9 @@ catalog:
   "@mcaptcha/core-glue": 0.1.0-alpha-5
   "@microsoft/api-extractor": 7.58.7
   "@misskey-dev/browser-image-resizer": 2024.1.0
-  "@misskey-dev/emoji-assets": 17.0.3
-  "@misskey-dev/emoji-data": 17.0.3
   "@misskey-dev/eslint-plugin": 2.1.0
   "@misskey-dev/sharp-read-bmp": 1.2.0
-  "@misskey-dev/summaly": 5.3.0
+  "@misskey-dev/summaly": github:MisskeyIO/summaly#5.2.5-io.3
   "@napi-rs/canvas": 1.0.0
   "@nestjs/common": 11.1.19
   "@nestjs/core": 11.1.19
@@ -296,6 +296,7 @@ catalog:
   "tsx": 4.21.0
   "typeorm": 0.3.28
   "typescript": 5.9.3
+  "unrun": 0.2.37
   "ulid": 3.0.2
   "unified": 11.0.5
   "utf-8-validate": 6.0.6
@@ -320,61 +321,69 @@ catalog:
   "ws": 8.20.1
   "xev": 3.0.2
   "xmlbuilder2": 4.0.3
+
 catalogMode: strict
 
-allowBuilds:
-  '@nestjs/core': true
-  '@parcel/watcher': true
-  '@sentry/profiling-node': true
-  '@sentry-internal/node-cpu-profiler': true
-  '@tensorflow/tfjs-node': true
-  bufferutil: true
-  canvas: true
-  core-js: true
-  cypress: true
-  esbuild: true
-  msgpackr-extract: true
-  msw: true
-  nice-napi: true
-  re2: true
-  sharp: true
-  utf-8-validate: true
-  v-code-diff: true
-  vue-demi: true
-  exifreader: false
+cleanupUnusedCatalogs: false
+
+ignorePatchFailures: false
+
+ignoredBuiltDependencies:
+  - '@sentry-internal/node-cpu-profiler'
+  - unrs-resolver
+
+onlyBuiltDependencies:
+  - '@nestjs/core'
+  - '@parcel/watcher'
+  - '@sentry/profiling-node'
+  - '@swc/core'
+  - '@tensorflow/tfjs-node'
+  - bufferutil
+  - canvas
+  - core-js
+  - cypress
+  - esbuild
+  - libpq
+  - msgpackr-extract
+  - msw
+  - nice-napi
+  - protobufjs
+  - re2
+  - sharp
+  - utf-8-validate
+  - v-code-diff
+  - vue-demi
+
 minimumReleaseAge: 10080 # delay 7days to mitigate supply-chain attack
 minimumReleaseAgeExclude:
   - '@misskey-dev/*'
   - '@syuilo/aiscript'
-  - buraha
-  - mfm-js
-  - slacc
-  - slacc-android-arm-eabi
-  - slacc-android-arm64
-  - slacc-darwin-arm64
-  - slacc-darwin-universal
-  - slacc-darwin-x64
-  - slacc-freebsd-x64
-  - slacc-linux-arm-gnueabihf
-  - slacc-linux-arm64-gnu
-  - slacc-linux-arm64-musl
-  - slacc-linux-x64-gnu
-  - slacc-linux-x64-musl
-  - slacc-win32-arm64-msvc
-  - slacc-win32-x64-msvc
-  - '@typescript/native-preview*'
-  - pnpm
-  - re2 # そのうち消す
-  - nan # そのうち消す
-  - systeminformation # 脆弱性対応。そのうち消す
-  - sanitize-html # 脆弱性対応。そのうち消す
-  - launder # 脆弱性対応。そのうち消す
-  # Renovate security update: ws@8.20.1
-  - ws@8.20.1
+
 overrides:
   '@aiscript-dev/aiscript-languageserver': '-'
+  '@misskey-dev/emoji-assets': workspace:*
+  '@misskey-dev/emoji-data': workspace:*
+  '@misskey-dev/summaly': github:MisskeyIO/summaly#5.2.5-io.3
+  '@tensorflow/tfjs': 4.22.0
+  '@tensorflow/tfjs-core': 4.22.0
+  '@tensorflow/tfjs-node': 4.22.0
+  '@types/jsdom': 21.1.7
+  '@types/punycode': 2.1.4
+  '@types/punycode.js': npm:@types/punycode@2.1.4
+  axios: 1.13.6
   chokidar: 5.0.0
-  lodash: 4.18.1
+  cookie: 1.1.1
+  cookie-signature: 1.2.2
+  debug: 4.4.3
+  jpeg-js: 0.4.4
+  jsdom: 26.1.0
+  lodash: 4.17.23
+  nsfwjs: 4.2.1
+  qs: 6.15.0
+  sharp: 0.34.5
+  tough-cookie: 6.0.0
+  web-streams-polyfill: 4.2.0
+
 engineStrict: true
 saveExact: true
 shellEmulator: true

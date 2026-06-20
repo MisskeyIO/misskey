@@ -29,7 +29,7 @@
 		"vue": "catalog:"
 	},
 	"devDependencies": {
-		"@misskey-dev/emoji-assets": "catalog:",
+		"@misskey-dev/emoji-assets": "workspace:*",
 		"@misskey-dev/summaly": "catalog:",
 		"@tabler/icons-webfont": "catalog:",
 		"@testing-library/vue": "catalog:",

@@ -8,7 +8,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div :class="$style.body">
 		<div :class="$style.top">
 			<button v-tooltip.noDelay.right="instance.name ?? i18n.ts.instance" class="_button" :class="$style.instance" @click="openInstanceMenu">
-				<img :src="instance.iconUrl || '/favicon.ico'" alt="" :class="$style.instanceIcon" style="view-transition-name: navbar-serverIcon;"/>
+				<img v-if="kawaiiMode" src="/client-assets/kawaii/misskey.png" alt="" :class="$style.instanceIconAlt"/>
+				<img v-else :src="instance.iconUrl || '/favicon.ico'" alt="" :class="$style.instanceIcon" style="view-transition-name: navbar-serverIcon;"/>
 			</button>
 			<button v-if="!iconOnly" v-tooltip.noDelay.right="i18n.ts.realtimeMode" class="_button" :class="[$style.realtimeMode, store.r.realtimeMode.value ? $style.on : null]" @click="toggleRealtimeMode">
 				<i v-if="store.r.realtimeMode.value" class="ti ti-bolt ti-fw"></i>
@@ -116,6 +117,7 @@ import { useRouter } from '@/router.js';
 import { prefer } from '@/preferences.js';
 import { getAccountMenu } from '@/accounts.js';
 import { $i } from '@/i.js';
+import { miLocalStorage } from '@/local-storage.js';
 
 const router = useRouter();
 
@@ -127,6 +129,8 @@ const props = defineProps<{
 const emit = defineEmits<{
 	(ev: 'widgetButtonClick'): void;
 }>();
+
+const kawaiiMode = miLocalStorage.getItem('kawaii') === 'true';
 
 const forceIconOnly = ref(!props.asDrawer && window.innerWidth <= 1279);
 const iconOnly = computed(() => {
@@ -429,6 +433,11 @@ function menuEdit() {
 		border-radius: 8px;
 	}
 
+	.instanceIconAlt {
+		display: inline-block;
+		width: 85%;
+	}
+
 	.realtimeMode {
 		display: inline-block;
 		width: var(--top-height);
@@ -658,6 +667,11 @@ function menuEdit() {
 		width: 30px;
 		aspect-ratio: 1;
 		border-radius: 8px;
+	}
+
+	.instanceIconAlt {
+		display: inline-block;
+		width: 85%;
 	}
 
 	.bottom {

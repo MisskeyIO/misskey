@@ -4,13 +4,13 @@ services:
     restart: always
     links:
       - db
-      - redis
+      - valkey
 #     - mcaptcha
 #     - meilisearch
     depends_on:
       db:
         condition: service_healthy
-      redis:
+      valkey:
         condition: service_healthy
     ports:
       - "3000:3000"
@@ -23,15 +23,15 @@ services:
       - ./files:/misskey/files
       - ./.config:/misskey/.config:ro
 
-  redis:
+  valkey:
     restart: always
-    image: redis:7-alpine
+    image: valkey/valkey:8-alpine
     networks:
       - internal_network
     volumes:
-      - ./redis:/data
+      - ./data/valkey:/data
     healthcheck:
-      test: "redis-cli ping"
+      test: "valkey-cli ping"
       interval: 5s
       retries: 20
 
@@ -43,7 +43,7 @@ services:
     env_file:
       - .config/docker.env
     volumes:
-      - ./db:/var/lib/postgresql
+      - ./data/db:/var/lib/postgresql
     healthcheck:
       test: "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"
       interval: 5s
@@ -90,7 +90,7 @@ services:
 #    networks:
 #      - internal_network
 #    volumes:
-#      - ./meili_data:/meili_data
+#      - ./data/meili_data:/meili_data
 
 networks:
   internal_network:

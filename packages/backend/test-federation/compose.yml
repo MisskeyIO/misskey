@@ -103,7 +103,7 @@ services:
   daemon:
     image: node:${NODE_VERSION}
     depends_on:
-      redis.test:
+      valkey.test:
         condition: service_healthy
     volumes:
       - type: bind
@@ -143,15 +143,15 @@ services:
         node ./packages/backend/test-federation/built/daemon.js
       "
 
-  redis.test:
-    image: redis:7-alpine
+  valkey.test:
+    image: valkey/valkey:8-alpine
     volumes:
       - type: bind
-        source: ./volumes/redis
+        source: ./volumes/valkey
         target: /data
         bind:
           create_host_path: true
     healthcheck:
-      test: redis-cli ping
+      test: valkey-cli ping
       interval: 5s
       retries: 20

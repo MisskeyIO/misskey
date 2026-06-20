@@ -5,17 +5,22 @@ name: Test (misskey.js)
 
 on:
   push:
-    branches: [ develop ]
+    branches:
+      - main
+      - next
+      - beta
+      - io
+      - host
     paths:
       - packages/misskey-js/**
       - pnpm-lock.yaml
       - .github/workflows/test-misskey-js.yml
   pull_request:
-    branches: [ develop ]
     paths:
       - packages/misskey-js/**
       - pnpm-lock.yaml
       - .github/workflows/test-misskey-js.yml
+
 permissions:
   contents: read
 
@@ -25,19 +30,27 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        node-version: [22.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v5
         with:
           run_install: false
 
-      - name: Setup Node.js
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v6
         with:
-          node-version-file: '.node-version'
+          node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
 
       - name: Install dependencies

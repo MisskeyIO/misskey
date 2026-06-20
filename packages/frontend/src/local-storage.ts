@@ -26,6 +26,7 @@ export type Keys = (
 	'fontSize' |
 	'ui' |
 	'ui_temp' |
+	'kawaii' |
 	'bootloaderLocales' |
 	'theme' |
 	'themeId' |

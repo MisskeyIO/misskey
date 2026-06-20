@@ -5,7 +5,8 @@
 
 // TODO: なんでもかんでもos.tsに突っ込むのやめたいのでよしなに分割する
 
-import { markRaw, ref, defineAsyncComponent, nextTick } from 'vue';
+import { computed, markRaw, ref, defineAsyncComponent, nextTick } from 'vue';
+import insertTextAtCursor from 'insert-text-at-cursor';
 import * as Misskey from 'misskey-js';
 import type { Component, MaybeRef } from 'vue';
 import type { ComponentEmit, ComponentProps as CP } from 'vue-component-type-helpers';
@@ -19,6 +20,7 @@ import type { MkDialogReturnType } from '@/components/MkDialog.vue';
 import type { OverloadToUnion } from '@/types/overload-to-union.js';
 import type MkRoleSelectDialog_TypeReferenceOnly from '@/components/MkRoleSelectDialog.vue';
 import type MkEmojiPickerDialog_TypeReferenceOnly from '@/components/MkEmojiPickerDialog.vue';
+import type MkEmojiPickerWindow_TypeReferenceOnly from '@/components/MkEmojiPickerWindow.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { prefer } from '@/preferences.js';
 import { i18n } from '@/i18n.js';
@@ -27,6 +29,7 @@ import MkWaitingDialog from '@/components/MkWaitingDialog.vue';
 import MkPageWindow from '@/components/MkPageWindow.vue';
 import MkToast from '@/components/MkToast.vue';
 import MkDialog from '@/components/MkDialog.vue';
+import MkEmojiPickerWindow from '@/components/MkEmojiPickerWindow.vue';
 import MkPopupMenu from '@/components/MkPopupMenu.vue';
 import MkContextMenu from '@/components/MkContextMenu.vue';
 import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
@@ -680,6 +683,72 @@ export async function pickEmoji(anchorElement: HTMLElement, opts: ComponentProps
 			},
 			closed: () => dispose(),
 		});
+	});
+}
+
+let openingEmojiPicker: ReturnType<typeof popup> | null = null;
+let activeTextarea: HTMLTextAreaElement | HTMLInputElement | null = null;
+
+export function openEmojiPicker(anchorElement: HTMLElement, opts: ComponentProps<typeof MkEmojiPickerWindow_TypeReferenceOnly>, initialTextarea: typeof activeTextarea): void {
+	if (openingEmojiPicker) return;
+
+	activeTextarea = initialTextarea;
+
+	const pinnedEmojis = computed(() => {
+		const palettes = prefer.r.emojiPalettes.value;
+		if (palettes.length === 0) return [] as string[];
+		const paletteId = (opts.asReactionPicker ? prefer.r.emojiPaletteForReaction : prefer.r.emojiPaletteForMain).value;
+		const palette = paletteId == null
+			? palettes[0]
+			: palettes.find(p => p.id === paletteId) ?? palettes[0];
+
+		return palette?.emojis ?? [];
+	});
+
+	for (const textarea of Array.from(
+		window.document.querySelectorAll('textarea, input'),
+	)) {
+		textarea.addEventListener('focus', () => {
+			activeTextarea = textarea as HTMLTextAreaElement | HTMLInputElement;
+		});
+	}
+
+	const observer = new MutationObserver(records => {
+		for (const record of records) {
+			for (const node of Array.from(record.addedNodes).filter(n => n instanceof HTMLElement) as HTMLElement[]) {
+				for (const textarea of Array.from(
+					node.querySelectorAll('textarea, input'),
+				).filter(el => (el as HTMLTextAreaElement | HTMLInputElement).dataset.preventEmojiInsert == null)) {
+					if (window.document.activeElement === textarea) activeTextarea = textarea as HTMLTextAreaElement | HTMLInputElement;
+					textarea.addEventListener('focus', () => {
+						activeTextarea = textarea as HTMLTextAreaElement | HTMLInputElement;
+					});
+				}
+			}
+		}
+	});
+
+	observer.observe(window.document.body, {
+		childList: true,
+		subtree: true,
+		attributes: false,
+		characterData: false,
+	});
+
+	openingEmojiPicker = popup(MkEmojiPickerWindow, {
+		anchorElement,
+		pinnedEmojis,
+		...opts,
+	}, {
+		chosen: emoji => {
+			if (activeTextarea == null) return;
+			insertTextAtCursor(activeTextarea, emoji);
+		},
+		closed: () => {
+			openingEmojiPicker?.dispose();
+			openingEmojiPicker = null;
+			observer.disconnect();
+		},
 	});
 }
 

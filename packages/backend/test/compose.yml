@@ -1,6 +1,6 @@
 services:
-  redistest:
-    image: redis:7
+  valkeytest:
+    image: valkey/valkey:8-alpine
     ports:
       - "127.0.0.1:56312:6379"
 

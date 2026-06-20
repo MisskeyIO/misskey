@@ -3,18 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-/// <reference path="../vue-shims.d.ts" />
-
+import '../vue-shims.d.ts';
 import { describe, test, assert, afterEach, beforeEach, expect, vi } from 'vitest';
 import { render, cleanup, fireEvent, type RenderResult } from '@testing-library/vue';
 import { ref } from 'vue';
 import { preferReactive, preferState } from './init.js';
-import type { SummalyResult } from '@misskey-dev/summaly';
+import type { summaly } from '@misskey-dev/summaly';
 import { components } from '@/components/index.js';
 import { directives } from '@/directives/index.js';
 import MkUrlPreview from '@/components/MkUrlPreview.vue';
 import MkLink from '@/components/MkLink.vue';
 import MkUrl from '@/components/global/MkUrl.vue';
+
+type SummalyResult = Awaited<ReturnType<typeof summaly>>;
 
 const osMock = vi.hoisted(() => {
 	return {

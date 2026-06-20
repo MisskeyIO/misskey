@@ -19,7 +19,7 @@
 		"js-built"
 	],
 	"dependencies": {
-		"@misskey-dev/emoji-data": "catalog:",
+		"@misskey-dev/emoji-data": "workspace:*",
 		"i18n": "workspace:*",
 		"json5": "catalog:",
 		"misskey-js": "workspace:*",

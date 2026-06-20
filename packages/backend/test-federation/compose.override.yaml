@@ -43,7 +43,7 @@ services:
         source: node_modules_backend_dev
         target: /misskey/packages/backend/node_modules
 
-  redis.test:
+  valkey.test:
     networks:
       - internal_network_a
       - internal_network_b

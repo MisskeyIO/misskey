@@ -164,8 +164,8 @@ function runCommand(command, args, cwd) {
 }
 
 async function buildEmojiData() {
-	await runCommand('pnpm', ['exec', 'tsgo', '-p', 'packages/emojis/packages/emoji-data/tsconfig.json', '--noEmit', '--skipLibCheck'], rootDir);
 	await runCommand('pnpm', ['--filter', '@misskey-dev/emoji-data', 'build'], rootDir);
+	await runCommand('pnpm', ['exec', 'tsgo', '-p', 'packages/emojis/packages/emoji-data/tsconfig.json', '--noEmit', '--skipLibCheck'], rootDir);
 }
 
 buildEmojiAssets()

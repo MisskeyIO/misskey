@@ -18,6 +18,10 @@ const ajv = new Ajv({
 });
 
 ajv.addFormat('misskey:id', /^[a-zA-Z0-9]+$/);
+ajv.addKeyword('optional');
+ajv.addKeyword('example');
+ajv.addKeyword('ref');
+ajv.addKeyword('selfRef');
 
 export type Response = Record<string, any> | void;
 

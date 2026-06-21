@@ -8,6 +8,11 @@ export default [
 		ignores: [
 			'**/node_modules',
 			'built',
+			'coverage',
+			'.eslintrc.js',
+			'jest.config.ts',
+			'test',
+			'test-d',
 		],
 	},
 	{

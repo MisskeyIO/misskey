@@ -19,8 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, markRaw, ref } from 'vue';
-import type { PageHeaderItem } from '@/types/page-header.js';
+import { computed, markRaw } from 'vue';
 import MkNotesTimeline from '@/components/MkNotesTimeline.vue';
 import MkButton from '@/components/MkButton.vue';
 import { definePage } from '@/page.js';
@@ -28,7 +27,6 @@ import { i18n } from '@/i18n.js';
 import { $i } from '@/i.js';
 import { store } from '@/store.js';
 import * as os from '@/os.js';
-import { genEmbedCode } from '@/utility/get-embed-code.js';
 import { Paginator } from '@/utility/paginator.js';
 
 const props = defineProps<{
@@ -51,19 +49,7 @@ async function post() {
 	paginator.reload();
 }
 
-const headerActions = computed<PageHeaderItem[]>(() => [{
-	icon: 'ti ti-dots',
-	text: i18n.ts.more,
-	handler: (ev) => {
-		os.popupMenu([{
-			text: i18n.ts.embed,
-			icon: 'ti ti-code',
-			action: () => {
-				genEmbedCode('tags', props.tag);
-			},
-		}], ev.currentTarget ?? ev.target);
-	},
-}]);
+const headerActions = computed(() => []);
 
 const headerTabs = computed(() => []);
 

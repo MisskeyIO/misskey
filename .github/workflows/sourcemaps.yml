@@ -88,21 +88,6 @@ jobs:
           ignore_missing: true
           finalize: false
 
-      - name: Upload embed vite sourcemaps to Sentry
-        uses: getsentry/action-release@v3
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT_FRONTEND }}
-          SENTRY_URL: ${{ secrets.SENTRY_URL }}
-        with:
-          release: ${{ steps.release.outputs.version }}
-          sourcemaps: built/_frontend_embed_vite_
-          url_prefix: "~/embed_vite/"
-          ignore_empty: true
-          ignore_missing: true
-          finalize: false
-
       - name: Upload frontend and library sourcemaps to Sentry
         uses: getsentry/action-release@v3
         env:

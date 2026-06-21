@@ -1,10 +1,15 @@
 import { EventEmitter } from 'eventemitter3';
-import _ReconnectingWebSocket, { Options } from 'reconnecting-websocket';
+import ReconnectingWebSocket from 'reconnecting-websocket/dist/reconnecting-websocket.mjs';
+import type { Options } from 'reconnecting-websocket';
 import type { BroadcastEvents, Channels } from './streaming.types.js';
 
-// コンストラクタとクラスそのものの定義が上手く解決出来ないため再定義
-const ReconnectingWebSocketConstructor = _ReconnectingWebSocket as unknown as typeof _ReconnectingWebSocket.default;
-type ReconnectingWebSocket = _ReconnectingWebSocket.default;
+type ReconnectingWebSocketConnection = {
+	binaryType: BinaryType;
+	addEventListener(type: 'open' | 'close', listener: () => void): void;
+	addEventListener(type: 'message', listener: (event: MessageEvent) => void): void;
+	send(data: string): void;
+	close(): void;
+};
 
 export function urlQuery(obj: Record<string, string | number | boolean | undefined>): string {
 	const params = Object.entries(obj)
@@ -45,7 +50,7 @@ export interface IStream extends EventEmitter<StreamEvents> {
  */
 // eslint-disable-next-line import/no-default-export
 export default class Stream extends EventEmitter<StreamEvents> implements IStream {
-	private stream: ReconnectingWebSocket;
+	private stream: ReconnectingWebSocketConnection;
 	public state: 'initializing' | 'reconnecting' | 'connected' = 'initializing';
 	private sharedConnectionPools: Pool[] = [];
 	private sharedConnections: SharedConnection[] = [];
@@ -54,7 +59,7 @@ export default class Stream extends EventEmitter<StreamEvents> implements IStrea
 
 	constructor(origin: string, user: { token: string; } | null, options?: {
 		WebSocket?: Options['WebSocket'];
-		binaryType?: ReconnectingWebSocket['binaryType'];
+		binaryType?: BinaryType;
 	}) {
 		super();
 
@@ -83,7 +88,7 @@ export default class Stream extends EventEmitter<StreamEvents> implements IStrea
 
 		const wsOrigin = origin.replace('http://', 'ws://').replace('https://', 'wss://');
 
-		this.stream = new ReconnectingWebSocketConstructor(`${wsOrigin}/streaming?${query}`, '', {
+		this.stream = new ReconnectingWebSocket(`${wsOrigin}/streaming?${query}`, '', {
 			minReconnectionDelay: 1, // https://github.com/pladaria/reconnecting-websocket/issues/91
 			WebSocket: options.WebSocket,
 		});

@@ -7,16 +7,25 @@ import * as assert from 'assert';
 import { describe, test, beforeAll } from 'vitest';
 import { Test } from '@nestjs/testing';
 
-import { CoreModule } from '@/core/CoreModule.js';
 import { ApMfmService } from '@/core/activitypub/ApMfmService.js';
-import { GlobalModule } from '@/GlobalModule.js';
+import { MfmService } from '@/core/MfmService.js';
+import { DI } from '@/di-symbols.js';
 
 describe('ApMfmService', () => {
 	let apMfmService: ApMfmService;
 
 	beforeAll(async () => {
 		const app = await Test.createTestingModule({
-			imports: [GlobalModule, CoreModule],
+			providers: [
+				ApMfmService,
+				MfmService,
+				{
+					provide: DI.config,
+					useValue: {
+						url: 'http://misskey.local',
+					},
+				},
+			],
 		}).compile();
 		apMfmService = app.get<ApMfmService>(ApMfmService);
 	});
@@ -44,6 +53,23 @@ describe('ApMfmService', () => {
 
 			assert.equal(noMisskeyContent, false, 'noMisskeyContent');
 			assert.equal(content, '<i>foo</i>', 'content');
+		});
+
+		test('Provide _misskey_content when additional appender is used', () => {
+			const note = {
+				text: 'foo',
+				mentionedRemoteUsers: '[]',
+			};
+
+			const { content, noMisskeyContent } = apMfmService.getNoteHtml(note as FIXME, [(doc, body) => {
+				const span = doc.createElement('span');
+				span.setAttribute('class', 'quote-inline');
+				span.textContent = 'bar';
+				body.appendChild(span);
+			}]);
+
+			assert.equal(noMisskeyContent, false, 'noMisskeyContent');
+			assert.equal(content, 'foo<span class="quote-inline">bar</span>', 'content');
 		});
 	});
 });

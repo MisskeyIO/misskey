@@ -40,6 +40,10 @@ export default [
 			// 型の情報を利用してlintする必要があるため無効化
 			// TODO: 有効化検討
 			'@typescript-eslint/no-misused-promises': 'off',
+			// ESLint 10でrecommended入りしたため、既存コードの整理は別タスクで行う
+			'no-useless-assignment': 'off',
+			// eslint-plugin更新でrecommended入りしたため、既存コードの整理は別タスクで行う
+			'preserve-caught-error': 'off',
 			'no-async-promise-executor': 'error',
 		},
 	},

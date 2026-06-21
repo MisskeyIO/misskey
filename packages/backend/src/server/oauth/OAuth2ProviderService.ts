@@ -451,7 +451,7 @@ export class OAuth2ProviderService {
 	}
 
 	@bindThis
-	private async findAccessToken(token: string, relations?: string[]): Promise<MiAccessToken | null> {
+	private async findAccessToken(token: string, relations?: { user: true }): Promise<MiAccessToken | null> {
 		return await this.accessTokensRepository.findOne({
 			where: [{
 				hash: token.toLowerCase(),
@@ -660,7 +660,7 @@ export class OAuth2ProviderService {
 				return;
 			}
 
-			const accessToken = await this.findAccessToken(token, ['user']);
+			const accessToken = await this.findAccessToken(token, { user: true });
 			reply.code(200);
 
 			if (!accessToken) return { active: false };

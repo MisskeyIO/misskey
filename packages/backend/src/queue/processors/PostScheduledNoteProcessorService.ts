@@ -51,7 +51,7 @@ export class PostScheduledNoteProcessorService {
 	private async processScheduledNote(scheduledNoteId: string): Promise<void> {
 		const scheduledNote = await this.scheduledNotesRepository.findOne({
 			where: { id: scheduledNoteId },
-			relations: ['user'],
+			relations: { user: true },
 		});
 		if (scheduledNote == null || scheduledNote.user == null || scheduledNote.scheduledAt == null) {
 			return;
@@ -96,7 +96,7 @@ export class PostScheduledNoteProcessorService {
 	private async processNoteDraft(noteDraftId: string): Promise<void> {
 		const noteDraft = await this.noteDraftsRepository.findOne({
 			where: { id: noteDraftId },
-			relations: ['user'],
+			relations: { user: true },
 		});
 		if (noteDraft == null || noteDraft.user == null || noteDraft.scheduledAt == null || !noteDraft.isActuallyScheduled) {
 			return;

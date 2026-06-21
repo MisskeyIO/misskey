@@ -45,9 +45,6 @@ export type CommonData = MinimumCommonData & {
 	frontendViteFiles: ViteFiles | null;
 	frontendBootloaderJs: string | null;
 	frontendBootloaderCss: string | null;
-	frontendEmbedViteFiles: ViteFiles | null;
-	frontendEmbedBootloaderJs: string | null;
-	frontendEmbedBootloaderCss: string | null;
 	metaJson?: string;
 	clientCtxJson?: string;
 };

@@ -20,9 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #header>{{ i18n.ts.searchResult }}</template>
 
 		<div v-if="searchResults.length > 0" class="_gaps_s">
-			<div v-for="message in searchResults" :key="message.id" :class="$style.searchResultItem">
-				<XMessage :message="message" :user="message.fromUser" :isSearchResult="true"/>
-			</div>
+			<MkNote v-for="note in searchResults" :key="note.id" :note="note" :withHardMute="true"/>
 		</div>
 		<MkResult v-else type="notFound"/>
 	</MkFoldableSection>
@@ -32,12 +30,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
-import XMessage from './XMessage.vue';
 import MkButton from '@/components/MkButton.vue';
-import { i18n } from '@/i18n.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
-import MkInput from '@/components/MkInput.vue';
 import MkFoldableSection from '@/components/MkFoldableSection.vue';
+import MkInput from '@/components/MkInput.vue';
+import MkNote from '@/components/MkNote.vue';
+import { i18n } from '@/i18n.js';
+import { ensureSignin } from '@/i.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
+
+const $i = ensureSignin();
 
 const props = defineProps<{
 	userId?: string;
@@ -46,24 +47,21 @@ const props = defineProps<{
 
 const searchQuery = ref('');
 const searched = ref(false);
-const searchResults = ref<Misskey.entities.ChatMessage[]>([]);
+const searchResults = ref<Misskey.entities.Note[]>([]);
+
+function isDirectNoteWithUser(note: Misskey.entities.Note): boolean {
+	if (props.userId == null) return true;
+	return note.userId === props.userId || (note.userId === $i.id && (note.visibleUserIds?.includes(props.userId) ?? false));
+}
 
 async function search() {
-	const res = await misskeyApi('chat/messages/search', {
-		query: searchQuery.value,
-		roomId: props.roomId,
-		userId: props.userId,
+	const res = await misskeyApi('notes/mentions', {
+		limit: 100,
+		visibility: 'specified',
 	});
 
-	searchResults.value = res;
+	const query = searchQuery.value.trim().toLowerCase();
+	searchResults.value = res.filter(note => isDirectNoteWithUser(note) && (query === '' || note.text?.toLowerCase().includes(query)));
 	searched.value = true;
 }
 </script>
-
-<style lang="scss" module>
-.searchResultItem {
-	padding: 12px;
-	border: solid 1px var(--MI_THEME-divider);
-	border-radius: 12px;
-}
-</style>

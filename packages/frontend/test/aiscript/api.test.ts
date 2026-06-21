@@ -8,6 +8,7 @@ import { aiScriptReadline, createAiScriptEnv } from '@/aiscript/api.js';
 import { errors, Interpreter, Parser, values } from '@syuilo/aiscript';
 import {
 	afterAll,
+	afterEach,
 	beforeAll,
 	beforeEach,
 	describe,
@@ -208,7 +209,7 @@ describe('AiScript common API', () => {
 		});
 
 		test.sequential('invalid type', async () => {
-			await expect(() => exe(`
+			await expect(exe(`
 				<: Mk:dialog('Hello', 'world', 'invalid')
 			`)).rejects.toBeInstanceOf(errors.AiScriptRuntimeError);
 			expect(osMock.alert).not.toHaveBeenCalled();
@@ -266,7 +267,7 @@ describe('AiScript common API', () => {
 
 		test.sequential('invalid type', async () => {
 			const confirm = osMock.confirm;
-			await expect(() => exe(`
+			await expect(exe(`
 				<: Mk:confirm('Hello', 'world', 'invalid')
 			`)).rejects.toBeInstanceOf(errors.AiScriptRuntimeError);
 			expect(confirm).not.toHaveBeenCalled();
@@ -277,6 +278,7 @@ describe('AiScript common API', () => {
 		beforeEach(() => {
 			vi.restoreAllMocks();
 			vi.clearAllMocks();
+			misskeyApiMock.mockReset();
 		});
 
 		test.sequential('successful', async () => {
@@ -327,7 +329,7 @@ describe('AiScript common API', () => {
 		});
 
 		test.sequential('invalid endpoint', async () => {
-			await expect(() => exe(`
+			await expect(exe(`
 				Mk:api('https://example.com/api/ping', {})
 			`)).rejects.toStrictEqual(
 				errorWithPos(new errors.AiScriptRuntimeError('invalid endpoint'), 2, 11),
@@ -336,7 +338,7 @@ describe('AiScript common API', () => {
 		});
 
 		test.sequential('missing param', async () => {
-			await expect(() => exe(`
+			await expect(exe(`
 				Mk:api('ping')
 			`)).rejects.toStrictEqual(
 				errorWithPos(new errors.AiScriptRuntimeError('expected param'), 2, 11),
@@ -346,7 +348,7 @@ describe('AiScript common API', () => {
 	});
 
 	describe('save and load', () => {
-		beforeEach(() => {
+		afterEach(() => {
 			miLocalStorage.removeItem('aiscript:widget:key');
 		});
 
@@ -364,7 +366,7 @@ describe('AiScript common API', () => {
 		});
 
 		test.sequential('missing value to save', async () => {
-			await expect(() => exe(`
+			await expect(exe(`
 				Mk:save('key')
 			`)).rejects.toStrictEqual(
 				errorWithPos(new errors.AiScriptRuntimeError('Expect anything, but got nothing.'), 2, 12),

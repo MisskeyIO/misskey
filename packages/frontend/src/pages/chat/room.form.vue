@@ -42,7 +42,6 @@ import { selectFile } from '@/utility/drive.js';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
 import { miLocalStorage } from '@/local-storage.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
 import { prefer } from '@/preferences.js';
 import { Autocomplete } from '@/utility/autocomplete.js';
 import { emojiPicker } from '@/utility/emoji-picker.js';
@@ -193,11 +192,12 @@ function send() {
 	sending.value = true;
 
 	if (props.user) {
-		misskeyApi('chat/messages/create-to-user', {
-			toUserId: props.user.id,
-			text: text.value ? text.value : undefined,
-			fileId: file.value ? file.value.id : undefined,
-		}).then(message => {
+		os.post({
+			specified: props.user,
+			initialVisibility: 'specified',
+			initialText: text.value,
+			initialFiles: file.value ? [file.value] : undefined,
+		}).then(() => {
 			clear();
 		}).catch(err => {
 			console.error(err);
@@ -205,17 +205,7 @@ function send() {
 			sending.value = false;
 		});
 	} else if (props.room) {
-		misskeyApi('chat/messages/create-to-room', {
-			toRoomId: props.room.id,
-			text: text.value ? text.value : undefined,
-			fileId: file.value ? file.value.id : undefined,
-		}).then(message => {
-			clear();
-		}).catch(err => {
-			console.error(err);
-		}).then(() => {
-			sending.value = false;
-		});
+		sending.value = false;
 	}
 }
 

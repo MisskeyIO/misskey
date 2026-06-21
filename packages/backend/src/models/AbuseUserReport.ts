@@ -14,7 +14,7 @@ export class MiAbuseUserReport {
 	@PrimaryColumn(id())
 	public id: string;
 
-	@Index()
+	@Index('IDX_abuse_user_report_createdAt')
 	@Column('timestamp with time zone', {
 		comment: 'The created date of the AbuseUserReport.',
 		default: () => 'CURRENT_TIMESTAMP',
@@ -72,7 +72,7 @@ export class MiAbuseUserReport {
 	})
 	public comment: string;
 
-	@Index()
+	@Index('IDX_abuse_user_report_category')
 	@Column('varchar', {
 		length: 20,
 		default: 'other',

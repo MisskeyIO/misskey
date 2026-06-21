@@ -56,7 +56,6 @@ import { GalleryPostPage } from './views/gallery-post.js';
 import { ChannelPage } from './views/channel.js';
 import { ReversiGamePage } from './views/reversi-game.js';
 import { AnnouncementPage } from './views/announcement.js';
-import { BaseEmbed } from './views/base-embed.js';
 import { InfoCardPage } from './views/info-card.js';
 import { BiosPage } from './views/bios.js';
 import { CliPage } from './views/cli.js';
@@ -74,7 +73,6 @@ export class ClientServerService {
 	private readonly fluentEmojiDir: string;
 	private readonly twemojiDir: string;
 	private readonly frontendViteOut: string;
-	private readonly frontendEmbedViteOut: string;
 	private readonly tarball: string;
 
 	constructor(
@@ -138,7 +136,6 @@ export class ClientServerService {
 		this.fluentEmojiDir = resolve(backendRootdir, 'node_modules/@misskey-dev/emoji-assets/built/fluent-emoji');
 		this.twemojiDir = resolve(backendRootdir, 'node_modules/@misskey-dev/emoji-assets/built/twemoji');
 		this.frontendViteOut = resolve(this.config.rootDir, 'built/_frontend_vite_');
-		this.frontendEmbedViteOut = resolve(this.config.rootDir, 'built/_frontend_embed_vite_');
 		this.tarball = resolve(this.config.rootDir, 'built/tarball');
 	}
 
@@ -213,19 +210,12 @@ export class ClientServerService {
 		});
 
 		//#region vite assets
-		if (this.config.frontendEmbedManifestExists) {
+		if (this.config.frontendManifestExists) {
 			this.clientLoggerService.logger.info(`[ClientServerService] Using built frontend vite assets. ${this.frontendViteOut}`);
 			fastify.register((fastify, options, done) => {
 				fastify.register(fastifyStatic, {
 					root: this.frontendViteOut,
 					prefix: '/vite/',
-					maxAge: ms('30 days'),
-					immutable: true,
-					decorateReply: false,
-				});
-				fastify.register(fastifyStatic, {
-					root: this.frontendEmbedViteOut,
-					prefix: '/embed_vite/',
 					maxAge: ms('30 days'),
 					immutable: true,
 					decorateReply: false,
@@ -242,13 +232,6 @@ export class ClientServerService {
 				upstream: urlOriginWithoutPort + ':' + port,
 				prefix: '/vite',
 				rewritePrefix: '/vite',
-			});
-
-			const embedPort = (process.env.EMBED_VITE_PORT ?? '5174');
-			fastify.register(fastifyProxy, {
-				upstream: urlOriginWithoutPort + ':' + embedPort,
-				prefix: '/embed_vite',
-				rewritePrefix: '/embed_vite',
 			});
 		}
 		//#endregion
@@ -378,13 +361,6 @@ export class ClientServerService {
 
 		// Manifest
 		fastify.get('/manifest.json', async (request, reply) => await this.manifestHandler(reply));
-
-		// Embed Javascript
-		fastify.get('/embed.js', async (request, reply) => {
-			return await reply.sendFile('/embed.js', this.staticAssets, {
-				maxAge: ms('1 day'),
-			});
-		});
 
 		fastify.get('/robots.txt', async (request, reply) => {
 			const disallowedPaths = [
@@ -579,7 +555,7 @@ export class ClientServerService {
 					id: request.params.note,
 					visibility: In(['public', 'home']),
 				},
-				relations: ['user', 'reply', 'renote'],
+				relations: { user: true, reply: true, renote: true },
 			});
 
 			if (
@@ -787,86 +763,6 @@ export class ClientServerService {
 		});
 		//#endregion
 
-		//#region embed pages
-		fastify.get<{ Params: { user: string; } }>('/embed/user-timeline/:user', async (request, reply) => {
-			reply.removeHeader('X-Frame-Options');
-
-			const user = await this.usersRepository.findOneBy({
-				id: request.params.user,
-			});
-
-			if (user == null) return;
-			if (user.host != null) return;
-
-			const _user = await this.userEntityService.pack(user);
-
-			reply.header('Cache-Control', 'public, max-age=3600');
-			return await HtmlTemplateService.replyHtml(reply, BaseEmbed({
-				title: this.meta.name ?? 'Misskey',
-				...await this.htmlTemplateService.getCommonData(),
-				embedCtxJson: htmlSafeJsonStringify({
-					user: _user,
-				}),
-			}));
-		});
-
-		fastify.get<{ Params: { note: string; } }>('/embed/notes/:note', async (request, reply) => {
-			reply.removeHeader('X-Frame-Options');
-
-			const note = await this.notesRepository.findOne({
-				where: {
-					id: request.params.note,
-				},
-				relations: ['user', 'reply', 'renote'],
-			});
-
-			if (note == null) return;
-			if (['specified', 'followers'].includes(note.visibility)) return;
-			if (note.userHost != null) return;
-
-			const _note = await this.noteEntityService.pack(note, null, { detail: true });
-
-			reply.header('Cache-Control', 'public, max-age=3600');
-			return await HtmlTemplateService.replyHtml(reply, BaseEmbed({
-				title: this.meta.name ?? 'Misskey',
-				...await this.htmlTemplateService.getCommonData(),
-				embedCtxJson: htmlSafeJsonStringify({
-					note: _note,
-				}),
-			}));
-		});
-
-		fastify.get<{ Params: { clip: string; } }>('/embed/clips/:clip', async (request, reply) => {
-			reply.removeHeader('X-Frame-Options');
-
-			const clip = await this.clipsRepository.findOneBy({
-				id: request.params.clip,
-			});
-
-			if (clip == null) return;
-
-			const _clip = await this.clipEntityService.pack(clip);
-
-			reply.header('Cache-Control', 'public, max-age=3600');
-			return await HtmlTemplateService.replyHtml(reply, BaseEmbed({
-				title: this.meta.name ?? 'Misskey',
-				...await this.htmlTemplateService.getCommonData(),
-				embedCtxJson: htmlSafeJsonStringify({
-					clip: _clip,
-				}),
-			}));
-		});
-
-		fastify.get('/embed/*', async (request, reply) => {
-			reply.removeHeader('X-Frame-Options');
-
-			reply.header('Cache-Control', 'public, max-age=3600');
-			return await HtmlTemplateService.replyHtml(reply, BaseEmbed({
-				title: this.meta.name ?? 'Misskey',
-				...await this.htmlTemplateService.getCommonData(),
-			}));
-		});
-
 		fastify.get('/_info_card_', async (request, reply) => {
 			reply.removeHeader('X-Frame-Options');
 
@@ -876,8 +772,6 @@ export class ClientServerService {
 				meta: this.meta,
 			}));
 		});
-		//#endregion
-
 		fastify.get('/bios', async (request, reply) => {
 			return await HtmlTemplateService.replyHtml(reply, BiosPage({
 				version: this.config.version,

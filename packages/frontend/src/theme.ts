@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-// TODO: (可能な部分を)sharedに抽出して frontend-embed と共通化
-
 import { ref, nextTick } from 'vue';
 import { EventEmitter } from 'eventemitter3';
 import lightTheme from '@@/themes/_light.json5';

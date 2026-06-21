@@ -72,22 +72,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkSwitch>
 		</SearchMarker>
 
-		<SearchMarker :keywords="['chat']">
-			<FormSection>
-				<template #label><SearchLabel>{{ i18n.ts.directMessage }}</SearchLabel></template>
-
-				<div class="_gaps_m">
-					<MkInfo v-if="$i.policies.chatAvailability === 'unavailable'">{{ i18n.ts._chat.chatNotAvailableForThisAccountOrServer }}</MkInfo>
-					<SearchMarker :keywords="['chat']">
-						<MkSelect v-model="chatScope" :items="chatScopeDef" @update:modelValue="save()">
-							<template #label><SearchLabel>{{ i18n.ts._chat.chatAllowedUsers }}</SearchLabel></template>
-							<template #caption>{{ i18n.ts._chat.chatAllowedUsers_note }}</template>
-						</MkSelect>
-					</SearchMarker>
-				</div>
-			</FormSection>
-		</SearchMarker>
-
 		<SearchMarker :keywords="['lockdown']">
 			<FormSection>
 				<template #label><SearchLabel>{{ i18n.ts.lockdown }}</SearchLabel></template>
@@ -295,20 +279,6 @@ const {
 	],
 	initialValue: $i.followersVisibility,
 });
-const {
-	model: chatScope,
-	def: chatScopeDef,
-} = useMkSelect({
-	items: [
-		{ label: i18n.ts._chat._chatAllowedUsers.everyone, value: 'everyone' },
-		{ label: i18n.ts._chat._chatAllowedUsers.followers, value: 'followers' },
-		{ label: i18n.ts._chat._chatAllowedUsers.following, value: 'following' },
-		{ label: i18n.ts._chat._chatAllowedUsers.mutual, value: 'mutual' },
-		{ label: i18n.ts._chat._chatAllowedUsers.none, value: 'none' },
-	],
-	initialValue: $i.chatScope,
-});
-
 const makeNotesFollowersOnlyBefore_type = computed({
 	get: () => {
 		if (makeNotesFollowersOnlyBefore.value == null) {
@@ -524,7 +494,6 @@ function save() {
 		publicReactions: !!publicReactions.value,
 		followingVisibility: followingVisibility.value,
 		followersVisibility: followersVisibility.value,
-		chatScope: chatScope.value,
 	});
 }
 

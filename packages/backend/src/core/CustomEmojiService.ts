@@ -374,7 +374,7 @@ export class CustomEmojiService implements OnApplicationShutdown {
 
 		do {
 			remoteEmojis = await this.emojisRepository.find({
-				select: ['id', 'name', 'host'],
+				select: { id: true, name: true, host: true },
 				where: {
 					host: Not(IsNull()),
 					...(cursor ? { id: MoreThan(cursor) } : {}),
@@ -501,7 +501,7 @@ export class CustomEmojiService implements OnApplicationShutdown {
 		}
 		const _emojis = emojisQuery.length > 0 ? await this.emojisRepository.find({
 			where: emojisQuery,
-			select: ['name', 'host', 'originalUrl', 'publicUrl'],
+			select: { name: true, host: true, originalUrl: true, publicUrl: true },
 		}) : [];
 		for (const emoji of _emojis) {
 			this.emojisCache.set(`${emoji.name} ${emoji.host}`, emoji);

@@ -169,7 +169,7 @@ export class NoteEntityService implements OnModuleInit {
 		if (packedNote.visibility === 'followers') {
 			if (meId == null) {
 				return true;
-			} else if (packedNote.reply && (meId === packedNote.reply.userId)) {
+		} else if (packedNote.replyUserId === meId || (packedNote.reply && (meId === packedNote.reply.userId))) {
 				// 自分の投稿に対するリプライ
 				return false;
 			} else if (packedNote.mentions && packedNote.mentions.some(id => meId === id)) {
@@ -179,6 +179,10 @@ export class NoteEntityService implements OnModuleInit {
 				// フォロワーかどうか
 				const followings = await this.cacheService.userFollowingsCache.fetch(meId);
 				if (!Object.hasOwn(followings, packedNote.userId)) {
+					const viewer = await this.usersRepository.findOneBy({ id: meId });
+					if (packedNote.user.host != null && viewer?.host != null) {
+						return false;
+					}
 					return true;
 				}
 			}
@@ -427,6 +431,7 @@ export class NoteEntityService implements OnModuleInit {
 			fileIds: note.fileIds,
 			files: packedFiles != null ? this.packAttachedFiles(note.fileIds, packedFiles) : this.driveFileEntityService.packManyByIds(note.fileIds),
 			replyId: note.replyId,
+			replyUserId: note.reply?.userId ?? note.replyUserId,
 			renoteId: note.renoteId,
 			channelId: note.channelId ?? undefined,
 			channel: channel ? {
@@ -486,6 +491,7 @@ export class NoteEntityService implements OnModuleInit {
 	@bindThis
 	public async isLanguageVisibleToMe(note: Packed<'Note'>, meId: MiUser['id'] | null | undefined): Promise<boolean> {
 		if (meId == null || meId === note.userId) return true;
+		if (note.mentions?.includes(meId) || note.visibleUserIds?.includes(meId)) return true;
 
 		const preference = await this.userLanguagesRepository.findOneBy({ userId: meId });
 		return isNoteLanguageVisible({
@@ -635,7 +641,7 @@ export class NoteEntityService implements OnModuleInit {
 	private findNoteOrFail(id: string): Promise<MiNote> {
 		return this.notesRepository.findOneOrFail({
 			where: { id },
-			relations: ['user', 'renote', 'reply'],
+			relations: { user: true, renote: true, reply: true },
 		});
 	}
 

@@ -85,24 +85,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</template>
 		</XFolder>
 
-		<XFolder v-if="matchQuery([i18n.ts._role._options.chatAvailability, 'chatAvailability'])" v-model:policyMeta="policyMetaModel.chatAvailability" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ i18n.ts._role._options.chatAvailability }}</template>
-			<template #valueText>{{ valuesModel.chatAvailability === 'available' ? i18n.ts.yes : valuesModel.chatAvailability === 'readonly' ? i18n.ts.readonly : i18n.ts.no }}</template>
-			<template #default="{ disabled }">
-				<MkSelect
-					v-model="valuesModel.chatAvailability"
-					:disabled="disabled"
-					:items="[
-						{ label: i18n.ts.enabled, value: 'available' },
-						{ label: i18n.ts.readonly, value: 'readonly' },
-						{ label: i18n.ts.disabled, value: 'unavailable' },
-					]"
-				>
-					<template #label>{{ i18n.ts.enable }}</template>
-				</MkSelect>
-			</template>
-		</XFolder>
-
 		<XFolder v-if="matchQuery([i18n.ts._role._options.mentionMax, 'mentionLimit'])" v-model:policyMeta="policyMetaModel.mentionLimit" :isBaseRole="isBaseRole" :readonly="readonly">
 			<template #label>{{ i18n.ts._role._options.mentionMax }}</template>
 			<template #valueText>{{ valuesModel.mentionLimit }}</template>

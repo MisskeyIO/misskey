@@ -21,13 +21,9 @@ import type { CommonData, ViteFiles } from './views/_.js';
 export class HtmlTemplateService {
 	private frontendAssetsFetched = false;
 	private readonly frontendViteBuilt: string;
-	private readonly frontendEmbedViteBuilt: string;
 	public frontendViteFiles: ViteFiles | null = null;
 	public frontendBootloaderJs: string | null = null;
 	public frontendBootloaderCss: string | null = null;
-	public frontendEmbedViteFiles: ViteFiles | null = null;
-	public frontendEmbedBootloaderJs: string | null = null;
-	public frontendEmbedBootloaderCss: string | null = null;
 
 	constructor(
 		@Inject(DI.config)
@@ -39,7 +35,6 @@ export class HtmlTemplateService {
 		private metaEntityService: MetaEntityService,
 	) {
 		this.frontendViteBuilt = resolve(this.config.rootDir, 'built/_frontend_vite_');
-		this.frontendEmbedViteBuilt = resolve(this.config.rootDir, 'built/_frontend_embed_vite_');
 	}
 
 	// 初期ロードで読み込むべきファイルのパスを収集する。
@@ -102,26 +97,16 @@ export class HtmlTemplateService {
 		const [
 			bootJs,
 			bootCss,
-			embedBootJs,
-			embedBootCss,
 		] = await Promise.all([
 			fsp.readFile(resolve(this.frontendViteBuilt, 'loader/boot.js'), 'utf-8').catch(() => null),
 			fsp.readFile(resolve(this.frontendViteBuilt, 'loader/style.css'), 'utf-8').catch(() => null),
-			fsp.readFile(resolve(this.frontendEmbedViteBuilt, 'loader/boot.js'), 'utf-8').catch(() => null),
-			fsp.readFile(resolve(this.frontendEmbedViteBuilt, 'loader/style.css'), 'utf-8').catch(() => null),
 		]);
 
 		let feViteManifest: Manifest | null = null;
-		let embedFeViteManifest: Manifest | null = null;
 
 		if (this.config.frontendManifestExists) {
 			const manifestContent = await fsp.readFile(resolve(this.frontendViteBuilt, 'manifest.json'), 'utf-8').catch(() => null);
 			feViteManifest = manifestContent ? JSON.parse(manifestContent) : null;
-		}
-
-		if (this.config.frontendEmbedManifestExists) {
-			const manifestContent = await fsp.readFile(resolve(this.frontendEmbedViteBuilt, 'manifest.json'), 'utf-8').catch(() => null);
-			embedFeViteManifest = manifestContent ? JSON.parse(manifestContent) : null;
 		}
 
 		if (feViteManifest != null) {
@@ -134,18 +119,6 @@ export class HtmlTemplateService {
 
 		if (bootCss != null) {
 			this.frontendBootloaderCss = bootCss;
-		}
-
-		if (embedFeViteManifest != null) {
-			this.frontendEmbedViteFiles = this.collectViteAssetFiles(embedFeViteManifest);
-		}
-
-		if (embedBootJs != null) {
-			this.frontendEmbedBootloaderJs = embedBootJs;
-		}
-
-		if (embedBootCss != null) {
-			this.frontendEmbedBootloaderCss = embedBootCss;
 		}
 	}
 
@@ -171,9 +144,6 @@ export class HtmlTemplateService {
 			frontendViteFiles: this.frontendViteFiles,
 			frontendBootloaderJs: this.frontendBootloaderJs,
 			frontendBootloaderCss: this.frontendBootloaderCss,
-			frontendEmbedViteFiles: this.frontendEmbedViteFiles,
-			frontendEmbedBootloaderJs: this.frontendEmbedBootloaderJs,
-			frontendEmbedBootloaderCss: this.frontendEmbedBootloaderCss,
 		};
 	}
 

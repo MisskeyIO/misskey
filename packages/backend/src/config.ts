@@ -205,7 +205,6 @@ export type Config = {
 	driveUrl: string;
 	userAgent: string;
 	frontendManifestExists: boolean;
-	frontendEmbedManifestExists: boolean;
 	rootDir: string;
 	mediaProxy: string;
 	remapDriveFileUrlForActivityPub: {
@@ -273,7 +272,6 @@ export function loadConfig(): Config {
 	const meta = JSON.parse(fs.readFileSync(resolve(projectBuiltDir, 'meta.json'), 'utf-8'));
 
 	const frontendManifestExists = fs.existsSync(resolve(projectBuiltDir, '_frontend_vite_/manifest.json'));
-	const frontendEmbedManifestExists = fs.existsSync(resolve(projectBuiltDir, '_frontend_embed_vite_/manifest.json'));
 
 	const config = JSON.parse(fs.readFileSync(compiledConfigFilePath, 'utf-8')) as Source;
 
@@ -365,7 +363,6 @@ export function loadConfig(): Config {
 		} : undefined,
 		userAgent: `Misskey/${version} (${config.url})`,
 		frontendManifestExists: frontendManifestExists,
-		frontendEmbedManifestExists: frontendEmbedManifestExists,
 		rootDir,
 		perChannelMaxNoteCacheCount: config.perChannelMaxNoteCacheCount ?? 1000,
 		perUserNotificationsMaxCount: config.perUserNotificationsMaxCount ?? 500,

@@ -45,18 +45,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 		</div>
 		<div v-else-if="tab === 'usage' && info" class="_gaps_m">
-			<MkTabs
-				v-model:tab="usageTab"
-				:tabs="[{
-					key: 'note',
-					title: 'Note',
-				}, {
-					key: 'chat',
-					title: 'Chat',
-				}]"
-			/>
-			<XNotes v-if="usageTab === 'note'" :fileId="props.file.id"/>
-			<XChat v-else-if="usageTab === 'chat'" :fileId="props.file.id"/>
+			<XNotes :fileId="props.file.id"/>
 		</div>
 		<div v-else-if="tab === 'ip' && info" class="_gaps_m">
 			<MkInfo v-if="!iAmAdmin" warn>{{ i18n.ts.requireAdminForView }}</MkInfo>
@@ -95,7 +84,6 @@ import bytes from '@/filters/bytes.js';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
 import { iAmAdmin, iAmModerator } from '@/i.js';
-import MkTabs from '@/components/MkTabs.vue';
 
 const props = defineProps<{
 	file: Misskey.entities.DriveFile,
@@ -104,9 +92,7 @@ const props = defineProps<{
 
 const tab = ref('overview');
 const isSensitive = ref(props.file.isSensitive);
-const usageTab = ref<'note' | 'chat'>('note');
 const XNotes = defineAsyncComponent(() => import('./drive.file.notes.vue'));
-const XChat = defineAsyncComponent(() => import('./admin-file.chat.vue'));
 
 async function del() {
 	const { canceled } = await os.confirm({

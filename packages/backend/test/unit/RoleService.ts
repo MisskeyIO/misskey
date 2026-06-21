@@ -45,6 +45,7 @@ describe('RoleService', () => {
 	let roleAssignmentsRepository: RoleAssignmentsRepository;
 	let userInlinePoliciesRepository: UserInlinePoliciesRepository;
 	let roleEntityService: RoleEntityService;
+	let globalEventService: GlobalEventService;
 	let meta: Mocked<MiMeta>;
 	let notificationService: Mocked<NotificationService>;
 	let clock: lolex.Clock;
@@ -170,6 +171,7 @@ describe('RoleService', () => {
 		rolesRepository = app.get<RolesRepository>(DI.rolesRepository);
 		roleAssignmentsRepository = app.get<RoleAssignmentsRepository>(DI.roleAssignmentsRepository);
 		userInlinePoliciesRepository = app.get<UserInlinePoliciesRepository>(DI.userInlinePoliciesRepository);
+		globalEventService = app.get<GlobalEventService>(GlobalEventService);
 
 		meta = app.get<MiMeta>(DI.meta) as Mocked<MiMeta>;
 		notificationService = app.get<NotificationService>(NotificationService) as Mocked<NotificationService>;
@@ -551,6 +553,28 @@ describe('RoleService', () => {
 
 			expect(result.canHideAds).toBe(true);
 			expect(result.driveCapacityMb).toBe(DEFAULT_POLICIES.driveCapacityMb + 50);
+		});
+
+		test('inline policy cache is refreshed on internal events', async () => {
+			const user = await createUser();
+			const inlinePolicy = await createInlinePolicy({
+				userId: user.id,
+				policy: 'canHideAds',
+				operation: 'set',
+				value: true,
+			});
+
+			const initial = await roleService.getUserPolicies(user.id);
+			expect(initial.canHideAds).toBe(true);
+
+			await userInlinePoliciesRepository.update({ id: inlinePolicy.id }, { value: false });
+			globalEventService.publishInternalEvent('userInlinePoliciesUpdated', { userId: user.id });
+
+			clock.uninstall();
+			await setTimeout(100);
+
+			const updated = await roleService.getUserPolicies(user.id);
+			expect(updated.canHideAds).toBe(false);
 		});
 	});
 

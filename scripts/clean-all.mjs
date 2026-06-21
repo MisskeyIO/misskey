@@ -20,9 +20,6 @@ const __dirname = import.meta.dirname;
 	fs.rmSync(__dirname + '/../packages/frontend/built', { recursive: true, force: true });
 	fs.rmSync(__dirname + '/../packages/frontend/node_modules', { recursive: true, force: true });
 
-	fs.rmSync(__dirname + '/../packages/frontend-embed/built', { recursive: true, force: true });
-	fs.rmSync(__dirname + '/../packages/frontend-embed/node_modules', { recursive: true, force: true });
-
 	fs.rmSync(__dirname + '/../packages/sw/built', { recursive: true, force: true });
 	fs.rmSync(__dirname + '/../packages/sw/node_modules', { recursive: true, force: true });
 

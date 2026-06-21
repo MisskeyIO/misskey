@@ -31,6 +31,18 @@ const accessDenied = {
 	id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e',
 };
 
+const chatUnavailable = {
+	message: 'Unavailable For Legal Reasons.',
+	code: 'CHAT_UNAVAILABLE_FOR_LEGAL_REASONS',
+	id: 'b7f67f19-58d8-4b9d-98fc-976bb6f4e239',
+	kind: 'permission',
+	httpStatusCode: 451,
+} as const;
+
+function isChatRelatedEndpoint(endpointName: string): boolean {
+	return endpointName.startsWith('chat/') || endpointName === 'drive/files/attached-chat-messages';
+}
+
 @Injectable()
 export class ApiCallService implements OnApplicationShutdown {
 	private logger: Logger;
@@ -307,6 +319,10 @@ export class ApiCallService implements OnApplicationShutdown {
 		request: FastifyRequest<{ Body: Record<string, unknown> | undefined, Querystring: Record<string, unknown> }>,
 	) {
 		const isSecure = user != null && token == null;
+
+		if (isChatRelatedEndpoint(ep.name)) {
+			throw new ApiError(chatUnavailable);
+		}
 
 		if (ep.meta.secure && !isSecure) {
 			throw new ApiError(accessDenied);

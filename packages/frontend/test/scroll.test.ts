@@ -4,14 +4,12 @@
  */
 
 import { describe, test, assert, afterEach } from 'vitest';
-import { Window } from 'happy-dom';
 import { onScrollBottom, onScrollTop } from '@@/js/scroll.js';
 
 describe('Scroll', () => {
 	describe('onScrollTop', () => {
-		/* 動作しない(happy-domのバグ？)
+		/* 動作しない
 		test('Initial onScrollTop callback for connected elements', () => {
-			const { document } = new Window();
 			const div = window.document.createElement('div');
 			assert.strictEqual(div.scrollTop, 0);
 
@@ -25,7 +23,6 @@ describe('Scroll', () => {
 		*/
 
 		test('No onScrollTop callback for disconnected elements', () => {
-			const { document: _ } = new Window();
 			const div = window.document.createElement('div');
 			assert.strictEqual(div.scrollTop, 0);
 
@@ -37,9 +34,8 @@ describe('Scroll', () => {
 	});
 
 	describe('onScrollBottom', () => {
-		/* 動作しない(happy-domのバグ？)
+		/* 動作しない
 		test('Initial onScrollBottom callback for connected elements', () => {
-			const { document } = new Window();
 			const div = window.document.createElement('div');
 			assert.strictEqual(div.scrollTop, 0);
 
@@ -53,7 +49,6 @@ describe('Scroll', () => {
 		*/
 
 		test('No onScrollBottom callback for disconnected elements', () => {
-			const { document: _ } = new Window();
 			const div = window.document.createElement('div');
 			assert.strictEqual(div.scrollTop, 0);
 

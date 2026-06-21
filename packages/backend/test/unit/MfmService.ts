@@ -8,16 +8,23 @@ import * as mfm from 'mfm-js';
 import { beforeAll, describe, test } from 'vitest';
 import { Test } from '@nestjs/testing';
 
-import { CoreModule } from '@/core/CoreModule.js';
 import { MfmService } from '@/core/MfmService.js';
-import { GlobalModule } from '@/GlobalModule.js';
+import { DI } from '@/di-symbols.js';
 
 describe('MfmService', () => {
 	let mfmService: MfmService;
 
 	beforeAll(async () => {
 		const app = await Test.createTestingModule({
-			imports: [GlobalModule, CoreModule],
+			providers: [
+				MfmService,
+				{
+					provide: DI.config,
+					useValue: {
+						url: 'http://misskey.local',
+					},
+				},
+			],
 		}).compile();
 		mfmService = app.get<MfmService>(MfmService);
 	});
@@ -45,6 +52,17 @@ describe('MfmService', () => {
 			const input = '```\n<p>Hello, world!</p>\n```';
 			const output = '<pre><code>&lt;p&gt;Hello, world!&lt;/p&gt;</code></pre>';
 			assert.equal(mfmService.toHtml(mfm.parse(input)), output);
+		});
+
+		test('additionalAppenders', () => {
+			const input = 'foo';
+			const output = 'foo<span class="x">bar</span>';
+			assert.equal(mfmService.toHtml(mfm.parse(input), [], [(doc, body) => {
+				const span = doc.createElement('span');
+				span.setAttribute('class', 'x');
+				span.textContent = 'bar';
+				body.appendChild(span);
+			}]), output);
 		});
 	});
 

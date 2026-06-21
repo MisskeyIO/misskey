@@ -699,5 +699,6 @@ export function isNoteLanguageVisible(params: {
 	if (params.hasMedia && preference.showMediaInAllLanguages) return true;
 	if (params.hasTags && preference.showHashtagsInAllLanguages) return true;
 
-	return preference.viewingLangs.includes(resolveNoteLang(params.noteLang, params.isRemote));
+	const noteLang = resolveNoteLang(params.noteLang, params.isRemote);
+	return preference.viewingLangs.includes(noteLang) || preference.viewingLangs.some(lang => lang.startsWith(`${noteLang}-`) || noteLang.startsWith(`${lang}-`));
 }

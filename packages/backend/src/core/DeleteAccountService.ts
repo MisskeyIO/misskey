@@ -69,7 +69,7 @@ export class DeleteAccountService {
 					{ followerSharedInbox: Not(IsNull()) },
 					{ followeeSharedInbox: Not(IsNull()) },
 				],
-				select: ['followerSharedInbox', 'followeeSharedInbox'],
+				select: { followerSharedInbox: true, followeeSharedInbox: true },
 			});
 
 			const inboxes = followings.map(x => x.followerSharedInbox ?? x.followeeSharedInbox);

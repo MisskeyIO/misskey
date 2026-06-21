@@ -3,7 +3,6 @@ packages:
   - packages/frontend-shared
   - packages/frontend
   - packages/frontend-builder
-  - packages/frontend-embed
   - packages/emojis/packages/emoji-assets
   - packages/emojis/packages/emoji-data
   - packages/i18n
@@ -17,68 +16,57 @@ packages:
 catalog:
   "@analytics/google-analytics": 1.1.0
   "@authenio/samlify-node-xmllint": 2.0.0
-  "@aws-sdk/client-s3": 3.1044.0
-  "@aws-sdk/lib-storage": 3.1044.0
-  "@eslint/js": 9.39.4
+  "@aws-sdk/client-s3": 3.1068.0
+  "@aws-sdk/lib-storage": 3.1068.0
+  "@eslint/js": 10.0.1
   "@fastify/accepts": 5.0.4
   "@fastify/cors": 11.2.0
-  "@fastify/express": 4.0.5
-  "@fastify/http-proxy": 11.4.4
+  "@fastify/express": 4.0.6
+  "@fastify/http-proxy": 11.5.0
   "@fastify/multipart": 10.0.0
   "@fastify/static": 9.1.3
   "@kitajs/html": 4.2.13
   "@kitajs/ts-html-plugin": 4.1.4
   "@mcaptcha/core-glue": 0.1.0-alpha-5
-  "@microsoft/api-extractor": 7.58.7
+  "@microsoft/api-extractor": 7.58.9
   "@misskey-dev/browser-image-resizer": 2024.1.0
-  "@misskey-dev/eslint-plugin": 2.1.0
-  "@misskey-dev/sharp-read-bmp": 1.2.0
+  "@misskey-dev/eslint-plugin": 2.2.1
+  "@misskey-dev/sharp-read-bmp": 1.3.0
   "@misskey-dev/summaly": github:MisskeyIO/summaly#5.2.5-io.3
   "@napi-rs/canvas": 1.0.0
-  "@nestjs/common": 11.1.19
-  "@nestjs/core": 11.1.19
-  "@nestjs/platform-express": 11.1.19
-  "@nestjs/testing": 11.1.19
-  "@oxc-project/runtime": 0.129.0
+  "@nestjs/common": 11.1.26
+  "@nestjs/core": 11.1.26
+  "@nestjs/platform-express": 11.1.26
+  "@nestjs/testing": 11.1.26
+  "@oxc-project/runtime": 0.135.0
   "@peertube/http-signature": 1.7.0
-  "@readme/openapi-parser": 6.1.1
+  "@readme/openapi-parser": 6.1.3
   "@rollup/plugin-esm-shim": 0.1.8
   "@rollup/plugin-json": 6.1.0
-  "@rollup/pluginutils": 5.3.0
-  "@sentry/node": 10.52.0
-  "@sentry/profiling-node": 10.52.0
-  "@sentry/vue": 10.52.0
+  "@rollup/pluginutils": 5.4.0
+  "@sentry/node": 10.57.0
+  "@sentry/profiling-node": 10.57.0
+  "@sentry/vue": 10.57.0
   "@simplewebauthn/browser": 13.3.0
-  "@simplewebauthn/server": 13.3.0
+  "@simplewebauthn/server": 13.3.1
   "@sinonjs/fake-timers": 15.4.0
-  "@smithy/node-http-handler": 4.6.1
-  "@storybook/addon-docs": 10.3.6
-  "@storybook/addon-essentials": 8.6.18
-  "@storybook/addon-interactions": 8.6.18
-  "@storybook/addon-links": 10.3.6
-  "@storybook/addon-mdx-gfm": 8.6.18
-  "@storybook/addon-storysource": 8.6.18
-  "@storybook/blocks": 8.6.18
-  "@storybook/components": 8.6.18
-  "@storybook/core-events": 8.6.18
-  "@storybook/manager-api": 8.6.18
-  "@storybook/preview-api": 8.6.18
-  "@storybook/react": 10.3.6
-  "@storybook/react-vite": 10.3.6
-  "@storybook/test": 8.6.18
-  "@storybook/theming": 8.6.18
-  "@storybook/types": 8.6.18
-  "@storybook/vue3": 10.3.6
-  "@storybook/vue3-vite": 10.3.6
+  "@smithy/node-http-handler": 4.7.8
+  "@storybook/addon-docs": 10.4.4
+  "@storybook/addon-links": 10.4.4
+  "@storybook/react": 10.4.4
+  "@storybook/react-vite": 10.4.4
+  "@storybook/vue3": 10.4.4
+  "@storybook/vue3-vite": 10.4.4
   "@syuilo/aiscript": 1.2.1
   "@syuilo/aiscript-0-19-0": npm:@syuilo/aiscript@^0.19.0
-  "@tabler/icons-webfont": 3.35.0
+  "@tabler/icons-webfont": 3.44.0
   "@tensorflow/tfjs": 4.22.0
   "@tensorflow/tfjs-core": 4.22.0
   "@tensorflow/tfjs-node": 4.22.0
   "@testing-library/vue": 8.1.0
+  "@twemoji/parser": 17.0.2
   "@types/accepts": 1.3.7
-  "@types/archiver": 7.0.0
+  "@types/archiver": 8.0.0
   "@types/body-parser": 1.19.6
   "@types/canvas-confetti": 1.9.0
   "@types/color-convert": 3.0.1
@@ -94,8 +82,8 @@ catalog:
   "@types/micromatch": 4.0.10
   "@types/mime-types": 3.0.1
   "@types/ms": 2.1.0
-  "@types/node": 24.12.2
-  "@types/nodemailer": 8.0.0
+  "@types/node": 25.9.3
+  "@types/nodemailer": 8.0.1
   "@types/oauth2orize": 1.11.5
   "@types/oauth2orize-pkce": 0.1.2
   "@types/pg": 8.20.0
@@ -118,20 +106,20 @@ catalog:
   "@types/wawoff2": 1.0.2
   "@types/web-push": 3.6.4
   "@types/ws": 8.18.1
-  "@typescript-eslint/eslint-plugin": 8.59.2
-  "@typescript-eslint/parser": 8.59.2
-  "@typescript/lib-webworker": npm:@types/serviceworker@0.0.74
-  "@typescript/native-preview": 7.0.0-dev.20260426.1
-  "@vitejs/plugin-vue": 6.0.6
-  "@vitest/coverage-v8": 4.1.5
-  "@vue/compiler-core": 3.5.34
-  "@vue/runtime-core": 3.5.34
+  "@typescript-eslint/eslint-plugin": 8.61.0
+  "@typescript-eslint/parser": 8.61.0
+  "@typescript/lib-webworker": npm:@types/serviceworker@0.0.197
+  "@typescript/native-preview": 7.0.0-dev.20260614.1
+  "@vitejs/plugin-vue": 6.0.7
+  "@vitest/coverage-v8": 4.1.8
+  "@vue/compiler-core": 3.5.38
+  "@vue/runtime-core": 3.5.38
   "accepts": 1.3.8
-  "acorn": 8.16.0
+  "acorn": 8.17.0
   "aiscript-vscode": github:aiscript-dev/aiscript-vscode#v0.1.16
   "ajv": 8.20.0
   "analytics": 0.8.19
-  "archiver": 7.0.1
+  "archiver": 8.0.0
   "astring": 1.9.0
   "async-mutex": 0.5.0
   "aws-sdk-client-mock": 4.1.0
@@ -140,7 +128,7 @@ catalog:
   "body-parser": 2.2.2
   "broadcast-channel": 7.3.0
   "bufferutil": 4.1.0
-  "bullmq": 5.76.6
+  "bullmq": 5.78.1
   "buraha": 0.0.1
   "cacheable-lookup": 7.0.0
   "canvas-confetti": 1.9.4
@@ -153,71 +141,73 @@ catalog:
   "chartjs-plugin-gradient": 0.6.1
   "chartjs-plugin-zoom": 2.2.0
   "chokidar": 5.0.0
-  "chromatic": 16.9.0
+  "chromatic": 17.4.1
+  "cldr-annotations-derived-full": 48.2.0
+  "cldr-annotations-full": 48.2.0
   "color-convert": 3.1.3
   "compare-versions": 6.1.1
-  "content-disposition": 1.1.0
+  "content-disposition": 2.0.1
   "crc-32": 1.2.2
   "cropperjs": 2.1.1
   "cross-env": 10.1.0
-  "cssnano": 8.0.0
-  "cypress": 15.14.2
-  "date-fns": 4.1.0
+  "cssnano": 8.0.2
+  "cypress": 15.17.0
+  "date-fns": 4.4.0
   "deep-email-validator": 0.1.27
-  "esbuild": 0.28.0
-  "eslint": 9.39.4
+  "esbuild": 0.28.1
+  "eslint": 10.5.0
   "eslint-plugin-import": 2.32.0
-  "eslint-plugin-vue": 10.9.1
+  "eslint-plugin-vue": 10.9.2
   "estree-walker": 3.0.3
   "eventemitter3": 5.0.4
   "execa": 9.6.1
-  "exifreader": 4.38.1
+  "exifreader": 4.41.0
   "fastify": 5.8.5
   "fastify-raw-body": 5.0.0
   "feed": 5.2.1
   "file-type": 22.0.1
   "fkill": 10.0.3
   "fluent-ffmpeg": 2.1.3
-  "form-data": 4.0.5
+  "form-data": 4.0.6
   "globals": 17.6.0
   "got": 15.0.5
-  "happy-dom": 20.9.0
-  "harfbuzzjs": 0.10.3
+  "harfbuzzjs": 1.3.0
   "hpagent": 1.2.0
   "http-link-header": 1.1.3
-  "idb-keyval": 6.2.2
-  "ignore-walk": 8.0.0
+  "idb-keyval": 6.2.5
+  "ignore-walk": 9.0.0
   "insert-text-at-cursor": 0.3.0
   "intersection-observer": 0.12.2
-  "ioredis": 5.10.1
-  "ios-haptics": 0.1.5
+  "ioredis": 5.11.1
+  "ios-haptics": 2.0.1
   "ip-cidr": 4.0.2
   "ipaddr.js": 2.4.0
   "is-file-animated": 1.0.2
   "is-svg": 6.1.0
   "jose": 6.2.3
-  "js-yaml": 4.1.1
+  "js-yaml": 4.2.0
   "json5": 2.2.3
   "jsonld": 9.0.0
-  "juice": 11.1.1
+  "juice": 12.1.0
+  "kuromojin": 3.0.1
   "magic-string": 0.30.21
   "matter-js": 0.20.0
   "mdast-util-to-string": 4.0.0
-  "mediabunny": 1.44.1
+  "mediabunny": 1.46.0
   "meilisearch": 0.58.0
   "mfm-js": 0.26.0
   "micromatch": 4.0.8
   "mime-types": 3.0.2
   "minimatch": 10.2.5
   "ms": 3.0.0-canary.202508261828
-  "msw": 2.14.3
+  "msw": 2.14.6
   "msw-storybook-addon": 2.0.7
   "nanoid": 5.1.11
   "ncp": 2.0.0
   "nested-property": 4.0.0
   "node-fetch": 3.3.2
   "node-html-parser": 7.1.0
-  "nodemailer": 8.0.7
+  "nodemailer": 8.0.11
   "nodemon": 3.1.14
   "nsfwjs": 4.3.0
   "oauth2orize": 1.12.0
@@ -226,13 +216,13 @@ catalog:
   "openapi-typescript": 7.13.0
   "os-utils": 0.0.14
   "otpauth": 9.5.1
-  "pg": 8.20.0
+  "pg": 8.21.0
   "photoswipe": 5.4.4
   "pid-port": 2.1.1
   "pkce-challenge": 6.0.0
-  "pnpm": 11.1.2
-  "postcss": 8.5.14
-  "prettier": 3.8.3
+  "pnpm": 11.6.0
+  "postcss": 8.5.15
+  "prettier": 3.8.4
   "probe-image-size": 7.3.0
   "promise-limit": 2.7.0
   "punycode.js": 2.3.1
@@ -242,85 +232,86 @@ catalog:
   "random-seed": 0.3.0
   "ratelimiter": 3.4.1
   "re2": 1.24.1
-  "react": 19.2.6
-  "react-dom": 19.2.6
+  "react": 19.2.7
+  "react-dom": 19.2.7
   "reconnecting-websocket": 4.4.0
   "reflect-metadata": 0.2.2
   "remark": 15.0.1
   "remark-parse": 11.0.0
   "rename": 1.0.4
-  "rolldown": 1.0.0
-  "rollup": 4.60.3
+  "rolldown": 1.1.1
+  "rollup": 4.62.0
   "rss-parser": 3.13.0
   "rxjs": 7.8.2
   "samlify": 2.13.1
-  "sanitize-html": 2.17.4
-  "sass-embedded": 1.99.0
+  "sanitize-html": 2.17.5
+  "sass-embedded": 1.100.0
   "secure-json-parse": 4.1.0
   "seedrandom": 3.0.5
-  "semver": 7.7.4
-  "sharp": 0.33.5
-  "shiki": 4.0.2
+  "semver": 7.8.4
+  "sharp": 0.35.1
+  "shiki": 4.2.0
   "simple-oauth2": 5.1.0
-  "slacc": 0.1.5
-  "slacc-android-arm-eabi": 0.1.5
-  "slacc-android-arm64": 0.1.5
-  "slacc-darwin-arm64": 0.1.5
-  "slacc-darwin-universal": 0.1.5
-  "slacc-darwin-x64": 0.1.5
-  "slacc-freebsd-x64": 0.1.5
-  "slacc-linux-arm-gnueabihf": 0.1.5
-  "slacc-linux-arm64-gnu": 0.1.5
-  "slacc-linux-arm64-musl": 0.1.5
-  "slacc-linux-x64-gnu": 0.1.5
-  "slacc-linux-x64-musl": 0.1.5
-  "slacc-win32-arm64-msvc": 0.1.5
-  "slacc-win32-x64-msvc": 0.1.5
-  "start-server-and-test": 3.0.2
-  "storybook": 10.3.6
-  "storybook-addon-misskey-theme": github:misskey-dev/storybook-addon-misskey-theme
+  "slacc": 0.2.0
+  "slacc-android-arm-eabi": 0.2.0
+  "slacc-android-arm64": 0.2.0
+  "slacc-darwin-arm64": 0.2.0
+  "slacc-darwin-universal": 0.2.0
+  "slacc-darwin-x64": 0.2.0
+  "slacc-freebsd-x64": 0.2.0
+  "slacc-linux-arm-gnueabihf": 0.2.0
+  "slacc-linux-arm64-gnu": 0.2.0
+  "slacc-linux-arm64-musl": 0.2.0
+  "slacc-linux-x64-gnu": 0.2.0
+  "slacc-linux-x64-musl": 0.2.0
+  "slacc-win32-arm64-msvc": 0.2.0
+  "slacc-win32-x64-msvc": 0.2.0
+  "start-server-and-test": 3.0.11
+  "storybook": 10.4.4
   "strict-event-emitter-types": 2.0.0
   "stringz": 2.1.0
   "supertest": 7.2.2
-  "systeminformation": 5.31.6
-  "tar": 7.5.14
-  "terser": 5.47.1
+  "systeminformation": 5.31.7
+  "tar": 7.5.16
+  "terser": 5.48.0
   "textarea-caret": 3.1.0
   "three": 0.184.0
   "throttle-debounce": 5.0.2
   "tinycolor2": 1.6.0
-  "tmp": 0.2.5
-  "ts-case-convert": 2.1.0
+  "tmp": 0.2.7
+  "ts-case-convert": 2.3.1
   "tsc-alias": 1.8.17
   "tsd": 0.33.0
-  "tsx": 4.21.0
-  "typeorm": 0.3.28
-  "typescript": 5.9.3
-  "unrun": 0.2.37
+  "tsdown": 0.22.2
+  "tsx": 4.22.4
+  "typeorm": 1.0.0
+  "typescript": 6.0.3
+  "unrun": 0.3.1
   "ulid": 3.0.2
   "unified": 11.0.5
   "utf-8-validate": 6.0.6
   "uuid": 14.0.0
   "v-code-diff": 1.13.1
   "vary": 1.1.2
-  "vite": 8.0.11
+  "vite": 8.0.16
   "vite-node": 6.0.0
   "vite-plugin-glsl": 1.6.0
   "vite-plugin-turbosnap": 1.0.3
-  "vitest": 4.1.5
+  "vitest": 4.1.8
   "vitest-fetch-mock": 0.4.5
   "vitest-mock-extended": 4.0.0
   "vitest-websocket-mock": 0.5.0
-  "vue": 3.5.34
-  "vue-component-type-helpers": 3.2.8
-  "vue-eslint-parser": 10.4.0
-  "vue-tsc": 3.2.8
+  "vue": 3.5.38
+  "vue-component-type-helpers": 3.3.5
+  "vue-eslint-parser": 10.4.1
+  "vue-tsc": 3.3.5
   "wanakana": 5.3.1
   "wawoff2": 2.0.1
   "web-push": 3.6.7
-  "ws": 8.20.1
+  "ws": 8.21.0
   "xev": 3.0.2
   "xmlbuilder2": 4.0.3
+  jsdom: 29.1.1
 
 catalogMode: strict
 
@@ -359,6 +350,11 @@ minimumReleaseAgeExclude:
   - '@misskey-dev/*'
   - '@syuilo/aiscript'
 
+peerDependencyRules:
+  allowedVersions:
+    '@kitajs/ts-html-plugin>typescript': 6.0.3
+    openapi-typescript>typescript: 6.0.3
+
 overrides:
   '@aiscript-dev/aiscript-languageserver': '-'
   '@misskey-dev/emoji-assets': workspace:*
@@ -378,13 +374,32 @@ overrides:
   jpeg-js: 0.4.4
   jsdom: 26.1.0
   lodash: 4.17.23
-  nsfwjs: 4.2.1
+  nsfwjs: 4.3.0
   qs: 6.15.0
-  sharp: 0.34.5
+  sharp: 0.35.1
   tough-cookie: 6.0.0
   web-streams-polyfill: 4.2.0
+
+patchedDependencies:
+  pg-pool@3.14.0: patches/pg-pool@3.14.0.patch
 
 engineStrict: true
 saveExact: true
 shellEmulator: true
 useWorkspaceCatalog: true
+allowBuilds:
+  '@parcel/watcher': true
+  '@sentry-internal/node-cpu-profiler': false
+  '@tensorflow/tfjs-node': true
+  bufferutil: true
+  core-js: true
+  cypress: true
+  esbuild: true
+  exifreader: true
+  msgpackr-extract: true
+  msw: true
+  re2: true
+  ttf2woff2: true
+  utf-8-validate: true
+  v-code-diff: true
+  vue-demi: true

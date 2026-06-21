@@ -12,10 +12,15 @@ import fetch from 'node-fetch';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import type { Config } from '@/config.js';
-import type { NSFWJS, PredictionType } from 'nsfwjs/core';
+import type { Tensor3D, Tensor4D } from '@tensorflow/tfjs-node';
+import type { NSFWJS, PredictionType } from 'nsfwjs';
 
 const REQUIRED_CPU_FLAGS_X64 = ['avx2', 'fma'];
 let isSupportedCpu: undefined | boolean = undefined;
+
+function isTensor3D(image: Tensor3D | Tensor4D): image is Tensor3D {
+	return image.shape.length === 3;
+}
 
 @Injectable()
 export class AiService {
@@ -47,7 +52,7 @@ export class AiService {
 			tf.env().global.fetch = fetch;
 
 			if (this.model == null) {
-				const nsfw = await import('nsfwjs/core');
+				const nsfw = await import('nsfwjs');
 				await this.modelLoadMutex.runExclusive(async () => {
 					if (this.model == null) {
 						this.model = await nsfw.load(pathToFileURL(this.modelDir).toString(), { size: 299 });
@@ -56,8 +61,12 @@ export class AiService {
 			}
 
 			const buffer = source instanceof Buffer ? source : await fs.promises.readFile(source);
-			const image = await tf.node.decodeImage(buffer, 3) as any;
+			const image = await tf.node.decodeImage(buffer, 3, 'int32', false);
 			try {
+				if (!isTensor3D(image)) {
+					return null;
+				}
+
 				const predictions = await this.model.classify(image);
 				return predictions;
 			} finally {

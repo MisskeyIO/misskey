@@ -6,7 +6,7 @@
 		"type": "git",
 		"url": "https://github.com/MisskeyIO/misskey.git"
 	},
-	"packageManager": "pnpm@11.1.2",
+	"packageManager": "pnpm@11.6.0",
 	"workspaces": [
 		"packages/misskey-js",
 		"packages/i18n",
@@ -18,7 +18,6 @@
 		"packages/sw",
 		"packages/backend",
 		"packages/frontend",
-		"packages/frontend-embed",
 		"scripts/changelog-checker"
 	],
 	"private": true,

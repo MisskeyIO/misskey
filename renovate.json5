@@ -40,7 +40,6 @@
 			groupName: '[Frontend] Update dependencies',
 			matchFileNames: [
 				'packages/frontend/**/package.json',
-				'packages/frontend-embed/**/package.json',
 				'packages/frontend-shared/**/package.json',
 				'packages/frontend-builder/**/package.json',
 				'packages/misskey-bubble-game/**/package.json',

@@ -18,6 +18,13 @@ import type * as mfm from 'mfm-js';
 const urlRegex = /^https?:\/\/[\w\/:%#@$&?!()\[\]~.,=+\-]+/;
 const urlRegexFull = /^https?:\/\/[\w\/:%#@$&?!()\[\]~.,=+\-]+$/;
 
+type AppenderDocument = {
+	createElement: (tagName: string) => htmlParser.HTMLElement;
+	createTextNode: (text: string) => htmlParser.TextNode;
+};
+
+export type Appender = (document: AppenderDocument, body: htmlParser.HTMLElement) => void;
+
 @Injectable()
 export class MfmService {
 	constructor(
@@ -270,7 +277,7 @@ export class MfmService {
 	}
 
 	@bindThis
-	public toHtml(nodes: mfm.MfmNode[] | null, mentionedRemoteUsers: IMentionedRemoteUsers = [], extraHtml: string | null = null) {
+	public toHtml(nodes: mfm.MfmNode[] | null, mentionedRemoteUsers: IMentionedRemoteUsers = [], additionalAppenders: Appender[] = []) {
 		if (nodes == null) {
 			return null;
 		}
@@ -433,6 +440,18 @@ export class MfmService {
 			},
 		} satisfies { [K in mfm.MfmNode['type']]: (node: mfm.NodeType<K>) => string } as { [K in mfm.MfmNode['type']]: (node: mfm.MfmNode) => string };
 
-		return `${toHtml(nodes)}${extraHtml ?? ''}`;
+		const html = toHtml(nodes);
+		if (additionalAppenders.length === 0) return html;
+
+		const doc: AppenderDocument = {
+			createElement: tagName => new htmlParser.HTMLElement(tagName, {}),
+			createTextNode: text => new htmlParser.TextNode(text),
+		};
+		const body = doc.createElement('p');
+		body.innerHTML = html;
+		for (const appender of additionalAppenders) {
+			appender(doc, body);
+		}
+		return body.innerHTML;
 	}
 }

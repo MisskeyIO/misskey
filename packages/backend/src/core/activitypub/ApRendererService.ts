@@ -28,7 +28,7 @@ import { bindThis } from '@/decorators.js';
 import { CustomEmojiService } from '@/core/CustomEmojiService.js';
 import { IdService } from '@/core/IdService.js';
 import { UtilityService } from '@/core/UtilityService.js';
-import { escapeHtml } from '@/misc/escape-html.js';
+import type { Appender } from '@/core/MfmService.js';
 import { JsonLdService } from './JsonLdService.js';
 import { ApMfmService } from './ApMfmService.js';
 import { CONTEXT } from './misc/contexts.js';
@@ -440,18 +440,29 @@ export class ApRendererService {
 			poll = await this.pollsRepository.findOneBy({ noteId: note.id });
 		}
 
-		let extraHtml: string | null = null;
+		const additionalAppenders: Appender[] = [];
 
 		if (quote != null) {
 			// Append quote link as `<br><br><span class="quote-inline">RE: <a href="...">...</a></span>`
 			// the class name `quote-inline` is used in non-misskey clients for styling quote notes.
 			// For compatibility, the span part should be kept as possible.
-			extraHtml = `<br><br><span class="quote-inline">RE: <a href="${escapeHtml(quote)}">${escapeHtml(quote)}</a></span>`;
+			additionalAppenders.push((doc, body) => {
+				body.appendChild(doc.createElement('br'));
+				body.appendChild(doc.createElement('br'));
+				const span = doc.createElement('span');
+				span.setAttribute('class', 'quote-inline');
+				span.appendChild(doc.createTextNode('RE: '));
+				const anchor = doc.createElement('a');
+				anchor.setAttribute('href', quote);
+				anchor.textContent = quote;
+				span.appendChild(anchor);
+				body.appendChild(span);
+			});
 		}
 
 		const summary = note.cw === '' ? String.fromCharCode(0x200B) : note.cw;
 
-		const { content, noMisskeyContent } = this.apMfmService.getNoteHtml(note, extraHtml);
+		const { content, noMisskeyContent } = this.apMfmService.getNoteHtml(note, additionalAppenders);
 
 		const emojis = await this.getEmojis(note.emojis);
 		const apemojis = emojis.filter(emoji => !emoji.localOnly).map(emoji => this.renderEmoji(emoji));

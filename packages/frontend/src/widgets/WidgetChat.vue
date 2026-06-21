@@ -4,25 +4,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<MkContainer :showHeader="widgetProps.showHeader" class="mkw-chat">
-	<template #icon><i class="ti ti-users"></i></template>
-	<template #header>{{ i18n.ts._widgets.chat }}</template>
-	<template #func="{ buttonStyleClass }"><button class="_button" :class="buttonStyleClass" @click="configure()"><i class="ti ti-settings"></i></button></template>
+<MkContainer :showHeader="showHeader" class="mkw-chat">
+	<template #icon><i class="ti ti-mail"></i></template>
+	<template #header>{{ i18n.ts.directMessage }}</template>
 
-	<div>
-		<MkChatHistories/>
-	</div>
+	<MkNotesTimeline :paginator="paginator"/>
 </MkContainer>
 </template>
 
 <script lang="ts" setup>
-import { } from 'vue';
-import { useWidgetPropsManager } from './widget.js';
-import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from './widget.js';
+import { computed, markRaw } from 'vue';
+import type { WidgetComponentExpose, WidgetComponentProps } from './widget.js';
 import type { FormWithDefault, GetFormResultType } from '@/utility/form.js';
 import MkContainer from '@/components/MkContainer.vue';
+import MkNotesTimeline from '@/components/MkNotesTimeline.vue';
 import { i18n } from '@/i18n.js';
-import MkChatHistories from '@/components/MkChatHistories.vue';
+import { Paginator } from '@/utility/paginator.js';
 
 const name = 'chat';
 
@@ -37,17 +34,18 @@ const widgetPropsDef = {
 type WidgetProps = GetFormResultType<typeof widgetPropsDef>;
 
 const props = defineProps<WidgetComponentProps<WidgetProps>>();
-const emit = defineEmits<WidgetComponentEmits<WidgetProps>>();
+const showHeader = computed(() => props.widget?.data.showHeader ?? widgetPropsDef.showHeader.default);
 
-const { widgetProps, configure, save } = useWidgetPropsManager(name,
-	widgetPropsDef,
-	props,
-	emit,
-);
+const paginator = markRaw(new Paginator('notes/mentions', {
+	limit: 10,
+	params: {
+		visibility: 'specified',
+	},
+}));
 
 defineExpose<WidgetComponentExpose>({
 	name,
-	configure,
+	configure: () => undefined,
 	id: props.widget ? props.widget.id : null,
 });
 </script>

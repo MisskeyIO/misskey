@@ -166,12 +166,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 		<hr>
 
-		<template v-if="$i.policies.chatAvailability !== 'unavailable'">
-			<MkButton @click="readAllChatMessages">{{ i18n.ts.readAllChatMessages }}</MkButton>
-
-			<hr>
-		</template>
-
 		<MkButton v-if="storagePersistenceSupported && !storagePersisted" @click="enableStoragePersistence">{{ i18n.ts._settings.settingsPersistence_title }}</MkButton>
 
 		<MkButton @click="forceCloudBackup">{{ i18n.ts._preferencesBackup.forceBackup }}</MkButton>
@@ -319,10 +313,6 @@ function resetAllTips() {
 function hideAllTips() {
 	_hideAllTips();
 	os.success();
-}
-
-function readAllChatMessages() {
-	os.apiWithDialog('chat/read-all', {});
 }
 
 async function forceCloudBackup() {

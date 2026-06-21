@@ -14,14 +14,14 @@ export class MiAbuseReportResolver {
 	@PrimaryColumn(id())
 	public id: string;
 
-	@Index()
+	@Index('IDX_abuse_report_resolver_createdAt')
 	@Column('timestamp with time zone', {
 		comment: 'The created date of the AbuseReportResolver.',
 		default: () => 'CURRENT_TIMESTAMP',
 	})
 	public createdAt: Date;
 
-	@Index()
+	@Index('IDX_abuse_report_resolver_updatedAt')
 	@Column('timestamp with time zone', {
 		comment: 'The updated date of AbuseReportResolver',
 		default: () => 'CURRENT_TIMESTAMP',
@@ -51,7 +51,7 @@ export class MiAbuseReportResolver {
 	})
 	public reportContentPattern: string | null;
 
-	@Index()
+	@Index('IDX_abuse_report_resolver_expirationDate')
 	@Column('timestamp with time zone', {
 		comment: 'The expiration date of AbuseReportResolver',
 		nullable: true,

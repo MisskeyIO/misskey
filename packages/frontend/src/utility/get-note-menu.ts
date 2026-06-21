@@ -21,7 +21,6 @@ import { clipsCache, favoritedChannelsCache } from '@/cache.js';
 import MkRippleEffect from '@/components/MkRippleEffect.vue';
 import { isSupportShare } from '@/utility/navigator.js';
 import { getAppearNote } from '@/utility/get-appear-note.js';
-import { genEmbedCode } from '@/utility/get-embed-code.js';
 import { prefer } from '@/preferences.js';
 import { getPluginHandlers } from '@/plugin.js';
 import { globalEvents } from '@/events.js';
@@ -160,19 +159,6 @@ export function getCopyNoteLinkMenu(note: Misskey.entities.Note, text: string): 
 		text,
 		action: (): void => {
 			copyToClipboard(`${url}/notes/${note.id}`);
-		},
-	};
-}
-
-function getNoteEmbedCodeMenu(note: Misskey.entities.Note, text: string): MenuItem | undefined {
-	if (note.url != null || note.uri != null) return undefined;
-	if (['specified', 'followers'].includes(note.visibility)) return undefined;
-
-	return {
-		icon: 'ti ti-code',
-		text,
-		action: (): void => {
-			genEmbedCode('notes', note.id);
 		},
 	};
 }
@@ -373,11 +359,6 @@ export function getNoteMenu(props: {
 					window.open(link, '_blank', 'noopener');
 				},
 			});
-		} else {
-			const embedMenu = getNoteEmbedCodeMenu(appearNote, i18n.ts.embed);
-			if (embedMenu != null) {
-				menuItems.push(embedMenu);
-			}
 		}
 
 		if (isSupportShare()) {
@@ -534,11 +515,6 @@ export function getNoteMenu(props: {
 					window.open(link, '_blank', 'noopener');
 				},
 			});
-		} else {
-			const embedMenu = getNoteEmbedCodeMenu(appearNote, i18n.ts.embed);
-			if (embedMenu != null) {
-				menuItems.push(embedMenu);
-			}
 		}
 	}
 

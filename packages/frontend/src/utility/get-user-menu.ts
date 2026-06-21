@@ -17,7 +17,6 @@ import { $i, iAmModerator } from '@/i.js';
 import { notesSearchAvailable, canSearchNonLocalNotes } from '@/utility/check-permissions.js';
 import { antennasCache, rolesCache, userListsCache } from '@/cache.js';
 import { mainRouter } from '@/router.js';
-import { genEmbedCode } from '@/utility/get-embed-code.js';
 import { prefer } from '@/preferences.js';
 import { getPluginHandlers } from '@/plugin.js';
 
@@ -201,18 +200,6 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 				window.open(user.url, '_blank', 'noopener');
 			},
 		});
-	} else {
-		menuItems.push({
-			icon: 'ti ti-code',
-			text: i18n.ts.embed,
-			type: 'parent',
-			children: [{
-				text: i18n.ts.noteOfThisUser,
-				action: () => {
-					genEmbedCode('user-timeline', user.id);
-				},
-			}], // TODO: ユーザーカードの埋め込みなど
-		});
 	}
 
 	if ($i && meId === user.id) {
@@ -381,6 +368,16 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 		//}
 
 		menuItems.push({ type: 'divider' }, {
+			icon: 'ti ti-messages',
+			text: i18n.ts.directMessage,
+			action: () => {
+				router.push('/chat/user/:userId', {
+					params: {
+						userId: user.id,
+					},
+				});
+			},
+		}, {
 			icon: 'ti ti-pencil-heart',
 			text: i18n.ts.createUserSpecifiedNote,
 			action: () => {
@@ -388,15 +385,6 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 				os.post({ specified: user, initialText: `${canonical} ` });
 			},
 		});
-
-		if ($i.policies.chatAvailability === 'available' && user.canChat && user.host == null) {
-			menuItems.push({
-				type: 'link',
-				icon: 'ti ti-messages',
-				text: i18n.ts._chat.chatWithThisUser,
-				to: `/chat/user/${user.id}`,
-			});
-		}
 
 		menuItems.push({ type: 'divider' }, {
 			icon: user.isMuted ? 'ti ti-eye' : 'ti ti-eye-off',

@@ -227,7 +227,8 @@ export function getConfig(): UserConfig {
 		},
 
 		test: {
-			environment: 'happy-dom',
+			environment: 'jsdom',
+			setupFiles: ['test/setup-dom.ts'],
 			deps: {
 				optimizer: {
 					web: {

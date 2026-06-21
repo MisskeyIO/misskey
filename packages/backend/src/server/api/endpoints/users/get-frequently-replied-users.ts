@@ -84,7 +84,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					id: -1,
 				},
 				take: 1000,
-				select: ['replyId'],
+				select: { replyId: true },
 			});
 
 			// 投稿が少なかったら中断
@@ -97,7 +97,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				where: {
 					id: In(recentNotes.map(p => p.replyId)),
 				},
-				select: ['userId'],
+				select: { userId: true },
 			});
 
 			const repliedUsers: any = {};

@@ -25,7 +25,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div :class="$style.footer">
 			<button class="_textButton" style="color: currentColor;" @click="showMenu"><i class="ti ti-dots-circle-horizontal"></i></button>
 			<MkTime :class="$style.time" :time="message.createdAt"/>
-			<MkA v-if="isSearchResult && 'toRoom' in message && message.toRoom != null" :to="`/chat/room/${message.toRoomId}`">{{ message.toRoom.name }}</MkA>
 			<MkA v-if="isSearchResult && 'toUser' in message && message.toUser != null && isMe" :to="`/chat/user/${message.toUserId}`">@{{ message.toUser.username }}</MkA>
 		</div>
 		<TransitionGroup
@@ -57,27 +56,22 @@ import * as Misskey from 'misskey-js';
 import { url } from '@@/js/config.js';
 import { isLink } from '@@/js/is-link.js';
 import type { MenuItem } from '@/types/menu.js';
-import type { NormalizedChatMessage } from './room.vue';
 import { extractUrlFromMfm } from '@/utility/extract-url-from-mfm.js';
 import MkUrlPreview from '@/components/MkUrlPreview.vue';
 import { ensureSignin } from '@/i.js';
-import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import MkFukidashi from '@/components/MkFukidashi.vue';
 import * as os from '@/os.js';
 import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
 import MkMediaList from '@/components/MkMediaList.vue';
-import { reactionPicker } from '@/utility/reaction-picker.js';
-import * as sound from '@/utility/sound.js';
 import MkReactionIcon from '@/components/MkReactionIcon.vue';
 import { prefer } from '@/preferences.js';
 import { DI } from '@/di.js';
-import { getHTMLElementOrNull } from '@/utility/get-dom-node-or-null.js';
 
 const $i = ensureSignin();
 
 const props = defineProps<{
-	message: NormalizedChatMessage | Misskey.entities.ChatMessage;
+	message: Misskey.entities.ChatMessage;
 	isSearchResult?: boolean;
 }>();
 
@@ -85,47 +79,11 @@ const isMe = computed(() => props.message.fromUserId === $i.id);
 const urls = computed(() => props.message.text ? extractUrlFromMfm(mfm.parse(props.message.text)) : []);
 
 provide(DI.mfmEmojiReactCallback, (reaction) => {
-	if ($i.policies.chatAvailability !== 'available') return;
-
-	sound.playMisskeySfx('reaction');
-	misskeyApi('chat/messages/react', {
-		messageId: props.message.id,
-		reaction: reaction,
-	});
+	void reaction;
 });
 
-function react(ev: PointerEvent) {
-	if ($i.policies.chatAvailability !== 'available') return;
-
-	const targetEl = getHTMLElementOrNull(ev.currentTarget ?? ev.target);
-	if (!targetEl) return;
-
-	reactionPicker.show(targetEl, null, async (reaction) => {
-		sound.playMisskeySfx('reaction');
-		misskeyApi('chat/messages/react', {
-			messageId: props.message.id,
-			reaction: reaction,
-		});
-	});
-}
-
 function onReactionClick(record: Misskey.entities.ChatMessage['reactions'][0]) {
-	if ($i.policies.chatAvailability !== 'available') return;
-
-	if (record.user.id === $i.id) {
-		misskeyApi('chat/messages/unreact', {
-			messageId: props.message.id,
-			reaction: record.reaction,
-		});
-	} else {
-		if (!props.message.reactions.some(r => r.user.id === $i.id && r.reaction === record.reaction)) {
-			sound.playMisskeySfx('reaction');
-			misskeyApi('chat/messages/react', {
-				messageId: props.message.id,
-				reaction: record.reaction,
-			});
-		}
-	}
+void record;
 }
 
 function onContextmenu(ev: PointerEvent) {
@@ -138,20 +96,6 @@ function onContextmenu(ev: PointerEvent) {
 function showMenu(ev: PointerEvent, contextmenu = false) {
 	const menu: MenuItem[] = [];
 
-	if (!isMe.value && $i.policies.chatAvailability === 'available') {
-		menu.push({
-			text: i18n.ts.reaction,
-			icon: 'ti ti-mood-plus',
-			action: (ev) => {
-				react(ev);
-			},
-		});
-
-		menu.push({
-			type: 'divider',
-		});
-	}
-
 	menu.push({
 		text: i18n.ts.copyContent,
 		icon: 'ti ti-copy',
@@ -163,19 +107,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 	menu.push({
 		type: 'divider',
 	});
-
-	if (isMe.value && $i.policies.chatAvailability === 'available') {
-		menu.push({
-			text: i18n.ts.delete,
-			icon: 'ti ti-trash',
-			danger: true,
-			action: () => {
-				misskeyApi('chat/messages/delete', {
-					messageId: props.message.id,
-				});
-			},
-		});
-	}
 
 	if (!isMe.value && props.message.fromUser != null) {
 		menu.push({

@@ -12,7 +12,7 @@ export class MiUserAccountMoveLog {
 	@PrimaryColumn(id())
 	public id: string;
 
-	@Index()
+	@Index('IDX_user_account_move_log_movedToId')
 	@Column(id())
 	public movedToId: MiUser['id'];
 
@@ -22,7 +22,7 @@ export class MiUserAccountMoveLog {
 	@JoinColumn({ name: 'movedToId', referencedColumnName: 'id', foreignKeyConstraintName: 'FK_user_account_move_log_movedToId' })
 	public movedTo: MiUser | null;
 
-	@Index()
+	@Index('IDX_user_account_move_log_movedFromId')
 	@Column(id())
 	public movedFromId: MiUser['id'];
 

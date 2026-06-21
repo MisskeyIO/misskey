@@ -393,11 +393,9 @@ export class ReactionService {
 		if (Object.keys(legacies).includes(reaction)) return legacies[reaction];
 
 		// Unicode絵文字
-		const match = emojiRegex.exec(reaction);
-		if (match) {
+		const unicode = emojiRegex.exec(reaction)?.[0] || emojiRegex.exec(`${reaction}\ufe0f`)?.[0];
+		if (unicode != null && unicode !== '' && unicode !== '\ufe0f') {
 			// 合字を含む1つの絵文字
-			const unicode = match[0];
-
 			// 異体字セレクタ除去
 			return unicode.match('\u200d') ? unicode : unicode.replace(/\ufe0f/g, '');
 		}

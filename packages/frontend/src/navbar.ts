@@ -132,9 +132,8 @@ export const navbarItemDef = reactive<{
 	chat: {
 		title: i18n.ts.directMessage_short,
 		icon: 'ti ti-messages',
+		show: computed(() => $i != null),
 		to: '/chat',
-		show: computed(() => $i != null && $i.policies.chatAvailability !== 'unavailable'),
-		indicated: computed(() => $i != null && $i.hasUnreadChatMessages),
 	},
 	achievements: {
 		title: i18n.ts.achievements,

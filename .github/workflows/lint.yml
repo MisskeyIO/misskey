@@ -40,6 +40,9 @@ permissions:
 jobs:
   pnpm_install:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [24]
     steps:
     - uses: actions/checkout@v6
       with:
@@ -51,7 +54,7 @@ jobs:
         run_install: false
     - uses: actions/setup-node@v6
       with:
-        node-version-file: '.node-version'
+        node-version: ${{ matrix.node-version }}
         cache: 'pnpm'
     - run: pnpm i --frozen-lockfile
 
@@ -61,6 +64,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
+        node-version: [24]
         workspace:
         - backend
         - frontend
@@ -85,7 +89,7 @@ jobs:
         run_install: false
     - uses: actions/setup-node@v6
       with:
-        node-version-file: '.node-version'
+        node-version: ${{ matrix.node-version }}
         cache: 'pnpm'
     - run: pnpm i --frozen-lockfile
     - name: Restore eslint cache
@@ -102,6 +106,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
+        node-version: [24]
         workspace:
         - backend
         - frontend
@@ -118,7 +123,7 @@ jobs:
         run_install: false
     - uses: actions/setup-node@v6
       with:
-        node-version-file: '.node-version'
+        node-version: ${{ matrix.node-version }}
         cache: 'pnpm'
     - run: pnpm i --frozen-lockfile
     - run: pnpm --filter misskey-reversi --filter misskey-bubble-game --filter misskey-js run build

@@ -320,7 +320,7 @@ catalog:
   tsc-alias: 1.8.16
   tsconfig-paths: 4.2.0
   tsd: 0.33.0
-  tsx: 4.21.0
+  tsx: 4.22.4
   typeorm: 0.3.28
   typescript: 5.9.3
   ulid: 3.0.2

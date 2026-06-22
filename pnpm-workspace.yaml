@@ -21,11 +21,11 @@ catalog:
   '@fastify/accepts': 5.0.4
   '@fastify/cookie': 11.0.2
   '@fastify/cors': 11.2.0
-  '@fastify/express': 4.0.4
+  '@fastify/express': 4.0.5
   '@fastify/formbody': 8.0.2
-  '@fastify/http-proxy': 11.4.2
+  '@fastify/http-proxy': 11.5.0
   '@fastify/multipart': 9.4.0
-  '@fastify/static': 9.0.0
+  '@fastify/static': 9.1.1
   '@fastify/view': 11.1.1
   '@isaacs/ttlcache': 2.1.4
   '@jest/globals': 30.3.0
@@ -42,12 +42,12 @@ catalog:
   '@nestjs/testing': 11.1.17
   '@opensearch-project/opensearch': 3.5.1
   '@opentelemetry/api': ^1.9.0
-  '@opentelemetry/auto-instrumentations-node': ^0.69.0
+  '@opentelemetry/auto-instrumentations-node': ^0.77.0
   '@opentelemetry/exporter-metrics-otlp-http': ^0.211.0
   '@opentelemetry/exporter-trace-otlp-http': ^0.211.0
   '@opentelemetry/resources': ^2.6.0
   '@opentelemetry/sdk-metrics': ^2.6.0
-  '@opentelemetry/sdk-node': ^0.211.0
+  '@opentelemetry/sdk-node': ^0.219.0
   '@opentelemetry/semantic-conventions': ^1.40.0
   '@peertube/http-signature': 1.7.0
   '@readme/openapi-parser': 6.0.0
@@ -178,7 +178,7 @@ catalog:
   cypress: 15.12.0
   date-fns: 4.1.0
   deep-email-validator: 0.1.21
-  esbuild: 0.27.4
+  esbuild: 0.28.1
   escape-regexp: 0.0.1
   eslint: 10.1.0
   eslint-plugin-import: 2.32.0
@@ -188,14 +188,14 @@ catalog:
   eventemitter3: 5.0.4
   execa: 9.6.1
   fast-glob: 3.3.3
-  fastify: 5.8.2
+  fastify: 5.8.5
   fastify-http-errors-enhanced: 7.0.1
   fastify-raw-body: 5.0.0
   feed: 5.2.0
   file-type: 21.3.3
   fkill: 10.0.3
   fluent-ffmpeg: 2.1.3
-  form-data: 4.0.5
+  form-data: 4.0.6
   glob: 13.0.6
   globals: 17.4.0
   got: 14.6.6
@@ -239,7 +239,7 @@ catalog:
   nested-property: 4.0.0
   node-fetch: 3.3.2
   node-forge: 1.3.3
-  nodemailer: 8.0.3
+  nodemailer: 9.0.1
   nodemon: 3.1.14
   nsfwjs: 4.2.1
   oauth: 0.10.2
@@ -282,8 +282,8 @@ catalog:
   rollup: 4.59.1
   rss-parser: 3.13.0
   rxjs: 7.8.2
-  samlify: 2.10.2
-  sanitize-html: 2.17.2
+  samlify: 2.13.0
+  sanitize-html: 2.17.4
   sass: 1.98.0
   secure-json-parse: 4.1.0
   seedrandom: 3.0.5
@@ -315,7 +315,7 @@ catalog:
   throttle-debounce: 5.0.2
   type-fest: 2.19.0
   tinycolor2: 1.6.0
-  tmp: 0.2.5
+  tmp: 0.2.7
   ts-case-convert: 2.1.0
   tsc-alias: 1.8.16
   tsconfig-paths: 4.2.0
@@ -325,10 +325,10 @@ catalog:
   typescript: 5.9.3
   ulid: 3.0.2
   utf-8-validate: 6.0.6
-  uuid: 13.0.0
+  uuid: 14.0.0
   v-code-diff: 1.13.1
   vary: 1.1.2
-  vite: 7.3.1
+  vite: 7.3.5
   vite-plugin-turbosnap: 1.0.3
   vitest: 4.1.0
   vitest-fetch-mock: 0.4.5
@@ -341,7 +341,7 @@ catalog:
   wanakana: 5.3.1
   web-push: 3.6.7
   webgl-audiovisualizer: github:MisskeyIO/webgl-audiovisualizer
-  ws: 8.20.0
+  ws: 8.21.0
   xev: 3.0.2
   xmlbuilder: 15.1.1
 

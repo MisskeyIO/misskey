@@ -5,7 +5,7 @@
 
 import { errors, utils, values } from '@syuilo/aiscript';
 import * as Misskey from 'misskey-js';
-import { url, lang } from '@@/js/config.js';
+import { url, lang, apiUrl } from '@@/js/config.js';
 import { assertStringAndIsIn } from './common.js';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
@@ -76,7 +76,11 @@ export function createAiScriptEnv(opts: { storageKey: string, token?: string }) 
 		}),
 		'Mk:api': values.FN_NATIVE(async ([ep, param, token]) => {
 			utils.assertString(ep);
-			if (ep.value.includes('://') || ep.value.includes('..') || ep.value.startsWith('auth/') || ep.value.startsWith('admin/')) {
+			if (ep.value.includes('://') || ep.value.includes('..')) {
+				throw new errors.AiScriptRuntimeError('invalid endpoint');
+			}
+			const normalizedEndpoint = new URL(`${apiUrl}/${ep.value}`).pathname.slice(new URL(apiUrl).pathname.length + 1);
+			if (normalizedEndpoint.startsWith('auth/') || normalizedEndpoint.startsWith('admin/')) {
 				throw new errors.AiScriptRuntimeError('invalid endpoint');
 			}
 			if (token) {

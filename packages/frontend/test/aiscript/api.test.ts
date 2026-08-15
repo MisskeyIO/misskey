@@ -346,9 +346,27 @@ describe('AiScript common API', () => {
 			expect(misskeyApiMock).not.toHaveBeenCalled();
 		});
 
+		test.sequential('invalid relative auth endpoint', async () => {
+			await expect(exe(`
+				Mk:api('./auth/signin', {})
+			`)).rejects.toStrictEqual(
+				errorWithPos(new errors.AiScriptRuntimeError('invalid endpoint'), 2, 11),
+			);
+			expect(misskeyApiMock).not.toHaveBeenCalled();
+		});
+
 		test.sequential('invalid admin endpoint', async () => {
 			await expect(exe(`
 				Mk:api('admin/accounts/create', {})
+			`)).rejects.toStrictEqual(
+				errorWithPos(new errors.AiScriptRuntimeError('invalid endpoint'), 2, 11),
+			);
+			expect(misskeyApiMock).not.toHaveBeenCalled();
+		});
+
+		test.sequential('invalid relative admin endpoint', async () => {
+			await expect(exe(`
+				Mk:api('./admin/accounts/create', {})
 			`)).rejects.toStrictEqual(
 				errorWithPos(new errors.AiScriptRuntimeError('invalid endpoint'), 2, 11),
 			);
@@ -360,13 +378,15 @@ describe('AiScript common API', () => {
 			await exe(`
 				<: Mk:api('authx/signin', {})
 				<: Mk:api('notes/create', {})
+				<: Mk:api('./notes/create', {})
 				<: Mk:api('auth', {})
 				<: Mk:api('admin', {})
 			`);
 			expect(misskeyApiMock).toHaveBeenNthCalledWith(1, 'authx/signin', {}, null, undefined, 'aiscript');
 			expect(misskeyApiMock).toHaveBeenNthCalledWith(2, 'notes/create', {}, null, undefined, 'aiscript');
-			expect(misskeyApiMock).toHaveBeenNthCalledWith(3, 'auth', {}, null, undefined, 'aiscript');
-			expect(misskeyApiMock).toHaveBeenNthCalledWith(4, 'admin', {}, null, undefined, 'aiscript');
+			expect(misskeyApiMock).toHaveBeenNthCalledWith(3, './notes/create', {}, null, undefined, 'aiscript');
+			expect(misskeyApiMock).toHaveBeenNthCalledWith(4, 'auth', {}, null, undefined, 'aiscript');
+			expect(misskeyApiMock).toHaveBeenNthCalledWith(5, 'admin', {}, null, undefined, 'aiscript');
 		});
 
 		test.sequential('missing param', async () => {

@@ -76,7 +76,7 @@ export function misskeyApi<
 	if (endpoint.includes('://')) throw new Error('invalid endpoint');
 	pendingApiRequestsCount.value++;
 
-	const credential = token ? token : $i ? $i.token : undefined;
+	const credential = token !== undefined ? token : $i ? $i.token : undefined;
 
 	const onFinally = () => {
 		pendingApiRequestsCount.value--;

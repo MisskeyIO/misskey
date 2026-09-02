@@ -25376,6 +25376,7 @@ export interface operations {
                 content: {
                     'application/json': {
                         rp: {
+                            name: string;
                             id?: string;
                         };
                         user: {

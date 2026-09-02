@@ -33,14 +33,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div v-if="shown" style="padding-left: 9px;">
 		<MkEmojiPickerSection
 			v-for="child in customEmojiTree"
-			:key="`custom:${child.category}`"
+			:key="`custom:${child.value}`"
 			:initialShown="initialShown"
 			:emojis="computed(() => customEmojis.filter(e => e.category === child.category).map(e => `:${e.name}:`))"
 			:hasChildSection="child.children.length !== 0"
 			:customEmojiTree="child.children"
 			@chosen="nestedChosen"
 		>
-			{{ child.category || i18n.ts.other }}
+			{{ child.value || i18n.ts.other }}
 		</MkEmojiPickerSection>
 	</div>
 	<div v-if="shown" class="body">

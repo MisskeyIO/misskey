@@ -90,15 +90,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<header class="_acrylic">{{ i18n.ts.customEmojis }}</header>
 			<XSection
 				v-for="child in customEmojiFolderRoot.children"
-				:key="`custom:${child.category}`"
+				:key="`custom:${child.value}`"
 				:initialShown="false"
-				:emojis="computed(() => customEmojis.filter(e => filterCategory(e, child.category)).map(e => `:${e.name}:`))"
-				:disabledEmojis="computed(() => customEmojis.filter(e => filterCategory(e, child.category)).filter(e => !canReact(e)).map(e => `:${e.name}:`))"
+				:emojis="computed(() => customEmojis.filter(e => filterCategory(e, child.value)).map(e => `:${e.name}:`))"
+				:disabledEmojis="computed(() => customEmojis.filter(e => filterCategory(e, child.value)).filter(e => !canReact(e)).map(e => `:${e.name}:`))"
 				:hasChildSection="child.children.length !== 0"
 				:customEmojiTree="child.children"
 				@chosen="chosen"
 			>
-				{{ child.category || i18n.ts.other }}
+				{{ child.value || i18n.ts.other }}
 			</XSection>
 		</div>
 		<div v-once class="group">
@@ -189,19 +189,18 @@ const searchResultCustom = ref<Misskey.entities.EmojiSimple[]>([]);
 const searchResultUnicode = ref<UnicodeEmojiDef[]>([]);
 const tab = ref<'index' | 'custom' | 'unicode' | 'tags'>('index');
 
-const customEmojiFolderRoot: CustomEmojiFolderTree = { category: '', children: [] };
+const customEmojiFolderRoot: CustomEmojiFolderTree = { value: '', category: '', children: [] };
 
 function parseAndMergeCategories(input: string, root: CustomEmojiFolderTree): CustomEmojiFolderTree {
-	const parts = (input && input !== 'null' ? input : '').split(' / ');
+	const parts = input.split('/').map(p => p.trim());
 	let currentNode: CustomEmojiFolderTree = root;
 
 	for (const part of parts) {
-		const path = currentNode.category ? `${currentNode.category} / ${part}` : part;
-
-		let existingNode = currentNode.children.find((node) => node.category === path);
+		let existingNode = currentNode.children.find((node) => node.value === part);
 		if (!existingNode) {
 			const newNode: CustomEmojiFolderTree = {
-				category: path,
+				value: part,
+				category: input,
 				children: [],
 			};
 			currentNode.children.push(newNode);

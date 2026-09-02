@@ -27,7 +27,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label>{{ i18n.ts.details }}</template>
 				<template #caption>{{ i18n.ts.fillAbuseReportDescription }}</template>
 			</MkTextarea>
-			<MkButton primary full :disabled="comment.length === 0 || category.length === 0" @click="send">{{ i18n.ts.send }}</MkButton>
+			<MkButton primary full :disabled="comment.length === 0 || category === ''" @click="send">{{ i18n.ts.send }}</MkButton>
 		</div>
 	</div>
 </MkWindow>

@@ -45,6 +45,9 @@ html
 			each href in entry.css
 				link(rel='stylesheet' href=`/vite/${href}`)
 
+		link(rel='stylesheet' href=`/assets/tabler-icons.${version}/dist/tabler-icons-outline.min.css`)
+		link(rel='stylesheet' href=`/assets/tabler-icons.${version}/dist/tabler-icons-filled.min.css`)
+
 		title
 			block title
 				= title || 'Misskey'

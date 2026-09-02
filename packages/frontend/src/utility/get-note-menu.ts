@@ -23,8 +23,6 @@ import { isSupportShare } from '@/utility/navigator.js';
 import { getAppearNote } from '@/utility/get-appear-note.js';
 import { prefer } from '@/preferences.js';
 import { getPluginHandlers } from '@/plugin.js';
-import { isMute, playUrl } from '@/utility/sound.js';
-import { isAprilFoolsDay } from '@/utility/seasonal-events.js';
 import { globalEvents } from '@/events.js';
 
 export async function getNoteClipMenu(props: {
@@ -39,17 +37,7 @@ export async function getNoteClipMenu(props: {
 		}
 	}
 
-	// const isRenote = (
-	// 	props.note.renote != null &&
-	// 	props.note.reply == null &&
-	// 	props.note.text == null &&
-	// 	props.note.cw == null &&
-	// 	props.note.fileIds && props.note.fileIds.length === 0 &&
-	// 	props.note.poll == null
-	// );
-
-	// const appearNote = isRenote ? props.note.renote as Misskey.entities.Note : props.note;
-	const appearNote = getAppearNote(props.note);
+	const appearNote = getAppearNote(props.note) ?? props.note;
 
 	const clips = await clipsCache.fetch();
 	const menu: MenuItem[] = [...clips.map(clip => ({
@@ -190,17 +178,7 @@ export function getNoteMenu(props: {
 	currentClip?: Misskey.entities.Clip;
 	postFormDimension?: number | null;
 }) {
-	// const isRenote = (
-	// 	props.note.renote != null &&
-	// 	props.note.reply == null &&
-	// 	props.note.text == null &&
-	// 	props.note.cw == null &&
-	// 	props.note.fileIds && props.note.fileIds.length === 0 &&
-	// 	props.note.poll == null
-	// );
-	//
-	// const appearNote = isRenote ? props.note.renote as Misskey.entities.Note : props.note;
-	const appearNote = getAppearNote(props.note);
+	const appearNote = getAppearNote(props.note) ?? props.note;
 	const link = appearNote.url ?? appearNote.uri;
 
 	const cleanups = [] as (() => void)[];
@@ -208,14 +186,10 @@ export function getNoteMenu(props: {
 	function del(): void {
 		os.confirm({
 			type: 'warning',
-			text: isAprilFoolsDay() ? i18n.ts.deleteNotWash + '\n' + i18n.ts.noteDeleteConfirm : i18n.ts.noteDeleteConfirm,
+			text: i18n.ts.noteDeleteConfirm,
 		}).then(({ canceled }) => {
 			if (canceled) return;
 			if ($i == null) return;
-
-			if (isAprilFoolsDay() && !isMute()) {
-				playUrl('/client-assets/sounds/flush.mp3', { volume: store.s.sound_masterVolume });
-			}
 
 			misskeyApi('notes/delete', {
 				noteId: appearNote.id,
@@ -229,7 +203,7 @@ export function getNoteMenu(props: {
 		});
 	}
 
-function delEdit(): void {
+	function delEdit(): void {
 		os.confirm({
 			type: 'warning',
 			text: i18n.ts.deleteAndEditConfirm,
@@ -492,8 +466,8 @@ function delEdit(): void {
 				});
 			}
 			menuItems.push({
-				icon: isAprilFoolsDay() ? 'ti ti-whirl' : 'ti ti-trash',
-				text: isAprilFoolsDay() ? i18n.ts.flushItAway : i18n.ts.delete,
+				icon: 'ti ti-trash',
+				text: i18n.ts.delete,
 				danger: true,
 				action: del,
 			});
@@ -580,17 +554,7 @@ export function getRenoteMenu(props: {
 	mock?: boolean;
 	postFormDimension?: number | null;
 }) {
-	// const isRenote = (
-	// 	props.note.renote != null &&
-	// 	props.note.reply == null &&
-	// 	props.note.text == null &&
-	// 	props.note.cw == null &&
-	// 	props.note.fileIds && props.note.fileIds.length === 0 &&
-	// 	props.note.poll == null
-	// );
-	//
-	// const appearNote = isRenote ? props.note.renote as Misskey.entities.Note : props.note;
-	const appearNote = getAppearNote(props.note);
+	const appearNote = getAppearNote(props.note) ?? props.note;
 	const dimension = appearNote.dimension ?? prefer.s.dimension ?? 0;
 	const postFormDimension = props.postFormDimension ?? undefined;
 
@@ -608,7 +572,9 @@ export function getRenoteMenu(props: {
 					const rect = el.getBoundingClientRect();
 					const x = rect.left + (el.offsetWidth / 2);
 					const y = rect.top + (el.offsetHeight / 2);
-					os.popup(MkRippleEffect, { x, y }, {}, 'end');
+					const { dispose } = os.popup(MkRippleEffect, { x, y }, {
+						end: () => dispose(),
+					});
 				}
 
 				if (!props.mock) {
@@ -647,7 +613,9 @@ export function getRenoteMenu(props: {
 					const rect = el.getBoundingClientRect();
 					const x = rect.left + (el.offsetWidth / 2);
 					const y = rect.top + (el.offsetHeight / 2);
-					os.popup(MkRippleEffect, { x, y }, {}, 'end');
+					const { dispose } = os.popup(MkRippleEffect, { x, y }, {
+						end: () => dispose(),
+					});
 				}
 
 				const configuredVisibility = prefer.s.rememberNoteVisibility ? store.s.visibility : prefer.s.defaultNoteVisibility;
@@ -699,7 +667,9 @@ export function getRenoteMenu(props: {
 							const rect = el.getBoundingClientRect();
 							const x = rect.left + (el.offsetWidth / 2);
 							const y = rect.top + (el.offsetHeight / 2);
-							os.popup(MkRippleEffect, { x, y }, {}, 'end');
+							const { dispose } = os.popup(MkRippleEffect, { x, y }, {
+								end: () => dispose(),
+							});
 						}
 
 						if (!props.mock) {

@@ -62,6 +62,8 @@ export type Column = {
 	onlyFiles?: boolean;
 	soundSetting?: SoundStore;
 	dimension?: number | null;
+	// The cache for the name of the antenna, channel, list, or role
+	timelineNameCache?: string;
 };
 
 const _currentProfile = prefer.s['deck.profiles'].find(p => p.name === prefer.s['deck.profile']);

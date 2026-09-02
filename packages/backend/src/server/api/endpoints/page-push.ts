@@ -48,6 +48,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (page == null) {
 				throw new ApiError(meta.errors.noSuchPage);
 			}
+			if (page.visibility === 'private' && page.userId !== me.id) {
+				throw new ApiError(meta.errors.noSuchPage);
+			}
 
 			this.globalEventService.publishMainStream(page.userId, 'pageEvent', {
 				pageId: ps.pageId,

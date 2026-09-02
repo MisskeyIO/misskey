@@ -24,7 +24,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		@error="onBlurhashError"
 	/>
 	<img
-		v-else-if="showPlainImage"
+		v-else-if="isThumbnailAvailable && file.thumbnailUrl != null"
 		:src="file.thumbnailUrl"
 		:alt="file.name"
 		:title="file.name"

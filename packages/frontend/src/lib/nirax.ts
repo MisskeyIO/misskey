@@ -5,7 +5,7 @@
 
 // NIRAX --- A lightweight router
 
-import { onBeforeUnmount, shallowRef } from 'vue';
+import { onBeforeUnmount, onMounted, shallowRef } from 'vue';
 import { EventEmitter } from 'eventemitter3';
 import type { Component, ShallowRef } from 'vue';
 
@@ -23,7 +23,6 @@ interface RouteDefBase {
 	loginRequired?: boolean;
 	name?: string;
 	hash?: string;
-	globalCacheKey?: string;
 	children?: RouteDef[];
 }
 
@@ -37,6 +36,8 @@ interface RouteDefWithRedirect extends RouteDefBase {
 
 export type RouteDef = RouteDefWithComponent | RouteDefWithRedirect;
 
+export type RouterFlag = 'forcePage';
+
 type ParsedPath = (string | {
 	name: string;
 	startsWith?: string;
@@ -44,31 +45,28 @@ type ParsedPath = (string | {
 	optional?: boolean;
 })[];
 
-export type RouterEvent = {
+export type RouterEvents = {
 	change: (ctx: {
-		beforePath: string;
-		path: string;
-		resolved: Resolved;
-		key: string;
+		beforeFullPath: string;
+		fullPath: string;
+		resolved: PathResolvedResult;
 	}) => void;
 	replace: (ctx: {
-		path: string;
-		key: string;
+		fullPath: string;
 	}) => void;
 	push: (ctx: {
-		beforePath: string;
-		path: string;
+		beforeFullPath: string;
+		fullPath: string;
 		route: RouteDef | null;
-		props: Map<string, string> | null;
-		key: string;
+		props: Map<string, string | boolean> | null;
 	}) => void;
 	same: () => void;
 };
 
-export type Resolved = {
+export type PathResolvedResult = {
 	route: RouteDef;
 	props: Map<string, string | boolean>;
-	child?: Resolved;
+	child?: PathResolvedResult;
 	redirected?: boolean;
 
 	/** @internal */
@@ -79,7 +77,111 @@ export type Resolved = {
 	};
 };
 
-export type AfterNavigationHook = (to: RouteDef, from: RouteDef) => any;
+//#region Path Types
+type Prettify<T> = {
+	[K in keyof T]: T[K]
+} & {};
+
+type RemoveNever<T> = {
+	[K in keyof T as T[K] extends never ? never : K]: T[K];
+} & {};
+
+type IsPathParameter<Part extends string> = Part extends `${string}:${infer Parameter}` ? Parameter : never;
+
+type GetPathParamKeys<Path extends string> =
+	Path extends `${infer A}/${infer B}`
+		? IsPathParameter<A> | GetPathParamKeys<B>
+		: IsPathParameter<Path>;
+
+type GetPathParams<Path extends string> = Prettify<{
+	[Param in GetPathParamKeys<Path> as Param extends `${string}?` ? never : Param]: string;
+} & {
+	[Param in GetPathParamKeys<Path> as Param extends `${infer OptionalParam}?` ? OptionalParam : never]?: string;
+}>;
+
+type UnwrapReadOnly<T> = T extends ReadonlyArray<infer U>
+	? U
+	: T extends Readonly<infer U>
+		? U
+		: T;
+
+type GetPaths<Def extends RouteDef> = Def extends { path: infer Path }
+	? Path extends string
+		? Def extends { children: infer Children }
+			? Children extends RouteDef[]
+				? Path | `${Path}${FlattenAllPaths<Children>}`
+				: Path
+			: Path
+		: never
+	: never;
+
+type FlattenAllPaths<Defs extends RouteDef[]> = GetPaths<Defs[number]>;
+
+type GetSinglePathQuery<Def extends RouteDef, Path extends FlattenAllPaths<RouteDef[]>> = RemoveNever<
+	Def extends { path: infer BasePath, children: infer Children }
+		? BasePath extends string
+			? Path extends `${BasePath}${infer ChildPath}`
+				? Children extends RouteDef[]
+					? ChildPath extends FlattenAllPaths<Children>
+						? GetPathQuery<Children, ChildPath>
+						: Record<string, never>
+				: never
+				: never
+			: never
+		: Def['path'] extends Path
+			? Def extends { query: infer Query }
+				? Query extends Record<string, string>
+					? UnwrapReadOnly<{ [Key in keyof Query]?: string; }>
+					: Record<string, never>
+			: Record<string, never>
+		: Record<string, never>
+	>;
+
+type GetPathQuery<Defs extends RouteDef[], Path extends FlattenAllPaths<Defs>> = GetSinglePathQuery<Defs[number], Path>;
+
+type RequiredIfNotEmpty<K extends string, T extends Record<string, unknown>> = T extends Record<string, never>
+	? { [Key in K]?: T }
+	: { [Key in K]: T };
+
+type NotRequiredIfEmpty<T extends Record<string, unknown>> = T extends Record<string, never> ? T | undefined : T;
+
+type GetRouterOperationProps<Defs extends RouteDef[], Path extends FlattenAllPaths<Defs>> = NotRequiredIfEmpty<RequiredIfNotEmpty<'params', GetPathParams<Path>> & {
+	query?: GetPathQuery<Defs, Path>;
+	hash?: string;
+}>;
+//#endregion
+
+function buildFullPath(args: {
+	path: string;
+	params?: Record<string, string>;
+	query?: Record<string, string>;
+	hash?: string;
+}) {
+	let fullPath = args.path;
+
+	if (args.params) {
+		for (const key in args.params) {
+			const value = args.params[key];
+			const replaceRegex = new RegExp(`:${key}(\\?)?`, 'g');
+			fullPath = fullPath.replace(replaceRegex, value ? encodeURIComponent(value) : '');
+		}
+		// remove any optional parameters that are not provided
+		fullPath = fullPath.replace(/\/:\w+\?(?=\/|$)/g, '');
+	}
+
+	if (args.query) {
+		const queryString = new URLSearchParams(args.query).toString();
+		if (queryString) {
+			fullPath += '?' + queryString;
+		}
+	}
+
+	if (args.hash) {
+		fullPath += '#' + encodeURIComponent(args.hash);
+	}
+
+	return fullPath;
+}
 
 function parsePath(path: string): ParsedPath {
 	const res = [] as ParsedPath;
@@ -106,129 +208,39 @@ function parsePath(path: string): ParsedPath {
 	return res;
 }
 
-export interface IRouter extends EventEmitter<RouterEvent> {
-	current: Resolved;
-	currentRef: ShallowRef<Resolved>;
-	currentRoute: ShallowRef<RouteDef>;
-	navHook: ((path: string, flag?: any) => boolean) | null;
-	afterHooks: Array<AfterNavigationHook | null>;
-
-	/**
-	 * ルートの初期化（eventListenerの定義後に必ず呼び出すこと）
-	 */
-	init(): void;
-
-	resolve(path: string): Resolved | null;
-
-	isReady(): Promise<boolean>;
-
-	getCurrentPath(): any;
-
-	getCurrentKey(): string;
-
-	afterEach(hook: AfterNavigationHook): AfterNavigationHook | undefined;
-
-	push(path: string, flag?: any): void;
-
-	replace(path: string, key?: string | null): void;
-
-	/** @see EventEmitter */
-	eventNames(): Array<EventEmitter.EventNames<RouterEvent>>;
-
-	/** @see EventEmitter */
-	listeners<T extends EventEmitter.EventNames<RouterEvent>>(
-		event: T
-	): Array<EventEmitter.EventListener<RouterEvent, T>>;
-
-	/** @see EventEmitter */
-	listenerCount(
-		event: EventEmitter.EventNames<RouterEvent>
-	): number;
-
-	/** @see EventEmitter */
-	emit<T extends EventEmitter.EventNames<RouterEvent>>(
-		event: T,
-		...args: EventEmitter.EventArgs<RouterEvent, T>
-	): boolean;
-
-	/** @see EventEmitter */
-	on<T extends EventEmitter.EventNames<RouterEvent>>(
-		event: T,
-		fn: EventEmitter.EventListener<RouterEvent, T>,
-		context?: any
-	): this;
-
-	/** @see EventEmitter */
-	addListener<T extends EventEmitter.EventNames<RouterEvent>>(
-		event: T,
-		fn: EventEmitter.EventListener<RouterEvent, T>,
-		context?: any
-	): this;
-
-	/** @see EventEmitter */
-	once<T extends EventEmitter.EventNames<RouterEvent>>(
-		event: T,
-		fn: EventEmitter.EventListener<RouterEvent, T>,
-		context?: any
-	): this;
-
-	/** @see EventEmitter */
-	removeListener<T extends EventEmitter.EventNames<RouterEvent>>(
-		event: T,
-		fn?: EventEmitter.EventListener<RouterEvent, T>,
-		context?: any,
-		once?: boolean | undefined
-	): this;
-
-	/** @see EventEmitter */
-	off<T extends EventEmitter.EventNames<RouterEvent>>(
-		event: T,
-		fn?: EventEmitter.EventListener<RouterEvent, T>,
-		context?: any,
-		once?: boolean | undefined
-	): this;
-
-	/** @see EventEmitter */
-	removeAllListeners(
-		event?: EventEmitter.EventNames<RouterEvent>
-	): this;
-}
-
-export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvent> implements IRouter {
-	public current: Resolved;
-	public currentRef: ShallowRef<Resolved>;
-	public currentRoute: ShallowRef<RouteDef>;
-	public navHook: ((path: string, flag?: any) => boolean) | null = null;
-	public afterHooks: Array<AfterNavigationHook | null> = [];
+export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvents> {
 	private routes: DEF;
-	private currentPath: string;
+	public current: PathResolvedResult;
+	public currentRef: ShallowRef<PathResolvedResult>;
+	public currentRoute: ShallowRef<RouteDef>;
+	private currentFullPath: string; // /foo/bar?baz=qux#hash
 	private isLoggedIn: boolean;
 	private notFoundPageComponent: Component;
-	private currentKey = Date.now().toString();
 	private redirectCount = 0;
 
-	constructor(routes: Nirax<DEF>['routes'], currentPath: Nirax<DEF>['currentPath'], isLoggedIn: boolean, notFoundPageComponent: Component) {
+	public navHook: ((fullPath: string, flag?: RouterFlag) => boolean) | null = null;
+
+	constructor(routes: DEF, currentFullPath: Nirax<DEF>['currentFullPath'], isLoggedIn: boolean, notFoundPageComponent: Component) {
 		super();
 
 		this.routes = routes;
-		this.current = this.resolve(currentPath)!;
+		this.current = this.resolve(currentFullPath)!;
 		this.currentRef = shallowRef(this.current);
 		this.currentRoute = shallowRef(this.current.route);
-		this.currentPath = currentPath;
+		this.currentFullPath = currentFullPath;
 		this.isLoggedIn = isLoggedIn;
 		this.notFoundPageComponent = notFoundPageComponent;
 	}
 
 	public init() {
-		const res = this.navigate(this.currentPath, null, false);
+		const res = this.navigate(this.currentFullPath, false);
 		this.emit('replace', {
-			path: res._parsedRoute.fullPath,
-			key: this.currentKey,
+			fullPath: res._parsedRoute.fullPath,
 		});
 	}
 
-	public resolve(path: string): Resolved | null {
-		const fullPath = path;
+	public resolve(fullPath: string): PathResolvedResult | null {
+		let path = fullPath;
 		let queryString: string | null = null;
 		let hash: string | null = null;
 		if (path[0] === '/') path = path.substring(1);
@@ -247,9 +259,7 @@ export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvent> imp
 			hash,
 		};
 
-		if (_DEV_) console.log('Routing: ', path, queryString);
-
-		function check(routes: RouteDef[], _parts: string[]): Resolved | null {
+		function check(routes: RouteDef[], _parts: string[]): PathResolvedResult | null {
 			forEachRouteLoop:
 			for (const route of routes) {
 				let parts = [..._parts];
@@ -352,82 +362,17 @@ export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvent> imp
 		return check(this.routes, _parts);
 	}
 
-	public isReady() {
-		return Promise.resolve(true);
-	}
+	private navigate(fullPath: string, emitChange = true, _redirected = false): PathResolvedResult {
+		const beforeFullPath = this.currentFullPath;
+		this.currentFullPath = fullPath;
 
-	public getCurrentPath() {
-		return this.currentPath;
-	}
-
-	public getCurrentKey() {
-		return this.currentKey;
-	}
-
-	public afterEach(hook: AfterNavigationHook): AfterNavigationHook | undefined {
-		this.afterHooks.push(hook);
-		return () => {
-			const index = this.afterHooks.indexOf(hook);
-			if (index !== -1) {
-				return this.afterHooks.splice(index, 1);
-			} else {
-				return undefined;
-			}
-		};
-	}
-
-	public push(path: string, flag?: any) {
-		const beforePath = this.currentPath;
-		if (path === beforePath) {
-			this.emit('same');
-			return;
-		}
-		if (this.navHook) {
-			const cancel = this.navHook(path, flag);
-			if (cancel) return;
-		}
-		const res = this.navigate(path, null);
-		if (res.route.path === '/:(*)') {
-			window.location.href = path;
-		} else {
-			this.emit('push', {
-				beforePath,
-				path: res._parsedRoute.fullPath,
-				route: res.route,
-				props: res.props,
-				key: this.currentKey,
-			});
-		}
-	}
-
-	public replace(path: string, key?: string | null) {
-		const res = this.navigate(path, key);
-		this.emit('replace', {
-			path: res._parsedRoute.fullPath,
-			key: this.currentKey,
-		});
-	}
-
-	public useListener<E extends keyof RouterEvent>(event: E, listener: (...args: EventEmitter.ArgumentMap<RouterEvent>[Extract<E, keyof RouterEvent>]) => void, context?: any) {
-		this.addListener(event, listener, context);
-
-		onBeforeUnmount(() => {
-			this.removeListener(event, listener, context);
-		});
-	}
-
-	private navigate(path: string, key: string | null | undefined, emitChange = true, _redirected = false): Resolved {
-		const beforePath = this.currentPath;
-		const beforeRoute = this.currentRoute.value;
-		this.currentPath = path;
-
-		const res = this.resolve(this.currentPath);
+		const res = this.resolve(this.currentFullPath);
 
 		if (res == null) {
-			throw new Error('no route found for: ' + path);
+			throw new Error('no route found for: ' + fullPath);
 		}
 
-		for (let current: Resolved | undefined = res; current; current = current.child) {
+		for (let current: PathResolvedResult | undefined = res; current; current = current.child) {
 			if ('redirect' in current.route) {
 				let redirectPath: string;
 				if (typeof current.route.redirect === 'function') {
@@ -439,35 +384,25 @@ export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvent> imp
 				if (_redirected && this.redirectCount++ > 10) {
 					throw new Error('redirect loop detected');
 				}
-				return this.navigate(redirectPath, null, emitChange, true);
+				return this.navigate(redirectPath, emitChange, true);
 			}
 		}
 
-		if (res.route.loginRequired && !this.isLoggedIn) {
-			res.route['component'] = this.notFoundPageComponent;
+		if (res.route.loginRequired && !this.isLoggedIn && 'component' in res.route) {
+			res.route.component = this.notFoundPageComponent;
 			res.props.set('showLoginPopup', true);
 		}
 
-		const isSamePath = beforePath === path;
-		if (isSamePath && key == null) key = this.currentKey;
 		this.current = res;
 		this.currentRef.value = res;
 		this.currentRoute.value = res.route;
-		this.currentKey = res.route.globalCacheKey ?? key ?? path;
 
 		if (emitChange && res.route.path !== '/:(*)') {
 			this.emit('change', {
-				beforePath,
-				path,
+				beforeFullPath,
+				fullPath,
 				resolved: res,
-				key: this.currentKey,
 			});
-		}
-
-		if (this.afterHooks.length > 0) {
-			for (const hook of this.afterHooks) {
-				if (hook) hook(res.route, beforeRoute);
-			}
 		}
 
 		this.redirectCount = 0;
@@ -476,5 +411,72 @@ export class Nirax<DEF extends RouteDef[]> extends EventEmitter<RouterEvent> imp
 			redirected: _redirected,
 		};
 	}
-}
 
+	public getCurrentFullPath() {
+		return this.currentFullPath;
+	}
+
+	public getCurrentPath() {
+		return this.currentFullPath;
+	}
+
+	public push<P extends FlattenAllPaths<DEF>>(path: P, props?: GetRouterOperationProps<DEF, P>, flag?: RouterFlag | null) {
+		const fullPath = buildFullPath({
+			path,
+			params: props?.params,
+			query: props?.query,
+			hash: props?.hash,
+		});
+		this.pushByPath(fullPath, flag);
+	}
+
+	public replace<P extends FlattenAllPaths<DEF>>(path: P, props?: GetRouterOperationProps<DEF, P>) {
+		const fullPath = buildFullPath({
+			path,
+			params: props?.params,
+			query: props?.query,
+			hash: props?.hash,
+		});
+		this.replaceByPath(fullPath);
+	}
+
+	/** どうしても必要な場合に使用（パスが確定している場合は `Nirax.push` を使用すること） */
+	public pushByPath(fullPath: string, flag?: RouterFlag | null) {
+		const beforeFullPath = this.currentFullPath;
+		if (fullPath === beforeFullPath) {
+			this.emit('same');
+			return;
+		}
+		if (this.navHook) {
+			const cancel = this.navHook(fullPath, flag ?? undefined);
+			if (cancel) return;
+		}
+		const res = this.navigate(fullPath);
+		if (res.route.path === '/:(*)') {
+			window.location.href = fullPath;
+		} else {
+			this.emit('push', {
+				beforeFullPath,
+				fullPath: res._parsedRoute.fullPath,
+				route: res.route,
+				props: res.props,
+			});
+		}
+	}
+
+	/** どうしても必要な場合に使用（パスが確定している場合は `Nirax.replace` を使用すること） */
+	public replaceByPath(fullPath: string) {
+		const res = this.navigate(fullPath);
+		this.emit('replace', {
+			fullPath: res._parsedRoute.fullPath,
+		});
+	}
+
+	public useListener<E extends keyof RouterEvents>(event: E, listener: EventEmitter.EventListener<RouterEvents, E>) {
+		this.addListener(event, listener);
+
+		onBeforeUnmount(() => {
+			this.removeListener(event, listener);
+		});
+	}
+}

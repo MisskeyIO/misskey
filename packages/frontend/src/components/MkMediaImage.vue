@@ -4,7 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<div v-if="!blocked" :class="[hide ? $style.hidden : $style.visible, (image.isSensitive && prefer.s.highlightSensitiveMedia) && $style.sensitive]" @click="showHiddenContent">
+<div :class="[hide ? $style.hidden : $style.visible, (image.isSensitive && prefer.s.highlightSensitiveMedia) && $style.sensitive]" @click="reveal">
 	<component
 		:is="(image.isSensitive && !$i) || disableImageLink ? 'div' : 'a'"
 		v-bind="(image.isSensitive && !$i) || disableImageLink ? {
@@ -108,8 +108,35 @@ const url = computed(() => (props.raw || prefer.s.loadRawImages)
 	? props.image.url
 	: prefer.s.disableShowingAnimatedImages
 		? getStaticImageUrl(props.image.url)
-		: props.image.thumbnailUrl,
+		: props.image.thumbnailUrl!,
 );
+
+async function reveal(ev: MouseEvent) {
+	if (!props.controls) {
+		return;
+	}
+
+	if (hide.value) {
+		ev.stopPropagation();
+		if (props.image.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
+			const { canceled } = await os.confirm({
+				type: 'question',
+				text: i18n.ts.sensitiveMediaRevealConfirm,
+			});
+			if (canceled) return;
+		}
+
+		hide.value = false;
+	}
+}
+
+// Plugin:register_note_view_interruptor を使って書き換えられる可能性があるためwatchする
+watch(() => props.image, () => {
+	hide.value = (prefer.s.nsfw === 'force' || prefer.s.dataSaver.media) ? true : (props.image.isSensitive && prefer.s.nsfw !== 'ignore');
+}, {
+	deep: true,
+	immediate: true,
+});
 
 function showMenu(ev: MouseEvent) {
 	const menuItems: MenuItem[] = [];

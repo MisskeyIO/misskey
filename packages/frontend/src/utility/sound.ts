@@ -28,7 +28,7 @@ export const soundsTypes = [
 	null,
 
 	// ドライブの音声
-	...($i?.policies.canUseDriveFileInSoundSettings ? ['_driveFile_'] : []),
+	...($i?.policies.canUseDriveFileInSoundSettings ? ['_driveFile_' as const] : []),
 
 	// プリインストール
 	'syuilo/n-aec',

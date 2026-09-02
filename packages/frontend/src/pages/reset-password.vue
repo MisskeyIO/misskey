@@ -35,9 +35,8 @@ const shouldDisableSubmitting = computed((): boolean => {
 });
 
 async function save() {
-	if (!newPassword.value?.isValid || submitting.value) return;
+	if (props.token == null || !newPassword.value?.isValid || submitting.value) return;
 	submitting.value = true;
-
 	await os.apiWithDialog('reset-password', {
 		token: props.token,
 		password: newPassword.value.password,

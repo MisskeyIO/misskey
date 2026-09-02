@@ -12,8 +12,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 
 		<template v-for="x in accounts" :key="x.host + x.id">
-			<MkUserCardMini v-if="x.user" :user="x.user" :class="$style.user" @click.prevent="menu(x.host, x.id, $event)"/>
-			<div v-else :class="$style.unknownUser" @click.prevent="menu(x.host, x.id, $event)">
+			<MkUserCardMini v-if="x.user" :user="x.user" :class="$style.user" @click.prevent="showMenu(x.host, x.id, $event)"/>
+			<div v-else :class="$style.unknownUser" @click.prevent="showMenu(x.host, x.id, $event)">
 				<span :class="$style.unknownUserAvatarMock"><i class="ti ti-user"></i></span>
 				<div>
 					<span :class="$style.unknownUserTitle">{{ x.username }}</span>
@@ -32,13 +32,16 @@ import type { MenuItem } from '@/types/menu.js';
 import MkButton from '@/components/MkButton.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
-import { getAccounts, switchAccount, removeAccount, login, getAccountWithSigninDialog, getAccountWithSignupDialog } from '@/accounts.js';
+import { switchAccount, removeAccount, login, getAccountWithSigninDialog, getAccountWithSignupDialog, getAccounts } from '@/accounts.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import MkUserCardMini from '@/components/MkUserCardMini.vue';
 import { prefer } from '@/preferences.js';
 
-const accounts = ref<Awaited<ReturnType<typeof getAccounts>>[number][]>([]);
+type Account = Awaited<ReturnType<typeof getAccounts>>[number];
+type DisplayAccount = Omit<Account, 'user'> & { user: Misskey.entities.User | null };
+
+const accounts = ref<DisplayAccount[]>([]);
 
 async function loadAccounts() {
 	const entries = await getAccounts();
@@ -60,17 +63,17 @@ async function loadAccounts() {
 	}));
 }
 
-function menu(host: string, accountId: string, ev: MouseEvent) {
+function showMenu(host: string, id: string, ev: MouseEvent) {
 	let menu: MenuItem[];
 
 	menu = [{
 		text: i18n.ts.switch,
 		icon: 'ti ti-switch-horizontal',
-		action: () => switchAccount(host, accountId),
+		action: () => switchAccount(host, id),
 	}, {
 		text: i18n.ts.remove,
 		icon: 'ti ti-trash',
-		action: () => removeAccount(host, accountId),
+		action: () => removeAccount(host, id),
 	}];
 
 	os.popupMenu(menu, ev.currentTarget ?? ev.target);

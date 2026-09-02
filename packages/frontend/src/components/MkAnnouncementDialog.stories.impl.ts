@@ -45,6 +45,8 @@ export const Default = {
 			icon: 'info',
 			imageUrl: null,
 			display: 'dialog',
+			closeDuration: 0,
+			displayOrder: 0,
 			needConfirmationToRead: false,
 			needEnrollmentTutorialToRead: false,
 			silence: false,

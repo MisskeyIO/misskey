@@ -56,6 +56,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (page == null) {
 				throw new ApiError(meta.errors.noSuchPage);
 			}
+			if (page.visibility === 'private' && page.userId !== me.id) {
+				throw new ApiError(meta.errors.noSuchPage);
+			}
 
 			const exist = await this.pageLikesRepository.findOneBy({
 				pageId: page.id,

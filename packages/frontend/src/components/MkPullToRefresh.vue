@@ -28,6 +28,7 @@ import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import { getScrollContainer } from '@@/js/scroll.js';
 import { i18n } from '@/i18n.js';
 import { isHorizontalSwipeSwiping } from '@/utility/touch.js';
+import { haptic } from '@/utility/haptic.js';
 
 const SCROLL_STOP = 10;
 const MAX_PULL_DISTANCE = Infinity;
@@ -204,6 +205,8 @@ function moving(event: MouseEvent | TouchEvent) {
 	pullDistance.value = Math.min(Math.max(moveHeight, 0), MAX_PULL_DISTANCE);
 
 	isPulledEnough.value = pullDistance.value >= FIRE_THRESHOLD;
+
+	if (isPulledEnough.value) haptic();
 }
 
 /**

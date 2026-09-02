@@ -5,6 +5,7 @@
 
 import { ref } from 'vue';
 import { compareVersions } from 'compare-versions';
+import { isSafeMode } from '@@/js/config.js';
 import * as Misskey from 'misskey-js';
 import type { Parser, Interpreter, values, utils as utils_TypeReferenceOnly } from '@syuilo/aiscript';
 import type { FormWithDefault } from '@/utility/form.js';
@@ -14,7 +15,6 @@ import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { prefer } from '@/preferences.js';
-import type { FormWithDefault } from '@/utility/form.js';
 
 export type Plugin = {
 	installId: string;
@@ -245,6 +245,7 @@ export function launchPlugins() {
 }
 
 async function launchPlugin(id: Plugin['installId']): Promise<void> {
+	if (isSafeMode) return;
 	const plugin = prefer.s.plugins.find(x => x.installId === id);
 	if (!plugin) return;
 
@@ -414,7 +415,7 @@ async function createPluginEnv(opts: { plugin: Plugin; storageKey: string }): Pr
 		'Plugin:register:note_view_interruptor': values.FN_NATIVE(([handler]) => {
 			utils.assertFunction(handler);
 			addPluginHandler(id, 'note_view_interruptor', {
-				handler: (note) => withContext(ctx => {
+				handler: withContext(ctx => (note) => {
 					return utils.valToJs(ctx.execFnSync(handler, [utils.jsToVal(note)])) as Misskey.entities.Note | null;
 				}),
 			});

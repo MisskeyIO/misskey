@@ -112,10 +112,6 @@ class HybridTimelineChannel extends Channel {
 			}
 		}
 
-		if (this.user && (note.visibleUserIds?.includes(this.user.id) ?? note.mentions?.includes(this.user.id))) {
-			this.connection.cacheNote(note);
-		}
-
 		if (this.minimize && this.canUseNoteJsonCache(note)) {
 			const badgeRoles = this.iAmModerator ? await this.roleService.getUserBadgeRoles(note.userId, false) : undefined;
 

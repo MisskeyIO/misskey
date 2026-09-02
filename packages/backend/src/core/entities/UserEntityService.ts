@@ -32,6 +32,7 @@ import type {
 	MiUserNotePining,
 	MiUserProfile,
 	MutingsRepository,
+	PagesRepository,
 	RenoteMutingsRepository,
 	UserMemoRepository,
 	UserNotePiningsRepository,
@@ -136,6 +137,9 @@ export class UserEntityService implements OnModuleInit {
 
 		@Inject(DI.userProfilesRepository)
 		private userProfilesRepository: UserProfilesRepository,
+
+		@Inject(DI.pagesRepository)
+		private pagesRepository: PagesRepository,
 
 		@Inject(DI.userMemosRepository)
 		private userMemosRepository: UserMemoRepository,
@@ -484,6 +488,8 @@ export class UserEntityService implements OnModuleInit {
 
 		const notificationsInfo = isMe && isDetailed ? await this.getNotificationsInfo(user.id) : null;
 		const languageConfig = isDetailed && (isMe || iAmModerator) ? await this.cacheService.userLanguageCache.fetch(user.id) : null;
+		const pinnedPage = profile?.pinnedPageId == null ? null : await this.pagesRepository.findOneBy({ id: profile.pinnedPageId });
+		const visiblePinnedPage = pinnedPage != null && (isMe || pinnedPage.visibility === 'public') ? pinnedPage : null;
 
 		// TODO: 例えば avatarUrl: true など間違った型を設定しても型エラーにならないのをどうにかする(ジェネリクス使わない方法で実装するしかなさそう？)
 		const packed = {
@@ -549,8 +555,8 @@ export class UserEntityService implements OnModuleInit {
 				pinnedNotes: this.noteEntityService.packMany(pins.map(pin => pin.note!), me, {
 					detail: true,
 				}),
-				pinnedPageId: profile!.pinnedPageId,
-				pinnedPage: profile!.pinnedPageId ? this.pageEntityService.pack(profile!.pinnedPageId, me) : null,
+				pinnedPageId: visiblePinnedPage?.id ?? null,
+				pinnedPage: visiblePinnedPage ? this.pageEntityService.pack(visiblePinnedPage, me) : null,
 				publicReactions: this.isLocalUser(user) ? profile!.publicReactions : false, // https://github.com/misskey-dev/misskey/issues/12964
 				followersVisibility: profile!.followersVisibility,
 				followingVisibility: profile!.followingVisibility,

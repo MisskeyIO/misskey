@@ -795,6 +795,7 @@ export class ClientServerService {
 			const page = await this.pagesRepository.findOneBy({
 				name: request.params.page,
 				userId: user.id,
+				visibility: 'public',
 			});
 
 			if (page) {
@@ -802,11 +803,7 @@ export class ClientServerService {
 					const _page = await this.pageEntityService.pack(page, null);
 					const profile = await this.userProfilesRepository.findOneByOrFail({ userId: page.userId });
 
-					if (['public'].includes(page.visibility)) {
-						reply.header('Cache-Control', 'public, max-age=15');
-					} else {
-						reply.header('Cache-Control', 'private, max-age=0, must-revalidate');
-					}
+					reply.header('Cache-Control', 'public, max-age=15');
 					if (profile.preventAiLearning) {
 						reply.header('X-Robots-Tag', 'noimageai');
 						reply.header('X-Robots-Tag', 'noai');

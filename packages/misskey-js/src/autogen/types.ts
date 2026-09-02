@@ -5419,6 +5419,7 @@ export type components = {
             script: string;
             /** @enum {string} */
             visibility: 'private' | 'public';
+            permissions: string[];
             likedCount: number;
             isLiked?: boolean;
         };

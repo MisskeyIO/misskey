@@ -61,7 +61,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, defineAsyncComponent } from 'vue';
+import { computed, ref } from 'vue';
 import MkPagination from '@/components/MkPagination.vue';
 import FormSection from '@/components/form/section.vue';
 import FormLink from '@/components/form/link.vue';
@@ -81,8 +81,8 @@ const pagination = {
 	noPaging: true,
 };
 
-function generateToken() {
-	os.popup(defineAsyncComponent(() => import('@/components/MkTokenGenerateWindow.vue')), {}, {
+async function generateToken() {
+	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkTokenGenerateWindow.vue').then(x => x.default), {}, {
 		done: async result => {
 			const { name, permissions } = result;
 			const { token } = await misskeyApi('miauth/gen-token', {
@@ -97,7 +97,8 @@ function generateToken() {
 				text: token,
 			});
 		},
-	}, 'closed');
+		closed: () => dispose(),
+	});
 }
 
 const headerActions = computed(() => []);

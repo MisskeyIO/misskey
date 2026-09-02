@@ -25,7 +25,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, defineAsyncComponent } from 'vue';
+import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import { ensureSignin } from '@/i.js';
 import * as os from '@/os.js';
@@ -46,18 +46,19 @@ function load() {
 load();
 
 async function add(ev: MouseEvent) {
-	os.popup(defineAsyncComponent(() => import('./avatar-decoration-edit-dialog.vue')), {
+	const { dispose } = await os.popupAsyncWithDialog(import('./avatar-decoration-edit-dialog.vue').then(x => x.default), {
 	}, {
 		done: result => {
 			if (result.created) {
 				avatarDecorations.value.unshift(result.created);
 			}
 		},
-	}, 'closed');
+		closed: () => dispose(),
+	});
 }
 
-function edit(avatarDecoration) {
-	os.popup(defineAsyncComponent(() => import('./avatar-decoration-edit-dialog.vue')), {
+async function edit(avatarDecoration) {
+	const { dispose } = await os.popupAsyncWithDialog(import('./avatar-decoration-edit-dialog.vue').then(x => x.default), {
 		avatarDecoration: avatarDecoration,
 	}, {
 		done: result => {
@@ -71,7 +72,8 @@ function edit(avatarDecoration) {
 				avatarDecorations.value = avatarDecorations.value.filter(x => x.id !== avatarDecoration.id);
 			}
 		},
-	}, 'closed');
+		closed: () => dispose(),
+	});
 }
 
 const headerActions = computed(() => [{

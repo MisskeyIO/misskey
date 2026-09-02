@@ -130,6 +130,7 @@ const user = ref<misskey.entities.UserLite | null>(null);
 const offset = ref(0);
 const hasMore = ref(false);
 import MkTextarea from '@/components/MkTextarea.vue';
+import { genId } from '@/utility/id.js';
 
 const announcementsStatus = ref<'active' | 'archived'>('active');
 
@@ -166,7 +167,7 @@ watch(announcementsStatus, async () => {
 
 function add() {
 	announcements.value.unshift({
-		_id: Math.random().toString(36),
+		_id: genId(),
 		id: null,
 		title: 'New announcement',
 		text: '',

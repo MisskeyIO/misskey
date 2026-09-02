@@ -71,7 +71,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, defineAsyncComponent, ref, useTemplateRef } from 'vue';
+import { computed, ref, useTemplateRef } from 'vue';
 import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
 import MkPagination from '@/components/MkPagination.vue';
@@ -128,18 +128,19 @@ const toggleSelect = (emoji) => {
 };
 
 const add = async (ev: MouseEvent) => {
-	os.popup(defineAsyncComponent(() => import('./emoji-edit-dialog.vue')), {
+	const { dispose } = await os.popupAsyncWithDialog(import('./emoji-edit-dialog.vue').then(x => x.default), {
 	}, {
 		done: result => {
 			if (result.created) {
 				emojisPaginationComponent.value?.paginator.prepend(result.created);
 			}
 		},
-	}, 'closed');
+		closed: () => dispose(),
+	});
 };
 
-const edit = (emoji) => {
-	os.popup(defineAsyncComponent(() => import('./emoji-edit-dialog.vue')), {
+const edit = async (emoji) => {
+	const { dispose } = await os.popupAsyncWithDialog(import('./emoji-edit-dialog.vue').then(x => x.default), {
 		emoji: emoji,
 	}, {
 		done: result => {
@@ -152,7 +153,8 @@ const edit = (emoji) => {
 				emojisPaginationComponent.value?.paginator.removeItem(emoji.id);
 			}
 		},
-	}, 'closed');
+		closed: () => dispose(),
+	});
 };
 
 const detailRemoteEmoji = (emoji) => {
@@ -205,7 +207,10 @@ const menu = (ev: MouseEvent) => {
 		icon: 'ti ti-upload',
 		text: i18n.ts.import,
 		action: async () => {
-			const file = await selectFile(ev.currentTarget ?? ev.target);
+			const file = await selectFile({
+				anchorElement: ev.currentTarget ?? ev.target,
+				multiple: false,
+			});
 			misskeyApi('admin/emoji/import-zip', {
 				fileId: file.id,
 			})

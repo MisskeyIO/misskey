@@ -1077,3 +1077,6 @@ _remoteLookupErrors:
     title: "Niet gevonden"
 _search:
   searchScopeAll: "Alle"
+_watermarkEditor:
+  image: "Afbeeldingen"
+  advanced: "Geavanceerd"

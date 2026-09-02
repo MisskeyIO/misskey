@@ -37,7 +37,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, defineAsyncComponent, inject, ref, watch } from 'vue';
+import { computed, inject, ref, watch } from 'vue';
 import type { MenuItem } from '@/types/menu.js';
 import { getProxiedImageUrl, getStaticImageUrl } from '@/utility/media-proxy.js';
 import { customEmojisMap } from '@/custom-emojis.js';
@@ -189,9 +189,11 @@ async function edit(name: string) {
 	const emoji = await misskeyApi('emoji', {
 		name: name,
 	});
-	os.popup(defineAsyncComponent(() => import('@/pages/emoji-edit-dialog.vue')), {
+	const { dispose } = await os.popupAsyncWithDialog(import('@/pages/emoji-edit-dialog.vue').then(x => x.default), {
 		emoji: emoji,
-	}, {	}, 'closed');
+	}, {
+		closed: () => dispose(),
+	});
 }
 
 function mute() {

@@ -637,8 +637,8 @@ catalogs:
       specifier: 10.1.1
       version: 10.1.1
     ms:
-      specifier: 3.0.0-canary.1
-      version: 3.0.0-canary.1
+      specifier: 3.0.0-canary.202508261828
+      version: 3.0.0-canary.202508261828
     msw:
       specifier: 2.12.7
       version: 2.12.7
@@ -1348,7 +1348,7 @@ importers:
         version: link:../misskey-reversi
       ms:
         specifier: 'catalog:'
-        version: 3.0.0-canary.1
+        version: 3.0.0-canary.202508261828
       nanoid:
         specifier: 'catalog:'
         version: 5.1.6
@@ -9922,9 +9922,9 @@ packages:
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
-  ms@3.0.0-canary.1:
-    resolution: {integrity: sha512-kh8ARjh8rMN7Du2igDRO9QJnqCb2xYTJxyQYK7vJJS4TvLLmsbyhiKpSW+t+y26gyOyMd0riphX0GeWKU3ky5g==}
-    engines: {node: '>=12.13'}
+  ms@3.0.0-canary.202508261828:
+    resolution: {integrity: sha512-NotsCoUCIUkojWCzQff4ttdCfIPoA1UGZsyQbi7KmqkNRfKCrvga8JJi2PknHymHOuor0cJSn/ylj52Cbt2IrQ==}
+    engines: {node: '>=18'}
 
   msgpackr-extract@3.0.3:
     resolution: {integrity: sha512-P0efT1C9jIdVRefqjzOQ9Xml57zpOXnIuS+csaB4MdZbTdmGDLo8XhzBG1N7aO11gKDDkJvBLULeFTo46wwreA==}
@@ -21784,7 +21784,7 @@ snapshots:
 
   ms@2.1.3: {}
 
-  ms@3.0.0-canary.1: {}
+  ms@3.0.0-canary.202508261828: {}
 
   msgpackr-extract@3.0.3:
     dependencies:

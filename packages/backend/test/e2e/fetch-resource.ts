@@ -6,7 +6,7 @@
 process.env.NODE_ENV = 'test';
 
 import * as assert from 'assert';
-import { channel, clip, galleryPost, page, play, post, signup, simpleGet, uploadFile } from '../utils.js';
+import { channel, clip, galleryPost, page, play, post, relativeFetch, signup, simpleGet, uploadFile } from '../utils.js';
 import type { SimpleGetResponse } from '../utils.js';
 import type * as misskey from 'misskey-js';
 
@@ -392,6 +392,53 @@ describe('Webリソース', () => {
 				path: path('xxxxxxxxxx'),
 				accept,
 			}));
+		});
+	});
+
+	describe('/notes/:id.json', () => {
+		const fetchNote = (noteId: string) => relativeFetch(`/notes/${noteId}.json`);
+		const cacheableCases: [string, misskey.Endpoints['notes/create']['req']][] = [
+			['public', { text: 'public note', visibility: 'public' }],
+			['home', { text: 'home note', visibility: 'home' }],
+			['次元', { text: 'dimension note', visibility: 'public', dimension: 1000 }],
+		];
+
+		test.each(cacheableCases)('%s投稿を公開キャッシュできる', async (_label, params) => {
+			const note = await post(alice, params);
+			const res = await fetchNote(note.id);
+
+			assert.strictEqual(res.status, 200);
+			assert.match(res.headers.get('cache-control') ?? '', /public/);
+			assert.strictEqual((await res.json() as { id: string }).id, note.id);
+		});
+
+		test.each(['followers', 'specified'] as const)('%s投稿を公開キャッシュしない', async (visibility) => {
+			const params: misskey.Endpoints['notes/create']['req'] = visibility === 'specified'
+				? { text: 'specified note', visibility, visibleUserIds: [bob.id] }
+				: { text: 'followers note', visibility };
+			const note = await post(alice, params);
+			const res = await fetchNote(note.id);
+
+			assert.strictEqual(res.status, 404);
+			assert.doesNotMatch(res.headers.get('cache-control') ?? '', /public/);
+		});
+
+		test('チャンネルのpublic投稿を公開キャッシュできる', async () => {
+			const note = await post(alice, { text: 'channel note', channelId: aliceChannel.id });
+			const res = await fetchNote(note.id);
+
+			assert.strictEqual(res.status, 200);
+			assert.match(res.headers.get('cache-control') ?? '', /public/);
+			assert.strictEqual((await res.json() as { id: string }).id, note.id);
+		});
+
+		test('非公開の返信先を含む投稿を公開キャッシュしない', async () => {
+			const reply = await post(alice, { text: 'followers reply target', visibility: 'followers' });
+			const note = await post(alice, { text: 'public reply', visibility: 'public', replyId: reply.id });
+			const res = await fetchNote(note.id);
+
+			assert.strictEqual(res.status, 404);
+			assert.doesNotMatch(res.headers.get('cache-control') ?? '', /public/);
 		});
 	});
 

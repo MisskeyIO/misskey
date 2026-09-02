@@ -68,7 +68,9 @@ function send() {
 }
 
 function onEndpointChange() {
-	misskeyApi('endpoint', { endpoint: endpoint.value }, withCredential.value ? undefined : null).then(resp => {
+	endpointAbortController.value?.abort();
+	endpointAbortController.value = new AbortController();
+	misskeyApi('endpoint', { endpoint: endpoint.value }, withCredential.value ? undefined : null, endpointAbortController.value.signal).then(resp => {
 		if (resp == null) {
 			body.value = '{}';
 			return;

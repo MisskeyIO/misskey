@@ -13781,6 +13781,7 @@ export interface operations {
                     feedbackUrl?: string | null;
                     impressumUrl?: string | null;
                     privacyPolicyUrl?: string | null;
+                    inquiryUrl?: string | null;
                     useObjectStorage?: boolean;
                     objectStorageBaseUrl?: string | null;
                     objectStorageBucket?: string | null;

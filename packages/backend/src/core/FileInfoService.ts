@@ -21,6 +21,7 @@ import { AiService } from '@/core/AiService.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import type Logger from '@/logger.js';
 import { bindThis } from '@/decorators.js';
+import { isMimeImage } from '@/misc/is-mime-image.js';
 
 export type FileInfo = {
 	size: number;
@@ -204,16 +205,7 @@ export class FileInfoService {
 			return [sensitive, porn];
 		}
 
-		if ([
-			'image/jpeg',
-			'image/png',
-			'image/webp',
-		].includes(mime)) {
-			const result = await this.aiService.detectSensitive(source, mime);
-			if (result) {
-				[sensitive, porn] = judgePrediction(result);
-			}
-		} else if (analyzeVideo && (mime === 'image/apng' || mime.startsWith('video/'))) {
+		if (analyzeVideo && (mime === 'image/apng' || mime.startsWith('video/'))) {
 			const [outDir, disposeOutDir] = await createTempDir();
 			try {
 				const command = FFmpeg()
@@ -268,7 +260,7 @@ export class FileInfoService {
 						}
 						targetIndex = nextIndex;
 						nextIndex += index; // fibonacci sequence によってフレーム数制限を掛ける
-						const result = await this.aiService.detectSensitive(path, 'image/png');
+						const result = await this.aiService.detectSensitive(path);
 						if (result) {
 							results.push(judgePrediction(result));
 						}
@@ -280,6 +272,22 @@ export class FileInfoService {
 				porn = results.filter(x => x[1]).length >= Math.ceil(results.length * sensitiveThresholdForPorn);
 			} finally {
 				disposeOutDir();
+			}
+		} else if (isMimeImage(mime, 'sharp-convertible-image-with-bmp')) {
+			/*
+			 * tfjs-nodeが扱える形式へ変換し、判定に必要な大きさへ揃える
+			 */
+			const png = await (await sharpBmp(source, mime))
+				.resize(299, 299, {
+					withoutEnlargement: false,
+				})
+				.rotate()
+				.flatten({ background: { r: 119, g: 119, b: 119 } })
+				.png()
+				.toBuffer();
+			const result = await this.aiService.detectSensitive(png);
+			if (result) {
+				[sensitive, porn] = judgePrediction(result);
 			}
 		}
 

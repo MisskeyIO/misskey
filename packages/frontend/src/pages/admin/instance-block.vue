@@ -30,7 +30,7 @@ import { ref, computed } from 'vue';
 import { definePage } from '@/page.js';
 import MkButton from '@/components/MkButton.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
-import FormSuspense from '@/components/form/suspense.vue';
+import FormSuspense from '@/components/global/MkSuspense.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { fetchInstance } from '@/instance.js';

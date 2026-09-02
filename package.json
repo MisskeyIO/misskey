@@ -72,6 +72,7 @@
   },
   "devDependencies": {
     "@misskey-dev/eslint-plugin": "catalog:",
+    "@types/js-yaml": "catalog:",
     "@types/node": "catalog:",
     "@typescript-eslint/eslint-plugin": "catalog:",
     "@typescript-eslint/parser": "catalog:",

@@ -5,7 +5,7 @@
 
 import { watch, version as vueVersion } from 'vue';
 import { compareVersions } from 'compare-versions';
-import { version, lang, apiUrl } from '@@/js/config.js';
+import { version, lang, updateLocale, locale, apiUrl } from '@@/js/config.js';
 import defaultLightTheme from '@@/themes/l-light.json5';
 import defaultDarkTheme from '@@/themes/d-green-lime.json5';
 import { createGtag, addGtag, consent as gtagConsent } from 'vue-gtag';// FIXME Google Analytics 周りの機能のチェック
@@ -16,7 +16,7 @@ import directives from '@/directives/index.js';
 import components from '@/components/index.js';
 import { applyTheme } from '@/theme.js';
 import { isDeviceDarkmode } from '@/utility/is-device-darkmode.js';
-import { i18n } from '@/i18n.js';
+import { updateI18n, i18n } from '@/i18n.js';
 import { refreshCurrentAccount, login, updateCurrentAccountPartial } from '@/accounts.js';
 import { store } from '@/store.js';
 import { fetchInstance, instance } from '@/instance.js';
@@ -81,6 +81,41 @@ export async function common(createVue: () => Promise<App<Element>>) {
 				isClientUpdated = true;
 			}
 		} catch (err) { /* empty */ }
+	}
+	//#endregion
+
+	//#region Detect language & fetch translations
+	const localeVersion = miLocalStorage.getItem('localeVersion');
+	const localeOutdated = (localeVersion == null || localeVersion !== version || locale == null);
+
+	async function fetchAndUpdateLocale({ useCache } = { useCache: true }) {
+		const fetchOptions: RequestInit | undefined = useCache ? undefined : { cache: 'no-store' };
+		const res = await window.fetch(`/assets/locales/${lang}.${version}.json`, fetchOptions);
+		if (res.status === 200) {
+			const newLocale = await res.text();
+			const parsedNewLocale = JSON.parse(newLocale);
+			miLocalStorage.setItem('locale', newLocale);
+			miLocalStorage.setItem('localeVersion', version);
+			updateLocale(parsedNewLocale);
+			updateI18n(parsedNewLocale);
+		}
+	}
+
+	if (localeOutdated) {
+		fetchAndUpdateLocale();
+	}
+
+	if (import.meta.hot) {
+		import.meta.hot.on('locale-update', async (updatedLang: string) => {
+			console.info(`Locale updated: ${updatedLang}`);
+			if (updatedLang === lang) {
+				await new Promise(resolve => {
+					window.setTimeout(resolve, 500);
+				});
+				await fetchAndUpdateLocale({ useCache: false });
+				window.location.reload();
+			}
+		});
 	}
 	//#endregion
 

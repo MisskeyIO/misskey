@@ -144,7 +144,8 @@ export class SignupApiService {
 
 		let ticket: MiRegistrationTicket | null = null;
 
-		if (this.meta.disableRegistration || envOption.disableRegistration) {
+		// テスト時はこの機構は障害となるため無効にする
+		if (process.env.NODE_ENV !== 'test' && (this.meta.disableRegistration || envOption.disableRegistration)) {
 			if (invitationCode == null || typeof invitationCode !== 'string') {
 				logger.error('Invalid request: invitation code is required.');
 				reply.code(400);

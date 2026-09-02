@@ -690,12 +690,7 @@ defineExpose({
 		height: 100%;
 		overflow-y: auto;
 		overflow-x: hidden;
-
 		scrollbar-width: none;
-
-		&::-webkit-scrollbar {
-			display: none;
-		}
 
 		> .group {
 			&:not(.index) {

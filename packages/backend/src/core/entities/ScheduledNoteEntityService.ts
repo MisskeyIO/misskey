@@ -21,8 +21,9 @@ export class ScheduledNoteEntityService {
 	public async pack(
 		src: MiScheduledNote['id'] | MiScheduledNote,
 		me: { id: MiUser['id'] },
-	) : Promise<Packed<'NoteDraft'>> {
+	) : Promise<Packed<'ScheduledNote'>> {
 		const item = typeof src === 'object' ? src : await this.scheduledNotesRepository.findOneByOrFail({ id: src, userId: me.id });
+		const pollExpiresAt = item.draft.poll?.expiresAt as unknown;
 
 		return {
 			id: item.id,
@@ -59,8 +60,13 @@ export class ScheduledNoteEntityService {
 				localOnly: item.draft.localOnly ?? false,
 				lang: item.draft.lang ?? null,
 				dimension: typeof item.draft.dimension === 'number' ? item.draft.dimension : null,
+				reactionAcceptance: item.draft.reactionAcceptance ?? null,
 				files: item.draft.files ? await this.driveFileEntityService.packMany(item.draft.files, me) : [],
-				poll: item.draft.poll ? { ...item.draft.poll, expiresAt: item.draft.poll.expiresAt?.getTime() ?? null, expiredAfter: null } : null,
+				poll: item.draft.poll ? {
+					...item.draft.poll,
+					expiresAt: pollExpiresAt == null ? null : pollExpiresAt instanceof Date ? pollExpiresAt.getTime() : new Date(pollExpiresAt as string).getTime(),
+					expiredAfter: item.draft.poll.expiredAfter ?? null,
+				} : null,
 				visibleUserIds: item.draft.visibility === 'specified' ? item.draft.visibleUsers?.map(x => x.id) : undefined,
 			},
 		};
@@ -70,9 +76,9 @@ export class ScheduledNoteEntityService {
 	public async packMany(
 		drafts: (MiScheduledNote['id'] | MiScheduledNote)[],
 		me: { id: MiUser['id'] },
-	) : Promise<Packed<'NoteDraft'>[]> {
+	) : Promise<Packed<'ScheduledNote'>[]> {
 		return (await Promise.allSettled(drafts.map(x => this.pack(x, me))))
 			.filter(result => result.status === 'fulfilled')
-			.map(result => (result as PromiseFulfilledResult<Packed<'NoteDraft'>>).value);
+			.map(result => (result as PromiseFulfilledResult<Packed<'ScheduledNote'>>).value);
 	}
 }

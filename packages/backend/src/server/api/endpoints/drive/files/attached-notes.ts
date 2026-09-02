@@ -45,6 +45,8 @@ export const paramDef = {
 	properties: {
 		sinceId: { type: 'string', format: 'misskey:id' },
 		untilId: { type: 'string', format: 'misskey:id' },
+		sinceDate: { type: 'integer' },
+		untilDate: { type: 'integer' },
 		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
 		fileId: { type: 'string', format: 'misskey:id' },
 	},
@@ -75,7 +77,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw new ApiError(meta.errors.noSuchFile);
 			}
 
-			const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId);
+			const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate);
 			query.andWhere(':file <@ note.fileIds', { file: [file.id] });
 
 			const notes = await query.limit(ps.limit).getMany();

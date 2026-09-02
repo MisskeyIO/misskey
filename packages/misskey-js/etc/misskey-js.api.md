@@ -1183,6 +1183,12 @@ export type DateString = string;
 export type DriveFile = components['schemas']['DriveFile'];
 
 // @public (undocumented)
+export type DriveFilesAttachedChatMessagesRequest = operations['drive___files___attached-chat-messages']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+export type DriveFilesAttachedChatMessagesResponse = operations['drive___files___attached-chat-messages']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
 export type DriveFilesAttachedNotesRequest = operations['drive___files___attached-notes']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
@@ -1667,6 +1673,8 @@ declare namespace entities {
         DriveResponse,
         DriveFilesRequest,
         DriveFilesResponse,
+        DriveFilesAttachedChatMessagesRequest,
+        DriveFilesAttachedChatMessagesResponse,
         DriveFilesAttachedNotesRequest,
         DriveFilesAttachedNotesResponse,
         DriveFilesCheckExistenceRequest,
@@ -1732,6 +1740,8 @@ declare namespace entities {
         FlashMyResponse,
         FlashMyLikesRequest,
         FlashMyLikesResponse,
+        FlashSearchRequest,
+        FlashSearchResponse,
         FlashShowRequest,
         FlashShowResponse,
         FlashUnlikeRequest,
@@ -1881,6 +1891,14 @@ declare namespace entities {
         NotesCreateRequest,
         NotesCreateResponse,
         NotesDeleteRequest,
+        NotesDraftsCountResponse,
+        NotesDraftsCreateRequest,
+        NotesDraftsCreateResponse,
+        NotesDraftsDeleteRequest,
+        NotesDraftsListRequest,
+        NotesDraftsListResponse,
+        NotesDraftsUpdateRequest,
+        NotesDraftsUpdateResponse,
         NotesFavoritesCreateRequest,
         NotesFavoritesDeleteRequest,
         NotesFeaturedRequest,
@@ -2059,6 +2077,7 @@ declare namespace entities {
         App,
         Note,
         NoteDraft,
+        ScheduledNote,
         NoteReaction,
         NoteFavorite,
         Notification_2 as Notification,
@@ -2231,6 +2250,12 @@ export type FlashMyRequest = operations['flash___my']['requestBody']['content'][
 
 // @public (undocumented)
 export type FlashMyResponse = operations['flash___my']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+export type FlashSearchRequest = operations['flash___search']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+export type FlashSearchResponse = operations['flash___search']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 export type FlashShowRequest = operations['flash___show']['requestBody']['content']['application/json'];
@@ -3290,6 +3315,30 @@ export type NotesCreateResponse = operations['notes___create']['responses']['200
 export type NotesDeleteRequest = operations['notes___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
+export type NotesDraftsCountResponse = operations['notes___drafts___count']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+export type NotesDraftsCreateRequest = operations['notes___drafts___create']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+export type NotesDraftsCreateResponse = operations['notes___drafts___create']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+export type NotesDraftsDeleteRequest = operations['notes___drafts___delete']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+export type NotesDraftsListRequest = operations['notes___drafts___list']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+export type NotesDraftsListResponse = operations['notes___drafts___list']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+export type NotesDraftsUpdateRequest = operations['notes___drafts___update']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+export type NotesDraftsUpdateResponse = operations['notes___drafts___update']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
 export type NotesFavoritesCreateRequest = operations['notes___favorites___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
@@ -3784,6 +3833,9 @@ export type RolesUsersRequest = operations['roles___users']['requestBody']['cont
 
 // @public (undocumented)
 export type RolesUsersResponse = operations['roles___users']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+export type ScheduledNote = components['schemas']['ScheduledNote'];
 
 // @public (undocumented)
 export type Signin = components['schemas']['Signin'];

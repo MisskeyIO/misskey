@@ -41,13 +41,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<MkInput v-model="searchUsername" style="margin: 0; flex: 1;" type="text" :spellcheck="false">
 					<span>{{ i18n.ts.username }}</span>
 				</MkInput>
-				<MkInput v-model="searchHost" style="margin: 0; flex: 1;" type="text" :spellcheck="false" :disabled="pagination.params().origin === 'local'">
+				<MkInput v-model="searchHost" style="margin: 0; flex: 1;" type="text" :spellcheck="false" :disabled="paginator.computedParams.value.origin === 'local'">
 					<span>{{ i18n.ts.host }}</span>
 				</MkInput>
 			</div>
 			-->
 
-			<MkPagination v-slot="{items}" ref="reports" :pagination="pagination">
+			<MkPagination v-slot="{items}" :paginator="paginator">
 				<div class="_gaps">
 					<XAbuseReport v-for="report in (items)" :key="report.id" :report="report" @resolved="resolved"/>
 				</div>
@@ -63,7 +63,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</template>
 					</MkAbuseReportResolver>
 				</MkFolder>
-				<MkPagination v-slot="{items}" ref="resolverPagingComponent" :pagination="resolverPagination">
+				<MkPagination v-slot="{items}" :paginator="resolverPaginator">
 					<div v-for="resolver in items" :key="resolver.id" :class="$style.resolverList">
 						<MkAbuseReportResolver v-model="editingResolver" :data="(resolver as any)" :editable="editableResolver === resolver.id" class="_spacer" style=" --MI_SPACER-min: 14px; --MI_SPACER-max: 22px;">
 							<template #button>
@@ -85,7 +85,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, useTemplateRef, ref } from 'vue';
+import { computed, markRaw, ref } from 'vue';
 import MkSelect from '@/components/MkSelect.vue';
 import MkPagination from '@/components/MkPagination.vue';
 import MkFolder from '@/components/MkFolder.vue';
@@ -95,14 +95,13 @@ import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import { definePage } from '@/page.js';
 import MkButton from '@/components/MkButton.vue';
+import { Paginator } from '@/utility/paginator.js';
 
-const reports = useTemplateRef('reports');
-const resolverPagingComponent = useTemplateRef('resolverPagingComponent');
 const folderComponent = ref<InstanceType<typeof MkFolder>>();
 
 const state = ref('unresolved');
-const reporterOrigin = ref('combined');
-const targetUserOrigin = ref('combined');
+const reporterOrigin = ref<'combined' | 'local' | 'remote'>('combined');
+const targetUserOrigin = ref<'combined' | 'local' | 'remote'>('combined');
 const tab = ref('list');
 const editableResolver = ref<null | string>(null);
 const defaultResolver = {
@@ -136,23 +135,21 @@ const editingResolver = ref<{
 	previousExpiresAt?: string;
 }>(defaultResolver);
 
-const pagination = {
-	endpoint: 'admin/abuse-user-reports' as const,
+const paginator = markRaw(new Paginator('admin/abuse-user-reports', {
 	limit: 10,
-	params: computed(() => ({
+	computedParams: computed(() => ({
 		state: state.value,
 		reporterOrigin: reporterOrigin.value,
 		targetUserOrigin: targetUserOrigin.value,
 	})),
-};
+}));
 
-const resolverPagination = {
-	endpoint: 'admin/abuse-report-resolver/list' as const,
+const resolverPaginator = markRaw(new Paginator('admin/abuse-report-resolver/list', {
 	limit: 10,
-};
+}));
 
 function resolved(reportId) {
-	reports.value?.paginator.removeItem(reportId);
+	paginator.removeItem(reportId);
 }
 
 function edit(id: string) {
@@ -179,7 +176,7 @@ function deleteResolver(id: string): void {
 	os.apiWithDialog('admin/abuse-report-resolver/delete', {
 		resolverId: id,
 	}).then(() => {
-		resolverPagingComponent.value?.paginator.reload();
+		resolverPaginator.reload();
 	});
 }
 
@@ -193,7 +190,7 @@ function create(): void {
 		forward: newResolver.value.forward,
 	}).then(() => {
 		folderComponent.value?.toggle();
-		resolverPagingComponent.value?.paginator.reload();
+		resolverPaginator.reload();
 		newResolver.value.name = '';
 		newResolver.value.targetUserPattern = '';
 		newResolver.value.reporterPattern = '';

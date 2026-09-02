@@ -1636,6 +1636,15 @@ export type paths = {
          */
         post: operations['drive___files'];
     };
+    '/drive/files/attached-chat-messages': {
+        /**
+         * drive/files/attached-chat-messages
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:drive*
+         */
+        post: operations['drive___files___attached-chat-messages'];
+    };
     '/drive/files/attached-notes': {
         /**
          * drive/files/attached-notes
@@ -2014,6 +2023,15 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *read:flash-likes*
          */
         post: operations['flash___my-likes'];
+    };
+    '/flash/search': {
+        /**
+         * flash/search
+         * @description No description provided.
+         *
+         *     **Credential required**: *No*
+         */
+        post: operations['flash___search'];
     };
     '/flash/show': {
         /**
@@ -2995,6 +3013,51 @@ export type paths = {
          *     **Credential required**: *Yes* / **Permission**: *write:notes*
          */
         post: operations['notes___delete'];
+    };
+    '/notes/drafts/count': {
+        /**
+         * notes/drafts/count
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:account*
+         */
+        post: operations['notes___drafts___count'];
+    };
+    '/notes/drafts/create': {
+        /**
+         * notes/drafts/create
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:account*
+         */
+        post: operations['notes___drafts___create'];
+    };
+    '/notes/drafts/delete': {
+        /**
+         * notes/drafts/delete
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:account*
+         */
+        post: operations['notes___drafts___delete'];
+    };
+    '/notes/drafts/list': {
+        /**
+         * notes/drafts/list
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *read:account*
+         */
+        post: operations['notes___drafts___list'];
+    };
+    '/notes/drafts/update': {
+        /**
+         * notes/drafts/update
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:account*
+         */
+        post: operations['notes___drafts___update'];
     };
     '/notes/favorites/create': {
         /**
@@ -4507,6 +4570,67 @@ export type components = {
             myReaction?: string | null;
         };
         NoteDraft: {
+            /**
+             * Format: id
+             * @example xxxxxxxxxx
+             */
+            id: string;
+            /** Format: date-time */
+            createdAt: string;
+            text: string | null;
+            cw?: string | null;
+            /** Format: id */
+            userId: string;
+            user: components['schemas']['UserLite'];
+            /**
+             * Format: id
+             * @example xxxxxxxxxx
+             */
+            replyId?: string | null;
+            /**
+             * Format: id
+             * @example xxxxxxxxxx
+             */
+            renoteId?: string | null;
+            /** @description The reply target note contents if exists. If the reply target has been deleted since the draft was created, this will be null while replyId is not null. */
+            reply?: components['schemas']['Note'] | null;
+            /** @description The renote target note contents if exists. If the renote target has been deleted since the draft was created, this will be null while renoteId is not null. */
+            renote?: components['schemas']['Note'] | null;
+            /** @enum {string} */
+            visibility: 'public' | 'home' | 'followers' | 'specified';
+            visibleUserIds?: string[];
+            fileIds?: string[];
+            files?: components['schemas']['DriveFile'][];
+            hashtag?: string;
+            poll?: {
+                /** Format: date-time */
+                expiresAt?: string | null;
+                expiredAfter?: number | null;
+                multiple: boolean;
+                choices: string[];
+            } | null;
+            /**
+             * Format: id
+             * @example xxxxxxxxxx
+             */
+            channelId?: string | null;
+            channel?: {
+                id: string;
+                name: string;
+                color: string;
+                isSensitive: boolean;
+                allowRenoteToExternal: boolean;
+                userId: string | null;
+            } | null;
+            localOnly?: boolean;
+            dimension: number | null;
+            lang: string | null;
+            /** Format: date-time */
+            scheduledAt: string | null;
+            /** @enum {string|null} */
+            reactionAcceptance: 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote' | null;
+        };
+        ScheduledNote: {
             /** Format: misskey:id */
             id: string;
             /** Format: date-time */
@@ -4550,6 +4674,8 @@ export type components = {
                 localOnly: boolean;
                 lang?: string | null;
                 dimension?: number | null;
+                /** @enum {string|null} */
+                reactionAcceptance: 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote' | null;
                 files: components['schemas']['DriveFile'][];
                 poll: {
                     choices: string[];
@@ -4741,7 +4867,7 @@ export type components = {
             createdAt: string;
             /** @enum {string} */
             type: 'noteScheduled';
-            draft: components['schemas']['NoteDraft'];
+            draft: components['schemas']['ScheduledNote'];
         } | {
             /** Format: id */
             id: string;
@@ -4757,7 +4883,7 @@ export type components = {
             createdAt: string;
             /** @enum {string} */
             type: 'scheduledNoteError';
-            draft: components['schemas']['NoteDraft'];
+            draft: components['schemas']['ScheduledNote'];
         } | {
             /** Format: id */
             id: string;
@@ -5255,7 +5381,7 @@ export type components = {
             script: string;
             /** @enum {string} */
             visibility: 'private' | 'public';
-            likedCount: number | null;
+            likedCount: number;
             isLiked?: boolean;
         };
         FlashLike: {
@@ -5418,6 +5544,8 @@ export type components = {
             mutualLinkLimit: number;
             /** @enum {string} */
             chatAvailability: 'available' | 'readonly' | 'unavailable';
+            noteDraftLimit: number;
+            watermarkAvailable: boolean;
         };
         ReversiGameLite: {
             /** Format: id */
@@ -5948,6 +6076,10 @@ export interface operations {
                 };
                 content: {
                     'application/json': {
+                        /** Format: id */
+                        id: string;
+                        /** Format: date-time */
+                        createdAt: string;
                         name: string;
                         targetUserPattern: string | null;
                         reporterPattern: string | null;
@@ -6424,6 +6556,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default null */
                     state?: string | null;
                     /**
@@ -7026,6 +7160,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default null */
                     publishing?: boolean | null;
                 };
@@ -7670,6 +7806,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** Format: misskey:id */
                     userId?: string | null;
                 };
@@ -8141,6 +8279,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** Format: misskey:id */
                     userId?: string | null;
                     type?: string | null;
@@ -8745,6 +8885,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -8831,6 +8973,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -11682,7 +11826,7 @@ export interface operations {
                     policies: {
                         id?: string | null;
                         /** @enum {string} */
-                        policy: 'gtlAvailable' | 'ltlAvailable' | 'canPublicNote' | 'canScheduleNote' | 'scheduleNoteLimit' | 'scheduleNoteMaxDays' | 'canInitiateConversation' | 'canCreateContent' | 'canUpdateContent' | 'canDeleteContent' | 'canPurgeAccount' | 'canUpdateAvatar' | 'canUpdateBanner' | 'mentionLimit' | 'canInvite' | 'inviteLimit' | 'inviteLimitCycle' | 'inviteExpirationTime' | 'canManageCustomEmojis' | 'canManageAvatarDecorations' | 'canSearchNotes' | 'canUseTranslator' | 'canUseDriveFileInSoundSettings' | 'canUseReaction' | 'canHideAds' | 'driveCapacityMb' | 'maxFileSizeMb' | 'alwaysMarkNsfw' | 'canUpdateBioMedia' | 'skipNsfwDetection' | 'pinLimit' | 'antennaLimit' | 'antennaNotesLimit' | 'wordMuteLimit' | 'webhookLimit' | 'clipLimit' | 'noteEachClipsLimit' | 'userListLimit' | 'userEachUserListsLimit' | 'rateLimitFactor' | 'avatarDecorationLimit' | 'canImportAntennas' | 'canImportBlocking' | 'canImportFollowing' | 'canImportMuting' | 'canImportUserLists' | 'mutualLinkSectionLimit' | 'mutualLinkLimit' | 'chatAvailability' | 'uploadableFileTypes';
+                        policy: 'gtlAvailable' | 'ltlAvailable' | 'canPublicNote' | 'canScheduleNote' | 'scheduleNoteLimit' | 'scheduleNoteMaxDays' | 'canInitiateConversation' | 'canCreateContent' | 'canUpdateContent' | 'canDeleteContent' | 'canPurgeAccount' | 'canUpdateAvatar' | 'canUpdateBanner' | 'mentionLimit' | 'canInvite' | 'inviteLimit' | 'inviteLimitCycle' | 'inviteExpirationTime' | 'canManageCustomEmojis' | 'canManageAvatarDecorations' | 'canSearchNotes' | 'canUseTranslator' | 'canUseDriveFileInSoundSettings' | 'canUseReaction' | 'canHideAds' | 'driveCapacityMb' | 'maxFileSizeMb' | 'alwaysMarkNsfw' | 'canUpdateBioMedia' | 'skipNsfwDetection' | 'pinLimit' | 'antennaLimit' | 'antennaNotesLimit' | 'wordMuteLimit' | 'webhookLimit' | 'clipLimit' | 'noteEachClipsLimit' | 'userListLimit' | 'userEachUserListsLimit' | 'rateLimitFactor' | 'avatarDecorationLimit' | 'canImportAntennas' | 'canImportBlocking' | 'canImportFollowing' | 'canImportMuting' | 'canImportUserLists' | 'mutualLinkSectionLimit' | 'mutualLinkLimit' | 'chatAvailability' | 'uploadableFileTypes' | 'noteDraftLimit' | 'watermarkAvailable';
                         /**
                          * @default set
                          * @enum {string}
@@ -11758,6 +11902,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                 };
@@ -11903,9 +12049,12 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     type?: string | null;
                     /** Format: misskey:id */
                     userId?: string | null;
+                    search?: string | null;
                 };
             };
         };
@@ -15246,6 +15395,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -15851,6 +16002,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 5 */
                     limit?: number;
                 };
@@ -15979,6 +16132,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 5 */
                     limit?: number;
                 };
@@ -16055,6 +16210,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 5 */
                     limit?: number;
                 };
@@ -18893,6 +19050,9 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
+                    search?: string | null;
                 };
             };
         };
@@ -19287,6 +19447,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /**
                      * Format: misskey:id
                      * @default null
@@ -19355,6 +19517,80 @@ export interface operations {
             };
         };
     };
+    'drive___files___attached-chat-messages': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    sinceId?: string;
+                    /** Format: misskey:id */
+                    untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
+                    /** @default 10 */
+                    limit?: number;
+                    /** Format: misskey:id */
+                    fileId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['ChatMessage'][];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
     'drive___files___attached-notes': {
         requestBody: {
             content: {
@@ -19363,6 +19599,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                     /** Format: misskey:id */
@@ -20078,6 +20316,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /**
                      * Format: misskey:id
                      * @default null
@@ -20498,6 +20738,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     type?: string;
                 };
             };
@@ -21084,6 +21326,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                 };
@@ -21155,6 +21399,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                 };
@@ -21660,6 +21906,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                 };
@@ -22312,6 +22560,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -22382,6 +22632,9 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
+                    search?: string | null;
                 };
             };
         };
@@ -22397,6 +22650,79 @@ export interface operations {
                         id: string;
                         flash: components['schemas']['Flash'];
                     }[];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    flash___search: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    query: string;
+                    /** Format: misskey:id */
+                    sinceId?: string;
+                    /** Format: misskey:id */
+                    untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
+                    /** @default 5 */
+                    limit?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Flash'][];
                 };
             };
             /** @description Client error */
@@ -23016,6 +23342,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                 };
@@ -23154,6 +23482,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                 };
@@ -23508,6 +23838,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -26081,6 +26413,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -26151,6 +26485,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -26225,6 +26561,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -26730,6 +27068,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default true */
                     markAsRead?: boolean;
                     includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'noteScheduled' | 'scheduledNotePosted' | 'scheduledNoteError' | 'sensitiveFlagAssigned' | 'createToken' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
@@ -26813,6 +27153,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default true */
                     markAsRead?: boolean;
                     includeTypes?: ('note' | 'follow' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'noteScheduled' | 'scheduledNotePosted' | 'scheduledNoteError' | 'sensitiveFlagAssigned' | 'createToken' | 'app' | 'test' | 'pollVote' | 'groupInvited')[];
@@ -26896,6 +27238,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -26970,6 +27314,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -27897,6 +28243,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -29008,6 +29356,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -29418,6 +29768,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -29562,6 +29914,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -29634,6 +29988,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -29966,6 +30322,417 @@ export interface operations {
             204: {
                 headers: {
                     [name: string]: unknown;
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    notes___drafts___count: {
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': number;
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    notes___drafts___create: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /**
+                     * @default public
+                     * @enum {string}
+                     */
+                    visibility?: 'public' | 'home' | 'followers' | 'specified';
+                    visibleUserIds?: string[];
+                    cw?: string | null;
+                    hashtag?: string | null;
+                    /** @default false */
+                    localOnly?: boolean;
+                    dimension?: number | null;
+                    /** @enum {string|null} */
+                    lang?: null | 'ja' | 'ja-JP' | 'ko' | 'ko-KR' | 'other';
+                    scheduledAt?: number | null;
+                    /**
+                     * @default null
+                     * @enum {string|null}
+                     */
+                    reactionAcceptance?: null | 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote';
+                    /** Format: misskey:id */
+                    replyId?: string | null;
+                    /** Format: misskey:id */
+                    renoteId?: string | null;
+                    /** Format: misskey:id */
+                    channelId?: string | null;
+                    text?: string | null;
+                    fileIds?: string[];
+                    poll?: {
+                        choices: string[];
+                        multiple?: boolean;
+                        expiresAt?: number | null;
+                        expiredAfter?: number | null;
+                    } | null;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        createdDraft: components['schemas']['NoteDraft'];
+                    };
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    notes___drafts___delete: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    draftId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    notes___drafts___list: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** @default 30 */
+                    limit?: number;
+                    /** Format: misskey:id */
+                    sinceId?: string;
+                    /** Format: misskey:id */
+                    untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['NoteDraft'][];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    notes___drafts___update: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: misskey:id */
+                    draftId: string;
+                    /**
+                     * @default public
+                     * @enum {string}
+                     */
+                    visibility?: 'public' | 'home' | 'followers' | 'specified';
+                    visibleUserIds?: string[];
+                    cw?: string | null;
+                    hashtag?: string | null;
+                    /** @default false */
+                    localOnly?: boolean;
+                    dimension?: number | null;
+                    /** @enum {string|null} */
+                    lang?: null | 'ja' | 'ja-JP' | 'ko' | 'ko-KR' | 'other';
+                    scheduledAt?: number | null;
+                    /**
+                     * @default null
+                     * @enum {string|null}
+                     */
+                    reactionAcceptance?: null | 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote';
+                    /** Format: misskey:id */
+                    replyId?: string | null;
+                    /** Format: misskey:id */
+                    renoteId?: string | null;
+                    /** Format: misskey:id */
+                    channelId?: string | null;
+                    text?: string | null;
+                    fileIds?: string[];
+                    poll?: {
+                        choices: string[];
+                        multiple?: boolean;
+                        expiresAt?: number | null;
+                        expiredAfter?: number | null;
+                    } | null;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        updatedDraft: components['schemas']['NoteDraft'];
+                    };
                 };
             };
             /** @description Client error */
@@ -30556,6 +31323,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     visibility?: string;
                 };
             };
@@ -30764,6 +31533,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -30837,6 +31608,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -31045,6 +31818,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -31115,6 +31890,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                 };
@@ -31267,7 +32044,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    'application/json': components['schemas']['NoteDraft'][];
+                    'application/json': components['schemas']['ScheduledNote'][];
                 };
             };
             /** @description Client error */
@@ -31326,6 +32103,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                     /** @default 0 */
@@ -31428,6 +32207,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                 };
@@ -33286,6 +34067,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -33739,6 +34522,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default false */
                     my?: boolean;
                 };
@@ -34343,6 +35128,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                 };
@@ -35134,6 +35921,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -35346,6 +36135,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -35421,6 +36212,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                 };
@@ -35498,6 +36291,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                     /** @description @deprecated use get-following-birthday-users instead. */
@@ -35574,6 +36369,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -36294,6 +37091,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -36929,6 +37728,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                 };
             };
         };
@@ -37692,6 +38493,8 @@ export interface operations {
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
+                    sinceDate?: number;
+                    untilDate?: number;
                     /** @default 10 */
                     limit?: number;
                     page?: number;

@@ -110,6 +110,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</MkPreferenceContainer>
 							</SearchMarker>
 
+							<!--
 							<SearchMarker :keywords="['auto', 'load', 'auto', 'more', 'scroll']">
 								<MkPreferenceContainer k="enableInfiniteScroll">
 									<MkSwitch v-model="enableInfiniteScroll">
@@ -117,6 +118,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 									</MkSwitch>
 								</MkPreferenceContainer>
 							</SearchMarker>
+							-->
 						</div>
 
 						<SearchMarker :keywords="['emoji', 'style', 'native', 'system', 'fluent', 'twemoji']">
@@ -167,14 +169,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<MkPreferenceContainer k="showFixedPostFormInChannel">
 									<MkSwitch v-model="showFixedPostFormInChannel">
 										<template #label><SearchLabel>{{ i18n.ts.showFixedPostFormInChannel }}</SearchLabel></template>
-									</MkSwitch>
-								</MkPreferenceContainer>
-							</SearchMarker>
-
-							<SearchMarker :keywords="['draft', 'drafts', 'post', 'form', 'autoload']">
-								<MkPreferenceContainer k="autoloadDrafts">
-									<MkSwitch v-model="autoloadDrafts">
-										<template #label><SearchLabel>{{ i18n.ts.autoloadDrafts }}</SearchLabel></template>
 									</MkSwitch>
 								</MkPreferenceContainer>
 							</SearchMarker>
@@ -964,7 +958,6 @@ const loadRawImages = prefer.model('loadRawImages');
 const imageNewTab = prefer.model('imageNewTab');
 const showFixedPostForm = prefer.model('showFixedPostForm');
 const showFixedPostFormInChannel = prefer.model('showFixedPostFormInChannel');
-const autoloadDrafts = prefer.model('autoloadDrafts');
 const numberOfPageCache = prefer.model('numberOfPageCache');
 const enableInfiniteScroll = prefer.model('enableInfiniteScroll');
 const useReactionPickerForContextMenu = prefer.model('useReactionPickerForContextMenu');

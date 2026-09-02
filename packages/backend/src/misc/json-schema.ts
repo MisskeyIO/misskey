@@ -32,6 +32,7 @@ import { packedNoteFavoriteSchema } from '@/models/json-schema/note-favorite.js'
 import { packedNoteReactionSchema } from '@/models/json-schema/note-reaction.js';
 import { packedNoteSchema } from '@/models/json-schema/note.js';
 import { packedNoteDraftSchema } from '@/models/json-schema/note-draft.js';
+import { packedScheduledNoteSchema } from '@/models/json-schema/scheduled-note.js';
 import { packedNotificationSchema } from '@/models/json-schema/notification.js';
 import { packedPageLikeSchema, packedPageBlockSchema, packedPageSchema } from '@/models/json-schema/page.js';
 import { packedQueueCountSchema } from '@/models/json-schema/queue.js';
@@ -92,6 +93,7 @@ export const refs = {
 	App: packedAppSchema,
 	Note: packedNoteSchema,
 	NoteDraft: packedNoteDraftSchema,
+	ScheduledNote: packedScheduledNoteSchema,
 	NoteReaction: packedNoteReactionSchema,
 	NoteFavorite: packedNoteFavoriteSchema,
 	Notification: packedNotificationSchema,

@@ -10,7 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div class="_gaps_m znqjceqz">
 				<div v-panel class="about">
 					<div ref="containerEl" class="container" :class="{ playing: easterEggEngine != null }">
-						<img v-if="kawaiiMode" src="/client-assets/kawaii/misskey.png" alt="" class="iconAlt" draggable="false" @load="iconLoaded" @click="gravity"/>
+						<img v-if="kawaiiMode" src="/client-assets/kawaii/about-icon.png" alt="" class="iconAlt" draggable="false" @load="iconLoaded" @click="gravity"/>
 						<img v-else src="/client-assets/about-icon.png" alt="" class="icon" draggable="false" @load="iconLoaded" @click="gravity"/>
 						<Mfm v-if="kawaiiMode" text="Logo by @sawaratsuki@misskey.io" class="iconCredit"/>
 						<div class="misskey">Misskey</div>

@@ -13,6 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<template #label><SearchLabel>{{ i18n.ts._serverSettings.entrancePageStyle }}</SearchLabel></template>
 						<option value="classic">Classic</option>
 						<option value="simple">Simple</option>
+						<option value="special">Misskey.io</option>
 					</MkRadios>
 				</SearchMarker>
 
@@ -168,7 +169,7 @@ import MkSwitch from '@/components/MkSwitch.vue';
 const meta = await misskeyApi('admin/meta');
 
 const clientOptions = meta.clientOptions as Partial<ClientOptions>;
-const entrancePageStyle = ref<ClientOptions['entrancePageStyle']>(clientOptions.entrancePageStyle ?? 'classic');
+const entrancePageStyle = ref<ClientOptions['entrancePageStyle']>(clientOptions.entrancePageStyle ?? 'special');
 const showTimelineForVisitor = ref<ClientOptions['showTimelineForVisitor']>(clientOptions.showTimelineForVisitor ?? true);
 const showActivitiesForVisitor = ref<ClientOptions['showActivitiesForVisitor']>(clientOptions.showActivitiesForVisitor ?? true);
 const iconUrl = ref(meta.iconUrl);

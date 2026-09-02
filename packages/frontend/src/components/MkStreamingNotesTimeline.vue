@@ -30,21 +30,24 @@ SPDX-License-Identifier: AGPL-3.0-only
 			tag="div"
 		>
 			<template v-for="(note, i) in paginator.items.value" :key="note.id">
-				<div v-if="i > 0 && isSeparatorNeeded(paginator.items.value[i -1].createdAt, note.createdAt)" :data-scroll-anchor="note.id">
+				<div v-if="note._shouldInsertGapMarker_" :class="$style.gapMarker" :data-scroll-anchor="note.id">
+					<span aria-hidden="true">⋮</span>
+				</div>
+				<div v-else-if="getTimelineSeparatorInfo(i)" :data-scroll-anchor="note.id">
 					<div :class="$style.date">
-						<span><i class="ti ti-chevron-up"></i> {{ getSeparatorInfo(paginator.items.value[i -1].createdAt, note.createdAt).prevText }}</span>
+						<span><i class="ti ti-chevron-up"></i> {{ getTimelineSeparatorInfo(i)?.prevText }}</span>
 						<span style="height: 1em; width: 1px; background: var(--MI_THEME-divider);"></span>
-						<span>{{ getSeparatorInfo(paginator.items.value[i -1].createdAt, note.createdAt).nextText }} <i class="ti ti-chevron-down"></i></span>
+						<span>{{ getTimelineSeparatorInfo(i)?.nextText }} <i class="ti ti-chevron-down"></i></span>
 					</div>
-					<MkNote :class="$style.note" :note="note" :withHardMute="true"/>
+					<MkNote :class="$style.note" :note="asNote(note)" :withHardMute="true"/>
 				</div>
 				<div v-else-if="note._shouldInsertAd_" :data-scroll-anchor="note.id">
-					<MkNote :class="$style.note" :note="note" :withHardMute="true"/>
+					<MkNote :class="$style.note" :note="asNote(note)" :withHardMute="true"/>
 					<div :class="$style.ad">
 						<MkAd :preferForms="['horizontal', 'horizontal-big']"/>
 					</div>
 				</div>
-				<MkNote v-else :class="$style.note" :note="note" :withHardMute="true" :data-scroll-anchor="note.id"/>
+				<MkNote v-else :class="$style.note" :note="asNote(note)" :withHardMute="true" :data-scroll-anchor="note.id"/>
 			</template>
 		</component>
 		<button v-show="paginator.canFetchOlder.value" key="_more_" v-appear="prefer.s.enableInfiniteScroll ? paginator.fetchOlder : null" :disabled="paginator.fetchingOlder.value" class="_button" :class="$style.more" @click="paginator.fetchOlder">
@@ -56,7 +59,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, watch, onUnmounted, provide, useTemplateRef, TransitionGroup, onMounted, shallowRef, ref } from 'vue';
+import { computed, watch, onUnmounted, provide, useTemplateRef, TransitionGroup, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
 import { useInterval } from '@@/js/use-interval.js';
 import { getScrollContainer, scrollToTop } from '@@/js/scroll.js';
@@ -66,15 +69,17 @@ import { usePagination } from '@/composables/use-pagination.js';
 import MkPullToRefresh from '@/components/MkPullToRefresh.vue';
 import { useStream } from '@/stream.js';
 import * as sound from '@/utility/sound.js';
+import { deepMerge } from '@/utility/merge.js';
+import type { DeepPartial } from '@/utility/merge.js';
 import { $i } from '@/i.js';
 import { instance } from '@/instance.js';
 import { prefer } from '@/preferences.js';
 import { store } from '@/store.js';
 import MkNote from '@/components/MkNote.vue';
-import MkButton from '@/components/MkButton.vue';
 import { i18n } from '@/i18n.js';
-import { globalEvents, useGlobalEvent } from '@/events.js';
+import { useGlobalEvent } from '@/events.js';
 import { isSeparatorNeeded, getSeparatorInfo } from '@/utility/timeline-date-separate.js';
+import { retryWithFibonacciBackoff } from '@/utility/retry.js';
 
 const props = withDefaults(defineProps<{
 	src: BasicTimelineType | 'mentions' | 'directs' | 'list' | 'antenna' | 'channel' | 'role';
@@ -147,7 +152,15 @@ type TimelineQueryType = {
 	dimension?: number,
 };
 
+type TimelineItem = Misskey.entities.Note & {
+	_shouldInsertAd_?: boolean;
+	_shouldInsertGapMarker_?: boolean;
+};
+type StreamNote = Pick<Misskey.entities.Note, 'id'> & DeepPartial<Misskey.entities.Note>;
+
 let adInsertionCounter = 0;
+const notVisibleNoteData: StreamNote[] = [];
+const pendingNoteFetches = new Map<string, Promise<void>>();
 
 const MIN_POLLING_INTERVAL = 1000 * 10;
 const POLLING_INTERVAL =
@@ -180,20 +193,90 @@ useGlobalEvent('noteDeleted', (noteId) => {
 
 function releaseQueue() {
 	paginator.releaseQueue();
-	scrollToTop(rootEl.value);
+	if (rootEl.value) scrollToTop(rootEl.value);
 }
 
-function prepend(note: Misskey.entities.Note) {
+function getTimelineSeparatorInfo(index: number) {
+	const previous = paginator.items.value[index - 1];
+	const current = paginator.items.value[index];
+	if (!previous || !current || previous._shouldInsertGapMarker_) return null;
+	if (!isSeparatorNeeded(previous.createdAt, current.createdAt)) return null;
+	return getSeparatorInfo(previous.createdAt, current.createdAt);
+}
+
+function asNote(note: unknown): Misskey.entities.Note {
+	return note as Misskey.entities.Note;
+}
+
+async function fetchNoteJson(id: string): Promise<Misskey.entities.Note> {
+	const response = await window.fetch(`/notes/${id}.json`, {
+		credentials: 'omit',
+	});
+	if (!response.ok) {
+		throw new Error(`ノートJSONの取得に失敗しました: ${response.status}`);
+	}
+	return await response.json() as Misskey.entities.Note;
+}
+
+function insertResolvedNote(note: TimelineItem, toQueue = !isTop()) {
 	adInsertionCounter++;
 
 	if (instance.notesPerOneAd > 0 && adInsertionCounter % instance.notesPerOneAd === 0) {
 		note._shouldInsertAd_ = true;
 	}
 
-	if (isTop()) {
-		paginator.prepend(note);
-	} else {
+	if (toQueue) {
 		paginator.enqueue(note);
+	} else {
+		paginator.prepend(note);
+	}
+}
+
+function scheduleMinimizedNoteRetry(data: StreamNote) {
+	if (pendingNoteFetches.has(data.id)) return;
+
+	const retry = retryWithFibonacciBackoff(() => fetchNoteJson(data.id), {
+		maxAttempts: 3,
+		initialDelayMs: 100,
+	}).then((note) => {
+		void prepend(deepMerge<Misskey.entities.Note>(data, note));
+	}).catch((error) => {
+		console.error('ノートJSONの再取得に失敗しました', data.id, error);
+	}).finally(() => {
+		pendingNoteFetches.delete(data.id);
+	});
+
+	pendingNoteFetches.set(data.id, retry);
+}
+
+async function fulfillNoteData(data: StreamNote): Promise<Misskey.entities.Note | null> {
+	// 軽量通知にはvisibilityがない
+	if (data.visibility == null) {
+		if (pendingNoteFetches.has(data.id)) return null;
+
+		try {
+			const note = await fetchNoteJson(data.id);
+			return deepMerge<Misskey.entities.Note>(data, note);
+		} catch {
+			scheduleMinimizedNoteRetry(data);
+			return null;
+		}
+	}
+
+	return data as Misskey.entities.Note;
+}
+
+async function prepend(data: StreamNote) {
+	let note = data;
+
+	if (window.document.hidden) {
+		notVisibleNoteData.push(data);
+		if (notVisibleNoteData.length > 10) notVisibleNoteData.shift();
+	} else {
+		const resolvedNote = await fulfillNoteData(data);
+		if (resolvedNote == null) return;
+		note = resolvedNote;
+		insertResolvedNote(resolvedNote);
 	}
 
 	emit('note');
@@ -203,25 +286,57 @@ function prepend(note: Misskey.entities.Note) {
 	}
 }
 
-let connection: Misskey.ChannelConnection | null = null;
-let connection2: Misskey.ChannelConnection | null = null;
-let paginationQuery: PagingCtx;
+async function loadUnloadedNotes() {
+	if (window.document.hidden || notVisibleNoteData.length === 0) return;
+
+	const items = notVisibleNoteData.splice(0);
+	const notes = await Promise.allSettled(items.map(fulfillNoteData));
+	const fulfilledNotes = notes
+		.filter((result): result is PromiseFulfilledResult<Misskey.entities.Note> => result.status === 'fulfilled' && result.value != null)
+		.map(result => result.value);
+	if (fulfilledNotes.length === 0) return;
+
+	const toQueue = !isTop();
+	if (items.length >= 10) {
+		if (toQueue) {
+			paginator.enqueue({
+				id: `gap-marker-${Date.now()}`,
+				_shouldInsertGapMarker_: true,
+			} as TimelineItem);
+		} else {
+			for (const id of paginator.items.value.map(item => item.id)) {
+				paginator.removeItem(id);
+			}
+		}
+	}
+
+	for (const note of fulfilledNotes) {
+		insertResolvedNote(note, toQueue);
+	}
+}
+
+let connection: Misskey.IChannelConnection<any> | null = null;
+let connection2: Misskey.IChannelConnection<any> | null = null;
+let paginationQuery!: PagingCtx;
 
 const stream = store.s.realtimeMode ? useStream() : null;
 
 function connectChannel() {
+	if (stream == null) return;
 	const dimension = props.dimension ?? prefer.r.dimension.value;
 
 	if (props.src === 'antenna') {
 		if (props.antenna == null) return;
 		connection = stream.useChannel('antenna', {
 			antennaId: props.antenna,
+			minimize: true,
 		});
 	} else if (props.src === 'home') {
 		connection = stream.useChannel('homeTimeline', {
 			withRenotes: props.withRenotes,
 			withFiles: props.onlyFiles ? true : undefined,
 			dimension,
+			minimize: true,
 		});
 		connection2 = stream.useChannel('main');
 	} else if (props.src === 'local') {
@@ -230,6 +345,7 @@ function connectChannel() {
 			withReplies: props.withReplies,
 			withFiles: props.onlyFiles ? true : undefined,
 			dimension,
+			minimize: true,
 		});
 	} else if (props.src === 'media') {
 		connection = stream.useChannel('hybridTimeline', {
@@ -237,6 +353,7 @@ function connectChannel() {
 			withReplies: props.withReplies,
 			withFiles: true,
 			dimension,
+			minimize: true,
 		});
 	} else if (props.src === 'social') {
 		connection = stream.useChannel('hybridTimeline', {
@@ -244,16 +361,18 @@ function connectChannel() {
 			withReplies: props.withReplies,
 			withFiles: props.onlyFiles ? true : undefined,
 			dimension,
+			minimize: true,
 		});
 	} else if (props.src === 'global') {
 		connection = stream.useChannel('globalTimeline', {
 			withRenotes: props.withRenotes,
 			withFiles: props.onlyFiles ? true : undefined,
 			dimension,
+			minimize: true,
 		});
 	} else if (props.src === 'mentions') {
 		connection = stream.useChannel('main');
-		connection.on('mention', prepend);
+		connection?.on('mention', prepend);
 	} else if (props.src === 'directs') {
 		const onNote = note => {
 			if (note.visibility === 'specified') {
@@ -261,25 +380,28 @@ function connectChannel() {
 			}
 		};
 		connection = stream.useChannel('main');
-		connection.on('mention', onNote);
+		connection?.on('mention', onNote);
 	} else if (props.src === 'list') {
 		if (props.list == null) return;
 		connection = stream.useChannel('userList', {
 			withRenotes: props.withRenotes,
 			withFiles: props.onlyFiles ? true : undefined,
 			listId: props.list,
+			minimize: true,
 		});
 	} else if (props.src === 'channel') {
 		if (props.channel == null) return;
 		connection = stream.useChannel('channel', {
 			channelId: props.channel,
 			dimension,
+			minimize: true,
 		});
 	} else if (props.src === 'role') {
 		if (props.role == null) return;
 		connection = stream.useChannel('roleTimeline', {
 			roleId: props.role,
 			dimension,
+			minimize: true,
 		});
 	}
 	if (props.src !== 'directs' && props.src !== 'mentions') connection?.on('note', prepend);
@@ -395,13 +517,18 @@ watch(() => props.withSensitive, reloadTimeline);
 // 初回表示用
 refreshEndpointAndChannel();
 
-const paginator = usePagination({
+onMounted(() => {
+	window.document.addEventListener('visibilitychange', loadUnloadedNotes);
+});
+
+const paginator = usePagination<keyof Misskey.Endpoints, TimelineItem>({
 	ctx: paginationQuery,
 	useShallowRef: true,
 });
 
 onUnmounted(() => {
 	disconnectChannel();
+	window.document.removeEventListener('visibilitychange', loadUnloadedNotes);
 });
 
 function reloadTimeline() {
@@ -461,6 +588,17 @@ defineExpose({
 
 .note {
 	border-bottom: solid 0.5px var(--MI_THEME-divider);
+}
+
+.gapMarker {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 8px 0;
+	border-bottom: solid 0.5px var(--MI_THEME-divider);
+	color: var(--MI_THEME-textSoft);
+	font-size: 1.2em;
+	user-select: none;
 }
 
 .new {

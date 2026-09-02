@@ -77,7 +77,7 @@ async function add() {
 }
 
 onMounted(() => {
-	if (props.modelValue.title == null) {
+	if (!props.modelValue.title) {
 		rename();
 	}
 });

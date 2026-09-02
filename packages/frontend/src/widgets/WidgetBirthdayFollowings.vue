@@ -10,62 +10,55 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template v-else #header>{{ i18n.ts._widgets.birthdaySoon }}</template>
 	<template #func="{ buttonStyleClass }"><button class="_button" :class="buttonStyleClass" @click="fetch(true)"><i class="ti ti-refresh"></i></button></template>
 
-	<MkPagination :pagination="birthdayUsersPagination">
-		<template #empty>
-			<div :class="$style.empty" :style="`height: ${widgetProps.showHeader ? widgetProps.height - 38 : widgetProps.height}px;`">
-				<img :src="infoImageUrl" class="_ghost"/>
-				<div>{{ i18n.ts.nothing }}</div>
-			</div>
-		</template>
-
-		<template #default="{ items: users }">
-			<MkDateSeparatedList v-slot="{ item }" :items="toMisskeyEntity(users)" :noGap="true">
-				<div v-if="item.user" :key="item.id" style="display: grid; grid-template-columns: auto 56px; grid-column-gap: 8px;">
-					<MkA :to="userPage(item.user)" style="overflow: hidden;">
-						<MkUserCardMini :user="item.user" :withChart="false" style="text-overflow: ellipsis; background: inherit; border-radius: unset;"/>
-					</MkA>
-					<div style="display: flex; margin-right: 16px;">
-						<button v-tooltip.noDelay="i18n.ts.note" class="_button" :class="$style.post" @click="os.post({initialText: `@${item.user.username}${item.user.host ? `@${item.user.host}` : ''} `})">
-							<i class="ti-fw ti ti-confetti" :class="$style.postIcon"></i>
-						</button>
-					</div>
-				</div>
-			</MkDateSeparatedList>
-		</template>
-	</MkPagination>
+	<MkLoading v-if="fetching && users.length === 0"/>
+	<div v-else-if="users.length > 0" :class="$style.list">
+		<div v-for="item in users" :key="item.user.id" :class="$style.row">
+			<time :datetime="item.birthday" :class="$style.birthday">{{ birthdayLabel(item.birthday) }}</time>
+			<MkA :to="userPage(item.user)" style="overflow: hidden;">
+				<MkUserCardMini :user="item.user" :withChart="false" style="text-overflow: ellipsis; background: inherit; border-radius: unset;"/>
+			</MkA>
+			<button v-tooltip.noDelay="i18n.ts.note" class="_button" :class="$style.post" @click="os.post({ initialText: `@${item.user.username}${item.user.host ? `@${item.user.host}` : ''} ` })">
+				<i class="ti-fw ti ti-confetti" :class="$style.postIcon"></i>
+			</button>
+		</div>
+		<MkButton v-if="hasMore" :class="$style.more" :disabled="fetching" @click="actualFetch()">{{ i18n.ts.loadMore }}</MkButton>
+	</div>
+	<div v-else :class="$style.empty" :style="`height: ${widgetProps.showHeader ? widgetProps.height - 38 : widgetProps.height}px;`">
+		<img :src="infoImageUrl" class="_ghost"/>
+		<div>{{ i18n.ts.nothing }}</div>
+	</div>
 </MkContainer>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
+import { useInterval } from '@@/js/use-interval.js';
 import { useWidgetPropsManager } from './widget.js';
 import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from './widget.js';
-import type { MisskeyEntity } from '@/composables/use-pagination.js';
+import type { FormWithDefault, GetFormResultType } from '@/utility/form.js';
+import MkContainer from '@/components/MkContainer.vue';
+import { misskeyApi } from '@/utility/misskey-api.js';
+import MkButton from '@/components/MkButton.vue';
+import MkUserCardMini from '@/components/MkUserCardMini.vue';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
 import { userPage } from '@/filters/user.js';
 import { infoImageUrl } from '@/instance.js';
-import type { GetFormResultType } from '@/utility/form.js';
-import { useInterval } from '@@/js/use-interval.js';
-import MkContainer from '@/components/MkContainer.vue';
-import MkPagination from '@/components/MkPagination.vue';
-import MkDateSeparatedList from '@/components/MkDateSeparatedList.vue';
-import MkUserCardMini from '@/components/MkUserCardMini.vue';
 
 const name = i18n.ts._widgets.birthdaySoon;
 
 const widgetPropsDef = {
 	showHeader: {
-		type: 'boolean' as const,
+		type: 'boolean',
 		default: true,
 	},
 	height: {
-		type: 'number' as const,
+		type: 'number',
 		default: 300,
 	},
 	period: {
-		type: 'radio' as const,
+		type: 'radio',
 		default: 'today',
 		options: [{
 			value: 'today', label: i18n.ts.today,
@@ -77,7 +70,7 @@ const widgetPropsDef = {
 			value: 'month', label: i18n.ts.oneMonth,
 		}],
 	},
-};
+} satisfies FormWithDefault;
 
 type WidgetProps = GetFormResultType<typeof widgetPropsDef>;
 
@@ -105,51 +98,66 @@ const end = computed(() => {
 	}
 });
 
-const birthdayUsersPagination = {
-	endpoint: 'users/get-following-birthday-users' as const,
-	limit: 18,
-	offsetMode: true,
-	params: computed(() => {
-		if (widgetProps.period === 'today') {
-			return {
-				birthday: {
-					month: begin.value.getMonth() + 1,
-					day: begin.value.getDate(),
-				},
-			};
-		} else {
-			return {
-				birthday: {
-					begin: {
-						month: begin.value.getMonth() + 1,
-						day: begin.value.getDate(),
-					},
-					end: {
-						month: end.value.getMonth() + 1,
-						day: end.value.getDate(),
-					},
-				},
-			};
-		}
-	}),
-};
+type BirthdayUser = Misskey.Endpoints['users/get-following-birthday-users']['res'][number];
 
-function fetch(force = false) {
-	const now = new Date();
-	if (force || now.getDate() !== begin.value.getDate()) {
-		begin.value = now;
+const users = ref<BirthdayUser[]>([]);
+const fetching = ref(false);
+const hasMore = ref(false);
+let lastFetchedDay = '';
+
+function birthdayParam() {
+	if (widgetProps.period === 'today') {
+		return {
+			month: begin.value.getMonth() + 1,
+			day: begin.value.getDate(),
+		};
+	}
+
+	return {
+		begin: {
+			month: begin.value.getMonth() + 1,
+			day: begin.value.getDate(),
+		},
+		end: {
+			month: end.value.getMonth() + 1,
+			day: end.value.getDate(),
+		},
+	};
+}
+
+async function actualFetch(reset = false) {
+	if (fetching.value) return;
+	if (reset) {
+		begin.value = new Date();
+		users.value = [];
+	}
+
+	fetching.value = true;
+	try {
+		const result = await misskeyApi('users/get-following-birthday-users', {
+			limit: 18,
+			offset: users.value.length,
+			birthday: birthdayParam(),
+		});
+		users.value.push(...result);
+		hasMore.value = result.length === 18;
+		lastFetchedDay = begin.value.toDateString();
+	} finally {
+		fetching.value = false;
 	}
 }
 
-function toMisskeyEntity(items): MisskeyEntity[] {
-	const r = items.map((item: { userId: string, birthday: string, user: Misskey.entities.UserLite }) => ({
-		id: item.user.id,
-		createdAt: item.birthday,
-		user: item.user,
-	}));
-
-	return [{ id: '_', createdAt: begin.value.toISOString() }, ...r];
+function fetch(force = false) {
+	const today = new Date().toDateString();
+	if (force || today !== lastFetchedDay) void actualFetch(true);
 }
+
+function birthdayLabel(birthday: string) {
+	const date = new Date(birthday);
+	return `${date.getMonth() + 1}/${date.getDate()}`;
+}
+
+watch(() => widgetProps.period, () => fetch(true));
 
 useInterval(fetch, 1000 * 60, {
 	immediate: true,
@@ -164,26 +172,29 @@ defineExpose<WidgetComponentExpose>({
 </script>
 
 <style lang="scss" module>
-.bdayFRoot {
-	overflow: hidden;
-	min-height: calc(calc(calc(50px * 3) - 8px) + calc(var(--MI-margin) * 2));
-}
-.bdayFGrid {
-	display: grid;
-	grid-template-columns: repeat(6, 42px);
-	grid-template-rows: repeat(3, 42px);
-	place-content: center;
-	gap: 8px;
-	margin: var(--MI-margin) auto;
-}
-
-.bdayFFallback {
-	height: 100%;
+.list {
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
-	align-items: center;
+	gap: 8px;
+	padding: 8px;
 }
+
+.row {
+	display: grid;
+	grid-template-columns: 48px minmax(0, 1fr) 48px;
+	align-items: center;
+	gap: 8px;
+}
+
+.birthday {
+	text-align: center;
+	font-size: 0.85em;
+}
+
+.more {
+	margin: 8px auto;
+}
+
 .empty {
 	display: flex;
 	flex-direction: column;

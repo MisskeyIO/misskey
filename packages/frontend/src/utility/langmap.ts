@@ -671,3 +671,4 @@ export const langmap = {
 };
 
 export const postingLangCodes = ['ja-JP', 'ko-KR', 'other'] as const;
+export type PostingLanguage = typeof postingLangCodes[number];

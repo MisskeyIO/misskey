@@ -84,5 +84,12 @@
   },
   "optionalDependencies": {
     "@tensorflow/tfjs-core": "catalog:"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "nsfwjs@4.2.1": "patches/nsfwjs@4.2.1.patch",
+      "pg-pool@3.11.0": "patches/pg-pool@3.11.0.patch",
+      "typeorm": "patches/typeorm.patch"
+    }
   }
 }

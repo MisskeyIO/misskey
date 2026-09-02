@@ -40,6 +40,7 @@ export default [...sharedConfig, {
         },
     },
     rules: {
+        '@typescript-eslint/no-unused-vars': 'off',
         '@typescript-eslint/no-empty-interface': ['error', {
             allowSingleExtends: true,
         }],
@@ -151,5 +152,8 @@ export default [...sharedConfig, {
             autofix: true,
         }],
         'vue/attribute-hyphenation': ['error', 'never'],
+        'vue/no-mutating-props': ['error', {
+            shallowOnly: true,
+        }],
     },
 }, ...storybook.configs["flat/recommended"]];

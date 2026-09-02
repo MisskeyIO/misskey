@@ -24,8 +24,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			:class="$style.notes"
 			:enterActiveClass="$style.transition_x_enterActive"
 			:leaveActiveClass="$style.transition_x_leaveActive"
-			:enterFromClass="$style.transition_x_enterFrom"
-			:leaveToClass="$style.transition_x_leaveTo"
+			:enterFromClass="aprilFools ? $style.aprilFools : $style.transition_x_enterFrom"
+			:leaveToClass="aprilFools ? $style.aprilFools : $style.transition_x_leaveTo"
 			:moveClass="$style.transition_x_move"
 			tag="div"
 		>
@@ -50,7 +50,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<MkNote v-else :class="$style.note" :note="asNote(note)" :withHardMute="true" :data-scroll-anchor="note.id"/>
 			</template>
 		</component>
-		<button v-show="paginator.canFetchOlder.value" key="_more_" v-appear="prefer.s.enableInfiniteScroll ? paginator.fetchOlder : null" :disabled="paginator.fetchingOlder.value" class="_button" :class="$style.more" @click="paginator.fetchOlder">
+		<button v-show="paginator.canFetchOlder.value" key="_more_" :disabled="paginator.fetchingOlder.value" class="_button" :class="$style.more" @click="paginator.fetchOlder">
 			<div v-if="!paginator.fetchingOlder.value">{{ i18n.ts.loadMore }}</div>
 			<MkLoading v-else :inline="true"/>
 		</button>
@@ -59,14 +59,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, watch, onUnmounted, provide, useTemplateRef, TransitionGroup, onMounted } from 'vue';
+import { computed, watch, onUnmounted, provide, useTemplateRef, TransitionGroup, onMounted, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
 import { useInterval } from '@@/js/use-interval.js';
+import { useDocumentVisibility } from '@@/js/use-document-visibility.js';
 import { getScrollContainer, scrollToTop } from '@@/js/scroll.js';
 import type { BasicTimelineType } from '@/timelines.js';
-import type { PagingCtx } from '@/composables/use-pagination.js';
 import type { SoundStore } from '@/preferences/def.js';
-import { usePagination } from '@/composables/use-pagination.js';
+import type { IPaginator } from '@/utility/paginator.js';
 import MkPullToRefresh from '@/components/MkPullToRefresh.vue';
 import { useStream } from '@/stream.js';
 import * as sound from '@/utility/sound.js';
@@ -81,6 +81,8 @@ import { i18n } from '@/i18n.js';
 import { useGlobalEvent } from '@/events.js';
 import { isSeparatorNeeded, getSeparatorInfo } from '@/utility/timeline-date-separate.js';
 import { retryWithFibonacciBackoff } from '@/utility/retry.js';
+import { Paginator } from '@/utility/paginator.js';
+import { isAprilFoolsDay } from '@/utility/seasonal-events.js';
 
 const props = withDefaults(defineProps<{
 	src: BasicTimelineType | 'mentions' | 'directs' | 'list' | 'antenna' | 'channel' | 'role';
@@ -108,10 +110,125 @@ const emit = defineEmits<{
 	note: [];
 }>();
 
+const aprilFools = prefer.s.animation && isAprilFoolsDay();
+
 provide('inTimeline', true);
 provide('tl_withSensitive', computed(() => props.withSensitive));
 provide('tl_dimension', computed(() => props.dimension ?? prefer.r.dimension.value));
 provide('inChannel', computed(() => props.src === 'channel'));
+
+type TimelineItem = Misskey.entities.Note & {
+	_shouldInsertAd_?: boolean;
+	_shouldInsertGapMarker_?: boolean;
+};
+type StreamNote = Pick<Misskey.entities.Note, 'id'> & DeepPartial<Misskey.entities.Note>;
+
+let paginator: IPaginator<TimelineItem>;
+
+if (props.src === 'antenna') {
+	paginator = markRaw(new Paginator('antennas/notes', {
+		computedParams: computed(() => ({
+			antennaId: props.antenna!,
+		})),
+		useShallowRef: true,
+	}));
+} else if (props.src === 'home') {
+	paginator = markRaw(new Paginator('notes/timeline', {
+		computedParams: computed(() => ({
+			withRenotes: props.withRenotes,
+			withFiles: props.onlyFiles ? true : undefined,
+			dimension: props.dimension ?? prefer.r.dimension.value,
+		})),
+		useShallowRef: true,
+	}));
+} else if (props.src === 'local') {
+	paginator = markRaw(new Paginator('notes/local-timeline', {
+		computedParams: computed(() => ({
+			withRenotes: props.withRenotes,
+			withReplies: props.withReplies,
+			withFiles: props.onlyFiles ? true : undefined,
+			dimension: props.dimension ?? prefer.r.dimension.value,
+		})),
+		useShallowRef: true,
+	}));
+} else if (props.src === 'media') {
+	paginator = markRaw(new Paginator('notes/hybrid-timeline', {
+		computedParams: computed(() => ({
+			withRenotes: props.withRenotes,
+			withReplies: props.withReplies,
+			withFiles: true,
+			dimension: props.dimension ?? prefer.r.dimension.value,
+		})),
+		useShallowRef: true,
+	}));
+} else if (props.src === 'social') {
+	paginator = markRaw(new Paginator('notes/hybrid-timeline', {
+		computedParams: computed(() => ({
+			withRenotes: props.withRenotes,
+			withReplies: props.withReplies,
+			withFiles: props.onlyFiles ? true : undefined,
+			dimension: props.dimension ?? prefer.r.dimension.value,
+		})),
+		useShallowRef: true,
+	}));
+} else if (props.src === 'global') {
+	paginator = markRaw(new Paginator('notes/global-timeline', {
+		computedParams: computed(() => ({
+			withRenotes: props.withRenotes,
+			withFiles: props.onlyFiles ? true : undefined,
+			dimension: props.dimension ?? prefer.r.dimension.value,
+		})),
+		useShallowRef: true,
+	}));
+} else if (props.src === 'mentions') {
+	paginator = markRaw(new Paginator('notes/mentions', {
+		useShallowRef: true,
+	}));
+} else if (props.src === 'directs') {
+	paginator = markRaw(new Paginator('notes/mentions', {
+		params: {
+			visibility: 'specified',
+		},
+		useShallowRef: true,
+	}));
+} else if (props.src === 'list') {
+	paginator = markRaw(new Paginator('notes/user-list-timeline', {
+		computedParams: computed(() => ({
+			withRenotes: props.withRenotes,
+			withFiles: props.onlyFiles ? true : undefined,
+			listId: props.list!,
+		})),
+		useShallowRef: true,
+	}));
+} else if (props.src === 'channel') {
+	paginator = markRaw(new Paginator('channels/timeline', {
+		computedParams: computed(() => ({
+			channelId: props.channel!,
+			dimension: props.dimension ?? prefer.r.dimension.value,
+		})),
+		useShallowRef: true,
+	}));
+} else if (props.src === 'role') {
+	paginator = markRaw(new Paginator('roles/notes', {
+		computedParams: computed(() => ({
+			roleId: props.role!,
+			dimension: props.dimension ?? prefer.r.dimension.value,
+		})),
+		useShallowRef: true,
+	}));
+} else {
+	throw new Error('Unrecognized timeline type: ' + props.src);
+}
+
+onMounted(() => {
+	paginator.init();
+
+	if (paginator.computedParams) {
+		watch(paginator.computedParams, () => {
+			paginator.reload();
+		}, { immediate: false, deep: true });
+	}
+});
 
 function isTop() {
 	if (scrollContainer == null) return true;
@@ -144,23 +261,20 @@ onUnmounted(() => {
 	}
 });
 
-type TimelineQueryType = {
-	antennaId?: string,
-	withRenotes?: boolean,
-	withReplies?: boolean,
-	withFiles?: boolean,
-	visibility?: string,
-	listId?: string,
-	channelId?: string,
-	roleId?: string,
-	dimension?: number,
-};
+const visibility = useDocumentVisibility();
+let isPausingUpdate = false;
 
-type TimelineItem = Misskey.entities.Note & {
-	_shouldInsertAd_?: boolean;
-	_shouldInsertGapMarker_?: boolean;
-};
-type StreamNote = Pick<Misskey.entities.Note, 'id'> & DeepPartial<Misskey.entities.Note>;
+watch(visibility, () => {
+	if (visibility.value === 'hidden') {
+		isPausingUpdate = true;
+	} else { // 'visible'
+		isPausingUpdate = false;
+		if (isTop()) {
+			releaseQueue();
+		}
+		void loadUnloadedNotes();
+	}
+});
 
 let adInsertionCounter = 0;
 const notVisibleNoteData: StreamNote[] = [];
@@ -177,7 +291,7 @@ if (!store.s.realtimeMode) {
 	// TODO: 先頭のノートの作成日時が1日以上前であれば流速が遅いTLと見做してインターバルを通常より延ばす
 	useInterval(async () => {
 		paginator.fetchNewer({
-			toQueue: !isTop(),
+			toQueue: !isTop() || isPausingUpdate,
 		});
 	}, POLLING_INTERVAL, {
 		immediate: false,
@@ -186,7 +300,7 @@ if (!store.s.realtimeMode) {
 
 	useGlobalEvent('notePosted', (note) => {
 		paginator.fetchNewer({
-			toQueue: !isTop(),
+			toQueue: !isTop() || isPausingUpdate,
 		});
 	});
 }
@@ -222,7 +336,7 @@ async function fetchNoteJson(id: string): Promise<Misskey.entities.Note> {
 	return await response.json() as Misskey.entities.Note;
 }
 
-function insertResolvedNote(note: TimelineItem, toQueue = !isTop()) {
+function insertResolvedNote(note: TimelineItem, toQueue = !isTop() || isPausingUpdate) {
 	adInsertionCounter++;
 
 	if (instance.notesPerOneAd > 0 && adInsertionCounter % instance.notesPerOneAd === 0) {
@@ -324,8 +438,7 @@ async function loadUnloadedNotes() {
 }
 
 let connection: Misskey.IChannelConnection<any> | null = null;
-let connection2: Misskey.IChannelConnection<any> | null = null;
-let paginationQuery!: PagingCtx;
+let connection2: Misskey.IChannelConnection<Misskey.Channels['main']> | null = null;
 
 const stream = store.s.realtimeMode ? useStream() : null;
 
@@ -420,123 +533,20 @@ function disconnectChannel() {
 	if (connection2) connection2.dispose();
 }
 
-function updatePaginationQuery() {
-	let endpoint: keyof Misskey.Endpoints | null;
-	let query: TimelineQueryType | null;
-	const dimension = props.dimension ?? prefer.r.dimension.value;
-
-	if (props.src === 'antenna') {
-		endpoint = 'antennas/notes';
-		query = {
-			antennaId: props.antenna,
-		};
-	} else if (props.src === 'home') {
-		endpoint = 'notes/timeline';
-		query = {
-			withRenotes: props.withRenotes,
-			withFiles: props.onlyFiles ? true : undefined,
-			dimension,
-		};
-	} else if (props.src === 'local') {
-		endpoint = 'notes/local-timeline';
-		query = {
-			withRenotes: props.withRenotes,
-			withReplies: props.withReplies,
-			withFiles: props.onlyFiles ? true : undefined,
-			dimension,
-		};
-	} else if (props.src === 'media') {
-		endpoint = 'notes/hybrid-timeline';
-		query = {
-			withRenotes: props.withRenotes,
-			withReplies: props.withReplies,
-			withFiles: true,
-			dimension,
-		};
-	} else if (props.src === 'social') {
-		endpoint = 'notes/hybrid-timeline';
-		query = {
-			withRenotes: props.withRenotes,
-			withReplies: props.withReplies,
-			withFiles: props.onlyFiles ? true : undefined,
-			dimension,
-		};
-	} else if (props.src === 'global') {
-		endpoint = 'notes/global-timeline';
-		query = {
-			withRenotes: props.withRenotes,
-			withFiles: props.onlyFiles ? true : undefined,
-			dimension,
-		};
-	} else if (props.src === 'mentions') {
-		endpoint = 'notes/mentions';
-		query = null;
-	} else if (props.src === 'directs') {
-		endpoint = 'notes/mentions';
-		query = {
-			visibility: 'specified',
-		};
-	} else if (props.src === 'list') {
-		endpoint = 'notes/user-list-timeline';
-		query = {
-			withRenotes: props.withRenotes,
-			withFiles: props.onlyFiles ? true : undefined,
-			listId: props.list,
-		};
-	} else if (props.src === 'channel') {
-		endpoint = 'channels/timeline';
-		query = {
-			channelId: props.channel,
-			dimension,
-		};
-	} else if (props.src === 'role') {
-		endpoint = 'roles/notes';
-		query = {
-			roleId: props.role,
-			dimension,
-		};
-	} else {
-		throw new Error('Unrecognized timeline type: ' + props.src);
-	}
-
-	paginationQuery = {
-		endpoint: endpoint,
-		limit: 10,
-		params: query,
-	};
+if (store.s.realtimeMode) {
+	connectChannel();
 }
 
-function refreshEndpointAndChannel() {
+watch(() => [props.list, props.antenna, props.channel, props.role, props.withRenotes, props.dimension], () => {
 	if (store.s.realtimeMode) {
 		disconnectChannel();
 		connectChannel();
 	}
-
-	updatePaginationQuery();
-}
-
-// デッキのリストカラムでwithRenotesを変更した場合に自動的に更新されるようにさせる
-// IDが切り替わったら切り替え先のTLを表示させたい
-watch(() => [props.list, props.antenna, props.channel, props.role, props.withRenotes, props.dimension], refreshEndpointAndChannel);
-
-// withSensitiveはクライアントで完結する処理のため、単にリロードするだけでOK
+});
 watch(() => props.withSensitive, reloadTimeline);
-
-// 初回表示用
-refreshEndpointAndChannel();
-
-onMounted(() => {
-	window.document.addEventListener('visibilitychange', loadUnloadedNotes);
-});
-
-const paginator = usePagination<keyof Misskey.Endpoints, TimelineItem>({
-	ctx: paginationQuery,
-	useShallowRef: true,
-});
 
 onUnmounted(() => {
 	disconnectChannel();
-	window.document.removeEventListener('visibilitychange', loadUnloadedNotes);
 });
 
 function reloadTimeline() {
@@ -587,6 +597,10 @@ defineExpose({
 
 .transition_x_leaveTo {
 	opacity: 0;
+}
+
+.aprilFools {
+	animation: global-spin-shrink 3s ease-in forwards;
 }
 
 .notes {
@@ -689,7 +703,6 @@ defineExpose({
 	align-items: center;
 	justify-content: center;
 	gap: 1em;
-	opacity: 0.75;
 	padding: 8px 8px;
 	margin: 0 auto;
 	border-bottom: solid 0.5px var(--MI_THEME-divider);

@@ -79,7 +79,7 @@
 			</button>
 		</div>
 	</div>
-	<MkPagination v-if="tab === 'scheduled'" ref="scheduledPaginationEl" :pagination="scheduledPagination">
+	<MkPagination v-if="tab === 'scheduled'" :paginator="scheduledPaginator">
 		<template #empty>
 			<div class="_fullinfo">
 				<img :src="infoImageUrl" class="_ghost"/>
@@ -87,7 +87,7 @@
 			</div>
 		</template>
 		<template #default="{ items }">
-			<div v-for="draft in items.map(x => convertNoteDraftToNoteCompat(x))" :key="draft.id" :class="$style.draftItem">
+			<div v-for="draft in items.map(x => convertScheduledNoteToNoteCompat(x))" :key="draft.id" :class="$style.draftItem">
 				<div :class="$style.draftNote">
 					<div :class="$style.draftNoteHeader">
 						<div :class="$style.draftNoteDestination">
@@ -159,7 +159,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onActivated, onMounted, ref, shallowRef, useTemplateRef } from 'vue';
+import { markRaw, onActivated, onMounted, ref, shallowRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import * as os from '@/os.js';
 import { miLocalStorage } from '@/local-storage.js';
@@ -171,6 +171,15 @@ import MkModalWindow from '@/components/MkModalWindow.vue';
 import MkPagination from '@/components/MkPagination.vue';
 import MkTab from '@/components/MkTab.vue';
 import { langmap } from '@/utility/langmap.js';
+import { Paginator } from '@/utility/paginator.js';
+
+type DraftNoteCompat = Misskey.entities.Note & {
+	useCw: boolean;
+	scheduledAt: string | null;
+	reason?: string;
+	lang?: string | null;
+	dimension?: number | null;
+};
 
 const emit = defineEmits<{
 	(ev: 'done', v: { canceled: true } | { canceled: false; selected: string | undefined }): void;
@@ -180,14 +189,14 @@ const emit = defineEmits<{
 const dialog = shallowRef<InstanceType<typeof MkModalWindow>>();
 const tab = ref('unsent');
 
-const drafts = ref<(Misskey.entities.Note & { useCw: boolean, scheduledAt: string })[]>([]);
+const drafts = ref<DraftNoteCompat[]>([]);
 
 onMounted(loadDrafts);
 onActivated(loadDrafts);
 
-function convertNoteDraftToNoteCompat(draft: Misskey.entities.NoteDraft, key?: string) {
+function convertScheduledNoteToNoteCompat(draft: Misskey.entities.ScheduledNote, key?: string): DraftNoteCompat {
 	return {
-		...(draft.data as Misskey.entities.Note & { useCw: boolean }),
+		...(draft.data as Misskey.entities.Note & { useCw: boolean; lang?: string | null; dimension?: number | null }),
 		id: key ?? draft.id,
 		createdAt: draft.updatedAt,
 		scheduledAt: draft.scheduledAt,
@@ -196,12 +205,12 @@ function convertNoteDraftToNoteCompat(draft: Misskey.entities.NoteDraft, key?: s
 		renote: draft.renote as Misskey.entities.Note,
 		reply: draft.reply as Misskey.entities.Note,
 		user: $i as Misskey.entities.User,
-	};
+	} as DraftNoteCompat;
 }
 
 function loadDrafts() {
 	const stored = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}');
-	drafts.value = Object.keys(stored).map((key) => convertNoteDraftToNoteCompat(stored[key], key));
+	drafts.value = Object.keys(stored).map((key) => convertScheduledNoteToNoteCompat(stored[key] as Misskey.entities.ScheduledNote, key));
 }
 
 function getLangLabel(lang: string | null | undefined): string {
@@ -228,7 +237,7 @@ function removeDraft(draft: string) {
 }
 
 function unschedule(draft: string) {
-	const item = scheduledPaginationEl.value!.paginator.items.value.find(x => x.id === draft);
+	const item = scheduledPaginator.items.value.find(x => x.id === draft);
 	if (!item) return;
 
 	let key = item.channel ? `channel:${item.channel.id}` : '';
@@ -254,7 +263,7 @@ function cancelScheduled(draft: string) {
 	os.apiWithDialog('notes/scheduled/cancel', {
 		draftId: draft,
 	}).then(() => {
-		scheduledPaginationEl.value?.paginator.reload();
+		scheduledPaginator.reload();
 	});
 }
 
@@ -265,14 +274,10 @@ function done(canceled: boolean, selected?: string): void {
 	dialog.value?.close();
 }
 
-const scheduledPaginationEl = useTemplateRef('scheduledPaginationEl');
-
-const scheduledPagination = {
-	endpoint: 'notes/scheduled/list' as const,
-	offsetMode: true,
+const scheduledPaginator = markRaw(new Paginator('notes/scheduled/list', {
 	limit: 10,
-	params: {},
-};
+	offsetMode: true,
+}));
 
 </script>
 

@@ -14,9 +14,9 @@ import type { ComponentProps as CP } from 'vue-component-type-helpers';
 import type { Form, GetFormResultType } from '@/utility/form.js';
 import type { MenuItem } from '@/types/menu.js';
 import type { PostFormProps } from '@/types/post-form.js';
-import type { UploaderDialogFeatures } from '@/components/MkUploaderDialog.vue';
-import type MkRoleSelectDialog from '@/components/MkRoleSelectDialog.vue';
-import type MkEmojiPickerDialog from '@/components/MkEmojiPickerDialog.vue';
+import type { UploaderFeatures } from '@/composables/use-uploader.js';
+import type MkRoleSelectDialog_TypeReferenceOnly from '@/components/MkRoleSelectDialog.vue';
+import type MkEmojiPickerDialog_TypeReferenceOnly from '@/components/MkEmojiPickerDialog.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { prefer } from '@/preferences.js';
 import { i18n } from '@/i18n.js';
@@ -705,7 +705,7 @@ export async function selectUser(opts: {
 	});
 }
 
-export async function selectRole(params: ComponentProps<typeof MkRoleSelectDialog>): Promise<
+export async function selectRole(params: ComponentProps<typeof MkRoleSelectDialog_TypeReferenceOnly>): Promise<
 	{ canceled: true; result: undefined; } |
 	{ canceled: false; result: Misskey.entities.Role[] }
 > {
@@ -721,7 +721,7 @@ export async function selectRole(params: ComponentProps<typeof MkRoleSelectDialo
 	});
 }
 
-export async function pickEmoji(anchorElement: HTMLElement, opts: ComponentProps<typeof MkEmojiPickerDialog>): Promise<string> {
+export async function pickEmoji(anchorElement: HTMLElement, opts: ComponentProps<typeof MkEmojiPickerDialog_TypeReferenceOnly>): Promise<string> {
 	return new Promise(async resolve => {
 		await popup(defineAsyncComponent(() => import('@/components/MkEmojiPickerDialog.vue')), {
 			anchorElement,
@@ -954,7 +954,7 @@ export function launchUploader(
 	options?: {
 		folderId?: string | null;
 		multiple?: boolean;
-		features?: UploaderDialogFeatures;
+		features?: UploaderFeatures;
 	},
 ): Promise<Misskey.entities.DriveFile[]> {
 	return new Promise(async (res, rej) => {

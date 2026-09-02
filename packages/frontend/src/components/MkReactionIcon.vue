@@ -23,8 +23,9 @@ const props = defineProps<{
 const elRef = useTemplateRef('elRef');
 
 if (props.withTooltip) {
-	useTooltip(elRef, async (showing) => {
-		await os.popup(defineAsyncComponent(() => import('@/components/MkReactionTooltip.vue')), {
+	useTooltip(elRef, (showing) => {
+		if (elRef.value == null) return;
+		const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkReactionTooltip.vue')), {
 			showing,
 			reaction: props.reaction.replace(/^:(\w+):$/, ':$1@.:'),
 			targetElement: elRef.value.$el,

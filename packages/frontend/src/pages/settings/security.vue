@@ -31,7 +31,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 		<FormSection>
 			<template #label>{{ i18n.ts.signinHistory }}</template>
-			<MkPagination :pagination="pagination" disableAutoLoad>
+			<MkPagination :paginator="paginator" withControl>
 				<template #default="{items}">
 					<div>
 						<div v-for="item in items" :key="item.id" v-panel class="timnmucd">
@@ -58,7 +58,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, shallowRef } from 'vue';
+import { computed, ref, shallowRef, markRaw } from 'vue';
 import X2fa from './2fa.vue';
 import FormSection from '@/components/form/section.vue';
 import FormSlot from '@/components/form/slot.vue';
@@ -71,14 +71,14 @@ import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import MkFeatureBanner from '@/components/MkFeatureBanner.vue';
+import { Paginator } from '@/utility/paginator.js';
 
 const changePasswordKey = ref(Date.now());
 const newPassword = shallowRef<InstanceType<typeof MkNewPassword> | null>(null);
 
-const pagination = {
-	endpoint: 'i/signin-history' as const,
+const paginator = markRaw(new Paginator('i/signin-history', {
 	limit: 5,
-};
+}));
 
 async function changePassword() {
 	if (!newPassword.value?.isValid) return;

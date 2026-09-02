@@ -21,7 +21,7 @@ export class ScheduledNoteEntityService {
 	public async pack(
 		src: MiScheduledNote['id'] | MiScheduledNote,
 		me: { id: MiUser['id'] },
-	) : Promise<Packed<'NoteDraft'>> {
+	) : Promise<Packed<'ScheduledNote'>> {
 		const item = typeof src === 'object' ? src : await this.scheduledNotesRepository.findOneByOrFail({ id: src, userId: me.id });
 
 		return {
@@ -70,9 +70,9 @@ export class ScheduledNoteEntityService {
 	public async packMany(
 		drafts: (MiScheduledNote['id'] | MiScheduledNote)[],
 		me: { id: MiUser['id'] },
-	) : Promise<Packed<'NoteDraft'>[]> {
+	) : Promise<Packed<'ScheduledNote'>[]> {
 		return (await Promise.allSettled(drafts.map(x => this.pack(x, me))))
 			.filter(result => result.status === 'fulfilled')
-			.map(result => (result as PromiseFulfilledResult<Packed<'NoteDraft'>>).value);
+			.map(result => (result as PromiseFulfilledResult<Packed<'ScheduledNote'>>).value);
 	}
 }

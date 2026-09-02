@@ -171,9 +171,8 @@ watch([modelValue, () => props.items], () => {
 }, { immediate: true, deep: true });
 
 function show() {
-	if (!inputEl.value) return;
-	if (opening.value) return;
-	if (props.readonly || props.disabled) return;
+	if (!inputEl.value || opening.value || props.disabled || props.readonly) return;
+	focus();
 
 	focused.value = true;
 	opening.value = true;

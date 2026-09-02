@@ -490,6 +490,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 						choices: ps.poll.choices,
 						multiple: ps.poll.multiple ?? false,
 						expiresAt: ps.poll.expiresAt ? new Date(ps.poll.expiresAt) : null,
+						expiredAfter: ps.poll.expiredAfter ?? null,
 					} : undefined,
 					text: ps.text ?? undefined,
 					reply,

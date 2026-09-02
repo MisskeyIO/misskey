@@ -162,6 +162,19 @@ export const packedNoteDraftSchema = {
 			type: 'boolean',
 			optional: true, nullable: false,
 		},
+		dimension: {
+			type: 'integer',
+			optional: false, nullable: true,
+		},
+		lang: {
+			type: 'string',
+			optional: false, nullable: true,
+		},
+		scheduledAt: {
+			type: 'string',
+			optional: false, nullable: true,
+			format: 'date-time',
+		},
 		reactionAcceptance: {
 			type: 'string',
 			optional: false, nullable: true,

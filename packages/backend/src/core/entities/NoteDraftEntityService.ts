@@ -111,6 +111,9 @@ export class NoteDraftEntityService implements OnModuleInit {
 			cw: noteDraft.cw,
 			visibility: noteDraft.visibility,
 			localOnly: noteDraft.localOnly,
+			dimension: noteDraft.dimension,
+			lang: noteDraft.lang,
+			scheduledAt: noteDraft.scheduledAt?.toISOString() ?? null,
 			reactionAcceptance: noteDraft.reactionAcceptance,
 			visibleUserIds: noteDraft.visibility === 'specified' ? noteDraft.visibleUserIds : undefined,
 			hashtag: noteDraft.hashtag ?? undefined,
@@ -143,7 +146,7 @@ export class NoteDraftEntityService implements OnModuleInit {
 					choices: noteDraft.pollChoices,
 					multiple: noteDraft.pollMultiple,
 					expiresAt: noteDraft.pollExpiresAt?.toISOString(),
-					expiredAfter: noteDraft.pollExpiredAfter,
+					expiredAfter: noteDraft.pollExpiredAfter == null ? null : Number(noteDraft.pollExpiredAfter),
 				} : undefined,
 			} : {} ),
 		});

@@ -4623,6 +4623,10 @@ export type components = {
                 userId: string | null;
             } | null;
             localOnly?: boolean;
+            dimension: number | null;
+            lang: string | null;
+            /** Format: date-time */
+            scheduledAt: string | null;
             /** @enum {string|null} */
             reactionAcceptance: 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote' | null;
         };
@@ -4670,6 +4674,8 @@ export type components = {
                 localOnly: boolean;
                 lang?: string | null;
                 dimension?: number | null;
+                /** @enum {string|null} */
+                reactionAcceptance: 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote' | null;
                 files: components['schemas']['DriveFile'][];
                 poll: {
                     choices: string[];
@@ -30446,6 +30452,10 @@ export interface operations {
                     hashtag?: string | null;
                     /** @default false */
                     localOnly?: boolean;
+                    dimension?: number | null;
+                    /** @enum {string|null} */
+                    lang?: null | 'ja' | 'ja-JP' | 'ko' | 'ko-KR' | 'other';
+                    scheduledAt?: number | null;
                     /**
                      * @default null
                      * @enum {string|null}
@@ -30687,6 +30697,10 @@ export interface operations {
                     hashtag?: string | null;
                     /** @default false */
                     localOnly?: boolean;
+                    dimension?: number | null;
+                    /** @enum {string|null} */
+                    lang?: null | 'ja' | 'ja-JP' | 'ko' | 'ko-KR' | 'other';
+                    scheduledAt?: number | null;
                     /**
                      * @default null
                      * @enum {string|null}

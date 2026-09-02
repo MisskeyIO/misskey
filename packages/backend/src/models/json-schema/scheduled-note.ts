@@ -136,6 +136,11 @@ export const packedScheduledNoteSchema = {
 					type: 'integer',
 					optional: true, nullable: true,
 				},
+				reactionAcceptance: {
+					type: 'string',
+					optional: false, nullable: true,
+					enum: ['likeOnly', 'likeOnlyForRemote', 'nonSensitiveOnly', 'nonSensitiveOnlyForLocalLikeOnlyForRemote', null],
+				},
 				files: {
 					type: 'array',
 					optional: false, nullable: false,

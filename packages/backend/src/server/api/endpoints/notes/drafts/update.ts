@@ -10,6 +10,7 @@ import { NoteDraftService } from '@/core/NoteDraftService.js';
 import { MAX_NOTE_TEXT_LENGTH } from '@/const.js';
 import { NoteDraftEntityService } from '@/core/entities/NoteDraftEntityService.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
+import { postingLangCodes } from '@/misc/langmap.js';
 import { ApiError } from '../../../error.js';
 
 export const meta = {
@@ -178,6 +179,9 @@ export const paramDef = {
 		cw: { type: 'string', nullable: true, minLength: 1, maxLength: 100 },
 		hashtag: { type: 'string', nullable: true, maxLength: 200 },
 		localOnly: { type: 'boolean', default: false },
+		dimension: { type: 'integer', nullable: true, minimum: 0, maximum: 2_147_483_647 },
+		lang: { type: 'string', enum: [null, ...postingLangCodes] as string[], nullable: true },
+		scheduledAt: { type: 'integer', nullable: true, maximum: 253_402_300_799_999 },
 		reactionAcceptance: { type: 'string', nullable: true, enum: [null, 'likeOnly', 'likeOnlyForRemote', 'nonSensitiveOnly', 'nonSensitiveOnlyForLocalLikeOnlyForRemote'], default: null },
 		replyId: { type: 'string', format: 'misskey:id', nullable: true },
 		renoteId: { type: 'string', format: 'misskey:id', nullable: true },
@@ -240,6 +244,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				cw: ps.cw ?? null,
 				...(ps.hashtag ? { hashtag: ps.hashtag } : {}),
 				localOnly: ps.localOnly,
+				dimension: ps.dimension ?? null,
+				lang: ps.lang ?? null,
+				scheduledAt: ps.scheduledAt == null ? null : new Date(ps.scheduledAt),
 				reactionAcceptance: ps.reactionAcceptance,
 				visibility: ps.visibility,
 				visibleUserIds: ps.visibleUserIds ?? [],

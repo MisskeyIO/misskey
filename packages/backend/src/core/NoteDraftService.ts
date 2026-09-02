@@ -23,6 +23,9 @@ export type NoteDraftOptions = {
 	text?: string | null;
 	cw?: string | null;
 	localOnly?: boolean | null;
+	dimension?: number | null;
+	lang?: string | null;
+	scheduledAt?: Date | null;
 	reactionAcceptance?: typeof noteReactionAcceptances[number];
 	visibility?: typeof noteVisibilities[number];
 	fileIds?: MiDriveFile['id'][];
@@ -169,6 +172,7 @@ export class NoteDraftService {
 			data.visibleUserIds = [];
 			data.localOnly = true;
 		}
+		if (typeof data.dimension === 'number' && data.dimension >= 1000) data.localOnly = true;
 
 		let appliedDraft = draft;
 
@@ -306,6 +310,9 @@ export class NoteDraftService {
 			pollExpiredAfter: data.poll ? data.poll.expiredAfter ?? null : null,
 			visibleUserIds: data.visibleUserIds ?? [],
 			localOnly: data.localOnly,
+			dimension: data.dimension ?? null,
+			lang: data.lang ?? null,
+			scheduledAt: data.scheduledAt ?? null,
 			reactionAcceptance: data.reactionAcceptance,
 		} satisfies MiNoteDraft;
 

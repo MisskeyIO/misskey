@@ -482,7 +482,7 @@ export type NoteCreateOption = {
 	reply?: MiNote | null;
 	renote?: MiNote | null;
 	files?: MiDriveFile[] | null;
-	poll?: IPoll | null;
+	poll?: (IPoll & { expiredAfter?: number | null }) | null;
 	localOnly?: boolean | null;
 	dimension?: number | null;
 	reactionAcceptance?: MiNote['reactionAcceptance'];

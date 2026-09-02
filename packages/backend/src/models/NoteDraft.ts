@@ -77,6 +77,21 @@ export class MiNoteDraft {
 	})
 	public localOnly: boolean;
 
+	@Column('integer', {
+		nullable: true,
+	})
+	public dimension: number | null;
+
+	@Column('varchar', {
+		length: 32, nullable: true,
+	})
+	public lang: string | null;
+
+	@Column('timestamp with time zone', {
+		nullable: true,
+	})
+	public scheduledAt: Date | null;
+
 	@Column('varchar', {
 		length: 64, nullable: true,
 	})

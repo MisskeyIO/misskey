@@ -29,7 +29,7 @@ import { packedInviteCodeSchema } from '@/models/json-schema/invite-code.js';
 import { packedModerationLogSchema } from '@/models/json-schema/moderation-log.js';
 import { packedMutingSchema } from '@/models/json-schema/muting.js';
 import { packedNoteFavoriteSchema } from '@/models/json-schema/note-favorite.js';
-import { packedNoteReactionSchema } from '@/models/json-schema/note-reaction.js';
+import { packedNoteReactionSchema, packedNoteReactionWithNoteSchema } from '@/models/json-schema/note-reaction.js';
 import { packedNoteSchema } from '@/models/json-schema/note.js';
 import { packedNoteDraftSchema } from '@/models/json-schema/note-draft.js';
 import { packedScheduledNoteSchema } from '@/models/json-schema/scheduled-note.js';
@@ -66,6 +66,7 @@ import {
 	packedMetaDetailedSchema,
 	packedMetaLiteSchema,
 } from '@/models/json-schema/meta.js';
+import { packedUserWebhookSchema } from '@/models/json-schema/user-webhook.js';
 import { packedSystemWebhookSchema } from '@/models/json-schema/system-webhook.js';
 import { packedAbuseReportNotificationRecipientSchema } from '@/models/json-schema/abuse-report-notification-recipient.js';
 import { packedChatMessageSchema, packedChatMessageLiteSchema, packedChatMessageLiteForRoomSchema, packedChatMessageLiteFor1on1Schema } from '@/models/json-schema/chat-message.js';
@@ -95,6 +96,7 @@ export const refs = {
 	NoteDraft: packedNoteDraftSchema,
 	ScheduledNote: packedScheduledNoteSchema,
 	NoteReaction: packedNoteReactionSchema,
+	NoteReactionWithNote: packedNoteReactionWithNoteSchema,
 	NoteFavorite: packedNoteFavoriteSchema,
 	Notification: packedNotificationSchema,
 	DriveFile: packedDriveFileSchema,
@@ -141,6 +143,7 @@ export const refs = {
 	MetaDetailed: packedMetaDetailedSchema,
 	AbuseUserReport: packedAbuseUserReportSchema,
 	ModerationLog: packedModerationLogSchema,
+	UserWebhook: packedUserWebhookSchema,
 	SystemWebhook: packedSystemWebhookSchema,
 	AbuseReportNotificationRecipient: packedAbuseReportNotificationRecipientSchema,
 	ChatMessage: packedChatMessageSchema,

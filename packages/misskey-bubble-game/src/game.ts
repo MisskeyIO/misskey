@@ -197,7 +197,7 @@ export class DropAndFusionGame extends EventEmitter<{
 			slop: this.gameMode === 'space' ? 0.01 : 0.7,
 			//mass: 0,
 			render: this.getMonoRenderOptions ? this.getMonoRenderOptions(mono) : undefined,
-		};
+		} satisfies Matter.IChamferableBodyDefinition;
 		if (mono.shape === 'circle') {
 			return Matter.Bodies.circle(x, y, mono.sizeX / 2, options);
 		} else if (mono.shape === 'rectangle') {

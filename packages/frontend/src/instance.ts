@@ -9,6 +9,12 @@ import { DEFAULT_INFO_IMAGE_URL, DEFAULT_SERVER_ERROR_IMAGE_URL } from '@@/js/co
 import { misskeyApiGet } from '@/utility/misskey-api.js';
 import { miLocalStorage } from '@/local-storage.js';
 
+export type ClientOptions = {
+	entrancePageStyle: 'classic' | 'simple';
+	showTimelineForVisitor: boolean;
+	showActivitiesForVisitor: boolean;
+};
+
 // TODO: 他のタブと永続化されたstateを同期
 
 //#region loader

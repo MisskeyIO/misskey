@@ -52,7 +52,7 @@ function initShaderProgram(gl: WebGLRenderingContext, vsSource: string, fsSource
 	const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
 
 	const shaderProgram = gl.createProgram();
-	if (shaderProgram == null || vertexShader == null || fragmentShader == null) return null;
+	if (vertexShader == null || fragmentShader == null) return null;
 
 	gl.attachShader(shaderProgram, vertexShader);
 	gl.attachShader(shaderProgram, fragmentShader);
@@ -79,8 +79,10 @@ onMounted(() => {
 	canvas.width = width;
 	canvas.height = height;
 
-	const gl = canvas.getContext('webgl', { premultipliedAlpha: true });
-	if (gl == null) return;
+	const maybeGl = canvas.getContext('webgl', { premultipliedAlpha: true });
+	if (maybeGl == null) return;
+
+	const gl = maybeGl;
 
 	gl.clearColor(0.0, 0.0, 0.0, 0.0);
 	gl.clear(gl.COLOR_BUFFER_BIT);
@@ -237,8 +239,8 @@ onMounted(() => {
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.DYNAMIC_DRAW);
 
 	if (isChromatic()) {
-		gl!.uniform1f(u_time, 0);
-		gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4);
+		gl.uniform1f(u_time, 0);
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 	} else {
 		function render(timeStamp: number) {
 			let sizeChanged = false;
@@ -257,8 +259,8 @@ onMounted(() => {
 				gl.viewport(0, 0, width, height);
 			}
 
-			gl!.uniform1f(u_time, timeStamp);
-			gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4);
+			gl.uniform1f(u_time, timeStamp);
+			gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
 			handle = window.requestAnimationFrame(render);
 		}
@@ -271,6 +273,8 @@ onUnmounted(() => {
 	if (handle) {
 		window.cancelAnimationFrame(handle);
 	}
+
+	// TODO: WebGLリソースの解放
 });
 </script>
 

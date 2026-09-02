@@ -172,18 +172,20 @@ async function save() {
 			}
 		}
 	} else {
-		try {
-			const created = await os.apiWithDialog('pages/create', options);
-			pageId.value = created.id;
-			currentName.value = name.value.trim();
-			await os.alert({
-				type: 'success',
-				text: 'Page created successfully',
-			});
-			mainRouter.push(`/pages/edit/${pageId.value}`);
-		} catch (error) {
-			onError(error);
-		}
+		const created = await os.apiWithDialog('pages/create', options, undefined, undefined, undefined, {
+			'4650348e-301c-499a-83c9-6aa988c66bc1': {
+				title: i18n.ts.somethingHappened,
+				text: i18n.ts._pages.nameAlreadyExists,
+			},
+		});
+
+		pageId.value = created.id;
+		currentName.value = name.value.trim();
+		mainRouter.replace('/pages/edit/:initPageId', {
+			params: {
+				initPageId: pageId.value,
+			},
+		});
 	}
 }
 
@@ -205,27 +207,24 @@ async function del() {
 }
 
 async function duplicate() {
-	try {
-		title.value = title.value + ' - copy';
-		name.value = name.value + '-copy';
+	title.value = title.value + ' - copy';
+	name.value = name.value + '-copy';
 
-		const created = await os.apiWithDialog('pages/create', getSaveOptions());
+	const created = await os.apiWithDialog('pages/create', getSaveOptions(), undefined, undefined, undefined, {
+		'4650348e-301c-499a-83c9-6aa988c66bc1': {
+			title: i18n.ts.somethingHappened,
+			text: i18n.ts._pages.nameAlreadyExists,
+		},
+	});
 
-		pageId.value = created.id;
-		currentName.value = name.value.trim();
+	pageId.value = created.id;
+	currentName.value = name.value.trim();
 
-		mainRouter.push(`/pages/edit/${pageId.value}`);
-	} catch (error) {
-		if (error && typeof error === 'object' && 'code' in error && error.code === '4650348e-301c-499a-83c9-6aa988c66bc1') {
-			await os.alert({
-				type: 'error',
-				title: i18n.ts.somethingHappened,
-				text: i18n.ts._pages.nameAlreadyExists,
-			});
-		} else {
-			onError(error);
-		}
-	}
+	mainRouter.push('/pages/edit/:initPageId', {
+		params: {
+			initPageId: pageId.value,
+		},
+	});
 }
 
 async function add() {

@@ -483,7 +483,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 			emojis,
 			userId: user.id,
 			localOnly: data.localOnly!,
-			reactionAcceptance: data.reactionAcceptance,
+			reactionAcceptance: data.reactionAcceptance ?? null,
 			visibility: data.visibility as any,
 			visibleUserIds: data.visibility === 'specified'
 				? data.visibleUsers
@@ -550,7 +550,11 @@ export class NoteCreateService implements OnApplicationShutdown {
 				void this.cacheService.noteDimensionCache.set(insert.id, data.dimension);
 			}
 
-			return insert;
+			return {
+				...insert,
+				reply: data.reply ?? null,
+				renote: data.renote ?? null,
+			};
 		} catch (e) {
 			// duplicate key error
 			if (isDuplicateKeyValueError(e)) {

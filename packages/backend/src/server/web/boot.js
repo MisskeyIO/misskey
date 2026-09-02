@@ -22,57 +22,29 @@
 		return;
 	}
 
-	if (localStorage.getItem('id') === null) {
-		localStorage.setItem('id', crypto.randomUUID().replaceAll('-', ''));
-	}
-	let id = localStorage.getItem('id');
-
-	//#region Detect language & fetch translations
-	if (localStorage.getItem('locale') === null) {
-		let lang = localStorage.getItem('lang');
-		if (lang == null || lang.toString == null || lang.toString() === 'null') {
-			const browserLang = typeof navigator !== 'undefined' && typeof navigator.language === 'string'
-				? navigator.language.toLowerCase()
-				: '';
-			if (browserLang.startsWith('ko')) lang = 'ko-KR';
-			else if (browserLang.startsWith('ja')) lang = 'ja-JP';
-			else lang = 'ja-JP';
-		}
-
-		const metaRes = await window.fetch('/api/meta', {
-			method: 'GET',
-			credentials: 'omit',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-Client-Transaction-Id': `${id}-misskey-${crypto.randomUUID().replaceAll('-', '')}`
-			},
-		});
-		if (metaRes.status !== 200) {
-			renderError('META_FETCH');
-			return;
-		}
-		const meta = await metaRes.json();
-		const v = meta.version;
-		if (v == null) {
-			renderError('META_FETCH_V');
-			return;
-		}
-
-		const localRes = await window.fetch(`/assets/locales/${lang}.${v}.json`);
-		if (localRes.status === 200) {
-			localStorage.setItem('lang', lang);
-			localStorage.setItem('locale', await localRes.text());
-			localStorage.setItem('localeVersion', v);
+	//#region Detect language
+	const supportedLangs = LANGS;
+	/** @type { string } */
+	let lang = localStorage.getItem('lang');
+	if (lang == null || !supportedLangs.includes(lang)) {
+		const browserLang = typeof navigator.language === 'string' ? navigator.language.toLowerCase() : '';
+		if (browserLang.startsWith('ko') && supportedLangs.includes('ko-KR')) {
+			lang = 'ko-KR';
 		} else {
-			renderError('LOCALE_FETCH');
-			return;
+			lang = supportedLangs.includes('ja-JP') ? 'ja-JP' : 'en-US';
 		}
+	}
+
+	// for https://github.com/misskey-dev/misskey/issues/10202
+	if (lang == null || lang.toString == null || lang.toString() === 'null') {
+		console.error('invalid lang value detected!!!', typeof lang, lang);
+		lang = 'en-US';
 	}
 	//#endregion
 
 	//#region Script
 	async function importAppScript() {
-		await import(`/vite/${CLIENT_ENTRY}`)
+		await import(CLIENT_ENTRY ? `/vite/${CLIENT_ENTRY.replace('scripts', lang)}` : '/vite/src/_boot_.ts')
 			.catch(async e => {
 				console.error(e);
 				renderError('APP_IMPORT', e);
@@ -89,23 +61,37 @@
 	}
 	//#endregion
 
-	//#region Theme
-	const theme = localStorage.getItem('theme');
-	if (theme) {
-		for (const [k, v] of Object.entries(JSON.parse(theme))) {
-			document.documentElement.style.setProperty(`--MI_THEME-${k}`, v.toString());
+	let isSafeMode = (localStorage.getItem('isSafeMode') === 'true');
 
-			// HTMLの theme-color 適用
-			if (k === 'htmlThemeColor') {
-				for (const tag of document.head.children) {
-					if (tag.tagName === 'META' && tag.getAttribute('name') === 'theme-color') {
-						tag.setAttribute('content', v);
-						break;
+	if (!isSafeMode) {
+		const urlParams = new URLSearchParams(window.location.search);
+
+		if (urlParams.has('safemode') && urlParams.get('safemode') === 'true') {
+			localStorage.setItem('isSafeMode', 'true');
+			isSafeMode = true;
+		}
+	}
+
+	//#region Theme
+	if (!isSafeMode) {
+		const theme = localStorage.getItem('theme');
+		if (theme) {
+			for (const [k, v] of Object.entries(JSON.parse(theme))) {
+				document.documentElement.style.setProperty(`--MI_THEME-${k}`, v.toString());
+
+				// HTMLの theme-color 適用
+				if (k === 'htmlThemeColor') {
+					for (const tag of document.head.children) {
+						if (tag.tagName === 'META' && tag.getAttribute('name') === 'theme-color') {
+							tag.setAttribute('content', v);
+							break;
+						}
 					}
 				}
 			}
 		}
 	}
+
 	const colorScheme = localStorage.getItem('colorScheme');
 	if (colorScheme) {
 		document.documentElement.style.setProperty('color-scheme', colorScheme);
@@ -122,11 +108,13 @@
 		document.documentElement.classList.add('useSystemFont');
 	}
 
-	const customCss = localStorage.getItem('customCss');
-	if (customCss && customCss.length > 0) {
-		const style = document.createElement('style');
-		style.innerHTML = customCss;
-		document.head.appendChild(style);
+	if (!isSafeMode) {
+		const customCss = localStorage.getItem('customCss');
+		if (customCss && customCss.length > 0) {
+			const style = document.createElement('style');
+			style.innerHTML = customCss;
+			document.head.appendChild(style);
+		}
 	}
 
 	async function addStyle(styleText) {
@@ -141,9 +129,25 @@
 			await new Promise(resolve => window.addEventListener('DOMContentLoaded', resolve));
 		}
 
-		const locale = JSON.parse(localStorage.getItem('locale') || '{}');
+		let messages = null;
+		const bootloaderLocales = localStorage.getItem('bootloaderLocales');
+		if (bootloaderLocales) {
+			messages = JSON.parse(bootloaderLocales);
+		}
+		if (!messages) {
+			// older version of misskey does not store bootloaderLocales, stores locale as a whole
+			const legacyLocale = localStorage.getItem('locale');
+			if (legacyLocale) {
+				const parsed = JSON.parse(legacyLocale);
+				messages = {
+					...(parsed._bootErrors ?? {}),
+					reload: parsed.reload,
+				};
+			}
+		}
+		if (!messages) messages = {};
 
-		const messages = Object.assign({
+		messages = Object.assign({
 			title: 'Failed to initialize Misskey',
 			solution: 'The following actions may solve the problem.',
 			solution1: 'Update your os and browser',
@@ -154,8 +158,12 @@
 			otherOption1: 'Clear preferences and cache',
 			otherOption2: 'Start the simple client',
 			otherOption3: 'Start the repair tool',
-		}, locale?._bootErrors || {});
-		const reload = locale?.reload || 'Reload';
+			otherOption4: 'Start Misskey in safe mode',
+			reload: 'Reload',
+		}, messages);
+
+		const safeModeUrl = new URL(window.location.href);
+		safeModeUrl.searchParams.set('safemode', 'true');
 
 		let errorsElement = document.getElementById('errors');
 
@@ -167,8 +175,8 @@
 				<path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75"></path>
 			</svg>
 			<h1>${messages.title}</h1>
-			<button class="button-big" id="reload">
-				<span class="button-label-big">${reload}</span>
+			<button class="button-big" onclick="location.reload(true);">
+				<span class="button-label-big">${messages?.reload}</span>
 			</button>
 			<p><b>${messages.solution}</b></p>
 			<p>${messages.solution1}</p>
@@ -177,6 +185,12 @@
 			<p>${messages.solution4}</p>
 			<details style="color: #86b300;">
 				<summary>${messages.otherOption}</summary>
+				<a href="${safeModeUrl}">
+					<button class="button-small">
+						<span class="button-label-small">${messages.otherOption4}</span>
+					</button>
+				</a>
+				<br>
 				<a href="/flush">
 					<button class="button-small">
 						<span class="button-label-small">${messages.otherOption1}</span>
@@ -198,9 +212,6 @@
 			<br>
 			<div id="errors"></div>
 			`;
-			document.getElementById("reload").addEventListener('click', () => {
-				location.reload();
-			});
 			errorsElement = document.getElementById('errors');
 		}
 		const detailsElement = document.createElement('details');

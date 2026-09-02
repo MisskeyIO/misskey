@@ -193,6 +193,10 @@ export class ClientServerService {
 					'url': 'url',
 				},
 			},
+			'shortcuts': [{
+				'name': 'Safemode',
+				'url': '/?safemode=true',
+			}],
 		};
 
 		manifest = {
@@ -654,7 +658,7 @@ export class ClientServerService {
 					id: request.params.note,
 					visibility: In(['public', 'home']),
 				},
-				relations: ['user'],
+				relations: ['user', 'reply', 'renote'],
 			});
 
 			if (
@@ -700,7 +704,7 @@ export class ClientServerService {
 					id: request.params.note,
 					visibility: In(['public', 'home']),
 				},
-				relations: ['user'],
+				relations: ['user', 'reply', 'renote'],
 			});
 
 			if (note) {

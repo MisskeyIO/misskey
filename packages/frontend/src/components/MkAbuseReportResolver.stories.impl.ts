@@ -34,6 +34,7 @@ export const Default = {
 			targetUserPattern: '^.*@.+$',
 			reporterPattern: null,
 			reportContentPattern: null,
+			expirationDate: null,
 			expiresAt: 'indefinitely',
 			forward: false,
 		},

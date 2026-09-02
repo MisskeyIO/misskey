@@ -3,10 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import type { StoryObj } from '@storybook/vue3-vite';
 import MkAd from './MkAd.vue';
+import type { StoryObj } from '@storybook/vue3-vite';
 import { i18n } from '@/i18n.js';
 
 const common = {
@@ -68,14 +67,16 @@ const common = {
 		await expect(imgAgain).toBeInTheDocument();
 	},
 	args: {
-		prefer: [],
+		preferForms: [],
 		specify: {
 			id: 'someadid',
 			ratio: 1,
 			url: '#test',
-			place: '',
+			place: 'square',
 			imageUrl: '',
+			imageBlurhash: null,
 			dayOfWeek: 7,
+			isSensitive: false,
 		},
 	},
 	parameters: {

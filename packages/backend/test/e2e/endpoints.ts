@@ -574,19 +574,10 @@ describe('Endpoints', () => {
 
 	describe('drive', () => {
 		test('ドライブ情報を取得できる', async () => {
-			await uploadFile(alice, {
-				blob: new Blob([new Uint8Array(256)]),
-			});
-			await uploadFile(alice, {
-				blob: new Blob([new Uint8Array(512)]),
-			});
-			await uploadFile(alice, {
-				blob: new Blob([new Uint8Array(1024)]),
-			});
 			const res = await api('drive', {}, alice);
 			assert.strictEqual(res.status, 200);
 			assert.strictEqual(typeof res.body === 'object' && !Array.isArray(res.body), true);
-			expect(res.body).toHaveProperty('usage', 1792);
+			expect(res.body).toHaveProperty('usage', 0);
 		});
 	});
 

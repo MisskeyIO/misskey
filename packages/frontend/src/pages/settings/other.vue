@@ -131,6 +131,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkSwitch v-model="stackingRouterView">
 							<template #label>Enable stacking router view</template>
 						</MkSwitch>
+						<MkSwitch v-model="enableFolderPageView">
+							<template #label>Enable folder page view</template>
+						</MkSwitch>
 					</div>
 				</MkFolder>
 			</SearchMarker>
@@ -152,6 +155,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<hr>
 
 		<FormLink to="/registry"><template #icon><i class="ti ti-adjustments"></i></template>{{ i18n.ts.registry }}</FormLink>
+
+		<hr>
+
+		<MkButton @click="resetAllTips"><i class="ti ti-bulb"></i> {{ i18n.ts.redisplayAllTips }}</MkButton>
+		<MkButton @click="hideAllTips"><i class="ti ti-bulb-off"></i> {{ i18n.ts.hideAllTips }}</MkButton>
 
 		<hr>
 
@@ -186,6 +194,7 @@ import { prefer } from '@/preferences.js';
 import MkRolePreview from '@/components/MkRolePreview.vue';
 import { signout } from '@/signout.js';
 import { migrateOldSettings } from '@/pref-migrate.js';
+import { store, TIPS } from '@/store.js';
 
 const $i = ensureSignin();
 
@@ -198,6 +207,7 @@ const userLists = ref<Misskey.entities.UserList[]>([]);
 const antennas = ref<Misskey.entities.Antenna[]>([]);
 const selectedListId = ref<string | null>(null);
 const selectedAntennaId = ref<string | null>(null);
+const enableFolderPageView = prefer.model('experimental.enableFolderPageView');
 
 watch(skipNoteRender, async () => {
 	await reloadAsk({ reason: i18n.ts.reloadToApplySetting, unison: true });
@@ -256,6 +266,20 @@ async function clearFanoutTimeline(type: 'home' | 'user' | 'list' | 'antenna', t
 
 function migrate() {
 	migrateOldSettings();
+}
+
+function resetAllTips() {
+	store.set('tips', {});
+	os.success();
+}
+
+function hideAllTips() {
+	const v = {};
+	for (const k of TIPS) {
+		v[k] = true;
+	}
+	store.set('tips', v);
+	os.success();
 }
 
 const headerActions = computed(() => []);

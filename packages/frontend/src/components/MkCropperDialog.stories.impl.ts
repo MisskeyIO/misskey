@@ -38,7 +38,7 @@ export const Default = {
 		};
 	},
 	args: {
-		file: file(),
+		imageFile: new File(['<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"/>'], 'image.svg', { type: 'image/svg+xml' }),
 		aspectRatio: NaN,
 	},
 	parameters: {

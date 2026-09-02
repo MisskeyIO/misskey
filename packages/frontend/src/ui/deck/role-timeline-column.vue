@@ -10,18 +10,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<span v-if="column.roleId && dimension > 0" :class="$style.dimensionBadge"><i class="ti ti-cube"></i>{{ dimension }}</span>
 	</template>
 
-	<MkTimeline v-if="column.roleId" ref="timeline" src="role" :role="column.roleId" :dimension="dimension" @note="onNote"/>
+	<MkStreamingNotesTimeline v-if="column.roleId" ref="timeline" src="role" :role="column.roleId" :dimension="dimension" @note="onNote"/>
 </XColumn>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, useTemplateRef, watch, computed } from 'vue';
+import { onMounted, ref, useTemplateRef, watch } from 'vue';
 import XColumn from './column.vue';
 import type { Column } from '@/deck.js';
 import type { MenuItem } from '@/types/menu.js';
 import type { SoundStore } from '@/preferences/def.js';
 import { updateColumn } from '@/deck.js';
-import MkTimeline from '@/components/MkTimeline.vue';
+import MkStreamingNotesTimeline from '@/components/MkStreamingNotesTimeline.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';

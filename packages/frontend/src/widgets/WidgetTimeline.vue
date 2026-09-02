@@ -25,7 +25,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<p :class="$style.disabledDescription">{{ i18n.ts._disabledTimeline.description }}</p>
 	</div>
 	<div v-else>
-		<MkTimeline :key="timelineKey" :src="widgetProps.src" :list="listId" :antenna="antennaId"/>
+		<MkStreamingNotesTimeline :key="timelineKey" :src="widgetProps.src" :list="listId" :antenna="antennaId"/>
 	</div>
 </MkContainer>
 </template>
@@ -41,7 +41,7 @@ import type { AllTimelineType, BasicTimelineType } from '@/timelines.js';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import MkContainer from '@/components/MkContainer.vue';
-import MkTimeline from '@/components/MkTimeline.vue';
+import MkStreamingNotesTimeline from '@/components/MkStreamingNotesTimeline.vue';
 import { i18n } from '@/i18n.js';
 import { availableBasicTimelines, isAvailableBasicTimeline, isBasicTimeline, basicTimelineIconClass } from '@/timelines.js';
 

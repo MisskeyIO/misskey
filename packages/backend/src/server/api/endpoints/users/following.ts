@@ -54,28 +54,43 @@ export const meta = {
 } as const;
 
 export const paramDef = {
-	type: 'object',
-	properties: {
-		sinceId: { type: 'string', format: 'misskey:id' },
-		untilId: { type: 'string', format: 'misskey:id' },
-		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-
-		userId: { type: 'string', format: 'misskey:id' },
-		username: { type: 'string' },
-		host: {
-			type: 'string',
-			nullable: true,
-			description: 'The local host is represented with `null`.',
+	allOf: [
+		{
+			anyOf: [
+				{
+					type: 'object',
+					properties: {
+						userId: { type: 'string', format: 'misskey:id' },
+					},
+					required: ['userId'],
+				},
+				{
+					type: 'object',
+					properties: {
+						username: { type: 'string' },
+						host: {
+							type: 'string',
+							nullable: true,
+							description: 'The local host is represented with `null`.',
+						},
+					},
+					required: ['username', 'host'],
+				},
+			],
 		},
-
-		birthday: {
-			...birthdaySchema, nullable: true,
-			description: '@deprecated use get-following-birthday-users instead.',
+		{
+			type: 'object',
+			properties: {
+				sinceId: { type: 'string', format: 'misskey:id' },
+				untilId: { type: 'string', format: 'misskey:id' },
+				limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
+				birthday: {
+					...birthdaySchema,
+					nullable: true,
+					description: '@deprecated use get-following-birthday-users instead.',
+				},
+			},
 		},
-	},
-	anyOf: [
-		{ required: ['userId'] },
-		{ required: ['username', 'host'] },
 	],
 } as const;
 
@@ -97,9 +112,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private roleService: RoleService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
-			const user = await this.usersRepository.findOneBy(ps.userId != null
+			const user = await this.usersRepository.findOneBy('userId' in ps
 				? { id: ps.userId }
-				: { usernameLower: ps.username!.toLowerCase(), host: ps.host ? this.utilityService.normalizeHost(ps.host) : IsNull() });
+				: { usernameLower: ps.username.toLowerCase(), host: this.utilityService.toPunyNullable(ps.host) ?? IsNull() });
 
 			if (user == null) {
 				throw new ApiError(meta.errors.noSuchUser);
@@ -133,15 +148,13 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				.andWhere('following.followerId = :userId', { userId: user.id })
 				.innerJoinAndSelect('following.followee', 'followee');
 
-			// @deprecated use get-following-birthday-users instead.
+			// 互換性のため残す。新規実装では get-following-birthday-users を使う。
 			if (ps.birthday) {
 				query.innerJoin(this.userProfilesRepository.metadata.targetName, 'followeeProfile', 'followeeProfile.userId = following.followeeId');
 
 				try {
-					const birthday = ps.birthday.split('-');
-					birthday.shift(); // 年の部分を削除
-					// なぜか get_birthday_date() = :birthday だとインデックスが効かないので、BETWEEN で対応
-					query.andWhere('get_birthday_date(followeeProfile.birthday) BETWEEN :birthday AND :birthday', { birthday: parseInt(birthday.join('')) });
+					const birthday = Number(ps.birthday.split('-').slice(1).join(''));
+					query.andWhere('get_birthday_date(followeeProfile.birthday) BETWEEN :birthday AND :birthday', { birthday });
 				} catch (err) {
 					throw new ApiError(meta.errors.birthdayInvalid);
 				}

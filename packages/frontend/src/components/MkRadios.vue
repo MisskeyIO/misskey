@@ -13,6 +13,10 @@ export default defineComponent({
 		modelValue: {
 			required: false,
 		},
+		vertical: {
+			type: Boolean,
+			default: false,
+		},
 		disabled: {
 			type: Boolean,
 			default: false,
@@ -38,7 +42,10 @@ export default defineComponent({
 		options = options.filter(vnode => vnode.type !== Comment);
 
 		return () => h('div', {
-			class: 'novjtcto',
+			class: [
+				'novjtcto',
+				...(props.vertical ? ['vertical'] : []),
+			],
 		}, [
 			...(label ? [h('div', {
 				class: 'label',
@@ -48,7 +55,7 @@ export default defineComponent({
 			}, options.map(option => h(MkRadio, {
 				key: option.key as string,
 				value: option.props?.value,
-				disabled: option.props?.disabled,
+				disabled: props.disabled || option.props?.disabled,
 				modelValue: value.value,
 				'onUpdate:modelValue': _v => value.value = _v,
 			}, () => option.children)),
@@ -75,7 +82,7 @@ export default defineComponent({
 
 	> .body {
 		display: flex;
-    gap: 12px;
+    gap: 10px;
     flex-wrap: wrap;
 	}
 
@@ -86,6 +93,12 @@ export default defineComponent({
 
 		&:empty {
 			display: none;
+		}
+	}
+
+	&.vertical {
+		> .body {
+			flex-direction: column;
 		}
 	}
 }

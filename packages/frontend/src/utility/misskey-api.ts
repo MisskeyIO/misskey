@@ -63,9 +63,9 @@ export type Response<E extends Endpoint | (string & unknown), P extends AnyReque
 // Implements Misskey.api.ApiClient.request
 export function misskeyApi<
 	ResT = void,
-	E extends Endpoint | NonNullable<string> = Endpoint,
-	P extends AnyRequest<E> = E extends Endpoint ? Request<E> : never,
-	_ResT = ResT extends void ? Response<E, P> : ResT,
+	E extends keyof Misskey.Endpoints = keyof Misskey.Endpoints,
+	P extends Misskey.Endpoints[E]['req'] = Misskey.Endpoints[E]['req'],
+	_ResT = ResT extends void ? Misskey.api.SwitchCaseResponseType<E, P> : ResT,
 >(
 	endpoint: E,
 	data: P & { i?: string | null; } = {} as any,

@@ -8,7 +8,7 @@ import * as Misskey from 'misskey-js';
 import * as os from '@/os.js';
 import { instance } from '@/instance.js';
 import { misskeyApiGet } from '@/utility/misskey-api.js';
-import { useTooltip } from '@/use/use-tooltip.js';
+import { useTooltip } from '@/composables/use-tooltip.js';
 
 const props = defineProps<{
 	userId: string,

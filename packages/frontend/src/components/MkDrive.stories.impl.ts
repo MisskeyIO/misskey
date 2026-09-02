@@ -29,11 +29,9 @@ export const Default = {
 				},
 				events() {
 					return {
-						selected: action('selected'),
-						'change-selection': action('change-selection'),
-						'move-root': action('move-root'),
+						changeSelectedFiles: action('changeSelectedFiles'),
+						changeSelectedFolders: action('changeSelectedFolders'),
 						cd: action('cd'),
-						'open-folder': action('open-folder'),
 					};
 				},
 			},

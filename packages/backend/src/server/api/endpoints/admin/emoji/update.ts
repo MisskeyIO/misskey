@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { CustomEmojiService } from '@/core/CustomEmojiService.js';
-import type { DriveFilesRepository, MiEmoji } from '@/models/_.js';
+import type { DriveFilesRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
 import { ApiError } from '../../../error.js';
 
@@ -37,36 +37,52 @@ export const meta = {
 } as const;
 
 export const paramDef = {
-	type: 'object',
-	properties: {
-		id: { type: 'string', format: 'misskey:id' },
-		name: { type: 'string', pattern: '^[a-zA-Z0-9_]+$' },
-		fileId: { type: 'string', format: 'misskey:id' },
-		category: {
-			type: 'string',
-			nullable: true,
-			description: 'Use `null` to reset the category.',
+	allOf: [
+		{
+			anyOf: [
+				{
+					type: 'object',
+					properties: {
+						id: { type: 'string', format: 'misskey:id' },
+					},
+					required: ['id'],
+				},
+				{
+					type: 'object',
+					properties: {
+						name: { type: 'string', pattern: '^[a-zA-Z0-9_]+$' },
+					},
+					required: ['name'],
+				},
+			],
 		},
-		aliases: { type: 'array', items: {
-			type: 'string',
-		} },
-		license: { type: 'string', nullable: true },
-		isSensitive: { type: 'boolean' },
-		localOnly: { type: 'boolean' },
-		requestedBy: { type: 'string', nullable: true },
-		memo: { type: 'string', nullable: true },
-		roleIdsThatCanBeUsedThisEmojiAsReaction: { type: 'array', items: {
-			type: 'string',
-			format: 'misskey:id',
-		} },
-		roleIdsThatCanNotBeUsedThisEmojiAsReaction: { type: 'array', items: {
-			type: 'string',
-			format: 'misskey:id',
-		} },
-	},
-	anyOf: [
-		{ required: ['id'] },
-		{ required: ['name'] },
+		{
+			type: 'object',
+			properties: {
+				fileId: { type: 'string', format: 'misskey:id' },
+				category: {
+					type: 'string',
+					nullable: true,
+					description: 'Use `null` to reset the category.',
+				},
+				aliases: { type: 'array', items: {
+					type: 'string',
+				} },
+				license: { type: 'string', nullable: true },
+				isSensitive: { type: 'boolean' },
+				localOnly: { type: 'boolean' },
+				requestedBy: { type: 'string', nullable: true },
+				memo: { type: 'string', nullable: true },
+				roleIdsThatCanBeUsedThisEmojiAsReaction: { type: 'array', items: {
+					type: 'string',
+					format: 'misskey:id',
+				} },
+				roleIdsThatCanNotBeUsedThisEmojiAsReaction: { type: 'array', items: {
+					type: 'string',
+					format: 'misskey:id',
+				} },
+			},
+		},
 	],
 } as const;
 
@@ -85,10 +101,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				if (driveFile == null) throw new ApiError(meta.errors.noSuchFile);
 			}
 
-			// JSON schemeのanyOfの型変換がうまくいっていないらしい
-			const required = { id: ps.id, name: ps.name } as
-				| { id: MiEmoji['id']; name?: string }
-				| { id?: MiEmoji['id']; name: string };
+			const required = 'id' in ps
+				? { id: ps.id, name: 'name' in ps ? ps.name as string : undefined }
+				: { name: ps.name };
 
 			const error = await this.customEmojiService.update({
 				...required,

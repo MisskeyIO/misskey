@@ -3513,7 +3513,6 @@ _imageEffector:
     zoomLinesMaskSize: "중앙 값"
     zoomLinesBlack: "검은색으로 하기"
     circle: "원형"
-drafts: "초안"
 _drafts:
   select: "초안 선택"
   cannotCreateDraftAnymore: "초안 작성 가능 수를 초과했습니다."

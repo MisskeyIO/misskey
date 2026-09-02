@@ -3523,7 +3523,6 @@ _imageEffector:
     zoomLinesMaskSize: "Center diameter"
     zoomLinesBlack: "Make black"
     circle: "Circular"
-drafts: "Drafts"
 _drafts:
   select: "Select Draft"
   cannotCreateDraftAnymore: "The number of drafts that can be created has been exceeded."

@@ -4472,7 +4472,8 @@ export type components = {
             expiresAt: string;
             /** Format: date-time */
             startsAt: string;
-            place: string;
+            /** @enum {string} */
+            place: 'square' | 'horizontal' | 'horizontal-big' | 'vertical';
             priority: string;
             ratio: number;
             url: string;
@@ -7076,7 +7077,8 @@ export interface operations {
                 'application/json': {
                     url: string;
                     memo: string;
-                    place: string;
+                    /** @enum {string} */
+                    place: 'square' | 'horizontal' | 'horizontal-big' | 'vertical';
                     priority: string;
                     ratio: number;
                     expiresAt: number;
@@ -7290,7 +7292,8 @@ export interface operations {
                     memo?: string;
                     url?: string;
                     imageUrl?: string;
-                    place?: string;
+                    /** @enum {string} */
+                    place?: 'square' | 'horizontal' | 'horizontal-big' | 'vertical';
                     priority?: string;
                     ratio?: number;
                     expiresAt?: number;

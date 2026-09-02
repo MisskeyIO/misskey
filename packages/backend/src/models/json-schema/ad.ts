@@ -29,6 +29,7 @@ export const packedAdSchema = {
 			type: 'string',
 			optional: false,
 			nullable: false,
+			enum: ['square', 'horizontal', 'horizontal-big', 'vertical'],
 		},
 		priority: {
 			type: 'string',

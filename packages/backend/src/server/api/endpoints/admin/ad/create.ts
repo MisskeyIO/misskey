@@ -32,7 +32,7 @@ export const paramDef = {
 	properties: {
 		url: { type: 'string', minLength: 1 },
 		memo: { type: 'string' },
-		place: { type: 'string' },
+		place: { type: 'string', enum: ['square', 'horizontal', 'horizontal-big', 'vertical'] },
 		priority: { type: 'string' },
 		ratio: { type: 'integer' },
 		expiresAt: { type: 'integer' },

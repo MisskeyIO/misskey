@@ -267,37 +267,6 @@ const makeNotesFollowersOnlyBefore_type = computed(() => {
 	}
 });
 
-const makeNotesFollowersOnlyBefore_presets = [
-	{ label: i18n.ts.oneHour, value: -3600 },
-	{ label: i18n.ts.oneDay, value: -86400 },
-	{ label: i18n.ts.threeDays, value: -259200 },
-	{ label: i18n.ts.oneWeek, value: -604800 },
-	{ label: i18n.ts.oneMonth, value: -2592000 },
-	{ label: i18n.ts.threeMonths, value: -7776000 },
-	{ label: i18n.ts.oneYear, value: -31104000 },
-];
-
-const makeNotesFollowersOnlyBefore_isCustomMode = ref(
-	makeNotesFollowersOnlyBefore.value != null &&
-	makeNotesFollowersOnlyBefore.value < 0 &&
-	!makeNotesFollowersOnlyBefore_presets.some((preset) => preset.value === makeNotesFollowersOnlyBefore.value),
-);
-
-const makeNotesFollowersOnlyBefore_selection = computed({
-	get: () => makeNotesFollowersOnlyBefore_isCustomMode.value ? 'custom' : makeNotesFollowersOnlyBefore.value,
-	set(value) {
-		makeNotesFollowersOnlyBefore_isCustomMode.value = value === 'custom';
-		if (value !== 'custom') makeNotesFollowersOnlyBefore.value = value;
-	},
-});
-
-const makeNotesFollowersOnlyBefore_customMonths = computed({
-	get: () => makeNotesFollowersOnlyBefore.value ? Math.abs(makeNotesFollowersOnlyBefore.value) / (30 * 24 * 60 * 60) : null,
-	set(value) {
-		if (value != null && value > 0) makeNotesFollowersOnlyBefore.value = -Math.abs(Math.floor(Number(value))) * 30 * 24 * 60 * 60;
-	},
-});
-
 const makeNotesHiddenBefore_type = computed(() => {
 	if (makeNotesHiddenBefore.value == null) {
 		return null;
@@ -306,37 +275,6 @@ const makeNotesHiddenBefore_type = computed(() => {
 	} else {
 		return 'relative';
 	}
-});
-
-const makeNotesHiddenBefore_presets = [
-	{ label: i18n.ts.oneHour, value: -3600 },
-	{ label: i18n.ts.oneDay, value: -86400 },
-	{ label: i18n.ts.threeDays, value: -259200 },
-	{ label: i18n.ts.oneWeek, value: -604800 },
-	{ label: i18n.ts.oneMonth, value: -2592000 },
-	{ label: i18n.ts.threeMonths, value: -7776000 },
-	{ label: i18n.ts.oneYear, value: -31104000 },
-];
-
-const makeNotesHiddenBefore_isCustomMode = ref(
-	makeNotesHiddenBefore.value != null &&
-	makeNotesHiddenBefore.value < 0 &&
-	!makeNotesHiddenBefore_presets.some((preset) => preset.value === makeNotesHiddenBefore.value),
-);
-
-const makeNotesHiddenBefore_selection = computed({
-	get: () => makeNotesHiddenBefore_isCustomMode.value ? 'custom' : makeNotesHiddenBefore.value,
-	set(value) {
-		makeNotesHiddenBefore_isCustomMode.value = value === 'custom';
-		if (value !== 'custom') makeNotesHiddenBefore.value = value;
-	},
-});
-
-const makeNotesHiddenBefore_customMonths = computed({
-	get: () => makeNotesHiddenBefore.value ? Math.abs(makeNotesHiddenBefore.value) / (30 * 24 * 60 * 60) : null,
-	set(value) {
-		if (value != null && value > 0) makeNotesHiddenBefore.value = -Math.abs(Math.floor(Number(value))) * 30 * 24 * 60 * 60;
-	},
 });
 
 const gaConsentInternal = ref(miLocalStorage.getItem('gaConsent') === 'true');

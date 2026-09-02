@@ -15,22 +15,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</template>
 	<div class="_spacer" style="--MI_SPACER-min: 20px; --MI_SPACER-max: 28px;">
 		<div class="_gaps_m" :class="$style.root">
-			<MkSelect v-model="category" :required="true">
+				<MkSelect
+					v-model="category"
+					:items="categoryItems"
+				:required="true"
+			>
 				<template #label>{{ i18n.ts.abuseReportCategory }}</template>
 				<template v-if="category" #caption><Mfm :text="i18n.ts._abuseReportCategory[`${category}_description`]"/></template>
-				<option value="" selected disabled>{{ i18n.ts.selectCategory }}</option>
-				<option value="nsfw">{{ i18n.ts._abuseReportCategory.nsfw }}</option>
-				<option value="spam">{{ i18n.ts._abuseReportCategory.spam }}</option>
-				<option value="explicit">{{ i18n.ts._abuseReportCategory.explicit }}</option>
-				<option value="phishing">{{ i18n.ts._abuseReportCategory.phishing }}</option>
-				<option value="personalInfoLeak">{{ i18n.ts._abuseReportCategory.personalInfoLeak }}</option>
-				<option value="selfHarm">{{ i18n.ts._abuseReportCategory.selfHarm }}</option>
-				<option value="criticalBreach">{{ i18n.ts._abuseReportCategory.criticalBreach }}</option>
-				<option value="otherBreach">{{ i18n.ts._abuseReportCategory.otherBreach }}</option>
-				<option value="violationRights">{{ i18n.ts._abuseReportCategory.violationRights }}</option>
-				<option value="violationRightsOther">{{ i18n.ts._abuseReportCategory.violationRightsOther }}</option>
-				<option value="notLike">{{ i18n.ts._abuseReportCategory.notLike }}</option>
-				<option value="other">{{ i18n.ts._abuseReportCategory.other }}</option>
 			</MkSelect>
 			<MkTextarea v-model="comment">
 				<template #label>{{ i18n.ts.details }}</template>
@@ -65,6 +56,7 @@ import type { Ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkWindow from '@/components/MkWindow.vue';
 import MkSelect from '@/components/MkSelect.vue';
+import type { MkSelectItem } from '@/components/MkSelect.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
 import MkButton from '@/components/MkButton.vue';
 import * as os from '@/os.js';
@@ -80,12 +72,29 @@ const emit = defineEmits<{
 	(ev: 'closed'): void;
 }>();
 
-// FIXME 確認
+type ApiCategory = NonNullable<Misskey.Endpoints['users/report-abuse']['req']['category']>;
+type ReportCategory = '' | 'notLike' | ApiCategory;
+
+const categoryItems = [
+	{ label: i18n.ts.selectCategory, value: '' },
+	{ label: i18n.ts._abuseReportCategory.nsfw, value: 'nsfw' },
+	{ label: i18n.ts._abuseReportCategory.spam, value: 'spam' },
+	{ label: i18n.ts._abuseReportCategory.explicit, value: 'explicit' },
+	{ label: i18n.ts._abuseReportCategory.phishing, value: 'phishing' },
+	{ label: i18n.ts._abuseReportCategory.personalInfoLeak, value: 'personalInfoLeak' },
+	{ label: i18n.ts._abuseReportCategory.selfHarm, value: 'selfHarm' },
+	{ label: i18n.ts._abuseReportCategory.criticalBreach, value: 'criticalBreach' },
+	{ label: i18n.ts._abuseReportCategory.otherBreach, value: 'otherBreach' },
+	{ label: i18n.ts._abuseReportCategory.violationRights, value: 'violationRights' },
+	{ label: i18n.ts._abuseReportCategory.violationRightsOther, value: 'violationRightsOther' },
+	{ label: i18n.ts._abuseReportCategory.notLike, value: 'notLike' },
+	{ label: i18n.ts._abuseReportCategory.other, value: 'other' },
+] satisfies MkSelectItem<ReportCategory>[];
 
 const uiWindow = useTemplateRef<InstanceType<typeof MkWindow>>('uiWindow');
 const uiWindow2 = useTemplateRef<InstanceType<typeof MkWindow>>('uiWindow2');
 const comment = ref(props.initialComment ?? '');
-const category = ref('');
+const category = ref<ReportCategory>('');
 const page = ref(1);
 const fullUserInfo: Ref<Misskey.entities.UserDetailed | null> = ref(null);
 
@@ -112,7 +121,9 @@ function refreshUserInfo() {
 }
 
 function send() {
-	if (category.value === 'notLike') {
+	const selectedCategory = category.value;
+	if (selectedCategory === '') return;
+	if (selectedCategory === 'notLike') {
 		uiWindow.value?.close();
 		page.value = 2;
 		return;
@@ -120,7 +131,7 @@ function send() {
 	os.apiWithDialog('users/report-abuse', {
 		userId: props.user.id,
 		comment: comment.value,
-		category: category.value,
+		category: selectedCategory,
 	}, undefined).then(res => {
 		misskeyApi('users/show', { userId: props.user.id })
 			.then((res) => {

@@ -75,9 +75,6 @@ export async function common(createVue: () => Promise<App<Element>>) {
 	if (lastVersion !== version) {
 		miLocalStorage.setItem('lastVersion', version);
 
-		// テーマリビルドするため
-		miLocalStorage.removeItem('theme');
-
 		try { // 変なバージョン文字列来るとcompareVersionsでエラーになるため
 			if (lastVersion != null && compareVersions(version, lastVersion) === 1) {
 				isClientUpdated = true;
@@ -106,11 +103,6 @@ export async function common(createVue: () => Promise<App<Element>>) {
 
 	// タッチデバイスでCSSの:hoverを機能させる
 	window.document.addEventListener('touchend', () => {}, { passive: true });
-
-	// URLに#pswpを含む場合は取り除く
-	if (window.location.hash === '#pswp') {
-		window.history.replaceState(null, '', window.location.href.replace('#pswp', ''));
-	}
 
 	// URLに#pswpを含む場合は取り除く
 	if (window.location.hash === '#pswp') {
@@ -202,7 +194,21 @@ export async function common(createVue: () => Promise<App<Element>>) {
 	}
 	//#endregion
 
+	//#region Sync dark mode
+	if (prefer.s.syncDeviceDarkMode) {
+		store.set('darkMode', isDeviceDarkmode());
+	}
+
+	window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (mql) => {
+		if (prefer.s.syncDeviceDarkMode) {
+			store.set('darkMode', mql.matches);
+		}
+	});
+	//#endregion
+
 	// NOTE: この処理は必ずクライアント更新チェック処理より後に来ること(テーマ再構築のため)
+	// NOTE: この処理は必ずダークモード判定処理より後に来ること(初回のテーマ適用のため)
+	// see: https://github.com/misskey-dev/misskey/issues/16562
 	watch(store.r.darkMode, (darkMode) => {
 		const theme = (() => {
 			if (darkMode) {
@@ -213,7 +219,7 @@ export async function common(createVue: () => Promise<App<Element>>) {
 		})();
 
 		applyTheme(theme);
-	}, { immediate: isSafeMode || miLocalStorage.getItem('theme') == null });
+	}, { immediate: true });
 
 	window.document.documentElement.dataset.colorScheme = store.s.darkMode ? 'dark' : 'light';
 
@@ -232,26 +238,6 @@ export async function common(createVue: () => Promise<App<Element>>) {
 				applyTheme(theme ?? defaultLightTheme);
 			}
 		});
-	}
-
-	//#region Sync dark mode
-	if (prefer.s.syncDeviceDarkMode) {
-		store.set('darkMode', isDeviceDarkmode());
-	}
-
-	window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (mql) => {
-		if (prefer.s.syncDeviceDarkMode) {
-			store.set('darkMode', mql.matches);
-		}
-	});
-	//#endregion
-
-	if (!isSafeMode) {
-		if (prefer.s.darkTheme && store.s.darkMode) {
-			if (miLocalStorage.getItem('themeId') !== prefer.s.darkTheme.id) applyTheme(prefer.s.darkTheme);
-		} else if (prefer.s.lightTheme && !store.s.darkMode) {
-			if (miLocalStorage.getItem('themeId') !== prefer.s.lightTheme.id) applyTheme(prefer.s.lightTheme);
-		}
 
 		fetchInstanceMetaPromise.then(() => {
 			// TODO: instance.defaultLightTheme/instance.defaultDarkThemeが不正な形式だった場合のケア

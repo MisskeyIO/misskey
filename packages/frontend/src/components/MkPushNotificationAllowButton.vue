@@ -90,7 +90,7 @@ function subscribe() {
 				publickey: encode(subscription.getKey('p256dh')),
 			});
 		}, async err => { // When subscribe failed
-		// 通知が許可されていなかったとき
+			// 通知が許可されていなかったとき
 			if (err?.name === 'NotAllowedError') {
 				console.info('User denied the notification permission request.');
 				return;
@@ -114,14 +114,13 @@ async function unsubscribe() {
 
 	if ($i && accounts.length >= 2) {
 		apiWithDialog('sw/unregister', {
-			i: $i.token,
 			endpoint,
-		});
+		}, $i.token);
 	} else {
 		pushSubscription.value.unsubscribe();
 		apiWithDialog('sw/unregister', {
 			endpoint,
-		});
+		}, null);
 		pushSubscription.value = null;
 	}
 }

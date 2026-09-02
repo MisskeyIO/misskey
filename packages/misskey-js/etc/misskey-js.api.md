@@ -879,6 +879,18 @@ export type Channels = {
         };
         receives: null;
     };
+    reversi: {
+        params: null;
+        events: {
+            matched: (payload: {
+                game: ReversiGameDetailed;
+            }) => void;
+            invited: (payload: {
+                user: User;
+            }) => void;
+        };
+        receives: null;
+    };
     reversiGame: {
         params: {
             gameId: string;
@@ -3540,7 +3552,7 @@ export { Notification_2 as Notification }
 export type NotificationsCreateRequest = operations['notifications___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-export const notificationTypes: readonly ["note", "follow", "mention", "reply", "renote", "quote", "reaction", "pollEnded", "receiveFollowRequest", "followRequestAccepted", "roleAssigned", "chatRoomInvitationReceived", "achievementEarned", "exportCompleted", "login", "noteScheduled", "scheduledNotePosted", "scheduledNoteError", "sensitiveFlagAssigned", "createToken", "app", "test"];
+export const notificationTypes: readonly ["note", "follow", "mention", "reply", "renote", "quote", "reaction", "pollEnded", "scheduledNotePosted", "scheduledNotePostFailed", "receiveFollowRequest", "followRequestAccepted", "app", "roleAssigned", "chatRoomInvitationReceived", "achievementEarned", "exportCompleted", "login", "noteScheduled", "scheduledNoteError", "sensitiveFlagAssigned", "createToken", "test"];
 
 // @public (undocumented)
 export function nyaize(text: string): string;
@@ -3648,6 +3660,9 @@ export type QueueStats = {
 
 // @public (undocumented)
 export type QueueStatsLog = QueueStats[];
+
+// @public (undocumented)
+export const queueTypes: readonly ["system", "endedPollNotification", "postScheduledNote", "deliver", "inbox", "db", "relationship", "objectStorage", "userWebhookDeliver", "systemWebhookDeliver"];
 
 // @public (undocumented)
 export type ReceivedAbuseReport = {

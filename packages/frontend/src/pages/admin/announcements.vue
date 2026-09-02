@@ -24,10 +24,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</MkFolder>
 			</MkFolder>
 
-			<MkSelect v-model="announcementsStatus">
+			<MkSelect v-model="announcementsStatus" :items="announcementsStatusDef">
 				<template #label>{{ i18n.ts.filter }}</template>
-				<option value="active">{{ i18n.ts.active }}</option>
-				<option value="archived">{{ i18n.ts.archived }}</option>
 			</MkSelect>
 
 			<MkLoading v-if="loading"/>
@@ -131,8 +129,18 @@ const offset = ref(0);
 const hasMore = ref(false);
 import MkTextarea from '@/components/MkTextarea.vue';
 import { genId } from '@/utility/id.js';
+import { useMkSelect } from '@/composables/use-mkselect.js';
 
-const announcementsStatus = ref<'active' | 'archived'>('active');
+const {
+	model: announcementsStatus,
+	def: announcementsStatusDef,
+} = useMkSelect({
+	items: [
+		{ label: i18n.ts.active, value: 'active' },
+		{ label: i18n.ts.archived, value: 'archived' },
+	],
+	initialValue: 'active',
+});
 
 const loading = ref(true);
 const fetching = ref(false);

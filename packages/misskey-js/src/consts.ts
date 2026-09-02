@@ -26,19 +26,20 @@ export const notificationTypes = [
 	'quote',
 	'reaction',
 	'pollEnded',
+	'scheduledNotePosted',
+	'scheduledNotePostFailed',
 	'receiveFollowRequest',
 	'followRequestAccepted',
+	'app',
 	'roleAssigned',
 	'chatRoomInvitationReceived',
 	'achievementEarned',
 	'exportCompleted',
 	'login',
 	'noteScheduled',
-	'scheduledNotePosted',
 	'scheduledNoteError',
 	'sensitiveFlagAssigned',
 	'createToken',
-	'app',
 	'test',
 ] as const;
 
@@ -263,6 +264,19 @@ export const rolePolicies = [
 	'uploadableFileTypes',
 	'noteDraftLimit',
 	'watermarkAvailable',
+] as const;
+
+export const queueTypes = [
+	'system',
+	'endedPollNotification',
+	'postScheduledNote',
+	'deliver',
+	'inbox',
+	'db',
+	'relationship',
+	'objectStorage',
+	'userWebhookDeliver',
+	'systemWebhookDeliver',
 ] as const;
 
 // See: packages/backend/src/core/ReversiService.ts@L410

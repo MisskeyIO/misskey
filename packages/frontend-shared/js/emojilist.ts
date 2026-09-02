@@ -14,27 +14,15 @@ export type UnicodeEmojiDef = {
 // initial converted from https://github.com/muan/emojilib/commit/242fe68be86ed6536843b83f7e32f376468b38fb
 import _emojilist from './emojilist.json' with { type: 'json' };
 
-const unicodeEmojisMap = new Map<string, UnicodeEmojiDef>(
-	_emojilist.map(x => [x[0] as string, {
-		char: x[0] as string,
-		name: x[1] as string,
-		category: unicodeEmojiCategories[x[2] as number],
-	}]),
-);
-export function getUnicodeEmoji(char: string): UnicodeEmojiDef | string {
-	// Colorize it because emojilist.json assumes that
-	return unicodeEmojisMap.get(colorizeEmoji(char))
-		// カラースタイル絵文字がjsonに無い場合はテキストスタイル絵文字にフォールバックする
-		?? unicodeEmojisMap.get(char)
-		// それでも見つからない場合はそのまま返す（絵文字情報がjsonに無い場合、このフォールバックが無いとレンダリングに失敗する）
-		?? char;
-}
-
 export const emojilist: UnicodeEmojiDef[] = _emojilist.map(x => ({
 	name: x[1] as string,
 	char: x[0] as string,
 	category: unicodeEmojiCategories[x[2] as number],
 }));
+
+const unicodeEmojisMap = new Map<string, UnicodeEmojiDef>(
+	emojilist.map(x => [x.char, x]),
+);
 
 const _indexByChar = new Map<string, number>();
 const _charGroupByCategory = new Map<string, string[]>();
@@ -50,6 +38,20 @@ for (let i = 0; i < emojilist.length; i++) {
 }
 
 export const emojiCharByCategory = _charGroupByCategory;
+
+export function getUnicodeEmojiOrNull(char: string): UnicodeEmojiDef | null {
+	// Colorize it because emojilist.json assumes that
+	return unicodeEmojisMap.get(colorizeEmoji(char))
+		// カラースタイル絵文字がjsonに無い場合はテキストスタイル絵文字にフォールバックする
+		?? unicodeEmojisMap.get(char)
+		// それでも見つからない場合はnullを返す
+		?? null;
+}
+
+export function getUnicodeEmoji(char: string): UnicodeEmojiDef | string {
+	// 絵文字が見つからない場合はそのまま返す（絵文字情報がjsonに無い場合、このフォールバックが無いとレンダリングに失敗する）
+	return getUnicodeEmojiOrNull(char) ?? char;
+}
 
 export function isSupportedEmoji(char: string): boolean {
 	return unicodeEmojisMap.has(colorizeEmoji(char)) || unicodeEmojisMap.has(char);
@@ -74,6 +76,7 @@ export function colorizeEmoji(char: string) {
 }
 
 export interface CustomEmojiFolderTree {
+	value: string;
 	category: string;
 	children: CustomEmojiFolderTree[];
 }

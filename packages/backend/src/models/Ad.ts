@@ -71,10 +71,12 @@ export class MiAd {
 		length: 8192, nullable: false,
 	})
 	public memo: string;
+
 	@Column('integer', {
 		default: 0, nullable: false,
 	})
 	public dayOfWeek: number;
+
 	constructor(data: Partial<MiAd>) {
 		if (data == null) return;
 

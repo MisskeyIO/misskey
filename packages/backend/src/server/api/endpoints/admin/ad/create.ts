@@ -39,7 +39,7 @@ export const paramDef = {
 		startsAt: { type: 'integer' },
 		imageUrl: { type: 'string', minLength: 1 },
 		dayOfWeek: { type: 'integer' },
-		isSensitive: { type: 'boolean', default: false },
+		isSensitive: { type: 'boolean' },
 	},
 	required: ['url', 'memo', 'place', 'priority', 'ratio', 'expiresAt', 'startsAt', 'imageUrl', 'dayOfWeek'],
 } as const;

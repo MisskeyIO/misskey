@@ -125,6 +125,31 @@ export const meta = {
 			id: '9ee33bbe-fde3-4c71-9b51-e50492c6b9c8',
 		},
 
+		tooManyScheduledNotes: {
+			message: 'You cannot create scheduled notes any more.',
+			code: 'TOO_MANY_SCHEDULED_NOTES',
+			id: '22ae69eb-09e3-4541-a850-773cfa45e693',
+		},
+
+		cannotScheduleToPast: {
+			message: 'Cannot schedule to the past.',
+			code: 'CANNOT_SCHEDULE_TO_PAST',
+			id: 'e577d185-8179-4a17-b47f-6093985558e6',
+		},
+
+		cannotScheduleToFarFuture: {
+			message: 'Cannot schedule to the far future.',
+			code: 'CANNOT_SCHEDULE_TO_FAR_FUTURE',
+			id: 'ea102856-e8da-4ae9-a98a-0326821bd177',
+		},
+
+		rolePermissionDenied: {
+			message: 'You are not assigned to a required role.',
+			code: 'ROLE_PERMISSION_DENIED',
+			id: '12f1d5d2-f7ec-4d7c-b608-e873f4b20327',
+			status: 403,
+		},
+
 		cannotRenoteToExternal: {
 			message: 'Cannot Renote to External.',
 			code: 'CANNOT_RENOTE_TO_EXTERNAL',
@@ -150,7 +175,6 @@ export const paramDef = {
 		localOnly: { type: 'boolean', default: false },
 		dimension: { type: 'integer', nullable: true, minimum: 0, maximum: 2_147_483_647 },
 		lang: { type: 'string', enum: [null, ...postingLangCodes] as string[], nullable: true },
-		scheduledAt: { type: 'integer', nullable: true, maximum: 253_402_300_799_999 },
 		reactionAcceptance: { type: 'string', nullable: true, enum: [null, 'likeOnly', 'likeOnlyForRemote', 'nonSensitiveOnly', 'nonSensitiveOnlyForLocalLikeOnlyForRemote'], default: null },
 		replyId: { type: 'string', format: 'misskey:id', nullable: true },
 		renoteId: { type: 'string', format: 'misskey:id', nullable: true },
@@ -166,7 +190,7 @@ export const paramDef = {
 		fileIds: {
 			type: 'array',
 			uniqueItems: true,
-			minItems: 1,
+			minItems: 0,
 			maxItems: 16,
 			items: { type: 'string', format: 'misskey:id' },
 		},
@@ -187,6 +211,8 @@ export const paramDef = {
 			},
 			required: ['choices'],
 		},
+		scheduledAt: { type: 'integer', nullable: true, maximum: 253_402_300_799_999 },
+		isActuallyScheduled: { type: 'boolean', default: false },
 	},
 	required: [],
 } as const;
@@ -199,26 +225,26 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const draft = await this.noteDraftService.create(me, {
-				fileIds: ps.fileIds,
-				poll: ps.poll ? {
-					choices: ps.poll.choices,
-					multiple: ps.poll.multiple ?? false,
-					expiresAt: ps.poll.expiresAt ? new Date(ps.poll.expiresAt) : null,
-					expiredAfter: ps.poll.expiredAfter ?? null,
-				} : undefined,
+				fileIds: ps.fileIds ?? [],
+				pollChoices: ps.poll?.choices ?? [],
+				pollMultiple: ps.poll?.multiple ?? false,
+				pollExpiresAt: ps.poll?.expiresAt ? new Date(ps.poll.expiresAt) : null,
+				pollExpiredAfter: ps.poll?.expiredAfter ?? null,
+				hasPoll: ps.poll != null,
 				text: ps.text ?? null,
-				replyId: ps.replyId ?? undefined,
-				renoteId: ps.renoteId ?? undefined,
+				replyId: ps.replyId ?? null,
+				renoteId: ps.renoteId ?? null,
 				cw: ps.cw ?? null,
-				...(ps.hashtag ? { hashtag: ps.hashtag } : {}),
+				hashtag: ps.hashtag ?? null,
 				localOnly: ps.localOnly,
 				dimension: ps.dimension ?? null,
 				lang: ps.lang ?? null,
-				scheduledAt: ps.scheduledAt == null ? null : new Date(ps.scheduledAt),
 				reactionAcceptance: ps.reactionAcceptance,
 				visibility: ps.visibility,
 				visibleUserIds: ps.visibleUserIds ?? [],
-				channelId: ps.channelId ?? undefined,
+				channelId: ps.channelId ?? null,
+				scheduledAt: ps.scheduledAt ? new Date(ps.scheduledAt) : null,
+				isActuallyScheduled: ps.isActuallyScheduled,
 			}).catch((err) => {
 				if (err instanceof IdentifiableError) {
 					switch (err.id) {
@@ -248,6 +274,15 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 							throw new ApiError(meta.errors.cannotReplyToInvisibleNote);
 						case '215dbc76-336c-4d2a-9605-95766ba7dab0':
 							throw new ApiError(meta.errors.cannotReplyToSpecifiedVisibilityNoteWithExtendedVisibility);
+						case 'c3275f19-4558-4c59-83e1-4f684b5fab66':
+							throw new ApiError(meta.errors.tooManyScheduledNotes);
+						case '7cc42034-f7ab-4f7c-87b4-e00854479080':
+							throw new ApiError(meta.errors.rolePermissionDenied);
+						case '94a89a43-3591-400a-9c17-dd166e71fdfa':
+						case 'b34d0c1b-996f-4e34-a428-c636d98df457':
+							throw new ApiError(meta.errors.cannotScheduleToPast);
+						case '506006cf-3092-4ae1-8145-b025001c591f':
+							throw new ApiError(meta.errors.cannotScheduleToFarFuture);
 						default:
 							throw err;
 					}

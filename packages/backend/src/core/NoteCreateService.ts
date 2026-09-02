@@ -209,11 +209,10 @@ export class NoteCreateService implements OnApplicationShutdown {
 		private userBlockingService: UserBlockingService,
 		private loggerService: LoggerService,
 		private cacheService: CacheService,
-	) {
-		this.updateNotesCountQueue = new CollapsedQueue(process.env.NODE_ENV !== 'test' ? 60 * 1000 * 5 : 0, this.collapseNotesCount, this.performUpdateNotesCount);
-		this.logger = this.loggerService.getLogger('note:create');
-		this.updateNotesCountQueue = new CollapsedQueue(process.env.NODE_ENV !== 'test' ? 60 * 1000 * 5 : 0, this.collapseNotesCount, this.performUpdateNotesCount);
-	}
+		) {
+			this.updateNotesCountQueue = new CollapsedQueue(process.env.NODE_ENV !== 'test' ? 60 * 1000 * 5 : 0, this.collapseNotesCount, this.performUpdateNotesCount);
+			this.logger = this.loggerService.getLogger('note:create');
+		}
 
 	@bindThis
 	public async create(user: {

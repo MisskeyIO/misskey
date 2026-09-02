@@ -8,13 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template #empty><MkResult type="empty" :text="i18n.ts.noNotes"/></template>
 
 	<template #default="{ items: notes }">
-		<component
-			:is="aprilFools ? TransitionGroup : 'div'"
-			:class="[$style.root, { [$style.noGap]: noGap, '_gaps': !noGap }]"
-			:enterFromClass="$style.aprilFools"
-			:leaveToClass="$style.aprilFools"
-			tag="div"
-		>
+		<div :class="[$style.root, { [$style.noGap]: noGap, '_gaps': !noGap }]">
 			<template v-for="(note, i) in notes" :key="note.id">
 				<div v-if="i > 0 && isSeparatorNeeded(notes[i - 1]!.createdAt, note.createdAt)" :data-scroll-anchor="note.id">
 					<div :class="$style.date">
@@ -32,13 +26,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 				<MkNote v-else :class="$style.note" :note="note" :withHardMute="true" :data-scroll-anchor="note.id"/>
 			</template>
-		</component>
+		</div>
 	</template>
 </MkPagination>
 </template>
 
 <script lang="ts" setup generic="T extends IPaginator<Misskey.entities.Note>">
-import { TransitionGroup } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { IPaginator } from '@/utility/paginator.js';
 import MkNote from '@/components/MkNote.vue';
@@ -46,8 +39,6 @@ import MkPagination from '@/components/MkPagination.vue';
 import { i18n } from '@/i18n.js';
 import { globalEvents, useGlobalEvent } from '@/events.js';
 import { isSeparatorNeeded, getSeparatorInfo } from '@/utility/timeline-date-separate.js';
-import { isAprilFoolsDay } from '@/utility/seasonal-events.js';
-import { prefer } from '@/preferences.js';
 
 const props = withDefaults(defineProps<{
 	paginator: T;
@@ -60,8 +51,6 @@ const props = withDefaults(defineProps<{
 	pullToRefresh: true,
 	withControl: true,
 });
-
-const aprilFools = prefer.s.animation && isAprilFoolsDay();
 
 useGlobalEvent('noteDeleted', (noteId) => {
 	props.paginator.removeItem(noteId);
@@ -103,10 +92,6 @@ defineExpose({
 			border-radius: var(--MI-radius);
 		}
 	}
-}
-
-.aprilFools {
-	animation: global-spin-shrink 3s ease-in forwards;
 }
 
 .date {

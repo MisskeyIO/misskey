@@ -24,8 +24,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			:class="$style.notes"
 			:enterActiveClass="$style.transition_x_enterActive"
 			:leaveActiveClass="$style.transition_x_leaveActive"
-			:enterFromClass="aprilFools ? $style.aprilFools : $style.transition_x_enterFrom"
-			:leaveToClass="aprilFools ? $style.aprilFools : $style.transition_x_leaveTo"
+			:enterFromClass="$style.transition_x_enterFrom"
+			:leaveToClass="$style.transition_x_leaveTo"
 			:moveClass="$style.transition_x_move"
 			tag="div"
 		>
@@ -82,7 +82,6 @@ import { useGlobalEvent } from '@/events.js';
 import { isSeparatorNeeded, getSeparatorInfo } from '@/utility/timeline-date-separate.js';
 import { retryWithFibonacciBackoff } from '@/utility/retry.js';
 import { Paginator } from '@/utility/paginator.js';
-import { isAprilFoolsDay } from '@/utility/seasonal-events.js';
 
 const props = withDefaults(defineProps<{
 	src: BasicTimelineType | 'mentions' | 'directs' | 'list' | 'antenna' | 'channel' | 'role';
@@ -109,8 +108,6 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
 	note: [];
 }>();
-
-const aprilFools = prefer.s.animation && isAprilFoolsDay();
 
 provide('inTimeline', true);
 provide('tl_withSensitive', computed(() => props.withSensitive));
@@ -597,10 +594,6 @@ defineExpose({
 
 .transition_x_leaveTo {
 	opacity: 0;
-}
-
-.aprilFools {
-	animation: global-spin-shrink 3s ease-in forwards;
 }
 
 .notes {

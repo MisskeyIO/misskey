@@ -42,7 +42,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { onUnmounted, onMounted, computed, useTemplateRef, TransitionGroup } from 'vue';
+import { onUnmounted, onMounted, onActivated, computed, useTemplateRef, TransitionGroup, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { useInterval } from '@@/js/use-interval.js';
 import type { notificationTypes } from '@@/js/const.js';
@@ -62,6 +62,7 @@ const props = defineProps<{
 }>();
 
 const rootEl = useTemplateRef('rootEl');
+const hasNewNotificationWhileTabHidden = ref(false);
 
 const paginator = usePagination({
 	ctx: prefer.s.useGroupedNotifications ? {
@@ -107,13 +108,21 @@ function onNotification(notification) {
 		}
 	}
 
-	if (!isMuted && filterMutedNotification(notification)) {
+	if (!window.document.hidden && !isMuted && filterMutedNotification(notification)) {
 		paginator.prepend(notification);
 	}
+
+	if (window.document.hidden) hasNewNotificationWhileTabHidden.value = true;
 }
 
 function reload() {
 	return paginator.reload();
+}
+
+function onVisibilityChange() {
+	if (window.document.visibilityState !== 'visible' || !hasNewNotificationWhileTabHidden.value) return;
+	hasNewNotificationWhileTabHidden.value = false;
+	void reload();
 }
 
 let connection: Misskey.ChannelConnection<Misskey.Channels['main']> | null = null;
@@ -124,10 +133,16 @@ onMounted(() => {
 		connection.on('notification', onNotification);
 		connection.on('notificationFlushed', reload);
 	}
+	window.document.addEventListener('visibilitychange', onVisibilityChange);
+});
+
+onActivated(() => {
+	void reload();
 });
 
 onUnmounted(() => {
 	if (connection) connection.dispose();
+	window.document.removeEventListener('visibilitychange', onVisibilityChange);
 });
 
 defineExpose({

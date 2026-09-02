@@ -17,7 +17,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template #header>
 		{{ i18n.ts.drafts }} ({{ currentDraftsCount }}/{{ $i?.policies.noteDraftLimit }})
 	</template>
-	<div class="_spacer">
+	<MkTab v-model="tab">
+		<option value="server">{{ i18n.ts._drafts.server }}</option>
+		<option v-if="$i?.policies.canScheduleNote" value="scheduled">{{ i18n.ts.scheduled }}</option>
+		<option v-if="hasLegacyDrafts" value="legacy">{{ i18n.ts._drafts.legacy }}</option>
+	</MkTab>
+	<div v-if="tab === 'server'" class="_spacer">
 		<MkPagination :paginator="paginator" withControl>
 			<template #empty>
 				<MkResult type="empty" :text="i18n.ts._drafts.noDrafts"/>
@@ -81,6 +86,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 										<i v-else-if="draft.visibility === 'specified'" class="ti ti-mail"></i>
 									</span>
 									<span v-if="draft.localOnly" :title="i18n.ts._visibility['disableFederation']"><i class="ti ti-rocket-off"></i></span>
+									<span v-if="typeof draft.dimension === 'number' && draft.dimension > 0" :title="i18n.tsx.dimensionWithNumber({ dimension: draft.dimension })"><i class="ti ti-cube"></i> {{ draft.dimension }}</span>
+									<span v-if="draft.lang" :title="getLangTitle(draft.lang)"><i class="ti ti-language"></i> {{ draft.lang }}</span>
+									<span v-if="draft.scheduledAt"><i class="ti ti-calendar-clock"></i> <MkTime :time="draft.scheduledAt"/></span>
 								</div>
 								<MkTime :time="draft.createdAt" :class="$style.draftCreatedAt" mode="detail" colored/>
 							</div>
@@ -110,20 +118,88 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</template>
 		</MkPagination>
 	</div>
+	<div v-else-if="tab === 'scheduled'" class="_spacer">
+		<MkPagination :paginator="scheduledPaginator">
+			<template #empty>
+				<MkResult type="empty" :text="i18n.ts.nothing"/>
+			</template>
+			<template #default="{ items }">
+				<div class="_gaps_s">
+					<div v-for="scheduled in (items as Misskey.entities.ScheduledNote[])" :key="scheduled.id" v-panel :class="$style.draft">
+						<div :class="$style.draftBody" class="_gaps_s">
+							<div :class="$style.draftInfo">
+								<div :class="$style.draftMeta">
+									<span v-if="scheduled.channel"><i class="ti ti-device-tv"></i> {{ scheduled.channel.name }}</span>
+									<span v-else-if="scheduled.reply"><i class="ti ti-arrow-back-up"></i> {{ Misskey.acct.toString(scheduled.reply.user) }}</span>
+									<span v-else-if="scheduled.renote"><i class="ti ti-quote"></i> {{ Misskey.acct.toString(scheduled.renote.user) }}</span>
+								</div>
+								<span v-if="scheduled.scheduledAt"><i class="ti ti-calendar-clock"></i> <MkTime :time="scheduled.scheduledAt" mode="detail" colored/></span>
+							</div>
+							<div :class="$style.draftContent">
+								<Mfm :text="scheduledSummary(scheduled)" :plain="true"/>
+							</div>
+							<div v-if="scheduled.reason" class="_caption"><i class="ti ti-alert-circle"></i> {{ scheduled.reason }}</div>
+						</div>
+						<div :class="$style.draftActions" class="_buttons">
+							<MkButton small @click="unschedule(scheduled)"><i class="ti ti-calendar-x"></i> {{ i18n.ts._drafts.unscheduleAndSave }}</MkButton>
+							<MkButton v-tooltip="i18n.ts.delete" danger small :iconOnly="true" @click="cancelScheduled(scheduled)"><i class="ti ti-trash"></i></MkButton>
+						</div>
+					</div>
+				</div>
+			</template>
+		</MkPagination>
+	</div>
+	<div v-else class="_spacer _gaps_m">
+		<div :class="$style.account">
+			<MkAvatar v-if="$i" :user="$i" :class="$style.avatar"/>
+			<div>
+				<div class="_caption">{{ i18n.ts._drafts.legacyAccount }}</div>
+				<MkAcct v-if="$i" :user="$i" detail/>
+			</div>
+		</div>
+		<div>{{ i18n.ts._drafts.legacyDescription }}</div>
+		<MkInfo v-if="legacyParseFailed || legacyInvalidCount > 0" warn>{{ i18n.ts._drafts.legacyDataBroken }}</MkInfo>
+		<MkResult v-if="legacyEntries.length === 0 && !legacyParseFailed && legacyInvalidCount === 0" type="empty" :text="i18n.ts._drafts.noDrafts"/>
+		<div class="_gaps_s">
+			<div v-for="entry in legacyEntries" :key="entry.key" v-panel :class="$style.draft">
+				<div :class="$style.draftBody" class="_gaps_s">
+					<div :class="$style.draftContent"><Mfm :text="legacySummary(entry.draft)" :plain="true"/></div>
+					<div :class="$style.draftFooter">
+						<div :class="$style.draftVisibility">
+							<span v-if="entry.draft.channel"><i class="ti ti-device-tv"></i> {{ entry.draft.channel.name }}</span>
+							<span v-if="typeof entry.draft.data.dimension === 'number' && entry.draft.data.dimension > 0"><i class="ti ti-cube"></i> {{ entry.draft.data.dimension }}</span>
+							<span v-if="entry.draft.data.lang"><i class="ti ti-language"></i> {{ entry.draft.data.lang }}</span>
+							<span v-if="entry.draft.scheduledAt"><i class="ti ti-calendar-clock"></i> <MkTime :time="entry.draft.scheduledAt"/></span>
+						</div>
+						<MkTime :time="entry.draft.updatedAt" :class="$style.draftCreatedAt" mode="detail" colored/>
+					</div>
+				</div>
+				<div :class="$style.draftActions" class="_buttons">
+					<MkButton primary small @click="migrateLegacyDraft(entry)"><i class="ti ti-cloud-upload"></i> {{ i18n.ts._drafts.migrate }}</MkButton>
+				</div>
+			</div>
+		</div>
+	</div>
 </MkModalWindow>
 </template>
 
 <script lang="ts" setup>
-import { ref, shallowRef, markRaw } from 'vue';
+import { computed, ref, shallowRef, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@/components/MkButton.vue';
+import MkInfo from '@/components/MkInfo.vue';
 import MkPagination from '@/components/MkPagination.vue';
+import MkTab from '@/components/MkTab.vue';
 import MkModalWindow from '@/components/MkModalWindow.vue';
 import { getNoteSummary } from '@/utility/get-note-summary.js';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import { $i } from '@/i.js';
-import { misskeyApi } from '@/utility/misskey-api';
+import { miLocalStorage } from '@/local-storage.js';
+import { langmap } from '@/utility/langmap.js';
+import { legacyNoteDraftToRequest, parseLegacyNoteDrafts, removeUnchangedLegacyNoteDraft, scheduledNoteToDraftRequest } from '@/utility/note-draft-migration.js';
+import type { LegacyNoteDraft, LegacyNoteDraftEntry } from '@/utility/note-draft-migration.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 import { Paginator } from '@/utility/paginator.js';
 
 const emit = defineEmits<{
@@ -136,10 +212,34 @@ const paginator = markRaw(new Paginator('notes/drafts/list', {
 	limit: 10,
 }));
 
+const scheduledPaginator = markRaw(new Paginator('notes/scheduled/list', {
+	limit: 10,
+	offsetMode: true,
+}));
+
+const tab = ref<'server' | 'scheduled' | 'legacy'>('server');
+const legacyEntries = ref<LegacyNoteDraftEntry[]>([]);
+const legacyInvalidCount = ref(0);
+const legacyParseFailed = ref(false);
+const hasLegacyDrafts = computed(() => legacyEntries.value.length > 0 || legacyInvalidCount.value > 0 || legacyParseFailed.value);
+
+function loadLegacyDrafts() {
+	const result = parseLegacyNoteDrafts(miLocalStorage.getItem('drafts'));
+	legacyEntries.value = result.entries;
+	legacyInvalidCount.value = result.invalidCount;
+	legacyParseFailed.value = result.parseFailed;
+}
+
+loadLegacyDrafts();
+
 const currentDraftsCount = ref(0);
-misskeyApi('notes/drafts/count').then((count) => {
+
+async function reloadDraftCount() {
+	const count = await misskeyApi('notes/drafts/count');
 	currentDraftsCount.value = count;
-});
+}
+
+void reloadDraftCount();
 
 const dialogEl = shallowRef<InstanceType<typeof MkModalWindow>>();
 
@@ -161,9 +261,109 @@ async function deleteDraft(draft: Misskey.entities.NoteDraft) {
 
 	if (canceled) return;
 
-	os.apiWithDialog('notes/drafts/delete', { draftId: draft.id }).then(() => {
-		paginator.reload();
+	try {
+		await os.apiWithDialog('notes/drafts/delete', { draftId: draft.id });
+	} catch {
+		return;
+	}
+
+	paginator.reload();
+	await reloadDraftCount();
+}
+
+function getLangTitle(lang: string): string {
+	const label = lang === 'other' ? i18n.ts.other : langmap[lang]?.nativeName ?? lang;
+	return `${i18n.ts.postingLanguage}: ${label}`;
+}
+
+function scheduledSummary(draft: Misskey.entities.ScheduledNote): string {
+	return draft.data.cw ?? draft.data.text ?? i18n.ts.nothing;
+}
+
+function legacySummary(draft: LegacyNoteDraft): string {
+	return draft.data.cw ?? draft.data.text ?? i18n.ts.nothing;
+}
+
+async function migrateLegacyDraft(entry: LegacyNoteDraftEntry) {
+	if ($i == null) return;
+	const account = Misskey.acct.toString($i);
+	const { canceled } = await os.confirm({
+		type: 'question',
+		text: i18n.tsx._drafts.migrateConfirm({ account }),
 	});
+	if (canceled) return;
+
+	let request: Misskey.Endpoints['notes/drafts/create']['req'];
+	try {
+		request = legacyNoteDraftToRequest(entry.draft);
+	} catch {
+		await os.alert({ type: 'error', text: i18n.ts._drafts.legacyDataBroken });
+		return;
+	}
+
+	try {
+		await os.apiWithDialog('notes/drafts/create', request);
+	} catch {
+		return;
+	}
+
+	const current = miLocalStorage.getItem('drafts');
+	const updated = removeUnchangedLegacyNoteDraft(current, entry.key, entry.fingerprint);
+	if (updated == null) {
+		await os.alert({ type: 'warning', text: i18n.ts._drafts.legacyChanged });
+	} else {
+		miLocalStorage.setItem('drafts', updated);
+	}
+
+	loadLegacyDrafts();
+	paginator.reload();
+	await reloadDraftCount();
+	tab.value = 'server';
+	os.success();
+}
+
+async function unschedule(draft: Misskey.entities.ScheduledNote) {
+	const { canceled } = await os.confirm({
+		type: 'question',
+		text: i18n.ts._drafts.unscheduleConfirm,
+	});
+	if (canceled) return;
+
+	try {
+		await os.apiWithDialog('notes/drafts/create', scheduledNoteToDraftRequest(draft));
+	} catch {
+		return;
+	}
+
+	try {
+		await os.apiWithDialog('notes/scheduled/cancel', { draftId: draft.id });
+	} catch {
+		paginator.reload();
+		await reloadDraftCount();
+		await os.alert({ type: 'warning', text: i18n.ts._drafts.unscheduleFailed });
+		return;
+	}
+
+	scheduledPaginator.reload();
+	paginator.reload();
+	await reloadDraftCount();
+	tab.value = 'server';
+	os.success();
+}
+
+async function cancelScheduled(draft: Misskey.entities.ScheduledNote) {
+	const { canceled } = await os.confirm({
+		type: 'warning',
+		text: i18n.ts._drafts.deleteScheduledConfirm,
+	});
+	if (canceled) return;
+
+	try {
+		await os.apiWithDialog('notes/scheduled/cancel', { draftId: draft.id });
+	} catch {
+		return;
+	}
+	scheduledPaginator.reload();
 }
 </script>
 
@@ -207,6 +407,9 @@ async function deleteDraft(draft: Misskey.entities.NoteDraft) {
 }
 
 .draftVisibility {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
 	flex-shrink: 0;
 }
 
@@ -219,5 +422,19 @@ async function deleteDraft(draft: Misskey.entities.NoteDraft) {
 	margin-top: 16px;
 	padding-top: 16px;
 	border-top: solid 1px var(--MI_THEME-divider);
+}
+
+.account {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px;
+	border: solid 1px var(--MI_THEME-divider);
+	border-radius: 10px;
+}
+
+.avatar {
+	width: 40px;
+	height: 40px;
 }
 </style>

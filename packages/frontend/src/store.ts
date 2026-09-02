@@ -276,10 +276,6 @@ export const store = markRaw(new Pizzax('base', {
 		where: 'device',
 		default: false,
 	},
-	autoloadDrafts: {
-		where: 'device',
-		default: true,
-	},
 	enableInfiniteScroll: {
 		where: 'device',
 		default: true,

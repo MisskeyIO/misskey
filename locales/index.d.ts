@@ -13360,6 +13360,54 @@ export interface Locale extends ILocale {
          * 下書き一覧
          */
         "listDrafts": string;
+        /**
+         * サーバー下書き
+         */
+        "server": string;
+        /**
+         * この端末の旧下書き
+         */
+        "legacy": string;
+        /**
+         * 移行先アカウント
+         */
+        "legacyAccount": string;
+        /**
+         * 旧版がこの端末に保存した下書きです。内容を確認し、現在のアカウントへ1件ずつ移行してください。
+         */
+        "legacyDescription": string;
+        /**
+         * 読み取れない旧下書きがあります。元データは削除していません。
+         */
+        "legacyDataBroken": string;
+        /**
+         * 移行中に元の下書きが更新されたため、端末側には残しました。サーバー側にはコピーされています。
+         */
+        "legacyChanged": string;
+        /**
+         * サーバーへ移行
+         */
+        "migrate": string;
+        /**
+         * この下書きを {account} のサーバー下書きへ移行しますか？
+         */
+        "migrateConfirm": ParameterizedString<"account">;
+        /**
+         * 予約を解除して下書きに戻す
+         */
+        "unscheduleAndSave": string;
+        /**
+         * 予約を解除し、サーバー下書きへ戻しますか？
+         */
+        "unscheduleConfirm": string;
+        /**
+         * サーバー下書きには保存しましたが、予約解除に失敗しました。両方を残しています。
+         */
+        "unscheduleFailed": string;
+        /**
+         * この予約投稿を削除しますか？
+         */
+        "deleteScheduledConfirm": string;
     };
 }
 declare const locales: {

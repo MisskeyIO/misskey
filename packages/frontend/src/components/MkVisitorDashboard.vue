@@ -6,7 +6,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <div v-if="instance" :class="$style.root">
 	<div :class="[$style.main, $style.panel]">
-		<img :src="instance.iconUrl || '/favicon.ico'" alt="" :class="$style.mainIcon"/>
+		<img v-if="kawaiiMode" src="/client-assets/kawaii/misskey.png" alt="Logo by @sawaratsuki@misskey.io" :class="$style.mainIconAlt"/>
+		<img v-else :src="instance.iconUrl || '/favicon.ico'" alt="" :class="$style.mainIcon"/>
 		<button class="_button _acrylic" :class="$style.mainMenu" @click="showMenu"><i class="ti ti-dots"></i></button>
 		<div :class="$style.mainFg">
 			<h1 :class="$style.mainTitle">
@@ -65,10 +66,12 @@ import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { instance } from '@/instance.js';
+import { miLocalStorage } from '@/local-storage.js';
 import MkNumber from '@/components/MkNumber.vue';
 import XActiveUsersChart from '@/components/MkVisitorDashboard.ActiveUsersChart.vue';
 import { openInstanceMenu } from '@/ui/_common_/common.js';
 
+const kawaiiMode = miLocalStorage.getItem('kawaii') === 'true';
 const stats = ref<Misskey.entities.StatsResponse | null>(null);
 
 if (instance.clientOptions.showActivitiesForVisitor !== false) {
@@ -116,6 +119,13 @@ function showMenu(ev: MouseEvent) {
 
 .mainIcon {
 	width: 85px;
+	margin-top: -47px;
+	vertical-align: bottom;
+	filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5));
+}
+
+.mainIconAlt {
+	width: 85%;
 	margin-top: -47px;
 	vertical-align: bottom;
 	filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5));

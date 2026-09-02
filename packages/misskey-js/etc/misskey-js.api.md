@@ -633,7 +633,15 @@ export type AuthSessionUserkeyRequest = operations['auth___session___userkey']['
 export type AuthSessionUserkeyResponse = operations['auth___session___userkey']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-export type AvatarDecoration = UserLite['avatarDecorations'][number];
+export type AvatarDecoration = {
+    id: string;
+    name: string;
+    url: string;
+    angle?: number;
+    flipH?: boolean;
+    offsetX?: number;
+    offsetY?: number;
+};
 
 // @public (undocumented)
 export type Blocking = components['schemas']['Blocking'];
@@ -2809,6 +2817,9 @@ export type ModerationLog = {
     type: 'updateUserNote';
     info: ModerationLogPayloads['updateUserNote'];
 } | {
+    type: 'updateInlinePolicies';
+    info: ModerationLogPayloads['updateInlinePolicies'];
+} | {
     type: 'addCustomEmoji';
     info: ModerationLogPayloads['addCustomEmoji'];
 } | {
@@ -2905,6 +2916,15 @@ export type ModerationLog = {
     type: 'deleteIndieAuthClient';
     info: ModerationLogPayloads['deleteIndieAuthClient'];
 } | {
+    type: 'createSSOServiceProvider';
+    info: ModerationLogPayloads['createSSOServiceProvider'];
+} | {
+    type: 'updateSSOServiceProvider';
+    info: ModerationLogPayloads['updateSSOServiceProvider'];
+} | {
+    type: 'deleteSSOServiceProvider';
+    info: ModerationLogPayloads['deleteSSOServiceProvider'];
+} | {
     type: 'createAvatarDecoration';
     info: ModerationLogPayloads['createAvatarDecoration'];
 } | {
@@ -2928,6 +2948,9 @@ export type ModerationLog = {
 } | {
     type: 'unsetUserBanner';
     info: ModerationLogPayloads['unsetUserBanner'];
+} | {
+    type: 'unsetUserMutualLink';
+    info: ModerationLogPayloads['unsetUserMutualLink'];
 } | {
     type: 'createSystemWebhook';
     info: ModerationLogPayloads['createSystemWebhook'];
@@ -2995,6 +3018,13 @@ export type ModerationLogPayloads = {
         userHost: string | null;
         before: string | null;
         after: string | null;
+    };
+    updateInlinePolicies: {
+        userId: string;
+        userUsername: string;
+        userHost: string | null;
+        before: unknown;
+        after: unknown;
     };
     addCustomEmoji: {
         emojiId: string;
@@ -3211,7 +3241,17 @@ export type ModerationLogPayloads = {
     unsetUserMutualLink: {
         userId: string;
         userUsername: string;
-        mutualLinkSections: string;
+        userHost: string | null;
+        userMutualLinkSections: {
+            name: string | null;
+            mutualLinks: {
+                id: string;
+                url: string;
+                fileId: string;
+                description: string | null;
+                imgSrc: string;
+            }[];
+        }[];
     };
     createSystemWebhook: {
         systemWebhookId: string;
@@ -3273,7 +3313,7 @@ export type ModerationLogPayloads = {
 };
 
 // @public (undocumented)
-export const moderationLogTypes: readonly ["updateServerSettings", "suspend", "unsuspend", "updateUserName", "updateUserNote", "addCustomEmoji", "updateCustomEmoji", "deleteCustomEmoji", "assignRole", "unassignRole", "createRole", "updateRole", "deleteRole", "clearQueue", "promoteQueue", "deleteDriveFile", "deleteNote", "createGlobalAnnouncement", "createUserAnnouncement", "updateGlobalAnnouncement", "updateUserAnnouncement", "deleteGlobalAnnouncement", "deleteUserAnnouncement", "resetPassword", "regenerateUserToken", "suspendRemoteInstance", "unsuspendRemoteInstance", "updateRemoteInstanceNote", "markSensitiveDriveFile", "unmarkSensitiveDriveFile", "resolveAbuseReport", "forwardAbuseReport", "updateAbuseReportNote", "createInvitation", "createAd", "updateAd", "deleteAd", "createIndieAuthClient", "updateIndieAuthClient", "deleteIndieAuthClient", "createSSOServiceProvider", "updateSSOServiceProvider", "deleteSSOServiceProvider", "createAvatarDecoration", "updateAvatarDecoration", "deleteAvatarDecoration", "unsetUserAvatar", "unsetUserBanner", "unsetUserMutualBanner", "createSystemWebhook", "updateSystemWebhook", "deleteSystemWebhook", "createAbuseReportNotificationRecipient", "updateAbuseReportNotificationRecipient", "deleteAbuseReportNotificationRecipient", "deleteAccount", "deletePage", "deleteFlash", "deleteGalleryPost", "deleteChatRoom", "updateProxyAccountDescription"];
+export const moderationLogTypes: readonly ["updateServerSettings", "suspend", "unsuspend", "updateUserName", "updateUserNote", "updateInlinePolicies", "addCustomEmoji", "updateCustomEmoji", "deleteCustomEmoji", "assignRole", "unassignRole", "createRole", "updateRole", "deleteRole", "clearQueue", "promoteQueue", "deleteDriveFile", "deleteNote", "createGlobalAnnouncement", "createUserAnnouncement", "updateGlobalAnnouncement", "updateUserAnnouncement", "deleteGlobalAnnouncement", "deleteUserAnnouncement", "resetPassword", "regenerateUserToken", "suspendRemoteInstance", "unsuspendRemoteInstance", "updateRemoteInstanceNote", "markSensitiveDriveFile", "unmarkSensitiveDriveFile", "resolveAbuseReport", "forwardAbuseReport", "updateAbuseReportNote", "createInvitation", "createAd", "updateAd", "deleteAd", "createIndieAuthClient", "updateIndieAuthClient", "deleteIndieAuthClient", "createSSOServiceProvider", "updateSSOServiceProvider", "deleteSSOServiceProvider", "createAvatarDecoration", "updateAvatarDecoration", "deleteAvatarDecoration", "unsetUserAvatar", "unsetUserBanner", "unsetUserMutualLink", "createSystemWebhook", "updateSystemWebhook", "deleteSystemWebhook", "createAbuseReportNotificationRecipient", "updateAbuseReportNotificationRecipient", "deleteAbuseReportNotificationRecipient", "deleteAccount", "deletePage", "deleteFlash", "deleteGalleryPost", "deleteChatRoom", "updateProxyAccountDescription"];
 
 // @public (undocumented)
 export type MuteCreateRequest = operations['mute___create']['requestBody']['content']['application/json'];

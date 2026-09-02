@@ -410,6 +410,7 @@ export type ModerationLogPayloads = {
 	unsetUserMutualLink: {
 		userId: string;
 		userUsername: string;
+		userHost: string | null;
 		userMutualLinkSections: { name: string | null; mutualLinks: { id: string; url: string; fileId: string; description: string | null; imgSrc: string; }[]; }[] | []
 	};
 	createSystemWebhook: {

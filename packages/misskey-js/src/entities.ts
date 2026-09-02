@@ -66,6 +66,9 @@ export type ModerationLog = {
 	type: 'updateUserNote';
 	info: ModerationLogPayloads['updateUserNote'];
 } | {
+	type: 'updateInlinePolicies';
+	info: ModerationLogPayloads['updateInlinePolicies'];
+} | {
 	type: 'addCustomEmoji';
 	info: ModerationLogPayloads['addCustomEmoji'];
 } | {
@@ -162,6 +165,15 @@ export type ModerationLog = {
 	type: 'deleteIndieAuthClient';
 	info: ModerationLogPayloads['deleteIndieAuthClient'];
 } | {
+	type: 'createSSOServiceProvider';
+	info: ModerationLogPayloads['createSSOServiceProvider'];
+} | {
+	type: 'updateSSOServiceProvider';
+	info: ModerationLogPayloads['updateSSOServiceProvider'];
+} | {
+	type: 'deleteSSOServiceProvider';
+	info: ModerationLogPayloads['deleteSSOServiceProvider'];
+} | {
 	type: 'createAvatarDecoration';
 	info: ModerationLogPayloads['createAvatarDecoration'];
 } | {
@@ -185,6 +197,9 @@ export type ModerationLog = {
 } | {
 	type: 'unsetUserBanner';
 	info: ModerationLogPayloads['unsetUserBanner'];
+} | {
+	type: 'unsetUserMutualLink';
+	info: ModerationLogPayloads['unsetUserMutualLink'];
 } | {
 	type: 'createSystemWebhook';
 	info: ModerationLogPayloads['createSystemWebhook'];

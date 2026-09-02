@@ -13,7 +13,6 @@ import type {
 	Role,
 	ReversiGameDetailed,
 	SystemWebhook,
-	UserLite,
 	ChatRoom,
 } from './autogen/models.js';
 
@@ -152,6 +151,7 @@ export const moderationLogTypes = [
 	'unsuspend',
 	'updateUserName',
 	'updateUserNote',
+	'updateInlinePolicies',
 	'addCustomEmoji',
 	'updateCustomEmoji',
 	'deleteCustomEmoji',
@@ -195,7 +195,7 @@ export const moderationLogTypes = [
 	'deleteAvatarDecoration',
 	'unsetUserAvatar',
 	'unsetUserBanner',
-	'unsetUserMutualBanner',
+	'unsetUserMutualLink',
 	'createSystemWebhook',
 	'updateSystemWebhook',
 	'deleteSystemWebhook',
@@ -291,7 +291,15 @@ export const reversiUpdateKeys = [
 
 export type ReversiUpdateKey = typeof reversiUpdateKeys[number];
 
-export type AvatarDecoration = UserLite['avatarDecorations'][number];
+export type AvatarDecoration = {
+	id: string;
+	name: string;
+	url: string;
+	angle?: number;
+	flipH?: boolean;
+	offsetX?: number;
+	offsetY?: number;
+};
 
 export type ReceivedAbuseReport = {
 	reportId: AbuseReportNotificationRecipient['id'];
@@ -327,6 +335,13 @@ export type ModerationLogPayloads = {
 		userHost: string | null;
 		before: string | null;
 		after: string | null;
+	};
+	updateInlinePolicies: {
+		userId: string;
+		userUsername: string;
+		userHost: string | null;
+		before: unknown;
+		after: unknown;
 	};
 	addCustomEmoji: {
 		emojiId: string;
@@ -543,7 +558,8 @@ export type ModerationLogPayloads = {
 	unsetUserMutualLink: {
 		userId: string;
 		userUsername: string;
-		mutualLinkSections: string;
+		userHost: string | null;
+		userMutualLinkSections: { name: string | null; mutualLinks: { id: string; url: string; fileId: string; description: string | null; imgSrc: string; }[]; }[];
 	};
 	createSystemWebhook: {
 		systemWebhookId: string;

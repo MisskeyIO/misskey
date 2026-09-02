@@ -53,6 +53,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 			this.moderationLogService.log(me, 'unsetUserMutualLink', {
 				userId: user.id,
 				userUsername: user.username,
+				userHost: user.host,
 				userMutualLinkSections: userProfile.mutualLinkSections,
 			});
 		});

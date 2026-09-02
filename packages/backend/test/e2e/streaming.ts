@@ -9,7 +9,7 @@ import * as assert from 'assert';
 import { setTimeout } from 'node:timers/promises';
 import { WebSocket } from 'ws';
 import { MiFollowing } from '@/models/Following.js';
-import { api, connectStream, createAppToken, initTestDb, port, post, sendEnvUpdateRequest, signup, waitFire } from '../utils.js';
+import { api, channel, connectStream, createAppToken, initTestDb, port, post, sendEnvUpdateRequest, signup, waitFire } from '../utils.js';
 import type * as misskey from 'misskey-js';
 
 describe('Streaming', () => {
@@ -129,6 +129,72 @@ describe('Streaming', () => {
 		});
 
 		describe('Home Timeline', () => {
+			test('publicとhomeだけを最小化する', async () => {
+				const received: Record<string, unknown>[] = [];
+				const ws = await connectStream(ayano, 'homeTimeline', (msg) => {
+					if (msg.type === 'note') received.push(msg.body);
+				}, { minimize: true });
+
+				const publicNote = await post(kyoko, { text: 'minimized public', visibility: 'public' });
+				const homeNote = await post(kyoko, { text: 'minimized home', visibility: 'home' });
+				const followersNote = await post(kyoko, { text: 'full followers', visibility: 'followers' });
+				const specifiedNote = await post(kyoko, { text: 'full specified', visibility: 'specified', visibleUserIds: [ayano.id] });
+
+				await setTimeout(1000);
+				ws.close();
+
+				const find = (id: string) => received.find(note => note.id === id);
+				const streamedPublic = find(publicNote.id);
+				const streamedHome = find(homeNote.id);
+				assert.ok(streamedPublic);
+				assert.ok(streamedHome);
+				assert.strictEqual(streamedPublic.text, undefined);
+				assert.strictEqual(streamedPublic.visibility, undefined);
+				assert.strictEqual(streamedHome.text, undefined);
+				assert.strictEqual(streamedHome.visibility, undefined);
+				const streamedFollowers = find(followersNote.id);
+				const streamedSpecified = find(specifiedNote.id);
+				assert.ok(streamedFollowers);
+				assert.ok(streamedSpecified);
+				assert.strictEqual(streamedFollowers.text, 'full followers');
+				assert.strictEqual(streamedFollowers.visibility, 'followers');
+				assert.strictEqual(streamedSpecified.text, 'full specified');
+				assert.strictEqual(streamedSpecified.visibility, 'specified');
+			});
+
+			test('次元Timelineのpublic投稿を最小化する', async () => {
+				const received: Record<string, unknown>[] = [];
+				const ws = await connectStream(ayano, 'homeTimeline', (msg) => {
+					if (msg.type === 'note') received.push(msg.body);
+				}, { minimize: true, dimension: 1000 });
+
+				const note = await post(kyoko, { text: 'minimized dimension', visibility: 'public', dimension: 1000 });
+				await setTimeout(1000);
+				ws.close();
+
+				const streamed = received.find(item => item.id === note.id);
+				assert.ok(streamed);
+				assert.strictEqual(streamed.text, undefined);
+				assert.strictEqual(streamed.visibility, undefined);
+			});
+
+			test('チャンネルのpublic投稿を最小化する', async () => {
+				const testChannel = await channel(ayano, {});
+				const received: Record<string, unknown>[] = [];
+				const ws = await connectStream(ayano, 'channel', (msg) => {
+					if (msg.type === 'note') received.push(msg.body);
+				}, { channelId: testChannel.id, minimize: true });
+
+				const note = await post(ayano, { text: 'minimized channel', channelId: testChannel.id });
+				await setTimeout(1000);
+				ws.close();
+
+				const streamed = received.find(item => item.id === note.id);
+				assert.ok(streamed);
+				assert.strictEqual(streamed.text, undefined);
+				assert.strictEqual(streamed.visibility, undefined);
+			});
+
 			test('自分の投稿が流れる', async () => {
 				const fired = await waitFire(
 					ayano, 'homeTimeline',	// ayano:Home

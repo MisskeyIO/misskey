@@ -9,7 +9,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 	<MkError v-else-if="paginator.error.value" @retry="paginator.init()"/>
 
-	<div v-else-if="paginator.items.value.length === 0" key="_empty_">
+	<div v-else-if="displayedNotifications.length === 0" key="_empty_">
 		<slot name="empty"><MkResult type="empty" :text="i18n.ts.noNotifications"/></slot>
 	</div>
 
@@ -23,11 +23,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 			:moveClass="$style.transition_x_move"
 			tag="div"
 		>
-			<div v-for="(notification, i) in paginator.items.value" :key="notification.id" :data-scroll-anchor="notification.id" :class="$style.item">
-				<div v-if="i > 0 && isSeparatorNeeded(paginator.items.value[i -1].createdAt, notification.createdAt)" :class="$style.date">
-					<span><i class="ti ti-chevron-up"></i> {{ getSeparatorInfo(paginator.items.value[i -1].createdAt, notification.createdAt).prevText }}</span>
+			<div v-for="(notification, i) in displayedNotifications" :key="notification.id" :data-scroll-anchor="notification.id" :class="$style.item">
+				<div v-if="i > 0 && isSeparatorNeeded(displayedNotifications[i - 1].createdAt, notification.createdAt)" :class="$style.date">
+					<span><i class="ti ti-chevron-up"></i> {{ getSeparatorInfo(displayedNotifications[i - 1].createdAt, notification.createdAt).prevText }}</span>
 					<span style="height: 1em; width: 1px; background: var(--MI_THEME-divider);"></span>
-					<span>{{ getSeparatorInfo(paginator.items.value[i -1].createdAt, notification.createdAt).nextText }} <i class="ti ti-chevron-down"></i></span>
+					<span>{{ getSeparatorInfo(displayedNotifications[i - 1].createdAt, notification.createdAt).nextText }} <i class="ti ti-chevron-down"></i></span>
 				</div>
 				<MkNote v-if="['reply', 'quote', 'mention'].includes(notification.type)" :class="$style.content" :note="notification.note" :withHardMute="true"/>
 				<XNotification v-else :class="$style.content" :notification="notification" :withTime="true" :full="true"/>
@@ -42,7 +42,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { onUnmounted, onMounted, computed, useTemplateRef, TransitionGroup } from 'vue';
+import { onUnmounted, onMounted, onActivated, computed, useTemplateRef, TransitionGroup, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { useInterval } from '@@/js/use-interval.js';
 import type { notificationTypes } from '@@/js/const.js';
@@ -55,12 +55,14 @@ import { prefer } from '@/preferences.js';
 import { store } from '@/store.js';
 import { usePagination } from '@/composables/use-pagination.js';
 import { isSeparatorNeeded, getSeparatorInfo } from '@/utility/timeline-date-separate.js';
+import { filterMutedNotification } from '@/utility/filter-muted-notification.js';
 
 const props = defineProps<{
 	excludeTypes?: typeof notificationTypes[number][];
 }>();
 
 const rootEl = useTemplateRef('rootEl');
+const hasNewNotificationWhileTabHidden = ref(false);
 
 const paginator = usePagination({
 	ctx: prefer.s.useGroupedNotifications ? {
@@ -77,6 +79,8 @@ const paginator = usePagination({
 		})),
 	},
 });
+
+const displayedNotifications = computed(() => paginator.items.value.filter(notification => filterMutedNotification(notification as Misskey.entities.Notification)));
 
 const MIN_POLLING_INTERVAL = 1000 * 10;
 const POLLING_INTERVAL =
@@ -104,13 +108,21 @@ function onNotification(notification) {
 		}
 	}
 
-	if (!isMuted) {
+	if (!window.document.hidden && !isMuted && filterMutedNotification(notification)) {
 		paginator.prepend(notification);
 	}
+
+	if (window.document.hidden) hasNewNotificationWhileTabHidden.value = true;
 }
 
 function reload() {
 	return paginator.reload();
+}
+
+function onVisibilityChange() {
+	if (window.document.visibilityState !== 'visible' || !hasNewNotificationWhileTabHidden.value) return;
+	hasNewNotificationWhileTabHidden.value = false;
+	void reload();
 }
 
 let connection: Misskey.ChannelConnection<Misskey.Channels['main']> | null = null;
@@ -121,10 +133,16 @@ onMounted(() => {
 		connection.on('notification', onNotification);
 		connection.on('notificationFlushed', reload);
 	}
+	window.document.addEventListener('visibilitychange', onVisibilityChange);
+});
+
+onActivated(() => {
+	void reload();
 });
 
 onUnmounted(() => {
 	if (connection) connection.dispose();
+	window.document.removeEventListener('visibilitychange', onVisibilityChange);
 });
 
 defineExpose({

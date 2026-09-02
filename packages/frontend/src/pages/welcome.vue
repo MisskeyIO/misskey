@@ -14,7 +14,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import XSetup from './welcome.setup.vue';
-import XEntrance from './welcome.entrance.a.vue';
+import XEntrance from './welcome.entrance.special.vue';
 import { instanceName } from '@@/js/config.js';
 import { definePage } from '@/page.js';
 import { fetchInstance } from '@/instance.js';

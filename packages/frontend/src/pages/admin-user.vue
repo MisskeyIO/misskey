@@ -194,7 +194,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<option value="archived">{{ i18n.ts.archived }}</option>
 				</MkSelect>
 
-				<MkPagination ref="announcementsPaginationEl" :pagination="announcementsPagination">
+				<MkPagination :pagination="announcementsPagination">
 					<template #default="{ items }">
 						<div class="_gaps_s">
 							<div v-for="announcement in items" :key="announcement.id" v-panel :class="$style.announcementItem" @click="editAnnouncement(announcement)">
@@ -331,8 +331,6 @@ const filesPagination = {
 		userId: props.userId,
 	})),
 };
-const announcementsPaginationEl = ref<InstanceType<typeof MkPagination>>();
-
 const announcementsStatus = ref<'active' | 'archived'>('active');
 
 const announcementsPagination = {

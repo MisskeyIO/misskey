@@ -49,7 +49,8 @@ function toggle(): void {
 <style lang="scss" module>
 .root {
 	position: relative;
-	display: inline-block;
+	display: inline-flex;
+	align-items: center;
 	text-align: left;
 	cursor: pointer;
 	padding: 7px 10px;
@@ -103,7 +104,8 @@ function toggle(): void {
 }
 
 .button {
-	position: absolute;
+	position: relative;
+	display: inline-block;
 	width: 14px;
 	height: 14px;
 	background: none;
@@ -127,7 +129,7 @@ function toggle(): void {
 }
 
 .label {
-	margin-left: 28px;
+	margin-left: 8px;
 	display: block;
 	line-height: 20px;
 	cursor: pointer;

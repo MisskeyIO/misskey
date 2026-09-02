@@ -26,7 +26,7 @@
 			</div>
 		</div>
 
-		<MkPagination v-slot="{items}" ref="logs" :pagination="pagination" style="margin-top: var(--MI-margin);">
+		<MkPagination v-slot="{items}" :pagination="pagination" style="margin-top: var(--MI-margin);">
 			<div class="_gaps_s">
 				<MkFolder v-for="item in items" :key="item.id">
 					<template #label>
@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, shallowRef, ref } from 'vue';
+import { computed, ref } from 'vue';
 import MkInput from '@/components/MkInput.vue';
 import MkPagination from '@/components/MkPagination.vue';
 import { i18n } from '@/i18n.js';
@@ -63,8 +63,6 @@ import { userPage } from '@/filters/user.js';
 import MkFolder from '@/components/MkFolder.vue';
 import { definePage } from '@/page.js';
 import MkSelect from '@/components/MkSelect.vue';
-
-const logs = shallowRef<InstanceType<typeof MkPagination>>();
 
 const movedToId = ref('');
 const movedFromId = ref('');

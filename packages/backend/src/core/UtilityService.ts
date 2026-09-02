@@ -8,10 +8,12 @@ import { isIP } from 'node:net';
 import punycode from 'punycode.js';
 import psl from 'psl';
 import RE2 from 're2';
+import semver from 'semver';
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import { MiMeta } from '@/models/Meta.js';
+import { MiMeta, SoftwareSuspension } from '@/models/Meta.js';
+import { MiInstance } from '@/models/Instance.js';
 import { bindThis } from '@/decorators.js';
 import { isPslError } from '@/misc/psl.js';
 import type { IObject } from '@/core/activitypub/type.js';
@@ -259,5 +261,21 @@ export class UtilityService {
 	public isFederationAllowedUri(uri: string): boolean {
 		const host = this.extractHost(uri);
 		return this.isFederationAllowedHost(host);
+	}
+
+	@bindThis
+	public isDeliverSuspendedSoftware(software: Pick<MiInstance, 'softwareName' | 'softwareVersion'>): SoftwareSuspension | undefined {
+		if (software.softwareName == null) return undefined;
+		if (software.softwareVersion == null) {
+			// software version is null; suspend iff versionRange is *
+			return this.meta.deliverSuspendedSoftware.find(x =>
+				x.software === software.softwareName
+				&& x.versionRange.trim() === '*');
+		} else {
+			const softwareVersion = software.softwareVersion;
+			return this.meta.deliverSuspendedSoftware.find(x =>
+				x.software === software.softwareName
+				&& semver.satisfies(softwareVersion, x.versionRange, { includePrerelease: true }));
+		}
 	}
 }

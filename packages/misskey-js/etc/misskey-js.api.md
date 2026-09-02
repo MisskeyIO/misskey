@@ -31,6 +31,12 @@ declare namespace acct {
 }
 
 // @public (undocumented)
+export type Achievement = components['schemas']['Achievement'];
+
+// @public (undocumented)
+export type AchievementName = components['schemas']['AchievementName'];
+
+// @public (undocumented)
 export type Ad = components['schemas']['Ad'];
 
 // Warning: (ae-forgotten-export) The symbol "operations" needs to be exported by the entry point index.d.ts
@@ -1210,6 +1216,9 @@ export type DriveFilesFindRequest = operations['drive___files___find']['requestB
 export type DriveFilesFindResponse = operations['drive___files___find']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
+export type DriveFilesMoveBulkRequest = operations['drive___files___move-bulk']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
 export type DriveFilesRequest = operations['drive___files']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
@@ -1669,6 +1678,7 @@ declare namespace entities {
         DriveFilesFindResponse,
         DriveFilesFindByHashRequest,
         DriveFilesFindByHashResponse,
+        DriveFilesMoveBulkRequest,
         DriveFilesShowRequest,
         DriveFilesShowResponse,
         DriveFilesUpdateRequest,
@@ -1903,6 +1913,8 @@ declare namespace entities {
         NotesSearchByTagResponse,
         NotesShowRequest,
         NotesShowResponse,
+        NotesShowPartialBulkRequest,
+        NotesShowPartialBulkResponse,
         NotesStateRequest,
         NotesStateResponse,
         NotesThreadMutingCreateRequest,
@@ -2040,6 +2052,8 @@ declare namespace entities {
         UserList,
         UserListMembership,
         UserAccountMoveLog,
+        Achievement,
+        AchievementName,
         Ad,
         Announcement,
         App,
@@ -3370,6 +3384,12 @@ export type NotesSearchRequest = operations['notes___search']['requestBody']['co
 
 // @public (undocumented)
 export type NotesSearchResponse = operations['notes___search']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+export type NotesShowPartialBulkRequest = operations['notes___show-partial-bulk']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+export type NotesShowPartialBulkResponse = operations['notes___show-partial-bulk']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 export type NotesShowRequest = operations['notes___show']['requestBody']['content']['application/json'];

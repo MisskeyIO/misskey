@@ -350,6 +350,10 @@ export const meta = {
 				type: 'boolean',
 				optional: false, nullable: false,
 			},
+			enableStatsForFederatedInstances: {
+				type: 'boolean',
+				optional: false, nullable: false,
+			},
 			enableServerMachineStats: {
 				type: 'boolean',
 				optional: false, nullable: false,
@@ -388,6 +392,10 @@ export const meta = {
 			},
 			perUserListTimelineCacheMax: {
 				type: 'number',
+				optional: false, nullable: false,
+			},
+			enableReactionsBuffering: {
+				type: 'boolean',
 				optional: false, nullable: false,
 			},
 			notesPerOneAd: {
@@ -508,6 +516,10 @@ export const meta = {
 				type: 'boolean',
 				optional: false, nullable: false,
 			},
+			urlPreviewAllowRedirect: {
+				type: 'boolean',
+				optional: false, nullable: false,
+			},
 			urlPreviewTimeout: {
 				type: 'number',
 				optional: false, nullable: false,
@@ -552,6 +564,45 @@ export const meta = {
 			inquiryUrl: {
 				type: 'string',
 				optional: false, nullable: true,
+			},
+			deliverSuspendedSoftware: {
+				type: 'array',
+				optional: false, nullable: false,
+				items: {
+					type: 'object',
+					optional: false, nullable: false,
+					properties: {
+						software: {
+							type: 'string',
+							optional: false, nullable: false,
+						},
+						versionRange: {
+							type: 'string',
+							optional: false, nullable: false,
+						},
+					},
+				},
+			},
+			singleUserMode: {
+				type: 'boolean',
+				optional: false, nullable: false,
+			},
+			ugcVisibilityForVisitor: {
+				type: 'string',
+				enum: ['all', 'local', 'none'],
+				optional: false, nullable: false,
+			},
+			proxyRemoteFiles: {
+				type: 'boolean',
+				optional: false, nullable: false,
+			},
+			signToActivityPubGet: {
+				type: 'boolean',
+				optional: false, nullable: false,
+			},
+			allowExternalApRedirect: {
+				type: 'boolean',
+				optional: false, nullable: false,
 			},
 		},
 	},
@@ -674,6 +725,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				truemailAuthKey: instance.truemailAuthKey,
 				enableChartsForRemoteUser: instance.enableChartsForRemoteUser,
 				enableChartsForFederatedInstances: instance.enableChartsForFederatedInstances,
+				enableStatsForFederatedInstances: instance.enableStatsForFederatedInstances,
 				enableServerMachineStats: instance.enableServerMachineStats,
 				enableIdenticonGeneration: instance.enableIdenticonGeneration,
 				bannedEmailDomains: instance.bannedEmailDomains,
@@ -685,12 +737,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				perRemoteUserUserTimelineCacheMax: instance.perRemoteUserUserTimelineCacheMax,
 				perUserHomeTimelineCacheMax: instance.perUserHomeTimelineCacheMax,
 				perUserListTimelineCacheMax: instance.perUserListTimelineCacheMax,
+				enableReactionsBuffering: instance.enableReactionsBuffering,
 				wellKnownWebsites: instance.wellKnownWebsites,
 				notesPerOneAd: instance.notesPerOneAd,
 				urlPreviewDenyList: instance.urlPreviewDenyList,
 				featuredGameChannels: instance.featuredGameChannels,
 				summalyProxy: instance.urlPreviewSummaryProxyUrl,
 				urlPreviewEnabled: instance.urlPreviewEnabled,
+				urlPreviewAllowRedirect: instance.urlPreviewAllowRedirect,
 				urlPreviewTimeout: instance.urlPreviewTimeout,
 				urlPreviewMaximumContentLength: instance.urlPreviewMaximumContentLength,
 				urlPreviewRequireContentLength: instance.urlPreviewRequireContentLength,
@@ -699,6 +753,12 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				federation: instance.federation,
 				federationHosts: instance.federationHosts,
 				prohibitedWordsForNameOfUser: instance.prohibitedWordsForNameOfUser,
+				deliverSuspendedSoftware: instance.deliverSuspendedSoftware,
+				singleUserMode: instance.singleUserMode,
+				ugcVisibilityForVisitor: instance.ugcVisibilityForVisitor,
+				proxyRemoteFiles: instance.proxyRemoteFiles,
+				signToActivityPubGet: instance.signToActivityPubGet,
+				allowExternalApRedirect: instance.allowExternalApRedirect,
 			};
 		});
 	}

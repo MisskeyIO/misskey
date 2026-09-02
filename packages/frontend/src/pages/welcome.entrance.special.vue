@@ -38,7 +38,7 @@ import { misskeyApiGet } from '@/utility/misskey-api.js';
 import MkVisitorDashboard from '@/components/MkVisitorDashboard.vue';
 import { getProxiedImageUrl } from '@/utility/media-proxy.js';
 import { instance as meta } from '@/instance.js';
-import MarqueeText from '@/components/MkMarquee.vue';
+import MarqueeText from '@/components/MkMarqueeText.vue';
 
 const instances = ref<Misskey.entities.FederationInstance[]>();
 

@@ -18,7 +18,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</p>
 		<p :class="$style.disabledDescription">{{ i18n.ts._disabledTimeline.description }}</p>
 	</div>
-	<MkTimeline
+	<MkStreamingNotesTimeline
 		v-else-if="column.tl"
 		ref="timeline"
 		:key="column.tl + withRenotes + withReplies + onlyFiles + dimension"
@@ -40,7 +40,7 @@ import type { Column } from '@/deck.js';
 import type { MenuItem } from '@/types/menu.js';
 import type { SoundStore } from '@/preferences/def.js';
 import { removeColumn, updateColumn } from '@/deck.js';
-import MkTimeline from '@/components/MkTimeline.vue';
+import MkStreamingNotesTimeline from '@/components/MkStreamingNotesTimeline.vue';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
 import { hasWithReplies, hasDimension, isAvailableBasicTimeline, basicTimelineIconClass } from '@/timelines.js';

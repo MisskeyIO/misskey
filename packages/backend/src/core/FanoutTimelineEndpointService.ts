@@ -38,6 +38,7 @@ type TimelineOptions = {
 	excludeNoFiles?: boolean;
 	excludeReplies?: boolean;
 	excludePureRenotes: boolean;
+	ignoreAuthorFromUserSuspension?: boolean;
 	dbFallback: (untilId: string | null, sinceId: string | null, limit: number) => Promise<MiNote[]>,
 };
 
@@ -128,6 +129,8 @@ export class FanoutTimelineEndpointService {
 				filter = (note) => {
 					if (isUserRelated(note, userIdsWhoBlockingMe, ps.ignoreAuthorFromBlock)) return false;
 					if (isUserRelated(note, userIdsWhoMeMuting, ps.ignoreAuthorFromMute)) return false;
+					if (isUserRelated(note.renote, userIdsWhoBlockingMe, ps.ignoreAuthorFromBlock)) return false;
+					if (isUserRelated(note.renote, userIdsWhoMeMuting, ps.ignoreAuthorFromMute)) return false;
 					if (!ps.ignoreAuthorFromMute && isRenote(note) && !isQuote(note) && userIdsWhoMeMutingRenotes.has(note.userId)) return false;
 					if (isInstanceMuted(note, userMutedInstances)) return false;
 
@@ -143,6 +146,23 @@ export class FanoutTimelineEndpointService {
 					}
 					if (note.userId !== note.renoteUserId && this.utilityService.isItemListedIn(note.renoteUserHost, this.meta.blockedHosts)) return false;
 					if (note.userId !== note.replyUserId && this.utilityService.isItemListedIn(note.replyUserHost, this.meta.blockedHosts)) return false;
+
+					return parentFilter(note);
+				};
+			}
+
+			{
+				const parentFilter = filter;
+				filter = (note) => {
+					const noteJoined = note as MiNote & {
+						renoteUser: MiUser | null;
+						replyUser: MiUser | null;
+					};
+					if (!ps.ignoreAuthorFromUserSuspension) {
+						if (note.user!.isSuspended) return false;
+					}
+					if (note.userId !== note.renoteUserId && noteJoined.renoteUser?.isSuspended) return false;
+					if (note.userId !== note.replyUserId && noteJoined.replyUser?.isSuspended) return false;
 
 					return parentFilter(note);
 				};

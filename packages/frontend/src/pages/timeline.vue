@@ -4,26 +4,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<PageWithHeader
-	ref="pageComponent" v-model:tab="src" :actions="headerActions"
-	:tabs="$i ? headerTabs : headerTabsWhenNotLogin" :swipable="true" :displayMyAvatar="true"
->
+<PageWithHeader v-model:tab="src" :actions="headerActions" :tabs="$i ? headerTabs : headerTabsWhenNotLogin" :swipable="true" :displayMyAvatar="true">
 	<div class="_spacer" style="--MI_SPACER-w: 800px;">
-		<MkInfo
-			v-if="isBasicTimeline(src) && !store.r.timelineTutorials.value[src] && isDescriptionTimeline(src)"
-			style="margin-bottom: var(--MI-margin);" closable @close="closeTutorial()"
-		>
+		<MkTip v-if="isBasicTimeline(src)" :k="`tl.${src}`" style="margin-bottom: var(--MI-margin);">
 			{{ i18n.ts._timelineDescription[src] }}
-		</MkInfo>
+		</MkTip>
 		<MkPostForm
 			v-if="prefer.r.showFixedPostForm.value" :class="$style.postForm" class="_panel" fixed
 			:initialDimension="dimension"
 			style="margin-bottom: var(--MI-margin);"
 		/>
-		<div v-if="queue > 0" :class="$style.new">
-			<button class="_buttonPrimary" :class="$style.newButton" @click="top()">{{ i18n.ts.newNoteRecived }}</button>
-		</div>
-		<MkTimeline
+		<MkStreamingNotesTimeline
 			ref="tlComponent"
 			:key="src + withRenotes + withReplies + onlyFiles + withSensitive + dimension"
 			:class="$style.tl"
@@ -35,7 +26,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 			:onlyFiles="onlyFiles"
 			:dimension="dimension"
 			:sound="true"
-			@queue="queueUpdated"
 		/>
 	</div>
 </PageWithHeader>
@@ -45,11 +35,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, watch, provide, useTemplateRef, ref, onMounted, onActivated } from 'vue';
 import type { Tab } from '@/components/global/MkPageHeader.tabs.vue';
 import type { MenuItem } from '@/types/menu.js';
-import type PageWithHeader from '@/components/global/PageWithHeader.vue';
-import type { AllTimelineType, TimelinePageSrc } from '@/timelines.js';
-import { isDescriptionTimeline } from '@/timelines.js';
-import MkTimeline from '@/components/MkTimeline.vue';
-import MkInfo from '@/components/MkInfo.vue';
+import type { TimelinePageSrc } from '@/timelines.js';
+import MkStreamingNotesTimeline from '@/components/MkStreamingNotesTimeline.vue';
 import MkPostForm from '@/components/MkPostForm.vue';
 import * as os from '@/os.js';
 import { store } from '@/store.js';
@@ -73,10 +60,9 @@ import {
 import { prefer } from '@/preferences.js';
 
 provide('shouldOmitHeaderTitle', true);
-const tlComponent = useTemplateRef<InstanceType<typeof MkTimeline>>('tlComponent');
-const pageComponent = useTemplateRef<InstanceType<typeof PageWithHeader>>('pageComponent');
 
-const queue = ref(0);
+const tlComponent = useTemplateRef('tlComponent');
+
 const srcWhenNotSignin = ref<'local' | 'global'>(isAvailableBasicTimeline('local') ? 'local' : 'global');
 const src = computed<TimelinePageSrc>({
 	get: () => ($i ? store.r.tl.value.src : srcWhenNotSignin.value),
@@ -135,10 +121,6 @@ const withSensitive = computed<boolean>({
 	set: (x) => saveTlFilter('withSensitive', x),
 });
 
-watch(src, () => {
-	queue.value = 0;
-});
-
 watch(dimension, (value, previous) => {
 	if (value == null || value === previous) return;
 	claimAchievement('dimensionConfigured');
@@ -148,14 +130,6 @@ async function pickDimension(): Promise<void> {
 	const selected = await selectDimension(dimension.value);
 	if (selected === undefined) return;
 	dimension.value = selected;
-}
-
-function queueUpdated(q: number): void {
-	queue.value = q;
-}
-
-function top(): void {
-	if (pageComponent.value) pageComponent.value.scrollToTop();
 }
 
 async function chooseList(ev: MouseEvent): Promise<void> {
@@ -265,13 +239,6 @@ function saveTlDimension(value: number | null): void {
 //
 // 	tlComponent.value.timetravel(date);
 // }
-
-function closeTutorial(): void {
-	if (!isBasicTimeline(src.value)) return;
-	const before = store.s.timelineTutorials;
-	before[src.value] = true;
-	store.set('timelineTutorials', before);
-}
 
 function switchTlIfNeeded() {
 	if (isBasicTimeline(src.value) && !isAvailableBasicTimeline(src.value)) {
@@ -396,25 +363,6 @@ definePage(() => ({
 </script>
 
 <style lang="scss" module>
-.new {
-	position: sticky;
-	top: calc(var(--MI-stickyTop, 0px) + 16px);
-	z-index: 1000;
-	width: 100%;
-	margin: calc(-0.675em - 8px) 0;
-
-	&:first-child {
-		margin-top: calc(-0.675em - 8px - var(--MI-margin));
-	}
-}
-
-.newButton {
-	display: block;
-	margin: var(--MI-margin) auto 0 auto;
-	padding: 8px 16px;
-	border-radius: 32px;
-}
-
 .postForm {
 	border-radius: var(--MI-radius);
 }

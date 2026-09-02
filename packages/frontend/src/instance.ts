@@ -5,7 +5,7 @@
 
 import { computed, reactive } from 'vue';
 import * as Misskey from 'misskey-js';
-import { DEFAULT_INFO_IMAGE_URL, DEFAULT_NOT_FOUND_IMAGE_URL, DEFAULT_SERVER_ERROR_IMAGE_URL } from '@@/js/const.js';
+import { DEFAULT_INFO_IMAGE_URL, DEFAULT_SERVER_ERROR_IMAGE_URL } from '@@/js/const.js';
 import { misskeyApiGet } from '@/utility/misskey-api.js';
 import { miLocalStorage } from '@/local-storage.js';
 
@@ -33,10 +33,6 @@ export const instance: Misskey.entities.MetaDetailed = reactive(cachedMeta ?? {}
 export const serverErrorImageUrl = computed(() => instance.serverErrorImageUrl ?? DEFAULT_SERVER_ERROR_IMAGE_URL);
 
 export const infoImageUrl = computed(() => instance.infoImageUrl ?? DEFAULT_INFO_IMAGE_URL);
-
-export const notFoundImageUrl = computed(() => instance.notFoundImageUrl ?? DEFAULT_NOT_FOUND_IMAGE_URL);
-
-export const isEnabledUrlPreview = computed(() => instance.enableUrlPreview ?? true);
 
 export async function fetchInstance(force = false): Promise<Misskey.entities.MetaDetailed> {
 	if (!force) {

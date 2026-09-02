@@ -47,7 +47,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch, defineAsyncComponent } from 'vue';
+import { ref, computed, watch, defineAsyncComponent, useTemplateRef } from 'vue';
 import MkPagination from '@/components/MkPagination.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkInfo from '@/components/MkInfo.vue';
@@ -76,7 +76,7 @@ const paginationPast = {
 	},
 };
 
-const paginationEl = ref<InstanceType<typeof MkPagination>>();
+const paginationEl = useTemplateRef('paginationEl');
 
 const tab = ref('current');
 
@@ -102,10 +102,10 @@ async function read(target): Promise<void> {
 	}
 
 	if (!paginationEl.value) return;
-	paginationEl.value.updateItem(target.id, a => {
-		a.isRead = true;
-		return a;
-	});
+	paginationEl.value.paginator.updateItem(target.id, a => ({
+		...a,
+		isRead: true,
+	}));
 	await misskeyApi('i/read-announcement', { announcementId: target.id });
 	if ($i) {
 		updateCurrentAccountPartial({
@@ -135,7 +135,7 @@ const unreadCount = ref($i?.unreadAnnouncements.length ?? 0);
 watch(() => $i?.unreadAnnouncements.length ?? 0, () => {
 	// 未読が増えた場合はリロード
 	if (($i?.unreadAnnouncements.length ?? 0) > unreadCount.value) {
-		paginationEl.value?.reload();
+		paginationEl.value?.paginator.reload();
 	}
 	unreadCount.value = $i?.unreadAnnouncements.length ?? 0;
 });

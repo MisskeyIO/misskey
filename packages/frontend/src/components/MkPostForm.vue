@@ -181,6 +181,14 @@ import { DI } from '@/di.js';
 import { checkDragDataType, getDragData } from '@/drag-and-drop.js';
 import { useUploader } from '@/composables/use-uploader.js';
 
+type LocalDraft = Omit<Misskey.entities.NoteDraft, 'id' | 'data'> & {
+	data: Omit<Misskey.entities.NoteDraft['data'], 'files'> & {
+		files?: Misskey.entities.NoteDraft['data']['files'];
+		quoteId?: string | null;
+		reactionAcceptance?: Misskey.entities.Note['reactionAcceptance'];
+	};
+};
+
 const $i = ensureSignin();
 
 const modal = inject(DI.inModal, false);
@@ -909,7 +917,7 @@ function saveDraft() {
 		scheduledAt = null;
 	}
 
-	const draftData = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}') as Record<string, Misskey.entities.NoteDraft>;
+	const draftData = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}');
 
 	draftData[draftKey.value] = {
 		updatedAt: new Date().toISOString(),
@@ -957,7 +965,7 @@ function saveDraft() {
 }
 
 function deleteDraft() {
-	const draftData = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}') as Record<string, Misskey.entities.NoteDraft>;
+	const draftData = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}');
 
 	delete draftData[draftKey.value];
 
@@ -1005,7 +1013,7 @@ async function openDrafts() {
 }
 
 function loadDraft(exactMatch = false) {
-	const drafts = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}') as Record<string, Misskey.entities.NoteDraft>;
+	const drafts = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}') as Record<string, LocalDraft>;
 	const scope = exactMatch ? draftKey.value : draftKey.value.replace(`note:${draftId.value}`, 'note:');
 	const draft = Object.entries(drafts).filter(([k]) => k.startsWith(scope))
 		.map(r => ({ key: r[0], value: { ...r[1], updatedAt: new Date(r[1].updatedAt).getTime() } }))
@@ -1027,8 +1035,9 @@ function loadDraft(exactMatch = false) {
 		localOnly.value = draft.value.data.localOnly;
 		postingLang.value = draft.value.data.lang;
 		dimension.value = draft.value.data.dimension ?? prefer.s.dimension;
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		files.value = draft.value.data.files?.filter(f => f?.id && f.type && f.name) || [];
+		quoteId.value = draft.value.data.quoteId ?? null;
+		reactionAcceptance.value = draft.value.data.reactionAcceptance ?? store.s.reactionAcceptance;
+		files.value = draft.value.data.files?.filter(f => f?.id && f.type && f.name) ?? [];
 		if (draft.value.data.poll) {
 			poll.value = draft.value.data.poll;
 		}

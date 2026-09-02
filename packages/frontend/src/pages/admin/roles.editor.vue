@@ -1128,7 +1128,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { watch, ref, computed } from 'vue';
 import { throttle } from 'throttle-debounce';
-import { ROLE_POLICIES } from '@@/js/const.js';
+import * as Misskey from 'misskey-js';
 import RolesEditorFormula from './RolesEditorFormula.vue';
 import MkInput from '@/components/MkInput.vue';
 import MkColorInput from '@/components/MkColorInput.vue';
@@ -1154,7 +1154,7 @@ const props = defineProps<{
 const role = ref(deepClone(props.modelValue));
 
 // fill missing policy
-for (const ROLE_POLICY of ROLE_POLICIES) {
+for (const ROLE_POLICY of Misskey.rolePolicies) {
 	if (role.value.policies[ROLE_POLICY] == null) {
 		role.value.policies[ROLE_POLICY] = {
 			useDefault: true,

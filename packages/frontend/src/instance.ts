@@ -10,7 +10,7 @@ import { misskeyApiGet } from '@/utility/misskey-api.js';
 import { miLocalStorage } from '@/local-storage.js';
 
 export type ClientOptions = {
-	entrancePageStyle: 'classic' | 'simple';
+	entrancePageStyle: 'classic' | 'simple' | 'special';
 	showTimelineForVisitor: boolean;
 	showActivitiesForVisitor: boolean;
 };

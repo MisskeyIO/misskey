@@ -32,7 +32,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, defineAsyncComponent, ref } from 'vue';
+import { computed, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { MenuItem } from '@/types/menu.js';
 import * as os from '@/os.js';
@@ -283,10 +283,11 @@ function onContextmenu(ev: MouseEvent) {
 		text: i18n.ts.openInWindow,
 		icon: 'ti ti-app-window',
 		action: async () => {
-			await os.popup(defineAsyncComponent(() => import('@/components/MkDriveWindow.vue')), {
+			const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkDriveWindow.vue').then(x => x.default), {
 				initialFolder: props.folder,
 			}, {
-			}, 'closed');
+				closed: () => dispose(),
+			});
 		},
 	}, { type: 'divider' }, {
 		text: i18n.ts.rename,

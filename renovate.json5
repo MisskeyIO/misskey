@@ -37,6 +37,7 @@
 				'packages/misskey-bubble-game/**/package.json',
 				'packages/misskey-reversi/**/package.json',
 				'packages/sw/**/package.json',
+				'packages/icons-subsetter/**/package.json',
 			],
 			// prevent wastage of Chromatic snapshots
 			rebaseWhen: 'never',

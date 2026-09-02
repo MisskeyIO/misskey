@@ -4,7 +4,6 @@
  */
 
 import * as Misskey from 'misskey-js';
-import { defineAsyncComponent } from 'vue';
 import { selectDriveFolder } from './drive.js';
 import type { MenuItem } from '@/types/menu.js';
 import { i18n } from '@/i18n.js';
@@ -28,8 +27,8 @@ function rename(file: Misskey.entities.DriveFile) {
 	});
 }
 
-function describe(file: Misskey.entities.DriveFile) {
-	os.popup(defineAsyncComponent(() => import('@/components/MkFileCaptionEditWindow.vue')), {
+async function describe(file: Misskey.entities.DriveFile) {
+	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkFileCaptionEditWindow.vue').then(x => x.default), {
 		default: file.comment ?? '',
 		file: file,
 	}, {
@@ -39,7 +38,8 @@ function describe(file: Misskey.entities.DriveFile) {
 				comment: caption.length === 0 ? null : caption,
 			});
 		},
-	}, 'closed');
+		closed: () => dispose(),
+	});
 }
 
 function move(file: Misskey.entities.DriveFile) {

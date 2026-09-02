@@ -164,7 +164,10 @@ watch(roleIdsThatCanNotBeUsedThisEmojiAsReaction, async () => {
 const imgUrl = computed(() => file.value ? file.value.url : props.emoji ? props.emoji.url : null);
 
 async function changeImage(ev: Event) {
-	file.value = await selectFile(ev.currentTarget ?? ev.target, null);
+	file.value = await selectFile({
+		anchorElement: ev.currentTarget ?? ev.target,
+		multiple: false,
+	});
 	if (name.value) return;
 
 	const candidate = file.value.name.replace(/\.(.+)$/, '');

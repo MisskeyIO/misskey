@@ -75,7 +75,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineAsyncComponent, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkInfo from '@/components/MkInfo.vue';
 import MkMediaList from '@/components/MkMediaList.vue';
@@ -178,10 +178,10 @@ function rename() {
 	});
 }
 
-function describe() {
+async function describe() {
 	if (!file.value) return;
 
-	os.popup(defineAsyncComponent(() => import('@/components/MkFileCaptionEditWindow.vue')), {
+	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkFileCaptionEditWindow.vue').then(x => x.default), {
 		default: file.value.comment ?? '',
 		file: file.value,
 	}, {
@@ -193,7 +193,8 @@ function describe() {
 				await fetchInfo();
 			});
 		},
-	}, 'closed');
+		closed: () => dispose(),
+	});
 }
 
 async function deleteFile() {

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { defineAsyncComponent } from 'vue';
 import { host } from '@@/js/config.js';
 import type { MenuItem } from '@/types/menu.js';
 import * as os from '@/os.js';
@@ -147,7 +146,9 @@ export function openInstanceMenu(ev: MouseEvent) {
 			text: i18n.ts._initialTutorial.launchTutorial,
 			icon: 'ti ti-presentation',
 			action: async () => {
-				await os.popup(defineAsyncComponent(() => import('@/components/MkTutorialDialog.vue')), {}, {}, 'closed');
+				const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkTutorialDialog.vue').then(x => x.default), {}, {
+					closed: () => dispose(),
+				});
 			},
 		});
 	}

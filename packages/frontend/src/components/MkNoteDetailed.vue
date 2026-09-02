@@ -276,7 +276,6 @@ import MkButton from '@/components/MkButton.vue';
 import { isEnabledUrlPreview } from '@/utility/url-preview.js';
 import { getAppearNote } from '@/utility/get-appear-note.js';
 import { prefer } from '@/preferences.js';
-import { getPluginHandlers } from '@/plugin.js';
 import { DI } from '@/di.js';
 import { globalEvents, useGlobalEvent } from '@/events.js';
 import { store } from '@/store.js';
@@ -292,25 +291,7 @@ const inChannel = inject('inChannel', null);
 
 let note = deepClone(props.note);
 
-// plugin
-const noteViewInterruptors = getPluginHandlers('note_view_interruptor');
-if (noteViewInterruptors.length > 0) {
-	onMounted(async () => {
-		let result: Misskey.entities.Note | null = deepClone(note);
-		for (const interruptor of noteViewInterruptors) {
-			try {
-				result = await interruptor.handler(result!) as Misskey.entities.Note | null;
-				if (result === null) {
-					isDeleted.value = true;
-					return;
-				}
-			} catch (err) {
-				console.error(err);
-			}
-		}
-		note = result as Misskey.entities.Note;
-	});
-}
+// 描画崩れを避けるため、note_view_interruptorは一時停止中。
 
 const isRenote = Misskey.note.isPureRenote(note);
 const appearNote = getAppearNote(note);

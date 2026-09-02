@@ -104,7 +104,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, watch, ref, defineAsyncComponent } from 'vue';
+import { computed, watch, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { url } from '@@/js/config.js';
 import type { MenuItem } from '@/types/menu.js';
@@ -252,15 +252,17 @@ function pin(pin) {
 	});
 }
 
-function reportAbuse() {
+async function reportAbuse() {
 	if (!page.value) return;
 
 	const pageUrl = `${url}/@${props.username}/pages/${props.pageName}`;
 
-	os.popup(defineAsyncComponent(() => import('@/components/MkAbuseReportWindow.vue')), {
+	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkAbuseReportWindow.vue').then(x => x.default), {
 		user: page.value.user,
 		initialComment: `Page: ${pageUrl}\n-----\n`,
-	}, {}, 'closed');
+	}, {
+		closed: () => dispose(),
+	});
 }
 
 function showMenu(ev: MouseEvent) {

@@ -16,7 +16,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { defineAsyncComponent } from 'vue';
 import { useWidgetPropsManager } from './widget.js';
 import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from './widget.js';
 import type { GetFormResultType } from '@/utility/form.js';
@@ -55,7 +54,7 @@ const { widgetProps, configure, save } = useWidgetPropsManager(name,
 );
 
 const configureNotification = async () => {
-	await os.popup(defineAsyncComponent(() => import('@/components/MkNotificationSelectWindow.vue')), {
+	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkNotificationSelectWindow.vue').then(x => x.default), {
 		excludeTypes: widgetProps.excludeTypes,
 	}, {
 		done: async (res) => {
@@ -63,7 +62,8 @@ const configureNotification = async () => {
 			widgetProps.excludeTypes = excludeTypes;
 			save();
 		},
-	}, 'closed');
+		closed: () => dispose(),
+	});
 };
 
 defineExpose<WidgetComponentExpose>({

@@ -40,8 +40,8 @@ import { misskeyApi } from '@/utility/misskey-api.js';
 import { useRouter } from '@/router.js';
 
 const props = withDefaults(defineProps<{
-  query?: string,
-  origin?: Endpoints['users/search']['req']['origin'],
+	query?: string,
+	origin?: Endpoints['users/search']['req']['origin'],
 }>(), {
 	query: '',
 	origin: 'combined',

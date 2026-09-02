@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ref, defineAsyncComponent } from 'vue';
+import { ref } from 'vue';
 import { compareVersions } from 'compare-versions';
 import * as Misskey from 'misskey-js';
 import type { Parser, Interpreter, values, utils as utils_TypeReferenceOnly } from '@syuilo/aiscript';
@@ -106,7 +106,7 @@ export async function authorizePlugin(plugin: Plugin) {
 	if (Object.hasOwn(store.s.pluginTokens, plugin.installId)) return;
 
 	const token = await new Promise<string>(async (res, rej) => {
-		await os.popup(defineAsyncComponent(() => import('@/components/MkTokenGenerateWindow.vue')), {
+		const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkTokenGenerateWindow.vue').then(x => x.default), {
 			title: i18n.ts.tokenRequested,
 			information: i18n.ts.pluginTokenRequestedDescription,
 			initialName: plugin.name,
@@ -121,7 +121,8 @@ export async function authorizePlugin(plugin: Plugin) {
 				});
 				res(token);
 			},
-		}, 'closed');
+			closed: () => dispose(),
+		});
 	});
 
 	store.set('pluginTokens', {

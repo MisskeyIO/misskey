@@ -61,7 +61,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, onDeactivated, onUnmounted, ref, watch, shallowRef, defineAsyncComponent } from 'vue';
+import { computed, onDeactivated, onUnmounted, ref, watch, shallowRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import { url } from '@@/js/config.js';
 import type { Ref } from 'vue';
@@ -251,10 +251,12 @@ async function reportAbuse() {
 
 	const pageUrl = `${url}/play/${flash.value.id}`;
 
-	os.popup(defineAsyncComponent(() => import('@/components/MkAbuseReportWindow.vue')), {
+	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkAbuseReportWindow.vue').then(x => x.default), {
 		user: flash.value.user,
 		initialComment: `Play: ${pageUrl}\n-----\n`,
-	}, {}, 'closed');
+	}, {
+		closed: () => dispose(),
+	});
 }
 
 function showMenu(ev: MouseEvent) {

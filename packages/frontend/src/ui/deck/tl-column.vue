@@ -28,7 +28,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		:withSensitive="withSensitive"
 		:onlyFiles="onlyFiles"
 		:dimension="dimension"
-		@note="onNote"
+		:sound="true"
+		:customSound="soundSetting"
 	/>
 </XColumn>
 </template>
@@ -45,7 +46,6 @@ import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
 import { hasWithReplies, hasDimension, isAvailableBasicTimeline, basicTimelineIconClass } from '@/timelines.js';
 import { soundSettingsButton } from '@/ui/deck/tl-note-notification.js';
-import * as sound from '@/utility/sound.js';
 import { selectDimension } from '@/utility/dimension.js';
 import { claimAchievement } from '@/utility/achievements.js';
 import { prefer } from '@/preferences.js';
@@ -138,10 +138,6 @@ async function setType() {
 	updateColumn(props.column.id, {
 		tl: src ?? undefined,
 	});
-}
-
-function onNote() {
-	sound.playMisskeySfxFile(soundSetting.value);
 }
 
 const menu = computed<MenuItem[]>(() => {

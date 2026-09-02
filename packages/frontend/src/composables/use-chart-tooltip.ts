@@ -17,7 +17,7 @@ export function useChartTooltip(opts: { position: 'top' | 'middle' } = { positio
 		borderColor: string;
 		text: string;
 	}[] | null>(null);
-	const tooltipComponent = os.popup(MkChartTooltip, {
+	const { dispose: disposeTooltipComponent } = os.popup(MkChartTooltip, {
 		showing: tooltipShowing,
 		x: tooltipX,
 		y: tooltipY,
@@ -25,8 +25,15 @@ export function useChartTooltip(opts: { position: 'top' | 'middle' } = { positio
 		series: tooltipSeries,
 	}, {});
 
-	onUnmounted(async () => {
-		(await tooltipComponent).dispose();
+	function windowTouchendHandler() {
+		tooltipShowing.value = false;
+	}
+
+	window.addEventListener('touchend', windowTouchendHandler, { passive: true });
+
+	onUnmounted(() => {
+		window.removeEventListener('touchend', windowTouchendHandler);
+		disposeTooltipComponent();
 	});
 
 	onDeactivated(() => {

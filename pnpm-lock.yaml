@@ -1921,6 +1921,9 @@ importers:
       i18n:
         specifier: workspace:*
         version: link:../i18n
+      icons-subsetter:
+        specifier: workspace:*
+        version: link:../icons-subsetter
       idb-keyval:
         specifier: 'catalog:'
         version: 6.2.2
@@ -2045,6 +2048,9 @@ importers:
       '@storybook/vue3-vite':
         specifier: 'catalog:'
         version: 10.2.3(esbuild@0.27.2)(rollup@4.57.1)(storybook@10.2.3(@testing-library/dom@10.4.0)(bufferutil@4.1.0)(prettier@3.8.1)(react@19.2.4)(utf-8-validate@6.0.6))(vite@7.3.1(@types/node@24.10.1)(lightningcss@1.31.1)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2))(vue@3.5.27(typescript@5.9.3))
+      '@tabler/icons-webfont':
+        specifier: 'catalog:'
+        version: 3.35.0
       '@testing-library/vue':
         specifier: 'catalog:'
         version: 8.1.0(@vue/compiler-sfc@3.5.27)(vue@3.5.27(typescript@5.9.3))
@@ -2262,6 +2268,9 @@ importers:
       i18n:
         specifier: workspace:*
         version: link:../i18n
+      icons-subsetter:
+        specifier: workspace:*
+        version: link:../icons-subsetter
       json5:
         specifier: 'catalog:'
         version: 2.2.3
@@ -2308,6 +2317,9 @@ importers:
       '@misskey-dev/summaly':
         specifier: github:MisskeyIO/summaly#5.2.5-io.3
         version: https://codeload.github.com/MisskeyIO/summaly/tar.gz/c81c026212f4ee8ca7aa00cf66a128c21fc5d968
+      '@tabler/icons-webfont':
+        specifier: 'catalog:'
+        version: 3.35.0
       '@testing-library/vue':
         specifier: 'catalog:'
         version: 8.1.0(@vue/compiler-sfc@3.5.27)(vue@3.5.27(typescript@5.9.3))
@@ -2395,9 +2407,6 @@ importers:
 
   packages/frontend-shared:
     dependencies:
-      '@tabler/icons-webfont':
-        specifier: 'catalog:'
-        version: 3.35.0
       i18n:
         specifier: workspace:*
         version: link:../i18n

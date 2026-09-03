@@ -22,6 +22,7 @@
     "estree-walker": "catalog:",
     "frontend-shared": "workspace:*",
     "i18n": "workspace:*",
+    "icons-subsetter": "workspace:*",
     "json5": "catalog:",
     "mfm-js": "catalog:",
     "misskey-js": "workspace:*",
@@ -39,6 +40,7 @@
   },
   "devDependencies": {
     "@misskey-dev/summaly": "catalog:",
+    "@tabler/icons-webfont": "catalog:",
     "@testing-library/vue": "catalog:",
     "@types/estree": "catalog:",
     "@types/micromatch": "catalog:",

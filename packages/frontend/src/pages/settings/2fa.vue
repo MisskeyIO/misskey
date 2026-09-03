@@ -86,7 +86,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { defineAsyncComponent, computed } from 'vue';
+import { computed } from 'vue';
 import { browserSupportsWebAuthn as webAuthnSupported, startRegistration } from '@simplewebauthn/browser';
 import MkButton from '@/components/MkButton.vue';
 import MkInfo from '@/components/MkInfo.vue';
@@ -119,9 +119,11 @@ async function registerTOTP(): Promise<void> {
 		token: auth.result.token,
 	});
 
-	os.popup(defineAsyncComponent(() => import('./2fa.qrdialog.vue')), {
+	const { dispose } = await os.popupAsyncWithDialog(import('./2fa.qrdialog.vue').then(x => x.default), {
 		twoFactorData,
-	}, {}, 'closed');
+	}, {
+		closed: () => dispose(),
+	});
 }
 
 async function unregisterTOTP(): Promise<void> {

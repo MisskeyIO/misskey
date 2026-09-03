@@ -51,7 +51,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, defineAsyncComponent, provide } from 'vue';
+import { computed, provide } from 'vue';
 import * as mfm from 'mfm-js';
 import * as Misskey from 'misskey-js';
 import { url } from '@@/js/config.js';
@@ -183,10 +183,12 @@ function showMenu(ev: MouseEvent, contextmenu = false) {
 			icon: 'ti ti-exclamation-circle',
 			action: async () => {
 				const localUrl = `${url}/chat/messages/${props.message.id}`;
-				await os.popup(defineAsyncComponent(() => import('@/components/MkAbuseReportWindow.vue')), {
+				const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkAbuseReportWindow.vue').then(x => x.default), {
 					user: props.message.fromUser!,
 					initialComment: `${localUrl}\n-----\n`,
-				}, {}, 'closed');
+				}, {
+					closed: () => dispose(),
+				});
 			},
 		});
 	}

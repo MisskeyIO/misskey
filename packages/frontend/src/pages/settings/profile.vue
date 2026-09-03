@@ -252,6 +252,7 @@ import { claimAchievement } from '@/utility/achievements.js';
 import { store } from '@/store.js';
 import MkInfo from '@/components/MkInfo.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
+import { genId } from '@/utility/id.js';
 
 const $i = ensureSignin();
 
@@ -279,14 +280,14 @@ watch(() => profile, () => {
 	deep: true,
 });
 
-const mutualLinkSections = ref($i.mutualLinkSections.map(section => ({ ...section, id: Math.random().toString(), none: !section.name })) ?? []);
-const fields = ref($i.fields.map(field => ({ id: Math.random().toString(), name: field.name, value: field.value })) ?? []);
+const mutualLinkSections = ref($i.mutualLinkSections.map(section => ({ ...section, id: genId(), none: !section.name })) ?? []);
+const fields = ref($i.fields.map(field => ({ id: genId(), name: field.name, value: field.value })) ?? []);
 const fieldEditMode = ref(false);
 const mutualLinkSectionEditMode = ref(false);
 
 function addField() {
 	fields.value.push({
-		id: Math.random().toString(),
+		id: genId(),
 		name: '',
 		value: '',
 	});
@@ -294,7 +295,7 @@ function addField() {
 
 function addMutualLinks(index:number) {
 	mutualLinkSections.value[index].mutualLinks.push({
-		id: Math.random().toString(),
+		id: genId(),
 		fileId: '',
 		url: '',
 		imgSrc: '',
@@ -304,7 +305,7 @@ function addMutualLinks(index:number) {
 
 function addMutualLinkSections() {
 	mutualLinkSections.value.push({
-		id: Math.random().toString(),
+		id: genId(),
 		name: 'New Section',
 		none: false,
 		mutualLinks: [],

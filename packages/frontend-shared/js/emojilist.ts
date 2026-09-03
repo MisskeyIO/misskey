@@ -51,6 +51,10 @@ for (let i = 0; i < emojilist.length; i++) {
 
 export const emojiCharByCategory = _charGroupByCategory;
 
+export function isSupportedEmoji(char: string): boolean {
+	return unicodeEmojisMap.has(colorizeEmoji(char)) || unicodeEmojisMap.has(char);
+}
+
 export function getEmojiName(char: string): string {
 	// Colorize it because emojilist.json assumes that
 	const idx = _indexByChar.get(colorizeEmoji(char)) ?? _indexByChar.get(char);

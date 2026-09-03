@@ -47,7 +47,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, defineAsyncComponent, onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { openInstanceMenu } from './common.js';
 import * as os from '@/os.js';
 import { navbarItemDef } from '@/navbar.js';
@@ -71,11 +71,13 @@ const otherNavItemIndicated = computed<boolean>(() => {
 	return false;
 });
 
-function more(ev: MouseEvent) {
-	os.popup(defineAsyncComponent(() => import('@/components/MkLaunchPad.vue')), {
+async function more(ev: MouseEvent) {
+	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkLaunchPad.vue').then(x => x.default), {
 		anchorElement: ev.currentTarget ?? ev.target,
 		anchor: { x: 'center', y: 'bottom' },
-	}, {}, 'closed');
+	}, {
+		closed: () => dispose(),
+	});
 }
 
 function openAccountMenu(ev: MouseEvent) {

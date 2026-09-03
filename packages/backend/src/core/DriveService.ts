@@ -319,8 +319,8 @@ export class DriveService {
 				type !== 'image/svg+xml' && // security reason
 				type !== 'image/avif' && // not supported by Mastodon and MS Edge
 			!(metadata.exif ?? metadata.iptc ?? metadata.xmp ?? metadata.tifftagPhotoshop) &&
-			metadata.width && metadata.width <= 4096 &&
-			metadata.height && metadata.height <= 4096
+			metadata.width && metadata.width <= 2048 &&
+			metadata.height && metadata.height <= 2048
 			);
 		} catch (err) {
 			this.registerLogger.warn(`sharp failed: ${err}`);
@@ -338,9 +338,9 @@ export class DriveService {
 
 			try {
 				if (['image/jpeg', 'image/webp', 'image/avif'].includes(type)) {
-					webpublic = await this.imageProcessingService.convertSharpToWebp(img, 4096, 4096);
+					webpublic = await this.imageProcessingService.convertSharpToWebp(img, 2048, 2048);
 				} else if (['image/png', 'image/bmp', 'image/svg+xml'].includes(type)) {
-					webpublic = await this.imageProcessingService.convertSharpToPng(img, 4096, 4096);
+					webpublic = await this.imageProcessingService.convertSharpToPng(img, 2048, 2048);
 				} else {
 					this.registerLogger.debug('web image not created (not an required image)');
 				}
@@ -821,14 +821,14 @@ export class DriveService {
 			await Promise.all(promises);
 		}
 
-		this.deletePostProcess(file, isExpired, deleter);
+		await this.deletePostProcess(file, isExpired, deleter);
 	}
 
 	@bindThis
 	private async deletePostProcess(file: MiDriveFile, isExpired = false, deleter?: MiUser) {
 		// リモートファイル期限切れ削除後は直リンクにする
 		if (isExpired && file.userHost !== null && file.uri != null) {
-			this.driveFilesRepository.update(file.id, {
+			await this.driveFilesRepository.update(file.id, {
 				isLink: true,
 				url: file.uri,
 				thumbnailUrl: null,
@@ -840,7 +840,7 @@ export class DriveService {
 				webpublicAccessKey: 'webpublic-' + randomUUID(),
 			});
 		} else {
-			this.driveFilesRepository.delete(file.id);
+			await this.driveFilesRepository.delete(file.id);
 		}
 
 		this.driveChart.update(file, false);

@@ -14,7 +14,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, useTemplateRef, watch, defineAsyncComponent } from 'vue';
+import { onMounted, ref, useTemplateRef, watch } from 'vue';
 import XColumn from './column.vue';
 import type { entities as MisskeyEntities } from 'misskey-js';
 import type { Column } from '@/deck.js';
@@ -72,14 +72,17 @@ async function setAntenna() {
 	if (canceled || antenna == null) return;
 
 	if (antenna === '_CREATE_') {
-		await os.popup(defineAsyncComponent(() => import('@/components/MkAntennaEditorDialog.vue')), {}, {
+		const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkAntennaEditorDialog.vue').then(x => x.default), {}, {
 			created: (newAntenna: MisskeyEntities.Antenna) => {
 				antennasCache.delete();
 				updateColumn(props.column.id, {
 					antennaId: newAntenna.id,
 				});
 			},
-		}, 'closed');
+			closed: () => {
+				dispose();
+			},
+		});
 		return;
 	}
 

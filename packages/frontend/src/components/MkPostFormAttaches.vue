@@ -126,7 +126,7 @@ async function rename(file) {
 async function describe(file: Misskey.entities.DriveFile) {
 	if (mock) return;
 
-	await os.popup(defineAsyncComponent(() => import('@/components/MkFileCaptionEditWindow.vue')), {
+	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkFileCaptionEditWindow.vue').then(x => x.default), {
 		default: file.comment !== null ? file.comment : '',
 		file: file,
 	}, {
@@ -139,7 +139,8 @@ async function describe(file: Misskey.entities.DriveFile) {
 				file.comment = comment;
 			});
 		},
-	}, 'closed');
+		closed: () => dispose(),
+	});
 }
 
 function showFileMenu(file: Misskey.entities.DriveFile, ev: MouseEvent | KeyboardEvent): void {
@@ -168,8 +169,10 @@ function showFileMenu(file: Misskey.entities.DriveFile, ev: MouseEvent | Keyboar
 			text: i18n.ts.preview,
 			icon: 'ti ti-photo-search',
 			action: async () => {
-				await os.popup(defineAsyncComponent(() => import('@/components/MkImgPreviewDialog.vue')), {
+				const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkImgPreviewDialog.vue').then(x => x.default), {
 					file: file,
+				}, {
+					closed: () => dispose(),
 				});
 			},
 		});

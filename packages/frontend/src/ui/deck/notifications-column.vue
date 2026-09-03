@@ -12,7 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { defineAsyncComponent, useTemplateRef } from 'vue';
+import { useTemplateRef } from 'vue';
 import XColumn from './column.vue';
 import type { Column } from '@/deck.js';
 import { updateColumn } from '@/deck.js';
@@ -27,8 +27,8 @@ const props = defineProps<{
 
 const notificationsComponent = useTemplateRef('notificationsComponent');
 
-function func() {
-	os.popup(defineAsyncComponent(() => import('@/components/MkNotificationSelectWindow.vue')), {
+async function func() {
+	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkNotificationSelectWindow.vue').then(x => x.default), {
 		excludeTypes: props.column.excludeTypes,
 	}, {
 		done: async (res) => {
@@ -37,7 +37,8 @@ function func() {
 				excludeTypes: excludeTypes,
 			});
 		},
-	}, 'closed');
+		closed: () => dispose(),
+	});
 }
 
 const menu = [{

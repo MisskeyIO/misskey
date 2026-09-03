@@ -3548,10 +3548,11 @@ export type PinnedUsersResponse = operations['pinned-users']['responses']['200']
 export type PromoReadRequest = operations['promo___read']['requestBody']['content']['application/json'];
 
 // Warning: (ae-forgotten-export) The symbol "AllNullRecord" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "AllNullOrOptionalRecord" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "NonNullableRecord" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export type PureRenote = Omit<Note, 'renote' | 'renoteId' | 'reply' | 'replyId' | 'text' | 'cw' | 'files' | 'fileIds' | 'poll'> & AllNullRecord<Pick<Note, 'reply' | 'replyId' | 'text' | 'cw' | 'poll'>> & {
+export type PureRenote = Omit<Note, 'renote' | 'renoteId' | 'reply' | 'replyId' | 'text' | 'cw' | 'files' | 'fileIds' | 'poll'> & AllNullRecord<Pick<Note, 'text'>> & AllNullOrOptionalRecord<Pick<Note, 'reply' | 'replyId' | 'cw' | 'poll'>> & {
     files: [];
     fileIds: [];
 } & NonNullableRecord<Pick<Note, 'renote' | 'renoteId'>>;

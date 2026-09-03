@@ -4,7 +4,7 @@
  */
 
 import { toUnicode } from 'punycode.js';
-import { defineAsyncComponent, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import { host, url } from '@@/js/config.js';
 import type { Router } from '@/router.js';
@@ -93,10 +93,12 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 		});
 	}
 
-	function reportAbuse() {
-		os.popup(defineAsyncComponent(() => import('@/components/MkAbuseReportWindow.vue')), {
+	async function reportAbuse() {
+		const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkAbuseReportWindow.vue').then(x => x.default), {
 			user: user,
-		}, {}, 'closed');
+		}, {
+			closed: () => dispose(),
+		});
 	}
 
 	async function getConfirmed(text: string): Promise<boolean> {

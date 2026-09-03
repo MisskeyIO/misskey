@@ -84,6 +84,7 @@ import { useStream } from '@/stream.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import MkFoldableSection from '@/components/MkFoldableSection.vue';
+import { genId } from '@/utility/id.js';
 
 const rootEl = useTemplateRef('rootEl');
 const topSubInstancesForPie = ref<InstanceForPie[] | null>(null);
@@ -165,7 +166,7 @@ onMounted(async () => {
 
 	nextTick(() => {
 		queueStatsConnection.send('requestLog', {
-			id: Math.random().toString().substring(2, 10),
+			id: genId(),
 			length: 100,
 		});
 	});

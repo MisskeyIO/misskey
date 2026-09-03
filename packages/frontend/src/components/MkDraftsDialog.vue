@@ -200,7 +200,7 @@ function convertNoteDraftToNoteCompat(draft: Misskey.entities.NoteDraft, key?: s
 }
 
 function loadDrafts() {
-	const stored = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}') as Record<string, Misskey.entities.NoteDraft>;
+	const stored = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}');
 	drafts.value = Object.keys(stored).map((key) => convertNoteDraftToNoteCompat(stored[key], key));
 }
 
@@ -219,7 +219,7 @@ function selectDraft(draft: string) {
 }
 
 function removeDraft(draft: string) {
-	const stored = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}') as Record<string, Misskey.entities.NoteDraft>;
+	const stored = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}');
 
 	delete stored[draft];
 	miLocalStorage.setItem('drafts', JSON.stringify(stored));
@@ -240,9 +240,9 @@ function unschedule(draft: string) {
 		key += `note:${item.id}`;
 	}
 
-	const stored = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}') as Record<string, Misskey.entities.NoteDraft>;
+	const stored = JSON.parse(miLocalStorage.getItem('drafts') ?? '{}');
 
-	stored[key] = item as unknown as Misskey.entities.NoteDraft;
+	stored[key] = item;
 	miLocalStorage.setItem('drafts', JSON.stringify(stored));
 
 	cancelScheduled(item.id);

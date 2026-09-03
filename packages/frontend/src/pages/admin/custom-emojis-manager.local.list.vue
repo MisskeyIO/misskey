@@ -69,7 +69,7 @@ export type EmojiSearchQuery = {
 </script>
 
 <script setup lang="ts">
-import { computed, defineAsyncComponent, onMounted, ref, nextTick, useCssModule } from 'vue';
+import { computed, onMounted, ref, nextTick, useCssModule } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { RequestLogItem } from '@/pages/admin/custom-emojis-manager.impl.js';
 import type { GridCellValidationEvent, GridCellValueChangeEvent, GridEvent } from '@/components/grid/grid-event.js';
@@ -174,7 +174,10 @@ function setupGrid(): GridSetting {
 			{
 				bindTo: 'url', icon: 'ti-icons', type: 'image', editable: true, width: 'auto', validators: [required],
 				async customValueEditor(row, col, value, cellElement) {
-					const file = await selectFile(cellElement);
+					const file = await selectFile({
+						anchorElement: cellElement,
+						multiple: false,
+					});
 					gridItems.value[row.index].url = file.url;
 					gridItems.value[row.index].fileId = file.id;
 
@@ -528,7 +531,7 @@ const headerActions = computed(() => [{
 	handler: async () => {
 		if (searchWindowOpening) return;
 		searchWindowOpening = true;
-		const { dispose } = await os.popup(defineAsyncComponent(() => import('./custom-emojis-manager.local.list.search.vue')), {
+		const { dispose } = await os.popupAsyncWithDialog(import('./custom-emojis-manager.local.list.search.vue').then(x => x.default), {
 			query: searchQuery.value,
 		}, {
 			queryUpdated: (query: EmojiSearchQuery) => {
@@ -585,9 +588,13 @@ const headerActions = computed(() => [{
 	icon: 'ti ti-notes',
 	text: i18n.ts._customEmojisManager._gridCommon.registrationLogs,
 	handler: async () => {
-		await os.popup(defineAsyncComponent(() => import('./custom-emojis-manager.local.list.logs.vue')), {
+		const { dispose } = await os.popupAsyncWithDialog(import('./custom-emojis-manager.local.list.logs.vue').then(x => x.default), {
 			logs: requestLogs.value,
-		}, {}, 'closed');
+		}, {
+			closed: () => {
+				dispose();
+			},
+		});
 	},
 }]);
 </script>

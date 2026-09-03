@@ -43,11 +43,11 @@ function clean (text: string) {
 }
 
 /**
- * 空文字列が入ることがあり、フォールバックが動作しなくなるのでプロパティごと消す
+ * 空値が入ることがあり、フォールバックが動作しなくなるのでプロパティごと消す
  */
 function removeEmpty<T extends ILocale>(obj: T): T {
-	for (const [k, v] of Object.entries(obj)) {
-		if (v === '') {
+	for (const [k, v] of Object.entries(obj) as [string, unknown][]) {
+		if (v == null || v === '') {
 			delete obj[k];
 		} else if (typeof v === 'object') {
 			removeEmpty(v as ILocale);

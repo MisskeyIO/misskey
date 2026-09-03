@@ -1,14 +1,11 @@
-import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import * as jose from 'jose';
 import * as Redis from 'ioredis';
 import * as saml from 'samlify';
 import * as validator from '@authenio/samlify-node-xmllint';
-import fastifyView from '@fastify/view';
 import fastifyCors from '@fastify/cors';
 import fastifyFormbody from '@fastify/formbody';
 import fastifyHttpErrorsEnhanced from 'fastify-http-errors-enhanced';
-import pug from 'pug';
 import xmlbuilder from 'xmlbuilder';
 import { Inject, Injectable } from '@nestjs/common';
 import { IsNull, Not } from 'typeorm';
@@ -27,6 +24,8 @@ import type { MiLocalUser } from '@/models/User.js';
 import { bindThis } from '@/decorators.js';
 import { DI } from '@/di-symbols.js';
 import { normalizeEmailAddress } from '@/misc/normalize-email-address.js';
+import { HtmlTemplateService } from '@/server/web/HtmlTemplateService.js';
+import { SsoPage } from '@/server/web/views/sso.js';
 import type { FastifyInstance } from 'fastify';
 
 @Injectable()
@@ -48,6 +47,7 @@ export class SAMLIdentifyProviderService {
 		private roleService: RoleService,
 		private cacheService: CacheService,
 		private loggerService: LoggerService,
+		private htmlTemplateService: HtmlTemplateService,
 	) {
 		this.#logger = this.loggerService.getLogger('sso:saml');
 		saml.setSchemaValidator(validator);
@@ -190,14 +190,6 @@ export class SAMLIdentifyProviderService {
 		fastify.register(fastifyHttpErrorsEnhanced, { preHandler: (error: Error): Error => { this.#logger.error(error); return error; } });
 		fastify.register(fastifyFormbody);
 		fastify.register(fastifyCors);
-		fastify.register(fastifyView, {
-			root: fileURLToPath(new URL('../web/views', import.meta.url)),
-			engine: { pug },
-			defaultContext: {
-				version: this.config.version,
-				config: this.config,
-			},
-		});
 
 		fastify.all<{
 			Params: { serviceId: string };
@@ -265,12 +257,13 @@ export class SAMLIdentifyProviderService {
 				this.#logger.info(`Rendering authorization page for "${ssoServiceProvider.name ?? ssoServiceProvider.issuer}"`);
 
 				reply.header('Cache-Control', 'no-store');
-				return await reply.view('sso', {
+				return await HtmlTemplateService.replyHtml(reply, SsoPage({
+					...await this.htmlTemplateService.getCommonData(),
 					transactionId: transactionId,
 					serviceName: ssoServiceProvider.name ?? ssoServiceProvider.issuer,
 					kind: 'saml',
 					prompt: prompt,
-				});
+				}));
 			} catch (err) {
 				this.#logger.error('Failed to parse SAML request', { error: err });
 				const traceableError = err as Error & { code?: string };

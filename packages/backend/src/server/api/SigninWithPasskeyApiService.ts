@@ -83,25 +83,25 @@ export class SigninWithPasskeyApiService {
 			});
 			return error(status ?? 500, failure ?? { id: '4e30e80c-e338-45a0-8c8f-44455efa3b76' });
 		};
+		if (this.config.enableIpRateLimit) {
+			if (process.env.NODE_ENV === 'production' && (request.ip === '::1' || request.ip === '127.0.0.1')) {
+				this.logger.warn('Recieved signin with passkey request from localhost IP address for rate limiting in production environment. This is likely due to an improper trustProxy setting in the config file.');
+			}
 
-		// Not more than 1 API call per 250ms and not more than 100 attempts per 30min
-		// NOTE: 1 Sign-in require 2 API calls
-		const rateLimit = await this.rateLimiterService.limit({ key: 'signin-with-passkey', duration: 60 * 30 * 1000, max: 200, minInterval: 250 }, getIpHash(request.ip));
-		if (rateLimit != null) {
-			this.logger.warn('Too many failed attempts to sign in.');
-			reply.code(429);
-			return {
-				error: {
-					message: 'Rate limit exceeded. Please try again later.',
-					code: 'RATE_LIMIT_EXCEEDED',
-					id: '22d05606-fbcf-421a-a2db-b32610dcfd1b',
-					info: {
-						message: 'Too many failed attempts to sign in.',
+			// Not more than 1 API call per 250ms and not more than 100 attempts per 30min
+			// NOTE: 1 Sign-in require 2 API calls
+			const rateLimit = await this.rateLimiterService.limit({ key: 'signin-with-passkey', duration: 60 * 30 * 1000, max: 200, minInterval: 250 }, getIpHash(request.ip));
+			if (rateLimit != null) {
+				this.logger.warn('Too many failed attempts to sign in.');
+				reply.code(429);
+				return {
+					error: {
+						message: 'Too many failed attempts to sign in. Try again later.',
 						code: 'TOO_MANY_AUTHENTICATION_FAILURES',
-						id: 'dffc9b5f-7f8c-4c06-a355-ea84632b462c',
+						id: '22d05606-fbcf-421a-a2db-b32610dcfd1b',
 					},
-				},
-			};
+				};
+			}
 		}
 
 		// Initiate Passkey Auth challenge with context

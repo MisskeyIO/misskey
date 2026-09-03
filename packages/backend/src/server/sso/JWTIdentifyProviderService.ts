@@ -1,9 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { fileURLToPath } from 'node:url';
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
-import pug from 'pug';
-import fastifyView from '@fastify/view';
 import fastifyCors from '@fastify/cors';
 import fastifyFormbody from '@fastify/formbody';
 import fastifyHttpErrorsEnhanced from 'fastify-http-errors-enhanced';
@@ -23,6 +20,8 @@ import { CacheService } from '@/core/CacheService.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import { RoleService } from '@/core/RoleService.js';
 import { normalizeEmailAddress } from '@/misc/normalize-email-address.js';
+import { HtmlTemplateService } from '@/server/web/HtmlTemplateService.js';
+import { SsoPage } from '@/server/web/views/sso.js';
 import type { FastifyInstance } from 'fastify';
 
 @Injectable()
@@ -44,6 +43,7 @@ export class JWTIdentifyProviderService {
 		private roleService: RoleService,
 		private cacheService: CacheService,
 		private loggerService: LoggerService,
+		private htmlTemplateService: HtmlTemplateService,
 	) {
 		this.#logger = this.loggerService.getLogger('sso:jwt');
 	}
@@ -53,14 +53,6 @@ export class JWTIdentifyProviderService {
 		fastify.register(fastifyHttpErrorsEnhanced, { preHandler: (error: Error): Error => { this.#logger.error(error); return error; } });
 		fastify.register(fastifyFormbody);
 		fastify.register(fastifyCors);
-		fastify.register(fastifyView, {
-			root: fileURLToPath(new URL('../web/views', import.meta.url)),
-			engine: { pug },
-			defaultContext: {
-				version: this.config.version,
-				config: this.config,
-			},
-		});
 
 		fastify.all<{
 			Params: { serviceId: string };
@@ -98,12 +90,13 @@ export class JWTIdentifyProviderService {
 			this.#logger.info(`Rendering authorization page for "${ssoServiceProvider.name ?? ssoServiceProvider.issuer}"`);
 
 			reply.header('Cache-Control', 'no-store');
-			return await reply.view('sso', {
+			return await HtmlTemplateService.replyHtml(reply, SsoPage({
+				...await this.htmlTemplateService.getCommonData(),
 				transactionId: transactionId,
 				serviceName: ssoServiceProvider.name ?? ssoServiceProvider.issuer,
 				kind: 'jwt',
 				prompt: prompt,
-			});
+			}));
 		});
 
 		fastify.post<{

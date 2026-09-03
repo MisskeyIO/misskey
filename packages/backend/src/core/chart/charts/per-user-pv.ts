@@ -25,12 +25,12 @@ export default class PerUserPvChart extends Chart<typeof schema> { // eslint-dis
 		@Inject(DI.db)
 		private db: DataSource,
 
-		@Inject(DI.redisForTimelines)
-		private redisForTimelines: Redis.Redis,
+		@Inject(DI.redis)
+		private redisClient: Redis.Redis,
 
 		private chartLoggerService: ChartLoggerService,
 	) {
-		super(db, (k) => acquireChartInsertLock(redisForTimelines, k), chartLoggerService.logger, name, schema, true);
+		super(db, (k) => acquireChartInsertLock(redisClient, k), chartLoggerService.logger, name, schema, true);
 	}
 
 	protected async tickMajor(): Promise<Partial<KVs<typeof schema>>> {
@@ -74,7 +74,6 @@ export default class PerUserPvChart extends Chart<typeof schema> { // eslint-dis
 			span === 'day' ? this.repositoryForDay :
 				new Error('not happen') as never;
 
-		// ログ取得
 		return await repository.createQueryBuilder()
 			.select('"group" as "userId", sum("___upv_user" + "___upv_visitor") as "count"')
 			.where('date BETWEEN :gt AND :lt', { gt: Chart.dateToTimestamp(gt), lt: Chart.dateToTimestamp(lt) })

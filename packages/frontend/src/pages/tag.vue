@@ -6,15 +6,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <PageWithHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs">
 	<div class="_spacer" style="--MI_SPACER-w: 800px;">
-			<div v-if="tab === 'all'">
-				<MkNotes ref="notes" class="" :pagination="pagination"/>
-			</div>
-			<div v-else-if="tab === 'localOnly'">
-				<MkNotes ref="notes" class="" :pagination="localOnlyPagination"/>
-			</div>
-			<div v-else-if="tab === 'withFiles'">
-				<MkNotes ref="notes" class="" :pagination="withFilesPagination"/>
-			</div>
+		<MkNotesTimeline v-if="tab === 'all'" ref="tlComponent" :pagination="pagination"/>
+		<MkNotesTimeline v-else-if="tab === 'localOnly'" ref="tlComponent" :pagination="localOnlyPagination"/>
+		<MkNotesTimeline v-else-if="tab === 'withFiles'" ref="tlComponent" :pagination="withFilesPagination"/>
 	</div>
 	<template v-if="$i" #footer>
 		<div :class="$style.footer">
@@ -27,8 +21,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
-import MkNotes from '@/components/MkNotes.vue';
+import { computed, ref, useTemplateRef } from 'vue';
+import MkNotesTimeline from '@/components/MkNotesTimeline.vue';
 import MkButton from '@/components/MkButton.vue';
 import { definePage } from '@/page.js';
 import { i18n } from '@/i18n.js';
@@ -49,7 +43,8 @@ const pagination = {
 		tag: props.tag,
 	})),
 };
-const notes = ref<InstanceType<typeof MkNotes>>();
+
+const tlComponent = useTemplateRef('tlComponent');
 
 const localOnlyPagination = {
 	endpoint: 'notes/search-by-tag' as const,
@@ -75,7 +70,7 @@ async function post() {
 	await os.post();
 	store.set('postFormHashtags', '');
 	store.set('postFormWithHashtags', false);
-	notes.value?.pagingComponent?.reload();
+	tlComponent.value?.reload();
 }
 
 const headerActions = [];

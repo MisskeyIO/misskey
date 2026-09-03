@@ -62,8 +62,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (ad == null) throw new ApiError(meta.errors.noSuchAd);
 
-			let imageBlurhash: string | null | undefined;
+			let imageBlurhash: string | null | undefined = undefined;
 			if (ps.imageUrl != null) {
+				imageBlurhash = null;
 				try {
 					const [tmpPath, cleanup] = await createTemp();
 					try {

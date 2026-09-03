@@ -92,8 +92,8 @@ export class ApRendererService {
 	public renderAnnounce(object: string | IObject, note: MiNote): IAnnounce {
 		const attributedTo = this.userEntityService.genLocalUserUri(note.userId);
 
-		let to: string[];
-		let cc: string[];
+		let to: string[] = [];
+		let cc: string[] = [];
 
 		if (note.visibility === 'public') {
 			to = ['https://www.w3.org/ns/activitystreams#Public'];
@@ -365,7 +365,7 @@ export class ApRendererService {
 			return ids.map(id => items.find(item => item.id === id)).filter(x => x != null);
 		};
 
-		let inReplyTo: string | IPost | null = null;
+		let inReplyTo;
 		let inReplyToNote: MiNote | null;
 
 		if (note.replyId) {
@@ -386,9 +386,11 @@ export class ApRendererService {
 					}
 				}
 			}
+		} else {
+			inReplyTo = null;
 		}
 
-		let quote: string | null = null;
+		let quote;
 
 		if (note.renoteId) {
 			const renote = await this.notesRepository.findOneBy({ id: note.renoteId });
@@ -402,8 +404,8 @@ export class ApRendererService {
 
 		const mentions = (JSON.parse(note.mentionedRemoteUsers) as IMentionedRemoteUsers).map(x => x.uri);
 
-		let to: string[];
-		let cc: string[];
+		let to: string[] = [];
+		let cc: string[] = [];
 
 		if (note.visibility === 'public') {
 			to = ['https://www.w3.org/ns/activitystreams#Public'];
@@ -416,7 +418,6 @@ export class ApRendererService {
 			cc = mentions;
 		} else {
 			to = mentions;
-			cc = [];
 		}
 
 		const mentionedUsers = note.mentions.length > 0 ? await this.usersRepository.findBy({
@@ -494,12 +495,12 @@ export class ApRendererService {
 					mediaType: 'text/x.misskeymarkdown',
 				},
 			}),
-			_misskey_quote: quote ?? undefined,
-			quoteUrl: quote ?? undefined,
+			_misskey_quote: quote,
+			quoteUrl: quote,
 			published: this.idService.parse(note.id).date.toISOString(),
 			to,
 			cc,
-			inReplyTo: inReplyTo ?? undefined,
+			inReplyTo,
 			attachment: files.map(x => this.renderDocument(x)),
 			sensitive: note.cw != null || files.some(file => file.isSensitive),
 			tag,

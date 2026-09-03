@@ -128,7 +128,6 @@
     "react-dom": "catalog:",
     "seedrandom": "catalog:",
     "start-server-and-test": "catalog:",
-    "type-fest": "catalog:",
     "storybook": "catalog:",
     "vite-plugin-turbosnap": "catalog:",
     "vitest": "catalog:",

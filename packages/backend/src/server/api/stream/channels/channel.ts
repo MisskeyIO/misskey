@@ -1,4 +1,4 @@
- /*
+/*
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
@@ -45,7 +45,8 @@ class ChannelChannel extends Channel {
 	}
 
 	@bindThis
-	private async onNote(note: Packed<'Note'>) {
+	private async onNote(sourceNote: Packed<'Note'>) {
+		let note = sourceNote;
 		if (note.channelId !== this.channelId) return;
 
 		if (note.reply) {
@@ -63,12 +64,10 @@ class ChannelChannel extends Channel {
 		const { shouldSkip } = await this.noteStreamingHidingService.processHiding(note, this.user?.id ?? null);
 		if (shouldSkip) return;
 
-		if (this.user) {
-			if (isRenotePacked(note) && !isQuotePacked(note)) {
-				if (note.renote && Object.keys(note.renote.reactions).length > 0) {
-					const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
-					note.renote.myReaction = myRenoteReaction;
-				}
+		if (this.user && isRenotePacked(note) && !isQuotePacked(note)) {
+			if (note.renote && Object.keys(note.renote.reactions).length > 0) {
+				const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
+				note = { ...note, renote: { ...note.renote, myReaction: myRenoteReaction } };
 			}
 		}
 
@@ -76,7 +75,7 @@ class ChannelChannel extends Channel {
 			this.connection.cacheNote(note);
 		}
 
-		if (this.minimize && ['public', 'home'].includes(note.visibility)) {
+		if (this.minimize && this.canUseNoteJsonCache(note)) {
 			const badgeRoles = this.iAmModerator ? await this.roleService.getUserBadgeRoles(note.userId, false) : undefined;
 
 			this.send('note', {

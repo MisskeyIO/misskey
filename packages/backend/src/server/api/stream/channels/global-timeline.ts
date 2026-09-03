@@ -51,7 +51,8 @@ class GlobalTimelineChannel extends Channel {
 	}
 
 	@bindThis
-	private async onNote(note: Packed<'Note'>) {
+	private async onNote(sourceNote: Packed<'Note'>) {
+		let note = sourceNote;
 		if (note.visibility !== 'public') return;
 		if (note.channelId != null) return;
 		if (note.user.requireSigninToViewContents && this.user == null) return;
@@ -110,7 +111,7 @@ class GlobalTimelineChannel extends Channel {
 			this.connection.cacheNote(note);
 		}
 
-		if (this.minimize && ['public', 'home'].includes(note.visibility)) {
+		if (this.minimize && this.canUseNoteJsonCache(note)) {
 			const badgeRoles = this.iAmModerator ? await this.roleService.getUserBadgeRoles(note.userId, false) : undefined;
 
 			this.send('note', {

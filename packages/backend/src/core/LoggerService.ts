@@ -6,7 +6,7 @@
 import { Injectable } from '@nestjs/common';
 import { rootLogger } from '@/logger.js';
 import { bindThis } from '@/decorators.js';
-import type { Keyword } from 'color-convert';
+import type { KEYWORD } from 'color-convert/conversions.js';
 
 @Injectable()
 export class LoggerService {
@@ -15,7 +15,7 @@ export class LoggerService {
 	}
 
 	@bindThis
-	public getLogger(domain: string, color?: Keyword | undefined) {
+	public getLogger(domain: string, color?: KEYWORD | undefined) {
 		return rootLogger.createSubLogger(domain, color);
 	}
 }

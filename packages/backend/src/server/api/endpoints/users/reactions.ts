@@ -108,12 +108,18 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 							.where('"reaction"."userId" = :userId', { userId: ps.userId }),
 						ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate,
 					),
-				'reaction',
-				'"reaction"."noteId" = note.id',
-				);
+					'reaction',
+					'"reaction"."noteId" = note.id',
+				)
+				.leftJoinAndSelect('note.user', 'user')
+				.leftJoinAndSelect('note.reply', 'reply')
+				.leftJoinAndSelect('note.renote', 'renote')
+				.leftJoinAndSelect('reply.user', 'replyUser')
+				.leftJoinAndSelect('renote.user', 'renoteUser');
 
 			this.queryService.generateVisibilityQuery(query, me);
 			this.queryService.generateBlockedHostQueryForNote(query);
+			this.queryService.generateSuspendedUserQueryForNote(query);
 
 			const reactions = (await query
 				.limit(ps.limit)

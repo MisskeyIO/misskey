@@ -22,6 +22,7 @@ import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { createBullBoard } from '@bull-board/api';
 import type { Config } from '@/config.js';
 import { getNoteSummary } from '@/misc/get-note-summary.js';
+import { isNoteCacheableForVisitor } from '@/misc/is-note-cacheable-for-visitor.js';
 import { DI } from '@/di-symbols.js';
 import * as Acct from '@/misc/acct.js';
 import type {
@@ -217,6 +218,7 @@ export class ClientServerService {
 			metaJson: htmlSafeJsonStringify(await this.metaEntityService.packDetailed(meta)),
 			now: Date.now(),
 			extraHead: this.config.extraHead,
+			federationEnabled: this.meta.federation !== 'none',
 		};
 	}
 
@@ -588,7 +590,12 @@ export class ClientServerService {
 
 			vary(reply.raw, 'Accept');
 
-			if (user) {
+			if (
+				user != null && (
+					this.meta.ugcVisibilityForVisitor === 'all' ||
+						(this.meta.ugcVisibilityForVisitor === 'local' && user.host == null)
+				)
+			) {
 				const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
 				const me = profile.fields
 					? profile.fields
@@ -650,7 +657,13 @@ export class ClientServerService {
 				relations: ['user'],
 			});
 
-			if (note && !note.user!.requireSigninToViewContents) {
+			if (
+				note &&
+				!note.user!.requireSigninToViewContents &&
+				(this.meta.ugcVisibilityForVisitor === 'all' ||
+					(this.meta.ugcVisibilityForVisitor === 'local' && note.userHost == null)
+				)
+			) {
 				try {
 					const _note = await this.noteEntityService.pack(note, null);
 					const profile = await this.userProfilesRepository.findOneByOrFail({ userId: note.userId });
@@ -682,19 +695,27 @@ export class ClientServerService {
 		});
 
 		fastify.get<{ Params: { note: string; } }>('/notes/:note.json', async (request, reply) => {
-			const note = await this.notesRepository.findOneBy({
-				id: request.params.note,
-				visibility: In(['public', 'home']),
+			const note = await this.notesRepository.findOne({
+				where: {
+					id: request.params.note,
+					visibility: In(['public', 'home']),
+				},
+				relations: ['user'],
 			});
 
 			if (note) {
 				try {
 					const _note = await this.noteEntityService.pack(note, null);
+					if (!isNoteCacheableForVisitor(_note, this.meta.ugcVisibilityForVisitor)) {
+						reply.header('Cache-Control', 'private, no-store');
+						reply.code(404);
+						return;
+					}
 					reply.header('Content-Type', 'application/json; charset=utf-8');
 					reply.header('Cache-Control', 'public, max-age=600');
 					return reply.send(_note);
 				} catch (err) {
-					reply.header('Cache-Control', 'max-age=10, must-revalidate');
+					reply.header('Cache-Control', 'private, no-store');
 					if (err instanceof IdentifiableError) {
 						this.clientLoggerService.logger.error(`Internal error occurred in ${request.routeOptions.url}: ${err.message}`, {
 							path: request.routeOptions.url,
@@ -751,6 +772,7 @@ export class ClientServerService {
 					}
 				}
 			} else {
+				reply.header('Cache-Control', 'private, no-store');
 				reply.code(404);
 				return;
 			}

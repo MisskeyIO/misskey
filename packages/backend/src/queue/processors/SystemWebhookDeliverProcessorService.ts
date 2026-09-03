@@ -77,7 +77,7 @@ export class SystemWebhookDeliverProcessorService {
 				}
 
 				// 5xx etc.
-				throw new Error(`${res.statusCode} ${res.statusMessage}`, { cause: res });
+				throw new Error(`${res.statusCode} ${res.statusMessage}`);
 			} else {
 				// DNS error, socket error, timeout ...
 				throw res;

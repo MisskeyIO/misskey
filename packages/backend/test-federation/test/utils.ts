@@ -68,7 +68,7 @@ async function createAdmin(host: Host): Promise<Misskey.entities.SignupResponse 
 	return await client.request('admin/accounts/create', ADMIN_PARAMS).then(res => {
 		ADMIN_CACHE.set(host, {
 			id: res.id,
-			// @ts-expect-error FIXME: openapi-typescript generates incorrect response type for this endpoint, so ignore this
+			// @ts-expect-error 自動生成型ではtokenが欠ける
 			i: res.token,
 		});
 		return res as Misskey.entities.SignupResponse;

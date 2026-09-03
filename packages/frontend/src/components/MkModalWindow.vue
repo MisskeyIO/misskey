@@ -6,7 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <MkModal ref="modal" hasInteractionWithOtherFocusTrappedEls :preferType="'dialog'" @click="onBgClick" @closed="emit('closed')" @esc="emit('esc')">
 	<div ref="rootEl" :class="$style.root" :style="{ width: `${width}px`, height: `min(${height}px, 100%)` }">
-		<div ref="headerEl" :class="$style.header">
+		<div :class="$style.header">
 			<button v-if="withOkButton && withCloseButton" :class="$style.headerButton" class="_button" @click="emit('close')"><i class="ti ti-x"></i></button>
 			<span :class="$style.title">
 				<slot name="header"></slot>
@@ -15,28 +15,29 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<button v-if="withOkButton" :class="$style.headerButton" class="_button" :disabled="okButtonDisabled" @click="emit('ok')"><i class="ti ti-check"></i></button>
 		</div>
 		<div :class="$style.body">
-			<slot :width="bodyWidth" :height="bodyHeight"></slot>
+			<slot></slot>
+		</div>
+		<div v-if="$slots.footer" :class="$style.footer">
+			<slot name="footer"></slot>
 		</div>
 	</div>
 </MkModal>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, useTemplateRef, ref } from 'vue';
+import { useTemplateRef } from 'vue';
 import MkModal from './MkModal.vue';
 
-const props = withDefaults(defineProps<{
+withDefaults(defineProps<{
 	withOkButton?: boolean;
 	withCloseButton?: boolean;
 	okButtonDisabled?: boolean;
-	escKeyDisabled?: boolean;
 	width?: number;
 	height?: number;
 }>(), {
 	withOkButton: false,
 	withCloseButton: true,
 	okButtonDisabled: false,
-	escKeyDisabled: false,
 	width: 400,
 	height: 500,
 });
@@ -50,10 +51,6 @@ const emit = defineEmits<{
 }>();
 
 const modal = useTemplateRef('modal');
-const rootEl = useTemplateRef('rootEl');
-const headerEl = useTemplateRef('headerEl');
-const bodyWidth = ref(0);
-const bodyHeight = ref(0);
 
 function close() {
 	modal.value?.close();
@@ -62,32 +59,6 @@ function close() {
 function onBgClick() {
 	emit('click');
 }
-
-const onKeydown = (evt) => {
-	if (evt.which === 27) { // Esc
-		if (props.escKeyDisabled) return;
-		evt.preventDefault();
-		evt.stopPropagation();
-		close();
-	}
-};
-
-const ro = new ResizeObserver((entries, observer) => {
-	if (rootEl.value == null || headerEl.value == null) return;
-	bodyWidth.value = rootEl.value.offsetWidth;
-	bodyHeight.value = rootEl.value.offsetHeight - headerEl.value.offsetHeight;
-});
-
-onMounted(() => {
-	if (rootEl.value == null || headerEl.value == null) return;
-	bodyWidth.value = rootEl.value.offsetWidth;
-	bodyHeight.value = rootEl.value.offsetHeight - headerEl.value.offsetHeight;
-	ro.observe(rootEl.value);
-});
-
-onUnmounted(() => {
-	ro.disconnect();
-});
 
 defineExpose({
 	close,
@@ -154,7 +125,14 @@ defineExpose({
 .body {
 	flex: 1;
 	overflow: auto;
-	background: var(--MI_THEME-panel);
+	background: var(--MI_THEME-bg);
 	container-type: size;
+}
+
+.footer {
+	padding: 12px 16px;
+	overflow: auto;
+	background: var(--MI_THEME-bg);
+	border-top: 1px solid var(--MI_THEME-divider);
 }
 </style>

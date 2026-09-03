@@ -93,39 +93,6 @@ export async function mainBoot() {
 		}
 	}
 
-	const stream = useStream();
-
-	let reloadDialogShowing = false;
-	stream.on('_disconnected_', async () => {
-		if (prefer.s.serverDisconnectedBehavior === 'reload') {
-			window.location.reload();
-		} else if (prefer.s.serverDisconnectedBehavior === 'dialog') {
-			if (reloadDialogShowing) return;
-			reloadDialogShowing = true;
-			const { canceled } = await confirm({
-				type: 'warning',
-				title: i18n.ts.disconnectedFromServer,
-				text: i18n.ts.reloadConfirm,
-			});
-			reloadDialogShowing = false;
-			if (!canceled) {
-				window.location.reload();
-			}
-		}
-	});
-
-	stream.on('emojiAdded', emojiData => {
-		addCustomEmoji(emojiData.emoji);
-	});
-
-	stream.on('emojiUpdated', emojiData => {
-		updateCustomEmojis(emojiData.emojis);
-	});
-
-	stream.on('emojiDeleted', emojiData => {
-		removeCustomEmojis(emojiData.emojis);
-	});
-
 	launchPlugins();
 
 	try {
@@ -357,50 +324,84 @@ export async function mainBoot() {
 			}
 		}
 
-		const main = markRaw(stream.useChannel('main', null, 'System'));
+		if (store.s.realtimeMode) {
+			const stream = useStream();
 
-		// 自分の情報が更新されたとき
-		main.on('meUpdated', i => {
-			updateCurrentAccountPartial(i);
-		});
-
-		main.on('announcementCreated', onAnnouncementCreated);
-
-		main.on('readAllNotifications', () => {
-			updateCurrentAccountPartial({
-				hasUnreadNotification: false,
-				unreadNotificationsCount: 0,
+			let reloadDialogShowing = false;
+			stream.on('_disconnected_', async () => {
+				if (prefer.s.serverDisconnectedBehavior === 'reload') {
+					window.location.reload();
+				} else if (prefer.s.serverDisconnectedBehavior === 'dialog') {
+					if (reloadDialogShowing) return;
+					reloadDialogShowing = true;
+					const { canceled } = await confirm({
+						type: 'warning',
+						title: i18n.ts.disconnectedFromServer,
+						text: i18n.ts.reloadConfirm,
+					});
+					reloadDialogShowing = false;
+					if (!canceled) {
+						window.location.reload();
+					}
+				}
 			});
-		});
 
-		main.on('unreadNotification', () => {
-			const unreadNotificationsCount = ($i?.unreadNotificationsCount ?? 0) + 1;
-			updateCurrentAccountPartial({
-				hasUnreadNotification: true,
-				unreadNotificationsCount,
+			stream.on('emojiAdded', emojiData => {
+				addCustomEmoji(emojiData.emoji);
 			});
-		});
 
-		main.on('newChatMessage', () => {
-			updateCurrentAccountPartial({ hasUnreadChatMessages: true });
-			sound.playMisskeySfx('chatMessage');
-		});
-
-		main.on('readAllAnnouncements', () => {
-			updateCurrentAccountPartial({
-				hasUnreadAnnouncement: false,
-				unreadAnnouncements: [],
+			stream.on('emojiUpdated', emojiData => {
+				updateCustomEmojis(emojiData.emojis);
 			});
-		});
 
-		// 個人宛てお知らせが発行されたとき
-		main.on('announcementCreated', onAnnouncementCreated);
+			stream.on('emojiDeleted', emojiData => {
+				removeCustomEmojis(emojiData.emojis);
+			});
 
-		// トークンが再生成されたとき
-		// このままではMisskeyが利用できないので強制的にサインアウトさせる
-		main.on('myTokenRegenerated', () => {
-			signout();
-		});
+			stream.on('announcementCreated', onAnnouncementCreated);
+
+			const main = markRaw(stream.useChannel('main', null, 'System'));
+
+			// 自分の情報が更新されたとき
+			main.on('meUpdated', i => {
+				updateCurrentAccountPartial(i);
+			});
+
+			main.on('readAllNotifications', () => {
+				updateCurrentAccountPartial({
+					hasUnreadNotification: false,
+					unreadNotificationsCount: 0,
+				});
+			});
+
+			main.on('unreadNotification', () => {
+				const unreadNotificationsCount = ($i?.unreadNotificationsCount ?? 0) + 1;
+				updateCurrentAccountPartial({
+					hasUnreadNotification: true,
+					unreadNotificationsCount,
+				});
+			});
+
+			main.on('newChatMessage', () => {
+				updateCurrentAccountPartial({ hasUnreadChatMessages: true });
+				sound.playMisskeySfx('chatMessage');
+			});
+
+			main.on('readAllAnnouncements', () => {
+				updateCurrentAccountPartial({
+					hasUnreadAnnouncement: false,
+					unreadAnnouncements: [],
+				});
+			});
+
+			// 個人宛てお知らせが発行されたとき
+			main.on('announcementCreated', onAnnouncementCreated);
+
+			// トークンが再生成された場合は再認証する
+			main.on('myTokenRegenerated', () => {
+				signout();
+			});
+		}
 	}
 
 	// shortcut

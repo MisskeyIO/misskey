@@ -121,7 +121,6 @@ type Source = {
 	proxyBypassHosts?: string[];
 
 	allowedPrivateNetworks?: string[];
-	disallowExternalApRedirect?: boolean;
 
 	contentSecurityPolicy?: string;
 
@@ -146,14 +145,11 @@ type Source = {
 	inboxJobMaxAttempts?: number;
 
 	mediaProxy?: string;
-	proxyRemoteFiles?: boolean;
 	videoThumbnailGenerator?: string;
 
 	bypassRateLimit?: { header: string; value: string }[];
 
 	remapDriveFileUrlForActivityPub?: { target: string; replacement: string }[];
-	signToActivityPubGet?: boolean;
-
 	perChannelMaxNoteCacheCount?: number;
 	perUserNotificationsMaxCount?: number;
 	deactivateAntennaThreshold?: number;
@@ -240,7 +236,6 @@ export type Config = {
 	proxyBypassHosts: string[] | undefined;
 	allowedPrivateNetworks: string[] | undefined;
 	contentSecurityPolicy: string | undefined;
-	disallowExternalApRedirect: boolean;
 	maxFileSize: number;
 	clusterLimit: number | undefined;
 	id: string;
@@ -256,9 +251,7 @@ export type Config = {
 	relationshipJobPerSec: number | undefined;
 	deliverJobMaxAttempts: number | undefined;
 	inboxJobMaxAttempts: number | undefined;
-	proxyRemoteFiles: boolean | undefined;
 	remapDriveFileUrlForActivityPub: { target: string; replacement: string }[] | undefined;
-	signToActivityPubGet: boolean | undefined;
 	logging?: {
 		sql?: {
 			disableQueryTruncation?: boolean,
@@ -324,7 +317,7 @@ const dir = `${_dirname}/../../../.config`;
 /**
  * Path of configuration file
  */
-const path = process.env.MISSKEY_CONFIG_YML
+export const path = process.env.MISSKEY_CONFIG_YML
 	? resolve(dir, process.env.MISSKEY_CONFIG_YML)
 	: process.env.NODE_ENV === 'test'
 		? resolve(dir, 'test.yml')
@@ -405,7 +398,6 @@ export function loadConfig(): Config {
 		proxyBypassHosts: config.proxyBypassHosts,
 		allowedPrivateNetworks: config.allowedPrivateNetworks,
 		contentSecurityPolicy: config.contentSecurityPolicy,
-		disallowExternalApRedirect: config.disallowExternalApRedirect ?? false,
 		maxFileSize: config.maxFileSize ?? 262144000,
 		clusterLimit: config.clusterLimit,
 		outgoingAddress: config.outgoingAddress,
@@ -420,9 +412,7 @@ export function loadConfig(): Config {
 		relationshipJobPerSec: config.relationshipJobPerSec,
 		deliverJobMaxAttempts: config.deliverJobMaxAttempts,
 		inboxJobMaxAttempts: config.inboxJobMaxAttempts,
-		proxyRemoteFiles: config.proxyRemoteFiles,
 		remapDriveFileUrlForActivityPub: config.remapDriveFileUrlForActivityPub,
-		signToActivityPubGet: config.signToActivityPubGet ?? true,
 		mediaProxy: externalMediaProxy ?? internalMediaProxy,
 		externalMediaProxyEnabled: externalMediaProxy !== null && externalMediaProxy !== internalMediaProxy,
 		videoThumbnailGenerator: config.videoThumbnailGenerator ?
@@ -447,7 +437,7 @@ function tryCreateUrl(url: string) {
 	try {
 		return new URL(url);
 	} catch (e) {
-		throw new Error(`url="${url}" is not a valid URL.`, { cause: e });
+		throw new Error(`url="${url}" is not a valid URL.`);
 	}
 }
 

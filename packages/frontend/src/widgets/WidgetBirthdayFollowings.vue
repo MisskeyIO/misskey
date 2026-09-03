@@ -10,7 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template v-else #header>{{ i18n.ts._widgets.birthdaySoon }}</template>
 	<template #func="{ buttonStyleClass }"><button class="_button" :class="buttonStyleClass" @click="fetch(true)"><i class="ti ti-refresh"></i></button></template>
 
-	<MkPagination ref="paginationEl" :pagination="birthdayUsersPagination">
+	<MkPagination :pagination="birthdayUsersPagination">
 		<template #empty>
 			<div :class="$style.empty" :style="`height: ${widgetProps.showHeader ? widgetProps.height - 38 : widgetProps.height}px;`">
 				<img :src="infoImageUrl" class="_ghost"/>
@@ -41,7 +41,7 @@ import { computed, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { useWidgetPropsManager } from './widget.js';
 import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from './widget.js';
-import type { MisskeyEntity } from '@/types/date-separated-list.js';
+import type { MisskeyEntity } from '@/composables/use-pagination.js';
 import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
 import { userPage } from '@/filters/user.js';
@@ -105,7 +105,6 @@ const end = computed(() => {
 	}
 });
 
-const paginationEl = ref<InstanceType<typeof MkPagination>>();
 const birthdayUsersPagination = {
 	endpoint: 'users/get-following-birthday-users' as const,
 	limit: 18,
@@ -138,7 +137,6 @@ const birthdayUsersPagination = {
 function fetch(force = false) {
 	const now = new Date();
 	if (force || now.getDate() !== begin.value.getDate()) {
-		// computed() で再評価されるので、paginationEl.value!.reload() は不要
 		begin.value = now;
 	}
 }

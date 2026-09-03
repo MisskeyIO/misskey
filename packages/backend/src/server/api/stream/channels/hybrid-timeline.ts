@@ -54,7 +54,8 @@ class HybridTimelineChannel extends Channel {
 	}
 
 	@bindThis
-	private async onNote(note: Packed<'Note'>) {
+	private async onNote(sourceNote: Packed<'Note'>) {
+		let note = sourceNote;
 		const isMe = this.user!.id === note.userId;
 
 		// チャンネルの投稿ではなく、自分自身の投稿 または
@@ -119,7 +120,7 @@ class HybridTimelineChannel extends Channel {
 			this.connection.cacheNote(note);
 		}
 
-		if (this.minimize && ['public', 'home'].includes(note.visibility)) {
+		if (this.minimize && this.canUseNoteJsonCache(note)) {
 			const badgeRoles = this.iAmModerator ? await this.roleService.getUserBadgeRoles(note.userId, false) : undefined;
 
 			this.send('note', {

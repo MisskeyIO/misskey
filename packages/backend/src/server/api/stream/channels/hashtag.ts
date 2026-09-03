@@ -47,7 +47,8 @@ class HashtagChannel extends Channel {
 	}
 
 	@bindThis
-	private async onNote(note: Packed<'Note'>) {
+	private async onNote(sourceNote: Packed<'Note'>) {
+		let note = sourceNote;
 		const noteTags = note.tags ? note.tags.map((t: string) => t.toLowerCase()) : [];
 		const matched = this.q.some(tags => tags.every(tag => noteTags.includes(normalizeForSearch(tag))));
 		if (!matched) return;
@@ -71,12 +72,10 @@ class HashtagChannel extends Channel {
 		const { shouldSkip } = await this.noteStreamingHidingService.processHiding(note, this.user?.id ?? null);
 		if (shouldSkip) return;
 
-		if (this.user) {
-			if (isRenotePacked(note) && !isQuotePacked(note)) {
-				if (note.renote && Object.keys(note.renote.reactions).length > 0) {
-					const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
-					note.renote.myReaction = myRenoteReaction;
-				}
+		if (this.user && isRenotePacked(note) && !isQuotePacked(note)) {
+			if (note.renote && Object.keys(note.renote.reactions).length > 0) {
+				const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
+				note = { ...note, renote: { ...note.renote, myReaction: myRenoteReaction } };
 			}
 		}
 

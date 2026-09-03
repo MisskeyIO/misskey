@@ -3965,6 +3965,28 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    '/drive/files/move-bulk': {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * drive/files/move-bulk
+         * @description No description provided.
+         *
+         *     **Credential required**: *Yes* / **Permission**: *write:drive*
+         */
+        post: operations['drive___files___move-bulk'];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     '/drive/files/show': {
         parameters: {
             query?: never;
@@ -7426,6 +7448,28 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    '/notes/show-partial-bulk': {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * notes/show-partial-bulk
+         * @description No description provided.
+         *
+         *     **Credential required**: *No*
+         */
+        post: operations['notes___show-partial-bulk'];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     '/notes/state': {
         parameters: {
             query?: never;
@@ -9391,7 +9435,7 @@ export type components = {
             pinnedNoteIds: string[];
             pinnedNotes: components['schemas']['Note'][];
             pinnedPageId: string | null;
-            pinnedPage: ((components['schemas']['Page'] | null) | null) | components['schemas']['Page'] | null;
+            pinnedPage: components['schemas']['Page'] | null;
             publicReactions: boolean;
             /** @enum {string} */
             followingVisibility: 'public' | 'followers' | 'private';
@@ -9608,10 +9652,7 @@ export type components = {
                 };
             };
             emailNotificationTypes: string[];
-            achievements: {
-                name: string;
-                unlockedAt: number;
-            }[];
+            achievements: components['schemas']['Achievement'][];
             loggedInDays: number;
             policies: components['schemas']['RolePolicies'];
             /** @default false */
@@ -9680,6 +9721,12 @@ export type components = {
             movedFromId: string;
             movedFrom: components['schemas']['UserDetailed'];
         };
+        Achievement: {
+            name: components['schemas']['AchievementName'];
+            unlockedAt: number;
+        };
+        /** @enum {string} */
+        AchievementName: 'notes1' | 'notes10' | 'notes100' | 'notes500' | 'notes1000' | 'notes5000' | 'notes10000' | 'notes20000' | 'notes30000' | 'notes40000' | 'notes50000' | 'notes60000' | 'notes70000' | 'notes80000' | 'notes90000' | 'notes100000' | 'login3' | 'login7' | 'login15' | 'login30' | 'login60' | 'login100' | 'login200' | 'login300' | 'login400' | 'login500' | 'login600' | 'login700' | 'login800' | 'login900' | 'login1000' | 'passedSinceAccountCreated1' | 'passedSinceAccountCreated2' | 'passedSinceAccountCreated3' | 'loggedInOnBirthday' | 'loggedInOnNewYearsDay' | 'noteClipped1' | 'noteFavorited1' | 'myNoteFavorited1' | 'profileFilled' | 'markedAsCat' | 'following1' | 'following10' | 'following50' | 'following100' | 'following300' | 'followers1' | 'followers10' | 'followers50' | 'followers100' | 'followers300' | 'followers500' | 'followers1000' | 'collectAchievements30' | 'viewAchievements3min' | 'iLoveMisskey' | 'foundTreasure' | 'client30min' | 'client60min' | 'noteDeletedWithin1min' | 'postedAtLateNight' | 'postedAt0min0sec' | 'selfQuote' | 'htl20npm' | 'viewInstanceChart' | 'outputHelloWorldOnScratchpad' | 'open3windows' | 'driveFolderCircularReference' | 'reactWithoutRead' | 'clickedClickHere' | 'justPlainLucky' | 'setNameToSyuilo' | 'cookieClicked' | 'brainDiver' | 'smashTestNotificationButton' | 'tutorialCompleted' | 'sensitiveContentConsentResponded' | 'postingLanguageConfigured' | 'viewingLanguagesConfigured' | 'dimensionConfigured' | 'bubbleGameExplodingHead' | 'bubbleGameDoubleExplodingHead';
         Ad: {
             /**
              * Format: id
@@ -9763,8 +9810,8 @@ export type components = {
              * @example xxxxxxxxxx
              */
             renoteId?: string | null;
-            reply?: ((components['schemas']['Note'] | null) | null) | components['schemas']['Note'] | null;
-            renote?: ((components['schemas']['Note'] | null) | null) | components['schemas']['Note'] | null;
+            reply?: components['schemas']['Note'] | null;
+            renote?: components['schemas']['Note'] | null;
             isHidden?: boolean;
             /** @enum {string} */
             visibility: 'public' | 'home' | 'followers' | 'specified';
@@ -9816,6 +9863,7 @@ export type components = {
             url?: string;
             reactionAndUserPairCache?: string[];
             clippedCount?: number;
+            hasPoll?: boolean;
             myReaction?: string | null;
         };
         NoteDraft: {
@@ -10027,8 +10075,7 @@ export type components = {
             createdAt: string;
             /** @enum {string} */
             type: 'achievementEarned';
-            /** @enum {string} */
-            achievement: 'notes1' | 'notes10' | 'notes100' | 'notes500' | 'notes1000' | 'notes5000' | 'notes10000' | 'notes20000' | 'notes30000' | 'notes40000' | 'notes50000' | 'notes60000' | 'notes70000' | 'notes80000' | 'notes90000' | 'notes100000' | 'login3' | 'login7' | 'login15' | 'login30' | 'login60' | 'login100' | 'login200' | 'login300' | 'login400' | 'login500' | 'login600' | 'login700' | 'login800' | 'login900' | 'login1000' | 'passedSinceAccountCreated1' | 'passedSinceAccountCreated2' | 'passedSinceAccountCreated3' | 'loggedInOnBirthday' | 'loggedInOnNewYearsDay' | 'noteClipped1' | 'noteFavorited1' | 'myNoteFavorited1' | 'profileFilled' | 'markedAsCat' | 'following1' | 'following10' | 'following50' | 'following100' | 'following300' | 'followers1' | 'followers10' | 'followers50' | 'followers100' | 'followers300' | 'followers500' | 'followers1000' | 'collectAchievements30' | 'viewAchievements3min' | 'iLoveMisskey' | 'foundTreasure' | 'client30min' | 'client60min' | 'noteDeletedWithin1min' | 'postedAtLateNight' | 'postedAt0min0sec' | 'selfQuote' | 'htl20npm' | 'viewInstanceChart' | 'outputHelloWorldOnScratchpad' | 'open3windows' | 'driveFolderCircularReference' | 'reactWithoutRead' | 'clickedClickHere' | 'justPlainLucky' | 'setNameToSyuilo' | 'cookieClicked' | 'brainDiver' | 'smashTestNotificationButton' | 'tutorialCompleted' | 'sensitiveContentConsentResponded' | 'postingLanguageConfigured' | 'viewingLanguagesConfigured' | 'dimensionConfigured' | 'bubbleGameExplodingHead' | 'bubbleGameDoubleExplodingHead';
+            achievement: components['schemas']['AchievementName'];
         } | {
             /** Format: id */
             id: string;
@@ -10167,13 +10214,13 @@ export type components = {
              * @example xxxxxxxxxx
              */
             folderId: string | null;
-            folder?: ((components['schemas']['DriveFolder'] | null) | null) | components['schemas']['DriveFolder'] | null;
+            folder?: components['schemas']['DriveFolder'] | null;
             /**
              * Format: id
              * @example xxxxxxxxxx
              */
             userId: string | null;
-            user?: ((components['schemas']['UserLite'] | null) | null) | components['schemas']['UserLite'] | null;
+            user?: components['schemas']['UserLite'] | null;
         };
         DriveFolder: {
             /**
@@ -10191,7 +10238,7 @@ export type components = {
             parentId: string | null;
             foldersCount?: number;
             filesCount?: number;
-            parent?: ((components['schemas']['DriveFolder'] | null) | null) | components['schemas']['DriveFolder'] | null;
+            parent?: components['schemas']['DriveFolder'] | null;
         };
         Following: {
             /**
@@ -10205,8 +10252,8 @@ export type components = {
             followeeId: string;
             /** Format: id */
             followerId: string;
-            followee?: components['schemas']['UserDetailedNotMe'] | null;
-            follower?: components['schemas']['UserDetailedNotMe'] | null;
+            followee?: components['schemas']['UserDetailedNotMe'];
+            follower?: components['schemas']['UserDetailedNotMe'];
         };
         FollowRequest: {
             /**
@@ -10277,8 +10324,8 @@ export type components = {
             expiresAt: string | null;
             /** Format: date-time */
             createdAt: string;
-            createdBy: ((components['schemas']['UserLite'] | null) | null) | components['schemas']['UserLite'] | null;
-            usedBy: ((components['schemas']['UserLite'] | null) | null) | components['schemas']['UserLite'] | null;
+            createdBy: components['schemas']['UserLite'] | null;
+            usedBy: components['schemas']['UserLite'] | null;
             /** Format: date-time */
             usedAt: string | null;
             used: boolean;
@@ -10306,7 +10353,7 @@ export type components = {
             font: string;
             script: string;
             eyeCatchingImageId: string | null;
-            eyeCatchingImage: ((components['schemas']['DriveFile'] | null) | null) | components['schemas']['DriveFile'] | null;
+            eyeCatchingImage: components['schemas']['DriveFile'] | null;
             attachedFiles: components['schemas']['DriveFile'][];
             likedCount: number;
             isLiked?: boolean;
@@ -10442,7 +10489,7 @@ export type components = {
             isNotResponding: boolean;
             isSuspended: boolean;
             /** @enum {string} */
-            suspensionState: 'none' | 'manuallySuspended' | 'goneSuspended' | 'autoSuspendedForNotResponding';
+            suspensionState: 'none' | 'manuallySuspended' | 'goneSuspended' | 'autoSuspendedForNotResponding' | 'softwareSuspended';
             isBlocked: boolean;
             /** @example misskey */
             softwareName: string | null;
@@ -10707,6 +10754,7 @@ export type components = {
             canHideAds: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
+            uploadableFileTypes: string[];
             alwaysMarkNsfw: boolean;
             skipNsfwDetection: boolean;
             canUpdateBioMedia: boolean;
@@ -10750,7 +10798,7 @@ export type components = {
             user2: components['schemas']['UserLite'];
             /** Format: id */
             winnerId: string | null;
-            winner: ((components['schemas']['UserLite'] | null) | null) | components['schemas']['UserLite'] | null;
+            winner: components['schemas']['UserLite'] | null;
             /** Format: id */
             surrenderedUserId: string | null;
             /** Format: id */
@@ -10786,7 +10834,7 @@ export type components = {
             user2: components['schemas']['UserLite'];
             /** Format: id */
             winnerId: string | null;
-            winner: ((components['schemas']['UserLite'] | null) | null) | components['schemas']['UserLite'] | null;
+            winner: components['schemas']['UserLite'] | null;
             /** Format: id */
             surrenderedUserId: string | null;
             /** Format: id */
@@ -10950,7 +10998,7 @@ export type components = {
             targetUser: components['schemas']['UserDetailed'];
             /** Format: id */
             assigneeId: string | null;
-            assignee?: ((components['schemas']['UserDetailed'] | null) | null) | components['schemas']['UserDetailed'] | null;
+            assignee?: components['schemas']['UserDetailed'] | null;
             forwarded: boolean;
             moderationNote: string;
         };
@@ -10993,9 +11041,9 @@ export type components = {
             /** @enum {string} */
             method: 'email' | 'webhook';
             userId?: string;
-            user?: components['schemas']['UserLite'] | null;
+            user?: components['schemas']['UserLite'];
             systemWebhookId?: string;
-            systemWebhook?: components['schemas']['SystemWebhook'] | null;
+            systemWebhook?: components['schemas']['SystemWebhook'];
         };
         ChatMessage: {
             id: string;
@@ -11004,12 +11052,12 @@ export type components = {
             fromUserId: string;
             fromUser: components['schemas']['UserLite'];
             toUserId?: string | null;
-            toUser?: ((components['schemas']['UserLite'] | null) | null) | components['schemas']['UserLite'] | null;
+            toUser?: components['schemas']['UserLite'] | null;
             toRoomId?: string | null;
-            toRoom?: ((components['schemas']['ChatRoom'] | null) | null) | components['schemas']['ChatRoom'] | null;
+            toRoom?: components['schemas']['ChatRoom'] | null;
             text?: string | null;
             fileId?: string | null;
-            file?: ((components['schemas']['DriveFile'] | null) | null) | components['schemas']['DriveFile'] | null;
+            file?: components['schemas']['DriveFile'] | null;
             isRead?: boolean;
             reactions: {
                 reaction: string;
@@ -11021,15 +11069,15 @@ export type components = {
             /** Format: date-time */
             createdAt: string;
             fromUserId: string;
-            fromUser?: components['schemas']['UserLite'] | null;
+            fromUser?: components['schemas']['UserLite'];
             toUserId?: string | null;
             toRoomId?: string | null;
             text?: string | null;
             fileId?: string | null;
-            file?: ((components['schemas']['DriveFile'] | null) | null) | components['schemas']['DriveFile'] | null;
+            file?: components['schemas']['DriveFile'] | null;
             reactions: {
                 reaction: string;
-                user?: ((components['schemas']['UserLite'] | null) | null) | components['schemas']['UserLite'] | null;
+                user?: components['schemas']['UserLite'] | null;
             }[];
         };
         ChatMessageLiteFor1on1: {
@@ -11040,7 +11088,7 @@ export type components = {
             toUserId: string;
             text?: string | null;
             fileId?: string | null;
-            file?: ((components['schemas']['DriveFile'] | null) | null) | components['schemas']['DriveFile'] | null;
+            file?: components['schemas']['DriveFile'] | null;
             reactions: {
                 reaction: string;
             }[];
@@ -11054,7 +11102,7 @@ export type components = {
             toRoomId: string;
             text?: string | null;
             fileId?: string | null;
-            file?: ((components['schemas']['DriveFile'] | null) | null) | components['schemas']['DriveFile'] | null;
+            file?: components['schemas']['DriveFile'] | null;
             reactions: {
                 reaction: string;
                 user: components['schemas']['UserLite'];
@@ -11069,6 +11117,7 @@ export type components = {
             name: string;
             description: string;
             isMuted?: boolean;
+            invitationExists?: boolean;
         };
         ChatRoomInvitation: {
             id: string;
@@ -11084,9 +11133,9 @@ export type components = {
             /** Format: date-time */
             createdAt: string;
             userId: string;
-            user?: components['schemas']['UserLite'] | null;
+            user?: components['schemas']['UserLite'];
             roomId: string;
-            room?: components['schemas']['ChatRoom'] | null;
+            room?: components['schemas']['ChatRoom'];
         };
     };
     responses: never;
@@ -11847,7 +11896,7 @@ export interface operations {
                         assigneeId: string | null;
                         reporter: components['schemas']['UserDetailed'];
                         targetUser: components['schemas']['UserDetailed'];
-                        assignee?: ((components['schemas']['UserDetailed'] | null) | null) | components['schemas']['UserDetailed'] | null;
+                        assignee?: components['schemas']['UserDetailed'] | null;
                         category: string;
                         moderationNote: string | null;
                     }[];
@@ -12836,7 +12885,7 @@ export interface operations {
                         displayOrder: number;
                         silence: boolean;
                         userId: string | null;
-                        user: ((components['schemas']['UserLite'] | null) | null) | components['schemas']['UserLite'] | null;
+                        user: components['schemas']['UserLite'] | null;
                         reads: number;
                         /** Format: date-time */
                         lastReadAt: string | null;
@@ -13752,9 +13801,10 @@ export interface operations {
             content: {
                 'application/json': {
                     /** Format: misskey:id */
-                    fileId?: string;
-                    url?: string;
-                } | unknown | unknown;
+                    fileId: string;
+                } | {
+                    url: string;
+                };
             };
         };
         responses: {
@@ -14775,10 +14825,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                'application/json': {
+                'application/json': ({
                     /** Format: misskey:id */
-                    id?: string;
-                    name?: string;
+                    id: string;
+                } | {
+                    name: string;
+                }) & {
                     /** Format: misskey:id */
                     fileId?: string;
                     /** @description Use `null` to reset the category. */
@@ -14791,7 +14843,7 @@ export interface operations {
                     memo?: string | null;
                     roleIdsThatCanBeUsedThisEmojiAsReaction?: string[];
                     roleIdsThatCanNotBeUsedThisEmojiAsReaction?: string[];
-                } | unknown | unknown;
+                };
             };
         };
         responses: {
@@ -15940,6 +15992,7 @@ export interface operations {
                         truemailAuthKey: string | null;
                         enableChartsForRemoteUser: boolean;
                         enableChartsForFederatedInstances: boolean;
+                        enableStatsForFederatedInstances: boolean;
                         enableServerMachineStats: boolean;
                         enableIdenticonGeneration: boolean;
                         manifestJsonOverride: string;
@@ -15950,6 +16003,7 @@ export interface operations {
                         perRemoteUserUserTimelineCacheMax: number;
                         perUserHomeTimelineCacheMax: number;
                         perUserListTimelineCacheMax: number;
+                        enableReactionsBuffering: boolean;
                         notesPerOneAd: number;
                         wellKnownWebsites: string[];
                         urlPreviewDenyList: string[];
@@ -15979,6 +16033,7 @@ export interface operations {
                         uri: string;
                         version: string;
                         urlPreviewEnabled: boolean;
+                        urlPreviewAllowRedirect: boolean;
                         urlPreviewTimeout: number;
                         urlPreviewMaximumContentLength: number;
                         urlPreviewRequireContentLength: boolean;
@@ -15989,6 +16044,16 @@ export interface operations {
                         federationHosts: string[];
                         prohibitedWordsForNameOfUser: string[];
                         inquiryUrl: string | null;
+                        deliverSuspendedSoftware: {
+                            software: string;
+                            versionRange: string;
+                        }[];
+                        singleUserMode: boolean;
+                        /** @enum {string} */
+                        ugcVisibilityForVisitor: 'all' | 'local' | 'none';
+                        proxyRemoteFiles: boolean;
+                        signToActivityPubGet: boolean;
+                        allowExternalApRedirect: boolean;
                     };
                 };
             };
@@ -17513,7 +17578,7 @@ export interface operations {
                     policies: {
                         id?: string | null;
                         /** @enum {string} */
-                        policy: 'gtlAvailable' | 'ltlAvailable' | 'canPublicNote' | 'canScheduleNote' | 'scheduleNoteLimit' | 'scheduleNoteMaxDays' | 'canInitiateConversation' | 'canCreateContent' | 'canUpdateContent' | 'canDeleteContent' | 'canPurgeAccount' | 'canUpdateAvatar' | 'canUpdateBanner' | 'mentionLimit' | 'canInvite' | 'inviteLimit' | 'inviteLimitCycle' | 'inviteExpirationTime' | 'canManageCustomEmojis' | 'canManageAvatarDecorations' | 'canSearchNotes' | 'canUseTranslator' | 'canUseDriveFileInSoundSettings' | 'canUseReaction' | 'canHideAds' | 'driveCapacityMb' | 'maxFileSizeMb' | 'alwaysMarkNsfw' | 'canUpdateBioMedia' | 'skipNsfwDetection' | 'pinLimit' | 'antennaLimit' | 'antennaNotesLimit' | 'wordMuteLimit' | 'webhookLimit' | 'clipLimit' | 'noteEachClipsLimit' | 'userListLimit' | 'userEachUserListsLimit' | 'rateLimitFactor' | 'avatarDecorationLimit' | 'canImportAntennas' | 'canImportBlocking' | 'canImportFollowing' | 'canImportMuting' | 'canImportUserLists' | 'mutualLinkSectionLimit' | 'mutualLinkLimit' | 'chatAvailability';
+                        policy: 'gtlAvailable' | 'ltlAvailable' | 'canPublicNote' | 'canScheduleNote' | 'scheduleNoteLimit' | 'scheduleNoteMaxDays' | 'canInitiateConversation' | 'canCreateContent' | 'canUpdateContent' | 'canDeleteContent' | 'canPurgeAccount' | 'canUpdateAvatar' | 'canUpdateBanner' | 'mentionLimit' | 'canInvite' | 'inviteLimit' | 'inviteLimitCycle' | 'inviteExpirationTime' | 'canManageCustomEmojis' | 'canManageAvatarDecorations' | 'canSearchNotes' | 'canUseTranslator' | 'canUseDriveFileInSoundSettings' | 'canUseReaction' | 'canHideAds' | 'driveCapacityMb' | 'maxFileSizeMb' | 'alwaysMarkNsfw' | 'canUpdateBioMedia' | 'skipNsfwDetection' | 'pinLimit' | 'antennaLimit' | 'antennaNotesLimit' | 'wordMuteLimit' | 'webhookLimit' | 'clipLimit' | 'noteEachClipsLimit' | 'userListLimit' | 'userEachUserListsLimit' | 'rateLimitFactor' | 'avatarDecorationLimit' | 'canImportAntennas' | 'canImportBlocking' | 'canImportFollowing' | 'canImportMuting' | 'canImportUserLists' | 'mutualLinkSectionLimit' | 'mutualLinkLimit' | 'chatAvailability' | 'uploadableFileTypes';
                         /**
                          * @default set
                          * @enum {string}
@@ -19574,6 +19639,7 @@ export interface operations {
                     truemailAuthKey?: string | null;
                     enableChartsForRemoteUser?: boolean;
                     enableChartsForFederatedInstances?: boolean;
+                    enableStatsForFederatedInstances?: boolean;
                     enableServerMachineStats?: boolean;
                     enableIdenticonGeneration?: boolean;
                     serverRules?: string[];
@@ -19586,6 +19652,7 @@ export interface operations {
                     perRemoteUserUserTimelineCacheMax?: number;
                     perUserHomeTimelineCacheMax?: number;
                     perUserListTimelineCacheMax?: number;
+                    enableReactionsBuffering?: boolean;
                     notesPerOneAd?: number;
                     silencedHosts?: string[] | null;
                     sensitiveMediaHosts?: string[] | null;
@@ -19595,6 +19662,7 @@ export interface operations {
                     /** @description [Deprecated] Use "urlPreviewSummaryProxyUrl" instead. */
                     summalyProxy?: string | null;
                     urlPreviewEnabled?: boolean;
+                    urlPreviewAllowRedirect?: boolean;
                     urlPreviewTimeout?: number;
                     urlPreviewMaximumContentLength?: number;
                     urlPreviewRequireContentLength?: boolean;
@@ -19604,6 +19672,16 @@ export interface operations {
                     /** @enum {string} */
                     federation?: 'all' | 'none' | 'specified';
                     federationHosts?: string[];
+                    deliverSuspendedSoftware?: {
+                        software: string;
+                        versionRange: string;
+                    }[];
+                    singleUserMode?: boolean;
+                    /** @enum {string} */
+                    ugcVisibilityForVisitor?: 'all' | 'local' | 'none';
+                    proxyRemoteFiles?: boolean;
+                    signToActivityPubGet?: boolean;
+                    allowExternalApRedirect?: boolean;
                 };
             };
         };
@@ -21428,7 +21506,7 @@ export interface operations {
                         /** Format: misskey:id */
                         id: string;
                         score: number;
-                        user?: components['schemas']['UserLite'] | null;
+                        user?: components['schemas']['UserLite'];
                     }[];
                 };
             };
@@ -21504,7 +21582,7 @@ export interface operations {
                         /** Format: misskey:id */
                         id: string;
                         score: number;
-                        user?: components['schemas']['UserLite'] | null;
+                        user?: components['schemas']['UserLite'];
                     }[];
                 };
             };
@@ -26255,6 +26333,77 @@ export interface operations {
             };
         };
     };
+    'drive___files___move-bulk': {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                'application/json': {
+                    fileIds: string[];
+                    /** Format: misskey:id */
+                    folderId?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description OK (without any results) */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
     drive___files___show: {
         parameters: {
             query?: never;
@@ -26266,9 +26415,10 @@ export interface operations {
             content: {
                 'application/json': {
                     /** Format: misskey:id */
-                    fileId?: string;
-                    url?: string;
-                } | unknown | unknown;
+                    fileId: string;
+                } | {
+                    url: string;
+                };
             };
         };
         responses: {
@@ -27945,7 +28095,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    'application/json': ((components['schemas']['FederationInstance'] | null) | null) | components['schemas']['FederationInstance'] | null;
+                    'application/json': components['schemas']['FederationInstance'] | null;
                 };
             };
             /** @description OK (without any results) */
@@ -34986,9 +35136,10 @@ export interface operations {
             content: {
                 'application/json': {
                     /** Format: misskey:id */
-                    tokenId?: string;
-                    token?: string | null;
-                } | unknown | unknown;
+                    tokenId: string;
+                } | {
+                    token: string | null;
+                };
             };
         };
         responses: {
@@ -38863,7 +39014,12 @@ export interface operations {
         };
         requestBody: {
             content: {
-                'application/json': {
+                'application/json': ({
+                    tag: string;
+                } | {
+                    /** @description The outer arrays are chained with OR, the inner arrays are chained with AND. */
+                    query: string[][];
+                }) & {
                     /** @default null */
                     local?: boolean | null;
                     /** @default null */
@@ -38883,10 +39039,7 @@ export interface operations {
                     untilId?: string;
                     /** @default 10 */
                     limit?: number;
-                    tag?: string;
-                    /** @description The outer arrays are chained with OR, the inner arrays are chained with AND. */
-                    query?: string[][];
-                } | unknown | unknown;
+                };
             };
         };
         responses: {
@@ -38969,6 +39122,85 @@ export interface operations {
                 };
                 content: {
                     'application/json': components['schemas']['Note'];
+                };
+            };
+            /** @description Client error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Authentication error */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Forbidden error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description I'm Ai */
+            418: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': components['schemas']['Error'];
+                };
+            };
+        };
+    };
+    'notes___show-partial-bulk': {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                'application/json': {
+                    noteIds: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description OK (with results) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        id: string;
+                        reactions: {
+                            [key: string]: number;
+                        };
+                        reactionEmojis: {
+                            [key: string]: string;
+                        };
+                    }[];
                 };
             };
             /** @description Client error */
@@ -40249,10 +40481,11 @@ export interface operations {
             content: {
                 'application/json': {
                     /** Format: misskey:id */
-                    pageId?: string;
-                    name?: string;
-                    username?: string;
-                } | unknown | unknown;
+                    pageId: string;
+                } | {
+                    name: string;
+                    username: string;
+                };
             };
         };
         responses: {
@@ -41501,7 +41734,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    'application/json': components['schemas']['ReversiGameDetailed'] | null;
+                    'application/json': components['schemas']['ReversiGameDetailed'];
                 };
             };
             /** @description OK (without any results) */
@@ -41725,7 +41958,7 @@ export interface operations {
                 content: {
                     'application/json': {
                         desynced: boolean;
-                        game?: ((components['schemas']['ReversiGameDetailed'] | null) | null) | components['schemas']['ReversiGameDetailed'] | null;
+                        game?: components['schemas']['ReversiGameDetailed'] | null;
                     };
                 };
             };
@@ -42803,10 +43036,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    'application/json': {
-                        name: string;
-                        unlockedAt: number;
-                    }[];
+                    'application/json': components['schemas']['Achievement'][];
                 };
             };
             /** @description Client error */
@@ -43173,19 +43403,21 @@ export interface operations {
         };
         requestBody: {
             content: {
-                'application/json': {
+                'application/json': ({
+                    /** Format: misskey:id */
+                    userId: string;
+                } | {
+                    username: string;
+                    /** @description The local host is represented with `null`. */
+                    host: string | null;
+                }) & {
                     /** Format: misskey:id */
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
                     /** @default 10 */
                     limit?: number;
-                    /** Format: misskey:id */
-                    userId?: string;
-                    username?: string;
-                    /** @description The local host is represented with `null`. */
-                    host?: string | null;
-                } | unknown | unknown;
+                };
             };
         };
         responses: {
@@ -43254,21 +43486,23 @@ export interface operations {
         };
         requestBody: {
             content: {
-                'application/json': {
+                'application/json': ({
+                    /** Format: misskey:id */
+                    userId: string;
+                } | {
+                    username: string;
+                    /** @description The local host is represented with `null`. */
+                    host: string | null;
+                }) & {
                     /** Format: misskey:id */
                     sinceId?: string;
                     /** Format: misskey:id */
                     untilId?: string;
                     /** @default 10 */
                     limit?: number;
-                    /** Format: misskey:id */
-                    userId?: string;
-                    username?: string;
-                    /** @description The local host is represented with `null`. */
-                    host?: string | null;
                     /** @description @deprecated use get-following-birthday-users instead. */
                     birthday?: string | null;
-                } | unknown | unknown;
+                };
             };
         };
         responses: {
@@ -45295,14 +45529,16 @@ export interface operations {
         };
         requestBody: {
             content: {
-                'application/json': {
+                'application/json': ({
+                    username: string | null;
+                } | {
+                    host: string | null;
+                }) & {
                     /** @default 10 */
                     limit?: number;
                     /** @default true */
                     detail?: boolean;
-                    username?: string | null;
-                    host?: string | null;
-                } | unknown | unknown;
+                };
             };
         };
         responses: {
@@ -45371,16 +45607,19 @@ export interface operations {
         };
         requestBody: {
             content: {
-                'application/json': {
+                'application/json': ({
                     /** Format: misskey:id */
-                    userId?: string;
-                    userIds?: string[];
-                    username?: string;
+                    userId: string;
+                } | {
+                    userIds: string[];
+                } | {
+                    username: string;
+                }) & {
                     /** @description The local host is represented with `null`. */
                     host?: string | null;
                     /** @default true */
                     detailed?: boolean;
-                } | unknown | unknown | unknown;
+                };
             };
         };
         responses: {

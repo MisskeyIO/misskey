@@ -159,7 +159,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onActivated, onMounted, ref, shallowRef } from 'vue';
+import { onActivated, onMounted, ref, shallowRef, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import * as os from '@/os.js';
 import { miLocalStorage } from '@/local-storage.js';
@@ -228,7 +228,7 @@ function removeDraft(draft: string) {
 }
 
 function unschedule(draft: string) {
-	const item = scheduledPaginationEl.value!.items.find(x => x.id === draft);
+	const item = scheduledPaginationEl.value!.paginator.items.value.find(x => x.id === draft);
 	if (!item) return;
 
 	let key = item.channel ? `channel:${item.channel.id}` : '';
@@ -254,7 +254,7 @@ function cancelScheduled(draft: string) {
 	os.apiWithDialog('notes/scheduled/cancel', {
 		draftId: draft,
 	}).then(() => {
-		scheduledPaginationEl.value?.reload();
+		scheduledPaginationEl.value?.paginator.reload();
 	});
 }
 
@@ -265,7 +265,7 @@ function done(canceled: boolean, selected?: string): void {
 	dialog.value?.close();
 }
 
-const scheduledPaginationEl = ref<InstanceType<typeof MkPagination>>();
+const scheduledPaginationEl = useTemplateRef('scheduledPaginationEl');
 
 const scheduledPagination = {
 	endpoint: 'notes/scheduled/list' as const,

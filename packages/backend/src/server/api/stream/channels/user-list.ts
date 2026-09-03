@@ -99,7 +99,8 @@ class UserListChannel extends Channel {
 	}
 
 	@bindThis
-	private async onNote(note: Packed<'Note'>) {
+	private async onNote(sourceNote: Packed<'Note'>) {
+		let note = sourceNote;
 		const isMe = this.user!.id === note.userId;
 
 		// チャンネル投稿は無視する
@@ -157,7 +158,7 @@ class UserListChannel extends Channel {
 			this.connection.cacheNote(note);
 		}
 
-		if (this.minimize && ['public', 'home'].includes(note.visibility)) {
+		if (this.minimize && this.canUseNoteJsonCache(note)) {
 			const badgeRoles = this.iAmModerator ? await this.roleService.getUserBadgeRoles(note.userId, false) : undefined;
 
 			this.send('note', {

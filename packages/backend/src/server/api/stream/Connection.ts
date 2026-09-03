@@ -18,6 +18,7 @@ import { isJsonObject } from '@/misc/json-value.js';
 import type { JsonObject, JsonValue } from '@/misc/json-value.js';
 import { RoleService } from '@/core/RoleService.js';
 import { normalizeDimension } from '@/misc/dimension.js';
+import { isNoteCacheableForVisitor } from '@/misc/is-note-cacheable-for-visitor.js';
 import type { ChannelsService } from './ChannelsService.js';
 import type { EventEmitter } from 'events';
 import type Channel from './channel.js';
@@ -63,6 +64,10 @@ export default class Connection {
 
 	public normalizeDimension(value: number | null | undefined): number | null {
 		return normalizeDimension(value, this.meta.dimensions ?? 1);
+	}
+
+	public canUseNoteJsonCache(note: Packed<'Note'>): boolean {
+		return isNoteCacheableForVisitor(note, this.meta.ugcVisibilityForVisitor);
 	}
 
 	@bindThis

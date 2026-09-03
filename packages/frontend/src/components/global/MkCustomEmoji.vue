@@ -4,8 +4,24 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<span v-if="errored && !fallbackToImage">:{{ customEmojiName }}:</span>
-<img v-else-if="errored" src="/client-assets/dummy.png" :alt="alt" :title="alt" decoding="async" style="-webkit-user-drag: none;" :class="[$style.root, { [$style.normal]: normal, [$style.noStyle]: noStyle }]"/>
+<img
+	v-if="shouldMute"
+	:class="[$style.root, { [$style.normal]: normal, [$style.noStyle]: noStyle }]"
+	src="/client-assets/unknown.png"
+	:title="alt"
+	draggable="false"
+	style="-webkit-user-drag: none;"
+	@click="onClick"
+/>
+<img
+	v-else-if="errored && fallbackToImage"
+	:class="[$style.root, { [$style.normal]: normal, [$style.noStyle]: noStyle }]"
+	src="/client-assets/dummy.png"
+	:title="alt"
+	draggable="false"
+	style="-webkit-user-drag: none;"
+/>
+<span v-else-if="errored">:{{ customEmojiName }}:</span>
 <img
 	v-else
 	:class="[$style.root, { [$style.normal]: normal, [$style.noStyle]: noStyle }]"
@@ -33,6 +49,7 @@ import MkCustomEmojiDetailedDialog from '@/components/MkCustomEmojiDetailedDialo
 import { $i } from '@/i.js';
 import { prefer } from '@/preferences.js';
 import { DI } from '@/di.js';
+import { makeEmojiMuteKey, mute as muteEmoji, unmute as unmuteEmoji, checkMuted as checkEmojiMuted } from '@/utility/emoji-mute.js';
 
 const props = defineProps<{
 	name: string;
@@ -44,12 +61,16 @@ const props = defineProps<{
 	menu?: boolean;
 	menuReaction?: boolean;
 	fallbackToImage?: boolean;
+	ignoreMuted?: boolean;
 }>();
 
 const react = inject(DI.mfmEmojiReactCallback);
 
 const customEmojiName = computed(() => (props.name[0] === ':' ? props.name.substring(1, props.name.length - 1) : props.name).replace('@.', ''));
 const isLocal = computed(() => !props.host && (customEmojiName.value.endsWith('@.') || !customEmojiName.value.includes('@')));
+const emojiCodeToMute = makeEmojiMuteKey(props);
+const isMuted = checkEmojiMuted(emojiCodeToMute);
+const shouldMute = computed(() => !props.ignoreMuted && isMuted.value);
 
 const rawUrl = computed(() => {
 	if (props.url) {
@@ -79,7 +100,7 @@ const url = computed(() => {
 });
 
 watch(url, (newValue) => {
-errored.value = (newValue === undefined);
+	errored.value = (newValue === undefined);
 });
 
 const alt = computed(() => `:${customEmojiName.value}:`);
@@ -92,13 +113,17 @@ function onClick(ev: MouseEvent) {
 		menuItems.push({
 			type: 'label',
 			text: `:${props.name}:`,
-		}, {
-			text: i18n.ts.copy,
-			icon: 'ti ti-copy',
-			action: () => {
-				copyToClipboard(`:${props.name}:`);
-			},
 		});
+
+		if (isLocal.value) {
+			menuItems.push({
+				text: i18n.ts.copy,
+				icon: 'ti ti-copy',
+				action: () => {
+					copyToClipboard(`:${props.name}:`);
+				},
+			});
+		}
 
 		if (props.menuReaction && react) {
 			menuItems.push({
@@ -110,19 +135,43 @@ function onClick(ev: MouseEvent) {
 			});
 		}
 
-		menuItems.push({
-			text: i18n.ts.info,
-			icon: 'ti ti-info-circle',
-			action: async () => {
-				os.popup(MkCustomEmojiDetailedDialog, {
-					emoji: await misskeyApiGet('emoji', {
-						name: customEmojiName.value,
-					}),
-				}, {}, 'closed');
-			},
-		});
+		if (isLocal.value) {
+			menuItems.push({
+				type: 'divider',
+			}, {
+				text: i18n.ts.info,
+				icon: 'ti ti-info-circle',
+				action: async () => {
+					const { dispose } = os.popup(MkCustomEmojiDetailedDialog, {
+						emoji: await misskeyApiGet('emoji', {
+							name: customEmojiName.value,
+						}),
+					}, {
+						closed: () => dispose(),
+					});
+				},
+			});
+		}
 
-		if ($i?.isModerator ?? $i?.isAdmin) {
+		if (isMuted.value) {
+			menuItems.push({
+				text: i18n.ts.emojiUnmute,
+				icon: 'ti ti-mood-smile',
+				action: async () => {
+					await unmute();
+				},
+			});
+		} else {
+			menuItems.push({
+				text: i18n.ts.emojiMute,
+				icon: 'ti ti-mood-off',
+				action: async () => {
+					await mute();
+				},
+			});
+		}
+
+		if (($i?.isModerator ?? $i?.isAdmin) && isLocal.value) {
 			menuItems.push({
 				text: i18n.ts.edit,
 				icon: 'ti ti-pencil',
@@ -143,6 +192,36 @@ async function edit(name: string) {
 	os.popup(defineAsyncComponent(() => import('@/pages/emoji-edit-dialog.vue')), {
 		emoji: emoji,
 	}, {	}, 'closed');
+}
+
+function mute() {
+	const titleEmojiName = isLocal.value
+		? `:${customEmojiName.value}:`
+		: emojiCodeToMute;
+	os.confirm({
+		type: 'question',
+		title: i18n.tsx.muteX({ x: titleEmojiName }),
+	}).then(({ canceled }) => {
+		if (canceled) {
+			return;
+		}
+		muteEmoji(emojiCodeToMute);
+	});
+}
+
+function unmute() {
+	const titleEmojiName = isLocal.value
+		? `:${customEmojiName.value}:`
+		: emojiCodeToMute;
+	os.confirm({
+		type: 'question',
+		title: i18n.tsx.unmuteX({ x: titleEmojiName }),
+	}).then(({ canceled }) => {
+		if (canceled) {
+			return;
+		}
+		unmuteEmoji(emojiCodeToMute);
+	});
 }
 
 </script>

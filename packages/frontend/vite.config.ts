@@ -80,10 +80,17 @@ export function toBase62(n: number): string {
 export function getConfig(): UserConfig {
 	return {
 		base: '/vite/',
+		clearScreen: false,
 
 		server: {
-			host,
+			host: '0.0.0.0',
+			allowedHosts: host ? [host] : undefined,
 			port: 5173,
+			strictPort: true,
+			hmr: {
+				// バックエンド経由でもViteへ直接接続する
+				clientPort: 5173,
+			},
 			headers: { // なんか効かない
 				'X-Frame-Options': 'DENY',
 			},
@@ -144,9 +151,6 @@ export function getConfig(): UserConfig {
 			_ENV_: JSON.stringify(process.env.NODE_ENV),
 			_DEV_: process.env.NODE_ENV !== 'production',
 			_PERF_PREFIX_: JSON.stringify('Misskey:'),
-			_DATA_TRANSFER_DRIVE_FILE_: JSON.stringify('mk_drive_file'),
-			_DATA_TRANSFER_DRIVE_FOLDER_: JSON.stringify('mk_drive_folder'),
-			_DATA_TRANSFER_DECK_COLUMN_: JSON.stringify('mk_deck_column'),
 			__VUE_OPTIONS_API__: true,
 			__VUE_PROD_DEVTOOLS__: false,
 		},

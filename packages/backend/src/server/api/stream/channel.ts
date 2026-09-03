@@ -134,6 +134,10 @@ export default abstract class Channel {
 		return shouldDeliverByDimension(note, this.dimension, this.user?.id);
 	}
 
+	protected canUseNoteJsonCache(note: Packed<'Note'>): boolean {
+		return this.connection.canUseNoteJsonCache(note);
+	}
+
 	constructor(id: string, connection: Connection, dimension?: number | null) {
 		this.id = id;
 		this.connection = connection;

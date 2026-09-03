@@ -11,9 +11,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<MkButton link to="/admin/abuse-report-notification-recipient" primary>{{ i18n.ts.notificationSetting }}</MkButton>
 			</div>
 
-			<MkInfo v-if="!store.r.abusesTutorial.value" closable @close="closeTutorial()">
+			<MkTip k="abuses">
 				{{ i18n.ts._abuseUserReport.resolveTutorial }}
-			</MkInfo>
+			</MkTip>
 
 			<div :class="$style.inputs" class="_gaps">
 				<MkSelect v-model="state" style="margin: 0; flex: 1;">
@@ -95,11 +95,9 @@ import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import { definePage } from '@/page.js';
 import MkButton from '@/components/MkButton.vue';
-import MkInfo from '@/components/MkInfo.vue';
-import { store } from '@/store.js';
 
 const reports = useTemplateRef('reports');
-const resolverPagingComponent = ref<InstanceType<typeof MkPagination>>();
+const resolverPagingComponent = useTemplateRef('resolverPagingComponent');
 const folderComponent = ref<InstanceType<typeof MkFolder>>();
 
 const state = ref('unresolved');
@@ -154,7 +152,7 @@ const resolverPagination = {
 };
 
 function resolved(reportId) {
-	reports.value!.removeItem(item => item.id === reportId);
+	reports.value?.paginator.removeItem(reportId);
 }
 
 function edit(id: string) {
@@ -181,7 +179,7 @@ function deleteResolver(id: string): void {
 	os.apiWithDialog('admin/abuse-report-resolver/delete', {
 		resolverId: id,
 	}).then(() => {
-		resolverPagingComponent.value?.reload();
+		resolverPagingComponent.value?.paginator.reload();
 	});
 }
 
@@ -195,7 +193,7 @@ function create(): void {
 		forward: newResolver.value.forward,
 	}).then(() => {
 		folderComponent.value?.toggle();
-		resolverPagingComponent.value?.reload();
+		resolverPagingComponent.value?.paginator.reload();
 		newResolver.value.name = '';
 		newResolver.value.targetUserPattern = '';
 		newResolver.value.reporterPattern = '';
@@ -203,10 +201,6 @@ function create(): void {
 		newResolver.value.expiresAt = 'indefinitely';
 		newResolver.value.forward = false;
 	});
-}
-
-function closeTutorial() {
-	store.set('abusesTutorial', false);
 }
 
 const headerActions = computed(() => []);

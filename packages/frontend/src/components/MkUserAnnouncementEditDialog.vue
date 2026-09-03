@@ -70,7 +70,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, shallowRef } from 'vue';
+import { ref, shallowRef, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkModalWindow from '@/components/MkModalWindow.vue';
 import MkButton from '@/components/MkButton.vue';
@@ -95,11 +95,11 @@ const emit = defineEmits<{
 	(ev: 'closed'): void
 }>();
 
-const dialog = ref<InstanceType<typeof MkModalWindow> | null>(null);
-const title = ref<string>(props.announcement ? props.announcement.title : '');
-const text = ref<string>(props.announcement ? props.announcement.text : '');
-const icon = ref<string>(props.announcement ? props.announcement.icon : 'info');
-const display = ref<string>(props.announcement ? props.announcement.display : 'dialog');
+const dialog = useTemplateRef('dialog');
+const title = ref(props.announcement ? props.announcement.title : '');
+const text = ref(props.announcement ? props.announcement.text : '');
+const icon = ref(props.announcement ? props.announcement.icon : 'info');
+const display = ref(props.announcement ? props.announcement.display : 'dialog');
 const needConfirmationToRead = ref(props.announcement ? props.announcement.needConfirmationToRead : false);
 const needEnrollmentTutorialToRead = ref(props.announcement ? props.announcement.needEnrollmentTutorialToRead : false);
 const closeDuration = ref<number>(props.announcement ? props.announcement.closeDuration : 0);

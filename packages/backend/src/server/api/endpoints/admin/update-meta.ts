@@ -122,6 +122,7 @@ export const paramDef = {
 		truemailAuthKey: { type: 'string', nullable: true },
 		enableChartsForRemoteUser: { type: 'boolean' },
 		enableChartsForFederatedInstances: { type: 'boolean' },
+		enableStatsForFederatedInstances: { type: 'boolean' },
 		enableServerMachineStats: { type: 'boolean' },
 		enableIdenticonGeneration: { type: 'boolean' },
 		serverRules: { type: 'array', items: { type: 'string' } },
@@ -134,6 +135,7 @@ export const paramDef = {
 		perRemoteUserUserTimelineCacheMax: { type: 'integer' },
 		perUserHomeTimelineCacheMax: { type: 'integer' },
 		perUserListTimelineCacheMax: { type: 'integer' },
+		enableReactionsBuffering: { type: 'boolean' },
 		notesPerOneAd: { type: 'integer' },
 		silencedHosts: {
 			type: 'array',
@@ -167,6 +169,7 @@ export const paramDef = {
 			description: '[Deprecated] Use "urlPreviewSummaryProxyUrl" instead.',
 		},
 		urlPreviewEnabled: { type: 'boolean' },
+		urlPreviewAllowRedirect: { type: 'boolean' },
 		urlPreviewTimeout: { type: 'integer' },
 		urlPreviewMaximumContentLength: { type: 'integer' },
 		urlPreviewRequireContentLength: { type: 'boolean' },
@@ -187,6 +190,25 @@ export const paramDef = {
 				type: 'string',
 			},
 		},
+		deliverSuspendedSoftware: {
+			type: 'array',
+			items: {
+				type: 'object',
+				properties: {
+					software: { type: 'string' },
+					versionRange: { type: 'string' },
+				},
+				required: ['software', 'versionRange'],
+			},
+		},
+		singleUserMode: { type: 'boolean' },
+		ugcVisibilityForVisitor: {
+			type: 'string',
+			enum: ['all', 'local', 'none'],
+		},
+		proxyRemoteFiles: { type: 'boolean' },
+		signToActivityPubGet: { type: 'boolean' },
+		allowExternalApRedirect: { type: 'boolean' },
 	},
 	required: [],
 } as const;
@@ -537,6 +559,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				set.enableChartsForFederatedInstances = ps.enableChartsForFederatedInstances;
 			}
 
+			if (ps.enableStatsForFederatedInstances !== undefined) {
+				set.enableStatsForFederatedInstances = ps.enableStatsForFederatedInstances;
+			}
+
 			if (ps.enableServerMachineStats !== undefined) {
 				set.enableServerMachineStats = ps.enableServerMachineStats;
 			}
@@ -581,6 +607,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				set.perUserListTimelineCacheMax = ps.perUserListTimelineCacheMax;
 			}
 
+			if (ps.enableReactionsBuffering !== undefined) {
+				set.enableReactionsBuffering = ps.enableReactionsBuffering;
+			}
+
 			if (ps.notesPerOneAd !== undefined) {
 				set.notesPerOneAd = ps.notesPerOneAd;
 			}
@@ -591,6 +621,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (ps.urlPreviewEnabled !== undefined) {
 				set.urlPreviewEnabled = ps.urlPreviewEnabled;
+			}
+
+			if (ps.urlPreviewAllowRedirect !== undefined) {
+				set.urlPreviewAllowRedirect = ps.urlPreviewAllowRedirect;
 			}
 
 			if (ps.urlPreviewTimeout !== undefined) {
@@ -623,8 +657,32 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				set.federation = ps.federation;
 			}
 
+			if (ps.deliverSuspendedSoftware !== undefined) {
+				set.deliverSuspendedSoftware = ps.deliverSuspendedSoftware;
+			}
+
 			if (Array.isArray(ps.federationHosts)) {
 				set.federationHosts = ps.federationHosts.filter(Boolean).map(x => x.toLowerCase());
+			}
+
+			if (ps.singleUserMode !== undefined) {
+				set.singleUserMode = ps.singleUserMode;
+			}
+
+			if (ps.ugcVisibilityForVisitor !== undefined) {
+				set.ugcVisibilityForVisitor = ps.ugcVisibilityForVisitor;
+			}
+
+			if (ps.proxyRemoteFiles !== undefined) {
+				set.proxyRemoteFiles = ps.proxyRemoteFiles;
+			}
+
+			if (ps.signToActivityPubGet !== undefined) {
+				set.signToActivityPubGet = ps.signToActivityPubGet;
+			}
+
+			if (ps.allowExternalApRedirect !== undefined) {
+				set.allowExternalApRedirect = ps.allowExternalApRedirect;
 			}
 
 			const before = await this.metaService.fetch(true);

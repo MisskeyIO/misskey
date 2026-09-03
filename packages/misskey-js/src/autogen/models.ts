@@ -63,6 +63,7 @@ export type ReversiGameDetailed = components['schemas']['ReversiGameDetailed'];
 export type MetaLite = components['schemas']['MetaLite'];
 export type MetaDetailedOnly = components['schemas']['MetaDetailedOnly'];
 export type MetaDetailed = components['schemas']['MetaDetailed'];
+export type MetaClientOptions = components['schemas']['MetaClientOptions'];
 export type AbuseUserReport = components['schemas']['AbuseUserReport'];
 export type ModerationLog = components['schemas']['ModerationLog'];
 export type UserWebhook = components['schemas']['UserWebhook'];

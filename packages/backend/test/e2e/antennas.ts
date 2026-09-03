@@ -70,6 +70,9 @@ describe('アンテナ', () => {
 	let userMutingAlice: User;
 	let userMutedByAlice: User;
 
+	let testChannel: misskey.entities.Channel;
+	let testMutedChannel: misskey.entities.Channel;
+
 	beforeAll(async () => {
 		await sendEnvUpdateRequest({ key: 'FORCE_IGNORE_IDEMPOTENCY_FOR_TESTING', value: 'true' });
 
@@ -123,6 +126,10 @@ describe('アンテナ', () => {
 		userMutedByAlice = await signup({ username: 'userMutedByAlice' });
 		await post(userMutedByAlice, { text: 'test' });
 		await api('mute/create', { userId: userMutedByAlice.id }, alice);
+
+		testChannel = (await api('channels/create', { name: 'test' }, root)).body;
+		testMutedChannel = (await api('channels/create', { name: 'test-muted' }, root)).body;
+		await api('channels/mute/create', { channelId: testMutedChannel.id }, alice);
 	}, 1000 * 60 * 10);
 
 	beforeEach(async () => {
@@ -606,6 +613,20 @@ describe('アンテナ', () => {
 				posts: [
 					{ note: (): Promise<Note> => post(bob, { text: `${keyword}`, replyId: alicePost.id }), included: true },
 					{ note: (): Promise<Note> => post(bob, { text: `${keyword}` }), included: true },
+				],
+			},
+			{
+				label: 'チャンネルノートも含む',
+				parameters: () => ({ src: 'all' }),
+				posts: [
+					{ note: (): Promise<Note> => post(bob, { text: `test ${keyword}`, channelId: testChannel.id }), included: true },
+				],
+			},
+			{
+				label: 'ミュートしてるチャンネルは含まない',
+				parameters: () => ({ src: 'all' }),
+				posts: [
+					{ note: (): Promise<Note> => post(bob, { text: `test ${keyword}`, channelId: testMutedChannel.id }) },
 				],
 			},
 		])('が取得できること（$label）', async ({ parameters, posts }) => {

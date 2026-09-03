@@ -29,7 +29,7 @@ export interface PageBody {
 	variables: Array<Record<string, any>>;
 	script: string;
 	eyeCatchingImage?: MiDriveFile | null;
-	font: string;
+	font: 'serif' | 'sans-serif';
 	alignCenter: boolean;
 	hideTitleWhenPinned: boolean;
 	visibility?: MiPage['visibility'];
@@ -142,7 +142,6 @@ export class PageService {
 				visibility: body.visibility,
 				eyeCatchingImageId: body.eyeCatchingImage === undefined ? undefined : (body.eyeCatchingImage?.id ?? null),
 			});
-
 			if (body.content != null) {
 				const beforeReferencedNotes = this.collectReferencedNotes(page.content);
 				const afterReferencedNotes = this.collectReferencedNotes(body.content);

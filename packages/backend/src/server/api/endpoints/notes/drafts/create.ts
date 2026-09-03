@@ -137,12 +137,6 @@ export const meta = {
 			id: '22ae69eb-09e3-4541-a850-773cfa45e693',
 		},
 
-		cannotScheduleToPast: {
-			message: 'Cannot schedule to the past.',
-			code: 'CANNOT_SCHEDULE_TO_PAST',
-			id: 'e577d185-8179-4a17-b47f-6093985558e6',
-		},
-
 		cannotScheduleToFarFuture: {
 			message: 'Cannot schedule to the far future.',
 			code: 'CANNOT_SCHEDULE_TO_FAR_FUTURE',
@@ -166,6 +160,18 @@ export const meta = {
 			message: 'Cannot Renote to External.',
 			code: 'CANNOT_RENOTE_TO_EXTERNAL',
 			id: 'ed1952ac-2d26-4957-8b30-2deda76bedf7',
+		},
+
+		scheduledAtRequired: {
+			message: 'scheduledAt is required when isActuallyScheduled is true.',
+			code: 'SCHEDULED_AT_REQUIRED',
+			id: '15e28a55-e74c-4d65-89b7-8880cdaaa87d',
+		},
+
+		scheduledAtMustBeInFuture: {
+			message: 'scheduledAt must be in the future.',
+			code: 'SCHEDULED_AT_MUST_BE_IN_FUTURE',
+			id: 'e4bed6c9-017e-4934-aed0-01c22cc60ec1',
 		},
 	},
 
@@ -299,8 +305,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 						case '7cc42034-f7ab-4f7c-87b4-e00854479080':
 							throw new ApiError(meta.errors.rolePermissionDenied);
 						case '94a89a43-3591-400a-9c17-dd166e71fdfa':
+							throw new ApiError(meta.errors.scheduledAtRequired);
 						case 'b34d0c1b-996f-4e34-a428-c636d98df457':
-							throw new ApiError(meta.errors.cannotScheduleToPast);
+							throw new ApiError(meta.errors.scheduledAtMustBeInFuture);
 						case '506006cf-3092-4ae1-8145-b025001c591f':
 							throw new ApiError(meta.errors.cannotScheduleToFarFuture);
 						case '4f5bb9ec-5c64-47e9-b21b-da977f45ae3d':

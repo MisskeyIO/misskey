@@ -15,6 +15,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<div :class="$style.bannerStatus">
 						<div><i class="ti ti-users ti-fw"></i><I18n :src="i18n.ts._channel.usersCount" tag="span" style="margin-left: 4px;"><template #n><b>{{ channel.usersCount }}</b></template></I18n></div>
 						<div><i class="ti ti-pencil ti-fw"></i><I18n :src="i18n.ts._channel.notesCount" tag="span" style="margin-left: 4px;"><template #n><b>{{ channel.notesCount }}</b></template></I18n></div>
+						<div v-if="$i != null && channel != null && $i.id === channel.userId" style="color: var(--MI_THEME-warn)"><i class="ti ti-user-star ti-fw"></i><span style="margin-left: 4px;">{{ i18n.ts.youAreAdmin }}</span></div>
 					</div>
 					<div v-if="channel.isSensitive" :class="$style.sensitiveIndicator">{{ i18n.ts.sensitive }}</div>
 					<div :class="$style.bannerFade"></div>
@@ -149,24 +150,25 @@ useInterval(() => {
 });
 
 watch(() => props.channelId, async () => {
-	channel.value = await misskeyApi('channels/show', {
+	const _channel = await misskeyApi('channels/show', {
 		channelId: props.channelId,
 	});
-	if (channel.value == null) return; // TSを黙らすため
 
-	favorited.value = channel.value.isFavorited ?? false;
-	if (favorited.value || channel.value.isFollowing) {
+	favorited.value = _channel.isFavorited ?? false;
+	if (favorited.value || _channel.isFollowing) {
 		tab.value = 'timeline';
 	}
 
-	if ((favorited.value || channel.value.isFollowing) && channel.value.lastNotedAt) {
-		const lastReadedAt: number = miLocalStorage.getItemAsJson(`channelLastReadedAt:${channel.value.id}`) ?? 0;
-		const lastNotedAt = Date.parse(channel.value.lastNotedAt);
+	if ((favorited.value || _channel.isFollowing) && _channel.lastNotedAt) {
+		const lastReadedAt: number = miLocalStorage.getItemAsJson(`channelLastReadedAt:${_channel.id}`) ?? 0;
+		const lastNotedAt = Date.parse(_channel.lastNotedAt);
 
 		if (lastNotedAt > lastReadedAt) {
-			miLocalStorage.setItemAsJson(`channelLastReadedAt:${channel.value.id}`, lastNotedAt);
+			miLocalStorage.setItemAsJson(`channelLastReadedAt:${_channel.id}`, lastNotedAt);
 		}
 	}
+
+	channel.value = _channel;
 }, { immediate: true });
 
 watch(dimension, (value, previous) => {
@@ -216,6 +218,53 @@ async function unfavorite() {
 	});
 }
 
+async function mute() {
+	if (!channel.value) return;
+	const _channel = channel.value;
+
+	const { canceled, result: period } = await os.select({
+		title: i18n.ts.mutePeriod,
+		items: [{
+			value: 'indefinitely', label: i18n.ts.indefinitely,
+		}, {
+			value: 'tenMinutes', label: i18n.ts.tenMinutes,
+		}, {
+			value: 'oneHour', label: i18n.ts.oneHour,
+		}, {
+			value: 'oneDay', label: i18n.ts.oneDay,
+		}, {
+			value: 'oneWeek', label: i18n.ts.oneWeek,
+		}],
+		default: 'indefinitely',
+	});
+	if (canceled) return;
+
+	const expiresAt = period === 'indefinitely' ? null
+		: period === 'tenMinutes' ? Date.now() + (1000 * 60 * 10)
+		: period === 'oneHour' ? Date.now() + (1000 * 60 * 60)
+		: period === 'oneDay' ? Date.now() + (1000 * 60 * 60 * 24)
+		: period === 'oneWeek' ? Date.now() + (1000 * 60 * 60 * 24 * 7)
+		: null;
+
+	os.apiWithDialog('channels/mute/create', {
+		channelId: _channel.id,
+		expiresAt,
+	}).then(() => {
+		_channel.isMuting = true;
+	});
+}
+
+async function unmute() {
+	if (!channel.value) return;
+	const _channel = channel.value;
+
+	os.apiWithDialog('channels/mute/delete', {
+		channelId: _channel.id,
+	}).then(() => {
+		_channel.isMuting = false;
+	});
+}
+
 async function search() {
 	if (!channel.value) return;
 
@@ -260,7 +309,9 @@ const headerActions = computed(() => {
 		icon: 'ti ti-link',
 		text: i18n.ts.copyUrl,
 		handler: async (): Promise<void> => {
-			copyToClipboard(`${url}/channels/${channel.value.id}`);
+			const currentChannel = channel.value;
+			if (!currentChannel) return;
+			copyToClipboard(`${url}/channels/${currentChannel.id}`);
 		},
 	});
 
@@ -269,20 +320,40 @@ const headerActions = computed(() => {
 			icon: 'ti ti-share',
 			text: i18n.ts.share,
 			handler: async (): Promise<void> => {
+				const currentChannel = channel.value;
+				if (!currentChannel) return;
 				navigator.share({
-					title: channel.value.name,
-					text: channel.value.description ?? undefined,
-					url: `${url}/channels/${channel.value.id}`,
+					title: currentChannel.name,
+					text: currentChannel.description ?? undefined,
+					url: `${url}/channels/${currentChannel.id}`,
 				});
 			},
 		});
 	}
 
-	if (tab.value === 'timeline' && $i) {
+	if (!channel.value.isMuting) {
 		headerItems.push({
-			icon: 'ti ti-cube',
-			label: dimension.value,
-			text: i18n.tsx.dimensionWithNumber({ dimension: dimension.value }),
+			icon: 'ti ti-volume',
+			text: i18n.ts.mute,
+			handler: async (): Promise<void> => {
+				await mute();
+			},
+		});
+	} else {
+		headerItems.push({
+			icon: 'ti ti-volume-off',
+			text: i18n.ts.unmute,
+			handler: async (): Promise<void> => {
+				await unmute();
+			},
+		});
+	}
+
+	if (tab.value === 'timeline' && $i) {
+			headerItems.push({
+				icon: 'ti ti-cube',
+				label: String(dimension.value),
+				text: i18n.tsx.dimensionWithNumber({ dimension: dimension.value }),
 			handler: pickDimension,
 		});
 	}

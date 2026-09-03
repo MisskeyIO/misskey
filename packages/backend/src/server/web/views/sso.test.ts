@@ -14,7 +14,7 @@ const commonData = {
 		url: 'https://example.com',
 		frontendManifestExists: true,
 		frontendEntry: { file: 'entry.js', css: [] },
-	} as Config,
+	} as unknown as Config,
 	langs: ['ja-JP'],
 	instanceName: 'Misskey',
 	icon: null,

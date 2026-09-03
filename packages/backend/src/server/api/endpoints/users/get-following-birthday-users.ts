@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import { Inject, Injectable } from '@nestjs/common';
 import { Brackets } from 'typeorm';
 import { DI } from '@/di-symbols.js';
@@ -24,8 +29,13 @@ export const meta = {
 			type: 'object',
 			optional: false, nullable: false,
 			properties: {
+				id: {
+					type: 'string',
+					optional: false, nullable: false,
+					format: 'misskey:id',
+				},
 				birthday: {
-					type: 'string', format: 'date-time',
+					type: 'string',
 					optional: false, nullable: false,
 				},
 				user: {
@@ -44,31 +54,35 @@ export const paramDef = {
 		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
 		offset: { type: 'integer', default: 0 },
 		birthday: {
-			type: 'object',
-			properties: {
-				month: { type: 'integer', minimum: 1, maximum: 12 },
-				day: { type: 'integer', minimum: 1, maximum: 31 },
-				begin: {
-					type: 'object',
-					properties: {
-						month: { type: 'integer', minimum: 1, maximum: 12 },
-						day: { type: 'integer', minimum: 1, maximum: 31 },
-					},
-					required: ['month', 'day'],
+			oneOf: [{
+				type: 'object',
+				properties: {
+					month: { type: 'integer', minimum: 1, maximum: 12 },
+					day: { type: 'integer', minimum: 1, maximum: 31 },
 				},
-				end: {
-					type: 'object',
-					properties: {
-						month: { type: 'integer', minimum: 1, maximum: 12 },
-						day: { type: 'integer', minimum: 1, maximum: 31 },
+				required: ['month', 'day'],
+			}, {
+				type: 'object',
+				properties: {
+					begin: {
+						type: 'object',
+						properties: {
+							month: { type: 'integer', minimum: 1, maximum: 12 },
+							day: { type: 'integer', minimum: 1, maximum: 31 },
+						},
+						required: ['month', 'day'],
 					},
-					required: ['month', 'day'],
+					end: {
+						type: 'object',
+						properties: {
+							month: { type: 'integer', minimum: 1, maximum: 12 },
+							day: { type: 'integer', minimum: 1, maximum: 31 },
+						},
+						required: ['month', 'day'],
+					},
 				},
-			},
-			anyOf: [
-				{ required: ['month', 'day'] },
-				{ required: ['begin', 'end'] },
-			],
+				required: ['begin', 'end'],
+			}],
 		},
 	},
 	required: ['birthday'],
@@ -92,6 +106,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (Object.hasOwn(ps.birthday, 'begin') && Object.hasOwn(ps.birthday, 'end')) {
 				const range = ps.birthday as { begin: { month: number; day: number }; end: { month: number; day: number }; };
+
+				// 誕生日は mmdd の形式の最大4桁の数字（例: 8月30日 → 830）でインデックスが効くようになっているので、その形式に変換
 				const begin = range.begin.month * 100 + range.begin.day;
 				const end = range.end.month * 100 + range.end.day;
 
@@ -126,20 +142,26 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				)
 			).map(u => [u.id, u]));
 
-			const now = new Date();
 			return birthdayUsers
 				.map(item => {
-					const birthday = new Date(
-						now.getFullYear(),
-						Math.floor(item.birthday_date / 100) - 1,
-						item.birthday_date % 100,
-						0, 0, 0, 0,
-					);
-					if (birthday.getTime() < now.getTime()) birthday.setFullYear(now.getFullYear() + 1);
-					return { birthday: birthday.toISOString(), user: users.get(item.user_id) };
+					const birthday = new Date();
+					birthday.setHours(0, 0, 0, 0);
+					// item.birthday_date は mmdd の形式の最大4桁の数字（例: 8月30日 → 830）で出力されるので、日付に戻してDateオブジェクトに設定
+					birthday.setMonth(Math.floor(item.birthday_date / 100) - 1, item.birthday_date % 100);
+
+					if (birthday.getTime() < new Date().setHours(0, 0, 0, 0)) {
+						birthday.setFullYear(new Date().getFullYear() + 1);
+					}
+
+					const birthdayStr = `${birthday.getFullYear()}-${(birthday.getMonth() + 1).toString().padStart(2, '0')}-${(birthday.getDate()).toString().padStart(2, '0')}`;
+					return {
+						id: item.user_id,
+						birthday: birthdayStr,
+						user: users.get(item.user_id),
+					};
 				})
-				.filter(item => item.user !== undefined)
-				.map(item => item as { birthday: string; user: Packed<'UserLite'> });
+				.filter(item => item.user != null)
+				.map(item => item as { id: string; birthday: string; user: Packed<'UserLite'> });
 		});
 	}
 }

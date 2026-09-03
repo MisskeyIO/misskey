@@ -32,7 +32,7 @@ export class MiUserList {
 	})
 	public isPublic: boolean;
 
-	@ManyToOne(type => MiUser, {
+	@ManyToOne(() => MiUser, {
 		onDelete: 'CASCADE',
 	})
 	@JoinColumn()

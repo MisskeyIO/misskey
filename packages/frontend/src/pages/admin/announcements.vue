@@ -7,6 +7,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 <PageWithHeader :actions="headerActions" :tabs="headerTabs">
 	<div class="_spacer" style="--MI_SPACER-w: 900px;">
 		<div class="_gaps">
+			<MkInfo>{{ i18n.ts._announcement.shouldNotBeUsedToPresentPermanentInfo }}</MkInfo>
+			<MkInfo v-if="announcementsStatus === 'active' && announcements.length > 5" warn>{{ i18n.ts._announcement.tooManyActiveAnnouncementDescription }}</MkInfo>
+
 			<MkFolder>
 				<template #label>{{ i18n.ts.options }}</template>
 
@@ -60,18 +63,26 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkInput v-model="announcement.imageUrl" type="url">
 							<template #label>{{ i18n.ts.imageUrl }}</template>
 						</MkInput>
-						<MkRadios v-model="announcement.icon">
+						<MkRadios
+							v-model="announcement.icon"
+							:options="[
+								{ value: 'info', icon: 'ti ti-info-circle' },
+								{ value: 'warning', icon: 'ti ti-alert-triangle', iconStyle: 'color: var(--MI_THEME-warn);' },
+								{ value: 'error', icon: 'ti ti-circle-x', iconStyle: 'color: var(--MI_THEME-error);' },
+								{ value: 'success', icon: 'ti ti-check', iconStyle: 'color: var(--MI_THEME-success);' },
+							]"
+						>
 							<template #label>{{ i18n.ts.icon }}</template>
-							<option value="info"><i class="ti ti-info-circle"></i></option>
-							<option value="warning"><i class="ti ti-alert-triangle" style="color: var(--MI_THEME-warn);"></i></option>
-							<option value="error"><i class="ti ti-circle-x" style="color: var(--MI_THEME-error);"></i></option>
-							<option value="success"><i class="ti ti-check" style="color: var(--MI_THEME-success);"></i></option>
 						</MkRadios>
-						<MkRadios v-model="announcement.display">
+						<MkRadios
+							v-model="announcement.display"
+							:options="[
+								{ value: 'normal', label: i18n.ts.normal },
+								{ value: 'banner', label: i18n.ts.banner },
+								{ value: 'dialog', label: i18n.ts.dialog },
+							]"
+						>
 							<template #label>{{ i18n.ts.display }}</template>
-							<option value="normal">{{ i18n.ts.normal }}</option>
-							<option value="banner">{{ i18n.ts.banner }}</option>
-							<option value="dialog">{{ i18n.ts.dialog }}</option>
 						</MkRadios>
 						<MkInfo v-if="announcement.display === 'dialog'" warn>{{ i18n.ts._announcement.dialogAnnouncementUxWarn }}</MkInfo>
 						<MkSwitch v-model="announcement.forExistingUsers" :helpText="i18n.ts._announcement.forExistingUsersDescription">
@@ -146,7 +157,12 @@ const loading = ref(true);
 const fetching = ref(false);
 let fetchSequence = 0;
 
-const announcements = ref<any[]>([]);
+const announcements = ref<(Omit<misskey.entities.AdminAnnouncementsListResponse[number], 'id' | 'createdAt' | 'updatedAt' | 'reads' | 'isActive'> & {
+	id: string | null;
+	_id?: string;
+	isActive?: misskey.entities.AdminAnnouncementsListResponse[number]['isActive'];
+	reads?: misskey.entities.AdminAnnouncementsListResponse[number]['reads'];
+})[]>([]);
 
 function selectUserFilter(): void {
 	os.selectUser().then(_user => {
@@ -190,28 +206,36 @@ function add() {
 	});
 }
 
-function del(announcement) {
-	os.confirm({
+async function del(announcement: (typeof announcements)['value'][number]) {
+	if (announcement.id == null) return;
+	const { canceled } = await os.confirm({
 		type: 'warning',
 		text: i18n.tsx.deleteAreYouSure({ x: announcement.title }),
-	}).then(({ canceled }) => {
-		if (canceled) return;
-		announcements.value = announcements.value.filter(x => x !== announcement);
-		misskeyApi('admin/announcements/delete', announcement);
+	});
+	if (canceled) return;
+	announcements.value = announcements.value.filter(x => x !== announcement);
+	misskeyApi('admin/announcements/delete', {
+		id: announcement.id,
 	});
 }
 
-async function archive(announcement) {
+async function archive(announcement: (typeof announcements)['value'][number]) {
+	if (announcement.id == null) return;
+	const { _id, ...data } = announcement; // _idを消す
 	await os.apiWithDialog('admin/announcements/update', {
-		...announcement,
+		...data,
+		id: announcement.id, // TSを黙らすため
 		isActive: false,
 	});
 	await refresh();
 }
 
-async function unarchive(announcement) {
+async function unarchive(announcement: (typeof announcements)['value'][number]) {
+	if (announcement.id == null) return;
+	const { _id, ...data } = announcement; // _idを消す
 	await os.apiWithDialog('admin/announcements/update', {
-		...announcement,
+		...data,
+		id: announcement.id, // TSを黙らすため
 		isActive: true,
 	});
 	await refresh();

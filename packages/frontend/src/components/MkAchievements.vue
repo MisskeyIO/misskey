@@ -23,7 +23,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 			<div :class="$style.body">
 				<div :class="$style.header">
-					<span :class="$style.title">{{ i18n.ts._achievements._types['_' + achievement.name].title }}</span>
+					<span :class="$style.title">{{ i18n.ts._achievements._types[`_${achievement.name}`].title }}</span>
 					<span :class="$style.time">
 						<time v-tooltip="new Date(achievement.unlockedAt).toLocaleString()">{{ new Date(achievement.unlockedAt).getFullYear() }}/{{ new Date(achievement.unlockedAt).getMonth() + 1 }}/{{ new Date(achievement.unlockedAt).getDate() }}</time>
 					</span>

@@ -68,7 +68,7 @@ export class NoteDeleteService {
 		}
 
 		if (!quiet) {
-			this.globalEventService.publishNoteStream(note, 'deleted', {
+			this.globalEventService.publishNoteStream(note.id, 'deleted', {
 				deletedAt: deletedAt,
 			});
 

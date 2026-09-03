@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
+import { DI } from '@/di-symbols.js';
 import type { MiMeta } from '@/models/Meta.js';
 import { ModerationLogService } from '@/core/ModerationLogService.js';
 import { LoggerService } from '@/core/LoggerService.js';
@@ -69,7 +70,14 @@ export const paramDef = {
 		description: { type: 'string', nullable: true },
 		defaultLightTheme: { type: 'string', nullable: true },
 		defaultDarkTheme: { type: 'string', nullable: true },
-		clientOptions: { type: 'object', nullable: false },
+		clientOptions: {
+			type: 'object', nullable: false,
+			properties: {
+				entrancePageStyle: { type: 'string', nullable: false, enum: ['classic', 'simple'] },
+				showTimelineForVisitor: { type: 'boolean', nullable: false },
+				showActivitiesForVisitor: { type: 'boolean', nullable: false },
+			},
+		},
 		emailRequiredForSignup: { type: 'boolean' },
 		enableHcaptcha: { type: 'boolean' },
 		hcaptchaSiteKey: { type: 'string', nullable: true },
@@ -222,6 +230,9 @@ export const paramDef = {
 @Injectable()
 export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-disable-line import/no-default-export
 	constructor(
+		@Inject(DI.meta)
+		private serverSettings: MiMeta,
+
 		private metaService: MetaService,
 		private moderationLogService: ModerationLogService,
 		private queueService: QueueService,
@@ -354,7 +365,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			}
 
 			if (ps.clientOptions !== undefined) {
-				set.clientOptions = ps.clientOptions;
+				set.clientOptions = {
+					...serverSettings.clientOptions,
+					...ps.clientOptions,
+				};
 			}
 			if (ps.emailRequiredForSignup !== undefined) {
 				set.emailRequiredForSignup = ps.emailRequiredForSignup;

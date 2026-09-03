@@ -3,73 +3,68 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Scope } from '@nestjs/common';
+import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { bindThis } from '@/decorators.js';
 import { RoleService } from '@/core/RoleService.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import type { GlobalEvents } from '@/core/GlobalEventService.js';
 import type { JsonObject } from '@/misc/json-value.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
-import { NoteStreamingHidingService } from '../NoteStreamingHidingService.js';
-import Channel, { type MiChannelService } from '../channel.js';
+import Channel, { type ChannelRequest } from '../channel.js';
+import { REQUEST } from '@nestjs/core';
 
-class RoleTimelineChannel extends Channel {
+@Injectable({ scope: Scope.TRANSIENT })
+export class RoleTimelineChannel extends Channel {
 	public readonly chName = 'roleTimeline';
-	public static readonly shouldShare = false;
-	public static readonly requireCredential = false as const;
+	public static shouldShare = false;
+	public static requireCredential = false as const;
 	private roleId: string;
 	private minimize: boolean;
 
 	constructor(
-		private roleService: RoleService,
+		@Inject(REQUEST)
+		request: ChannelRequest,
+
 		private noteEntityService: NoteEntityService,
-		private noteStreamingHidingService: NoteStreamingHidingService,
-		id: string,
-		connection: Channel['connection'],
-		dimension?: number | null,
+		private roleService: RoleService,
 	) {
-		super(id, connection, dimension);
+		super(request);
 		//this.onNote = this.onNote.bind(this);
 	}
 
 	@bindThis
-	public async init(params: JsonObject) : Promise<boolean> {
-		if (typeof params.roleId !== 'string') return false;
+	public async init(params: JsonObject) {
+		if (typeof params.roleId !== 'string') return;
 		this.roleId = params.roleId;
 		this.minimize = !!(params.minimize ?? false);
 
 		this.subscriber.on(`roleTimelineStream:${this.roleId}`, this.onEvent);
-
-		return true;
 	}
 
 	@bindThis
 	private async onEvent(data: GlobalEvents['roleTimeline']['payload']) {
 		if (data.type === 'note') {
-			const note = data.body;
+			let note = data.body;
 
 			if (!(await this.roleService.isExplorable({ id: this.roleId }))) {
 				return;
 			}
 			if (note.visibility !== 'public') return;
-			if (note.user.requireSigninToViewContents && this.user == null) return;
-			if (note.renote && note.renote.user.requireSigninToViewContents && this.user == null) return;
-			if (note.reply && note.reply.user.requireSigninToViewContents && this.user == null) return;
-			if (!this.isNoteVisibleForMe(note)) return;
 
 			if (note.reply) {
 				const reply = note.reply;
-				if (!this.isNoteVisibleForMe(reply)) return;
+				// 自分のフォローしていないユーザーの visibility: followers な投稿への返信は弾く
+				if (reply.visibility === 'followers' && !Object.hasOwn(this.following, reply.userId)) return;
+				// 自分の見ることができないユーザーの visibility: specified な投稿への返信は弾く
+				if (reply.visibility === 'specified' && !reply.visibleUserIds!.includes(this.user!.id)) return;
 			}
 
 			// 純粋なリノート（引用リノートでないリノート）の場合
 			if (note.renote && isRenotePacked(note) && !isQuotePacked(note)) {
-				if (!this.isNoteVisibleForMe(note.renote)) return;
-				if (note.renote.user.requireSigninToViewContents && this.user == null) return;
 				if (note.renote.reply) {
 					const reply = note.renote.reply;
-					if (reply.user.requireSigninToViewContents && this.user == null) return;
-					if (!this.isNoteVisibleForMe(reply)) return;
+					// 自分のフォローしていないユーザーの visibility: followers な投稿への返信のリノートは弾く
+					if (reply.visibility === 'followers' && !Object.hasOwn(this.following, reply.userId)) return;
 				}
 			}
 
@@ -79,20 +74,10 @@ class RoleTimelineChannel extends Channel {
 
 			if (this.isNoteMutedOrBlocked(note)) return;
 
-			const { shouldSkip } = await this.noteStreamingHidingService.processHiding(note, this.user?.id ?? null);
-			if (shouldSkip) return;
-
-			let noteToSend = note;
 			if (this.user && isRenotePacked(note) && !isQuotePacked(note)) {
 				if (note.renote && Object.keys(note.renote.reactions).length > 0) {
 					const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
-					noteToSend = {
-						...note,
-						renote: {
-							...note.renote,
-							myReaction: myRenoteReaction,
-						},
-					};
+					note = { ...note, renote: { ...note.renote, myReaction: myRenoteReaction } };
 				}
 			}
 
@@ -100,14 +85,14 @@ class RoleTimelineChannel extends Channel {
 				const badgeRoles = this.iAmModerator ? await this.roleService.getUserBadgeRoles(note.userId, false) : undefined;
 
 				this.send('note', {
-					id: noteToSend.id, myReaction: noteToSend.myReaction,
-					poll: noteToSend.poll?.choices ? { choices: noteToSend.poll.choices } : undefined,
-					reply: noteToSend.reply?.myReaction ? { myReaction: noteToSend.reply.myReaction } : undefined,
-					renote: noteToSend.renote?.myReaction ? { myReaction: noteToSend.renote.myReaction } : undefined,
+					id: note.id, myReaction: note.myReaction,
+					poll: note.poll?.choices ? { choices: note.poll.choices } : undefined,
+					reply: note.reply?.myReaction ? { myReaction: note.reply.myReaction } : undefined,
+					renote: note.renote?.myReaction ? { myReaction: note.renote.myReaction } : undefined,
 					...(badgeRoles?.length ? { user: { badgeRoles } } : {}),
 				});
 			} else {
-				this.send('note', noteToSend);
+				this.send('note', note);
 			}
 		} else {
 			this.send(data.type, data.body);
@@ -118,31 +103,5 @@ class RoleTimelineChannel extends Channel {
 	public dispose() {
 		// Unsubscribe events
 		this.subscriber.off(`roleTimelineStream:${this.roleId}`, this.onEvent);
-	}
-}
-
-@Injectable()
-export class RoleTimelineChannelService implements MiChannelService<false> {
-	public readonly shouldShare = RoleTimelineChannel.shouldShare;
-	public readonly requireCredential = RoleTimelineChannel.requireCredential;
-	public readonly kind = RoleTimelineChannel.kind;
-
-	constructor(
-		private roleService: RoleService,
-		private noteEntityService: NoteEntityService,
-		private readonly noteStreamingHidingService: NoteStreamingHidingService,
-	) {
-	}
-
-	@bindThis
-	public create(id: string, connection: Channel['connection'], dimension?: number | null): RoleTimelineChannel {
-		return new RoleTimelineChannel(
-			this.roleService,
-			this.noteEntityService,
-			this.noteStreamingHidingService,
-			id,
-			connection,
-			dimension,
-		);
 	}
 }

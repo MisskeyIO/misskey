@@ -114,7 +114,7 @@ watch(moderationNote, async () => {
 	});
 });
 
-function resolve(resolvedAs) {
+function resolve(resolvedAs: 'accept' | 'reject' | null) {
 	os.apiWithDialog('admin/resolve-abuse-user-report', {
 		reportId: props.report.id,
 		resolvedAs,
@@ -130,7 +130,7 @@ function forward() {
 	});
 }
 
-function showMenu(ev: MouseEvent) {
+function showMenu(ev: PointerEvent) {
 	os.popupMenu([{
 		icon: 'ti ti-hash',
 		text: 'Copy ID',

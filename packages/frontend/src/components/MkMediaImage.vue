@@ -4,7 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<div :class="[hide ? $style.hidden : $style.visible, (image.isSensitive && prefer.s.highlightSensitiveMedia) && $style.sensitive]" @click="reveal">
+<div :class="[hide ? $style.hidden : $style.visible, (image.isSensitive && prefer.s.highlightSensitiveMedia) && $style.sensitive]" @click="reveal" @contextmenu.stop="onContextmenu">
 	<component
 		:is="(image.isSensitive && !$i) || disableImageLink ? 'div' : 'a'"
 		v-bind="(image.isSensitive && !$i) || disableImageLink ? {
@@ -111,13 +111,25 @@ const url = computed(() => (props.raw || prefer.s.loadRawImages)
 		: props.image.thumbnailUrl!,
 );
 
-async function reveal(ev: MouseEvent) {
+async function reveal(ev: PointerEvent) {
 	if (!props.controls) {
 		return;
 	}
 
 	if (hide.value) {
+		ev.preventDefault();
 		ev.stopPropagation();
+
+		if (props.image.isSensitive && !$i) {
+			await pleaseLogin();
+			return;
+		}
+
+		if (props.image.isSensitive && sensitiveContentConsent.value !== true) {
+			const allowed = await requestSensitiveContentConsent();
+			if (!allowed) return;
+		}
+
 		if (props.image.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
 			const { canceled } = await os.confirm({
 				type: 'question',
@@ -130,15 +142,7 @@ async function reveal(ev: MouseEvent) {
 	}
 }
 
-// Plugin:register_note_view_interruptor を使って書き換えられる可能性があるためwatchする
-watch(() => props.image, () => {
-	hide.value = (prefer.s.nsfw === 'force' || prefer.s.dataSaver.media) ? true : (props.image.isSensitive && prefer.s.nsfw !== 'ignore');
-}, {
-	deep: true,
-	immediate: true,
-});
-
-function showMenu(ev: MouseEvent) {
+function getMenu() {
 	const menuItems: MenuItem[] = [];
 
 	menuItems.push({
@@ -154,10 +158,11 @@ function showMenu(ev: MouseEvent) {
 			text: i18n.ts.saveThisFile,
 			icon: 'ti ti-cloud-upload',
 			action: () => {
-				selectDriveFolder(null).then(async folder => {
+				selectDriveFolder(null).then(({ canceled, folders }) => {
+					if (canceled) return;
 					misskeyApi('drive/files/upload-from-url', {
 						url: props.image.url,
-						folderId: folder[0]?.id,
+						folderId: folders[0]?.id,
 					});
 				});
 			},
@@ -221,36 +226,15 @@ function showMenu(ev: MouseEvent) {
 		});
 	}
 
-	os.popupMenu(menuItems, ev.currentTarget ?? ev.target);
+	return menuItems;
 }
 
-async function showHiddenContent(ev: MouseEvent) {
-	if (!props.controls || !hide.value) {
-		return;
-	}
+function showMenu(ev: PointerEvent) {
+	os.popupMenu(getMenu(), (ev.currentTarget ?? ev.target ?? undefined) as HTMLElement | undefined);
+}
 
-	ev.preventDefault();
-	ev.stopPropagation();
-
-	if (props.image.isSensitive && !$i) {
-		await pleaseLogin();
-		return;
-	}
-
-	if (props.image.isSensitive && sensitiveContentConsent.value !== true) {
-		const allowed = await requestSensitiveContentConsent();
-		if (!allowed) return;
-	}
-
-	if (props.image.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
-		const { canceled } = await os.confirm({
-			type: 'question',
-			text: i18n.ts.sensitiveMediaRevealConfirm,
-		});
-		if (canceled) return;
-	}
-
-	hide.value = false;
+function onContextmenu(ev: PointerEvent) {
+	os.contextMenu(getMenu(), ev);
 }
 
 function toggleSensitive(file: Misskey.entities.DriveFile) {

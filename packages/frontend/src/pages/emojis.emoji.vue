@@ -27,7 +27,7 @@ const props = defineProps<{
 	emoji: Misskey.entities.EmojiSimple;
 }>();
 
-function menu(ev) {
+function menu(ev: PointerEvent) {
 	const menuItems: MenuItem[] = [];
 	menuItems.push({
 		type: 'label',
@@ -54,22 +54,21 @@ function menu(ev) {
 		menuItems.push({
 			text: i18n.ts.edit,
 			icon: 'ti ti-pencil',
-			action: () => {
-				edit(props.emoji);
+			action: async () => {
+				const detailedEmoji = await misskeyApiGet('emoji', {
+					name: props.emoji.name,
+				});
+				const { dispose } = await os.popupAsyncWithDialog(import('@/pages/emoji-edit-dialog.vue').then(x => x.default), {
+					emoji: detailedEmoji,
+				}, {
+					closed: () => dispose(),
+				});
 			},
 		});
 	}
 
 	os.popupMenu(menuItems, ev.currentTarget ?? ev.target);
 }
-
-const edit = async (emoji) => {
-	const { dispose } = await os.popupAsyncWithDialog(import('@/pages/emoji-edit-dialog.vue').then(x => x.default), {
-		emoji: emoji,
-	}, {
-		closed: () => dispose(),
-	});
-};
 </script>
 
 <style lang="scss" module>

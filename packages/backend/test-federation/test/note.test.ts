@@ -64,14 +64,12 @@ describe('Note', () => {
 				'id',
 				'emojis',
 				'replyId',
-				'replyUserId',
 				'reply',
 				'userId',
 				'user',
 				'uri',
 			]);
 			assert(resolvedNote.replyId != null);
-			strictEqual(resolvedNote.replyUserId, aliceInB.id);
 			assert(resolvedNote.reply != null);
 			deepStrictEqualWithExcludedFields(replyedNote, resolvedNote.reply, [
 				'id',

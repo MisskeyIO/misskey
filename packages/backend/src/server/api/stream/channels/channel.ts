@@ -3,47 +3,45 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Scope } from '@nestjs/common';
 import type { Packed } from '@/misc/json-schema.js';
+import { RoleService } from '@/core/RoleService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { bindThis } from '@/decorators.js';
-import { RoleService } from '@/core/RoleService.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import { isInstanceMuted } from '@/misc/is-instance-muted.js';
 import { isUserRelated } from '@/misc/is-user-related.js';
 import type { JsonObject } from '@/misc/json-value.js';
-import { NoteStreamingHidingService } from '../NoteStreamingHidingService.js';
-import Channel, { type MiChannelService } from '../channel.js';
+import Channel, { type ChannelRequest } from '../channel.js';
+import { REQUEST } from '@nestjs/core';
 
-class ChannelChannel extends Channel {
+@Injectable({ scope: Scope.TRANSIENT })
+export class ChannelChannel extends Channel {
 	public readonly chName = 'channel';
-	public static readonly shouldShare = false;
-	public static readonly requireCredential = false as const;
+	public static shouldShare = false;
+	public static requireCredential = false as const;
 	private channelId: string;
 	private minimize: boolean;
 
 	constructor(
+		@Inject(REQUEST)
+		request: ChannelRequest,
+
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
-		private noteStreamingHidingService: NoteStreamingHidingService,
-		id: string,
-		connection: Channel['connection'],
-		dimension?: number | null,
 	) {
-		super(id, connection, dimension);
+		super(request);
 		//this.onNote = this.onNote.bind(this);
 	}
 
 	@bindThis
 	public async init(params: JsonObject) {
-		if (typeof params.channelId !== 'string') return false;
+		if (typeof params.channelId !== 'string') return;
 		this.channelId = params.channelId;
 		this.minimize = !!(params.minimize ?? false);
 
 		// Subscribe stream
 		this.subscriber.on('notesStream', this.onNote);
-
-		return true;
 	}
 
 	@bindThis
@@ -57,18 +55,15 @@ class ChannelChannel extends Channel {
 
 		if (note.reply) {
 			const reply = note.reply;
-			if (!this.isNoteVisibleForMe(reply)) return;
+			if (reply.visibility === 'followers' && !Object.hasOwn(this.following, reply.userId)) return;
+			if (reply.visibility === 'specified' && (this.user == null || !reply.visibleUserIds!.includes(this.user.id))) return;
 		}
 
 		if (!this.shouldDeliverByDimension(note)) return;
 
 		if (!(await this.noteEntityService.isLanguageVisibleToMe(note, this.user?.id))) return;
 
-		if (!this.isNoteVisibleForMe(note)) return;
 		if (this.isNoteMutedOrBlocked(note)) return;
-
-		const { shouldSkip } = await this.noteStreamingHidingService.processHiding(note, this.user?.id ?? null);
-		if (shouldSkip) return;
 
 		if (this.user && isRenotePacked(note) && !isQuotePacked(note)) {
 			if (note.renote && Object.keys(note.renote.reactions).length > 0) {
@@ -125,31 +120,5 @@ class ChannelChannel extends Channel {
 	public dispose() {
 		// Unsubscribe events
 		this.subscriber.off('notesStream', this.onNote);
-	}
-}
-
-@Injectable()
-export class ChannelChannelService implements MiChannelService<false> {
-	public readonly shouldShare = ChannelChannel.shouldShare;
-	public readonly requireCredential = ChannelChannel.requireCredential;
-	public readonly kind = ChannelChannel.kind;
-
-	constructor(
-		private roleService: RoleService,
-		private noteEntityService: NoteEntityService,
-		private noteStreamingHidingService: NoteStreamingHidingService,
-	) {
-	}
-
-	@bindThis
-	public create(id: string, connection: Channel['connection'], dimension?: number | null): ChannelChannel {
-		return new ChannelChannel(
-			this.roleService,
-			this.noteEntityService,
-			this.noteStreamingHidingService,
-			id,
-			connection,
-			dimension,
-		);
 	}
 }

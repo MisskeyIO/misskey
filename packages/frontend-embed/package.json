@@ -59,7 +59,6 @@
     "prettier": "catalog:",
     "start-server-and-test": "catalog:",
     "tsx": "catalog:",
-    "typescript": "catalog:",
     "vite-plugin-turbosnap": "catalog:",
     "vue-component-type-helpers": "catalog:",
     "vue-eslint-parser": "catalog:",

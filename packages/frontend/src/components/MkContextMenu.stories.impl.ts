@@ -25,7 +25,7 @@ export const Empty = {
 				},
 			},
 			methods: {
-				onContextmenu(ev: MouseEvent) {
+				onContextmenu(ev: PointerEvent) {
 					os.contextMenu(args.items, ev);
 				},
 			},

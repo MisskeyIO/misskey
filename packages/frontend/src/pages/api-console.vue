@@ -76,7 +76,7 @@ function onEndpointChange() {
 			return;
 		}
 
-		const endpointBody = {};
+		const endpointBody = {} as Record<string, unknown>;
 		for (const p of resp.params) {
 			endpointBody[p.name] =
 				p.type === 'String' ? '' :

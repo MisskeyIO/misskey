@@ -25,7 +25,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		:myReaction="props.myReaction"
 		@reactionToggled="onMockToggleReaction"
 	/>
-	<slot v-if="hasMoreReactions" name="more"/>
+	<slot v-if="hasMoreReactions" name="more"></slot>
 </component>
 </template>
 
@@ -33,11 +33,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 import * as Misskey from 'misskey-js';
 import { inject, watch, ref } from 'vue';
 import { TransitionGroup } from 'vue';
+import { isSupportedEmoji } from '@@/js/emojilist.js';
 import XReaction from '@/components/MkReactionsViewer.reaction.vue';
 import { $i } from '@/i.js';
 import { prefer } from '@/preferences.js';
 import { customEmojisMap } from '@/custom-emojis.js';
-import { isSupportedEmoji } from '@@/js/emojilist.js';
 import { DI } from '@/di.js';
 import { store } from '@/store.js';
 
@@ -63,8 +63,8 @@ const initialReactions = new Set(Object.keys(props.reactions));
 const _reactions = ref<[string, number][]>([]);
 const hasMoreReactions = ref(false);
 
-if (props.myReaction && !Object.keys(_reactions.value).includes(props.myReaction)) {
-	_reactions.value[props.myReaction] = props.reactions[props.myReaction];
+if (props.myReaction != null && !(props.myReaction in props.reactions)) {
+	_reactions.value.push([props.myReaction, props.reactions[props.myReaction]]);
 }
 
 function shouldDisplayReaction([reaction]: [string, number]): boolean {

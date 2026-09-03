@@ -156,78 +156,75 @@ export class NoteEntityService implements OnModuleInit {
 	}
 
 	@bindThis
-	private isSpecifiedVisibleTo(packedNote: Packed<'Note'>, meId: MiUser['id'] | null): boolean {
-		if (meId == null) return false;
-
-		return packedNote.visibleUserIds?.includes(meId) ?? false;
-	}
-
-	@bindThis
-	private isSigninOrTimeHidden(packedNote: Packed<'Note'>, meId: MiUser['id'] | null): boolean {
-		if (packedNote.user.requireSigninToViewContents && meId == null) {
-			return true;
-		}
-
-		const hiddenBefore = packedNote.user.makeNotesHiddenBefore;
-		return shouldHideNoteByTime(hiddenBefore, packedNote.createdAt);
-	}
-
-	@bindThis
-	private async isFollowerVisibleTo(packedNote: Packed<'Note'>, meId: MiUser['id'] | null): Promise<boolean> {
-		if (meId == null) {
-			return false;
-		}
-
-		if (packedNote.replyUserId === meId) {
-			return true;
-		}
-
-		if (packedNote.mentions?.includes(meId)) {
-			return true;
-		}
-
-		const followings = await this.cacheService.userFollowingsCache.fetch(meId);
-		if (Object.hasOwn(followings, packedNote.userId)) {
-			return true;
-		}
-
-		const viewer = await this.usersRepository.findOneBy({ id: meId });
-		return packedNote.user.host != null && viewer?.host != null;
-	}
-
-	@bindThis
-	public async shouldHideNote(packedNote: Packed<'Note'>, meId: MiUser['id'] | null): Promise<boolean> {
-		if (meId === packedNote.userId) return false;
+	private async hideNote(packedNote: Packed<'Note'>, meId: MiUser['id'] | null): Promise<void> {
+		if (meId === packedNote.userId) return;
 
 		// TODO: isVisibleForMe を使うようにしても良さそう(型違うけど)
+		let hide = false;
 
-		if (this.isSigninOrTimeHidden(packedNote, meId)) {
-			return true;
+		if (packedNote.user.requireSigninToViewContents && meId == null) {
+			hide = true;
+		}
+
+		if (!hide) {
+			const hiddenBefore = packedNote.user.makeNotesHiddenBefore;
+			if (shouldHideNoteByTime(hiddenBefore, packedNote.createdAt)) {
+				hide = true;
+			}
 		}
 
 		// visibility が specified かつ自分が指定されていなかったら非表示
-		if (packedNote.visibility === 'specified' && !this.isSpecifiedVisibleTo(packedNote, meId)) {
-			return true;
+		if (!hide) {
+			if (packedNote.visibility === 'specified') {
+				if (meId == null) {
+					hide = true;
+				} else {
+					// 指定されているかどうか
+					const specified = packedNote.visibleUserIds!.some(id => meId === id);
+
+					if (!specified) {
+						hide = true;
+					}
+				}
+			}
 		}
 
 		// visibility が followers かつ自分が投稿者のフォロワーでなかったら非表示
-		if (packedNote.visibility === 'followers' && !(await this.isFollowerVisibleTo(packedNote, meId))) {
-			return true;
+		if (!hide) {
+			if (packedNote.visibility === 'followers') {
+				if (meId == null) {
+					hide = true;
+				} else if (packedNote.reply && (meId === packedNote.reply.userId)) {
+					// 自分の投稿に対するリプライ
+					hide = false;
+				} else if (packedNote.mentions && packedNote.mentions.some(id => meId === id)) {
+					// 自分へのメンション
+					hide = false;
+				} else {
+					// フォロワーかどうか
+					// TODO: 当関数呼び出しごとにクエリが走るのは重そうだからなんとかする
+					const isFollowing = await this.followingsRepository.exists({
+						where: {
+							followeeId: packedNote.userId,
+							followerId: meId,
+						},
+					});
+
+					hide = !isFollowing;
+				}
+			}
 		}
 
-		return false;
-	}
-
-	@bindThis
-	public hideNote(packedNote: Packed<'Note'>): void {
-		packedNote.visibleUserIds = undefined;
-		packedNote.fileIds = [];
-		packedNote.files = [];
-		packedNote.text = null;
-		packedNote.poll = undefined;
-		packedNote.cw = null;
-		packedNote.isHidden = true;
-		// TODO: hiddenReason みたいなのを提供しても良さそう
+		if (hide) {
+			packedNote.visibleUserIds = undefined;
+			packedNote.fileIds = [];
+			packedNote.files = [];
+			packedNote.text = null;
+			packedNote.poll = undefined;
+			packedNote.cw = null;
+			packedNote.isHidden = true;
+			// TODO: hiddenReason みたいなのを提供しても良さそう
+		}
 	}
 
 	@bindThis
@@ -312,7 +309,7 @@ export class NoteEntityService implements OnModuleInit {
 
 	@bindThis
 	public async isVisibleForMe(note: MiNote, meId: MiUser['id'] | null): Promise<boolean> {
-		// This code must always be synchronized with the checks in QueryService.generateVisibilityQuery.
+		// This code must always be synchronized with the checks in generateVisibilityQuery.
 		// visibility が specified かつ自分が指定されていなかったら非表示
 		if (note.visibility === 'specified') {
 			if (meId == null) {
@@ -522,7 +519,6 @@ export class NoteEntityService implements OnModuleInit {
 			fileIds: note.fileIds,
 			files: packedFiles != null ? this.packAttachedFiles(note.fileIds, packedFiles, me) : this.driveFileEntityService.packManyByIds(note.fileIds, me),
 			replyId: note.replyId,
-			replyUserId: note.reply?.userId ?? note.replyUserId,
 			renoteId: note.renoteId,
 			channelId: note.channelId ?? undefined,
 			channel: channel ? {
@@ -582,8 +578,8 @@ export class NoteEntityService implements OnModuleInit {
 
 		this.treatVisibility(packed);
 
-		if (!opts.skipHide && await this.shouldHideNote(packed, meId)) {
-			this.hideNote(packed);
+		if (!opts.skipHide) {
+			await this.hideNote(packed, meId);
 		}
 
 		return packed;

@@ -267,6 +267,7 @@ const scheduledPaginator = markRaw(new Paginator('notes/drafts/list', {
 }));
 
 const currentDraftsCount = ref(0);
+
 async function reloadDraftCount() {
 	const count = await misskeyApi('notes/drafts/count');
 	currentDraftsCount.value = count;

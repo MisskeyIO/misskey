@@ -9,11 +9,14 @@ export class BirthdayIndex1767169026317 {
     async up(queryRunner) {
         const state = await inspectState(queryRunner);
         if (isCurrentState(state)) return;
-        if (!isLegacyState(state)) throw invalidStateError('適用前', state);
+        const isMixed = isMixedState(state);
+        if (!isMixed && !isLegacyState(state)) throw invalidStateError('適用前', state);
 
         await queryRunner.query(`DROP INDEX "public"."IDX_de22cd2b445eee31ae51cdbe99"`);
-        await queryRunner.query(`CREATE OR REPLACE FUNCTION get_birthday_date(birthday TEXT) RETURNS SMALLINT AS $$ BEGIN RETURN CAST((SUBSTR(birthday, 6, 2) || SUBSTR(birthday, 9, 2)) AS SMALLINT); END; $$ LANGUAGE plpgsql IMMUTABLE;`);
-        await queryRunner.query(`CREATE INDEX "IDX_USERPROFILE_BIRTHDAY_DATE" ON "user_profile" (get_birthday_date("birthday"))`);
+        if (!isMixed) {
+            await queryRunner.query(`CREATE OR REPLACE FUNCTION get_birthday_date(birthday TEXT) RETURNS SMALLINT AS $$ BEGIN RETURN CAST((SUBSTR(birthday, 6, 2) || SUBSTR(birthday, 9, 2)) AS SMALLINT); END; $$ LANGUAGE plpgsql IMMUTABLE;`);
+            await queryRunner.query(`CREATE INDEX "IDX_USERPROFILE_BIRTHDAY_DATE" ON "user_profile" (get_birthday_date("birthday"))`);
+        }
 
         const migratedState = await inspectState(queryRunner);
         if (!isCurrentState(migratedState)) throw invalidStateError('適用後', migratedState);
@@ -96,6 +99,14 @@ function isLegacyState({ indexes, functions }) {
 function isCurrentState({ indexes, functions }) {
     return indexes.length === 1
         && matchesIndex(indexes[0], currentIndexName, 'get_birthday_date((birthday)::text)')
+        && functions.length === 1
+        && matchesFunction(functions[0]);
+}
+
+function isMixedState({ indexes, functions }) {
+    return indexes.length === 2
+        && indexes.some(index => matchesIndex(index, legacyIndexName, 'substr((birthday)::text,6,5)'))
+        && indexes.some(index => matchesIndex(index, currentIndexName, 'get_birthday_date((birthday)::text)'))
         && functions.length === 1
         && matchesFunction(functions[0]);
 }

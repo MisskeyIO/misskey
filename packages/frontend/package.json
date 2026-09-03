@@ -50,6 +50,7 @@
     "estree-walker": "catalog:",
     "eventemitter3": "catalog:",
     "execa": "catalog:",
+    "exifreader": "catalog:",
     "frontend-shared": "workspace:*",
     "idb-keyval": "catalog:",
     "insert-text-at-cursor": "catalog:",

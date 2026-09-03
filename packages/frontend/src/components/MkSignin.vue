@@ -135,7 +135,7 @@ function onPasskeyDone(credential: AuthenticationResponseJSON): void {
 	waiting.value = true;
 
 	if (doingPasskeyFromInputPage.value) {
-		misskeyApi('signin-with-passkey', {
+		misskeyApi<Misskey.entities.SigninWithPasskeyResponse>('signin-with-passkey', {
 			credential,
 			context: passkeyContext.value,
 		}).then((res) => {

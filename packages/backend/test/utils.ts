@@ -343,7 +343,6 @@ export const uploadFile = async (user?: UserToken, { path, name, blob }: UploadO
 		: isAbsolute(path.toString())
 			? new URL(path)
 			: new URL(path, new URL('resources/', import.meta.url));
-
 	const uploadFilename = hasBlobName(blob) ? blob.name! : basename(absPath.toString());
 	const baseUrl = `http://127.0.0.1:${port}`;
 

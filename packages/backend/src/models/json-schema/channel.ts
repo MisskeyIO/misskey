@@ -85,6 +85,10 @@ export const packedChannelSchema = {
 			type: 'boolean',
 			optional: true, nullable: false,
 		},
+		isMuting: {
+			type: 'boolean',
+			optional: true, nullable: false,
+		},
 		pinnedNotes: {
 			type: 'array',
 			optional: true, nullable: false,

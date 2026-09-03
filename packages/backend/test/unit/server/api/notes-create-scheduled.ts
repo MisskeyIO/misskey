@@ -17,6 +17,7 @@ function dependencies(idempotent: string | null = null, reservationResult: 'OK' 
 	const noteCreateService = { fetchAndCreate: jest.fn() };
 	const noteDraftService = {
 		get: jest.fn(async (_me: unknown, _id: string) => idempotent === draft.id ? draft : null),
+		getByIdempotencyKey: jest.fn(async (_me: unknown, _key: string) => null as typeof draft | null),
 		create: jest.fn(async (_me: unknown, _data: unknown, _draftId?: string) => draft),
 	};
 	const endpoint = new NotesCreateEndpoint(
@@ -65,6 +66,7 @@ describe('notes/createの予約互換', () => {
 			noExtractMentions: true,
 			noExtractHashtags: true,
 			noExtractEmojis: true,
+			idempotencyKey: expect.any(String),
 		}), target.draft.id);
 		expect(target.redis.set).toHaveBeenCalledWith(expect.any(String), target.draft.id, 'EX', 30, 'NX');
 		expect(target.redis.set.mock.invocationCallOrder[0]).toBeLessThan(target.noteDraftService.create.mock.invocationCallOrder[0]);
@@ -78,6 +80,29 @@ describe('notes/createの予約互換', () => {
 		expect(target.noteDraftService.get).toHaveBeenCalledWith(expect.objectContaining({ id: 'userid' }), target.draft.id);
 		expect(target.noteDraftService.create).not.toHaveBeenCalled();
 		expect(target.noteCreateService.fetchAndCreate).not.toHaveBeenCalled();
+	});
+
+	test('Redisの記録がなくてもDBの同一予約を再作成しない', async () => {
+		const target = dependencies();
+		target.noteDraftService.getByIdempotencyKey.mockResolvedValue(target.draft);
+
+		await target.endpoint.exec({ text: 'test', scheduledAt: Date.now() + 60_000 }, { id: 'userid' } as never, null);
+
+		expect(target.noteDraftService.create).not.toHaveBeenCalled();
+		expect(target.noteCreateService.fetchAndCreate).not.toHaveBeenCalled();
+	});
+
+	test('同時挿入で競合してもDBの既存予約を採用する', async () => {
+		const target = dependencies();
+		target.noteDraftService.getByIdempotencyKey
+			.mockResolvedValueOnce(null)
+			.mockResolvedValueOnce(target.draft);
+		target.noteDraftService.create.mockRejectedValueOnce(new Error('duplicate'));
+
+		await expect(target.endpoint.exec({ text: 'test', scheduledAt: Date.now() + 60_000 }, { id: 'userid' } as never, null)).resolves.toBeUndefined();
+
+		expect(target.noteDraftService.getByIdempotencyKey).toHaveBeenCalledTimes(2);
+		expect(target.redis.unlinkIf).not.toHaveBeenCalled();
 	});
 
 	test('同時要求が予約済みなら別の下書きを作らない', async () => {

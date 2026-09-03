@@ -9,7 +9,7 @@ import * as assert from 'node:assert';
 import { setTimeout } from 'node:timers/promises';
 import type { INestApplicationContext } from '@nestjs/common';
 import type * as misskey from 'misskey-js';
-import { api, castAsError, signup, startJobQueue } from '../utils.js';
+import { api, castAsError, sendEnvUpdateRequest, signup, startJobQueue } from '../utils.js';
 
 type IoDraftFields = {
 	dimension: number | null;
@@ -153,6 +153,28 @@ describe('NoteDraft', () => {
 		assert.ok(scheduled);
 		assert.strictEqual(scheduled.reactionAcceptance, 'likeOnly');
 		assert.strictEqual(scheduled.poll?.expiredAfter, expiredAfter);
+	});
+
+	test('Redisの記録に頼らず同じ予約を一件だけ保存する', async () => {
+		const params = {
+			text: 'idempotent scheduled note',
+			scheduledAt: Date.now() + 300_000,
+		};
+
+		await sendEnvUpdateRequest({ key: 'FORCE_IGNORE_IDEMPOTENCY_FOR_TESTING', value: 'true' });
+		try {
+			const results = await Promise.all([
+				api('notes/create', params, alice),
+				api('notes/create', params, alice),
+			]);
+			assert.ok(results.every(result => result.status === 204));
+		} finally {
+			await sendEnvUpdateRequest({ key: 'FORCE_IGNORE_IDEMPOTENCY_FOR_TESTING', value: 'false' });
+		}
+
+		const listRes = await api('notes/drafts/list', { scheduled: true }, alice);
+		assert.strictEqual(listRes.status, 200);
+		assert.strictEqual(listRes.body.filter(item => item.text === params.text).length, 1);
 	});
 
 	test('予約投稿の投票期間は実投稿時から数える', async () => {

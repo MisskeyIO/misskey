@@ -15,6 +15,7 @@ import type { MiDriveFile } from './DriveFile.js';
 @Index('IDX_NOTE_DRAFT_FILE_IDS', { synchronize: false }) // GIN for fileIds in production
 @Index('IDX_NOTE_DRAFT_VISIBLE_USER_IDS', { synchronize: false }) // GIN for visibleUserIds in production
 @Index('IDX_note_draft_scheduled_recovery', { synchronize: false })
+@Index('IDX_note_draft_user_idempotency', ['userId', 'idempotencyKey'], { unique: true, where: '"idempotencyKey" IS NOT NULL' })
 export class MiNoteDraft {
 	@PrimaryColumn(id())
 	public id: string;
@@ -66,6 +67,12 @@ export class MiNoteDraft {
 		comment: 'The ID of author.',
 	})
 	public userId: MiUser['id'];
+
+	@Column('varchar', {
+		length: 64,
+		nullable: true,
+	})
+	public idempotencyKey: string | null;
 
 	@ManyToOne(type => MiUser, {
 		onDelete: 'CASCADE',

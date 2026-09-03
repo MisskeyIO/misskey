@@ -18,7 +18,9 @@ import { QueueService } from '@/core/QueueService.js';
 import type Logger from '@/logger.js';
 import { LoggerService } from '@/core/LoggerService.js';
 
-export type NoteDraftOptions = Omit<MiNoteDraft, 'id' | 'userId' | 'user' | 'reply' | 'renote' | 'channel' | 'scheduledFailureReason' | 'reservedNoteId'>;
+export type NoteDraftOptions = Omit<MiNoteDraft, 'id' | 'userId' | 'user' | 'reply' | 'renote' | 'channel' | 'scheduledFailureReason' | 'reservedNoteId' | 'idempotencyKey'> & {
+	idempotencyKey?: string | null;
+};
 
 export const INVALID_SCHEDULED_NOTE_ID = '4f5bb9ec-5c64-47e9-b21b-da977f45ae3d';
 
@@ -65,6 +67,14 @@ export class NoteDraftService {
 	}
 
 	@bindThis
+	public async getByIdempotencyKey(me: MiLocalUser, idempotencyKey: string): Promise<MiNoteDraft | null> {
+		return await this.noteDraftsRepository.findOneBy({
+			userId: me.id,
+			idempotencyKey,
+		});
+	}
+
+	@bindThis
 	public async create(me: MiLocalUser, data: NoteDraftOptions, draftId = this.idService.gen()): Promise<MiNoteDraft> {
 		//#region check draft limit
 		const policies = await this.roleService.getUserPolicies(me.id);
@@ -93,6 +103,7 @@ export class NoteDraftService {
 			...data,
 			id: draftId,
 			userId: me.id,
+			idempotencyKey: data.idempotencyKey ?? null,
 		});
 
 		if (draft.scheduledAt && draft.isActuallyScheduled) {

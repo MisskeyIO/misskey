@@ -65,7 +65,7 @@ export class NoteDraftService {
 	}
 
 	@bindThis
-	public async create(me: MiLocalUser, data: NoteDraftOptions): Promise<MiNoteDraft> {
+	public async create(me: MiLocalUser, data: NoteDraftOptions, draftId = this.idService.gen()): Promise<MiNoteDraft> {
 		//#region check draft limit
 		const policies = await this.roleService.getUserPolicies(me.id);
 
@@ -91,7 +91,7 @@ export class NoteDraftService {
 
 		const draft = await this.noteDraftsRepository.insertOne({
 			...data,
-			id: this.idService.gen(),
+			id: draftId,
 			userId: me.id,
 		});
 

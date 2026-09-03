@@ -14,6 +14,7 @@ import { Endpoint } from '@/server/api/endpoint-base.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { NoteCreateService } from '@/core/NoteCreateService.js';
 import { NoteDraftService } from '@/core/NoteDraftService.js';
+import { IdService } from '@/core/IdService.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import { DI } from '@/di-symbols.js';
@@ -289,6 +290,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		@Inject(DI.notesRepository)
 		private notesRepository: NotesRepository,
 
+		private idService: IdService,
 		private loggerService: LoggerService,
 		private noteEntityService: NoteEntityService,
 		private noteCreateService: NoteCreateService,
@@ -298,7 +300,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const logger = this.loggerService.getLogger('api:notes:create');
 			const hash = createHash('sha256').update(JSON.stringify(ps)).digest('base64');
 			const key = `note:idempotent:${me.id}:${hash}`;
-			const idempotent = process.env.FORCE_IGNORE_IDEMPOTENCY_FOR_TESTING !== 'true' ? await this.redisForTimelines.get(key) : null;
+			const ignoreIdempotency = process.env.FORCE_IGNORE_IDEMPOTENCY_FOR_TESTING === 'true';
+			const idempotent = !ignoreIdempotency ? await this.redisForTimelines.get(key) : null;
 
 			if (idempotent === '_') {
 				throw new ApiError(meta.errors.processing);
@@ -320,7 +323,13 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				if (draft != null) return;
 			}
 
-			await this.redisForTimelines.set(key, '_', 'EX', 30);
+			const reservation = ps.scheduledAt != null ? this.idService.gen() : '_';
+			const reserved = ignoreIdempotency
+				? await this.redisForTimelines.set(key, reservation, 'EX', 30)
+				: await this.redisForTimelines.set(key, reservation, 'EX', 30, 'NX');
+			if (reserved !== 'OK') {
+				throw new ApiError(meta.errors.processing);
+			}
 
 			try {
 				if (ps.scheduledAt != null) {
@@ -348,9 +357,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 						noExtractMentions: ps.noExtractMentions,
 						noExtractHashtags: ps.noExtractHashtags,
 						noExtractEmojis: ps.noExtractEmojis,
-					});
+					}, reservation);
 
-					await this.redisForTimelines.set(key, draft.id, 'EX', 60);
 					return;
 				}
 
@@ -388,7 +396,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					}),
 				};
 			} catch (err) {
-				await this.redisForTimelines.unlinkIf(key, '_');
+				await this.redisForTimelines.unlinkIf(key, reservation);
 				logger.error('ノートの作成に失敗しました。', {
 					errorName: err instanceof Error ? err.name : 'unknown',
 					errorId: err instanceof IdentifiableError ? err.id : undefined,

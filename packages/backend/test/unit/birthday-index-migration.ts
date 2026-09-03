@@ -40,6 +40,8 @@ const birthdayFunction = {
 	body: ' BEGIN RETURN CAST((SUBSTR(birthday, 6, 2) || SUBSTR(birthday, 9, 2)) AS SMALLINT); END; ',
 };
 
+const mutationQueries = (queries: string[]) => queries.filter(sql => sql.startsWith('CREATE') || sql.startsWith('DROP'));
+
 class MockQueryRunner {
 	public readonly queries: string[] = [];
 
@@ -84,5 +86,27 @@ describe('誕生日index migration', () => {
 
 		const drift = new MockQueryRunner([{ ...legacyIndex, isValid: false }], []);
 		await expect(migration.up(drift)).rejects.toThrow('適用前状態が不正です');
+	});
+
+	test('既知の混在状態では旧indexだけを削除する', async () => {
+		const migration = new BirthdayIndex1767169026317();
+		const mixed = new MockQueryRunner([currentIndex, legacyIndex], [birthdayFunction], true);
+
+		await migration.up(mixed);
+
+		expect(mixed.indexes).toEqual([currentIndex]);
+		expect(mixed.functions).toEqual([birthdayFunction]);
+		expect(mutationQueries(mixed.queries)).toEqual([
+			'DROP INDEX "public"."IDX_de22cd2b445eee31ae51cdbe99"',
+		]);
+	});
+
+	test('定義の異なる混在状態は変更せず拒否する', async () => {
+		const migration = new BirthdayIndex1767169026317();
+		const mixed = new MockQueryRunner([currentIndex, { ...legacyIndex, isValid: false }], [birthdayFunction]);
+
+		await expect(migration.up(mixed)).rejects.toThrow('適用前状態が不正です');
+
+		expect(mutationQueries(mixed.queries)).toEqual([]);
 	});
 });

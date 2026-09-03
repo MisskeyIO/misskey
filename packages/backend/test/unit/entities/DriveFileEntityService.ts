@@ -134,7 +134,7 @@ describe('DriveFileEntityService', () => {
 			const folder = await createFolder('pack-root', null);
 			const file = await createFile(folder.id, user.id);
 
-			const packed = await service.pack(file, { detail: false, self: true }) as any;
+			const packed = await service.pack(file, undefined, { detail: false, self: true }) as any;
 			expect(packed.id).toBe(file.id);
 			expect(packed.folder).toBeNull();
 			expect(packed.user).toBeNull();
@@ -146,7 +146,7 @@ describe('DriveFileEntityService', () => {
 			const child = await createFolder('pack-child', folder.id);
 			const file = await createFile(child.id, null);
 
-			const packed = await service.pack(file, { detail: true, self: true }) as any;
+			const packed = await service.pack(file, undefined, { detail: true, self: true }) as any;
 			expect(packed.folder?.id).toBe(child.id);
 			expect(packed.folder?.parent?.id).toBe(folder.id);
 		});
@@ -154,7 +154,7 @@ describe('DriveFileEntityService', () => {
 
 	describe('packNullable', () => {
 		test('returns null for missing', async () => {
-			const packed = await service.packNullable('non-existent' as any, { detail: false });
+			const packed = await service.packNullable('non-existent' as any, undefined, { detail: false });
 			expect(packed).toBeNull();
 		});
 
@@ -162,7 +162,7 @@ describe('DriveFileEntityService', () => {
 			const user = await createUser();
 			const file = await createFile(null, user.id);
 
-			const packed = await service.packNullable(file, { withUser: true, self: true }, {
+			const packed = await service.packNullable(file, undefined, { withUser: true, self: true }, {
 				packedUser: { id: user.id, username: 'hint' } as any,
 			});
 			expect(packed?.user?.id).toBe(user.id);
@@ -176,7 +176,7 @@ describe('DriveFileEntityService', () => {
 			const fileA = await createFile(null, user.id);
 			const fileB = await createFile(null, user.id);
 
-			const packed = await service.packMany([fileA, fileB], { withUser: true, self: true });
+			const packed = await service.packMany([fileA, fileB], undefined, { withUser: true, self: true });
 			expect(packed.length).toBe(2);
 			expect(userEntityServiceMock.packMany).toHaveBeenCalledTimes(1);
 			expect(userEntityServiceMock.packMany.mock.calls[0]?.[0]?.length).toBe(1);
@@ -187,7 +187,7 @@ describe('DriveFileEntityService', () => {
 			const folder = await createFolder('packmany-root', null);
 			const file = await createFile(folder.id, null);
 
-			const packed = await service.packMany([file], { detail: true, self: true });
+			const packed = await service.packMany([file], undefined, { detail: true, self: true });
 			expect(packed[0]?.folder?.id).toBe(folder.id);
 			expect(packed[0]?.folder?.parent).toBeUndefined();
 		});
@@ -197,7 +197,7 @@ describe('DriveFileEntityService', () => {
 			const file = await createFile(folder.id, null);
 			const packSpy = jest.spyOn(driveFolderEntityService, 'pack');
 
-			await service.packMany([file], { detail: true, self: true });
+			await service.packMany([file], undefined, { detail: true, self: true });
 			expect(packSpy).toHaveBeenCalled();
 			packSpy.mockRestore();
 		});
@@ -218,7 +218,7 @@ describe('DriveFileEntityService', () => {
 			}
 
 			const start = Date.now();
-			await service.packMany(files, { detail: true, withUser: true, self: true });
+			await service.packMany(files, undefined, { detail: true, withUser: true, self: true });
 			const elapsed = Date.now() - start;
 
 			console.log(`DriveFileEntityService.packMany benchmark: ${elapsed}ms`);

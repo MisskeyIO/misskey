@@ -245,8 +245,16 @@ export async function isFired<C extends keyof Misskey.Channels, T extends keyof 
 				}
 			}) as any);
 		});
-	});
-}
+
+		await trigger();
+		return await Promise.race([
+			receivePromise,
+			sleep(500).then(() => false),
+		]);
+	} finally {
+		stream.close();
+	}
+};
 
 export async function isNoteUpdatedEventFired(
 	host: Host,
@@ -269,18 +277,14 @@ export async function isNoteUpdatedEventFired(
 
 		await trigger();
 
-		await trigger().then(() => {
-			timer = setTimeout(() => {
-				stream.close();
-				resolve(false);
-			}, 500);
-		}).catch(err => {
-			stream.close();
-			clearTimeout(timer);
-			reject(err);
-		});
-	});
-}
+		return await Promise.race([
+			receivePromise,
+			sleep(500).then(() => false),
+		]);
+	} finally {
+		stream.close();
+	}
+};
 
 export async function assertNotificationReceived(
 	receiverHost: Host,

@@ -113,19 +113,6 @@ const REPEATABLE_SYSTEM_JOB_DEF = [{
 	pattern: '0 4 * * *',
 }];
 
-function parseRedisInfo(infoText: string): Record<string, string> {
-	const fields = infoText
-		.split('\n')
-		.filter(line => line.length > 0 && !line.startsWith('#'))
-		.map(line => line.trim().split(':'));
-
-	const result: Record<string, string> = {};
-	for (const [key, value] of fields) {
-		result[key] = value;
-	}
-	return result;
-}
-
 @Injectable()
 export class QueueService {
 	constructor(

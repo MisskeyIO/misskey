@@ -287,7 +287,7 @@ export class NoteDraftService {
 				id: In(data.visibleUserIds),
 			});
 		}
-		if (data.visibility === 'specified' && data.visibleUserIds != null && (new Set(data.visibleUserIds).size !== data.visibleUserIds.length || visibleUsers.length !== data.visibleUserIds.length)) {
+		if (data.visibility === 'specified' && data.visibleUserIds != null && (new Set(data.visibleUserIds).size !== data.visibleUserIds.length || _visibleUsers.length !== data.visibleUserIds.length)) {
 			throw new IdentifiableError('81df0c8d-2cfe-4e1a-9e93-b948ef455d9d', 'Visible users are missing or duplicated');
 		}
 		//#endregion

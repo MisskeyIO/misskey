@@ -279,9 +279,39 @@ export class DriveFileEntityService {
 		me: { id: MiUser['id'] } | null | undefined,
 		options?: PackOptions,
 	): Promise<Packed<'DriveFile'>[]> {
-		return (await Promise.allSettled(files.map(f => this.packNullable(f, me, options))))
-			.filter(result => result.status === 'fulfilled' && result.value != null)
-			.map(result => (result as PromiseFulfilledResult<Packed<'DriveFile'>>).value);
+		let userMap: Map<string, Packed<'UserLite'>> | null = null;
+		if (options?.withUser) {
+			const users = files
+				.map(({ user, userId }) => user ?? userId)
+				.filter(x => x != null);
+			const uniqueUsers = uniqueByKey(users, user => typeof user === 'string' ? user : user.id);
+			const packedUsers = await this.userEntityService.packMany(uniqueUsers, me);
+			userMap = new Map(packedUsers.map(user => [user.id, user]));
+		}
+
+		let folderMap: Map<string, Packed<'DriveFolder'>> | null = null;
+		if (options?.detail) {
+			const folders = files
+				.map(({ folder, folderId }) => folder ?? folderId)
+				.filter(x => x != null);
+			const uniqueFolders = uniqueByKey(folders, folder => typeof folder === 'string' ? folder : folder.id);
+			const packedFolders = await this.driveFolderEntityService.packMany(uniqueFolders, { detail: true });
+			folderMap = new Map(packedFolders.map(folder => [folder.id, folder]));
+		}
+
+		const items = (await Promise.allSettled(files.map(file => this.packNullable(
+			file,
+			me,
+			options,
+			{
+				packedUser: file.userId ? userMap?.get(file.userId) : undefined,
+				packedFolder: file.folderId ? folderMap?.get(file.folderId) : undefined,
+			},
+		))))
+			.filter(result => result.status === 'fulfilled')
+			.map(result => result.value);
+
+		return items.filter(item => item != null);
 	}
 
 	@bindThis

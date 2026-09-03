@@ -322,6 +322,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				const draft = await this.noteDraftService.get(me, idempotent);
 				if (draft != null) return;
 			}
+			if (ps.scheduledAt != null) {
+				const draft = await this.noteDraftService.getByIdempotencyKey(me, hash);
+				if (draft != null) return;
+			}
 
 			const reservation = ps.scheduledAt != null ? this.idService.gen() : '_';
 			const reserved = ignoreIdempotency
@@ -357,8 +361,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 						noExtractMentions: ps.noExtractMentions,
 						noExtractHashtags: ps.noExtractHashtags,
 						noExtractEmojis: ps.noExtractEmojis,
+						idempotencyKey: hash,
 					}, reservation);
 
+					await this.redisForTimelines.set(key, reservation, 'EX', 60);
 					return;
 				}
 
@@ -396,6 +402,13 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					}),
 				};
 			} catch (err) {
+				if (ps.scheduledAt != null) {
+					const draft = await this.noteDraftService.getByIdempotencyKey(me, hash);
+					if (draft != null) {
+						await this.redisForTimelines.set(key, draft.id, 'EX', 60);
+						return;
+					}
+				}
 				await this.redisForTimelines.unlinkIf(key, reservation);
 				logger.error('ノートの作成に失敗しました。', {
 					errorName: err instanceof Error ? err.name : 'unknown',

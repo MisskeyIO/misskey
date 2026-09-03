@@ -107,6 +107,14 @@ export class MiPage {
 	})
 	public visibility: 'public' | 'private';
 
+	@Index()
+	@Column({
+		...id(),
+		array: true,
+		default: '{}',
+	})
+	public visibleUserIds: MiUser['id'][];
+
 	@Column('integer', {
 		default: 0,
 	})

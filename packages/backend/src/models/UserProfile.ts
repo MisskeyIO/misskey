@@ -14,6 +14,7 @@ import type { MiDriveFile } from './DriveFile.js';
 // TODO: このテーブルで管理している情報すべてレジストリで管理するようにしても良いかも
 //       ただ、「emailVerified が true なユーザーを find する」のようなクエリは書けなくなるからウーン
 @Entity('user_profile')
+@Index('IDX_58699f75b9cf904f5f007909cb', { synchronize: false })
 export class MiUserProfile {
 	@PrimaryColumn(id())
 	public userId: MiUser['id'];

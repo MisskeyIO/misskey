@@ -14,6 +14,7 @@ import type { MiDriveFile } from './DriveFile.js';
 @Entity('note_draft')
 @Index('IDX_NOTE_DRAFT_FILE_IDS', { synchronize: false }) // GIN for fileIds in production
 @Index('IDX_NOTE_DRAFT_VISIBLE_USER_IDS', { synchronize: false }) // GIN for visibleUserIds in production
+@Index('IDX_note_draft_scheduled_recovery', { synchronize: false })
 export class MiNoteDraft {
 	@PrimaryColumn(id())
 	public id: string;

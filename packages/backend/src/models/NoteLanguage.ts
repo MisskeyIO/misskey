@@ -10,7 +10,7 @@ export class MiNoteLanguage {
 	@OneToOne(() => MiNote, {
 		onDelete: 'CASCADE',
 	})
-	@JoinColumn()
+	@JoinColumn({ foreignKeyConstraintName: 'FK_note_lang_note' })
 	public note: MiNote | null;
 
 	@Column('varchar', {

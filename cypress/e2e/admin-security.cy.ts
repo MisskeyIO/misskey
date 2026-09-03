@@ -21,7 +21,8 @@ describe('Admin security settings', () => {
 		cy.visit('/admin/security');
 	});
 
-	it('shows IndieAuth clients', () => {
+	it('shows authentication service settings', () => {
 		cy.contains('[data-cy-folder-header]', 'IndieAuth Clients').should('be.visible');
+		cy.contains('[data-cy-folder-header]', 'Single Sign-On Service Providers').should('be.visible');
 	});
 });

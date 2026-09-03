@@ -61,6 +61,7 @@ describe('After setup instance', () => {
   });
 
 	it('signup', () => {
+		cy.intercept('GET', 'https://api.pwnedpasswords.com/range/*', '');
 		cy.visitHome();
 
 		cy.intercept('POST', '/api/signup').as('signup');

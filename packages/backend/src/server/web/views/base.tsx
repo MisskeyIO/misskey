@@ -29,6 +29,7 @@ export function Layout(props: PropsWithChildren<CommonProps<{
 	// 変数名をsafeで始めることでエラーをスキップ
 	const safeMetaJson = props.metaJson;
 	const safeClientCtxJson = props.clientCtxJson;
+	const safeExtraHead = props.extraHead;
 
 	return (
 		<>
@@ -88,6 +89,8 @@ export function Layout(props: PropsWithChildren<CommonProps<{
 					{safeClientCtxJson != null ? <script type="application/json" id="misskey_clientCtx" data-generated-at={now}>{safeClientCtxJson}</script> : null}
 
 					{props.frontendBootloaderJs != null ? <script>{props.frontendBootloaderJs}</script> : <script src="/vite/loader/boot.js"></script>}
+
+					{safeExtraHead}
 				</head>
 				<body>
 					<noscript>

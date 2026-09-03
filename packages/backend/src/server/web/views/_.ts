@@ -42,6 +42,7 @@ export type CommonData = MinimumCommonData & {
 	frontendEmbedBootloaderCss: string | null;
 	metaJson?: string;
 	clientCtxJson?: string;
+	extraHead?: string;
 };
 
 export type CommonPropsMinimum<T = Record<string, any>> = MinimumCommonData & T;

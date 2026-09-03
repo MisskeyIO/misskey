@@ -30,6 +30,7 @@ const commonData = {
 	frontendBootloaderCss: null,
 	frontendEmbedBootloaderJs: null,
 	frontendEmbedBootloaderCss: null,
+	extraHead: '<meta name="custom-head" content="enabled">',
 } satisfies CommonData;
 
 describe('SsoPage', () => {
@@ -47,5 +48,6 @@ describe('SsoPage', () => {
 		expect(html).not.toContain('content=""><script>');
 		expect(html).toContain('name="misskey:sso:kind" content="jwt"');
 		expect(html).toContain('name="misskey:sso:prompt" content="consent"');
+		expect(html).toContain('<meta name="custom-head" content="enabled">');
 	});
 });

@@ -94,6 +94,7 @@ export class HtmlTemplateService {
 			frontendBootloaderCss: this.frontendBootloaderCss,
 			frontendEmbedBootloaderJs: this.frontendEmbedBootloaderJs,
 			frontendEmbedBootloaderCss: this.frontendEmbedBootloaderCss,
+			extraHead: this.config.extraHead,
 		};
 	}
 

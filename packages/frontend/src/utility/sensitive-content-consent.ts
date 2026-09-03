@@ -20,8 +20,8 @@ export function setSensitiveContentConsent(value: boolean): void {
 }
 
 async function openSensitiveContentConsent(): Promise<boolean> {
-	return await new Promise<boolean>(async (resolve) => {
-		await os.popup(defineAsyncComponent(() => import('@/components/MkSensitiveContentConsent.vue')), {}, {
+	return await new Promise<boolean>((resolve) => {
+		os.popup(defineAsyncComponent(() => import('@/components/MkSensitiveContentConsent.vue')), {}, {
 			decided: (allowed: boolean) => {
 				resolve(allowed);
 			},

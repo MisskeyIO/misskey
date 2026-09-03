@@ -33,7 +33,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<span :class="$style.headerRightButtonText">{{ targetChannel.name }}</span>
 				</button>
 			</template>
-			<button v-tooltip="i18n.ts._visibility.disableFederation" class="_button" :class="[$style.headerRightItem, { [$style.danger]: localOnly }]" :disabled="targetChannel != null || visibility === 'specified' || isPrivateDimension" @click="toggleLocalOnly">
+			<button v-if="visibility !== 'specified'" v-tooltip="i18n.ts._visibility.disableFederation" class="_button" :class="[$style.headerRightItem, { [$style.danger]: localOnly }]" :disabled="targetChannel != null || isPrivateDimension" @click="toggleLocalOnly">
 				<span v-if="!localOnly"><i class="ti ti-rocket"></i></span>
 				<span v-else><i class="ti ti-rocket-off"></i></span>
 			</button>
@@ -558,7 +558,6 @@ async function setVisibility() {
 	await os.popup(defineAsyncComponent(() => import('@/components/MkVisibilityPicker.vue')), {
 		currentVisibility: visibility.value,
 		isSilenced: $i.isSilenced,
-		localOnly: localOnly.value,
 		anchorElement: visibilityButton.value ?? undefined,
 		...(replyTargetNote.value ? { isReplyVisibilitySpecified: replyTargetNote.value.visibility === 'specified' } : {}),
 	}, {
@@ -836,13 +835,6 @@ async function onPaste(ev: ClipboardEvent) {
 		const { canceled } = await os.confirm({
 			type: 'info',
 			text: i18n.ts.quoteQuestion,
-		}).then(({ canceled }) => {
-			if (canceled) {
-				if (textareaEl.value) insertTextAtCursor(textareaEl.value, paste);
-				return;
-			}
-
-			quoteId.value = RegExp(/^\/notes\/(.+?)\/?$/).exec(paste.substring(url.length))?.[1] ?? null;
 		});
 
 		if (canceled) {
@@ -859,15 +851,6 @@ async function onPaste(ev: ClipboardEvent) {
 		const { canceled } = await os.confirm({
 			type: 'info',
 			text: i18n.ts.attachAsFileQuestion,
-		}).then(({ canceled }) => {
-			if (canceled) {
-				if (textareaEl.value) insertTextAtCursor(textareaEl.value, paste);
-				return;
-			}
-
-			const fileName = formatTimeString(new Date(), pastedFileName).replace(/{{number}}/g, '0');
-			const file = new File([paste], `${fileName}.txt`, { type: 'text/plain' });
-			uploader.addFiles([file]);
 		});
 
 		if (canceled) {
@@ -1075,7 +1058,7 @@ async function post(ev?: PointerEvent) {
 		channelId: targetChannel.value ? targetChannel.value.id : undefined,
 		poll: poll.value,
 		cw: useCw.value ? cw.value ?? '' : null,
-		localOnly: localOnly.value,
+		localOnly: visibility.value === 'specified' ? false : localOnly.value,
 		dimension: dimension.value,
 		visibility: visibility.value,
 		visibleUserIds: visibility.value === 'specified' ? visibleUsers.value.map(u => u.id) : undefined,
@@ -1337,7 +1320,7 @@ function showPerUploadItemMenu(item: UploaderItem, ev: MouseEvent) {
 	os.popupMenu(menu, ev.currentTarget ?? ev.target);
 }
 
-function showPerUploadItemMenuViaContextmenu(item: UploaderItem, ev: MouseEvent) {
+function showPerUploadItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	const menu = uploader.getMenu(item);
 	os.contextMenu(menu, ev);
 }

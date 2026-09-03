@@ -144,8 +144,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 				:myReaction="$appearNote.myReaction"
 				:noteId="appearNote.id"
 				:note="appearNote"
-				:maxNumber="16"
-				@mockUpdateMyReaction="emitUpdReaction"
 			/>
 			<button class="_button" :class="$style.noteFooterButton" @click="reply()">
 				<i class="ti ti-arrow-back-up"></i>
@@ -459,7 +457,9 @@ if (appearNote.reactionAcceptance === 'likeOnly') {
 }
 
 async function renote(): Promise<void> {
-	await pleaseLogin({ openOnRemote: pleaseLoginContext.value });
+	const isLoggedIn = await pleaseLogin({ openOnRemote: pleaseLoginContext.value });
+	if (!isLoggedIn) return;
+
 	showMovedDialog();
 
 	const { menu } = getRenoteMenu({ note: note, renoteButton });
@@ -470,7 +470,9 @@ async function renote(): Promise<void> {
 }
 
 async function reply(): Promise<void> {
-	await pleaseLogin({ openOnRemote: pleaseLoginContext.value });
+	const isLoggedIn = await pleaseLogin({ openOnRemote: pleaseLoginContext.value });
+	if (!isLoggedIn) return;
+
 	showMovedDialog();
 
 	os.post({
@@ -482,7 +484,9 @@ async function reply(): Promise<void> {
 }
 
 async function react(): Promise<void> {
-	await pleaseLogin({ openOnRemote: pleaseLoginContext.value });
+	const isLoggedIn = await pleaseLogin({ openOnRemote: pleaseLoginContext.value });
+	if (!isLoggedIn) return;
+
 	showMovedDialog();
 
 	if (appearNote.reactionAcceptance === 'likeOnly' || !$i?.policies.canUseReaction) {
@@ -595,7 +599,8 @@ async function reactionMuteToggle(reactionName: string | null) {
 
 async function showRenoteMenu(): Promise<void> {
 	if (!isMyRenote) return;
-	await pleaseLogin({ openOnRemote: pleaseLoginContext.value });
+	const isLoggedIn = await pleaseLogin({ openOnRemote: pleaseLoginContext.value });
+	if (!isLoggedIn) return;
 
 	os.popupMenu([{
 		text: i18n.ts.unrenote,

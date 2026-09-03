@@ -154,7 +154,8 @@ function shareWithNote() {
 
 async function like() {
 	if (!flash.value) return;
-	await pleaseLogin();
+	const isLoggedIn = await pleaseLogin();
+	if (!isLoggedIn) return;
 
 	os.apiWithDialog('flash/like', {
 		flashId: flash.value.id,
@@ -166,7 +167,8 @@ async function like() {
 
 async function unlike() {
 	if (!flash.value) return;
-	await pleaseLogin();
+	const isLoggedIn = await pleaseLogin();
+	if (!isLoggedIn) return;
 
 	const confirm = await os.confirm({
 		type: 'warning',

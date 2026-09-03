@@ -68,7 +68,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts">
 export type Result = string | number | true | null;
-export type MkDialogReturnType<T = Result> = { canceled: true, result: undefined } | { canceled: false, result: T };
+export type MkDialogReturnType<T = Result> =
+	{ canceled: true, result: undefined, toggle?: undefined } |
+	{ canceled: false, result: T, toggle?: boolean };
 </script>
 
 <script lang="ts" setup>
@@ -82,7 +84,8 @@ import MkSelect from '@/components/MkSelect.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
 import MkKeyValue from '@/components/MkKeyValue.vue';
-import type { MkSelectItem, OptionValue } from '@/components/MkSelect.vue';
+import type { MkSelectItem } from '@/components/MkSelect.vue';
+import type { OptionValue } from '@/types/option-value.js';
 import { useMkSelect } from '@/composables/use-mkselect.js';
 import { i18n } from '@/i18n.js';
 
@@ -145,7 +148,7 @@ const props = withDefaults(defineProps<{
 });
 
 const emit = defineEmits<{
-	(ev: 'done', v: { canceled: true } | { canceled: false, result: Result, toggle: boolean }): void;
+	(ev: 'done', v: MkDialogReturnType): void;
 	(ev: 'closed'): void;
 }>();
 
@@ -222,7 +225,7 @@ function done(canceled: true): void;
 function done(canceled: false, result: Result, toggle: boolean): void; // eslint-disable-line no-redeclare
 
 function done(canceled: boolean, result?: Result, toggle?: boolean ): void { // eslint-disable-line no-redeclare
-	emit('done', { canceled, result, toggle } as { canceled: true } | { canceled: false, result: Result, toggle: boolean });
+	emit('done', { canceled, result, toggle } as MkDialogReturnType);
 	modal.value?.close();
 }
 

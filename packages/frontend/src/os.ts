@@ -9,8 +9,8 @@ import { computed, defineAsyncComponent, markRaw, nextTick, ref } from 'vue';
 import { EventEmitter } from 'eventemitter3';
 import insertTextAtCursor from 'insert-text-at-cursor';
 import * as Misskey from 'misskey-js';
-import type { Component, InputHTMLAttributes, Ref } from 'vue';
-import type { ComponentProps as CP } from 'vue-component-type-helpers';
+import type { Component, InputHTMLAttributes, MaybeRef } from 'vue';
+import type { ComponentEmit, ComponentProps as CP } from 'vue-component-type-helpers';
 import type { Form, GetFormResultType } from '@/utility/form.js';
 import type { MenuItem } from '@/types/menu.js';
 import type { PostFormProps } from '@/types/post-form.js';
@@ -186,32 +186,31 @@ export function claimZIndex(priority: keyof typeof zIndexes = 'low'): number {
 	return zIndexes[priority];
 }
 
-// emit の型は $props から取り出す
-type ComponentEmit<T> = T extends new () => { $props: infer Props }
-	? [keyof Pick<T, Extract<keyof T, `on${string}`>>] extends [never]
-		? Record<string, unknown>
-		: EmitsExtractor<Props>
-	: T extends (...args: any) => any
-		? ReturnType<T> extends { [x: string]: any; __ctx?: { [x: string]: any; props: infer Props } }
-			? [keyof Pick<T, Extract<keyof T, `on${string}`>>] extends [never]
-				? Record<string, unknown>
-				: EmitsExtractor<Props>
-			: never
-		: never;
-
 // props に ref を許可するようにする
 type PropsWithRefs<P> = { [K in keyof P]: MaybeRef<P[K]> };
 type ComponentProps<T extends Component> = PropsWithRefs<CP<T>>;
 
-type EmitsExtractor<T> = {
-	[K in keyof T as K extends `onVnode${string}` ? never : K extends `on${infer E}` ? Uncapitalize<E> : K extends string ? never : K]: T[K];
+type FilterSpecificFunc<T> = T extends (...args: any[]) => void
+	? (any[] extends Parameters<T> ? never : T)
+	: T;
+
+type CleanFunctions<T> = {
+	[K in keyof T]: T[K] extends (...args: any[]) => any
+		? FilterSpecificFunc<T[K]>
+		: T[K];
 };
+
+type ComponentEmitsObject<C extends Component, IE = OverloadToUnion<ComponentEmit<C>>> = CleanFunctions<{
+	[K in IE extends (evName: infer U, ...args: any[]) => any ? U & PropertyKey : never]: IE extends (evName: K, ...args: infer A) => infer R
+		? (...args: A) => R
+		: (...args: any[]) => void;
+}>;
 
 export function popup<T extends Component>(
 	component: T,
 	props: ComponentProps<T>,
-	events: ComponentEmit<T> = {} as ComponentEmit<T>,
-	disposeEvent?: keyof ComponentEmit<T>,
+	events: Partial<ComponentEmitsObject<T>> = {},
+	disposeEvent?: keyof ComponentEmitsObject<T>,
 ): { dispose: () => void } {
 	markRaw(component);
 
@@ -311,8 +310,8 @@ export function alert(props: {
 	okWaitInitiate?: 'dialog' | 'input' | 'switch';
 	okWaitDuration?: number;
 }): Promise<void> {
-	return new Promise(async (resolve) => {
-		await popup(MkDialog, props, {
+	return new Promise((resolve) => {
+		popup(MkDialog, props, {
 			done: () => {
 				resolve();
 			},
@@ -331,8 +330,8 @@ export function confirm(props: {
 	okWaitDuration?: number;
 	cancelText?: string;
 }): Promise<{ canceled: boolean, result?: string | number | true | null, toggle?: boolean }> {
-	return new Promise(async (resolve) => {
-		await popup(MkDialog, {
+	return new Promise((resolve) => {
+		popup(MkDialog, {
 			...props,
 			showCancelButton: true,
 		}, {
@@ -361,8 +360,8 @@ export function actions<const T extends ActionsAction[]>(props: {
 } | {
 	canceled: false; result: T[number]['value'];
 }> {
-	return new Promise(async (resolve) => {
-		await popup(MkDialog, {
+	return new Promise((resolve) => {
+		popup(MkDialog, {
 			...props,
 			actions: props.actions.map(a => ({
 				text: a.text,
@@ -426,8 +425,8 @@ export function inputText(props: {
 } | {
 	canceled: false; result: string | null;
 }> {
-	return new Promise(async (resolve) => {
-		await popup(MkDialog, {
+	return new Promise((resolve) => {
+		popup(MkDialog, {
 			title: props.title ?? undefined,
 			text: props.text ?? undefined,
 			input: {
@@ -440,7 +439,11 @@ export function inputText(props: {
 			},
 		}, {
 			done: result => {
-				resolve(typeof result.result === 'string' ? result : { canceled: true, result: undefined });
+				if (!result.canceled && typeof result.result === 'string') {
+					resolve({ canceled: false, result: result.result });
+				} else {
+					resolve({ canceled: true, result: undefined });
+				}
 			},
 		}, 'closed');
 	});
@@ -489,8 +492,8 @@ export function inputNumber(props: {
 } | {
 	canceled: false; result: number | null;
 }> {
-	return new Promise(async (resolve) => {
-		await popup(MkDialog, {
+	return new Promise((resolve) => {
+		popup(MkDialog, {
 			title: props.title ?? undefined,
 			text: props.text ?? undefined,
 			input: {
@@ -520,8 +523,8 @@ export function inputDatetime(props: {
 } | {
 	canceled: false; result: Date;
 }> {
-	return new Promise(async (resolve) => {
-		await popup(MkDialog, {
+	return new Promise((resolve) => {
+		popup(MkDialog, {
 			title: props.title ?? undefined,
 			text: props.text ?? undefined,
 			input: {
@@ -531,7 +534,7 @@ export function inputDatetime(props: {
 			},
 		}, {
 			done: result => {
-				const date = result ? new Date(result.result) : undefined;
+				const date = !result.canceled && typeof result.result === 'string' ? new Date(result.result) : undefined;
 				if (date && !isNaN(date.getTime())) {
 					resolve({ result: date, canceled: false });
 				} else {
@@ -563,8 +566,8 @@ export function authenticateDialog(): Promise<{
 } | {
 	canceled: false; result: { password: string; token: string | null; };
 }> {
-	return new Promise(async (resolve) => {
-		await popup(defineAsyncComponent(() => import('@/components/MkPasswordDialog.vue')), {}, {
+	return new Promise((resolve) => {
+		popup(defineAsyncComponent(() => import('@/components/MkPasswordDialog.vue')), {}, {
 			done: result => {
 				resolve(result ? { canceled: false, result } : { canceled: true, result: undefined });
 			},
@@ -582,8 +585,8 @@ export function select<C extends OptionValue, D extends C | null = null>(props: 
 } | {
 	canceled: false; result: Exclude<D, undefined> extends null ? C | null : C;
 }> {
-	return new Promise(async (resolve) => {
-		await popup(MkDialog, {
+	return new Promise((resolve) => {
+		popup(MkDialog, {
 			title: props.title ?? undefined,
 			text: props.text ?? undefined,
 			select: {
@@ -599,12 +602,12 @@ export function select<C extends OptionValue, D extends C | null = null>(props: 
 }
 
 export function success(): Promise<void> {
-	return new Promise(async (resolve) => {
+	return new Promise((resolve) => {
 		const showing = ref(true);
 		window.setTimeout(() => {
 			showing.value = false;
 		}, 1000);
-		await popup(MkWaitingDialog, {
+		popup(MkWaitingDialog, {
 			success: true,
 			showing: showing,
 		}, {
@@ -646,12 +649,12 @@ export function waiting(options: { text?: string } = {}) {
 }
 
 export function form<F extends Form>(title: string, f: F): Promise<{
-	canceled: true; result: undefined;
+	canceled: true; result?: undefined;
 } | {
-	canceled: false; result: GetFormResultType<F>;
+	canceled?: false; result: GetFormResultType<F>;
 }> {
-	return new Promise(async (resolve) => {
-		await popup(defineAsyncComponent(() => import('@/components/MkFormDialog.vue')), { title, form: f }, {
+	return new Promise((resolve) => {
+		popup(defineAsyncComponent(() => import('@/components/MkFormDialog.vue')), { title, form: f }, {
 			done: result => {
 				resolve(result as { canceled?: false, result: GetFormResultType<F> });
 			},
@@ -663,8 +666,8 @@ export async function selectUser(opts: {
 	includeSelf?: boolean;
 	localOnly?: boolean;
 } = {}): Promise<Misskey.entities.UserDetailed> {
-	return new Promise(async (resolve) => {
-		await popup(defineAsyncComponent(() => import('@/components/MkUserSelectDialog.vue')), {
+	return new Promise((resolve) => {
+		popup(defineAsyncComponent(() => import('@/components/MkUserSelectDialog.vue')), {
 			includeSelf: opts.includeSelf,
 			localOnly: opts.localOnly,
 		}, {
@@ -679,8 +682,8 @@ export async function selectRole(params: ComponentProps<typeof MkRoleSelectDialo
 	{ canceled: true; result: undefined; } |
 	{ canceled: false; result: Misskey.entities.Role[] }
 > {
-	return new Promise(async (resolve) => {
-		await popup(defineAsyncComponent(() => import('@/components/MkRoleSelectDialog.vue')), params, {
+	return new Promise((resolve) => {
+		popup(defineAsyncComponent(() => import('@/components/MkRoleSelectDialog.vue')), params, {
 			done: roles => {
 				resolve({ canceled: false, result: roles });
 			},
@@ -692,8 +695,8 @@ export async function selectRole(params: ComponentProps<typeof MkRoleSelectDialo
 }
 
 export async function pickEmoji(anchorElement: HTMLElement, opts: ComponentProps<typeof MkEmojiPickerDialog_TypeReferenceOnly>): Promise<string> {
-	return new Promise(async resolve => {
-		await popup(defineAsyncComponent(() => import('@/components/MkEmojiPickerDialog.vue')), {
+	return new Promise(resolve => {
+		popup(defineAsyncComponent(() => import('@/components/MkEmojiPickerDialog.vue')), {
 			anchorElement,
 			...opts,
 		}, {
@@ -706,9 +709,9 @@ export async function pickEmoji(anchorElement: HTMLElement, opts: ComponentProps
 
 export async function cropImageFile<F extends File | Blob>(imageFile: F, options: {
 	aspectRatio: number | null;
-}): Promise<File> {
-	return new Promise(async resolve => {
-		await popup(defineAsyncComponent(() => import('@/components/MkCropperDialog.vue')), {
+}): Promise<F> {
+	return new Promise(resolve => {
+		popup(defineAsyncComponent(() => import('@/components/MkCropperDialog.vue')), {
 			imageFile: imageFile,
 			aspectRatio: options.aspectRatio,
 		}, {
@@ -772,7 +775,7 @@ export async function openEmojiPicker(src: HTMLElement, opts: ComponentProps<typ
 		characterData: false,
 	});
 
-	openingEmojiPicker = await popup(MkEmojiPickerWindow, {
+	openingEmojiPicker = popup(MkEmojiPickerWindow, {
 		src,
 		pinnedEmojis,
 		...opts,
@@ -830,8 +833,8 @@ export function contextMenu(items: MenuItem[], ev: PointerEvent): Promise<void> 
 
 	let returnFocusTo = getHTMLElementOrNull(ev.currentTarget ?? ev.target) ?? getHTMLElementOrNull(window.document.activeElement);
 	ev.preventDefault();
-	return new Promise(resolve => nextTick(async () => {
-		const { dispose } = await popup(MkContextMenu, {
+	return new Promise(resolve => nextTick(() => {
+		const { dispose } = popup(MkContextMenu, {
 			items,
 			ev,
 		}, {
@@ -850,7 +853,7 @@ export function contextMenu(items: MenuItem[], ev: PointerEvent): Promise<void> 
 }
 
 export async function post(props: PostFormProps = {}): Promise<void> {
-	await pleaseLogin({
+	const isLoggedIn = await pleaseLogin({
 		openOnRemote: (props.initialText || props.initialNote ? {
 			type: 'share',
 			params: {
@@ -860,15 +863,17 @@ export async function post(props: PostFormProps = {}): Promise<void> {
 			},
 		} : undefined),
 	});
+	if (!isLoggedIn) return;
+
 	showMovedDialog();
 
-	return new Promise(async (resolve) => {
+	return new Promise((resolve) => {
 		// NOTE: MkPostFormDialogをdynamic importするとiOSでテキストエリアに自動フォーカスできない
 		// NOTE: ただ、dynamic importしない場合、MkPostFormDialogインスタンスが使いまわされ、
 		//       Vueが渡されたコンポーネントに内部的に__propsというプロパティを生やす影響で、
 		//       複数のpost formを開いたときに場合によってはエラーになる
 		//       もちろん複数のpost formを開けること自体Misskeyサイドのバグなのだが
-		const { dispose } = await popup(MkPostFormDialog, props, {
+		const { dispose } = popup(MkPostFormDialog, props, {
 			closed: () => {
 				resolve();
 				dispose();

@@ -117,22 +117,30 @@ async function reveal(ev: PointerEvent) {
 	}
 
 	if (hide.value) {
+		ev.preventDefault();
 		ev.stopPropagation();
-		if (!(await canRevealFile(props.image))) {
+
+		if (props.image.isSensitive && !$i) {
+			await pleaseLogin();
 			return;
+		}
+
+		if (props.image.isSensitive && sensitiveContentConsent.value !== true) {
+			const allowed = await requestSensitiveContentConsent();
+			if (!allowed) return;
+		}
+
+		if (props.image.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
+			const { canceled } = await os.confirm({
+				type: 'question',
+				text: i18n.ts.sensitiveMediaRevealConfirm,
+			});
+			if (canceled) return;
 		}
 
 		hide.value = false;
 	}
 }
-
-// Plugin:register_note_view_interruptor を使って書き換えられる可能性があるためwatchする
-watch(() => props.image, (newImage) => {
-	hide.value = shouldHideFileByDefault(newImage);
-}, {
-	deep: true,
-	immediate: true,
-});
 
 function getMenu() {
 	const menuItems: MenuItem[] = [];
@@ -150,10 +158,11 @@ function getMenu() {
 			text: i18n.ts.saveThisFile,
 			icon: 'ti ti-cloud-upload',
 			action: () => {
-				selectDriveFolder(null).then(async folder => {
+				selectDriveFolder(null).then(({ canceled, folders }) => {
+					if (canceled) return;
 					misskeyApi('drive/files/upload-from-url', {
 						url: props.image.url,
-						folderId: folder[0]?.id,
+						folderId: folders[0]?.id,
 					});
 				});
 			},
@@ -220,33 +229,12 @@ function getMenu() {
 	return menuItems;
 }
 
-async function showHiddenContent(ev: MouseEvent) {
-	if (!props.controls || !hide.value) {
-		return;
-	}
+function showMenu(ev: PointerEvent) {
+	os.popupMenu(getMenu(), (ev.currentTarget ?? ev.target ?? undefined) as HTMLElement | undefined);
+}
 
-	ev.preventDefault();
-	ev.stopPropagation();
-
-	if (props.image.isSensitive && !$i) {
-		await pleaseLogin();
-		return;
-	}
-
-	if (props.image.isSensitive && sensitiveContentConsent.value !== true) {
-		const allowed = await requestSensitiveContentConsent();
-		if (!allowed) return;
-	}
-
-	if (props.image.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
-		const { canceled } = await os.confirm({
-			type: 'question',
-			text: i18n.ts.sensitiveMediaRevealConfirm,
-		});
-		if (canceled) return;
-	}
-
-	hide.value = false;
+function onContextmenu(ev: PointerEvent) {
+	os.contextMenu(getMenu(), ev);
 }
 
 function toggleSensitive(file: Misskey.entities.DriveFile) {

@@ -4,7 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<div>
+<div :class="$style.root">
 	<XBanner v-for="media in bannerMediaList" :key="media.id" :media="media" :user="user"/>
 	<div v-if="count > 0" :class="$style.container">
 		<div
@@ -113,8 +113,10 @@ const buildLightbox = (): PhotoSwipeLightbox | null => {
 				src: media.url,
 				w: media.properties.width,
 				h: media.properties.height,
-				alt: media.comment ?? media.name,
-				comment: media.comment ?? media.name,
+				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+				alt: media.comment || media.name,
+				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+				comment: media.comment || media.name,
 			};
 			if (media.properties.orientation != null && media.properties.orientation >= 5) {
 				[item.w, item.h] = [item.h, item.w];

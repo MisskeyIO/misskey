@@ -171,10 +171,12 @@ import MkSwitch from '@/components/MkSwitch.vue';
 
 const meta = await misskeyApi('admin/meta');
 
-const clientOptions = meta.clientOptions as Partial<ClientOptions>;
-const entrancePageStyle = ref<ClientOptions['entrancePageStyle']>(clientOptions.entrancePageStyle ?? 'classic');
-const showTimelineForVisitor = ref<ClientOptions['showTimelineForVisitor']>(clientOptions.showTimelineForVisitor ?? true);
-const showActivitiesForVisitor = ref<ClientOptions['showActivitiesForVisitor']>(clientOptions.showActivitiesForVisitor ?? true);
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+const entrancePageStyle = ref<Misskey.entities.MetaClientOptions['entrancePageStyle']>(meta.clientOptions.entrancePageStyle ?? 'classic');
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+const showTimelineForVisitor = ref<Misskey.entities.MetaClientOptions['showTimelineForVisitor']>(meta.clientOptions.showTimelineForVisitor ?? true);
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+const showActivitiesForVisitor = ref<Misskey.entities.MetaClientOptions['showActivitiesForVisitor']>(meta.clientOptions.showActivitiesForVisitor ?? true);
 const iconUrl = ref(meta.iconUrl);
 const app192IconUrl = ref(meta.app192IconUrl);
 const app512IconUrl = ref(meta.app512IconUrl);

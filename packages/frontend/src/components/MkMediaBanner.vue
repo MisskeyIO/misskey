@@ -27,6 +27,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import { i18n } from '@/i18n.js';
+import * as os from '@/os.js';
 import MkMediaAudio from '@/components/MkMediaAudio.vue';
 import { pleaseLogin } from '@/utility/please-login.js';
 import { sensitiveContentConsent, requestSensitiveContentConsent } from '@/utility/sensitive-content-consent.js';

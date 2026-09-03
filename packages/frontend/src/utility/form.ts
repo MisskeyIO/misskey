@@ -34,6 +34,7 @@ export interface NumberFormItem extends FormItemBase {
 	description?: string;
 	required?: boolean;
 	step?: number;
+	manualSave?: boolean;
 	min?: number;
 	max?: number;
 }

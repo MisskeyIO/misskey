@@ -48,68 +48,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts">
-import { Comment, defineComponent, h, ref, watch } from 'vue';
-import type { VNode } from 'vue';
-import MkRadio from './MkRadio.vue';
+import type { StyleValue } from 'vue';
+import type { OptionValue } from '@/types/option-value.js';
 
-export default defineComponent({
-	props: {
-		modelValue: {
-			required: false,
-		},
-		vertical: {
-			type: Boolean,
-			default: false,
-		},
-		disabled: {
-			type: Boolean,
-			default: false,
-		},
-	},
-	setup(props, context) {
-		const value = ref(props.modelValue);
-		watch(value, () => {
-			context.emit('update:modelValue', value.value);
-		});
-		watch(() => props.modelValue, v => {
-			value.value = v;
-		});
-		if (!context.slots.default) return null;
-		let options = context.slots.default();
-		const label = context.slots.label && context.slots.label();
-		const caption = context.slots.caption && context.slots.caption();
-
-		// なぜかFragmentになることがあるため
-		if (options.length === 1 && options[0].props == null) options = options[0].children as VNode[];
-
-		// vnodeのうちv-if=falseなものを除外する(trueになるものはoptionなど他typeになる)
-		options = options.filter(vnode => vnode.type !== Comment);
-
-		return () => h('div', {
-			class: [
-				'novjtcto',
-				...(props.vertical ? ['vertical'] : []),
-			],
-		}, [
-			...(label ? [h('div', {
-				class: 'label',
-			}, label)] : []),
-			h('div', {
-				class: 'body',
-			}, options.map(option => h(MkRadio, {
-				key: option.key as string,
-				value: option.props?.value,
-				disabled: props.disabled || option.props?.disabled,
-				modelValue: value.value,
-				'onUpdate:modelValue': _v => value.value = _v,
-			}, () => option.children)),
-			),
-			...(caption ? [h('div', {
-				class: 'caption',
-			}, caption)] : []),
-		]);
-	},
-});
+export type MkRadiosOption<T = OptionValue, S = string> = {
+	value: T;
+	slotId?: S;
+	label?: string;
+	labelStyle?: StyleValue;
+	icon?: string;
+	iconStyle?: StyleValue;
+	caption?: string;
+	disabled?: boolean;
+};
 </script>
 
 <script setup lang="ts" generic="const T extends MkRadiosOption">

@@ -118,7 +118,7 @@ const onContextmenu = (ev) => {
 			os.pageWindow(path);
 		},
 	}], ev);
-}
+};
 </script>
 
 <style lang="scss" module>

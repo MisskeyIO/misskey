@@ -7,6 +7,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 <PageWithHeader :actions="headerActions" :tabs="headerTabs">
 	<div class="_spacer" style="--MI_SPACER-w: 900px;">
 		<div class="_gaps">
+			<MkInfo>{{ i18n.ts._announcement.shouldNotBeUsedToPresentPermanentInfo }}</MkInfo>
+			<MkInfo v-if="announcementsStatus === 'active' && announcements.length > 5" warn>{{ i18n.ts._announcement.tooManyActiveAnnouncementDescription }}</MkInfo>
+
 			<MkFolder>
 				<template #label>{{ i18n.ts.options }}</template>
 
@@ -154,11 +157,11 @@ const loading = ref(true);
 const fetching = ref(false);
 let fetchSequence = 0;
 
-const announcements = ref<(Omit<Misskey.entities.AdminAnnouncementsListResponse[number], 'id' | 'createdAt' | 'updatedAt' | 'reads' | 'isActive'> & {
+const announcements = ref<(Omit<misskey.entities.AdminAnnouncementsListResponse[number], 'id' | 'createdAt' | 'updatedAt' | 'reads' | 'isActive'> & {
 	id: string | null;
 	_id?: string;
-	isActive?: Misskey.entities.AdminAnnouncementsListResponse[number]['isActive'];
-	reads?: Misskey.entities.AdminAnnouncementsListResponse[number]['reads'];
+	isActive?: misskey.entities.AdminAnnouncementsListResponse[number]['isActive'];
+	reads?: misskey.entities.AdminAnnouncementsListResponse[number]['reads'];
 })[]>([]);
 
 function selectUserFilter(): void {

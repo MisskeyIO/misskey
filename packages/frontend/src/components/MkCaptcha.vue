@@ -151,6 +151,11 @@ function reset() {
 	testcaptchaPassed.value = false;
 	testcaptchaInput.value = '';
 	emit('update:modelValue', null);
+
+	if (mCaptchaReciever != null) {
+		mCaptchaReciever.destroy();
+		mCaptchaReciever = null;
+	}
 }
 
 function remove() {

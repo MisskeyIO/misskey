@@ -332,8 +332,8 @@ export async function getAccountMenu(opts: {
 }
 
 export function getAccountWithSigninDialog(): Promise<{ id: string, token: string } | null> {
-	return new Promise(async (resolve) => {
-		await popup(defineAsyncComponent(() => import('@/components/MkSigninDialog.vue')), {}, {
+	return new Promise((resolve) => {
+		popup(defineAsyncComponent(() => import('@/components/MkSigninDialog.vue')), {}, {
 			done: async (res: Misskey.entities.SigninFlowResponse & { finished: true }) => {
 				const user = await fetchAccount(res.i, res.id, true);
 				await addAccount(host, user, res.i);
@@ -347,8 +347,8 @@ export function getAccountWithSigninDialog(): Promise<{ id: string, token: strin
 }
 
 export function getAccountWithSignupDialog(): Promise<{ id: string, token: string } | null> {
-	return new Promise(async (resolve) => {
-		await popup(defineAsyncComponent(() => import('@/components/MkSignupDialog.vue')), {}, {
+	return new Promise((resolve) => {
+		popup(defineAsyncComponent(() => import('@/components/MkSignupDialog.vue')), {}, {
 			done: async (res: Misskey.entities.SignupResponse) => {
 				const user = JSON.parse(JSON.stringify(res));
 				delete user.token;

@@ -566,6 +566,10 @@ export const meta = {
 				type: 'number',
 				optional: false, nullable: false,
 			},
+			showRoleBadgesOfRemoteUsers: {
+				type: 'boolean',
+				optional: false, nullable: false,
+			},
 		},
 	},
 } as const;
@@ -710,6 +714,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				enableRemoteNotesCleaning: instance.enableRemoteNotesCleaning,
 				remoteNotesCleaningExpiryDaysForEachNotes: instance.remoteNotesCleaningExpiryDaysForEachNotes,
 				remoteNotesCleaningMaxProcessingDurationInMinutes: instance.remoteNotesCleaningMaxProcessingDurationInMinutes,
+				showRoleBadgesOfRemoteUsers: instance.showRoleBadgesOfRemoteUsers,
 			};
 		});
 	}

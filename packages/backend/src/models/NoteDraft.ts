@@ -14,6 +14,8 @@ import type { MiDriveFile } from './DriveFile.js';
 @Entity('note_draft')
 @Index('IDX_NOTE_DRAFT_FILE_IDS', { synchronize: false }) // GIN for fileIds in production
 @Index('IDX_NOTE_DRAFT_VISIBLE_USER_IDS', { synchronize: false }) // GIN for visibleUserIds in production
+@Index('IDX_note_draft_scheduled_recovery', { synchronize: false })
+@Index('IDX_note_draft_user_idempotency', ['userId', 'idempotencyKey'], { unique: true, where: '"idempotencyKey" IS NOT NULL' })
 export class MiNoteDraft {
 	@PrimaryColumn(id())
 	public id: string;
@@ -66,6 +68,12 @@ export class MiNoteDraft {
 	})
 	public userId: MiUser['id'];
 
+	@Column('varchar', {
+		length: 64,
+		nullable: true,
+	})
+	public idempotencyKey: string | null;
+
 	@ManyToOne(type => MiUser, {
 		onDelete: 'CASCADE',
 	})
@@ -86,11 +94,6 @@ export class MiNoteDraft {
 		length: 32, nullable: true,
 	})
 	public lang: string | null;
-
-	@Column('timestamp with time zone', {
-		nullable: true,
-	})
-	public scheduledAt: Date | null;
 
 	@Column('varchar', {
 		length: 64, nullable: true,
@@ -141,7 +144,7 @@ export class MiNoteDraft {
 	@JoinColumn()
 	public channel: MiChannel | null;
 
-	// 以下、Pollについて追加
+	//#region 以下、Pollについて追加
 
 	@Column('boolean', {
 		default: false,
@@ -166,13 +169,45 @@ export class MiNoteDraft {
 	})
 	public pollExpiredAfter: number | null;
 
-	// ここまで追加
+	//#endregion
 
-	constructor(data: Partial<MiNoteDraft>) {
-		if (data == null) return;
+	// 予約日時
+	// これがあるだけでは実際に予約されているかどうかはわからない
+	@Column('timestamp with time zone', {
+		nullable: true,
+	})
+	public scheduledAt: Date | null;
 
-		for (const [k, v] of Object.entries(data)) {
-			(this as any)[k] = v;
-		}
-	}
+	// scheduledAtに基づいて実際にスケジュールされているか
+	@Column('boolean', {
+		default: false,
+	})
+	public isActuallyScheduled: boolean;
+
+	@Column('varchar', {
+		length: 256,
+		nullable: true,
+	})
+	public scheduledFailureReason: string | null;
+
+	@Column('boolean', {
+		default: false,
+	})
+	public noExtractMentions: boolean;
+
+	@Column('boolean', {
+		default: false,
+	})
+	public noExtractHashtags: boolean;
+
+	@Column('boolean', {
+		default: false,
+	})
+	public noExtractEmojis: boolean;
+
+	@Column({
+		...id(),
+		nullable: true,
+	})
+	public reservedNoteId: MiNote['id'] | null;
 }

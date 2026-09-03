@@ -415,7 +415,7 @@ async function createPluginEnv(opts: { plugin: Plugin; storageKey: string }): Pr
 		'Plugin:register:note_view_interruptor': values.FN_NATIVE(([handler]) => {
 			utils.assertFunction(handler);
 			addPluginHandler(id, 'note_view_interruptor', {
-				handler: withContext(ctx => (note) => {
+				handler: (note) => withContext(ctx => {
 					return utils.valToJs(ctx.execFnSync(handler, [utils.jsToVal(note)])) as Misskey.entities.Note | null;
 				}),
 			});

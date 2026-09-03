@@ -47,9 +47,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							{{ submitText }}
 						</span>
 					</template>
-					<span>
-						<i :class="posted ? 'ti ti-check' : replyTargetNote ? 'ti ti-arrow-back-up' : renoteTargetNote ? 'ti ti-quote' : 'ti ti-send'"></i>
-					</span>
+					<i style="margin-left: 6px;" :class="submitIcon"></i>
 				</div>
 			</button>
 		</div>
@@ -70,6 +68,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<button class="_buttonPrimary" style="padding: 4px; border-radius: 8px;" @click="addVisibleUser"><i class="ti ti-plus ti-fw"></i></button>
 		</div>
 	</div>
+	<MkInfo v-if="scheduledAt != null" :class="$style.scheduledAt">
+		<I18n :src="i18n.ts.scheduleToPostOnX" tag="span">
+			<template #x>
+				<MkTime :time="scheduledAt" :mode="'detail'" style="font-weight: bold;"/>
+			</template>
+		</I18n> - <button class="_textButton" @click="cancelSchedule()">{{ i18n.ts.cancel }}</button>
+		<div v-if="scheduledTimeExceededPolicy" style="margin-top: 4px; color: var(--MI_THEME-infoWarnFg)">
+			<Mfm :text="i18n.tsx._postForm.policyScheduleNoteMaxDaysExceeded({ max: $i.policies.scheduleNoteMaxDays })"/>
+		</div>
+	</MkInfo>
 	<MkInfo v-if="hasNotSpecifiedMentions" warn :class="$style.hasNotSpecifiedMentions">{{ i18n.ts.notSpecifiedMentionWarning }} - <button class="_textButton" @click="addMissingMention()">{{ i18n.ts.add }}</button></MkInfo>
 	<div v-show="useCw" :class="$style.cwOuter">
 		<input ref="cwInputEl" v-model="cw" class="mk-input-text" :class="$style.cw" :placeholder="i18n.ts.annotation" @keydown="onKeydown" @keyup="onKeyup" @compositionend="onCompositionEnd">
@@ -81,21 +89,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div v-if="maxTextLength - textLength < 100" :class="['_acrylic', $style.textCount, { [$style.textOver]: textLength > maxTextLength }]">{{ maxTextLength - textLength }}</div>
 	</div>
 	<input v-show="withHashtags" ref="hashtagsInputEl" v-model="hashtags" class="mk-input-text" :class="$style.hashtags" :placeholder="i18n.ts.hashtags" list="hashtags">
-	<div v-if="scheduledTime" :class="$style.scheduledTime">
-		<div>
-			<div style="display: flex; gap: 4px" :style="scheduledTimeExceededPolicy ? 'color: var(--MI_THEME-error)' : undefined">
-				<span style="margin-right: 4px"><i class="ti ti-calendar-clock"></i></span>
-				<component :is="scheduledTimeExceededPolicy ? 'del' : 'span'" :style="scheduledTimeExceededPolicy ? 'opacity: 0.6' : undefined">
-					{{ i18n.tsx.willBePostedAt({ x: dateTimeFormat.format(scheduledTime) }) }}
-				</component>
-			</div>
-			<div v-if="scheduledTimeExceededPolicy" style="display: flex; gap: 4px; margin-top: 4px; color: var(--MI_THEME-infoWarnFg)">
-				<span style="margin-right: 4px"><i class="ti ti-exclamation-circle"></i></span>
-				<Mfm :text="i18n.tsx._postForm.policyScheduleNoteMaxDaysExceeded({ max: $i.policies.scheduleNoteMaxDays })"/>
-			</div>
-		</div>
-		<button class="_button" style="margin-left: auto" @click="scheduledTime = null"><i class="ti ti-x"></i></button>
-	</div>
 	<MkInfo v-if="files.length > 0 && instance.tosUrl" warn style="margin-top: 8px;" :rounded="false">
 		<Mfm :text="i18n.tsx._postForm.tosAndGuidelinesInfo({ tosUrl: instance.tosUrl })"/>
 	</MkInfo>
@@ -117,7 +110,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<button v-tooltip="i18n.ts.poll" class="_button" :class="[$style.footerButton, { [$style.footerButtonActive]: poll }]" @click="togglePoll"><i class="ti ti-chart-arrows"></i></button>
 			<button v-tooltip="i18n.ts.useCw" class="_button" :class="[$style.footerButton, { [$style.footerButtonActive]: useCw }]" @click="useCw = !useCw"><i class="ti ti-eye-off"></i></button>
 			<button v-tooltip="i18n.ts.hashtags" class="_button" :class="[$style.footerButton, { [$style.footerButtonActive]: withHashtags }]" @click="withHashtags = !withHashtags"><i class="ti ti-hash"></i></button>
-			<button v-if="$i.policies.canScheduleNote" v-tooltip="i18n.ts.setScheduledTime" class="_button" :class="$style.footerButton" @click="setScheduledTime"><i class="ti ti-calendar-clock"></i></button>
+			<button v-if="$i.policies.canScheduleNote && $i.policies.scheduleNoteLimit > 0" v-tooltip="i18n.ts.schedulePost" class="_button" :class="$style.footerButton" @click="schedule"><i class="ti ti-calendar-clock"></i></button>
 			<button v-tooltip="i18n.ts.mention" class="_button" :class="$style.footerButton" @click="insertMention"><i class="ti ti-at"></i></button>
 			<button v-if="showAddMfmFunction" v-tooltip="i18n.ts.addMfmFunction" :class="['_button', $style.footerButton]" @click="insertMfmFunction"><i class="ti ti-palette"></i></button>
 			<button v-if="postFormActions.length > 0" v-tooltip="i18n.ts.plugins" class="_button" :class="$style.footerButton" @click="showActions"><i class="ti ti-plug"></i></button>
@@ -162,11 +155,10 @@ import MkInfo from '@/components/MkInfo.vue';
 import { i18n } from '@/i18n.js';
 import { instance } from '@/instance.js';
 import { ensureSignin, notesCount, incNotesCount } from '@/i.js';
-import { getAccounts, openAccountMenu as openAccountMenu_ } from '@/accounts.js';
+import { getAccounts, getAccountMenu } from '@/accounts.js';
 import { deepClone } from '@/utility/clone.js';
 import MkRippleEffect from '@/components/MkRippleEffect.vue';
 import { miLocalStorage } from '@/local-storage.js';
-import { dateTimeFormat } from '@/utility/intl-const.js';
 import { claimAchievement } from '@/utility/achievements.js';
 import { mfmFunctionPicker } from '@/utility/mfm-function-picker.js';
 import { langmap } from '@/utility/langmap.js';
@@ -235,9 +227,12 @@ if (props.initialVisibleUsers) {
 	props.initialVisibleUsers.forEach(u => pushVisibleUser(u));
 }
 const reactionAcceptance = ref(store.s.reactionAcceptance);
-const scheduledTime = ref<Date | null>(null);
+const scheduledAt = ref<number | null>(null);
+const noExtractMentions = ref(false);
+const noExtractHashtags = ref(false);
+const noExtractEmojis = ref(false);
 const scheduledTimeExceededPolicy = computed(() =>
-	scheduledTime.value ? (scheduledTime.value.getTime() - Date.now()) / 86_400_000 > $i!.policies.scheduleNoteMaxDays : false
+	scheduledAt.value != null ? (scheduledAt.value - Date.now()) / 86_400_000 > $i.policies.scheduleNoteMaxDays : false
 );
 const autocompleteTextareaInput = ref<Autocomplete | null>(null);
 const autocompleteCwInput = ref<Autocomplete | null>(null);
@@ -260,6 +255,10 @@ const postFormActions = getPluginHandlers('post_form_action');
 
 const uploader = useUploader({
 	multiple: true,
+});
+
+onUnmounted(() => {
+	uploader.dispose();
 });
 
 uploader.events.on('itemUploaded', ctx => {
@@ -289,15 +288,17 @@ const placeholder = computed((): string => {
 });
 
 const submitText = computed((): string => {
-	if (scheduledTime.value) {
-		return i18n.ts.schedule;
-	} else if (renoteTargetNote.value) {
-		return i18n.ts.quote;
-	} else if (replyTargetNote.value) {
-		return i18n.ts.reply;
-	} else {
-		return i18n.ts.note;
-	}
+	return scheduledAt.value != null
+		? i18n.ts.schedule
+		: renoteTargetNote.value
+			? i18n.ts.quote
+			: replyTargetNote.value
+				? i18n.ts.reply
+				: i18n.ts.note;
+});
+
+const submitIcon = computed((): string => {
+	return posted.value ? 'ti ti-check' : scheduledAt.value != null ? 'ti ti-calendar-time' : replyTargetNote.value ? 'ti ti-arrow-back-up' : renoteTargetNote.value ? 'ti ti-quote' : 'ti ti-send';
 });
 
 const textLength = computed((): number => {
@@ -610,11 +611,11 @@ async function toggleReactionAcceptance() {
 	const select = await os.select({
 		title: i18n.ts.reactionAcceptance,
 		items: [
-			{ value: null, text: i18n.ts.all },
-			{ value: 'likeOnlyForRemote' as const, text: i18n.ts.likeOnlyForRemote },
-			{ value: 'nonSensitiveOnly' as const, text: i18n.ts.nonSensitiveOnly },
-			{ value: 'nonSensitiveOnlyForLocalLikeOnlyForRemote' as const, text: i18n.ts.nonSensitiveOnlyForLocalLikeOnlyForRemote },
-			{ value: 'likeOnly' as const, text: i18n.ts.likeOnly },
+			{ value: null, label: i18n.ts.all },
+			{ value: 'likeOnlyForRemote' as const, label: i18n.ts.likeOnlyForRemote },
+			{ value: 'nonSensitiveOnly' as const, label: i18n.ts.nonSensitiveOnly },
+			{ value: 'nonSensitiveOnlyForLocalLikeOnlyForRemote' as const, label: i18n.ts.nonSensitiveOnlyForLocalLikeOnlyForRemote },
+			{ value: 'likeOnly' as const, label: i18n.ts.likeOnly },
 		],
 		default: reactionAcceptance.value,
 	});
@@ -670,6 +671,25 @@ function showOtherSettings() {
 			toggleReactionAcceptance();
 		},
 	}, { type: 'divider' }, {
+		type: 'button',
+		text: i18n.ts._drafts.saveToDraft,
+		icon: 'ti ti-cloud-upload',
+		action: async () => {
+			if (!canSaveAsServerDraft.value) {
+				return os.alert({
+					type: 'error',
+					text: i18n.ts._drafts.cannotCreateDraft,
+				});
+			}
+			saveServerDraft();
+		},
+	}, ...($i.policies.canScheduleNote && $i.policies.scheduleNoteLimit > 0 ? [{
+		icon: 'ti ti-calendar-time',
+		text: i18n.ts.schedulePost + '...',
+		action: () => {
+			schedule();
+		},
+	}] : []), { type: 'divider' }, {
 		type: 'switch',
 		icon: 'ti ti-eye',
 		text: i18n.ts.preview,
@@ -713,16 +733,6 @@ function removeVisibleUser(user) {
 	visibleUsers.value = erase(user, visibleUsers.value);
 }
 
-async function setScheduledTime() {
-	const { canceled, result: date } = await os.inputDateTime({
-		title: i18n.ts.setScheduledTime,
-		default: scheduledTime.value ?? undefined,
-	});
-	if (canceled) return;
-
-	scheduledTime.value = date;
-}
-
 function clear() {
 	text.value = '';
 	useCw.value = false;
@@ -734,7 +744,10 @@ function clear() {
 	files.value = [];
 	poll.value = null;
 	visibleUsers.value = [];
-	scheduledTime.value = null;
+	scheduledAt.value = null;
+	noExtractMentions.value = false;
+	noExtractHashtags.value = false;
+	noExtractEmojis.value = false;
 	quoteId.value = null;
 	serverDraftId.value = null;
 }
@@ -874,7 +887,9 @@ function onDrop(ev: DragEvent): void {
 	//#endregion
 }
 
-async function saveServerDraft() {
+async function saveServerDraft(options: {
+	isActuallyScheduled?: boolean;
+} = {}) {
 	if (draftProcessing.value) return;
 	draftProcessing.value = true;
 	try {
@@ -897,7 +912,11 @@ async function saveServerDraft() {
 			reactionAcceptance: reactionAcceptance.value,
 			dimension: dimension.value,
 			lang: postingLang.value,
-			scheduledAt: scheduledTime.value?.getTime() ?? null,
+			scheduledAt: scheduledAt.value,
+			isActuallyScheduled: options.isActuallyScheduled ?? false,
+			noExtractMentions: noExtractMentions.value,
+			noExtractHashtags: noExtractHashtags.value,
+			noExtractEmojis: noExtractEmojis.value,
 		};
 
 		if (serverDraftId.value == null) {
@@ -942,6 +961,21 @@ async function post(ev?: MouseEvent) {
 			const y = rect.top + (el.offsetHeight / 2);
 			os.popup(MkRippleEffect, { x, y }, {}, 'end');
 		}
+	}
+
+	if (scheduledAt.value != null) {
+		if (uploader.items.value.some(x => x.uploaded == null)) {
+			await uploadFiles();
+
+			// アップロード失敗したものがあったら中止
+			if (uploader.items.value.some(x => x.uploaded == null)) {
+				return;
+			}
+		}
+
+		await postAsScheduled();
+		clear();
+		return;
 	}
 
 	if (props.mock) return;
@@ -996,8 +1030,10 @@ async function post(ev?: MouseEvent) {
 		visibility: visibility.value,
 		visibleUserIds: visibility.value === 'specified' ? visibleUsers.value.map(u => u.id) : undefined,
 		reactionAcceptance: reactionAcceptance.value,
-		scheduledAt: scheduledTime.value?.getTime() ?? undefined,
 		lang: postingLang.value ?? undefined,
+		noExtractMentions: noExtractMentions.value,
+		noExtractHashtags: noExtractHashtags.value,
+		noExtractEmojis: noExtractEmojis.value,
 		noCreatedNote: true,
 	};
 
@@ -1125,6 +1161,14 @@ async function post(ev?: MouseEvent) {
 	emit('posting');
 }
 
+async function postAsScheduled() {
+	if (props.mock) return;
+
+	await saveServerDraft({
+		isActuallyScheduled: true,
+	});
+}
+
 function cancel() {
 	emit('cancel');
 }
@@ -1199,10 +1243,10 @@ function showActions(ev: MouseEvent) {
 
 const postAccount = ref<Misskey.entities.UserDetailed | null>(null);
 
-function openAccountMenu(ev: MouseEvent) {
+async function openAccountMenu(ev: MouseEvent) {
 	if (props.mock) return;
 
-	openAccountMenu_({
+	const items = await getAccountMenu({
 		withExtraOperation: false,
 		includeCurrentAccount: true,
 		active: postAccount.value != null ? postAccount.value.id : $i.id,
@@ -1214,7 +1258,9 @@ function openAccountMenu(ev: MouseEvent) {
 				postAccount.value = account;
 			}
 		},
-	}, ev);
+	});
+
+	os.popupMenu(items, (ev.currentTarget ?? ev.target ?? undefined) as HTMLElement | undefined);
 }
 
 function showPerUploadItemMenu(item: UploaderItem, ev: MouseEvent) {
@@ -1253,7 +1299,10 @@ async function restoreServerDraft(draft: Misskey.entities.NoteDraft) {
 		visibleUsers.value = [];
 		hashtags.value = '';
 		withHashtags.value = false;
-		scheduledTime.value = null;
+		scheduledAt.value = null;
+		noExtractMentions.value = false;
+		noExtractHashtags.value = false;
+		noExtractEmojis.value = false;
 		quoteId.value = null;
 		renoteTargetNote.value = null;
 		replyTargetNote.value = null;
@@ -1287,10 +1336,10 @@ async function restoreServerDraft(draft: Misskey.entities.NoteDraft) {
 		targetChannel.value = (draft.channel as Misskey.entities.Channel | null | undefined) ?? null;
 		dimension.value = draft.dimension ?? prefer.s.dimension;
 		postingLang.value = draft.lang as PostingLanguage | null;
-		if (draft.scheduledAt) {
-			const date = new Date(draft.scheduledAt);
-			scheduledTime.value = Number.isNaN(date.getTime()) || date.getTime() < Date.now() ? null : date;
-		}
+		scheduledAt.value = draft.scheduledAt != null && draft.scheduledAt >= Date.now() ? draft.scheduledAt : null;
+		noExtractMentions.value = draft.noExtractMentions;
+		noExtractHashtags.value = draft.noExtractHashtags;
+		noExtractEmojis.value = draft.noExtractEmojis;
 		serverDraftId.value = draft.id;
 	} finally {
 		draftProcessing.value = false;
@@ -1298,8 +1347,10 @@ async function restoreServerDraft(draft: Misskey.entities.NoteDraft) {
 }
 
 function showDraftMenu(ev: MouseEvent) {
-	function showDraftsDialog() {
-		const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkNoteDraftsDialog.vue')), {}, {
+	function showDraftsDialog(scheduled: boolean) {
+		const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkNoteDraftsDialog.vue')), {
+			scheduled,
+		}, {
 			restore: async (draft: Misskey.entities.NoteDraft) => {
 				await restoreServerDraft(draft);
 			},
@@ -1314,25 +1365,33 @@ function showDraftMenu(ev: MouseEvent) {
 
 	os.popupMenu([{
 		type: 'button',
-		text: i18n.ts._drafts.saveToDraft,
-		icon: 'ti ti-cloud-upload',
-		action: async () => {
-			if (!canSaveAsServerDraft.value) {
-				return os.alert({
-					type: 'error',
-					text: i18n.ts._drafts.cannotCreateDraft,
-				});
-			}
-				await saveServerDraft();
-		},
-	}, {
-		type: 'button',
 		text: i18n.ts._drafts.listDrafts,
 		icon: 'ti ti-cloud-download',
 		action: () => {
-			showDraftsDialog();
+			showDraftsDialog(false);
+		},
+	}, {
+		type: 'button',
+		text: i18n.ts._drafts.listScheduledNotes,
+		icon: 'ti ti-clock-down',
+		action: () => {
+			showDraftsDialog(true);
 		},
 	}], (ev.currentTarget ?? ev.target ?? undefined) as HTMLElement | undefined);
+}
+
+async function schedule() {
+	const { canceled, result } = await os.inputDatetime({
+		title: i18n.ts.schedulePost,
+	});
+	if (canceled) return;
+	if (result.getTime() <= Date.now()) return;
+
+	scheduledAt.value = result.getTime();
+}
+
+function cancelSchedule() {
+	scheduledAt.value = null;
 }
 
 onMounted(() => {
@@ -1375,7 +1434,7 @@ onMounted(() => {
 				});
 			}
 			quoteId.value = init.renote ? init.renote.id : null;
-			scheduledTime.value = null;
+			scheduledAt.value = null;
 			reactionAcceptance.value = init.reactionAcceptance;
 		}
 	});
@@ -1406,6 +1465,7 @@ async function canClose() {
 
 defineExpose({
 	clear,
+	abortUploader: () => uploader.abortAll(),
 	canClose,
 });
 </script>
@@ -1452,20 +1512,6 @@ defineExpose({
 	width: 28px;
 	height: 28px;
 	margin: auto;
-}
-
-.draftButton {
-	padding: 8px;
-	font-size: 90%;
-	border-radius: 6px;
-
-	&:hover {
-		background: light-dark(rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.05));
-	}
-
-	&:disabled {
-		background: none;
-	}
 }
 
 .headerRight {
@@ -1624,6 +1670,10 @@ html[data-color-scheme=light] .preview {
 	margin: 0 20px 16px 20px;
 }
 
+.scheduledAt {
+	margin: 0 20px 16px 20px;
+}
+
 .cw,
 .hashtags,
 .text {
@@ -1714,15 +1764,6 @@ html[data-color-scheme=light] .preview {
 	&.textOver {
 		color: #ff2a2a;
 	}
-}
-
-.scheduledTime {
-	display: flex;
-	padding: 8px 12px;
-	gap: 4px;
-	align-items: center;
-	font-size: 90%;
-	background: var(--MI_THEME-infoBg);
 }
 
 .footer {

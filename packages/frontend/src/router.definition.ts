@@ -579,6 +579,10 @@ export const ROUTE_DEF: RouteDef[] = [{
 	component: page(() => import('@/pages/reversi/game.vue')),
 	loginRequired: false,
 }, {
+	path: '/qr',
+	component: page(() => import('@/pages/qr.vue')),
+	loginRequired: true,
+}, {
 	path: '/debug',
 	component: page(() => import('@/pages/debug.vue')),
 	loginRequired: false,

@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <PageWithHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs">
 	<div class="_spacer" style="--MI_SPACER-w: 700px;">
 		<div class="jqqmcavi">
-			<MkButton v-if="pageId" class="button" inline link :to="`/@${ author?.username }/pages/${ currentName }`"><i class="ti ti-external-link"></i> {{ i18n.ts._pages.viewPage }}</MkButton>
+			<MkButton v-if="pageId && author != null" class="button" inline link :to="`/@${ author.username }/pages/${ currentName }`"><i class="ti ti-external-link"></i> {{ i18n.ts._pages.viewPage }}</MkButton>
 			<MkButton v-if="!readonly" inline primary class="button" @click="save"><i class="ti ti-device-floppy"></i> {{ i18n.ts.save }}</MkButton>
 			<MkButton v-if="pageId" inline class="button" @click="duplicate"><i class="ti ti-copy"></i> {{ i18n.ts.duplicate }}</MkButton>
 			<MkButton v-if="pageId && !readonly" inline class="button" danger @click="del"><i class="ti ti-trash"></i> {{ i18n.ts.delete }}</MkButton>
@@ -24,22 +24,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</MkInput>
 
 				<MkInput v-model="name" type="text" pattern="^[a-zA-Z0-9_-]+$" autocapitalize="off">
-					<template #prefix>{{ url }}/@{{ author?.username }}/pages/</template>
+					<template #prefix>{{ url }}/@{{ author?.username ?? '???' }}/pages/</template>
 					<template #label>{{ i18n.ts._pages.url }}</template>
 				</MkInput>
 
 				<MkSwitch v-model="alignCenter">{{ i18n.ts._pages.alignCenter }}</MkSwitch>
 
-				<MkSelect v-model="font">
+				<MkSelect v-model="font" :items="fontDef">
 					<template #label>{{ i18n.ts._pages.font }}</template>
-					<option value="serif">{{ i18n.ts._pages.fontSerif }}</option>
-					<option value="sans-serif">{{ i18n.ts._pages.fontSansSerif }}</option>
 				</MkSelect>
 
-				<MkSelect v-model="visibility">
+				<MkSelect v-model="visibility" :items="visibilityDef">
 					<template #label>{{ i18n.ts._pages.visibility }}</template>
-					<option value="public">{{ i18n.ts._pages.public }}</option>
-					<option value="private">{{ i18n.ts._pages.private }}</option>
 				</MkSelect>
 
 				<MkSwitch v-model="hideTitleWhenPinned">{{ i18n.ts._pages.hideTitleWhenPinned }}</MkSwitch>
@@ -82,7 +78,8 @@ import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import { $i } from '@/i.js';
 import { mainRouter } from '@/router.js';
-import { getPageBlockList } from '@/pages/page-editor/common.js';
+import { useMkSelect } from '@/composables/use-mkselect.js';
+import { createPageBlock, getPageBlockList } from '@/pages/page-editor/common.js';
 
 const props = defineProps<{
 	initPageId?: string;
@@ -91,7 +88,7 @@ const props = defineProps<{
 }>();
 
 const tab = ref('settings');
-const author = ref($i);
+const author = ref<Misskey.entities.User | null>($i);
 const readonly = ref(false);
 const page = ref<Misskey.entities.Page | null>(null);
 const pageId = ref<string | null>(null);
@@ -101,8 +98,26 @@ const summary = ref<string | null>(null);
 const name = ref(Date.now().toString());
 const eyeCatchingImage = ref<Misskey.entities.DriveFile | null>(null);
 const eyeCatchingImageId = ref<string | null>(null);
-const font = ref<'sans-serif' | 'serif'>('sans-serif');
-const visibility = ref<'public' | 'private'>('public');
+const {
+	model: font,
+	def: fontDef,
+} = useMkSelect({
+	items: [
+		{ label: i18n.ts._pages.fontSansSerif, value: 'sans-serif' },
+		{ label: i18n.ts._pages.fontSerif, value: 'serif' },
+	],
+	initialValue: 'sans-serif',
+});
+const {
+	model: visibility,
+	def: visibilityDef,
+} = useMkSelect({
+	items: [
+		{ label: i18n.ts._pages.public, value: 'public' },
+		{ label: i18n.ts._pages.private, value: 'private' },
+	],
+	initialValue: 'public',
+});
 const content = ref<Misskey.entities.Page['content']>([]);
 const alignCenter = ref(false);
 const hideTitleWhenPinned = ref(false);
@@ -135,14 +150,6 @@ function getSaveOptions(): Misskey.entities.PagesCreateRequest {
 	};
 }
 
-function onError(error: any) {
-	console.error('Error occurred:', error);
-	os.alert({
-		type: 'error',
-		text: i18n.ts.somethingHappened,
-	});
-}
-
 async function save() {
 	const options = getSaveOptions();
 
@@ -152,27 +159,20 @@ async function save() {
 			...options,
 		};
 
-		try {
-			await os.apiWithDialog('pages/update', updateOptions);
+		await os.apiWithDialog('pages/update', updateOptions, undefined, {
+			'2298a392-d4a1-44c5-9ebb-ac1aeaa5a9ab': {
+				title: i18n.ts.somethingHappened,
+				text: i18n.ts._pages.nameAlreadyExists,
+			},
+		});
 
-			currentName.value = name.value.trim();
-			await os.alert({
-				type: 'success',
-				text: i18n.ts.saved,
-			});
-		} catch (error) {
-			if (error && typeof error === 'object' && 'code' in error && error.code === '2298a392-d4a1-44c5-9ebb-ac1aeaa5a9ab') {
-				await os.alert({
-					type: 'error',
-					title: i18n.ts.somethingHappened,
-					text: i18n.ts._pages.nameAlreadyExists,
-				});
-			} else {
-				onError(error);
-			}
-		}
+		currentName.value = name.value.trim();
+		await os.alert({
+			type: 'success',
+			text: i18n.ts.saved,
+		});
 	} else {
-		const created = await os.apiWithDialog('pages/create', options, undefined, undefined, undefined, {
+		const created = await os.apiWithDialog('pages/create', options, undefined, {
 			'4650348e-301c-499a-83c9-6aa988c66bc1': {
 				title: i18n.ts.somethingHappened,
 				text: i18n.ts._pages.nameAlreadyExists,
@@ -210,7 +210,7 @@ async function duplicate() {
 	title.value = title.value + ' - copy';
 	name.value = name.value + '-copy';
 
-	const created = await os.apiWithDialog('pages/create', getSaveOptions(), undefined, undefined, undefined, {
+	const created = await os.apiWithDialog('pages/create', getSaveOptions(), undefined, {
 		'4650348e-301c-499a-83c9-6aa988c66bc1': {
 			title: i18n.ts.somethingHappened,
 			text: i18n.ts._pages.nameAlreadyExists,
@@ -232,10 +232,9 @@ async function add() {
 		title: i18n.ts._pages.chooseBlock,
 		items: getPageBlockList(),
 	});
-	if (canceled) return;
+	if (canceled || type == null) return;
 
-	const id = genId();
-	content.value.push({ id, type });
+	content.value.push(createPageBlock(type, genId()));
 }
 
 function setEyeCatchingImage(img: Event) {

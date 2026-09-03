@@ -91,11 +91,15 @@
 					<template #label>{{ i18n.ts.displayedContentSettings }}</template>
 					<div class="_gaps_s">
 						<MkInfo>{{ i18n.ts._initialAccountSetting.theseSettingsCanEditLater }}</MkInfo>
-						<MkSelect v-model="draft.nsfw">
+						<MkSelect
+							v-model="draft.nsfw"
+							:items="[
+								{ label: i18n.ts._displayOfSensitiveMedia.respect, value: 'respect' },
+								{ label: i18n.ts._displayOfSensitiveMedia.ignore, value: 'ignore' },
+								{ label: i18n.ts._displayOfSensitiveMedia.force, value: 'force' },
+							]"
+						>
 							<template #label>{{ i18n.ts.displayOfSensitiveMedia }}</template>
-							<option value="respect">{{ i18n.ts._displayOfSensitiveMedia.respect }}</option>
-							<option value="ignore">{{ i18n.ts._displayOfSensitiveMedia.ignore }}</option>
-							<option value="force">{{ i18n.ts._displayOfSensitiveMedia.force }}</option>
 						</MkSelect>
 						<MkSwitch v-model="draft.highlightSensitiveMedia">
 							{{ i18n.ts.highlightSensitiveMedia }}
@@ -103,11 +107,15 @@
 						<MkSwitch v-model="draft.confirmWhenRevealingSensitiveMedia">
 							{{ i18n.ts.confirmWhenRevealingSensitiveMedia }}
 						</MkSwitch>
-						<MkSelect v-model="draft.displayOfSensitiveAds">
+						<MkSelect
+							v-model="draft.displayOfSensitiveAds"
+							:items="[
+								{ label: i18n.ts._displayOfSensitiveAds.hidden, value: 'hidden' },
+								{ label: i18n.ts._displayOfSensitiveAds.always, value: 'always' },
+								{ label: i18n.ts._displayOfSensitiveAds.filtered, value: 'filtered' },
+							]"
+						>
 							<template #label>{{ i18n.ts.displayOfSensitiveAds }}</template>
-							<option value="hidden">{{ i18n.ts._displayOfSensitiveAds.hidden }}</option>
-							<option value="always">{{ i18n.ts._displayOfSensitiveAds.always }}</option>
-							<option value="filtered">{{ i18n.ts._displayOfSensitiveAds.filtered }}</option>
 						</MkSelect>
 					</div>
 				</MkFolder>

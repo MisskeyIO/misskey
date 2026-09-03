@@ -180,6 +180,7 @@ export function flash(): entities.Flash {
 		summary: 'Some Play summary',
 		script,
 		visibility: 'public',
+		permissions: [],
 		likedCount: 0,
 		isLiked: false,
 	};

@@ -3,17 +3,19 @@
 	<div class="_spacer" style="--MI_SPACER-w: 900px;">
 		<div style="display: flex; flex-direction: column; gap: var(--MI-margin); flex-wrap: wrap;">
 			<div :class="$style.inputs">
-				<MkSelect v-model="from" :class="$style.input">
+					<MkSelect
+						v-model="from"
+						:items="serverLocationItems"
+					:class="$style.input"
+				>
 					<template #label>{{ i18n.ts._accountMigration.movedFromServer }}</template>
-					<option value="all">{{ i18n.ts.all }}</option>
-					<option value="remote">{{ i18n.ts.remote }}</option>
-					<option value="local">{{ i18n.ts.local }}</option>
 				</MkSelect>
-				<MkSelect v-model="to" :class="$style.input">
+					<MkSelect
+						v-model="to"
+						:items="serverLocationItems"
+					:class="$style.input"
+				>
 					<template #label>{{ i18n.ts._accountMigration.movedToServer }}</template>
-					<option value="all">{{ i18n.ts.all }}</option>
-					<option value="remote">{{ i18n.ts.remote }}</option>
-					<option value="local">{{ i18n.ts.local }}</option>
 				</MkSelect>
 			</div>
 			<div :class="$style.inputs">
@@ -26,7 +28,7 @@
 			</div>
 		</div>
 
-		<MkPagination v-slot="{items}" :pagination="pagination" style="margin-top: var(--MI-margin);">
+			<MkPagination v-slot="{items}" :paginator="paginator" style="margin-top: var(--MI-margin);">
 			<div class="_gaps_s">
 				<MkFolder v-for="item in items" :key="item.id">
 					<template #label>
@@ -55,7 +57,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, ref, markRaw } from 'vue';
 import MkInput from '@/components/MkInput.vue';
 import MkPagination from '@/components/MkPagination.vue';
 import { i18n } from '@/i18n.js';
@@ -63,22 +65,31 @@ import { userPage } from '@/filters/user.js';
 import MkFolder from '@/components/MkFolder.vue';
 import { definePage } from '@/page.js';
 import MkSelect from '@/components/MkSelect.vue';
+import type { MkSelectItem } from '@/components/MkSelect.vue';
+import { Paginator } from '@/utility/paginator.js';
+
+type ServerLocation = 'all' | 'remote' | 'local';
+
+const serverLocationItems = [
+	{ label: i18n.ts.all, value: 'all' },
+	{ label: i18n.ts.remote, value: 'remote' },
+	{ label: i18n.ts.local, value: 'local' },
+] satisfies MkSelectItem<ServerLocation>[];
 
 const movedToId = ref('');
 const movedFromId = ref('');
-const from = ref('all');
-const to = ref('all');
+const from = ref<ServerLocation>('all');
+const to = ref<ServerLocation>('all');
 
-const pagination = {
-	endpoint: 'admin/show-user-account-move-logs' as const,
+const paginator = markRaw(new Paginator('admin/show-user-account-move-logs', {
 	limit: 30,
-	params: computed(() => ({
+	computedParams: computed(() => ({
 		movedFromId: movedFromId.value === '' ? null : movedFromId.value,
 		movedToId: movedToId.value === '' ? null : movedToId.value,
 		from: from.value,
 		to: to.value,
 	})),
-};
+}));
 
 const headerActions = computed(() => []);
 

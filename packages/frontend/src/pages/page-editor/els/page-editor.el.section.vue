@@ -30,7 +30,7 @@ import * as os from '@/os.js';
 import { i18n } from '@/i18n.js';
 import { deepClone } from '@/utility/clone.js';
 import MkButton from '@/components/MkButton.vue';
-import { getPageBlockList } from '@/pages/page-editor/common.js';
+import { createPageBlock, getPageBlockList } from '@/pages/page-editor/common.js';
 
 const XBlocks = defineAsyncComponent(() => import('../page-editor.blocks.vue'));
 
@@ -71,14 +71,13 @@ async function add() {
 		title: i18n.ts._pages.chooseBlock,
 		items: getPageBlockList(),
 	});
-	if (canceled) return;
+	if (canceled || type == null) return;
 
-	const id = genId();
-	children.value.push({ id, type });
+	children.value.push(createPageBlock(type, genId()));
 }
 
 onMounted(() => {
-	if (props.modelValue.title == null) {
+	if (!props.modelValue.title) {
 		rename();
 	}
 });

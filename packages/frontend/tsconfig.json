@@ -38,6 +38,7 @@
 		],
 		"types": [
 			"vite/client",
+			"vite-plugin-glsl/ext",
 			"vitest/importMeta"
 		],
 		"lib": [

@@ -78,6 +78,7 @@ export class ChannelEntityService {
 			description: channel.description,
 			userId: channel.userId,
 			bannerUrl: banner ? this.driveFileEntityService.getPublicUrl(banner) : null,
+			bannerId: channel.bannerId,
 			pinnedNoteIds: channel.pinnedNoteIds,
 			color: channel.color,
 			isArchived: channel.isArchived,

@@ -121,6 +121,7 @@ function fetchNote() {
 	showPrev.value = false;
 	showNext.value = false;
 	note.value = null;
+	hasSensitiveFiles.value = false;
 
 	if (CTX_NOTE && CTX_NOTE.id === props.noteId) {
 		note.value = CTX_NOTE;
@@ -131,6 +132,15 @@ function fetchNote() {
 		noteId: props.noteId,
 	}).then(res => {
 		note.value = res;
+		const fileIds = res.fileIds ?? [];
+		if (res.userId === $i?.id && fileIds.length > 0) {
+			const noteId = res.id;
+			Promise.all(fileIds.map(fileId => misskeyApi('drive/files/show', { fileId }))).then(files => {
+				if (note.value?.id === noteId) {
+					hasSensitiveFiles.value = files.some(file => file.isSensitiveByModerator);
+				}
+			});
+		}
 		const appearNote = getAppearNote(res) ?? res;
 		// 古いノートは被クリップ数をカウントしていないので、2023-10-01以前のものは強制的にnotes/clipsを叩く
 		if ((appearNote.clippedCount ?? 0) > 0 || new Date(appearNote.createdAt).getTime() < new Date('2023-10-01').getTime()) {
@@ -140,11 +150,11 @@ function fetchNote() {
 				clips.value = _clips;
 			});
 		}
-	}).catch(async (err) => {
-		if (err.id === '8e75455b-738c-471d-9f80-62693f33372e') {
-			await pleaseLogin({
+	}).catch(err => {
+		if (['fbcc002d-37d9-4944-a6b0-d9e29f2d33ab', '145f88d2-b03d-4087-8143-a78928883c4b'].includes(err.id)) {
+			pleaseLogin({
 				path: '/',
-				message: i18n.ts.thisContentsAreMarkedAsSigninRequiredByAuthor,
+				message: err.id === 'fbcc002d-37d9-4944-a6b0-d9e29f2d33ab' ? i18n.ts.thisContentsAreMarkedAsSigninRequiredByAuthor : i18n.ts.signinOrContinueOnRemote,
 				openOnRemote: {
 					type: 'lookup',
 					url: `https://${host}/notes/${props.noteId}`,

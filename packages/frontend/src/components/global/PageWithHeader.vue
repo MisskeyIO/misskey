@@ -75,10 +75,6 @@ defineExpose({
 </script>
 
 <style lang="scss" module>
-.root {
-
-}
-
 .body, .swiper {
 	min-height: calc(100cqh - (var(--MI-stickyTop, 0px) + var(--MI-stickyBottom, 0px)));
 }

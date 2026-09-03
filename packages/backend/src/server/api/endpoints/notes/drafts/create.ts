@@ -101,6 +101,12 @@ export const meta = {
 			id: 'b6992544-63e7-67f0-fa7f-32444b1b5306',
 		},
 
+		noSuchVisibleUser: {
+			message: 'Some visible users are not found.',
+			code: 'NO_SUCH_VISIBLE_USER',
+			id: '96fe23ce-3494-4ad8-b69f-1a166e41ee94',
+		},
+
 		cannotRenoteOutsideOfChannel: {
 			message: 'Cannot renote outside of channel.',
 			code: 'CANNOT_RENOTE_OUTSIDE_OF_CHANNEL',
@@ -123,6 +129,37 @@ export const meta = {
 			message: 'You cannot create drafts any more.',
 			code: 'TOO_MANY_DRAFTS',
 			id: '9ee33bbe-fde3-4c71-9b51-e50492c6b9c8',
+		},
+
+		tooManyScheduledNotes: {
+			message: 'You cannot create scheduled notes any more.',
+			code: 'TOO_MANY_SCHEDULED_NOTES',
+			id: '22ae69eb-09e3-4541-a850-773cfa45e693',
+		},
+
+		cannotScheduleToPast: {
+			message: 'Cannot schedule to the past.',
+			code: 'CANNOT_SCHEDULE_TO_PAST',
+			id: 'e577d185-8179-4a17-b47f-6093985558e6',
+		},
+
+		cannotScheduleToFarFuture: {
+			message: 'Cannot schedule to the far future.',
+			code: 'CANNOT_SCHEDULE_TO_FAR_FUTURE',
+			id: 'ea102856-e8da-4ae9-a98a-0326821bd177',
+		},
+
+		invalidScheduledNote: {
+			message: 'Scheduled note content is invalid.',
+			code: 'INVALID_SCHEDULED_NOTE',
+			id: 'e35e6376-01de-476f-a752-a90a848a4f55',
+		},
+
+		rolePermissionDenied: {
+			message: 'You are not assigned to a required role.',
+			code: 'ROLE_PERMISSION_DENIED',
+			id: '12f1d5d2-f7ec-4d7c-b608-e873f4b20327',
+			status: 403,
 		},
 
 		cannotRenoteToExternal: {
@@ -150,7 +187,6 @@ export const paramDef = {
 		localOnly: { type: 'boolean', default: false },
 		dimension: { type: 'integer', nullable: true, minimum: 0, maximum: 2_147_483_647 },
 		lang: { type: 'string', enum: [null, ...postingLangCodes] as string[], nullable: true },
-		scheduledAt: { type: 'integer', nullable: true, maximum: 253_402_300_799_999 },
 		reactionAcceptance: { type: 'string', nullable: true, enum: [null, 'likeOnly', 'likeOnlyForRemote', 'nonSensitiveOnly', 'nonSensitiveOnlyForLocalLikeOnlyForRemote'], default: null },
 		replyId: { type: 'string', format: 'misskey:id', nullable: true },
 		renoteId: { type: 'string', format: 'misskey:id', nullable: true },
@@ -166,7 +202,7 @@ export const paramDef = {
 		fileIds: {
 			type: 'array',
 			uniqueItems: true,
-			minItems: 1,
+			minItems: 0,
 			maxItems: 16,
 			items: { type: 'string', format: 'misskey:id' },
 		},
@@ -187,6 +223,11 @@ export const paramDef = {
 			},
 			required: ['choices'],
 		},
+		scheduledAt: { type: 'integer', nullable: true, maximum: 253_402_300_799_999 },
+		isActuallyScheduled: { type: 'boolean', default: false },
+		noExtractMentions: { type: 'boolean', default: false },
+		noExtractHashtags: { type: 'boolean', default: false },
+		noExtractEmojis: { type: 'boolean', default: false },
 	},
 	required: [],
 } as const;
@@ -199,26 +240,29 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const draft = await this.noteDraftService.create(me, {
-				fileIds: ps.fileIds,
-				poll: ps.poll ? {
-					choices: ps.poll.choices,
-					multiple: ps.poll.multiple ?? false,
-					expiresAt: ps.poll.expiresAt ? new Date(ps.poll.expiresAt) : null,
-					expiredAfter: ps.poll.expiredAfter ?? null,
-				} : undefined,
+				fileIds: ps.fileIds ?? [],
+				pollChoices: ps.poll?.choices ?? [],
+				pollMultiple: ps.poll?.multiple ?? false,
+				pollExpiresAt: ps.poll?.expiresAt ? new Date(ps.poll.expiresAt) : null,
+				pollExpiredAfter: ps.poll?.expiredAfter ?? null,
+				hasPoll: ps.poll != null,
 				text: ps.text ?? null,
-				replyId: ps.replyId ?? undefined,
-				renoteId: ps.renoteId ?? undefined,
+				replyId: ps.replyId ?? null,
+				renoteId: ps.renoteId ?? null,
 				cw: ps.cw ?? null,
-				...(ps.hashtag ? { hashtag: ps.hashtag } : {}),
+				hashtag: ps.hashtag ?? null,
 				localOnly: ps.localOnly,
 				dimension: ps.dimension ?? null,
 				lang: ps.lang ?? null,
-				scheduledAt: ps.scheduledAt == null ? null : new Date(ps.scheduledAt),
 				reactionAcceptance: ps.reactionAcceptance,
 				visibility: ps.visibility,
 				visibleUserIds: ps.visibleUserIds ?? [],
-				channelId: ps.channelId ?? undefined,
+				channelId: ps.channelId ?? null,
+				scheduledAt: ps.scheduledAt == null ? null : new Date(ps.scheduledAt),
+				isActuallyScheduled: ps.isActuallyScheduled,
+				noExtractMentions: ps.noExtractMentions,
+				noExtractHashtags: ps.noExtractHashtags,
+				noExtractEmojis: ps.noExtractEmojis,
 			}).catch((err) => {
 				if (err instanceof IdentifiableError) {
 					switch (err.id) {
@@ -228,6 +272,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 							throw new ApiError(meta.errors.cannotCreateAlreadyExpiredPoll);
 						case 'b6992544-63e7-67f0-fa7f-32444b1b5306':
 							throw new ApiError(meta.errors.noSuchFile);
+						case '81df0c8d-2cfe-4e1a-9e93-b948ef455d9d':
+							throw new ApiError(meta.errors.noSuchVisibleUser);
 						case '64929870-2540-4d11-af41-3b484d78c956':
 							throw new ApiError(meta.errors.noSuchRenoteTarget);
 						case '76cc5583-5a14-4ad3-8717-0298507e32db':
@@ -248,6 +294,17 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 							throw new ApiError(meta.errors.cannotReplyToInvisibleNote);
 						case '215dbc76-336c-4d2a-9605-95766ba7dab0':
 							throw new ApiError(meta.errors.cannotReplyToSpecifiedVisibilityNoteWithExtendedVisibility);
+						case 'c3275f19-4558-4c59-83e1-4f684b5fab66':
+							throw new ApiError(meta.errors.tooManyScheduledNotes);
+						case '7cc42034-f7ab-4f7c-87b4-e00854479080':
+							throw new ApiError(meta.errors.rolePermissionDenied);
+						case '94a89a43-3591-400a-9c17-dd166e71fdfa':
+						case 'b34d0c1b-996f-4e34-a428-c636d98df457':
+							throw new ApiError(meta.errors.cannotScheduleToPast);
+						case '506006cf-3092-4ae1-8145-b025001c591f':
+							throw new ApiError(meta.errors.cannotScheduleToFarFuture);
+						case '4f5bb9ec-5c64-47e9-b21b-da977f45ae3d':
+							throw new ApiError(meta.errors.invalidScheduledNote);
 						default:
 							throw err;
 					}

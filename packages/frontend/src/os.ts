@@ -15,6 +15,7 @@ import type { Form, GetFormResultType } from '@/utility/form.js';
 import type { MenuItem } from '@/types/menu.js';
 import type { PostFormProps } from '@/types/post-form.js';
 import type { UploaderFeatures } from '@/composables/use-uploader.js';
+import type { MkSelectItem, OptionValue } from '@/components/MkSelect.vue';
 import type MkRoleSelectDialog_TypeReferenceOnly from '@/components/MkRoleSelectDialog.vue';
 import type MkEmojiPickerDialog_TypeReferenceOnly from '@/components/MkEmojiPickerDialog.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
@@ -42,12 +43,10 @@ export const apiWithDialog = (<E extends keyof Misskey.Endpoints, P extends Miss
 	endpoint: E,
 	data: P = {} as P,
 	token?: string | null | undefined,
-	onSuccess?: ((res: Misskey.api.SwitchCaseResponseType<E, P>) => void) | null | undefined,
-	onFailure?: ((err: Misskey.api.APIError) => void) | null,
 	customErrors?: ApiWithDialogCustomErrors,
 ): Promise<Misskey.api.SwitchCaseResponseType<E, P>> => {
-	const promise = misskeyApi(endpoint, data, token);
-	promiseDialog(promise, onSuccess, onFailure ?? (err => apiErrorHandler(err, endpoint, customErrors)));
+	const promise = misskeyApi<void, E, P>(endpoint, data as P & { i?: string | null }, token);
+	promiseDialog(promise, null, err => apiErrorHandler(err, endpoint, customErrors));
 
 	return promise;
 });
@@ -88,9 +87,12 @@ export async function apiErrorHandler(err: Misskey.api.APIError, endpoint?: stri
 	} else if (err.code === 'ROLE_PERMISSION_DENIED') {
 		title = i18n.ts.permissionDeniedError;
 		text = i18n.ts.permissionDeniedErrorDescription;
-	} else if (err.code?.startsWith('TOO_MANY_')) {
+	} else if (err.code?.startsWith('TOO_MANY')) {
 		title = i18n.ts.youCannotCreateAnymore;
 		text = `${i18n.ts.error}: ${err.id}`;
+	} else if (err.message.startsWith('Unexpected token')) {
+		title = i18n.ts.gotInvalidResponseError;
+		text = i18n.ts.gotInvalidResponseErrorDescription;
 	}
 
 	// @ts-expect-error Misskey内部で定義されていない不明なエラー
@@ -120,7 +122,7 @@ export async function apiErrorHandler(err: Misskey.api.APIError, endpoint?: stri
 
 export function promiseDialog<T>(
 	promise: Promise<T>,
-	onSuccess?: ((res: Awaited<T>) => void) | null,
+	onSuccess?: ((res: T) => void) | null,
 	onFailure?: ((err: Misskey.api.APIError) => void) | null,
 	text?: string,
 ): Promise<T> {
@@ -516,19 +518,16 @@ export function inputNumber(props: {
 	});
 }
 
-export function inputDateTime(props: {
-	title?: string | null;
-	text?: string | null;
+export function inputDatetime(props: {
+	title?: string;
+	text?: string;
 	placeholder?: string | null;
-	default?: Date | null;
+	default?: string | null;
 }): Promise<{
 	canceled: true; result: undefined;
 } | {
 	canceled: false; result: Date;
 }> {
-	const defaultValue = props.default ?? new Date();
-	defaultValue.setMinutes(defaultValue.getMinutes() - defaultValue.getTimezoneOffset());
-
 	return new Promise(async (resolve) => {
 		await popup(MkDialog, {
 			title: props.title ?? undefined,
@@ -536,7 +535,7 @@ export function inputDateTime(props: {
 			input: {
 				type: 'datetime-local',
 				placeholder: props.placeholder,
-				default: defaultValue.toISOString().slice(0, -5),
+				default: props.default ?? null,
 			},
 		}, {
 			done: result => {
@@ -548,6 +547,22 @@ export function inputDateTime(props: {
 				}
 			},
 		}, 'closed');
+	});
+}
+
+export function inputDateTime(props: {
+	title?: string | null;
+	text?: string | null;
+	placeholder?: string | null;
+	default?: Date | null;
+}) {
+	const defaultValue = new Date(props.default ?? Date.now());
+	defaultValue.setMinutes(defaultValue.getMinutes() - defaultValue.getTimezoneOffset());
+	return inputDatetime({
+		...props,
+		title: props.title ?? undefined,
+		text: props.text ?? undefined,
+		default: defaultValue.toISOString().slice(0, -5),
 	});
 }
 
@@ -565,50 +580,15 @@ export function authenticateDialog(): Promise<{
 	});
 }
 
-type SelectItem<C> = {
-	value: C;
-	text: string;
-};
-
-// default が指定されていたら result は null になり得ないことを保証する overload function
-export function select<C = unknown>(props: {
-	title?: string | null;
-	text?: string | null;
-	default: string;
-	items: (SelectItem<C> | {
-		sectionTitle: string;
-		items: SelectItem<C>[];
-	} | undefined)[];
+export function select<C extends OptionValue, D extends C | null = null>(props: {
+	title?: string;
+	text?: string;
+	default?: D;
+	items: (MkSelectItem<C> | undefined)[];
 }): Promise<{
 	canceled: true; result: undefined;
 } | {
-	canceled: false; result: C;
-}>;
-export function select<C = unknown>(props: {
-	title?: string | null;
-	text?: string | null;
-	default?: string | null;
-	items: (SelectItem<C> | {
-		sectionTitle: string;
-		items: SelectItem<C>[];
-	} | undefined)[];
-}): Promise<{
-	canceled: true; result: undefined;
-} | {
-	canceled: false; result: C | null;
-}>;
-export function select<C = unknown>(props: {
-	title?: string | null;
-	text?: string | null;
-	default?: string | null;
-	items: (SelectItem<C> | {
-		sectionTitle: string;
-		items: SelectItem<C>[];
-	} | undefined)[];
-}): Promise<{
-	canceled: true; result: undefined;
-} | {
-	canceled: false; result: C | null;
+	canceled: false; result: Exclude<D, undefined> extends null ? C | null : C;
 }> {
 	return new Promise(async (resolve) => {
 		await popup(MkDialog, {
@@ -806,7 +786,7 @@ export async function openEmojiPicker(src: HTMLElement, opts: ComponentProps<typ
 		...opts,
 	}, {
 		chosen: emoji => {
-			insertTextAtCursor(activeTextarea, emoji);
+			if (activeTextarea) insertTextAtCursor(activeTextarea, emoji);
 		},
 		closed: () => {
 			openingEmojiPicker!.dispose();
@@ -819,7 +799,6 @@ export async function openEmojiPicker(src: HTMLElement, opts: ComponentProps<typ
 export function popupMenu(items: (MenuItem | null)[], anchorElement?: HTMLElement | EventTarget | null, options?: {
 	align?: string;
 	width?: number;
-	viaKeyboard?: boolean;
 	onClosing?: () => void;
 }): Promise<void> {
 	if (!(anchorElement instanceof HTMLElement)) {
@@ -833,7 +812,6 @@ export function popupMenu(items: (MenuItem | null)[], anchorElement?: HTMLElemen
 			anchorElement,
 			width: options?.width,
 			align: options?.align,
-			viaKeyboard: options?.viaKeyboard,
 			returnFocusTo,
 		}, {
 			closed: () => {

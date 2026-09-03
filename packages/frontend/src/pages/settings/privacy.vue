@@ -33,20 +33,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</SearchMarker>
 
 		<SearchMarker :keywords="['following', 'visibility']">
-			<MkSelect v-model="followingVisibility" @update:modelValue="save()">
+			<MkSelect v-model="followingVisibility" :items="followingVisibilityDef" @update:modelValue="save()">
 				<template #label><SearchLabel>{{ i18n.ts.followingVisibility }}</SearchLabel></template>
-				<option value="public">{{ i18n.ts._ffVisibility.public }}</option>
-				<option value="followers">{{ i18n.ts._ffVisibility.followers }}</option>
-				<option value="private">{{ i18n.ts._ffVisibility.private }}</option>
 			</MkSelect>
 		</SearchMarker>
 
 		<SearchMarker :keywords="['follower', 'visibility']">
-			<MkSelect v-model="followersVisibility" @update:modelValue="save()">
+			<MkSelect v-model="followersVisibility" :items="followersVisibilityDef" @update:modelValue="save()">
 				<template #label><SearchLabel>{{ i18n.ts.followersVisibility }}</SearchLabel></template>
-				<option value="public">{{ i18n.ts._ffVisibility.public }}</option>
-				<option value="followers">{{ i18n.ts._ffVisibility.followers }}</option>
-				<option value="private">{{ i18n.ts._ffVisibility.private }}</option>
 			</MkSelect>
 		</SearchMarker>
 
@@ -77,122 +71,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #caption><SearchText>{{ i18n.ts.makeExplorableDescription }}</SearchText></template>
 			</MkSwitch>
 		</SearchMarker>
-
-		<!--		<SearchMarker :keywords="['chat']">-->
-		<!--			<FormSection>-->
-		<!--				<template #label><SearchLabel>{{ i18n.ts.chat }}</SearchLabel></template>-->
-
-		<!--				<div class="_gaps_m">-->
-		<!--					<MkInfo v-if="$i.policies.chatAvailability === 'unavailable'">{{ i18n.ts._chat.chatNotAvailableForThisAccountOrServer }}</MkInfo>-->
-		<!--					<SearchMarker :keywords="['chat']">-->
-		<!--						<MkSelect v-model="chatScope" @update:modelValue="save()">-->
-		<!--							<template #label><SearchLabel>{{ i18n.ts._chat.chatAllowedUsers }}</SearchLabel></template>-->
-		<!--							<option value="everyone">{{ i18n.ts._chat._chatAllowedUsers.everyone }}</option>-->
-		<!--							<option value="followers">{{ i18n.ts._chat._chatAllowedUsers.followers }}</option>-->
-		<!--							<option value="following">{{ i18n.ts._chat._chatAllowedUsers.following }}</option>-->
-		<!--							<option value="mutual">{{ i18n.ts._chat._chatAllowedUsers.mutual }}</option>-->
-		<!--							<option value="none">{{ i18n.ts._chat._chatAllowedUsers.none }}</option>-->
-		<!--							<template #caption>{{ i18n.ts._chat.chatAllowedUsers_note }}</template>-->
-		<!--						</MkSelect>-->
-		<!--					</SearchMarker>-->
-		<!--				</div>-->
-		<!--			</FormSection>-->
-		<!--		</SearchMarker>-->
-
-		<!--		<SearchMarker :keywords="['lockdown']">-->
-		<!--			<FormSection>-->
-		<!--				<template #label><SearchLabel>{{ i18n.ts.lockdown }}</SearchLabel><span class="_beta">{{ i18n.ts.beta }}</span></template>-->
-
-		<!--				<div class="_gaps_m">-->
-		<!--					<SearchMarker :keywords="['login', 'signin']">-->
-		<!--						<MkSwitch :modelValue="requireSigninToViewContents" @update:modelValue="update_requireSigninToViewContents">-->
-		<!--							<template #label><SearchLabel>{{ i18n.ts._accountSettings.requireSigninToViewContents }}</SearchLabel></template>-->
-		<!--							<template #caption>-->
-		<!--								<div>{{ i18n.ts._accountSettings.requireSigninToViewContentsDescription1 }}</div>-->
-		<!--								<div><i class="ti ti-alert-triangle" style="color: var(&#45;&#45;MI_THEME-warn);"></i> {{ i18n.ts._accountSettings.requireSigninToViewContentsDescription2 }}</div>-->
-		<!--							</template>-->
-		<!--						</MkSwitch>-->
-		<!--					</SearchMarker>-->
-
-		<!--					<SearchMarker :keywords="['follower']">-->
-		<!--						<FormSlot>-->
-		<!--							<template #label><SearchLabel>{{ i18n.ts._accountSettings.makeNotesFollowersOnlyBefore }}</SearchLabel></template>-->
-
-		<!--							<div class="_gaps_s">-->
-		<!--								<MkSelect :modelValue="makeNotesFollowersOnlyBefore_type" @update:modelValue="makeNotesFollowersOnlyBefore = $event === 'relative' ? -604800 : $event === 'absolute' ? Math.floor(Date.now() / 1000) : null">-->
-		<!--									<option :value="null">{{ i18n.ts.none }}</option>-->
-		<!--									<option value="relative">{{ i18n.ts._accountSettings.notesHavePassedSpecifiedPeriod }}</option>-->
-		<!--									<option value="absolute">{{ i18n.ts._accountSettings.notesOlderThanSpecifiedDateAndTime }}</option>-->
-		<!--								</MkSelect>-->
-
-		<!--								<MkSelect v-if="makeNotesFollowersOnlyBefore_type === 'relative'" v-model="makeNotesFollowersOnlyBefore">-->
-		<!--									<option :value="-3600">{{ i18n.ts.oneHour }}</option>-->
-		<!--									<option :value="-86400">{{ i18n.ts.oneDay }}</option>-->
-		<!--									<option :value="-259200">{{ i18n.ts.threeDays }}</option>-->
-		<!--									<option :value="-604800">{{ i18n.ts.oneWeek }}</option>-->
-		<!--									<option :value="-2592000">{{ i18n.ts.oneMonth }}</option>-->
-		<!--									<option :value="-7776000">{{ i18n.ts.threeMonths }}</option>-->
-		<!--									<option :value="-31104000">{{ i18n.ts.oneYear }}</option>-->
-		<!--								</MkSelect>-->
-
-		<!--								<MkInput-->
-		<!--									v-if="makeNotesFollowersOnlyBefore_type === 'absolute'"-->
-		<!--									:modelValue="formatDateTimeString(new Date(makeNotesFollowersOnlyBefore * 1000), 'yyyy-MM-dd')"-->
-		<!--									type="date"-->
-		<!--									:manualSave="true"-->
-		<!--									@update:modelValue="makeNotesFollowersOnlyBefore = Math.floor(new Date($event).getTime() / 1000)"-->
-		<!--								>-->
-		<!--								</MkInput>-->
-		<!--							</div>-->
-
-		<!--							<template #caption>-->
-		<!--								<div><SearchKeyword>{{ i18n.ts._accountSettings.makeNotesFollowersOnlyBeforeDescription }}</SearchKeyword></div>-->
-		<!--							</template>-->
-		<!--						</FormSlot>-->
-		<!--					</SearchMarker>-->
-
-		<!--										<SearchMarker :keywords="['hidden']">-->
-		<!--											<FormSlot>-->
-		<!--												<template #label><SearchLabel>{{ i18n.ts._accountSettings.makeNotesHiddenBefore }}</SearchLabel></template>-->
-
-		<!--												<div class="_gaps_s">-->
-		<!--													<MkSelect :modelValue="makeNotesHiddenBefore_type" @update:modelValue="makeNotesHiddenBefore = $event === 'relative' ? -604800 : $event === 'absolute' ? Math.floor(Date.now() / 1000) : null">-->
-		<!--														<option :value="null">{{ i18n.ts.none }}</option>-->
-		<!--														<option value="relative">{{ i18n.ts._accountSettings.notesHavePassedSpecifiedPeriod }}</option>-->
-		<!--														<option value="absolute">{{ i18n.ts._accountSettings.notesOlderThanSpecifiedDateAndTime }}</option>-->
-		<!--													</MkSelect>-->
-
-		<!--													<MkSelect v-if="makeNotesHiddenBefore_type === 'relative'" v-model="makeNotesHiddenBefore">-->
-		<!--														<option :value="-3600">{{ i18n.ts.oneHour }}</option>-->
-		<!--														<option :value="-86400">{{ i18n.ts.oneDay }}</option>-->
-		<!--														<option :value="-259200">{{ i18n.ts.threeDays }}</option>-->
-		<!--														<option :value="-604800">{{ i18n.ts.oneWeek }}</option>-->
-		<!--														<option :value="-2592000">{{ i18n.ts.oneMonth }}</option>-->
-		<!--														<option :value="-7776000">{{ i18n.ts.threeMonths }}</option>-->
-		<!--														<option :value="-31104000">{{ i18n.ts.oneYear }}</option>-->
-		<!--													</MkSelect>-->
-
-		<!--													<MkInput-->
-		<!--														v-if="makeNotesHiddenBefore_type === 'absolute'"-->
-		<!--														:modelValue="formatDateTimeString(new Date(makeNotesHiddenBefore * 1000), 'yyyy-MM-dd')"-->
-		<!--														type="date"-->
-		<!--														:manualSave="true"-->
-		<!--														@update:modelValue="makeNotesHiddenBefore = Math.floor(new Date($event).getTime() / 1000)"-->
-		<!--													>-->
-		<!--													</MkInput>-->
-		<!--												</div>-->
-
-		<!--												<template #caption>-->
-		<!--													<div><SearchKeyword>{{ i18n.ts._accountSettings.makeNotesHiddenBeforeDescription }}</SearchKeyword></div>-->
-		<!--												</template>-->
-		<!--											</FormSlot>-->
-		<!--										</SearchMarker>-->
-
-		<!--					<MkInfo warn>{{ i18n.ts._accountSettings.mayNotEffectSomeSituations }}</MkInfo>-->
-		<!--				</div>-->
-		<!--			</FormSection>-->
-		<!--		</SearchMarker>-->
-
 		<SearchMarker :label="i18n.ts.gtagConsentCustomize" :keywords="['analytics', 'privacy']">
 			<FormSection v-if="instance.googleAnalyticsId">
 				<MkFolder :defaultOpen="true">
@@ -229,6 +107,7 @@ import FormSection from '@/components/form/section.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import MkSelect from '@/components/MkSelect.vue';
 import MkFolder from '@/components/MkFolder.vue';
+import { useMkSelect } from '@/composables/use-mkselect.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
 import { instance } from '@/instance.js';
@@ -253,8 +132,28 @@ const makeNotesFollowersOnlyBefore = ref($i.makeNotesFollowersOnlyBefore ?? null
 const makeNotesHiddenBefore = ref($i.makeNotesHiddenBefore ?? null);
 const hideOnlineStatus = ref($i.hideOnlineStatus);
 const publicReactions = ref($i.publicReactions);
-const followingVisibility = ref($i.followingVisibility);
-const followersVisibility = ref($i.followersVisibility);
+const {
+	model: followingVisibility,
+	def: followingVisibilityDef,
+} = useMkSelect({
+	items: [
+		{ label: i18n.ts.public, value: 'public' },
+		{ label: i18n.ts.followers, value: 'followers' },
+		{ label: i18n.ts.private, value: 'private' },
+	],
+	initialValue: $i.followingVisibility,
+});
+const {
+	model: followersVisibility,
+	def: followersVisibilityDef,
+} = useMkSelect({
+	items: [
+		{ label: i18n.ts.public, value: 'public' },
+		{ label: i18n.ts.followers, value: 'followers' },
+		{ label: i18n.ts.private, value: 'private' },
+	],
+	initialValue: $i.followersVisibility,
+});
 const chatScope = ref($i.chatScope);
 
 const makeNotesFollowersOnlyBefore_type = computed(() => {
@@ -285,7 +184,7 @@ const gaConsent = computed({
 		gaConsentInternal.value = value;
 	},
 });
-const gtagConsentInternal = ref({
+const gtagConsentInternal = ref<GtagConsentParams>({
 	ad_storage: 'denied',
 	ad_user_data: 'denied',
 	ad_personalization: 'denied',

@@ -25,12 +25,14 @@ export function migrateOldSettings() {
 		});
 
 		const plugins = ColdDeviceStorage.get('plugins');
-		prefer.commit('plugins', plugins.map(p => ({
-			...p,
-			config: p.config ?? {},
-			installId: (p as any).id,
-			id: undefined,
-		})));
+		prefer.commit('plugins', plugins.map(p => {
+			const { id, ...rest } = p;
+			return {
+				...rest,
+				config: rest.config ?? {},
+				installId: id,
+			};
+		}));
 
 		prefer.commit('deck.profile', deckStore.s.profile);
 		misskeyApi('i/registry/keys', {
@@ -72,7 +74,7 @@ export function migrateOldSettings() {
 		prefer.commit('collapseRenotes', store.s.collapseRenotes);
 		prefer.commit('rememberNoteVisibility', store.s.rememberNoteVisibility);
 		prefer.commit('uploadFolder', store.s.uploadFolder);
-		prefer.commit('menu', [...store.s.menu, 'chat']);
+			prefer.commit('menu', store.s.menu.filter(item => item !== 'chat'));
 		prefer.commit('statusbars', store.s.statusbars);
 		prefer.commit('pinnedUserLists', store.s.pinnedUserLists);
 		prefer.commit('serverDisconnectedBehavior', store.s.serverDisconnectedBehavior);
@@ -116,7 +118,13 @@ export function migrateOldSettings() {
 		prefer.commit('enableCondensedLine', store.s.enableCondensedLine);
 		prefer.commit('keepScreenOn', store.s.keepScreenOn);
 		prefer.commit('useGroupedNotifications', store.s.useGroupedNotifications);
-		prefer.commit('dataSaver', store.s.dataSaver);
+		prefer.commit('dataSaver', {
+			...prefer.s.dataSaver,
+			media: store.s.dataSaver.media,
+			avatar: store.s.dataSaver.avatar,
+			urlPreviewThumbnail: store.s.dataSaver.urlPreview,
+			code: store.s.dataSaver.code,
+		});
 		prefer.commit('enableSeasonalScreenEffect', store.s.enableSeasonalScreenEffect);
 		prefer.commit('enableHorizontalSwipe', store.s.enableHorizontalSwipe);
 		prefer.commit('useNativeUiForVideoAudioPlayer', store.s.useNativeUIForVideoAudioPlayer);

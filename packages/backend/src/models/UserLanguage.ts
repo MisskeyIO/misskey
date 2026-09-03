@@ -10,7 +10,7 @@ export class MiUserLanguage {
 	@OneToOne(() => MiUser, {
 		onDelete: 'CASCADE',
 	})
-	@JoinColumn()
+	@JoinColumn({ foreignKeyConstraintName: 'FK_user_lang_user' })
 	public user: MiUser | null;
 
 	@Column('varchar', {

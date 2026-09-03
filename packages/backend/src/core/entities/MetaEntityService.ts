@@ -122,7 +122,7 @@ export class MetaEntityService {
 				imageUrl: ad.imageUrl,
 				imageBlurhash: ad.imageBlurhash,
 				dayOfWeek: ad.dayOfWeek,
-				isSensitive: ad.isSensitive,
+				isSensitive: ad.isSensitive ? true : undefined,
 			})),
 			wellKnownWebsites: instance.wellKnownWebsites,
 			notesPerOneAd: instance.notesPerOneAd,

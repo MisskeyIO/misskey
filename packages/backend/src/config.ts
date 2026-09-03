@@ -7,6 +7,7 @@ import * as fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import * as yaml from 'js-yaml';
+import { type FastifyServerOptions } from 'fastify';
 import type * as Sentry from '@sentry/node';
 import type * as SentryVue from '@sentry/vue';
 import type * as Bull from 'bullmq';
@@ -29,6 +30,7 @@ type Source = {
 	url?: string;
 	port?: number;
 	socket?: string;
+	trustProxy?: FastifyServerOptions['trustProxy'];
 	chmodSocket?: string;
 	disableHsts?: boolean;
 	db: {
@@ -171,6 +173,7 @@ export type Config = {
 	url: string;
 	port: number;
 	socket: string | undefined;
+	trustProxy: FastifyServerOptions['trustProxy'];
 	chmodSocket: string | undefined;
 	disableHsts: boolean | undefined;
 	db: {
@@ -364,6 +367,7 @@ export function loadConfig(): Config {
 		url: url.origin,
 		port: config.port ?? parseInt(process.env.PORT ?? '', 10),
 		socket: config.socket,
+		trustProxy: config.trustProxy,
 		chmodSocket: config.chmodSocket,
 		disableHsts: config.disableHsts,
 		host,

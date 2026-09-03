@@ -620,12 +620,6 @@ export class MiMeta {
 	})
 	public ugcVisibilityForVisitor: 'all' | 'local' | 'none';
 
-	@Column('varchar', {
-		length: 64,
-		nullable: true,
-	})
-	public googleAnalyticsMeasurementId: string | null;
-
 	@Column('jsonb', {
 		default: [],
 	})
@@ -665,6 +659,11 @@ export class MiMeta {
 		default: 90, // days
 	})
 	public remoteNotesCleaningExpiryDaysForEachNotes: number;
+
+	@Column('boolean', {
+		default: false,
+	})
+	public showRoleBadgesOfRemoteUsers: boolean;
 
 	@Column('jsonb', {
 		default: { },

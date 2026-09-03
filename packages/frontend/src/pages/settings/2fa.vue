@@ -214,7 +214,10 @@ async function addSecurityKey() {
 	if (name.canceled) return;
 
 	const credential = await os.promiseDialog(
-		startRegistration({ optionsJSON: registrationOptions }),
+		startRegistration({
+			// @ts-expect-error API schemaではWebAuthnの型を完全に表現できない
+			optionsJSON: registrationOptions,
+		}),
 		null,
 		() => {}, // ユーザーのキャンセルはrejectなのでエラーダイアログを出さない
 		i18n.ts._2fa.tapSecurityKey,
@@ -225,9 +228,10 @@ async function addSecurityKey() {
 	if (auth2.canceled) return;
 
 	await os.apiWithDialog('i/2fa/key-done', {
-		password: auth.result.password,
-		token: auth.result.token,
+		password: auth2.result.password,
+		token: auth2.result.token,
 		name: name.result,
+		// @ts-expect-error API schemaではWebAuthnの型を完全に表現できない
 		credential,
 	});
 }

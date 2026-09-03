@@ -107,6 +107,15 @@ export class MiPage {
 	})
 	public visibility: 'public' | 'private';
 
+	// 旧DBとの互換列。公開範囲の判定には使わない。
+	@Index()
+	@Column({
+		...id(),
+		array: true,
+		default: '{}',
+	})
+	public visibleUserIds: MiUser['id'][];
+
 	@Column('integer', {
 		default: 0,
 	})

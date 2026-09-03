@@ -6,13 +6,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <div :class="$style.root">
 	<div :class="$style.head">
-		<MkAvatar v-if="['pollEnded', 'note'].includes(notification.type) && notification.note" :class="$style.icon" :user="notification.note.user" link preview/>
-		<MkAvatar v-else-if="['roleAssigned', 'achievementEarned', 'exportCompleted', 'login', 'noteScheduled', 'scheduledNotePosted', 'scheduledNoteError', 'createToken'].includes(notification.type)" :class="$style.icon" :user="$i" link preview/>
-		<div
-			v-else-if="notification.type === 'sensitiveFlagAssigned'"
-			:class="$style.iconFrame"
-		>
-			<div :class="[$style.iconInner]">
+		<MkAvatar v-if="['pollEnded', 'note'].includes(notification.type) && 'note' in notification" :class="$style.icon" :user="notification.note.user" link preview/>
+		<MkAvatar v-else-if="['roleAssigned', 'achievementEarned', 'exportCompleted', 'login', 'createToken', 'scheduledNotePosted', 'scheduledNotePostFailed'].includes(notification.type)" :class="$style.icon" :user="$i" link preview/>
+		<div v-else-if="notification.type === 'sensitiveFlagAssigned'" :class="$style.iconFrame">
+			<div :class="$style.iconInner">
 				<img :class="$style.iconImg" src="/fluent-emoji/1f6a9.png">
 			</div>
 		</div>
@@ -31,12 +28,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 				[$style.t_mention]: notification.type === 'mention',
 				[$style.t_quote]: notification.type === 'quote',
 				[$style.t_pollEnded]: notification.type === 'pollEnded',
+				[$style.t_scheduledNotePosted]: notification.type === 'scheduledNotePosted',
+				[$style.t_scheduledNotePostFailed]: notification.type === 'scheduledNotePostFailed',
 				[$style.t_achievementEarned]: notification.type === 'achievementEarned',
 				[$style.t_exportCompleted]: notification.type === 'exportCompleted',
 				[$style.t_login]: notification.type === 'login',
-				[$style.t_noteScheduled]: notification.type === 'noteScheduled',
-				[$style.t_scheduledNotePosted]: notification.type === 'scheduledNotePosted',
-				[$style.t_scheduledNoteError]: notification.type === 'scheduledNoteError',
 				[$style.t_createToken]: notification.type === 'createToken',
 				[$style.t_chatRoomInvitationReceived]: notification.type === 'chatRoomInvitationReceived',
 				[$style.t_roleAssigned]: notification.type === 'roleAssigned' && notification.role.iconUrl == null,
@@ -50,10 +46,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<i v-else-if="notification.type === 'mention'" class="ti ti-at"></i>
 			<i v-else-if="notification.type === 'quote'" class="ti ti-quote"></i>
 			<i v-else-if="notification.type === 'pollEnded'" class="ti ti-chart-arrows"></i>
+			<i v-else-if="notification.type === 'scheduledNotePosted'" class="ti ti-send"></i>
+			<i v-else-if="notification.type === 'scheduledNotePostFailed'" class="ti ti-alert-triangle"></i>
 			<i v-else-if="notification.type === 'achievementEarned'" class="ti ti-medal"></i>
-			<i v-else-if="notification.type === 'noteScheduled'" class="ti ti-calendar-clock"></i>
-			<i v-else-if="notification.type === 'scheduledNotePosted'" class="ti ti-calendar-check"></i>
-			<i v-else-if="notification.type === 'scheduledNoteError'" class="ti ti-calendar-exclamation"></i>
 			<i v-else-if="notification.type === 'exportCompleted'" class="ti ti-archive"></i>
 			<i v-else-if="notification.type === 'login'" class="ti ti-login-2"></i>
 			<i v-else-if="notification.type === 'createToken'" class="ti ti-key"></i>
@@ -73,23 +68,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 	<div :class="$style.tail">
 		<header :class="$style.header">
-			<span v-if="notification.type === 'pollEnded'" :class="$style.headerName">{{ i18n.ts._notification.pollEnded }}</span>
-			<span v-else-if="notification.type === 'note'" :class="$style.headerName">{{ i18n.ts._notification.newNote }}: <MkUserName :user="notification.note.user"/></span>
-			<span v-else-if="notification.type === 'roleAssigned'" :class="$style.headerName">{{ i18n.ts._notification.roleAssigned }}</span>
-			<span v-else-if="notification.type === 'chatRoomInvitationReceived'" :class="$style.headerName">{{ i18n.ts._notification.chatRoomInvitationReceived }}</span>
-			<span v-else-if="notification.type === 'achievementEarned'" :class="$style.headerName">{{ i18n.ts._notification.achievementEarned }}</span>
-			<span v-else-if="notification.type === 'noteScheduled'" :class="$style.headerName">{{ i18n.ts._notification.noteScheduled }}</span>
-			<span v-else-if="notification.type === 'scheduledNotePosted'" :class="$style.headerName">{{ i18n.ts._notification.scheduledNotePosted }}</span>
-			<span v-else-if="notification.type === 'scheduledNoteError'" :class="$style.headerName">{{ i18n.ts._notification.scheduledNoteError }}</span>
-			<span v-else-if="notification.type === 'login'" :class="$style.headerName">{{ i18n.ts._notification.login }}</span>
-			<span v-else-if="notification.type === 'createToken'" :class="$style.headerName">{{ i18n.ts._notification.createToken }}</span>
-			<span v-else-if="notification.type === 'test'" :class="$style.headerName">{{ i18n.ts._notification.testNotification }}</span>
-			<span v-else-if="notification.type === 'exportCompleted'" :class="$style.headerName">{{ i18n.tsx._notification.exportOfXCompleted({ x: exportEntityName[notification.exportedEntity] }) }}</span>
+			<span v-if="notification.type === 'pollEnded'">{{ i18n.ts._notification.pollEnded }}</span>
+			<span v-else-if="notification.type === 'scheduledNotePosted'">{{ i18n.ts._notification.scheduledNotePosted }}</span>
+			<span v-else-if="notification.type === 'scheduledNotePostFailed'">{{ i18n.ts._notification.scheduledNotePostFailed }}</span>
+			<span v-else-if="notification.type === 'note'">{{ i18n.ts._notification.newNote }}: <MkUserName :user="notification.note.user"/></span>
+			<span v-else-if="notification.type === 'roleAssigned'">{{ i18n.ts._notification.roleAssigned }}</span>
+			<span v-else-if="notification.type === 'chatRoomInvitationReceived'">{{ i18n.ts._notification.chatRoomInvitationReceived }}</span>
+			<span v-else-if="notification.type === 'achievementEarned'">{{ i18n.ts._notification.achievementEarned }}</span>
+			<span v-else-if="notification.type === 'login'">{{ i18n.ts._notification.login }}</span>
+			<span v-else-if="notification.type === 'createToken'">{{ i18n.ts._notification.createToken }}</span>
+			<span v-else-if="notification.type === 'test'">{{ i18n.ts._notification.testNotification }}</span>
+			<span v-else-if="notification.type === 'exportCompleted'">{{ i18n.tsx._notification.exportOfXCompleted({ x: exportEntityName[notification.exportedEntity] }) }}</span>
 			<MkA v-else-if="notification.type === 'follow' || notification.type === 'mention' || notification.type === 'reply' || notification.type === 'renote' || notification.type === 'quote' || notification.type === 'reaction' || notification.type === 'receiveFollowRequest' || notification.type === 'followRequestAccepted'" v-user-preview="notification.user.id" :class="$style.headerName" :to="userPage(notification.user)"><MkUserName :user="notification.user"/></MkA>
-			<span v-else-if="notification.type === 'reaction:grouped' && notification.note.reactionAcceptance === 'likeOnly'" :class="$style.headerName">{{ i18n.tsx._notification.likedBySomeUsers({ n: getActualReactedUsersCount(notification) }) }}</span>
-			<span v-else-if="notification.type === 'reaction:grouped'" :class="$style.headerName">{{ i18n.tsx._notification.reactedBySomeUsers({ n: getActualReactedUsersCount(notification) }) }}</span>
-			<span v-else-if="notification.type === 'renote:grouped'" :class="$style.headerName">{{ i18n.tsx._notification.renotedBySomeUsers({ n: notification.users.length }) }}</span>
-			<span v-else-if="notification.type === 'app'" :class="$style.headerName">{{ notification.header }}</span>
+			<span v-else-if="notification.type === 'reaction:grouped' && notification.note.reactionAcceptance === 'likeOnly'">{{ i18n.tsx._notification.likedBySomeUsers({ n: getActualReactedUsersCount(notification) }) }}</span>
+			<span v-else-if="notification.type === 'reaction:grouped'">{{ i18n.tsx._notification.reactedBySomeUsers({ n: getActualReactedUsersCount(notification) }) }}</span>
+			<span v-else-if="notification.type === 'renote:grouped'">{{ i18n.tsx._notification.renotedBySomeUsers({ n: notification.users.length }) }}</span>
+			<span v-else-if="notification.type === 'app'">{{ notification.header }}</span>
 			<MkA v-else-if="notification.type === 'sensitiveFlagAssigned'" :to="'/my/drive/file/'+notification.fileId" :class="$style.headerName">{{ i18n.ts._notification.sensitiveFlagAssigned }}</MkA>
 			<MkTime v-if="withTime" :time="notification.createdAt" :class="$style.headerTime"/>
 		</header>
@@ -121,6 +115,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<Mfm :text="getNoteSummary(notification.note)" :plain="true" :nowrap="true" :author="notification.note.user"/>
 				<i class="ti ti-quote" :class="$style.quote"></i>
 			</MkA>
+			<MkA v-else-if="notification.type === 'scheduledNotePosted'" :class="$style.text" :to="notePage(notification.note)" :title="getNoteSummary(notification.note)">
+				<i class="ti ti-quote" :class="$style.quote"></i>
+				<Mfm :text="getNoteSummary(notification.note)" :plain="true" :nowrap="true" :author="notification.note.user"/>
+				<i class="ti ti-quote" :class="$style.quote"></i>
+			</MkA>
 			<div v-else-if="notification.type === 'roleAssigned'" :class="$style.text">
 				{{ notification.role.name }}
 			</div>
@@ -133,23 +132,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkA v-else-if="notification.type === 'exportCompleted'" :class="$style.text" :to="`/my/drive/file/${notification.fileId}`">
 				{{ i18n.ts.showFile }}
 			</MkA>
-			<div v-else-if="notification.type === 'noteScheduled'">
-				<Mfm :class="$style.text" :text="getNoteSummary(notification.draft.data as unknown as Misskey.entities.Note)" :plain="true" :nowrap="true"/>
-				<div v-if="notification.draft.scheduledAt" :class="$style.text" style="opacity: 0.6;">
-					<span><i class="ti ti-calendar-clock" style="margin-right: 4px;"/></span>
-					<MkTime :time="notification.draft.scheduledAt"/>
-				</div>
-			</div>
-			<MkA v-else-if="notification.type === 'scheduledNotePosted'" :class="$style.text" :to="notePage(notification.note)" :title="getNoteSummary(notification.note)">
-				<Mfm :text="getNoteSummary(notification.note)" :plain="true" :nowrap="true" :author="notification.note.user"/>
-			</MkA>
-			<div v-else-if="notification.type === 'scheduledNoteError'">
-				<Mfm :class="$style.text" :text="getNoteSummary(notification.draft.data as unknown as Misskey.entities.Note)" :plain="true" :nowrap="true"/>
-				<div v-if="notification.draft.reason" :class="$style.text" style="opacity: 0.6;">
-					<span><i class="ti ti-exclamation-circle" style="margin-right: 4px;"/></span>
-					{{ notification.draft.reason }}
-				</div>
-			</div>
 			<MkA v-else-if="notification.type === 'createToken'" :class="$style.text" to="/settings/apps">
 				<Mfm :text="i18n.tsx._notification.createTokenDescription({ text: i18n.ts.manageAccessTokens })"/>
 			</MkA>
@@ -196,7 +178,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 			</div>
 			<Mfm v-else-if="notification.type === 'sensitiveFlagAssigned'" :text="i18n.ts.sensitiveByModerator"/>
-			<span v-if="['sensitiveFlagAssigned'].includes(notification.type)" :class="$style.text" style="opacity: 0.6;">
+			<span v-if="notification.type === 'sensitiveFlagAssigned'" :class="$style.text" style="opacity: 0.6;">
 				{{ i18n.ts.thisInfoIsNotVisibleOtherUser }}
 			</span>
 		</div>
@@ -271,9 +253,8 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	overflow-wrap: break-word;
 	display: flex;
 	contain: content;
-
 	content-visibility: auto;
-	contain-intrinsic-size: none auto 100px;
+	contain-intrinsic-size: 0 100px;
 
 	--eventFollow: #36aed2;
 	--eventRenote: #36d298;
@@ -380,18 +361,22 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	pointer-events: none;
 }
 
+.t_scheduledNotePosted {
+	background: var(--eventOther);
+	pointer-events: none;
+}
+
+.t_scheduledNotePostFailed {
+	background: var(--eventOther);
+	pointer-events: none;
+}
+
 .t_achievementEarned {
 	background: var(--eventAchievement);
 	pointer-events: none;
 }
 
 .t_exportCompleted {
-	background: var(--eventOther);
-	pointer-events: none;
-}
-
-.t_noteScheduled, .t_scheduledNotePosted, .t_scheduledNoteError {
-	padding: 3px;
 	background: var(--eventOther);
 	pointer-events: none;
 }
@@ -517,25 +502,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	height: 100%;
 	padding: 4px;
 	border-radius: 100%;
-	box-sizing: border-box;
-	pointer-events: none;
-	user-select: none;
-	filter: drop-shadow(0px 2px 2px #00000044);
-	box-shadow: 0 1px 0px #ffffff88 inset;
-	overflow: clip;
 	background: linear-gradient(0deg, #703827, #d37566);
-}
-
-.iconImg {
-	width: calc(100% - 12px);
-	height: calc(100% - 12px);
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	margin: auto;
-	filter: drop-shadow(0px 1px 2px #000000aa);
 }
 
 .iconInner {
@@ -543,8 +510,16 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	width: 100%;
 	height: 100%;
 	border-radius: 100%;
-	box-shadow: 0 1px 0px #ffffff88 inset;
-	background: linear-gradient(0deg, #d37566, #703827);
+	box-shadow: 0 1px 0 #ffffff88 inset;
+}
+
+.iconImg {
+	position: absolute;
+	inset: 0;
+	width: calc(100% - 12px);
+	height: calc(100% - 12px);
+	margin: auto;
+	filter: drop-shadow(0 1px 2px #000000aa);
 }
 
 @container (max-width: 600px) {

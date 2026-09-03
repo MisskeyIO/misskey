@@ -454,7 +454,7 @@ if (!props.mock) {
 	}
 }
 
-async function renote(viaKeyboard = false): Promise<void> {
+async function renote(): Promise<void> {
 	await pleaseLogin({ openOnRemote: pleaseLoginContext.value });
 	showMovedDialog();
 
@@ -464,9 +464,7 @@ async function renote(viaKeyboard = false): Promise<void> {
 		mock: props.mock,
 		postFormDimension: tl_dimension.value ?? undefined,
 	});
-	os.popupMenu(menu, renoteButton.value, {
-		viaKeyboard,
-	});
+	os.popupMenu(menu, renoteButton.value);
 
 	subscribeManuallyToNoteCapture();
 }

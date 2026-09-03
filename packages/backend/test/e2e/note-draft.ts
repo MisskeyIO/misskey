@@ -9,18 +9,12 @@ import * as assert from 'node:assert';
 import { setTimeout } from 'node:timers/promises';
 import type { INestApplicationContext } from '@nestjs/common';
 import type * as misskey from 'misskey-js';
-import { api, castAsError, signup, startJobQueue } from '../utils.js';
+import { api, castAsError, sendEnvUpdateRequest, signup, startJobQueue } from '../utils.js';
 
 type IoDraftFields = {
 	dimension: number | null;
 	lang: string | null;
-	scheduledAt: string | null;
-};
-
-type IoDraftRequest = {
-	dimension?: number | null;
-	lang?: string | null;
-	scheduledAt?: number | null;
+	scheduledAt: number | null;
 };
 
 describe('NoteDraft', () => {
@@ -47,7 +41,7 @@ describe('NoteDraft', () => {
 
 	test('ioの投稿設定を作成・更新できる', async () => {
 		const scheduledAt = Math.ceil(Date.now() / 1000) * 1000 + 60_000;
-		const createParams: misskey.Endpoints['notes/drafts/create']['req'] & IoDraftRequest = {
+		const createParams: misskey.Endpoints['notes/drafts/create']['req'] = {
 			text: 'draft',
 			dimension: 0,
 			lang: 'ja',
@@ -59,10 +53,10 @@ describe('NoteDraft', () => {
 		const created = createRes.body.createdDraft as typeof createRes.body.createdDraft & IoDraftFields;
 		assert.strictEqual(created.dimension, 0);
 		assert.strictEqual(created.lang, 'ja');
-		assert.strictEqual(created.scheduledAt, new Date(scheduledAt).toISOString());
+		assert.strictEqual(created.scheduledAt, scheduledAt);
 		assert.strictEqual(created.localOnly, false);
 
-		const updateParams: misskey.Endpoints['notes/drafts/update']['req'] & IoDraftRequest = {
+		const updateParams: misskey.Endpoints['notes/drafts/update']['req'] = {
 			draftId: created.id,
 			text: 'updated',
 			localOnly: false,
@@ -141,37 +135,61 @@ describe('NoteDraft', () => {
 
 	test('予約投稿から下書きへ戻す値を保持する', async () => {
 		const expiredAfter = 86_400_000;
-		const createRes = await api('notes/create', {
+		const createRes = await api('notes/drafts/create', {
 			text: 'scheduled draft',
 			scheduledAt: Date.now() + 300_000,
+			isActuallyScheduled: true,
 			reactionAcceptance: 'likeOnly',
 			poll: {
 				choices: ['yes', 'no'],
 				expiredAfter,
 			},
 		}, alice);
-		assert.strictEqual(createRes.status, 204);
+		assert.strictEqual(createRes.status, 200);
 
-		const listRes = await api('notes/scheduled/list', {}, alice);
+		const listRes = await api('notes/drafts/list', { scheduled: true }, alice);
 		assert.strictEqual(listRes.status, 200);
-		const scheduled = listRes.body.find(item => item.data.text === 'scheduled draft');
+		const scheduled = listRes.body.find(item => item.text === 'scheduled draft');
 		assert.ok(scheduled);
-		assert.strictEqual((scheduled.data as typeof scheduled.data & { reactionAcceptance: string | null }).reactionAcceptance, 'likeOnly');
-		assert.strictEqual(scheduled.data.poll?.expiredAfter, expiredAfter);
+		assert.strictEqual(scheduled.reactionAcceptance, 'likeOnly');
+		assert.strictEqual(scheduled.poll?.expiredAfter, expiredAfter);
+	});
+
+	test('Redisの記録に頼らず同じ予約を一件だけ保存する', async () => {
+		const params = {
+			text: 'idempotent scheduled note',
+			scheduledAt: Date.now() + 300_000,
+		};
+
+		await sendEnvUpdateRequest({ key: 'FORCE_IGNORE_IDEMPOTENCY_FOR_TESTING', value: 'true' });
+		try {
+			const results = await Promise.all([
+				api('notes/create', params, alice),
+				api('notes/create', params, alice),
+			]);
+			assert.ok(results.every(result => result.status === 204));
+		} finally {
+			await sendEnvUpdateRequest({ key: 'FORCE_IGNORE_IDEMPOTENCY_FOR_TESTING', value: 'false' });
+		}
+
+		const listRes = await api('notes/drafts/list', { scheduled: true }, alice);
+		assert.strictEqual(listRes.status, 200);
+		assert.strictEqual(listRes.body.filter(item => item.text === params.text).length, 1);
 	});
 
 	test('予約投稿の投票期間は実投稿時から数える', async () => {
 		const expiredAfter = 60_000;
 		const scheduledAt = Math.ceil(Date.now() / 1000) * 1000 + 2000;
-		const createRes = await api('notes/create', {
+		const createRes = await api('notes/drafts/create', {
 			text: 'scheduled poll',
 			scheduledAt,
+			isActuallyScheduled: true,
 			poll: {
 				choices: ['yes', 'no'],
 				expiredAfter,
 			},
 		}, alice);
-		assert.strictEqual(createRes.status, 204);
+		assert.strictEqual(createRes.status, 200);
 
 		let note: misskey.entities.Note | undefined;
 		const timeoutAt = Date.now() + 10_000;
@@ -191,15 +209,16 @@ describe('NoteDraft', () => {
 	test('予約投稿の投票期限を絶対日時でも保持する', async () => {
 		const scheduledAt = Math.ceil(Date.now() / 1000) * 1000 + 2000;
 		const expiresAt = scheduledAt + 60_000;
-		const createRes = await api('notes/create', {
+		const createRes = await api('notes/drafts/create', {
 			text: 'scheduled poll with deadline',
 			scheduledAt,
+			isActuallyScheduled: true,
 			poll: {
 				choices: ['yes', 'no'],
 				expiresAt,
 			},
 		}, alice);
-		assert.strictEqual(createRes.status, 204);
+		assert.strictEqual(createRes.status, 200);
 
 		let note: misskey.entities.Note | undefined;
 		const timeoutAt = Date.now() + 10_000;

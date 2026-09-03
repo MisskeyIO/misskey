@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IsNull } from 'typeorm';
 import * as Bull from 'bullmq';
 import * as Redis from 'ioredis';
 import { DI } from '@/di-symbols.js';
@@ -10,6 +9,7 @@ import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { acquireDistributedLock } from '@/misc/distributed-lock.js';
 import { NotificationService } from '@/core/NotificationService.js';
 import { NoteCreateService } from '@/core/NoteCreateService.js';
+import { LEGACY_SCHEDULED_NOTE_NOT_MIGRATED_SQL } from '@/models/ScheduledNote.js';
 import { QueueLoggerService } from '../QueueLoggerService.js';
 import type { ScheduledNoteJobData } from '../types.js';
 
@@ -35,17 +35,28 @@ export class ScheduledNoteProcessorService {
 	public async process(job: Bull.Job<ScheduledNoteJobData>): Promise<string> {
 		this.logger.info(`processing ${job.data.draftId}`);
 
+		let release: (() => Promise<void>) | undefined;
 		try {
-			await acquireDistributedLock(this.redisForTimelines, `note:scheduled:${job.data.draftId}`, 30 * 1000, 1, 100);
+			release = await acquireDistributedLock(this.redisForTimelines, `note:scheduled:${job.data.draftId}`, 30 * 1000, 1, 100);
 		} catch (e) {
 			this.logger.warn(`draft=${job.data.draftId} is already being processed`);
 			return 'ok';
 		}
 
-		const draft = await this.scheduledNotesRepository.findOne({
-			where: { id: job.data.draftId, reason: IsNull() },
-			relations: ['user'],
-		});
+		try {
+			return await this.processLocked(job);
+		} finally {
+			await release();
+		}
+	}
+
+	private async processLocked(job: Bull.Job<ScheduledNoteJobData>): Promise<string> {
+		const draft = await this.scheduledNotesRepository.createQueryBuilder('draft')
+			.leftJoinAndSelect('draft.user', 'user')
+			.where('draft.id = :id', { id: job.data.draftId })
+			.andWhere('draft.reason IS NULL')
+			.andWhere(LEGACY_SCHEDULED_NOTE_NOT_MIGRATED_SQL)
+			.getOne();
 
 		if (draft == null) {
 			this.logger.warn(`draft not found: ${job.data.draftId}`);
@@ -74,7 +85,6 @@ export class ScheduledNoteProcessorService {
 				...draft.draft,
 				poll,
 				createdAt: new Date(),
-				scheduledAt: null,
 			})) as MiNote;
 
 			await this.scheduledNotesRepository.delete({ id: draft.id });
@@ -93,14 +103,17 @@ export class ScheduledNoteProcessorService {
 					'85ab9bd7-3a41-4530-959d-f07073900109',
 					'd450b8a9-48e4-4dab-ae36-f4db763fda7c',
 				].includes(e.id)) {
-					this.logger.warn(`creating note from draft=${draft.id} failed: ${e.message}`);
+					this.logger.warn('旧予約投稿の作成に失敗しました', {
+						draftId: draft.id,
+						errorId: e.id,
+					});
 
 					await this.scheduledNotesRepository.update({ id: draft.id }, {
 						scheduledAt: null,
 						reason: e.message,
 					});
 
-					this.notificationService.createNotification(draft.userId, 'scheduledNoteError', {
+					await this.notificationService.createNotificationAsync(draft.userId, 'scheduledNoteError', {
 						draftId: draft.id,
 					});
 

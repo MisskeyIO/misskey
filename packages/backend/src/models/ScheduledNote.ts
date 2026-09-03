@@ -3,6 +3,9 @@ import type { NoteCreateOption } from '@/types.js';
 import { id } from './util/id.js';
 import { MiUser } from './User.js';
 
+export const LEGACY_SCHEDULED_NOTE_MIGRATED = '__note_draft_migrated__';
+export const LEGACY_SCHEDULED_NOTE_NOT_MIGRATED_SQL = 'NOT EXISTS (SELECT 1 FROM "note_scheduled_migration" migration WHERE migration."noteScheduledId" = draft.id)';
+
 @Entity('note_scheduled')
 @Index(['userId', 'scheduledAt'], { unique: true })
 export class MiScheduledNote {

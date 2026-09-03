@@ -418,6 +418,10 @@ onlyBuiltDependencies:
 overrides:
   '@aiscript-dev/aiscript-languageserver': '-'
   '@misskey-dev/summaly': github:MisskeyIO/summaly#5.2.5-io.3
+  '@peculiar/asn1-ecc': 2.6.1
+  '@peculiar/asn1-rsa': 2.6.1
+  '@peculiar/asn1-schema': 2.6.0
+  '@peculiar/asn1-x509': 2.6.1
   '@tensorflow/tfjs': 4.22.0
   '@tensorflow/tfjs-core': 4.22.0
   '@tensorflow/tfjs-node': 4.22.0

@@ -175,4 +175,31 @@ export class MiNoteDraft {
 		default: false,
 	})
 	public isActuallyScheduled: boolean;
+
+	@Column('varchar', {
+		length: 256,
+		nullable: true,
+	})
+	public scheduledFailureReason: string | null;
+
+	@Column('boolean', {
+		default: false,
+	})
+	public noExtractMentions: boolean;
+
+	@Column('boolean', {
+		default: false,
+	})
+	public noExtractHashtags: boolean;
+
+	@Column('boolean', {
+		default: false,
+	})
+	public noExtractEmojis: boolean;
+
+	@Column({
+		...id(),
+		nullable: true,
+	})
+	public reservedNoteId: MiNote['id'] | null;
 }

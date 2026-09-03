@@ -178,5 +178,21 @@ export const packedNoteDraftSchema = {
 			type: 'boolean',
 			optional: false, nullable: false,
 		},
+		scheduledFailureReason: {
+			type: 'string',
+			optional: false, nullable: true,
+		},
+		noExtractMentions: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
+		noExtractHashtags: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
+		noExtractEmojis: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
 	},
 } as const;

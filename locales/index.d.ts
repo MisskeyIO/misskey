@@ -13812,6 +13812,14 @@ export interface Locale extends ILocale {
          * 予約解除
          */
         "cancelSchedule": string;
+        /**
+         * 予約投稿に失敗しました。内容を確認して再設定してください。
+         */
+        "scheduledPostFailed": string;
+        /**
+         * 元の予約日時
+         */
+        "originalScheduledAt": string;
     };
     /**
      * 二次元コード

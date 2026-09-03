@@ -228,6 +228,9 @@ if (props.initialVisibleUsers) {
 }
 const reactionAcceptance = ref(store.s.reactionAcceptance);
 const scheduledAt = ref<number | null>(null);
+const noExtractMentions = ref(false);
+const noExtractHashtags = ref(false);
+const noExtractEmojis = ref(false);
 const scheduledTimeExceededPolicy = computed(() =>
 	scheduledAt.value != null ? (scheduledAt.value - Date.now()) / 86_400_000 > $i.policies.scheduleNoteMaxDays : false
 );
@@ -742,6 +745,9 @@ function clear() {
 	poll.value = null;
 	visibleUsers.value = [];
 	scheduledAt.value = null;
+	noExtractMentions.value = false;
+	noExtractHashtags.value = false;
+	noExtractEmojis.value = false;
 	quoteId.value = null;
 	serverDraftId.value = null;
 }
@@ -908,6 +914,9 @@ async function saveServerDraft(options: {
 			lang: postingLang.value,
 			scheduledAt: scheduledAt.value,
 			isActuallyScheduled: options.isActuallyScheduled ?? false,
+			noExtractMentions: noExtractMentions.value,
+			noExtractHashtags: noExtractHashtags.value,
+			noExtractEmojis: noExtractEmojis.value,
 		};
 
 		if (serverDraftId.value == null) {
@@ -1022,6 +1031,9 @@ async function post(ev?: MouseEvent) {
 		visibleUserIds: visibility.value === 'specified' ? visibleUsers.value.map(u => u.id) : undefined,
 		reactionAcceptance: reactionAcceptance.value,
 		lang: postingLang.value ?? undefined,
+		noExtractMentions: noExtractMentions.value,
+		noExtractHashtags: noExtractHashtags.value,
+		noExtractEmojis: noExtractEmojis.value,
 		noCreatedNote: true,
 	};
 
@@ -1288,6 +1300,9 @@ async function restoreServerDraft(draft: Misskey.entities.NoteDraft) {
 		hashtags.value = '';
 		withHashtags.value = false;
 		scheduledAt.value = null;
+		noExtractMentions.value = false;
+		noExtractHashtags.value = false;
+		noExtractEmojis.value = false;
 		quoteId.value = null;
 		renoteTargetNote.value = null;
 		replyTargetNote.value = null;
@@ -1322,6 +1337,9 @@ async function restoreServerDraft(draft: Misskey.entities.NoteDraft) {
 		dimension.value = draft.dimension ?? prefer.s.dimension;
 		postingLang.value = draft.lang as PostingLanguage | null;
 		scheduledAt.value = draft.scheduledAt != null && draft.scheduledAt >= Date.now() ? draft.scheduledAt : null;
+		noExtractMentions.value = draft.noExtractMentions;
+		noExtractHashtags.value = draft.noExtractHashtags;
+		noExtractEmojis.value = draft.noExtractEmojis;
 		serverDraftId.value = draft.id;
 	} finally {
 		draftProcessing.value = false;

@@ -101,6 +101,12 @@ export const meta = {
 			id: 'b6992544-63e7-67f0-fa7f-32444b1b5306',
 		},
 
+		noSuchVisibleUser: {
+			message: 'Some visible users are not found.',
+			code: 'NO_SUCH_VISIBLE_USER',
+			id: '96fe23ce-3494-4ad8-b69f-1a166e41ee94',
+		},
+
 		cannotRenoteOutsideOfChannel: {
 			message: 'Cannot renote outside of channel.',
 			code: 'CANNOT_RENOTE_OUTSIDE_OF_CHANNEL',
@@ -179,6 +185,12 @@ export const meta = {
 			id: 'ea102856-e8da-4ae9-a98a-0326821bd177',
 		},
 
+		invalidScheduledNote: {
+			message: 'Scheduled note content is invalid.',
+			code: 'INVALID_SCHEDULED_NOTE',
+			id: 'e35e6376-01de-476f-a752-a90a848a4f55',
+		},
+
 		rolePermissionDenied: {
 			message: 'You are not assigned to a required role.',
 			code: 'ROLE_PERMISSION_DENIED',
@@ -245,6 +257,9 @@ export const paramDef = {
 		},
 		scheduledAt: { type: 'integer', nullable: true, maximum: 253_402_300_799_999 },
 		isActuallyScheduled: { type: 'boolean' },
+		noExtractMentions: { type: 'boolean' },
+		noExtractHashtags: { type: 'boolean' },
+		noExtractEmojis: { type: 'boolean' },
 	},
 	required: ['draftId'],
 } as const;
@@ -258,24 +273,32 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		super(meta, paramDef, async (ps, me) => {
 			const draft = await this.noteDraftService.update(me, ps.draftId, {
 				fileIds: ps.fileIds,
-				pollChoices: ps.poll?.choices,
-				pollMultiple: ps.poll?.multiple,
-				pollExpiresAt: ps.poll?.expiresAt ? new Date(ps.poll.expiresAt) : null,
-				pollExpiredAfter: ps.poll?.expiredAfter,
+				...(ps.poll === undefined ? {} : {
+					pollChoices: ps.poll?.choices ?? [],
+					pollMultiple: ps.poll?.multiple ?? false,
+					pollExpiresAt: ps.poll?.expiresAt == null ? null : new Date(ps.poll.expiresAt),
+					pollExpiredAfter: ps.poll?.expiredAfter ?? null,
+					hasPoll: ps.poll != null,
+				}),
 				text: ps.text,
 				replyId: ps.replyId,
 				renoteId: ps.renoteId,
 				cw: ps.cw,
 				hashtag: ps.hashtag,
 				localOnly: ps.localOnly,
-				dimension: ps.dimension ?? null,
-				lang: ps.lang ?? null,
+				dimension: ps.dimension,
+				lang: ps.lang,
 				reactionAcceptance: ps.reactionAcceptance,
 				visibility: ps.visibility,
 				visibleUserIds: ps.visibleUserIds,
 				channelId: ps.channelId,
-				scheduledAt: ps.scheduledAt ? new Date(ps.scheduledAt) : null,
+				...(ps.scheduledAt === undefined ? {} : {
+					scheduledAt: ps.scheduledAt === null ? null : new Date(ps.scheduledAt),
+				}),
 				isActuallyScheduled: ps.isActuallyScheduled,
+				noExtractMentions: ps.noExtractMentions,
+				noExtractHashtags: ps.noExtractHashtags,
+				noExtractEmojis: ps.noExtractEmojis,
 			}).catch((err) => {
 				if (err instanceof IdentifiableError) {
 					switch (err.id) {
@@ -285,6 +308,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 							throw new ApiError(meta.errors.cannotCreateAlreadyExpiredPoll);
 						case 'b6992544-63e7-67f0-fa7f-32444b1b5306':
 							throw new ApiError(meta.errors.noSuchFile);
+						case '81df0c8d-2cfe-4e1a-9e93-b948ef455d9d':
+							throw new ApiError(meta.errors.noSuchVisibleUser);
 						case '64929870-2540-4d11-af41-3b484d78c956':
 							throw new ApiError(meta.errors.noSuchRenote);
 						case '76cc5583-5a14-4ad3-8717-0298507e32db':
@@ -326,6 +351,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 							throw new ApiError(meta.errors.cannotScheduleToPast);
 						case '506006cf-3092-4ae1-8145-b025001c591f':
 							throw new ApiError(meta.errors.cannotScheduleToFarFuture);
+						case '4f5bb9ec-5c64-47e9-b21b-da977f45ae3d':
+							throw new ApiError(meta.errors.invalidScheduledNote);
 						default:
 							throw err;
 					}

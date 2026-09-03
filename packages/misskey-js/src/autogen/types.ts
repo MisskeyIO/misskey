@@ -4646,6 +4646,10 @@ export type components = {
             reactionAcceptance: 'likeOnly' | 'likeOnlyForRemote' | 'nonSensitiveOnly' | 'nonSensitiveOnlyForLocalLikeOnlyForRemote' | null;
             scheduledAt: number | null;
             isActuallyScheduled: boolean;
+            scheduledFailureReason: string | null;
+            noExtractMentions: boolean;
+            noExtractHashtags: boolean;
+            noExtractEmojis: boolean;
         };
         ScheduledNote: {
             /** Format: misskey:id */
@@ -30337,6 +30341,7 @@ export interface operations {
                         expiresAt?: number | null;
                         expiredAfter?: number | null;
                     } | null;
+                    scheduledAt?: number | null;
                     /** @default false */
                     noCreatedNote?: boolean;
                 };
@@ -30585,6 +30590,12 @@ export interface operations {
                     scheduledAt?: number | null;
                     /** @default false */
                     isActuallyScheduled?: boolean;
+                    /** @default false */
+                    noExtractMentions?: boolean;
+                    /** @default false */
+                    noExtractHashtags?: boolean;
+                    /** @default false */
+                    noExtractEmojis?: boolean;
                 };
             };
         };
@@ -30825,6 +30836,9 @@ export interface operations {
                     } | null;
                     scheduledAt?: number | null;
                     isActuallyScheduled?: boolean;
+                    noExtractMentions?: boolean;
+                    noExtractHashtags?: boolean;
+                    noExtractEmojis?: boolean;
                 };
             };
         };

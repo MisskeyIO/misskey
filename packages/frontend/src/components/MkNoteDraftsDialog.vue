@@ -66,6 +66,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 										</template>
 									</I18n>
 								</MkInfo>
+								<MkInfo v-if="draft.scheduledFailureReason != null" warn>
+									<div>{{ i18n.ts._drafts.scheduledPostFailed }}</div>
+									<div v-if="draft.scheduledAt != null">
+										{{ i18n.ts._drafts.originalScheduledAt }}: <MkTime :time="draft.scheduledAt" mode="detail"/>
+									</div>
+								</MkInfo>
 								<div :class="$style.draftInfo">
 									<div :class="$style.draftMeta">
 										<div v-if="draft.reply" class="_nowrap">

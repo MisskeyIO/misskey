@@ -3683,6 +3683,8 @@ _drafts:
   schedule: "投稿予約"
   listScheduledNotes: "予約投稿一覧"
   cancelSchedule: "予約解除"
+  scheduledPostFailed: "予約投稿に失敗しました。内容を確認して再設定してください。"
+  originalScheduledAt: "元の予約日時"
 
 qr: "二次元コード"
 _qr:

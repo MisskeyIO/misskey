@@ -3552,6 +3552,8 @@ _drafts:
   schedule: "Schedule note"
   listScheduledNotes: "Scheduled notes list"
   cancelSchedule: "Cancel schedule"
+  scheduledPostFailed: "The scheduled post failed. Review it before scheduling again."
+  originalScheduledAt: "Original scheduled time"
 qr: "QR Code"
 _qr:
   showTabTitle: "Display"

@@ -29,7 +29,6 @@ catalog:
   '@fastify/http-proxy': 11.4.1
   '@fastify/multipart': 9.4.0
   '@fastify/static': 9.0.0
-  '@fastify/view': 11.1.1
   '@isaacs/ttlcache': 2.1.4
   '@jest/globals': 30.2.0
   '@kitajs/html': 4.2.11
@@ -119,7 +118,6 @@ catalog:
   '@types/oauth2orize': 1.11.5
   '@types/oauth2orize-pkce': 0.1.2
   '@types/pg': 8.16.0
-  '@types/pug': 2.0.10
   '@types/punycode.js': npm:@types/punycode@2.1.4
   '@types/qrcode': 1.5.6
   '@types/random-seed': 0.3.5
@@ -279,7 +277,6 @@ catalog:
   probe-image-size: 7.2.3
   promise-limit: 2.7.0
   psl: 1.15.0
-  pug: 3.0.3
   punycode.js: 2.3.1
   qrcode: 1.5.4
   qr-code-styling: 1.9.2

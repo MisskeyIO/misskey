@@ -54,9 +54,6 @@ catalogs:
     '@fastify/static':
       specifier: 9.0.0
       version: 9.0.0
-    '@fastify/view':
-      specifier: 11.1.1
-      version: 11.1.1
     '@isaacs/ttlcache':
       specifier: 2.1.4
       version: 2.1.4
@@ -309,9 +306,6 @@ catalogs:
     '@types/pg':
       specifier: 8.16.0
       version: 8.16.0
-    '@types/pug':
-      specifier: 2.0.10
-      version: 2.0.10
     '@types/qrcode':
       specifier: 1.5.6
       version: 1.5.6
@@ -768,9 +762,6 @@ catalogs:
     psl:
       specifier: 1.15.0
       version: 1.15.0
-    pug:
-      specifier: 3.0.3
-      version: 3.0.3
     punycode.js:
       specifier: 2.3.1
       version: 2.3.1
@@ -1199,9 +1190,6 @@ importers:
       '@fastify/static':
         specifier: 'catalog:'
         version: 9.0.0
-      '@fastify/view':
-        specifier: 'catalog:'
-        version: 11.1.1
       '@kitajs/html':
         specifier: 'catalog:'
         version: 4.2.11
@@ -1469,9 +1457,6 @@ importers:
       psl:
         specifier: 'catalog:'
         version: 1.15.0
-      pug:
-        specifier: 'catalog:'
-        version: 3.0.3
       punycode.js:
         specifier: 'catalog:'
         version: 2.3.1
@@ -1647,9 +1632,6 @@ importers:
       '@types/pg':
         specifier: 'catalog:'
         version: 8.16.0
-      '@types/pug':
-        specifier: 'catalog:'
-        version: 2.0.10
       '@types/punycode.js':
         specifier: npm:@types/punycode@2.1.4
         version: '@types/punycode@2.1.4'
@@ -6350,9 +6332,6 @@ packages:
 
   '@types/pg@8.16.0':
     resolution: {integrity: sha512-RmhMd/wD+CF8Dfo+cVIy3RR5cl8CyfXQ0tGgW6XBL8L4LM/UTEbNXYRbLwU6w+CgrKBNbrQWt4FUtTfaU5jSYQ==}
-
-  '@types/pug@2.0.10':
-    resolution: {integrity: sha512-Sk/uYFOBAB7mb74XcpizmH0KOR2Pv3D2Hmrh1Dmy5BmK3MpdSa5kqZcg6EKBdklU0bFXX9gCfzvpnyUehrPIuA==}
 
   '@types/punycode@2.1.4':
     resolution: {integrity: sha512-trzh6NzBnq8yw5e35f8xe8VTYjqM3NE7bohBtvDVf/dtUer3zYTLK1Ka3DG3p7bdtoaOHZucma6FfVKlQ134pQ==}
@@ -17624,8 +17603,6 @@ snapshots:
       '@types/node': 24.10.1
       pg-protocol: 1.11.0
       pg-types: 2.2.0
-
-  '@types/pug@2.0.10': {}
 
   '@types/punycode@2.1.4': {}
 

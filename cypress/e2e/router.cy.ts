@@ -15,13 +15,17 @@ describe('Router transition', () => {
 			// ユーザー作成
 			cy.registerUser('alice', 'alice1234');
 
-			cy.login('alice', 'alice1234');
+			// 初期設定済みの状態を作る
+			cy.get('@alice').its('token').then(token => {
+				cy.request('POST', '/api/i/registry/set', {
+					i: token,
+					scope: ['client', 'base'],
+					key: 'accountSetupWizard',
+					value: -1,
+				});
+			});
 
-			// アカウント初期設定ウィザード
-			// 表示に時間がかかるのでデフォルト秒数だとタイムアウトする
-			cy.get('[data-cy-user-setup] [data-cy-modal-window-close]', { timeout: 30000 }).click();
-			cy.wait(500);
-			cy.get('[data-cy-modal-dialog-ok]').click();
+			cy.login('alice', 'alice1234');
 		});
 
 		it('redirect to user profile', () => {

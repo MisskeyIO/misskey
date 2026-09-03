@@ -6,7 +6,7 @@
 import { computed, reactive } from 'vue';
 import * as Misskey from 'misskey-js';
 import { DEFAULT_INFO_IMAGE_URL, DEFAULT_SERVER_ERROR_IMAGE_URL } from '@@/js/const.js';
-import { misskeyApiGet } from '@/utility/misskey-api.js';
+import { misskeyApi, misskeyApiGet } from '@/utility/misskey-api.js';
 import { miLocalStorage } from '@/local-storage.js';
 
 // TODO: 他のタブと永続化されたstateを同期
@@ -43,7 +43,7 @@ export async function fetchInstance(force = false): Promise<Misskey.entities.Met
 		}
 	}
 
-	const meta = await misskeyApiGet('meta', {
+	const meta = await (force ? misskeyApi : misskeyApiGet)('meta', {
 		detail: true,
 	});
 

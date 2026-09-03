@@ -142,6 +142,7 @@ export const refs = {
 	MetaLite: packedMetaLiteSchema,
 	MetaDetailedOnly: packedMetaDetailedOnlySchema,
 	MetaDetailed: packedMetaDetailedSchema,
+	MetaClientOptions: packedMetaClientOptionsSchema,
 	AbuseUserReport: packedAbuseUserReportSchema,
 	ModerationLog: packedModerationLogSchema,
 	UserWebhook: packedUserWebhookSchema,

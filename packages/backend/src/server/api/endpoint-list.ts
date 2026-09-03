@@ -456,7 +456,6 @@ export * as 'announcement' from './endpoints/announcement.js';
 export * as 'channels/featured-games' from './endpoints/channels/featured-games.js';
 export * as 'notes/scheduled/cancel' from './endpoints/notes/scheduled/cancel.js';
 export * as 'notes/scheduled/list' from './endpoints/notes/scheduled/list.js';
-export * as 'users/get-following-birthday-users' from './endpoints/users/get-following-birthday-users.js';
 export * as 'users/get-skeb-status' from './endpoints/users/get-skeb-status.js';
 export * as 'users/get-security-info' from './endpoints/users/get-security-info.js';
 export * as 'users/stats' from './endpoints/users/stats.js';

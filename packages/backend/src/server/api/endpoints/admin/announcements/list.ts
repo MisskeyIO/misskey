@@ -52,12 +52,12 @@ export const meta = {
 				},
 				imageUrl: {
 					type: 'string',
-					optional: false, nullable: false,
-					enum: ['info', 'warning', 'error', 'success'],
+					optional: false, nullable: true,
 				},
 				icon: {
 					type: 'string',
 					optional: false, nullable: false,
+					enum: ['info', 'warning', 'error', 'success'],
 				},
 				display: {
 					type: 'string',

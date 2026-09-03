@@ -33,6 +33,9 @@ describe('config settings migration', () => {
 			`ALTER TABLE "meta" ADD "proxyRemoteFiles" boolean NOT NULL DEFAULT ${expected[0]}`,
 			`ALTER TABLE "meta" ADD "signToActivityPubGet" boolean NOT NULL DEFAULT ${expected[1]}`,
 			`ALTER TABLE "meta" ADD "allowExternalApRedirect" boolean NOT NULL DEFAULT ${expected[2]}`,
+			'ALTER TABLE "meta" ALTER COLUMN "proxyRemoteFiles" SET DEFAULT true',
+			'ALTER TABLE "meta" ALTER COLUMN "signToActivityPubGet" SET DEFAULT true',
+			'ALTER TABLE "meta" ALTER COLUMN "allowExternalApRedirect" SET DEFAULT true',
 		]);
 	});
 });

@@ -8,6 +8,7 @@ import type { MiUserListMembership, UserListMembershipsRepository, UserListsRepo
 import type { Packed } from '@/misc/json-schema.js';
 import { RoleService } from '@/core/RoleService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { NoteStreamingHidingService } from '../NoteStreamingHidingService.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
@@ -39,6 +40,7 @@ export class UserListChannel extends Channel {
 
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
+		private noteStreamingHidingService: NoteStreamingHidingService,
 	) {
 		super(request);
 		//this.updateListUsers = this.updateListUsers.bind(this);
@@ -46,8 +48,8 @@ export class UserListChannel extends Channel {
 	}
 
 	@bindThis
-	public async init(params: JsonObject) {
-		if (typeof params.listId !== 'string') return;
+	public async init(params: JsonObject): Promise<boolean> {
+		if (typeof params.listId !== 'string') return false;
 		this.listId = params.listId;
 		this.withFiles = !!(params.withFiles ?? false);
 		this.withRenotes = !!(params.withRenotes ?? true);
@@ -60,7 +62,7 @@ export class UserListChannel extends Channel {
 				userId: this.user!.id,
 			},
 		});
-		if (!listExist) return;
+		if (!listExist) return false;
 
 		// Subscribe stream
 		this.subscriber.on(`userListStream:${this.listId}`, this.send);
@@ -69,6 +71,8 @@ export class UserListChannel extends Channel {
 
 		this.updateListUsers();
 		this.listUsersClock = setInterval(this.updateListUsers, 5000);
+
+		return true;
 	}
 
 	@bindThis
@@ -94,17 +98,16 @@ export class UserListChannel extends Channel {
 		let note = sourceNote;
 		const isMe = this.user!.id === note.userId;
 
+		// チャンネル投稿は無視する
+		if (note.channelId) return;
+
 		// ファイルを含まない投稿は除外
 		if (this.withFiles && (note.fileIds == null || note.fileIds.length === 0)) return;
 		if (this.withFiles && (note.files === undefined || note.files.length === 0)) return;
 
 		if (!Object.hasOwn(this.membershipsMap, note.userId)) return;
 
-		if (note.visibility === 'followers') {
-			if (!isMe && !Object.hasOwn(this.following, note.userId)) return;
-		} else if (note.visibility === 'specified') {
-			if (!note.visibleUserIds!.includes(this.user!.id)) return;
-		}
+		if (!this.isNoteVisibleForMe(note)) return;
 
 		if (note.reply) {
 			const reply = note.reply;
@@ -132,6 +135,10 @@ export class UserListChannel extends Channel {
 		if (!(await this.noteEntityService.isLanguageVisibleToMe(note, this.user?.id))) return;
 
 		if (this.isNoteMutedOrBlocked(note)) return;
+
+		const filtered = await this.noteStreamingHidingService.filter(note, this.user?.id ?? null);
+		if (!filtered) return;
+		note = filtered;
 
 		if (this.user && isRenotePacked(note) && !isQuotePacked(note)) {
 			if (note.renote && Object.keys(note.renote.reactions).length > 0) {

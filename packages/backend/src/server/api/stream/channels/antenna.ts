@@ -4,9 +4,13 @@
  */
 
 import { Inject, Injectable, Scope } from '@nestjs/common';
+import { DI } from '@/di-symbols.js';
+import type { AntennasRepository } from '@/models/_.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { RoleService } from '@/core/RoleService.js';
+import { NoteStreamingHidingService } from '../NoteStreamingHidingService.js';
 import { bindThis } from '@/decorators.js';
+import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import type { GlobalEvents } from '@/core/GlobalEventService.js';
 import type { JsonObject } from '@/misc/json-value.js';
 import Channel, { type ChannelRequest } from '../channel.js';
@@ -25,27 +29,44 @@ export class AntennaChannel extends Channel {
 		@Inject(REQUEST)
 		request: ChannelRequest,
 
+		@Inject(DI.antennasRepository)
+		private antennasReposiotry: AntennasRepository,
+
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
+		private noteStreamingHidingService: NoteStreamingHidingService,
 	) {
 		super(request);
 		//this.onEvent = this.onEvent.bind(this);
 	}
 
 	@bindThis
-	public async init(params: JsonObject) {
-		if (typeof params.antennaId !== 'string') return;
+	public async init(params: JsonObject): Promise<boolean> {
+		if (typeof params.antennaId !== 'string') return false;
+		if (!this.user) return false;
+
 		this.antennaId = params.antennaId;
 		this.minimize = !!(params.minimize ?? false);
 
+		const antennaExists = await this.antennasReposiotry.exists({
+			where: {
+				id: this.antennaId,
+				userId: this.user.id,
+			},
+		});
+
+		if (!antennaExists) return false;
+
 		// Subscribe stream
 		this.subscriber.on(`antennaStream:${this.antennaId}`, this.onEvent);
+
+		return true;
 	}
 
 	@bindThis
 	private async onEvent(data: GlobalEvents['antenna']['payload']) {
 		if (data.type === 'note') {
-			const note = await this.noteEntityService.pack(data.body.id, this.user, {
+			let note = await this.noteEntityService.pack(data.body.id, this.user, {
 				detail: true,
 				skipLanguageCheck: true,
 				viewerDimension: null,
@@ -59,7 +80,19 @@ export class AntennaChannel extends Channel {
 
 			if (!(await this.noteEntityService.isLanguageVisibleToMe(note, this.user?.id))) return;
 
+			if (!this.isNoteVisibleForMe(note)) return;
 			if (this.isNoteMutedOrBlocked(note)) return;
+
+			const filtered = await this.noteStreamingHidingService.filter(note, this.user?.id ?? null);
+			if (!filtered) return;
+			note = filtered;
+
+			if (this.user && isRenotePacked(note) && !isQuotePacked(note)) {
+				if (note.renote && Object.keys(note.renote.reactions).length > 0) {
+					const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
+					note = { ...note, renote: { ...note.renote, myReaction: myRenoteReaction } };
+				}
+			}
 
 			if (this.minimize && this.canUseNoteJsonCache(note)) {
 				const badgeRoles = this.iAmModerator ? await this.roleService.getUserBadgeRoles(note.userId, false) : undefined;

@@ -12,6 +12,7 @@ on:
       - packages/backend/**
       - packages/frontend/**
       - packages/frontend-shared/**
+      - packages/frontend-builder/**
       - packages/frontend-embed/**
       - packages/sw/**
       - packages/misskey-js/**
@@ -24,10 +25,10 @@ on:
       - packages/backend/**
       - packages/frontend/**
       - packages/frontend-shared/**
+      - packages/frontend-builder/**
       - packages/frontend-embed/**
       - packages/sw/**
       - packages/misskey-js/**
-      - packages/shared/.eslintrc.js
       - packages/misskey-bubble-game/**
       - packages/misskey-reversi/**
       - packages/shared/eslint.config.js
@@ -64,6 +65,7 @@ jobs:
         - backend
         - frontend
         - frontend-shared
+        - frontend-builder
         - frontend-embed
         - sw
         - misskey-js
@@ -102,6 +104,7 @@ jobs:
       matrix:
         workspace:
         - backend
+        - frontend
         - sw
         - misskey-js
     steps:
@@ -118,5 +121,10 @@ jobs:
         node-version-file: '.node-version'
         cache: 'pnpm'
     - run: pnpm i --frozen-lockfile
-    - run: pnpm --filter misskey-reversi --filter misskey-bubble-game --filter misskey-js run build
+    - run: pnpm --filter misskey-js run build
+      if: ${{ matrix.workspace == 'backend' || matrix.workspace == 'frontend' || matrix.workspace == 'sw' }}
+    - run: pnpm --filter misskey-reversi run build
+      if: ${{ matrix.workspace == 'backend' || matrix.workspace == 'frontend' }}
+    - run: pnpm --filter misskey-bubble-game run build
+      if: ${{ matrix.workspace == 'frontend' }}
     - run: pnpm --filter ${{ matrix.workspace }} run typecheck

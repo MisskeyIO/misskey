@@ -250,6 +250,7 @@ export class UtilityService {
 
 	@bindThis
 	public isFederationAllowedHost(host: string): boolean {
+		if (this.isSelfHost(host)) return true;
 		if (this.meta.federation === 'none') return false;
 		if (this.meta.federation === 'specified' && !this.meta.federationHosts.some(x => `.${host.toLowerCase()}`.endsWith(`.${x}`))) return false;
 		if (this.isItemListedIn(host, this.meta.blockedHosts)) return false;

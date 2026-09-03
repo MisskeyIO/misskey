@@ -34,9 +34,6 @@ jobs:
   test:
     name: Federation test
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [22.x]
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -67,10 +64,10 @@ jobs:
           path: /opt/hostedtoolcache/ffmpeg
           key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ steps.setup-ffmpeg.outputs.ffmpeg-version }}
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version-file: '.node-version'
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -86,6 +83,7 @@ jobs:
 
       - name: Setup
         run: |
+          echo "NODE_VERSION=$(cat .node-version)" >> "$GITHUB_ENV"
           cd packages/backend/test-federation
           bash ./setup.sh
           sudo chmod 644 ./certificates/*.test.key

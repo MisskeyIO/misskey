@@ -412,7 +412,7 @@ onMounted(async () => {
 }
 
 .changedRow {
-	background-color: var(--MI_THEME-infoBg);
+	background-color: var(--MI_THEME-infoBg) !important;
 }
 
 .searchArea {

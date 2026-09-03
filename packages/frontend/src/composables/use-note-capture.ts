@@ -9,7 +9,6 @@ import { EventEmitter } from 'eventemitter3';
 import type { Reactive } from 'vue';
 import { useStream } from '@/stream.js';
 import { $i } from '@/i.js';
-import { store } from '@/store.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { prefer } from '@/preferences.js';
 import { globalEvents } from '@/events.js';
@@ -286,7 +285,7 @@ export function useNoteCapture(props: {
 			return;
 		}
 
-		if ($i && store.s.realtimeMode) {
+		if ($i) {
 			realtimeSubscribe({
 				note,
 			});

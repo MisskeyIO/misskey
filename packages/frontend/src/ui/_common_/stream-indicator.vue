@@ -20,7 +20,6 @@ import { i18n } from '@/i18n.js';
 import MkButton from '@/components/MkButton.vue';
 import * as os from '@/os.js';
 import { prefer } from '@/preferences.js';
-import { store } from '@/store.js';
 
 const zIndex = os.claimZIndex('high');
 
@@ -43,17 +42,15 @@ function reload() {
 	window.location.reload();
 }
 
-if (store.s.realtimeMode) {
-	const stream = useStream();
-	stream.on('_connected_', resetDisconnected);
-	stream.on('_disconnected_', onDisconnected);
+const stream = useStream();
+stream.on('_connected_', resetDisconnected);
+stream.on('_disconnected_', onDisconnected);
 
-	onUnmounted(() => {
-		window.clearTimeout(timeoutId.value);
-		stream.off('_connected_', resetDisconnected);
-		stream.off('_disconnected_', onDisconnected);
-	});
-}
+onUnmounted(() => {
+	window.clearTimeout(timeoutId.value);
+	stream.off('_connected_', resetDisconnected);
+	stream.off('_disconnected_', onDisconnected);
+});
 </script>
 
 <style lang="scss" module>

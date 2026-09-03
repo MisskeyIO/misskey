@@ -1424,9 +1424,6 @@ _settings:
   makeEveryTextElementsSelectable_description: "これをつけると、場面によったら使いにくくなるかもしれん。"
   useStickyIcons: "アイコンがスクロールにひっつくようにする"
   enablePullToRefresh_description: "マウスやったら、ホイールを押し込みながらドラッグしてな。"
-  realtimeMode_description: "サーバーと接続を確立して、リアルタイムでコンテンツを更新するで。通信量とバッテリーの消費が多くなるかもしれへん。"
-  contentsUpdateFrequency_description: "高いほどリアルタイムにコンテンツが更新されるんやけど、そのぶんパフォーマンスが落ちるし、通信量とバッテリーの消費も増えるねん。"
-  contentsUpdateFrequency_description2: "リアルタイムモードをつけてるんやったら、この設定がどうであれリアルタイムでコンテンツが更新されるで。"
   emojiPaletteBanner: "絵文字ピッカーに置いとくプリセットをパレットっていうので登録したり、ピッカーの見た目を変えたりできるで。"
 _preferencesProfile:
   profileNameDescription: "このデバイスはなんて呼んだらええんや？"

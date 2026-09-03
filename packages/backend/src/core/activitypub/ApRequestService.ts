@@ -17,8 +17,8 @@ import { LoggerService } from '@/core/LoggerService.js';
 import { bindThis } from '@/decorators.js';
 import type Logger from '@/logger.js';
 import { validateContentTypeSetAsActivityPub } from '@/core/activitypub/misc/validator.js';
+import { assertActivityMatchesUrl, FetchAllowSoftFailMask } from '@/core/activitypub/misc/check-against-url.js';
 import type { IObject } from './type.js';
-import { FetchAllowSoftFailMask } from "@/core/activitypub/misc/check-against-url.js";
 
 type Request = {
 	url: string;
@@ -81,7 +81,7 @@ export class ApRequestCreator {
 			}, args.additionalHeaders),
 		};
 
-		const result = this.#signToRequest(request, args.key, ['(request-target)', 'date', 'host', 'accept']);
+		const result = this.#signToRequest(request, args.key, ['(request-target)', 'date', 'host']);
 
 		return {
 			request,
@@ -223,7 +223,7 @@ export class ApRequestService {
 				const alternate = document.querySelector('head > link[rel="alternate"][type="application/activity+json"]');
 				if (alternate) {
 					const href = alternate.getAttribute('href');
-					if (href && this.utilityService.isRelatedUris(url, href)) {
+					if (href && this.utilityService.punyHost(url) === this.utilityService.punyHost(href)) {
 						return await this.signedGet(href, user, allowSoftfail, false);
 					}
 				}
@@ -237,8 +237,8 @@ export class ApRequestService {
 		const finalUrl = res.url; // redirects may have been involved
 		const activity = await res.json() as IObject;
 
-		this.utilityService.assertActivityRelatedToUrl(activity, finalUrl);
-		// assertActivityMatchesUrl(url, activity, finalUrl, allowSoftfail);
+		assertActivityMatchesUrl(url, activity, finalUrl, allowSoftfail);
+
 		return activity;
 	}
 }

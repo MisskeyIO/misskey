@@ -7,9 +7,10 @@ import { Inject, Injectable, Scope } from '@nestjs/common';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { bindThis } from '@/decorators.js';
 import { RoleService } from '@/core/RoleService.js';
+import { NoteStreamingHidingService } from '../NoteStreamingHidingService.js';
+import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import type { GlobalEvents } from '@/core/GlobalEventService.js';
 import type { JsonObject } from '@/misc/json-value.js';
-import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import Channel, { type ChannelRequest } from '../channel.js';
 import { REQUEST } from '@nestjs/core';
 
@@ -27,6 +28,7 @@ export class RoleTimelineChannel extends Channel {
 
 		private noteEntityService: NoteEntityService,
 		private roleService: RoleService,
+		private noteStreamingHidingService: NoteStreamingHidingService,
 	) {
 		super(request);
 		//this.onNote = this.onNote.bind(this);
@@ -50,13 +52,16 @@ export class RoleTimelineChannel extends Channel {
 				return;
 			}
 			if (note.visibility !== 'public') return;
+			if (note.user.requireSigninToViewContents && this.user == null) return;
+			if (note.renote && note.renote.user.requireSigninToViewContents && this.user == null) return;
+			if (note.reply && note.reply.user.requireSigninToViewContents && this.user == null) return;
 
 			if (note.reply) {
 				const reply = note.reply;
 				// 自分のフォローしていないユーザーの visibility: followers な投稿への返信は弾く
 				if (reply.visibility === 'followers' && !Object.hasOwn(this.following, reply.userId)) return;
 				// 自分の見ることができないユーザーの visibility: specified な投稿への返信は弾く
-				if (reply.visibility === 'specified' && !reply.visibleUserIds!.includes(this.user!.id)) return;
+				if (reply.visibility === 'specified' && (this.user == null || !reply.visibleUserIds?.includes(this.user.id))) return;
 			}
 
 			// 純粋なリノート（引用リノートでないリノート）の場合
@@ -73,6 +78,10 @@ export class RoleTimelineChannel extends Channel {
 			if (!(await this.noteEntityService.isLanguageVisibleToMe(note, this.user?.id))) return;
 
 			if (this.isNoteMutedOrBlocked(note)) return;
+
+			const filtered = await this.noteStreamingHidingService.filter(note, this.user?.id ?? null);
+			if (!filtered) return;
+			note = filtered;
 
 			if (this.user && isRenotePacked(note) && !isQuotePacked(note)) {
 				if (note.renote && Object.keys(note.renote.reactions).length > 0) {

@@ -1,62 +1,64 @@
 {
-  "type": "module",
-  "name": "misskey-js",
-  "version": "2026.2.0-beta.0-mhq.1",
-  "description": "Misskey SDK for JavaScript",
-  "license": "MIT",
-  "main": "./built/index.js",
-  "types": "./built/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./built/index.js",
-      "types": "./built/index.d.ts",
-      "default": "./built/index.js"
-    },
-    "./*": {
-      "import": "./built/*",
-      "types": "./built/*",
-      "default": "./built/*"
-    }
-  },
-  "scripts": {
-    "build": "node ./build.js",
-    "watch": "nodemon -w package.json -e json --exec \"node ./build.js --watch\"",
-    "tsd": "tsd",
-    "api": "pnpm api-extractor run --local --verbose",
-    "api-prod": "pnpm api-extractor run --verbose",
-    "eslint": "eslint './**/*.{js,jsx,ts,tsx}'",
-    "typecheck": "tsgo --noEmit",
-    "lint": "pnpm typecheck && pnpm eslint",
-    "vitest": "vitest run --coverage",
-    "test": "pnpm vitest && pnpm tsd",
-    "update-autogen-code": "pnpm --filter misskey-js-type-generator generate && ncp generator/built/autogen src/autogen"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/misskey-dev/misskey.git",
-    "directory": "packages/misskey-js"
-  },
-  "devDependencies": {
-    "@microsoft/api-extractor": "catalog:",
-    "@misskey-dev/eslint-plugin": "catalog:",
-    "@types/node": "catalog:",
-    "@typescript-eslint/eslint-plugin": "catalog:",
-    "@typescript-eslint/parser": "catalog:",
-    "@vitest/coverage-v8": "catalog:",
-    "esbuild": "catalog:",
-    "eslint": "catalog:",
-    "execa": "catalog:",
-    "ncp": "catalog:",
-    "nodemon": "catalog:",
-    "tsd": "catalog:",
-    "vitest": "catalog:",
-    "vitest-websocket-mock": "catalog:"
-  },
-  "files": [
-    "built"
-  ],
-  "dependencies": {
-    "@simplewebauthn/browser": "catalog:",
-    "eventemitter3": "catalog:"
-  }
+	"type": "module",
+	"name": "misskey-js",
+	"version": "2026.2.0-beta.0-mhq.1",
+	"description": "Misskey SDK for JavaScript",
+	"license": "MIT",
+	"main": "./built/index.js",
+	"types": "./built/index.d.ts",
+	"exports": {
+		".": {
+			"import": "./built/index.js",
+			"types": "./built/index.d.ts",
+			"default": "./built/index.js"
+		},
+		"./*": {
+			"import": "./built/*",
+			"types": "./built/*",
+			"default": "./built/*"
+		}
+	},
+	"scripts": {
+		"build": "node ./build.js",
+		"watch": "nodemon -w package.json -e json --exec \"node ./build.js --watch\"",
+		"tsd": "tsd",
+		"api": "pnpm api-extractor run --local --verbose",
+		"api-prod": "pnpm api-extractor run --verbose",
+		"eslint": "eslint './**/*.{js,jsx,ts,tsx}'",
+		"typecheck": "tsgo --noEmit",
+		"lint": "pnpm typecheck && pnpm eslint",
+		"vitest": "vitest run --coverage",
+		"test": "pnpm vitest && pnpm tsd",
+		"update-autogen-code": "pnpm --filter misskey-js-type-generator generate && ncp generator/built/autogen src/autogen"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/misskey-dev/misskey.git",
+		"directory": "packages/misskey-js"
+	},
+	"devDependencies": {
+		"@microsoft/api-extractor": "catalog:",
+		"@types/node": "catalog:",
+		"@typescript-eslint/eslint-plugin": "catalog:",
+		"@typescript-eslint/parser": "catalog:",
+		"@vitest/coverage-v8": "catalog:",
+		"esbuild": "catalog:",
+		"execa": "catalog:",
+		"ncp": "catalog:",
+		"nodemon": "catalog:",
+		"tsd": "catalog:",
+		"vitest": "catalog:",
+		"vitest-websocket-mock": "catalog:",
+		"@misskey-dev/eslint-plugin": "catalog:",
+		"eslint": "catalog:"
+	},
+	"files": [
+		"built"
+	],
+	"dependencies": {
+		"@simplewebauthn/types": "catalog:",
+		"eventemitter3": "catalog:",
+		"reconnecting-websocket": "catalog:",
+		"@simplewebauthn/browser": "catalog:"
+	}
 }

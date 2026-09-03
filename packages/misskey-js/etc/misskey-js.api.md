@@ -2058,8 +2058,8 @@ declare namespace entities {
         UsersFollowingResponse,
         UsersGalleryPostsRequest,
         UsersGalleryPostsResponse,
-        UsersGetFollowingBirthdayUsersRequest,
-        UsersGetFollowingBirthdayUsersResponse,
+        UsersGetFollowingUsersByBirthdayRequest,
+        UsersGetFollowingUsersByBirthdayResponse,
         UsersGetFrequentlyRepliedUsersRequest,
         UsersGetFrequentlyRepliedUsersResponse,
         UsersGetSecurityInfoRequest,
@@ -2171,6 +2171,7 @@ declare namespace entities {
         MetaLite,
         MetaDetailedOnly,
         MetaDetailed,
+        MetaClientOptions,
         AbuseUserReport,
         UserWebhook,
         SystemWebhook,
@@ -2792,6 +2793,9 @@ export type MeDetailedOnly = components['schemas']['MeDetailedOnly'];
 
 // @public (undocumented)
 export type Message = Parameters<WebSocket['send']>[0];
+
+// @public (undocumented)
+export type MetaClientOptions = components['schemas']['MetaClientOptions'];
 
 // @public (undocumented)
 export type MetaDetailed = components['schemas']['MetaDetailed'];
@@ -3578,7 +3582,10 @@ export type NoteUpdatedEvent = {
     type: 'reacted';
     body: {
         reaction: string;
-        emoji: string | null;
+        emoji?: {
+            name: string;
+            url: string;
+        } | null;
         userId: User['id'];
     };
 } | {
@@ -4175,10 +4182,10 @@ export type UsersGalleryPostsRequest = operations['users___gallery___posts']['re
 export type UsersGalleryPostsResponse = operations['users___gallery___posts']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-export type UsersGetFollowingBirthdayUsersRequest = operations['users___get-following-birthday-users']['requestBody']['content']['application/json'];
+export type UsersGetFollowingUsersByBirthdayRequest = operations['users___get-following-users-by-birthday']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-export type UsersGetFollowingBirthdayUsersResponse = operations['users___get-following-birthday-users']['responses']['200']['content']['application/json'];
+export type UsersGetFollowingUsersByBirthdayResponse = operations['users___get-following-users-by-birthday']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
 export type UsersGetFrequentlyRepliedUsersRequest = operations['users___get-frequently-replied-users']['requestBody']['content']['application/json'];

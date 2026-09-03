@@ -3800,14 +3800,14 @@ export type paths = {
          */
         post: operations['users___gallery___posts'];
     };
-    '/users/get-following-birthday-users': {
+    '/users/get-following-users-by-birthday': {
         /**
-         * users/get-following-birthday-users
-         * @description Find users who have a birthday on the specified range.
+         * users/get-following-users-by-birthday
+         * @description Retrieve users who have a birthday on the specified range.
          *
          *     **Credential required**: *Yes* / **Permission**: *read:account*
          */
-        post: operations['users___get-following-birthday-users'];
+        post: operations['users___get-following-users-by-birthday'];
     };
     '/users/get-frequently-replied-users': {
         /**
@@ -5846,6 +5846,12 @@ export type components = {
             cacheRemoteSensitiveFiles: boolean;
         };
         MetaDetailed: components['schemas']['MetaLite'] & components['schemas']['MetaDetailedOnly'];
+        MetaClientOptions: {
+            /** @enum {string} */
+            entrancePageStyle: 'classic' | 'simple';
+            showTimelineForVisitor: boolean;
+            showActivitiesForVisitor: boolean;
+        };
         AbuseUserReport: {
             /**
              * Format: id
@@ -7628,8 +7634,10 @@ export interface operations {
                         isActive: boolean;
                         title: string;
                         imageUrl: string | null;
-                        icon: string;
-                        display: string;
+                        /** @enum {string} */
+                        icon: 'info' | 'warning' | 'error' | 'success';
+                        /** @enum {string} */
+                        display: 'normal' | 'banner' | 'dialog';
                         forExistingUsers: boolean;
                         needConfirmationToRead: boolean;
                         needEnrollmentTutorialToRead: boolean;
@@ -36639,7 +36647,7 @@ export interface operations {
                     untilDate?: number;
                     /** @default 10 */
                     limit?: number;
-                    /** @description @deprecated use get-following-birthday-users instead. */
+                    /** @description @deprecated use get-following-users-by-birthday instead. */
                     birthday?: string | null;
                 };
             };
@@ -36775,7 +36783,7 @@ export interface operations {
             };
         };
     };
-    'users___get-following-birthday-users': {
+    'users___get-following-users-by-birthday': {
         requestBody: {
             content: {
                 'application/json': {
@@ -36784,17 +36792,18 @@ export interface operations {
                     /** @default 0 */
                     offset?: number;
                     birthday: {
-                        month?: number;
-                        day?: number;
-                        begin?: {
+                        month: number;
+                        day: number;
+                    } | {
+                        begin: {
                             month: number;
                             day: number;
                         };
-                        end?: {
+                        end: {
                             month: number;
                             day: number;
                         };
-                    } | unknown | unknown;
+                    };
                 };
             };
         };
@@ -36806,7 +36815,8 @@ export interface operations {
                 };
                 content: {
                     'application/json': {
-                        /** Format: date-time */
+                        /** Format: misskey:id */
+                        id: string;
                         birthday: string;
                         user: components['schemas']['UserLite'];
                     }[];

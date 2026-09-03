@@ -17,8 +17,8 @@
 		"rollup": "catalog:"
 	},
 	"dependencies": {
-		"estree-walker": "catalog:",
 		"i18n": "workspace:*",
+		"estree-walker": "catalog:",
 		"magic-string": "catalog:",
 		"vite": "catalog:"
 	}

@@ -103,6 +103,18 @@ if (cluster.isWorker) {
 	await workerMain();
 }
 
+process.on('message', msg => {
+	if (msg === 'gc') {
+		if (global.gc != null) {
+			coreLogger.info('Manual GC triggered');
+			global.gc();
+			if (process.send != null) process.send('gc ok');
+		} else {
+			coreLogger.warn('Manual GC requested but gc is not available. Start the process with --expose-gc to enable this feature.');
+		}
+	}
+});
+
 // ユニットテスト時にMisskeyが子プロセスで起動された時のため
 // それ以外のときは process.send は使えないので弾く
 if (process.send) {

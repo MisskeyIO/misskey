@@ -9,11 +9,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<SearchMarker path="/admin/branding" :label="i18n.ts.branding" :keywords="['branding']" icon="ti ti-paint">
 			<div class="_gaps_m">
 				<SearchMarker :keywords="['entrance', 'welcome', 'landing', 'front', 'home', 'page', 'style']">
-					<MkRadios v-model="entrancePageStyle">
+					<MkRadios
+						v-model="entrancePageStyle"
+						:options="[
+							{ value: 'classic' },
+							{ value: 'simple' },
+							{ value: 'special', label: 'Misskey.io' },
+						]"
+					>
 						<template #label><SearchLabel>{{ i18n.ts._serverSettings.entrancePageStyle }}</SearchLabel></template>
-						<option value="classic">Classic</option>
-						<option value="simple">Simple</option>
-						<option value="special">Misskey.io</option>
 					</MkRadios>
 				</SearchMarker>
 
@@ -152,6 +156,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
 import JSON5 from 'json5';
+import * as Misskey from 'misskey-js';
 import { host } from '@@/js/config.js';
 import type { ClientOptions } from '@/instance.js';
 import MkInput from '@/components/MkInput.vue';

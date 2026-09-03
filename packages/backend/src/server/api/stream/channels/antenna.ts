@@ -3,30 +3,32 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import { bindThis } from '@/decorators.js';
-import { RoleService } from '@/core/RoleService.js';
+import { Inject, Injectable, Scope } from '@nestjs/common';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { RoleService } from '@/core/RoleService.js';
+import { bindThis } from '@/decorators.js';
 import type { GlobalEvents } from '@/core/GlobalEventService.js';
 import type { JsonObject } from '@/misc/json-value.js';
-import Channel, { type MiChannelService } from '../channel.js';
+import Channel, { type ChannelRequest } from '../channel.js';
+import { REQUEST } from '@nestjs/core';
 
-class AntennaChannel extends Channel {
+@Injectable({ scope: Scope.TRANSIENT })
+export class AntennaChannel extends Channel {
 	public readonly chName = 'antenna';
-	public static readonly shouldShare = false;
-	public static readonly requireCredential = true as const;
-	public static readonly kind = 'read:account';
+	public static shouldShare = false;
+	public static requireCredential = true as const;
+	public static kind = 'read:account';
 	private antennaId: string;
 	private minimize: boolean;
 
 	constructor(
+		@Inject(REQUEST)
+		request: ChannelRequest,
+
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
-
-		id: string,
-		connection: Channel['connection'],
 	) {
-		super(id, connection, null);
+		super(request);
 		//this.onEvent = this.onEvent.bind(this);
 	}
 
@@ -51,9 +53,7 @@ class AntennaChannel extends Channel {
 
 			if (note.reply) {
 				const reply = note.reply;
-				// 自分のフォローしていないユーザーの visibility: followers な投稿への返信は弾く
 				if (reply.visibility === 'followers' && !Object.hasOwn(this.following, reply.userId)) return;
-				// 自分の見ることができないユーザーの visibility: specified な投稿への返信は弾く
 				if (reply.visibility === 'specified' && !reply.visibleUserIds!.includes(this.user!.id)) return;
 			}
 
@@ -83,28 +83,5 @@ class AntennaChannel extends Channel {
 	public dispose() {
 		// Unsubscribe events
 		this.subscriber.off(`antennaStream:${this.antennaId}`, this.onEvent);
-	}
-}
-
-@Injectable()
-export class AntennaChannelService implements MiChannelService<true> {
-	public readonly shouldShare = AntennaChannel.shouldShare;
-	public readonly requireCredential = AntennaChannel.requireCredential;
-	public readonly kind = AntennaChannel.kind;
-
-	constructor(
-		private roleService: RoleService,
-		private noteEntityService: NoteEntityService,
-	) {
-	}
-
-	@bindThis
-	public create(id: string, connection: Channel['connection'], dimension?: number | null): AntennaChannel {
-		return new AntennaChannel(
-			this.roleService,
-			this.noteEntityService,
-			id,
-			connection,
-		);
 	}
 }

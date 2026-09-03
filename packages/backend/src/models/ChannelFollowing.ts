@@ -28,7 +28,7 @@ export class MiChannelFollowing {
 	})
 	public followeeId: MiChannel['id'];
 
-	@ManyToOne(type => MiChannel, {
+	@ManyToOne(() => MiChannel, {
 		onDelete: 'CASCADE',
 	})
 	@JoinColumn()
@@ -41,7 +41,7 @@ export class MiChannelFollowing {
 	})
 	public followerId: MiUser['id'];
 
-	@ManyToOne(type => MiUser, {
+	@ManyToOne(() => MiUser, {
 		onDelete: 'CASCADE',
 	})
 	@JoinColumn()

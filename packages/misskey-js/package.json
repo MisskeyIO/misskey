@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "misskey-js",
-  "version": "2025.12.2-mhq.1",
+  "version": "2026.2.0-beta.0-mhq.1",
   "description": "Misskey SDK for JavaScript",
   "license": "MIT",
   "main": "./built/index.js",
@@ -25,7 +25,7 @@
     "api": "pnpm api-extractor run --local --verbose",
     "api-prod": "pnpm api-extractor run --verbose",
     "eslint": "eslint './**/*.{js,jsx,ts,tsx}'",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsgo --noEmit",
     "lint": "pnpm typecheck && pnpm eslint",
     "vitest": "vitest run --coverage",
     "test": "pnpm vitest && pnpm tsd",
@@ -49,7 +49,6 @@
     "ncp": "catalog:",
     "nodemon": "catalog:",
     "tsd": "catalog:",
-    "typescript": "catalog:",
     "vitest": "catalog:",
     "vitest-websocket-mock": "catalog:"
   },

@@ -105,7 +105,7 @@ function fetchFlash() {
 	});
 }
 
-function share(ev: MouseEvent) {
+function share(ev: PointerEvent) {
 	if (!flash.value) return;
 
 	const menuItems: MenuItem[] = [];
@@ -154,7 +154,8 @@ function shareWithNote() {
 
 async function like() {
 	if (!flash.value) return;
-	await pleaseLogin();
+	const isLoggedIn = await pleaseLogin();
+	if (!isLoggedIn) return;
 
 	os.apiWithDialog('flash/like', {
 		flashId: flash.value.id,
@@ -166,7 +167,8 @@ async function like() {
 
 async function unlike() {
 	if (!flash.value) return;
-	await pleaseLogin();
+	const isLoggedIn = await pleaseLogin();
+	if (!isLoggedIn) return;
 
 	const confirm = await os.confirm({
 		type: 'warning',
@@ -226,10 +228,10 @@ async function run() {
 		THIS_URL: values.STR(`${url}/play/${flash.value.id}`),
 	}, {
 		in: aiScriptReadline,
-		out: (value) => {
+		out: () => {
 			// nop
 		},
-		log: (type, params) => {
+		log: () => {
 			// nop
 		},
 	});
@@ -270,7 +272,7 @@ async function reportAbuse() {
 	});
 }
 
-function showMenu(ev: MouseEvent) {
+function showMenu(ev: PointerEvent) {
 	if (!flash.value) return;
 
 	const menu: MenuItem[] = [

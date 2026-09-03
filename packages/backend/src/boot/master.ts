@@ -4,8 +4,6 @@
  */
 
 import * as fs from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { dirname } from 'node:path';
 import * as os from 'node:os';
 import cluster from 'node:cluster';
 import chalk from 'chalk';
@@ -16,19 +14,14 @@ import type { Config } from '@/config.js';
 import { envOption } from '@/env.js';
 import { jobQueue, server } from './common.js';
 
-const _filename = fileURLToPath(import.meta.url);
-const _dirname = dirname(_filename);
-
-const meta = JSON.parse(fs.readFileSync(`${_dirname}/../../../../built/meta.json`, 'utf-8'));
-
 const bootLogger = coreLogger.createSubLogger('boot', 'magenta', false);
 
 const themeColor = chalk.hex('#86b300');
 
-function greet() {
+function greet(props: { version: string }) {
 	if (!envOption.quiet && !envOption.logJson) {
 		//#region Misskey logo
-		const v = `v${meta.version}`;
+		const v = `v${props.version}`;
 		console.log(themeColor('  _____ _         _           '));
 		console.log(themeColor(' |     |_|___ ___| |_ ___ _ _ '));
 		console.log(themeColor(' | | | | |_ -|_ -| \'_| -_| | |'));
@@ -44,7 +37,7 @@ function greet() {
 	}
 
 	bootLogger.info('Welcome to Misskey!');
-	bootLogger.info(`Misskey v${meta.version}`, { version: meta.version, hostname: os.hostname(), pid: process.pid }, true);
+	bootLogger.info(`Misskey v${props.version}`, { version: props.version, hostname: os.hostname(), pid: process.pid }, true);
 }
 
 /**
@@ -55,10 +48,10 @@ export async function masterMain() {
 
 	// initialize app
 	try {
-		greet();
+		config = loadConfigBoot();
+		greet({ version: config.version });
 		showEnvironment();
 		showNodejsVersion();
-		config = loadConfigBoot();
 		//await connectDb();
 		if (config.pidFile) fs.writeFileSync(config.pidFile, process.pid.toString());
 	} catch (e) {
@@ -73,7 +66,7 @@ export async function masterMain() {
 		const { nodeProfilingIntegration } = await import('@sentry/profiling-node');
 
 		Sentry.init({
-			release: meta.version,
+			release: config.version,
 			integrations: [
 				...(config.sentryForBackend.enableNodeProfiling ? [nodeProfilingIntegration()] : []),
 			],

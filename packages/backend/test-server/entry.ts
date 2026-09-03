@@ -1,31 +1,34 @@
-import process from 'node:process';
 import { portToPid } from 'pid-port';
 import fkill from 'fkill';
 import Fastify from 'fastify';
-import { server } from '../built/boot/common.js';
-import { loadConfig } from '../built/config.js';
-import { coreLogger } from '../built/logger.js';
+import { NestFactory } from '@nestjs/core';
+import { MainModule } from '@/MainModule.js';
+import { ServerService } from '@/server/ServerService.js';
+import { loadConfig } from '@/config.js';
+import { NestLogger } from '@/NestLogger.js';
+import { INestApplicationContext } from '@nestjs/common';
 
 const config = loadConfig();
 const originEnv = JSON.stringify(process.env);
 
 process.env.NODE_ENV = 'test';
 
-let app;
+let app: INestApplicationContext;
+let serverService: ServerService;
 
 /**
  * テスト用のサーバインスタンスを起動する
  */
 async function launch() {
-	process.on('unhandledRejection', console.dir);
-	process.on('uncaughtException', err => {
-		coreLogger.error(`Uncaught exception: ${err.message}`, { error: err });
-	});
-
 	await killTestServer();
 
 	console.log('starting application...');
-	app = await server();
+
+	app = await NestFactory.createApplicationContext(MainModule, {
+		logger: new NestLogger(),
+	});
+	serverService = app.get(ServerService);
+	await serverService.launch();
 
 	await startControllerEndpoints();
 
@@ -57,7 +60,7 @@ async function killTestServer() {
 async function startControllerEndpoints(port = config.port + 1000) {
 	const fastify = Fastify();
 
-	fastify.post('/env', async (req, res) => {
+	fastify.post<{ Body: { key?: string, value?: string } }>('/env', async (req, res) => {
 		console.log(req.body);
 		const key = req.body['key'];
 		if (!key) {
@@ -70,15 +73,21 @@ async function startControllerEndpoints(port = config.port + 1000) {
 		res.code(200).send({ success: true });
 	});
 
-	fastify.post('/env-reset', async (req, res) => {
+	fastify.post<{ Body: { key?: string, value?: string } }>('/env-reset', async (req, res) => {
 		process.env = JSON.parse(originEnv);
 
+		await serverService.dispose();
 		await app.close();
 
 		await killTestServer();
 
 		console.log('starting application...');
-		app = await server();
+
+		app = await NestFactory.createApplicationContext(MainModule, {
+			logger: new NestLogger(),
+		});
+		serverService = app.get(ServerService);
+		await serverService.launch();
 
 		res.code(200).send({ success: true });
 	});

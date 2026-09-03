@@ -63,7 +63,7 @@ async function loadAccounts() {
 	}));
 }
 
-function showMenu(host: string, id: string, ev: MouseEvent) {
+function showMenu(host: string, id: string, ev: PointerEvent) {
 	let menu: MenuItem[];
 
 	menu = [{
@@ -79,7 +79,7 @@ function showMenu(host: string, id: string, ev: MouseEvent) {
 	os.popupMenu(menu, ev.currentTarget ?? ev.target);
 }
 
-function addAccount(ev: MouseEvent) {
+function addAccount(ev: PointerEvent) {
 	os.popupMenu([{
 		text: i18n.ts.existingAccount,
 		action: () => { addExistingAccount(); },

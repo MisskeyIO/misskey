@@ -463,7 +463,9 @@ if (!props.mock) {
 }
 
 async function renote(): Promise<void> {
-	await pleaseLogin({ openOnRemote: pleaseLoginContext.value });
+	const isLoggedIn = await pleaseLogin({ openOnRemote: pleaseLoginContext.value });
+	if (!isLoggedIn) return;
+
 	showMovedDialog();
 
 	const { menu } = getRenoteMenu({
@@ -482,7 +484,9 @@ async function reply(): Promise<void> {
 		return;
 	}
 
-	await pleaseLogin({ openOnRemote: pleaseLoginContext.value });
+	const isLoggedIn = await pleaseLogin({ openOnRemote: pleaseLoginContext.value });
+	if (!isLoggedIn) return;
+
 	showMovedDialog();
 
 	os.post({
@@ -495,7 +499,9 @@ async function reply(): Promise<void> {
 }
 
 async function react(): Promise<void> {
-	await pleaseLogin({ openOnRemote: pleaseLoginContext.value });
+	const isLoggedIn = await pleaseLogin({ openOnRemote: pleaseLoginContext.value });
+	if (!isLoggedIn) return;
+
 	showMovedDialog();
 
 	if (appearNote.reactionAcceptance === 'likeOnly' || !$i?.policies.canUseReaction) {
@@ -589,7 +595,7 @@ function toggleReact() {
 	}
 }
 
-function onContextmenu(ev: MouseEvent): void {
+function onContextmenu(ev: PointerEvent): void {
 	if (props.mock) {
 		return;
 	}
@@ -639,6 +645,8 @@ async function showRenoteMenu(): Promise<void> {
 	if (props.mock) {
 		return;
 	}
+	const isLoggedIn = await pleaseLogin({ openOnRemote: pleaseLoginContext.value });
+	if (!isLoggedIn) return;
 
 	function getUnrenote(): MenuItem {
 		return {
@@ -663,8 +671,6 @@ async function showRenoteMenu(): Promise<void> {
 	};
 
 	if (isMyRenote) {
-		await pleaseLogin({ openOnRemote: pleaseLoginContext.value });
-
 		os.popupMenu([
 			renoteDetailsMenu,
 			getCopyNoteLinkMenu(note, i18n.ts.copyLinkRenote),

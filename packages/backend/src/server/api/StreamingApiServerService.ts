@@ -8,19 +8,14 @@ import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import * as WebSocket from 'ws';
 import { DI } from '@/di-symbols.js';
-import type { UsersRepository, MiAccessToken, MiMeta } from '@/models/_.js';
-import { NotificationService } from '@/core/NotificationService.js';
+import type { MiAccessToken } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
-import { CacheService } from '@/core/CacheService.js';
 import { MiLocalUser } from '@/models/User.js';
 import { UserService } from '@/core/UserService.js';
-import { RoleService } from '@/core/RoleService.js';
-import { ChannelFollowingService } from '@/core/ChannelFollowingService.js';
-import { ChannelMutingService } from '@/core/ChannelMutingService.js';
 import { AuthenticateService, AuthenticationError } from './AuthenticateService.js';
-import MainStreamConnection from './stream/Connection.js';
-import { ChannelsService } from './stream/ChannelsService.js';
+import MainStreamConnection, { ConnectionRequest } from './stream/Connection.js';
 import type * as http from 'node:http';
+import { ContextIdFactory, ModuleRef } from '@nestjs/core';
 
 @Injectable()
 export class StreamingApiServerService {
@@ -32,20 +27,9 @@ export class StreamingApiServerService {
 		@Inject(DI.redisForSub)
 		private redisForSub: Redis.Redis,
 
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		@Inject(DI.meta)
-		private meta: MiMeta,
-
-		private cacheService: CacheService,
+		private moduleRef: ModuleRef,
 		private authenticateService: AuthenticateService,
-		private channelsService: ChannelsService,
-		private notificationService: NotificationService,
 		private usersService: UserService,
-		private roleService: RoleService,
-		private channelFollowingService: ChannelFollowingService,
-		private channelMutingService: ChannelMutingService,
 	) {
 	}
 
@@ -99,16 +83,12 @@ export class StreamingApiServerService {
 				return;
 			}
 
-			const stream = new MainStreamConnection(
-				this.channelsService,
-				this.notificationService,
-				this.cacheService,
-				this.roleService,
-				this.channelFollowingService,
-				this.channelMutingService,
-				this.meta,
-				user, app,
-			);
+			const contextId = ContextIdFactory.create();
+			this.moduleRef.registerRequestByContextId<ConnectionRequest>({
+				user,
+				token: app,
+			}, contextId);
+			const stream = await this.moduleRef.create(MainStreamConnection, contextId);
 
 			await stream.init();
 
@@ -131,7 +111,7 @@ export class StreamingApiServerService {
 			user: MiLocalUser | null;
 			app: MiAccessToken | null
 		}) => {
-			const { stream, user, app } = ctx;
+			const { stream, user } = ctx;
 
 			const ev = new EventEmitter();
 
@@ -180,12 +160,13 @@ export class StreamingApiServerService {
 	}
 
 	@bindThis
-	public detach(): void {
+	public detach(): Promise<void> {
 		if (this.#cleanConnectionsIntervalId) {
 			clearInterval(this.#cleanConnectionsIntervalId);
 			this.#cleanConnectionsIntervalId = null;
 		}
-		this.#wss.close();
-		this.#wss.clients.forEach(client => client.terminate());
+		return new Promise((resolve) => {
+			this.#wss.close(() => resolve());
+		});
 	}
 }

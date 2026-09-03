@@ -291,7 +291,7 @@ describe('Webリソース', () => {
 			const res = await ok({
 				path: path(alice.username, alicePrivatePage.name),
 			});
-			const html = res.body.serialize();
+			const html = res.body.toString();
 
 			assert.strictEqual(metaTag(res, 'misskey:page-id'), undefined);
 			assert.strictEqual(html.includes(alicePrivatePage.id), false);

@@ -274,6 +274,7 @@ export class MfmService {
 		if (nodes == null) {
 			return null;
 		}
+
 		function toHtml(children?: mfm.MfmNode[]): string {
 			if (children == null) return '';
 			return children.map(x => handlers[x.type](x)).join('');

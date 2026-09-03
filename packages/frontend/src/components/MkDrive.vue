@@ -146,7 +146,6 @@ import { i18n } from '@/i18n.js';
 import { claimAchievement } from '@/utility/achievements.js';
 import { prefer } from '@/preferences.js';
 import { chooseFileFromPcAndUpload, selectDriveFolder } from '@/utility/drive.js';
-import { store } from '@/store.js';
 import { makeDateGroupedTimelineComputedRef } from '@/utility/timeline-date-separate.js';
 import { globalEvents, useGlobalEvent } from '@/events.js';
 import { checkDragDataType, getDragData, setDragData } from '@/drag-and-drop.js';
@@ -704,10 +703,8 @@ useGlobalEvent('driveFoldersDeleted', (folders) => {
 let connection: Misskey.IChannelConnection<Misskey.Channels['drive']> | null = null;
 
 onMounted(() => {
-	if (store.s.realtimeMode) {
-		connection = useStream().useChannel('drive');
-		connection.on('fileCreated', onStreamDriveFileCreated);
-	}
+	connection = useStream().useChannel('drive');
+	connection.on('fileCreated', onStreamDriveFileCreated);
 
 	if (props.initialFolder) {
 		cd(props.initialFolder);

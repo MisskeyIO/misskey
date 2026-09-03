@@ -252,6 +252,35 @@ describe('After user setup', () => {
 		cy.contains('Hello, Misskey!', { timeout: 15000 });
   });
 
+	it('リアルタイム更新を無効化できない', () => {
+		cy.get('[data-cy-open-post-form]').should('be.visible');
+		cy.window().then(win => {
+			const key = 'idbfallback::pizzax::base';
+			const state = JSON.parse(win.localStorage.getItem(key) ?? '{}');
+			win.localStorage.setItem(key, JSON.stringify({ ...state, realtimeMode: false }));
+		});
+
+		cy.visit('/', {
+			onBeforeLoad(win) {
+				const messages: unknown[] = [];
+				const NativeWebSocket = win.WebSocket;
+				class CapturingWebSocket extends NativeWebSocket {
+					send(data: string | ArrayBufferLike | Blob | ArrayBufferView) {
+						if (typeof data === 'string') messages.push(JSON.parse(data));
+						super.send(data);
+					}
+				}
+				Object.defineProperty(win, 'WebSocket', { value: CapturingWebSocket });
+				Object.defineProperty(win, '__realtimeMessages', { value: messages });
+			},
+		});
+
+		cy.window().should(win => {
+			const messages = (win as unknown as { __realtimeMessages: Array<{ type?: string; body?: { channel?: string; params?: { minimize?: boolean; }; }; }>; }).__realtimeMessages;
+			expect(messages.some(message => message.type === 'connect' && message.body?.channel === 'homeTimeline' && message.body.params?.minimize === true)).to.equal(true);
+		});
+	});
+
 	it('open note form with hotkey', () => {
 		// Wait until the page loads
 		cy.get('[data-cy-open-post-form]').should('be.visible');

@@ -28,10 +28,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<template #value><span class="_monospace">{{ $i.id }}</span></template>
 						</MkKeyValue>
 
-					<MkKeyValue>
-						<template #key>{{ i18n.ts.registeredDate }}</template>
-						<template #value><MkTime :time="$i.createdAt" mode="detail"/></template>
-					</MkKeyValue>
+						<MkKeyValue>
+							<template #key>{{ i18n.ts.registeredDate }}</template>
+							<template #value><MkTime :time="$i.createdAt" mode="detail"/></template>
+						</MkKeyValue>
 
 						<SearchMarker :keywords="['role', 'policy']">
 							<MkFolder>
@@ -46,10 +46,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</MkFolder>
 						</SearchMarker>
 
-					<FormLink to="/settings/account-stats"><template #icon><i class="ti ti-info-circle"/></template>{{ i18n.ts.statistics }}</FormLink>
-				</div>
-			</MkFolder>
-
+						<FormLink to="/settings/account-stats"><template #icon><i class="ti ti-info-circle"/></template>{{ i18n.ts.statistics }}</FormLink>
+					</div>
+				</MkFolder>
 			</SearchMarker>
 
 			<SearchMarker :keywords="['timeline', 'cache']">
@@ -169,7 +168,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 		<hr>
 
-		<MkButton v-if="!storagePersisted" @click="enableStoragePersistence">{{ i18n.ts._settings.settingsPersistence_title }}</MkButton>
+		<template v-if="$i.policies.chatAvailability !== 'unavailable'">
+			<MkButton @click="readAllChatMessages">{{ i18n.ts.readAllChatMessages }}</MkButton>
+
+			<hr>
+		</template>
+
+		<MkButton v-if="storagePersistenceSupported && !storagePersisted" @click="enableStoragePersistence">{{ i18n.ts._settings.settingsPersistence_title }}</MkButton>
 
 		<MkButton @click="forceCloudBackup">{{ i18n.ts._preferencesBackup.forceBackup }}</MkButton>
 
@@ -197,7 +202,7 @@ import MkSelect from '@/components/MkSelect.vue';
 import FormSlot from '@/components/form/slot.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
-import { enableStoragePersistence, storagePersisted } from '@/utility/storage.js';
+import { enableStoragePersistence, getStoragePersistenceStatusRef, storagePersistenceSupported } from '@/utility/storage.js';
 import { ensureSignin } from '@/i.js';
 import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
@@ -211,6 +216,8 @@ import { suggestReload } from '@/utility/reload-suggest.js';
 import { cloudBackup } from '@/preferences/utility.js';
 
 const $i = ensureSignin();
+
+const storagePersisted = await getStoragePersistenceStatusRef();
 
 const reportError = prefer.model('reportError');
 const enableCondensedLine = prefer.model('enableCondensedLine');
@@ -292,6 +299,10 @@ function resetAllTips() {
 function hideAllTips() {
 	_hideAllTips();
 	os.success();
+}
+
+function readAllChatMessages() {
+	os.apiWithDialog('chat/read-all', {});
 }
 
 async function forceCloudBackup() {

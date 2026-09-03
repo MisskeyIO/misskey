@@ -7,6 +7,7 @@ import { Inject, Injectable, Scope } from '@nestjs/common';
 import type { Packed } from '@/misc/json-schema.js';
 import { MetaService } from '@/core/MetaService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { NoteStreamingHidingService } from '../NoteStreamingHidingService.js';
 import { bindThis } from '@/decorators.js';
 import { RoleService } from '@/core/RoleService.js';
 import { isQuotePacked, isRenotePacked } from '@/misc/is-renote.js';
@@ -31,6 +32,7 @@ export class LocalTimelineChannel extends Channel {
 		private metaService: MetaService,
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
+		private noteStreamingHidingService: NoteStreamingHidingService,
 	) {
 		super(request);
 		//this.onNote = this.onNote.bind(this);
@@ -67,14 +69,11 @@ export class LocalTimelineChannel extends Channel {
 		// 関係ない返信は除外
 		if (note.reply) {
 			const reply = note.reply;
-			if ((this.following[note.userId]?.withReplies ?? false) || this.withReplies) {
-				// 自分のフォローしていないユーザーの visibility: followers な投稿への返信は弾く
-				if (reply.visibility === 'followers' && !Object.hasOwn(this.following, reply.userId)) return;
-				// 自分の見ることができないユーザーの visibility: specified な投稿への返信は弾く
-				if (reply.visibility === 'specified' && !reply.visibleUserIds!.includes(this.user!.id)) return;
-			} else {
+			if (reply.visibility === 'followers' && !Object.hasOwn(this.following, reply.userId)) return;
+			if (reply.visibility === 'specified' && (this.user == null || !reply.visibleUserIds?.includes(this.user.id))) return;
+			if (this.user && !this.following[note.userId]?.withReplies && !this.withReplies) {
 				// 「チャンネル接続主への返信」でもなければ、「チャンネル接続主が行った返信」でもなければ、「投稿者の投稿者自身への返信」でもない場合
-				if (reply.userId !== this.user!.id && note.userId !== this.user!.id && reply.userId !== note.userId) return;
+				if (reply.userId !== this.user.id && note.userId !== this.user.id && reply.userId !== note.userId) return;
 			}
 		}
 
@@ -93,6 +92,10 @@ export class LocalTimelineChannel extends Channel {
 		if (!(await this.noteEntityService.isLanguageVisibleToMe(note, this.user?.id))) return;
 
 		if (this.isNoteMutedOrBlocked(note)) return;
+
+		const filtered = await this.noteStreamingHidingService.filter(note, this.user?.id ?? null);
+		if (!filtered) return;
+		note = filtered;
 
 		if (this.user && isRenotePacked(note) && !isQuotePacked(note)) {
 			if (note.renote && Object.keys(note.renote.reactions).length > 0) {

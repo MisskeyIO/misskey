@@ -480,8 +480,8 @@ export type MinimumUser = {
 };
 
 export type NoteCreateOption = {
+	id?: MiNote['id'];
 	createdAt?: Date | null;
-	scheduledAt?: Date | null;
 	name?: string | null;
 	text?: string | null;
 	reply?: MiNote | null;

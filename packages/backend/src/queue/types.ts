@@ -131,6 +131,7 @@ export type ScheduledNoteJobData = {
 
 export type PostScheduledNoteJobData = {
 	noteDraftId: string;
+	scheduledAt: number;
 };
 
 export type SystemWebhookDeliverJobData<T extends SystemWebhookEventType = SystemWebhookEventType> = {

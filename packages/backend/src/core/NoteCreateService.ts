@@ -13,7 +13,6 @@ import { extractCustomEmojisFromMfm } from '@/misc/extract-custom-emojis-from-mf
 import { extractHashtags } from '@/misc/extract-hashtags.js';
 import type { IMentionedRemoteUsers, MiNoteWithDimension } from '@/models/Note.js';
 import { MiNote } from '@/models/Note.js';
-import { MiScheduledNote } from '@/models/ScheduledNote.js';
 import type {
 	BlockingsRepository,
 	ChannelFollowingsRepository,
@@ -26,7 +25,6 @@ import type {
 	NotesRepository,
 	NoteLanguagesRepository,
 	NoteThreadMutingsRepository,
-	ScheduledNotesRepository,
 	UserListMembershipsRepository,
 	UserProfilesRepository,
 	UsersRepository,
@@ -79,6 +77,31 @@ import { CacheService } from '@/core/CacheService.js';
 import { isQuote, isRenote } from '@/misc/is-renote.js';
 
 type NotificationType = 'reply' | 'renote' | 'quote' | 'mention';
+
+export const NOTE_CREATE_PERMANENT_ERROR_IDS = {
+	noSuchFile: '801c046c-5bf5-4234-ad2b-e78fc20a2ac7',
+	invalidVisibleUsers: '81df0c8d-2cfe-4e1a-9e93-b948ef455d9d',
+	noSuchRenote: '53983c56-e163-45a6-942f-4ddc485d4290',
+	cannotRenotePureRenote: 'bde24c37-121f-4e7d-980d-cec52f599f02',
+	blockedByRenoteUser: '2b4fe776-4414-4a2d-ae39-f3418b8fd4d3',
+	renoteFollowersVisibility: '90b9d6f0-893a-4fef-b0f1-e9a33989f71a',
+	renoteSpecifiedVisibility: '48d7a997-da5c-4716-b3c3-92db3f37bf7d',
+	noSuchRenoteChannel: 'b060f9a6-8909-4080-9e0b-94d9fa6f6a77',
+	cannotRenoteOutsideChannel: '7e435f4a-780d-4cfc-a15a-42519bd6fb67',
+	noSuchReply: '60142edb-1519-408e-926d-4f108d27bee0',
+	cannotReplyPureRenote: 'f089e4e2-c0e7-4f60-8a23-e5a6bf786b36',
+	cannotReplyInvisibleNote: '11cd37b3-a411-4f77-8633-c580ce6a8dce',
+	cannotExtendSpecifiedReply: 'ced780a1-2012-4caf-bc7e-a95a291294cb',
+	cannotReplyToBot: '66819f28-9525-389d-4b0a-4974363fbbbf',
+	blockedByReplyUser: 'b0df6025-f2e8-44b4-a26a-17ad99104612',
+	expiredPoll: '0c11c11e-0c8d-48e7-822c-76ccef660068',
+	noSuchChannel: 'bfa3905b-25f5-4894-b430-da331a490e4b',
+	cannotCreateContent: '5b1c2b67-50a6-4a8a-a59c-0ede40890de3',
+	prohibitedWords: '689ee33f-f97c-479a-ac49-1b9f8140af99',
+	unfamiliarRemoteUser: 'e11b3a16-f543-4885-8eb1-66cad131dbfd',
+	cannotInitiateConversation: '332dd91b-6a00-430a-ac39-620cf60ad34b',
+	tooManyMentions: '9f466dab-c856-48cd-9e65-ff90ff750580',
+} as const;
 
 class NotificationManager {
 	private notifier: { id: MiUser['id']; };
@@ -163,9 +186,6 @@ export class NoteCreateService implements OnApplicationShutdown {
 		@Inject(DI.noteLanguagesRepository)
 		private noteLanguagesRepository: NoteLanguagesRepository,
 
-		@Inject(DI.scheduledNotesRepository)
-		private scheduledNotesRepository: ScheduledNotesRepository,
-
 		@Inject(DI.instancesRepository)
 		private instancesRepository: InstancesRepository,
 
@@ -232,6 +252,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 		isBot: MiUser['isBot'];
 		isCat: MiUser['isCat'];
 	}, data: {
+		id?: MiNote['id'];
 		createdAt: Date;
 		replyId: MiNote['id'] | null;
 		renoteId: MiNote['id'] | null;
@@ -253,6 +274,9 @@ export class NoteCreateService implements OnApplicationShutdown {
 		const visibleUsers = data.visibleUserIds.length > 0 ? await this.usersRepository.findBy({
 			id: In(data.visibleUserIds),
 		}) : [];
+		if (data.visibility === 'specified' && (new Set(data.visibleUserIds).size !== data.visibleUserIds.length || visibleUsers.length !== data.visibleUserIds.length)) {
+			throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.invalidVisibleUsers, 'Visible users are missing or duplicated');
+		}
 
 		let files: MiDriveFile[] = [];
 		if (data.fileIds.length > 0) {
@@ -266,7 +290,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 				.getMany();
 
 			if (files.length !== data.fileIds.length) {
-				throw new IdentifiableError('801c046c-5bf5-4234-ad2b-e78fc20a2ac7', 'No such file');
+				throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.noSuchFile, 'No such file');
 			}
 		}
 
@@ -279,9 +303,9 @@ export class NoteCreateService implements OnApplicationShutdown {
 			});
 
 			if (renote == null) {
-				throw new IdentifiableError('53983c56-e163-45a6-942f-4ddc485d4290', 'No such renote target');
+				throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.noSuchRenote, 'No such renote target');
 			} else if (isRenote(renote) && !isQuote(renote)) {
-				throw new IdentifiableError('bde24c37-121f-4e7d-980d-cec52f599f02', 'Cannot renote pure renote');
+				throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.cannotRenotePureRenote, 'Cannot renote pure renote');
 			}
 
 			// Check blocking
@@ -293,16 +317,16 @@ export class NoteCreateService implements OnApplicationShutdown {
 					},
 				});
 				if (blockExist) {
-					throw new IdentifiableError('2b4fe776-4414-4a2d-ae39-f3418b8fd4d3', 'You have been blocked by the user');
+					throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.blockedByRenoteUser, 'You have been blocked by the user');
 				}
 			}
 
 			if (renote.visibility === 'followers' && renote.userId !== user.id) {
 				// 他人のfollowers noteはreject
-				throw new IdentifiableError('90b9d6f0-893a-4fef-b0f1-e9a33989f71a', 'Renote target visibility');
+				throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.renoteFollowersVisibility, 'Renote target visibility');
 			} else if (renote.visibility === 'specified') {
 				// specified / direct noteはreject
-				throw new IdentifiableError('48d7a997-da5c-4716-b3c3-92db3f37bf7d', 'Renote target visibility');
+				throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.renoteSpecifiedVisibility, 'Renote target visibility');
 			}
 
 			if (renote.channelId && renote.channelId !== data.channelId) {
@@ -311,10 +335,10 @@ export class NoteCreateService implements OnApplicationShutdown {
 				const renoteChannel = await this.channelsRepository.findOneBy({ id: renote.channelId });
 				if (renoteChannel == null) {
 					// リノートしたいノートが書き込まれているチャンネルが無い
-					throw new IdentifiableError('b060f9a6-8909-4080-9e0b-94d9fa6f6a77', 'No such channel');
+					throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.noSuchRenoteChannel, 'No such channel');
 				} else if (!renoteChannel.allowRenoteToExternal) {
 					// リノート作成のリクエストだが、対象チャンネルがリノート禁止だった場合
-					throw new IdentifiableError('7e435f4a-780d-4cfc-a15a-42519bd6fb67', 'Channel does not allow renote to external');
+					throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.cannotRenoteOutsideChannel, 'Channel does not allow renote to external');
 				}
 			}
 		}
@@ -328,15 +352,15 @@ export class NoteCreateService implements OnApplicationShutdown {
 			});
 
 			if (reply == null) {
-				throw new IdentifiableError('60142edb-1519-408e-926d-4f108d27bee0', 'No such reply target');
+				throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.noSuchReply, 'No such reply target');
 			} else if (isRenote(reply) && !isQuote(reply)) {
-				throw new IdentifiableError('f089e4e2-c0e7-4f60-8a23-e5a6bf786b36', 'Cannot reply to pure renote');
+				throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.cannotReplyPureRenote, 'Cannot reply to pure renote');
 			} else if (!await this.noteEntityService.isVisibleForMe(reply, user.id)) {
-				throw new IdentifiableError('11cd37b3-a411-4f77-8633-c580ce6a8dce', 'No such reply target');
+				throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.cannotReplyInvisibleNote, 'No such reply target');
 			} else if (reply.visibility === 'specified' && data.visibility !== 'specified') {
-				throw new IdentifiableError('ced780a1-2012-4caf-bc7e-a95a291294cb', 'Cannot reply to specified note with different visibility');
+				throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.cannotExtendSpecifiedReply, 'Cannot reply to specified note with different visibility');
 			} else if (user.isBot && reply.user!.isBot && reply.userId !== user.id) {
-				throw new IdentifiableError('66819f28-9525-389d-4b0a-4974363fbbbf', 'Cannot reply to another bot');
+				throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.cannotReplyToBot, 'Cannot reply to another bot');
 			}
 
 			// Check blocking
@@ -348,7 +372,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 					},
 				});
 				if (blockExist) {
-					throw new IdentifiableError('b0df6025-f2e8-44b4-a26a-17ad99104612', 'You have been blocked by the user');
+					throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.blockedByReplyUser, 'You have been blocked by the user');
 				}
 			}
 		}
@@ -356,7 +380,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 		if (data.poll) {
 			if (data.poll.expiresAt != null) {
 				if (data.poll.expiresAt.getTime() < Date.now()) {
-					throw new IdentifiableError('0c11c11e-0c8d-48e7-822c-76ccef660068', 'Poll expiration must be future time');
+					throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.expiredPoll, 'Poll expiration must be future time');
 				}
 			}
 		}
@@ -366,11 +390,12 @@ export class NoteCreateService implements OnApplicationShutdown {
 			channel = await this.channelsRepository.findOneBy({ id: data.channelId, isArchived: false });
 
 			if (channel == null) {
-				throw new IdentifiableError('bfa3905b-25f5-4894-b430-da331a490e4b', 'No such channel');
+				throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.noSuchChannel, 'No such channel');
 			}
 		}
 
 		return this.create(user, {
+			id: data.id,
 			createdAt: data.createdAt,
 			files: files,
 			poll: data.poll,
@@ -398,7 +423,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 		host: MiUser['host'];
 		isBot: MiUser['isBot'];
 		isCat: MiUser['isCat'];
-	}, data: NoteCreateOption, silent = false): Promise<MiNote | MiScheduledNote> {
+	}, data: NoteCreateOption, silent = false): Promise<MiNote> {
 		// チャンネル外にリプライしたら対象のスコープに合わせる
 		// (クライアントサイドでやっても良い処理だと思うけどとりあえずサーバーサイドで)
 		if (data.reply && data.channel && data.reply.channelId !== data.channel.id) {
@@ -428,15 +453,15 @@ export class NoteCreateService implements OnApplicationShutdown {
 		const policies = await this.roleService.getUserPolicies(user.id);
 
 		if (!policies.canCreateContent) {
-			this.logger.error('Request rejected because user has no permission to create content', { userId: user.id, note: data });
-			throw new IdentifiableError('5b1c2b67-50a6-4a8a-a59c-0ede40890de3', 'User has no permission to create content.');
+			this.logger.error('Request rejected because user has no permission to create content', { userId: user.id });
+			throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.cannotCreateContent, 'User has no permission to create content.');
 		}
 
 		if (data.visibility === 'public' && data.channel == null) {
 			const sensitiveWords = meta.sensitiveWords;
 			if (this.utilityService.isKeyWordIncluded(data.cw ?? this.utilityService.concatNoteContentsForKeyWordCheck({ text: data.text, pollChoices: data.poll?.choices }), sensitiveWords)) {
 				data.visibility = 'home';
-				this.logger.warn('Visibility changed to home because sensitive words are included', { userId: user.id, note: data });
+				this.logger.warn('Visibility changed to home because sensitive words are included', { userId: user.id });
 			} else if (!policies.canPublicNote) {
 				data.visibility = 'home';
 			}
@@ -452,8 +477,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 		);
 
 		if (hasProhibitedWords) {
-			this.logger.error('Request rejected because prohibited words are included', { userId: user.id, note: data });
-			throw new IdentifiableError('689ee33f-f97c-479a-ac49-1b9f8140af99', 'Notes including prohibited words are not allowed.');
+			this.logger.error('Request rejected because prohibited words are included', { userId: user.id });
+			throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.prohibitedWords, 'Notes including prohibited words are not allowed.');
 		}
 
 		const inSilencedInstance = this.utilityService.isItemListedIn(user.host, meta.silencedHosts);
@@ -557,8 +582,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 		if (process.env.MISSKEY_BLOCK_MENTIONS_FROM_UNFAMILIAR_REMOTE_USERS === 'true' && user.host !== null && willCauseNotification) {
 			const userEntity = await this.usersRepository.findOneBy({ id: user.id });
 			if ((userEntity?.followersCount ?? 0) === 0) {
-				this.logger.error('Request rejected because user has no local followers', { userId: user.id, note: data });
-				throw new IdentifiableError('e11b3a16-f543-4885-8eb1-66cad131dbfd', 'Notes including mentions, replies, or renotes from remote users are not allowed until user has at least one local follower.');
+				this.logger.error('Request rejected because user has no local followers', { userId: user.id });
+				throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.unfamiliarRemoteUser, 'Notes including mentions, replies, or renotes from remote users are not allowed until user has at least one local follower.');
 			}
 		}
 
@@ -569,8 +594,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 				|| (data.visibility === 'specified' && data.visibleUsers?.some(u => u.id !== user.id))
 				|| (this.isQuote(data) && data.renote.userId !== user.id)
 			) {
-				this.logger.error('Request rejected because user has no permission to initiate conversation', { userId: user.id, note: data });
-				throw new IdentifiableError('332dd91b-6a00-430a-ac39-620cf60ad34b', 'Notes including mentions, replies, or renotes are not allowed.');
+				this.logger.error('Request rejected because user has no permission to initiate conversation', { userId: user.id });
+				throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.cannotInitiateConversation, 'Notes including mentions, replies, or renotes are not allowed.');
 			}
 		}
 
@@ -595,52 +620,31 @@ export class NoteCreateService implements OnApplicationShutdown {
 		}
 
 		if (mentionedUsers.length > 0 && mentionedUsers.length > policies.mentionLimit) {
-			throw new IdentifiableError('9f466dab-c856-48cd-9e65-ff90ff750580', `Notes including mentions are limited to ${policies.mentionLimit} users.`);
+			throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.tooManyMentions, `Notes including mentions are limited to ${policies.mentionLimit} users.`);
 		}
 
-		if (!data.scheduledAt) {
-			const note = await this.insertNote(user, data, tags, emojis, mentionedUsers);
+		const note = await this.insertNote(user, data, tags, emojis, mentionedUsers);
 
-			if (data.lang != null) {
-				await this.noteLanguagesRepository.insert({
-					noteId: note.id,
-					lang: data.lang,
-				});
-				this.cacheService.noteLanguageCache.set(note.id, data.lang);
-			}
-
-			setImmediate('post created', { signal: this.#shutdownController.signal }).then(
-				() => this.postNoteCreated(note, user, data, silent, tags!, mentionedUsers!),
-				() => { /* aborted, ignore this */ },
-			);
-
-			return note;
-		} else {
-			if (!policies.canScheduleNote) {
-				throw new IdentifiableError('7cc42034-f7ab-4f7c-87b4-e00854479080', 'User has no permission to schedule notes.');
-			}
-
-			if ((data.scheduledAt.getTime() - Date.now()) / 86_400_000 > policies.scheduleNoteMaxDays) {
-				throw new IdentifiableError('506006cf-3092-4ae1-8145-b025001c591f', `User can schedule notes up to ${policies.scheduleNoteMaxDays} days in the future.`);
-			}
-
-			const scheduledCount = await this.scheduledNotesRepository.countBy({ userId: user.id });
-			if (scheduledCount >= policies.scheduleNoteLimit) {
-				throw new IdentifiableError('7fc78d25-d947-45c1-9547-02257b98cab3', `User can schedule up to ${policies.scheduleNoteLimit} notes.`);
-			}
-
-			const draft = await this.insertScheduledNote(user, data);
-
-			await this.queueService.createScheduledNoteJob(draft.id, draft.scheduledAt!);
-
-			return draft;
+		if (data.lang != null) {
+			await this.noteLanguagesRepository.insert({
+				noteId: note.id,
+				lang: data.lang,
+			});
+			this.cacheService.noteLanguageCache.set(note.id, data.lang);
 		}
+
+		setImmediate('post created', { signal: this.#shutdownController.signal }).then(
+			() => this.postNoteCreated(note, user, data, silent, tags!, mentionedUsers!),
+			() => { /* aborted, ignore this */ },
+		);
+
+		return note;
 	}
 
 	@bindThis
 	private async insertNote(user: { id: MiUser['id']; host: MiUser['host']; }, data: NoteCreateOption, tags: string[], emojis: string[], mentionedUsers: MinimumUser[]) {
 		const insert = new MiNote({
-			id: this.idService.gen(data.createdAt?.getTime()),
+			id: data.id ?? this.idService.gen(data.createdAt?.getTime()),
 			createdAt: data.createdAt!,
 			fileIds: data.files ? data.files.map(file => file.id) : [],
 			replyId: data.reply ? data.reply.id : null,
@@ -739,34 +743,9 @@ export class NoteCreateService implements OnApplicationShutdown {
 				throw err;
 			}
 
-			this.logger.error(`Failed to create note: ${e}`, { error: e });
-
-			throw e;
-		}
-	}
-
-	@bindThis
-	private async insertScheduledNote(user: { id: MiUser['id']; host: MiUser['host']; }, data: NoteCreateOption) {
-		const insert = new MiScheduledNote({
-			id: this.idService.gen(data.createdAt?.getTime()),
-			createdAt: data.createdAt!,
-			scheduledAt: data.scheduledAt!,
-			userId: user.id,
-			draft: data,
-		});
-
-		// 予約投稿を作成
-		try {
-			await this.scheduledNotesRepository.insert(insert);
-
-			return insert;
-		} catch (e) {
-			// duplicate key error
-			if (isDuplicateKeyValueError(e)) {
-				throw new IdentifiableError('5ea8e4f5-9d64-4e6c-92b8-9e2b5a4756bc', 'There is already a scheduled note with the same time.');
-			}
-
-			this.logger.error(`Failed to create scheduled note: ${e}`, { error: e });
+			this.logger.error('Failed to create note', {
+				errorName: e instanceof Error ? e.name : 'unknown',
+			});
 
 			throw e;
 		}

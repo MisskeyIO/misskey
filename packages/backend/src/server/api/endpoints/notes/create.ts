@@ -13,6 +13,7 @@ import { postingLangCodes } from '@/misc/langmap.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { NoteCreateService } from '@/core/NoteCreateService.js';
+import { NoteDraftService } from '@/core/NoteDraftService.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import { DI } from '@/di-symbols.js';
@@ -119,6 +120,12 @@ export const meta = {
 			id: 'b6992544-63e7-67f0-fa7f-32444b1b5306',
 		},
 
+		noSuchVisibleUser: {
+			message: 'Some visible users are not found.',
+			code: 'NO_SUCH_VISIBLE_USER',
+			id: '96fe23ce-3494-4ad8-b69f-1a166e41ee94',
+		},
+
 		cannotRenoteOutsideOfChannel: {
 			message: 'Cannot renote outside of channel.',
 			code: 'CANNOT_RENOTE_OUTSIDE_OF_CHANNEL',
@@ -141,6 +148,43 @@ export const meta = {
 			message: 'Replying to another bot account is not allowed.',
 			code: 'REPLY_TO_BOT_NOT_ALLOWED',
 			id: '66819f28-9525-389d-4b0a-4974363fbbbf',
+		},
+
+		tooManyDrafts: {
+			message: 'You cannot create drafts any more.',
+			code: 'TOO_MANY_DRAFTS',
+			id: '9ee33bbe-fde3-4c71-9b51-e50492c6b9c8',
+		},
+
+		tooManyScheduledNotes: {
+			message: 'You cannot create scheduled notes any more.',
+			code: 'TOO_MANY_SCHEDULED_NOTES',
+			id: '22ae69eb-09e3-4541-a850-773cfa45e693',
+		},
+
+		cannotScheduleToPast: {
+			message: 'Cannot schedule to the past.',
+			code: 'CANNOT_SCHEDULE_TO_PAST',
+			id: 'e577d185-8179-4a17-b47f-6093985558e6',
+		},
+
+		cannotScheduleToFarFuture: {
+			message: 'Cannot schedule to the far future.',
+			code: 'CANNOT_SCHEDULE_TO_FAR_FUTURE',
+			id: 'ea102856-e8da-4ae9-a98a-0326821bd177',
+		},
+
+		rolePermissionDenied: {
+			message: 'You are not assigned to a required role.',
+			code: 'ROLE_PERMISSION_DENIED',
+			id: '12f1d5d2-f7ec-4d7c-b608-e873f4b20327',
+			httpStatusCode: 403,
+		},
+
+		invalidScheduledNote: {
+			message: 'Scheduled note content is invalid.',
+			code: 'INVALID_SCHEDULED_NOTE',
+			id: 'e35e6376-01de-476f-a752-a90a848a4f55',
 		},
 	},
 } as const;
@@ -203,6 +247,7 @@ export const paramDef = {
 			},
 			required: ['choices'],
 		},
+		scheduledAt: { type: 'integer', nullable: true, maximum: 253_402_300_799_999 },
 		noCreatedNote: { type: 'boolean', default: false },
 	},
 	// (re)note with text, files and poll are optional
@@ -247,6 +292,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private loggerService: LoggerService,
 		private noteEntityService: NoteEntityService,
 		private noteCreateService: NoteCreateService,
+		private noteDraftService: NoteDraftService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const logger = this.loggerService.getLogger('api:notes:create');
@@ -269,11 +315,45 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 						}),
 					};
 				}
+
+				const draft = await this.noteDraftService.get(me, idempotent);
+				if (draft != null) return;
 			}
 
 			await this.redisForTimelines.set(key, '_', 'EX', 30);
 
 			try {
+				if (ps.scheduledAt != null) {
+					const draft = await this.noteDraftService.create(me, {
+						fileIds: ps.fileIds ?? ps.mediaIds ?? [],
+						pollChoices: ps.poll?.choices ?? [],
+						pollMultiple: ps.poll?.multiple ?? false,
+						pollExpiresAt: ps.poll?.expiresAt == null ? null : new Date(ps.poll.expiresAt),
+						pollExpiredAfter: ps.poll?.expiredAfter ?? null,
+						hasPoll: ps.poll != null,
+						text: ps.text ?? null,
+						replyId: ps.replyId ?? null,
+						renoteId: ps.renoteId ?? null,
+						cw: ps.cw ?? null,
+						hashtag: null,
+						localOnly: ps.localOnly,
+						dimension: ps.dimension ?? null,
+						lang: ps.lang ?? null,
+						reactionAcceptance: ps.reactionAcceptance,
+						visibility: ps.visibility,
+						visibleUserIds: ps.visibleUserIds ?? [],
+						channelId: ps.channelId ?? null,
+						scheduledAt: new Date(ps.scheduledAt),
+						isActuallyScheduled: true,
+						noExtractMentions: ps.noExtractMentions,
+						noExtractHashtags: ps.noExtractHashtags,
+						noExtractEmojis: ps.noExtractEmojis,
+					});
+
+					await this.redisForTimelines.set(key, draft.id, 'EX', 60);
+					return;
+				}
+
 				const note = await this.noteCreateService.fetchAndCreate(me, {
 					createdAt: new Date(),
 					fileIds: ps.fileIds ?? ps.mediaIds ?? [],
@@ -309,7 +389,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				};
 			} catch (err) {
 				await this.redisForTimelines.unlinkIf(key, '_');
-				logger.error('ノートの作成に失敗しました。', { error: err });
+				logger.error('ノートの作成に失敗しました。', {
+					errorName: err instanceof Error ? err.name : 'unknown',
+					errorId: err instanceof IdentifiableError ? err.id : undefined,
+				});
 				// TODO: 他のErrorもここでキャッチしてエラーメッセージを当てるようにしたい
 				if (err instanceof IdentifiableError) {
 					if (err.id === '689ee33f-f97c-479a-ac49-1b9f8140af99') {
@@ -318,6 +401,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 						throw new ApiError(meta.errors.containsTooManyMentions);
 					} else if (err.id === '801c046c-5bf5-4234-ad2b-e78fc20a2ac7') {
 						throw new ApiError(meta.errors.noSuchFile);
+					} else if (err.id === '81df0c8d-2cfe-4e1a-9e93-b948ef455d9d') {
+						throw new ApiError(meta.errors.noSuchVisibleUser);
 					} else if (err.id === '53983c56-e163-45a6-942f-4ddc485d4290') {
 						throw new ApiError(meta.errors.noSuchRenoteTarget);
 					} else if (err.id === 'bde24c37-121f-4e7d-980d-cec52f599f02') {
@@ -348,6 +433,18 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 						throw new ApiError(meta.errors.noSuchChannel);
 					} else if (err.id === '66819f28-9525-389d-4b0a-4974363fbbbf') {
 						throw new ApiError(meta.errors.replyingToAnotherBot);
+					} else if (err.id === '9ee33bbe-fde3-4c71-9b51-e50492c6b9c8') {
+						throw new ApiError(meta.errors.tooManyDrafts);
+					} else if (err.id === 'c3275f19-4558-4c59-83e1-4f684b5fab66') {
+						throw new ApiError(meta.errors.tooManyScheduledNotes);
+					} else if (err.id === '7cc42034-f7ab-4f7c-87b4-e00854479080') {
+						throw new ApiError(meta.errors.rolePermissionDenied);
+					} else if (err.id === '94a89a43-3591-400a-9c17-dd166e71fdfa' || err.id === 'b34d0c1b-996f-4e34-a428-c636d98df457') {
+						throw new ApiError(meta.errors.cannotScheduleToPast);
+					} else if (err.id === '506006cf-3092-4ae1-8145-b025001c591f') {
+						throw new ApiError(meta.errors.cannotScheduleToFarFuture);
+					} else if (err.id === '4f5bb9ec-5c64-47e9-b21b-da977f45ae3d') {
+						throw new ApiError(meta.errors.invalidScheduledNote);
 					}
 				}
 				throw err;

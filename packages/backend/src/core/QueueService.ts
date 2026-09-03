@@ -7,6 +7,7 @@ import { randomUUID, createHash } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import type { IActivity } from '@/core/activitypub/type.js';
 import type { MiDriveFile } from '@/models/DriveFile.js';
+import type { MiNoteDraft } from '@/models/NoteDraft.js';
 import type { MiScheduledNote } from '@/models/ScheduledNote.js';
 import type { MiAbuseUserReport } from '@/models/AbuseUserReport.js';
 import type { MiWebhook, WebhookEventTypes } from '@/models/Webhook.js';
@@ -53,6 +54,30 @@ export const QUEUE_TYPES = [
 	'userWebhookDeliver',
 	'systemWebhookDeliver',
 ] as const;
+
+export function getPostScheduledNoteJobId(draftId: MiNoteDraft['id'], scheduledAt: Date | number): string {
+	const scheduledAtMs = typeof scheduledAt === 'number' ? scheduledAt : scheduledAt.getTime();
+	return `scheduled-note-${draftId}-${scheduledAtMs}`;
+}
+
+export const POST_SCHEDULED_NOTE_ATTEMPTS = 8;
+
+export function getPostScheduledNoteJobOptions(draftId: MiNoteDraft['id'], scheduledAt: Date, now = Date.now()): Bull.JobsOptions {
+	return {
+		jobId: getPostScheduledNoteJobId(draftId, scheduledAt),
+		delay: Math.max(scheduledAt.getTime() - now, 0),
+		attempts: POST_SCHEDULED_NOTE_ATTEMPTS,
+		backoff: {
+			type: 'exponential',
+			delay: 30 * 1000,
+		},
+		removeOnComplete: true,
+		removeOnFail: {
+			age: 3600 * 24 * 7,
+			count: 100,
+		},
+	};
+}
 
 const REPEATABLE_SYSTEM_JOB_DEF = [{
 	name: 'tickCharts',
@@ -494,6 +519,20 @@ export class QueueService {
 			removeOnComplete: true,
 			removeOnFail: true,
 		});
+	}
+
+	@bindThis
+	public createPostScheduledNoteJob(draftId: MiNoteDraft['id'], scheduledAt: Date) {
+		const scheduledAtMs = scheduledAt.getTime();
+		return this.postScheduledNoteQueue.add('postScheduledNote', {
+			noteDraftId: draftId,
+			scheduledAt: scheduledAtMs,
+		}, getPostScheduledNoteJobOptions(draftId, scheduledAt));
+	}
+
+	@bindThis
+	public removePostScheduledNoteJob(draftId: MiNoteDraft['id'], scheduledAt: Date) {
+		return this.postScheduledNoteQueue.remove(getPostScheduledNoteJobId(draftId, scheduledAt));
 	}
 
 	@bindThis

@@ -572,6 +572,8 @@ export class QueueProcessorService implements OnApplicationShutdown {
 
 	@bindThis
 	public async start(): Promise<void> {
+		await this.checkMissingScheduledNoteProcessorService.process();
+
 		await Promise.all([
 			this.systemQueueWorker.run(),
 			this.dbQueueWorker.run(),

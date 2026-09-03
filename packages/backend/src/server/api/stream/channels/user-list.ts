@@ -98,9 +98,6 @@ export class UserListChannel extends Channel {
 		let note = sourceNote;
 		const isMe = this.user!.id === note.userId;
 
-		// チャンネル投稿は無視する
-		if (note.channelId) return;
-
 		// ファイルを含まない投稿は除外
 		if (this.withFiles && (note.fileIds == null || note.fileIds.length === 0)) return;
 		if (this.withFiles && (note.files === undefined || note.files.length === 0)) return;

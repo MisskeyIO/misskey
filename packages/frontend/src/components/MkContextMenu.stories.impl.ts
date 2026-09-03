@@ -8,6 +8,7 @@
 import type { StoryObj } from '@storybook/vue3-vite';
 import { userEvent, within } from 'storybook/test';
 import MkContextMenu from './MkContextMenu.vue';
+import type { StoryObj } from '@storybook/vue3';
 import * as os from '@/os.js';
 export const Empty = {
 	render(args) {
@@ -25,7 +26,7 @@ export const Empty = {
 				},
 			},
 			methods: {
-				onContextmenu(ev: MouseEvent) {
+				onContextmenu(ev: PointerEvent) {
 					os.contextMenu(args.items, ev);
 				},
 			},

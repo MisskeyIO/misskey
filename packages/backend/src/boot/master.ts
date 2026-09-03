@@ -4,8 +4,6 @@
  */
 
 import * as fs from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { dirname } from 'node:path';
 import * as os from 'node:os';
 import cluster from 'node:cluster';
 import chalk from 'chalk';
@@ -28,7 +26,7 @@ const themeColor = chalk.hex('#86b300');
 function greet() {
 	if (!envOption.quiet && !envOption.logJson) {
 		//#region Misskey logo
-		const v = `v${meta.version}`;
+		const v = `v${props.version}`;
 		console.log(themeColor('  _____ _         _           '));
 		console.log(themeColor(' |     |_|___ ___| |_ ___ _ _ '));
 		console.log(themeColor(' | | | | |_ -|_ -| \'_| -_| | |'));
@@ -55,10 +53,10 @@ export async function masterMain() {
 
 	// initialize app
 	try {
-		greet();
+		config = loadConfigBoot();
+		greet({ version: config.version });
 		showEnvironment();
 		showNodejsVersion();
-		config = loadConfigBoot();
 		//await connectDb();
 		if (config.pidFile) fs.writeFileSync(config.pidFile, process.pid.toString());
 	} catch (e) {

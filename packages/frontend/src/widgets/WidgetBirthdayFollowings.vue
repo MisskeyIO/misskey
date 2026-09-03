@@ -51,6 +51,7 @@ const name = i18n.ts._widgets.birthdaySoon;
 const widgetPropsDef = {
 	showHeader: {
 		type: 'boolean',
+		label: i18n.ts._widgetOptions.showHeader,
 		default: true,
 	},
 	height: {
@@ -112,6 +113,7 @@ function birthdayParam() {
 			day: begin.value.getDate(),
 		};
 	}
+});
 
 	return {
 		begin: {
@@ -197,8 +199,7 @@ defineExpose<WidgetComponentExpose>({
 
 .empty {
 	display: flex;
-	flex-direction: column;
-	justify-content: center;
+	font-size: 85%;
 	align-items: center;
 
 	> img {

@@ -9,7 +9,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	:width="450"
 	:canClose="false"
 	:withOkButton="true"
-	:okButtonDisabled="false"
+	:okButtonDisabled="!canSave"
 	@click="cancel()"
 	@ok="ok()"
 	@close="cancel()"
@@ -67,19 +67,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { reactive, useTemplateRef } from 'vue';
-import MkInput from './MkInput.vue';
-import MkTextarea from './MkTextarea.vue';
-import MkSwitch from './MkSwitch.vue';
-import MkSelect from './MkSelect.vue';
-import MkRange from './MkRange.vue';
-import MkButton from './MkButton.vue';
-import MkRadios from './MkRadios.vue';
-import XFile from './MkFormDialog.file.vue';
-import type { MkSelectItem } from '@/components/MkSelect.vue';
-import type { Form, EnumFormItem, RadioFormItem } from '@/utility/form.js';
+import { ref, useTemplateRef } from 'vue';
+import type { Form } from '@/utility/form.js';
 import MkModalWindow from '@/components/MkModalWindow.vue';
-import { i18n } from '@/i18n.js';
+import MkForm from '@/components/MkForm.vue';
 
 const props = defineProps<{
 	title: string;
@@ -96,19 +87,30 @@ const emit = defineEmits<{
 }>();
 
 const dialog = useTemplateRef('dialog');
-const values = reactive({});
 
-for (const item in props.form) {
-	if ('default' in props.form[item]) {
-		values[item] = props.form[item].default ?? null;
-	} else {
-		values[item] = null;
+const values = ref((() => {
+	const obj: Record<string, any> = {};
+	for (const item in props.form) {
+		if ('default' in props.form[item]) {
+			obj[item] = props.form[item].default ?? null;
+		} else {
+			obj[item] = null;
+		}
 	}
+	return obj;
+})());
+
+const canSave = ref(true);
+
+function onCanSaveStateChanged(newCanSave: boolean) {
+	canSave.value = newCanSave;
 }
 
 function ok() {
+	if (!canSave.value) return;
+
 	emit('done', {
-		result: values,
+		result: values.value,
 	});
 	dialog.value?.close();
 }
@@ -118,19 +120,5 @@ function cancel() {
 		canceled: true,
 	});
 	dialog.value?.close();
-}
-
-function getMkSelectDef(def: EnumFormItem): MkSelectItem[] {
-	return def.enum.map((v) => {
-		if (typeof v === 'string') {
-			return { value: v, label: v };
-		} else {
-			return { value: v.value, label: v.label };
-		}
-	});
-}
-
-function getRadioKey(e: RadioFormItem['options'][number]) {
-	return typeof e.value === 'string' ? e.value : JSON.stringify(e.value);
 }
 </script>

@@ -66,6 +66,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 </MkModal>
 </template>
 
+<script lang="ts">
+export type Result = string | number | true | null;
+export type MkDialogReturnType<T = Result> = { canceled: true, result: undefined } | { canceled: false, result: T };
+</script>
+
 <script lang="ts" setup>
 import { ref, useTemplateRef, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import type { InputHTMLAttributes } from 'vue';
@@ -97,8 +102,6 @@ type Select = {
 	items: MkSelectItem[];
 	default: OptionValue | null;
 };
-
-type Result = string | number | true | null;
 
 const props = withDefaults(defineProps<{
 	type?: 'success' | 'error' | 'warning' | 'info' | 'question' | 'waiting';

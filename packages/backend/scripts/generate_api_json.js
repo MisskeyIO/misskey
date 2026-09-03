@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { writeFileSync, existsSync } from 'node:fs';
 import { execa } from 'execa';
 import { writeFileSync, existsSync } from 'node:fs';
 
@@ -19,10 +20,10 @@ async function main() {
 	}
 
 	/** @type {import('../src/config.js')} */
-	const { loadConfig } = await import('../built/config.js');
+	const { loadConfig } = await import('../src-js/config.js');
 
 	/** @type {import('../src/server/api/openapi/gen-spec.js')} */
-	const { genOpenapiSpec } = await import('../built/server/api/openapi/gen-spec.js');
+	const { genOpenapiSpec } = await import('../src-js/server/api/openapi/gen-spec.js');
 
 	const config = loadConfig();
 	const spec = genOpenapiSpec(config, true);

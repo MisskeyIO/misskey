@@ -8,6 +8,7 @@
 Dockerfile
 build/
 built/
+src-js/
 db/
 compose.yml
 docker-compose.yml

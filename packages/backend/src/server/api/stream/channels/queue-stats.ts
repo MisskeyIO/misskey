@@ -4,15 +4,17 @@
  */
 
 import Xev from 'xev';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Scope } from '@nestjs/common';
 import { bindThis } from '@/decorators.js';
 import { isJsonObject } from '@/misc/json-value.js';
 import type { JsonObject, JsonValue } from '@/misc/json-value.js';
-import Channel, { type MiChannelService } from '../channel.js';
+import Channel, { type ChannelRequest } from '../channel.js';
+import { REQUEST } from '@nestjs/core';
 
 const ev = new Xev();
 
-class QueueStatsChannel extends Channel {
+@Injectable({ scope: Scope.TRANSIENT })
+export class QueueStatsChannel extends Channel {
 	public readonly chName = 'queueStats';
 	public static readonly shouldShare = true;
 	public static readonly requireCredential = false as const;

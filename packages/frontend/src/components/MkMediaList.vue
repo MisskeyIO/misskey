@@ -11,6 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			ref="gallery"
 			:class="[
 				$style.medias,
+				...(prefer.s.showMediaListByGridInWideArea ? [$style.gridInWideArea] : []),
 				count === 1 ? [$style.n1, {
 					[$style.n116_9]: prefer.s.mediaListWithOneImageAppearance === '16_9',
 					[$style.n11_1]: prefer.s.mediaListWithOneImageAppearance === '1_1',
@@ -160,8 +161,10 @@ const buildLightbox = (): PhotoSwipeLightbox | null => {
 			[itemData.w, itemData.h] = [itemData.h, itemData.w];
 		}
 		itemData.msrc = file.thumbnailUrl ?? undefined;
-		itemData.alt = file.comment ?? file.name;
-		itemData.comment = file.comment ?? file.name;
+		// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+		itemData.alt = file.comment || file.name;
+		// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+		itemData.comment = file.comment || file.name;
 		itemData.thumbCropped = true;
 
 		return itemData;
@@ -254,6 +257,10 @@ defineExpose({
 </script>
 
 <style lang="scss" module>
+.root {
+	container-type: inline-size;
+}
+
 .container {
 	position: relative;
 	width: 100%;
@@ -335,6 +342,20 @@ defineExpose({
 .media {
 	overflow: hidden; // clipにするとバグる
 	border-radius: 8px;
+}
+
+@container (min-width: 500px) {
+	.medias.gridInWideArea {
+		display: grid;
+		aspect-ratio: auto;
+		grid-template-columns: repeat(4, 1fr);
+		grid-template-rows: auto;
+		grid-gap: 8px;
+
+		> .media {
+			aspect-ratio: 1 / 1;
+		}
+	}
 }
 
 :global(.pswp) {

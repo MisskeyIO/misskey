@@ -12,9 +12,11 @@ import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import { isInstanceMuted } from '@/misc/is-instance-muted.js';
 import { isUserRelated } from '@/misc/is-user-related.js';
 import type { JsonObject } from '@/misc/json-value.js';
-import Channel, { type MiChannelService } from '../channel.js';
+import Channel, { type ChannelRequest } from '../channel.js';
+import { REQUEST } from '@nestjs/core';
 
-class ChannelChannel extends Channel {
+@Injectable({ scope: Scope.TRANSIENT })
+export class ChannelChannel extends Channel {
 	public readonly chName = 'channel';
 	public static readonly shouldShare = false;
 	public static readonly requireCredential = false as const;

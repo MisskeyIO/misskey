@@ -3,24 +3,26 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Scope } from '@nestjs/common';
 import { isInstanceMuted, isUserFromMutedInstance } from '@/misc/is-instance-muted.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { bindThis } from '@/decorators.js';
 import type { JsonObject } from '@/misc/json-value.js';
-import Channel, { type MiChannelService } from '../channel.js';
+import Channel, { type ChannelRequest } from '../channel.js';
+import { REQUEST } from '@nestjs/core';
 
-class MainChannel extends Channel {
+@Injectable({ scope: Scope.TRANSIENT })
+export class MainChannel extends Channel {
 	public readonly chName = 'main';
 	public static readonly shouldShare = true;
 	public static readonly requireCredential = true as const;
 	public static readonly kind = 'read:account';
 
 	constructor(
-		private noteEntityService: NoteEntityService,
+		@Inject(REQUEST)
+		request: ChannelRequest,
 
-		id: string,
-		connection: Channel['connection'],
+		private noteEntityService: NoteEntityService,
 	) {
 		super(id, connection, null);
 	}

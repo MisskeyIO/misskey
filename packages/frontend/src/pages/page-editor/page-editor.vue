@@ -237,9 +237,9 @@ async function add() {
 	content.value.push(createPageBlock(type, genId()));
 }
 
-function setEyeCatchingImage(img: Event) {
+function setEyeCatchingImage(ev: PointerEvent) {
 	selectFile({
-		anchorElement: img.currentTarget ?? img.target,
+		anchorElement: ev.currentTarget ?? ev.target,
 		multiple: false,
 	}).then(file => {
 		eyeCatchingImageId.value = file.id;

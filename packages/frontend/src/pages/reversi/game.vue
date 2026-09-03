@@ -25,8 +25,6 @@ import { url } from '@@/js/config.js';
 import { i18n } from '@/i18n.js';
 import { useInterval } from '@@/js/use-interval.js';
 
-const $i = ensureSignin();
-
 const router = useRouter();
 
 const props = defineProps<{
@@ -77,7 +75,7 @@ async function fetchGame() {
 		connection.value.on('canceled', x => {
 			connection.value?.dispose();
 
-			if (x.userId !== $i.id) {
+			if (x.userId !== $i?.id) {
 				os.alert({
 					type: 'warning',
 					text: i18n.ts._reversi.gameCanceled,

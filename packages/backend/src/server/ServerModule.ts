@@ -12,7 +12,6 @@ import { NodeinfoServerService } from './NodeinfoServerService.js';
 import { ServerService } from './ServerService.js';
 import { WellKnownServerService } from './WellKnownServerService.js';
 import { GetterService } from './api/GetterService.js';
-import { ChannelsService } from './api/stream/ChannelsService.js';
 import { ActivityPubServerService } from './ActivityPubServerService.js';
 import { ApiLoggerService } from './api/ApiLoggerService.js';
 import { ApiServerService } from './api/ApiServerService.js';
@@ -67,7 +66,7 @@ import { SigninWithPasskeyApiService } from './api/SigninWithPasskeyApiService.j
 		ServerService,
 		WellKnownServerService,
 		GetterService,
-		ChannelsService,
+		MainStreamConnection,
 		ApiCallService,
 		ApiLoggerService,
 		ApiServerService,

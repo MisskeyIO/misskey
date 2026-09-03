@@ -9,9 +9,11 @@ import { RoleService } from '@/core/RoleService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import type { GlobalEvents } from '@/core/GlobalEventService.js';
 import type { JsonObject } from '@/misc/json-value.js';
-import Channel, { type MiChannelService } from '../channel.js';
+import Channel, { type ChannelRequest } from '../channel.js';
+import { REQUEST } from '@nestjs/core';
 
-class AntennaChannel extends Channel {
+@Injectable({ scope: Scope.TRANSIENT })
+export class AntennaChannel extends Channel {
 	public readonly chName = 'antenna';
 	public static readonly shouldShare = false;
 	public static readonly requireCredential = true as const;
@@ -23,8 +25,7 @@ class AntennaChannel extends Channel {
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
 
-		id: string,
-		connection: Channel['connection'],
+		private noteEntityService: NoteEntityService,
 	) {
 		super(id, connection, null);
 		//this.onEvent = this.onEvent.bind(this);

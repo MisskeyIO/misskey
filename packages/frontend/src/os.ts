@@ -15,7 +15,10 @@ import type { Form, GetFormResultType } from '@/utility/form.js';
 import type { MenuItem } from '@/types/menu.js';
 import type { PostFormProps } from '@/types/post-form.js';
 import type { UploaderFeatures } from '@/composables/use-uploader.js';
-import type { MkSelectItem, OptionValue } from '@/components/MkSelect.vue';
+import type { MkSelectItem } from '@/components/MkSelect.vue';
+import type { OptionValue } from '@/types/option-value.js';
+import type { MkDialogReturnType } from '@/components/MkDialog.vue';
+import type { OverloadToUnion } from '@/types/overload-to-union.js';
 import type MkRoleSelectDialog_TypeReferenceOnly from '@/components/MkRoleSelectDialog.vue';
 import type MkEmojiPickerDialog_TypeReferenceOnly from '@/components/MkEmojiPickerDialog.vue';
 import { misskeyApi } from '@/utility/misskey-api.js';
@@ -197,7 +200,8 @@ type ComponentEmit<T> = T extends new () => { $props: infer Props }
 		: never;
 
 // props に ref を許可するようにする
-type ComponentProps<T extends Component> = { [K in keyof CP<T>]: CP<T>[K] | Ref<CP<T>[K]> };
+type PropsWithRefs<P> = { [K in keyof P]: MaybeRef<P[K]> };
+type ComponentProps<T extends Component> = PropsWithRefs<CP<T>>;
 
 type EmitsExtractor<T> = {
 	[K in keyof T as K extends `onVnode${string}` ? never : K extends `on${infer E}` ? Uncapitalize<E> : K extends string ? never : K]: T[K];
@@ -238,10 +242,10 @@ export function popup<T extends Component>(
 export async function popupAsyncWithDialog<T extends Component>(
 	componentFetching: Promise<T>,
 	props: ComponentProps<T>,
-	events: Partial<ComponentEmit<T>> = {},
+	events: Partial<ComponentEmitsObject<T>> = {},
 ): Promise<{ dispose: () => void }> {
 	let component: T;
-	let closeWaiting = () => {};
+	let closeWaiting = () => { };
 
 	const timer = window.setTimeout(() => {
 		closeWaiting = waiting();
@@ -339,14 +343,14 @@ export function confirm(props: {
 	});
 }
 
-// TODO: const T extends ... にしたい
-// https://zenn.dev/general_link/articles/813e47b7a0eef7#const-type-parameters
-export function actions<T extends {
+type ActionsAction = {
 	value: string;
 	text: string;
-	primary?: boolean,
-	danger?: boolean,
-}[]>(props: {
+	primary?: boolean;
+	danger?: boolean;
+};
+
+export function actions<const T extends ActionsAction[]>(props: {
 	type: 'error' | 'info' | 'success' | 'warning' | 'waiting' | 'question';
 	title?: string | null;
 	text?: string | null;
@@ -370,7 +374,7 @@ export function actions<T extends {
 			})),
 		}, {
 			done: result => {
-				resolve(result ? result : { canceled: true });
+				resolve(result as MkDialogReturnType<T[number]['value']>);
 			},
 		}, 'closed');
 	});
@@ -386,11 +390,7 @@ export function inputText(props: {
 	default: string;
 	minLength?: number;
 	maxLength?: number;
-}): Promise<{
-	canceled: true; result: undefined;
-} | {
-	canceled: false; result: string;
-}>;
+}): Promise<MkDialogReturnType<string>>;
 // min lengthが指定されてたら result は null になり得ないことを保証する overload function
 export function inputText(props: {
 	type?: 'text' | 'email' | 'password' | 'url';
@@ -401,11 +401,7 @@ export function inputText(props: {
 	default?: string;
 	minLength: number;
 	maxLength?: number;
-}): Promise<{
-	canceled: true; result: undefined;
-} | {
-	canceled: false; result: string;
-}>;
+}): Promise<MkDialogReturnType<string>>;
 export function inputText(props: {
 	type?: 'text' | 'email' | 'password' | 'url' | 'textarea';
 	title?: string | null;
@@ -415,11 +411,7 @@ export function inputText(props: {
 	default?: string | null;
 	minLength?: number;
 	maxLength?: number;
-}): Promise<{
-	canceled: true; result: undefined;
-} | {
-	canceled: false; result: string | null;
-}>;
+}): Promise<MkDialogReturnType<string | null>>;
 export function inputText(props: {
 	type?: 'text' | 'email' | 'password' | 'url' | 'textarea';
 	title?: string | null;
@@ -512,7 +504,7 @@ export function inputNumber(props: {
 			},
 		}, {
 			done: result => {
-				resolve(result ? result : { canceled: true });
+				resolve(result as MkDialogReturnType<number | null>);
 			},
 		}, 'closed');
 	});
@@ -600,7 +592,7 @@ export function select<C extends OptionValue, D extends C | null = null>(props: 
 			},
 		}, {
 			done: result => {
-				resolve(result ? result : { canceled: true });
+				resolve(result as MkDialogReturnType<Exclude<D, undefined> extends null ? C | null : C>);
 			},
 		}, 'closed');
 	});
@@ -661,7 +653,7 @@ export function form<F extends Form>(title: string, f: F): Promise<{
 	return new Promise(async (resolve) => {
 		await popup(defineAsyncComponent(() => import('@/components/MkFormDialog.vue')), { title, form: f }, {
 			done: result => {
-				resolve(result);
+				resolve(result as { canceled?: false, result: GetFormResultType<F> });
 			},
 		}, 'closed');
 	});
@@ -712,7 +704,7 @@ export async function pickEmoji(anchorElement: HTMLElement, opts: ComponentProps
 	});
 }
 
-export async function cropImageFile(imageFile: File | Blob, options: {
+export async function cropImageFile<F extends File | Blob>(imageFile: F, options: {
 	aspectRatio: number | null;
 }): Promise<File> {
 	return new Promise(async resolve => {
@@ -721,7 +713,7 @@ export async function cropImageFile(imageFile: File | Blob, options: {
 			aspectRatio: options.aspectRatio,
 		}, {
 			ok: x => {
-				resolve(x);
+				resolve(x as F);
 			},
 		}, 'closed');
 	});
@@ -800,6 +792,7 @@ export function popupMenu(items: (MenuItem | null)[], anchorElement?: HTMLElemen
 	align?: string;
 	width?: number;
 	onClosing?: () => void;
+	onClosed?: () => void;
 }): Promise<void> {
 	if (!(anchorElement instanceof HTMLElement)) {
 		anchorElement = null;
@@ -818,6 +811,7 @@ export function popupMenu(items: (MenuItem | null)[], anchorElement?: HTMLElemen
 				resolve();
 				dispose();
 				returnFocusTo = null;
+				options?.onClosed?.();
 			},
 			closing: () => {
 				options?.onClosing?.();
@@ -826,7 +820,7 @@ export function popupMenu(items: (MenuItem | null)[], anchorElement?: HTMLElemen
 	}));
 }
 
-export function contextMenu(items: MenuItem[], ev: MouseEvent): Promise<void> {
+export function contextMenu(items: MenuItem[], ev: PointerEvent): Promise<void> {
 	if (
 		prefer.s.contextMenu === 'native' ||
 		(prefer.s.contextMenu === 'appWithShift' && !ev.shiftKey)
@@ -925,7 +919,7 @@ export function chooseFileFromPc(
 	});
 }
 
-export function launchUploader(
+export async function launchUploader(
 	files: File[],
 	options?: {
 		folderId?: string | null;
@@ -933,9 +927,10 @@ export function launchUploader(
 		features?: UploaderFeatures;
 	},
 ): Promise<Misskey.entities.DriveFile[]> {
-	return new Promise(async (res, rej) => {
+	return new Promise((res, rej) => {
 		if (files.length === 0) return rej();
-		const { dispose } = await popupAsyncWithDialog(import('@/components/MkUploaderDialog.vue').then(x => x.default), {
+		let dispose: () => void;
+		popupAsyncWithDialog(import('@/components/MkUploaderDialog.vue').then(x => x.default), {
 			files: markRaw(files),
 			folderId: options?.folderId,
 			multiple: options?.multiple,
@@ -946,7 +941,7 @@ export function launchUploader(
 				res(driveFiles);
 			},
 			closed: () => dispose(),
-		});
+		}).then(d => dispose = d.dispose, rej);
 	});
 }
 

@@ -25,7 +25,7 @@ export class MiUserListFavorite {
 	@Column(id())
 	public userId: MiUser['id'];
 
-	@ManyToOne(type => MiUser, {
+	@ManyToOne(() => MiUser, {
 		onDelete: 'CASCADE',
 	})
 	@JoinColumn()
@@ -34,7 +34,7 @@ export class MiUserListFavorite {
 	@Column(id())
 	public userListId: MiUserList['id'];
 
-	@ManyToOne(type => MiUserList, {
+	@ManyToOne(() => MiUserList, {
 		onDelete: 'CASCADE',
 	})
 	@JoinColumn()

@@ -12,9 +12,11 @@ import { RoleService } from '@/core/RoleService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import type { JsonObject } from '@/misc/json-value.js';
-import Channel, { type MiChannelService } from '../channel.js';
+import Channel, { type ChannelRequest } from '../channel.js';
+import { REQUEST } from '@nestjs/core';
 
-class UserListChannel extends Channel {
+@Injectable({ scope: Scope.TRANSIENT })
+export class UserListChannel extends Channel {
 	public readonly chName = 'userList';
 	public static readonly shouldShare = false;
 	public static readonly requireCredential = false as const;
@@ -26,13 +28,19 @@ class UserListChannel extends Channel {
 	private minimize: boolean;
 
 	constructor(
+		@Inject(DI.userListsRepository)
 		private userListsRepository: UserListsRepository,
 		private userListMembershipsRepository: UserListMembershipsRepository,
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
 
-		id: string,
-		connection: Channel['connection'],
+		@Inject(DI.userListMembershipsRepository)
+		private userListMembershipsRepository: UserListMembershipsRepository,
+
+		@Inject(REQUEST)
+		request: ChannelRequest,
+
+		private noteEntityService: NoteEntityService,
 	) {
 		super(id, connection, null);
 		//this.updateListUsers = this.updateListUsers.bind(this);

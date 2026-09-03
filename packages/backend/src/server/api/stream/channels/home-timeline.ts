@@ -10,9 +10,11 @@ import { RoleService } from '@/core/RoleService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import type { JsonObject } from '@/misc/json-value.js';
-import Channel, { type MiChannelService } from '../channel.js';
+import Channel, { type ChannelRequest } from '../channel.js';
+import { REQUEST } from '@nestjs/core';
 
-class HomeTimelineChannel extends Channel {
+@Injectable({ scope: Scope.TRANSIENT })
+export class HomeTimelineChannel extends Channel {
 	public readonly chName = 'homeTimeline';
 	public static readonly shouldShare = false;
 	public static readonly requireCredential = true as const;

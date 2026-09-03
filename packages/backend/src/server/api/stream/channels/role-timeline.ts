@@ -12,7 +12,8 @@ import type { JsonObject } from '@/misc/json-value.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import Channel, { type MiChannelService } from '../channel.js';
 
-class RoleTimelineChannel extends Channel {
+@Injectable({ scope: Scope.TRANSIENT })
+export class RoleTimelineChannel extends Channel {
 	public readonly chName = 'roleTimeline';
 	public static readonly shouldShare = false;
 	public static readonly requireCredential = false as const;

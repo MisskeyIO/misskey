@@ -25,7 +25,7 @@ export class MiFlashLike {
 	@Column(id())
 	public userId: MiUser['id'];
 
-	@ManyToOne(type => MiUser, {
+	@ManyToOne(() => MiUser, {
 		onDelete: 'CASCADE',
 	})
 	@JoinColumn()
@@ -34,7 +34,7 @@ export class MiFlashLike {
 	@Column(id())
 	public flashId: MiFlash['id'];
 
-	@ManyToOne(type => MiFlash, {
+	@ManyToOne(() => MiFlash, {
 		onDelete: 'CASCADE',
 	})
 	@JoinColumn()

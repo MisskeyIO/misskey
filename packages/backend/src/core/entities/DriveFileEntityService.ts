@@ -17,6 +17,7 @@ import { deepClone } from '@/misc/clone.js';
 import { bindThis } from '@/decorators.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
 import { IdService } from '@/core/IdService.js';
+import { uniqueByKey } from '@/misc/unique-by-key.js';
 import { UtilityService } from '../UtilityService.js';
 import { VideoProcessingService } from '../VideoProcessingService.js';
 import { UserEntityService } from './UserEntityService.js';
@@ -236,6 +237,7 @@ export class DriveFileEntityService {
 		options?: PackOptions,
 		hint?: {
 			packedUser?: Packed<'UserLite'>
+			packedFolder?: Packed<'DriveFolder'>
 		},
 	): Promise<Packed<'DriveFile'> | null> {
 		const opts = Object.assign({
@@ -263,9 +265,9 @@ export class DriveFileEntityService {
 			thumbnailUrl: this.getThumbnailUrl(file),
 			comment: file.comment,
 			folderId: file.folderId,
-			folder: opts.detail && file.folderId ? this.driveFolderEntityService.pack(file.folderId, {
+			folder: opts.detail && file.folderId ? (hint?.packedFolder ?? this.driveFolderEntityService.pack(file.folderId, {
 				detail: true,
-			}) : null,
+			})) : null,
 			userId: file.userId,
 			user: (opts.withUser && file.userId) ? hint?.packedUser ?? await this.userEntityService.pack(file.userId, me) : null,
 		});

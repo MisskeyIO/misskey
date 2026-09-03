@@ -28,7 +28,6 @@
 		"jsx": "react-jsx",
 		"jsxImportSource": "@kitajs/html",
 		"rootDir": "./src",
-		"baseUrl": "./",
 		"paths": {
 			"@/*": ["./src/*"]
 		},

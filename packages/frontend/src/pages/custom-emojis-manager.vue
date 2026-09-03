@@ -54,7 +54,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<template #empty><span>{{ i18n.ts.noCustomEmojis }}</span></template>
 					<template #default="{items}">
 						<div class="ldhfsamy">
-							<div v-for="emoji in items" :key="emoji.id" class="emoji _panel _button" @click="remoteMenu(emoji, $event)">
+							<div v-for="emoji in items" :key="emoji.id" class="emoji _panel _button" @click="remoteMenu(emoji as RemoteEmoji, $event)">
 								<img :src="getProxiedImageUrl(emoji.url, 'emoji')" class="img" :alt="emoji.name"/>
 								<div class="body">
 									<div class="name _monospace">{{ emoji.name }}</div>
@@ -93,6 +93,8 @@ const host = ref<string | null>(null);
 const selectMode = ref(false);
 const selectedEmojis = ref<string[]>([]);
 
+type RemoteEmoji = Misskey.entities.AdminEmojiListRemoteResponse[number] & { host: string };
+
 const paginator = markRaw(new Paginator('admin/emoji/list', {
 	limit: 30,
 	computedParams: computed(() => ({
@@ -116,7 +118,7 @@ const selectAll = () => {
 	}
 };
 
-const toggleSelect = (emoji) => {
+const toggleSelect = (emoji: Misskey.entities.EmojiDetailed) => {
 	if (selectedEmojis.value.includes(emoji.id)) {
 		selectedEmojis.value = selectedEmojis.value.filter(x => x !== emoji.id);
 	} else {
@@ -124,19 +126,23 @@ const toggleSelect = (emoji) => {
 	}
 };
 
-const add = async (ev: MouseEvent) => {
+const add = async () => {
 	const { dispose } = await os.popupAsyncWithDialog(import('./emoji-edit-dialog.vue').then(x => x.default), {
 	}, {
 		done: result => {
 			if (result.created) {
-				paginator.prepend(result.created);
+				const nowIso = (new Date()).toISOString();
+				paginator.prepend({
+					...result.created,
+					createdAt: nowIso,
+				});
 			}
 		},
 		closed: () => dispose(),
 	});
 };
 
-const edit = async (emoji) => {
+const edit = async (emoji: Misskey.entities.EmojiDetailed) => {
 	const { dispose } = await os.popupAsyncWithDialog(import('./emoji-edit-dialog.vue').then(x => x.default), {
 		emoji: emoji,
 	}, {
@@ -160,13 +166,19 @@ const detailRemoteEmoji = (emoji) => {
 	}, {}, 'closed');
 };
 
-const importEmoji = (emoji) => {
+const importEmoji = (emojiId: string) => {
 	os.apiWithDialog('admin/emoji/copy', {
-		emojiId: emoji.id,
+		emojiId: emojiId,
 	});
 };
 
-const remoteMenu = (emoji, ev: MouseEvent) => {
+const remoteMenu = (emoji: {
+	id: string,
+	name: string,
+	host: string,
+	license: string | null,
+	url: string
+}, ev: PointerEvent) => {
 	os.popupMenu([{
 		type: 'label',
 		text: ':' + emoji.name + ':',
@@ -177,11 +189,11 @@ const remoteMenu = (emoji, ev: MouseEvent) => {
 	}, {
 		text: i18n.ts.import,
 		icon: 'ti ti-plus',
-		action: () => { importEmoji(emoji); },
+		action: () => { importEmoji(emoji.id); },
 	}], ev.currentTarget ?? ev.target);
 };
 
-const menu = (ev: MouseEvent) => {
+const menu = (ev: PointerEvent) => {
 	os.popupMenu([{
 		icon: 'ti ti-download',
 		text: i18n.ts.export,

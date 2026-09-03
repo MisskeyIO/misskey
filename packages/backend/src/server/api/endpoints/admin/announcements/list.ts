@@ -52,7 +52,8 @@ export const meta = {
 				},
 				imageUrl: {
 					type: 'string',
-					optional: false, nullable: true,
+					optional: false, nullable: false,
+					enum: ['info', 'warning', 'error', 'success'],
 				},
 				icon: {
 					type: 'string',
@@ -61,6 +62,7 @@ export const meta = {
 				display: {
 					type: 'string',
 					optional: false, nullable: false,
+					enum: ['normal', 'banner', 'dialog'],
 				},
 				forExistingUsers: {
 					type: 'boolean',

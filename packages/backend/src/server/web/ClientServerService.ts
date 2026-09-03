@@ -6,6 +6,7 @@
 import { randomUUID, randomBytes } from 'node:crypto';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import * as fs from 'node:fs';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from 'ms';
 import sharp from 'sharp';
@@ -315,6 +316,7 @@ export class ClientServerService {
 
 		//#region vite assets
 		if (this.config.frontendEmbedManifestExists) {
+			console.log(`[ClientServerService] Using built frontend vite assets. ${frontendViteOut}`);
 			fastify.register((fastify, options, done) => {
 				fastify.register(fastifyStatic, {
 					root: frontendViteOut,
@@ -334,6 +336,7 @@ export class ClientServerService {
 				done();
 			});
 		} else {
+			console.log('[ClientServerService] Proxying to Vite dev server.');
 			const urlOriginWithoutPort = configUrl.origin.replace(/:\d+$/, '');
 
 			const port = (process.env.VITE_PORT ?? '5173');
@@ -393,7 +396,7 @@ export class ClientServerService {
 
 			reply.header('Content-Security-Policy', 'default-src \'none\'; style-src \'unsafe-inline\'');
 
-			return await reply.sendFile(path, `${_dirname}/../../../../../fluent-emojis/dist/`, {
+			return reply.sendFile(path, fluentEmojisDir, {
 				maxAge: ms('30 days'),
 			});
 		});
@@ -408,7 +411,7 @@ export class ClientServerService {
 
 			reply.header('Content-Security-Policy', 'default-src \'none\'; style-src \'unsafe-inline\'');
 
-			return await reply.sendFile(path, `${_dirname}/../../../node_modules/@discordapp/twemoji/dist/svg/`, {
+			return reply.sendFile(path, twemojiDir, {
 				maxAge: ms('30 days'),
 			});
 		});
@@ -422,7 +425,7 @@ export class ClientServerService {
 			}
 
 			const mask = await sharp(
-				`${_dirname}/../../../node_modules/@discordapp/twemoji/dist/svg/${path.replace('.png', '')}.svg`,
+				`${twemojiDir}/${path.replace('.png', '')}.svg`,
 				{ density: 1000 },
 			)
 				.resize(488, 488)
@@ -1065,9 +1068,6 @@ export class ClientServerService {
 				version: this.config.version,
 			}));
 		});
-
-		const override = (source: string, target: string, depth = 0) =>
-			[, ...target.split('/').filter(x => x), ...source.split('/').filter(x => x).splice(depth)].join('/');
 
 		fastify.get('/flush', async (request, reply) => {
 			let sendHeader = true;

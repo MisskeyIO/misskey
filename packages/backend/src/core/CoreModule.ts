@@ -142,7 +142,7 @@ import { ApLoggerService } from './activitypub/ApLoggerService.js';
 import { ApMfmService } from './activitypub/ApMfmService.js';
 import { ApRendererService } from './activitypub/ApRendererService.js';
 import { ApRequestService } from './activitypub/ApRequestService.js';
-import { ApResolverService } from './activitypub/ApResolverService.js';
+import { ApResolverService, Resolver } from './activitypub/ApResolverService.js';
 import { JsonLdService } from './activitypub/JsonLdService.js';
 import { RemoteLoggerService } from './RemoteLoggerService.js';
 import { RemoteUserResolveService } from './RemoteUserResolveService.js';
@@ -451,6 +451,7 @@ const $ApQuestionService: Provider = { provide: 'ApQuestionService', useExisting
 		ApRendererService,
 		ApRequestService,
 		ApResolverService,
+		Resolver,
 		JsonLdService,
 		RemoteLoggerService,
 		RemoteUserResolveService,
@@ -751,6 +752,7 @@ const $ApQuestionService: Provider = { provide: 'ApQuestionService', useExisting
 		ApRendererService,
 		ApRequestService,
 		ApResolverService,
+		Resolver,
 		JsonLdService,
 		RemoteLoggerService,
 		RemoteUserResolveService,

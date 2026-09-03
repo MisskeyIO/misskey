@@ -7,28 +7,25 @@ import * as fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 import { Inject, Injectable } from '@nestjs/common';
-import rename from 'rename';
-import sharp from 'sharp';
-import { sharpBmp } from '@misskey-dev/sharp-read-bmp';
 import type { Config } from '@/config.js';
-import type { MiDriveFile, DriveFilesRepository } from '@/models/_.js';
+import type { DriveFilesRepository } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
-import { createTemp } from '@/misc/create-temp.js';
-import { FILE_TYPE_BROWSERSAFE } from '@/const.js';
 import { StatusError } from '@/misc/status-error.js';
 import type Logger from '@/logger.js';
 import { DownloadService } from '@/core/DownloadService.js';
-import { IImageStreamable, ImageProcessingService, webpDefault } from '@/core/ImageProcessingService.js';
-import { VideoProcessingService } from '@/core/VideoProcessingService.js';
 import { InternalStorageService } from '@/core/InternalStorageService.js';
-import { contentDisposition } from '@/misc/content-disposition.js';
 import { FileInfoService } from '@/core/FileInfoService.js';
+import { ImageProcessingService } from '@/core/ImageProcessingService.js';
+import { VideoProcessingService } from '@/core/VideoProcessingService.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import { bindThis } from '@/decorators.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
 import { appendQuery, omitHttps, query } from '@/misc/prelude/url.js';
 import { correctFilename } from '@/misc/correct-filename.js';
 import { handleRequestRedirectToOmitSearch } from '@/misc/fastify-hook-handlers.js';
+import { FileServerDriveHandler } from './file/FileServerDriveHandler.js';
+import { FileServerFileResolver } from './file/FileServerFileResolver.js';
+import { FileServerProxyHandler } from './file/FileServerProxyHandler.js';
 import type { FastifyInstance, FastifyRequest, FastifyReply, FastifyPluginOptions } from 'fastify';
 
 const _filename = fileURLToPath(import.meta.url);
@@ -49,6 +46,9 @@ interface TransformQuery {
 @Injectable()
 export class FileServerService {
 	private logger: Logger;
+	private driveHandler: FileServerDriveHandler;
+	private proxyHandler: FileServerProxyHandler;
+	private fileResolver: FileServerFileResolver;
 
 	constructor(
 		@Inject(DI.config)
@@ -65,6 +65,24 @@ export class FileServerService {
 		private loggerService: LoggerService,
 	) {
 		this.logger = this.loggerService.getLogger('server', 'gray');
+		this.fileResolver = new FileServerFileResolver(
+			this.driveFilesRepository,
+			this.fileInfoService,
+			this.downloadService,
+			this.internalStorageService,
+		);
+		this.driveHandler = new FileServerDriveHandler(
+			this.config,
+			this.fileResolver,
+			assets,
+			this.videoProcessingService,
+		);
+		this.proxyHandler = new FileServerProxyHandler(
+			this.config,
+			this.fileResolver,
+			assets,
+			this.imageProcessingService,
+		);
 
 		//this.createServer = this.createServer.bind(this);
 	}
@@ -89,7 +107,7 @@ export class FileServerService {
 			});
 
 			fastify.get<{ Params: { key: string; } }>('/files/:key', async (request, reply) => {
-				return await this.sendDriveFile(request, reply)
+				return await this.driveHandler.handle(request, reply)
 					.catch(err => this.errorHandler(request, reply, err));
 			});
 			fastify.get<{ Params: { key: string; } }>('/files/:key/*', async (request, reply) => {

@@ -11,9 +11,11 @@ import { RoleService } from '@/core/RoleService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import type { JsonObject } from '@/misc/json-value.js';
-import Channel, { type MiChannelService } from '../channel.js';
+import Channel, { type ChannelRequest } from '../channel.js';
+import { REQUEST } from '@nestjs/core';
 
-class GlobalTimelineChannel extends Channel {
+@Injectable({ scope: Scope.TRANSIENT })
+export class GlobalTimelineChannel extends Channel {
 	public readonly chName = 'globalTimeline';
 	public static readonly shouldShare = false;
 	public static readonly requireCredential = false as const;
@@ -22,6 +24,9 @@ class GlobalTimelineChannel extends Channel {
 	private minimize: boolean;
 
 	constructor(
+		@Inject(REQUEST)
+		request: ChannelRequest,
+
 		private metaService: MetaService,
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,

@@ -28,7 +28,7 @@ export class MiUserListMembership {
 	})
 	public userId: MiUser['id'];
 
-	@ManyToOne(type => MiUser, {
+	@ManyToOne(() => MiUser, {
 		onDelete: 'CASCADE',
 	})
 	@JoinColumn()
@@ -41,7 +41,7 @@ export class MiUserListMembership {
 	})
 	public userListId: MiUserList['id'];
 
-	@ManyToOne(type => MiUserList, {
+	@ManyToOne(() => MiUserList, {
 		onDelete: 'CASCADE',
 	})
 	@JoinColumn()

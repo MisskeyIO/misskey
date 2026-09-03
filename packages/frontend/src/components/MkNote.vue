@@ -589,7 +589,7 @@ function toggleReact() {
 	}
 }
 
-function onContextmenu(ev: MouseEvent): void {
+function onContextmenu(ev: PointerEvent): void {
 	if (props.mock) {
 		return;
 	}
@@ -639,6 +639,8 @@ async function showRenoteMenu(): Promise<void> {
 	if (props.mock) {
 		return;
 	}
+	const isLoggedIn = await pleaseLogin({ openOnRemote: pleaseLoginContext.value });
+	if (!isLoggedIn) return;
 
 	function getUnrenote(): MenuItem {
 		return {

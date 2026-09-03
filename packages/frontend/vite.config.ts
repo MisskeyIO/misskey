@@ -14,6 +14,7 @@ import pluginCreateSearchIndex from './lib/vite-plugin-create-search-index.js';
 import type { Options as SearchIndexOptions } from './lib/vite-plugin-create-search-index.js';
 import { Features } from 'lightningcss';
 import pluginWatchLocales from './lib/vite-plugin-watch-locales.js';
+import { pluginRemoveUnrefI18n } from '../frontend-builder/rollup-plugin-remove-unref-i18n.js';
 
 const url = process.env.NODE_ENV === 'development' ? yaml.load(await fsp.readFile('../../.config/default.yml', 'utf-8')).url : null;
 const host = url ? (new URL(url)).hostname : undefined;
@@ -27,6 +28,11 @@ export const searchIndexes = [{
 	targetFilePaths: ['src/pages/settings/*.vue'],
 	mainVirtualModule: 'search-index:settings',
 	modulesToHmrOnUpdate: ['src/pages/settings/index.vue'],
+	verbose: process.env.FRONTEND_SEARCH_INDEX_VERBOSE === 'true',
+}, {
+	targetFilePaths: ['src/pages/admin/*.vue'],
+	mainVirtualModule: 'search-index:admin',
+	modulesToHmrOnUpdate: ['src/pages/admin/index.vue'],
 	verbose: process.env.FRONTEND_SEARCH_INDEX_VERBOSE === 'true',
 }] satisfies SearchIndexOptions[];
 
@@ -101,6 +107,7 @@ export function getConfig(): UserConfig {
 			pluginWatchLocales(),
 			...searchIndexes.map(options => pluginCreateSearchIndex(options)),
 			pluginVue(),
+			pluginRemoveUnrefI18n(),
 			pluginJson5(),
 			...process.env.NODE_ENV === 'production'
 				? [
@@ -166,24 +173,27 @@ export function getConfig(): UserConfig {
 			manifest: 'manifest.json',
 			rollupOptions: {
 				input: {
-					app: './src/_boot_.ts',
+					i18n: './src/i18n.ts',
+					entry: './src/_boot_.ts',
 				},
 				external: externalPackages.map(p => p.match),
+				preserveEntrySignatures: 'allow-extension',
 				output: {
 					manualChunks: {
 						vue: ['vue'],
 						photoswipe: ['photoswipe', 'photoswipe/lightbox', 'photoswipe/style.css'],
+						// dependencies of i18n.ts
+						'config': ['@@/js/config.js'],
 					},
-					entryFileNames: `${meta.version}.[hash].js`,
-					chunkFileNames: `${meta.version}.[hash].js`,
-					assetFileNames: `${meta.version}.[hash][extname]`,
+					entryFileNames: 'scripts/[hash:8].js',
+					chunkFileNames: 'scripts/[hash:8].js',
+					assetFileNames: 'assets/[hash:8][extname]',
 					sourcemapPathTransform: (relativeSourcePath, sourcemapPath) => {
 						const repoRoot = path.resolve(__dirname, '../..');
 						const absoluteSourcePath = path.isAbsolute(relativeSourcePath)
 							? relativeSourcePath
 							: path.resolve(path.dirname(sourcemapPath), relativeSourcePath);
 						const rootedPath = path.relative(repoRoot, absoluteSourcePath);
-
 						return rootedPath.startsWith('..')
 							? relativeSourcePath.replaceAll('\\', '/')
 							: rootedPath.replaceAll('\\', '/');

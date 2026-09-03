@@ -362,7 +362,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			let renote: MiNote | null = null;
 			if (ps.renoteId != null) {
 				// Fetch renote to note
-				renote = await this.notesRepository.findOne({ where: { id: ps.renoteId }, relations: ['user'] });
+				renote = await this.notesRepository.findOne({
+					where: { id: ps.renoteId },
+					relations: ['user', 'renote', 'reply'],
+				});
 
 				if (renote == null) {
 					logger.error('No such renote target.', { renoteId: ps.renoteId });
@@ -415,7 +418,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			let reply: MiNote | null = null;
 			if (ps.replyId != null) {
 				// Fetch reply
-				reply = await this.notesRepository.findOne({ where: { id: ps.replyId }, relations: ['user'] });
+				reply = await this.notesRepository.findOne({
+					where: { id: ps.replyId },
+					relations: ['user'],
+				});
 
 				if (reply == null) {
 					logger.error('No such reply target.', { replyId: ps.replyId });

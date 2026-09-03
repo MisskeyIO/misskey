@@ -27,6 +27,7 @@ export function migrateOldSettings() {
 		const plugins = ColdDeviceStorage.get('plugins');
 		prefer.commit('plugins', plugins.map(p => ({
 			...p,
+			config: p.config ?? {},
 			installId: (p as any).id,
 			id: undefined,
 		})));

@@ -37,6 +37,7 @@ import { prefer } from '@/preferences.js';
 import { DI } from '@/di.js';
 import { noteEvents } from '@/composables/use-note-capture.js';
 import { mute as muteEmoji, unmute as unmuteEmoji, checkMuted as isEmojiMuted } from '@/utility/emoji-mute.js';
+import { haptic } from '@/utility/haptic.js';
 
 const props = defineProps<{
 	note: Misskey.entities.Note;
@@ -64,7 +65,7 @@ const emoji = computed(() => isCustomEmoji.value ? customEmojisMap.get(emojiName
 const canToggle = computed(() => {
 	return !remoteReactionRegExp.test(props.reaction) && $i && (
 		!isCustomEmoji.value
-	|| (emoji.value && checkReactionPermissions($i, props.note, emoji.value))
+		|| (emoji.value && checkReactionPermissions($i, props.note, emoji.value))
 	);
 });
 const canGetInfo = computed(() => !remoteReactionRegExp.test(props.reaction) && props.reaction.includes(':'));
@@ -72,6 +73,9 @@ const isLocalCustomEmoji = props.reaction[0] === ':' && props.reaction.includes(
 
 async function toggleReaction() {
 	if (!canToggle.value) return;
+	if ($i == null) return;
+
+	const me = $i;
 
 	const oldReaction = props.myReaction;
 	if (oldReaction) {
@@ -85,6 +89,7 @@ async function toggleReaction() {
 
 		if (oldReaction !== props.reaction) {
 			sound.playMisskeySfx('reaction');
+			haptic();
 		}
 
 		if (mock) {
@@ -96,7 +101,7 @@ async function toggleReaction() {
 			noteId: props.noteId,
 		}).then(() => {
 			noteEvents.emit(`unreacted:${props.noteId}`, {
-				userId: $i!.id,
+				userId: me.id,
 				reaction: oldReaction,
 			});
 			if (oldReaction !== props.reaction) {
@@ -104,10 +109,12 @@ async function toggleReaction() {
 					noteId: props.noteId,
 					reaction: props.reaction,
 				}).then(() => {
+					const emoji = customEmojisMap.get(emojiName.value);
+					if (emoji == null) return;
 					noteEvents.emit(`reacted:${props.noteId}`, {
-						userId: $i!.id,
+						userId: me.id,
 						reaction: props.reaction,
-						emoji: emoji.value,
+						emoji: emoji,
 					});
 				});
 			}
@@ -123,6 +130,7 @@ async function toggleReaction() {
 		}
 
 		sound.playMisskeySfx('reaction');
+		haptic();
 
 		if (mock) {
 			emit('reactionToggled', props.reaction, (props.count + 1));
@@ -133,10 +141,13 @@ async function toggleReaction() {
 			noteId: props.noteId,
 			reaction: props.reaction,
 		}).then(() => {
+			const emoji = customEmojisMap.get(emojiName.value);
+			if (emoji == null) return;
+
 			noteEvents.emit(`reacted:${props.noteId}`, {
-				userId: $i!.id,
+				userId: me.id,
 				reaction: props.reaction,
-				emoji: emoji.value,
+				emoji: emoji,
 			});
 		});
 		// TODO: 上位コンポーネントでやる
@@ -217,6 +228,8 @@ onMounted(() => {
 
 if (!mock) {
 	useTooltip(buttonEl, async (showing) => {
+		if (buttonEl.value == null) return;
+
 		const reactions = await misskeyApiGet('notes/reactions', {
 			noteId: props.noteId,
 			type: props.reaction,
@@ -226,13 +239,15 @@ if (!mock) {
 
 		const users = reactions.map(x => x.user);
 
-		await os.popup(XDetails, {
+		const { dispose } = os.popup(XDetails, {
 			showing,
 			reaction: props.reaction,
 			users,
 			count: props.count,
-			targetElement: buttonEl.value,
-		}, {}, 'closed');
+			anchorElement: buttonEl.value,
+		}, {
+			closed: () => dispose(),
+		});
 	}, 100);
 }
 </script>

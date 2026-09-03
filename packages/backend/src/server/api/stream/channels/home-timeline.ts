@@ -102,10 +102,6 @@ class HomeTimelineChannel extends Channel {
 			}
 		}
 
-		if (note.visibleUserIds?.includes(user.id) ?? note.mentions?.includes(user.id)) {
-			this.connection.cacheNote(note);
-		}
-
 		if (this.minimize && this.canUseNoteJsonCache(note)) {
 			const badgeRoles = this.iAmModerator ? await this.roleService.getUserBadgeRoles(note.userId, false) : undefined;
 

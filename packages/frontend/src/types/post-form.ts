@@ -9,7 +9,14 @@ import type { PostingLanguage } from '@/utility/langmap.js';
 export interface PostFormProps {
 	reply?: Misskey.entities.Note | null;
 	renote?: Misskey.entities.Note | null;
-	channel?: Misskey.entities.Channel | null; // TODO
+	channel?: {
+		id: string;
+		name: string;
+		color: string;
+		isSensitive: boolean;
+		allowRenoteToExternal: boolean;
+		userId: string | null;
+	} | null;
 	mention?: Misskey.entities.User;
 	specified?: Misskey.entities.UserDetailed;
 	initialText?: string;

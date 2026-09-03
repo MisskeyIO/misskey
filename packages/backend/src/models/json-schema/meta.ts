@@ -19,6 +19,10 @@ export const packedMetaLiteSchema = {
 			type: 'string',
 			optional: false, nullable: false,
 		},
+		providesTarball: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
 		name: {
 			type: 'string',
 			optional: false, nullable: true,
@@ -71,6 +75,10 @@ export const packedMetaLiteSchema = {
 		defaultLightTheme: {
 			type: 'string',
 			optional: false, nullable: true,
+		},
+		clientOptions: {
+			type: 'object',
+			optional: false, nullable: false,
 		},
 		disableRegistration: {
 			type: 'boolean',

@@ -181,12 +181,10 @@ export function claimZIndex(priority: keyof typeof zIndexes = 'low'): number {
 	return zIndexes[priority];
 }
 
-// InstanceType<typeof Component>['$emit'] だとインターセクション型が返ってきて
-// 使い物にならないので、代わりに ['$props'] から色々省くことで emit の型を生成する
-// FIXME: 何故か *.ts ファイルからだと型がうまく取れない？ことがあるのをなんとかしたい
+// emit の型は $props から取り出す
 type ComponentEmit<T> = T extends new () => { $props: infer Props }
 	? [keyof Pick<T, Extract<keyof T, `on${string}`>>] extends [never]
-		? Record<string, unknown> // *.ts ファイルから型がうまく取れないとき用（これがないと {} になって型エラーがうるさい）
+		? Record<string, unknown>
 		: EmitsExtractor<Props>
 	: T extends (...args: any) => any
 		? ReturnType<T> extends { [x: string]: any; __ctx?: { [x: string]: any; props: infer Props } }
@@ -818,7 +816,7 @@ export async function openEmojiPicker(src: HTMLElement, opts: ComponentProps<typ
 	});
 }
 
-export function popupMenu(items: MenuItem[], anchorElement?: HTMLElement | EventTarget | null, options?: {
+export function popupMenu(items: (MenuItem | null)[], anchorElement?: HTMLElement | EventTarget | null, options?: {
 	align?: string;
 	width?: number;
 	viaKeyboard?: boolean;
@@ -829,9 +827,9 @@ export function popupMenu(items: MenuItem[], anchorElement?: HTMLElement | Event
 	}
 
 	let returnFocusTo = getHTMLElementOrNull(anchorElement) ?? getHTMLElementOrNull(window.document.activeElement);
-	return new Promise(resolve => nextTick(async () => {
-		const { dispose } = await popup(MkPopupMenu, {
-			items,
+	return new Promise(resolve => nextTick(() => {
+		const { dispose } = popup(MkPopupMenu, {
+			items: items.filter(x => x != null),
 			anchorElement,
 			width: options?.width,
 			align: options?.align,

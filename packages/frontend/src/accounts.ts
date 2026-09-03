@@ -23,7 +23,7 @@ export async function getAccounts(): Promise<{
 	host: string;
 	id: Misskey.entities.User['id'];
 	username: Misskey.entities.User['username'];
-	user?: Misskey.entities.User | null;
+	user?: Misskey.entities.MeDetailed | null;
 	token: string | null;
 }[]> {
 	const tokens = store.s.accountTokens;
@@ -38,7 +38,7 @@ export async function getAccounts(): Promise<{
 	}));
 }
 
-async function addAccount(host: string, user: Misskey.entities.User, token: AccountWithToken['token']) {
+async function addAccount(host: string, user: Misskey.entities.MeDetailed, token: AccountWithToken['token']) {
 	const key = host + '/' + user.id;
 	store.set('accountTokens', { ...store.s.accountTokens, [key]: token });
 	store.set('accountInfos', { ...store.s.accountInfos, [key]: user });
@@ -229,6 +229,7 @@ export async function openAccountMenu(opts: {
 	onChoose?: (account: Misskey.entities.User) => void;
 }, ev: MouseEvent) {
 	if (!$i) return;
+	const me = $i;
 
 	async function switchAccountByUser(account: Misskey.entities.User) {
 		const storedAccounts = await getAccounts();
@@ -246,7 +247,7 @@ export async function openAccountMenu(opts: {
 		login(token);
 	}
 
-	const storedAccounts = await getAccounts().then(accounts => accounts.filter(x => x.id !== $i.id));
+	const storedAccounts = await getAccounts().then(accounts => accounts.filter(x => x.id !== me.id));
 	const accountsPromise = storedAccounts.length > 0
 		? misskeyApi('users/show', { userIds: storedAccounts.map(x => x.id) })
 		: Promise.resolve([] as Misskey.entities.User[]);

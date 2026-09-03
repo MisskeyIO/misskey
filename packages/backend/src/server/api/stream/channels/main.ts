@@ -43,10 +43,6 @@ class MainChannel extends Channel {
 							viewerDimension: null,
 						});
 
-						if (this.user && (note.visibleUserIds?.includes(this.user.id) ?? note.mentions?.includes(this.user.id))) {
-							this.connection.cacheNote(note);
-						}
-
 						data.body.note = note;
 					}
 					break;
@@ -61,10 +57,6 @@ class MainChannel extends Channel {
 							skipLanguageCheck: true,
 							viewerDimension: null,
 						});
-
-						if (this.user && (note.visibleUserIds?.includes(this.user.id) ?? note.mentions?.includes(this.user.id))) {
-							this.connection.cacheNote(note);
-						}
 
 						data.body = note;
 					}

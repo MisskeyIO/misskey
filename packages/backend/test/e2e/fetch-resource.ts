@@ -6,7 +6,7 @@
 process.env.NODE_ENV = 'test';
 
 import * as assert from 'assert';
-import { channel, clip, galleryPost, page, play, post, relativeFetch, signup, simpleGet, uploadFile } from '../utils.js';
+import { api, channel, clip, galleryPost, page, play, post, relativeFetch, signup, simpleGet, uploadFile } from '../utils.js';
 import type { SimpleGetResponse } from '../utils.js';
 import type * as misskey from 'misskey-js';
 
@@ -26,6 +26,7 @@ describe('Webリソース', () => {
 	let aliceUploadedFile: misskey.entities.DriveFile | null;
 	let alicesPost: misskey.entities.Note;
 	let alicePage: misskey.entities.Page;
+	let alicePrivatePage: misskey.entities.Page;
 	let alicePlay: misskey.entities.Flash;
 	let aliceClip: misskey.entities.Clip;
 	let aliceGalleryPost: misskey.entities.GalleryPost;
@@ -78,11 +79,19 @@ describe('Webリソース', () => {
 
 	beforeAll(async () => {
 		alice = await signup({ username: 'alice' });
+		await api('admin/update-meta', { federation: 'all' }, alice as misskey.entities.SignupResponse);
 		aliceUploadedFile = (await uploadFile(alice)).body;
 		alicesPost = await post(alice, {
 			text: 'test',
 		});
 		alicePage = await page(alice, {});
+		alicePrivatePage = await page(alice, {
+			name: 'private-page',
+			title: '非公開ページのタイトル',
+			summary: '非公開ページの概要',
+			eyeCatchingImageId: aliceUploadedFile!.id,
+			visibility: 'private',
+		});
 		alicePlay = await play(alice, {});
 		aliceClip = await clip(alice, {});
 		aliceGalleryPost = await galleryPost(alice, {
@@ -277,6 +286,19 @@ describe('Webリソース', () => {
 		test('はGETできる。(存在しないIDでも。)', async () => await ok({
 			path: path(alice.username, 'xxxxxxxxxx'),
 		}));
+
+		test('非公開ページの内容をHTMLへ含めない。', async () => {
+			const res = await ok({
+				path: path(alice.username, alicePrivatePage.name),
+			});
+			const html = res.body.serialize();
+
+			assert.strictEqual(metaTag(res, 'misskey:page-id'), undefined);
+			assert.strictEqual(html.includes(alicePrivatePage.id), false);
+			assert.strictEqual(html.includes(alicePrivatePage.title), false);
+			assert.strictEqual(html.includes(alicePrivatePage.summary!), false);
+			assert.strictEqual(html.includes(alicePrivatePage.eyeCatchingImage!.url), false);
+		});
 	});
 
 	describe('/users/:id', () => {

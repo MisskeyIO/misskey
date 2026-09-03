@@ -27,6 +27,6 @@ export function getAutoPostingLang(browserLanguage?: string | null): PostingLang
 	return 'ja-JP';
 }
 
-export function getDefaultViewingLangs(postingLang: string): string[] {
+export function getDefaultViewingLangs(postingLang: PostingLanguage): (PostingLanguage | 'unknown' | 'remote')[] {
 	return Array.from(new Set([postingLang, 'ja-JP', 'unknown', 'remote']));
 }

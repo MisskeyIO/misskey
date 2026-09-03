@@ -183,6 +183,7 @@ export const moderationLogTypes = [
 	'deleteFlash',
 	'deleteGalleryPost',
 	'deleteChatRoom',
+	'updateProxyAccountDescription',
 ] as const;
 
 // See: packages/backend/src/core/ReversiService.ts@L410
@@ -504,4 +505,8 @@ export type ModerationLogPayloads = {
 		roomId: string;
 		room: ChatRoom;
 	};
+	updateProxyAccountDescription: {
+		before: string | null;
+		after: string | null;
+	}
 };

@@ -6,7 +6,6 @@
 import { Module } from '@nestjs/common';
 import { CoreModule } from '@/core/CoreModule.js';
 import { GlobalModule } from '@/GlobalModule.js';
-import { CheckModeratorsActivityProcessorService } from '@/queue/processors/CheckModeratorsActivityProcessorService.js';
 import { QueueLoggerService } from './QueueLoggerService.js';
 import { QueueProcessorService } from './QueueProcessorService.js';
 import { DeliverProcessorService } from './processors/DeliverProcessorService.js';
@@ -19,6 +18,8 @@ import { CheckMissingScheduledNoteProcessorService } from './processors/CheckMis
 import { BakeBufferedReactionsProcessorService } from './processors/BakeBufferedReactionsProcessorService.js';
 import { CleanChartsProcessorService } from './processors/CleanChartsProcessorService.js';
 import { CleanProcessorService } from './processors/CleanProcessorService.js';
+import { CheckModeratorsActivityProcessorService } from './processors/CheckModeratorsActivityProcessorService.js';
+import { CleanRemoteNotesProcessorService } from './processors/CleanRemoteNotesProcessorService.js';
 import { CleanRemoteFilesProcessorService } from './processors/CleanRemoteFilesProcessorService.js';
 import { UserSuspendProcessorService } from './processors/UserSuspendProcessorService.js';
 import { DeleteAccountProcessorService } from './processors/DeleteAccountProcessorService.js';
@@ -95,6 +96,7 @@ import { CleanBlockedRemoteCustomEmojisProcessorService } from './processors/Cle
 		CheckExpiredMutingsProcessorService,
 		CheckModeratorsActivityProcessorService,
 		SendEmailProcessorService,
+		CleanRemoteNotesProcessorService,
 		QueueProcessorService,
 	],
 	exports: [

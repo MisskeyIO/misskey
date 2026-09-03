@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "watch": "vite",
-    "build": "vite build",
+    "build": "tsx build.ts",
     "typecheck": "vue-tsc --noEmit",
     "eslint": "eslint --quiet \"src/**/*.{ts,vue}\"",
     "lint": "pnpm typecheck && pnpm eslint"
@@ -61,6 +61,7 @@
     "nodemon": "catalog:",
     "prettier": "catalog:",
     "start-server-and-test": "catalog:",
+    "tsx": "catalog:",
     "vite-plugin-turbosnap": "catalog:",
     "vue-component-type-helpers": "catalog:",
     "vue-eslint-parser": "catalog:",

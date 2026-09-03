@@ -374,7 +374,6 @@ const props = defineProps<{
 }>();
 
 const flash = ref<Misskey.entities.Flash | null>(null);
-const visibility = ref<Misskey.entities.FlashUpdateRequest['visibility']>('public');
 
 if (props.id) {
 	flash.value = await misskeyApi('flash/show', {
@@ -385,6 +384,7 @@ if (props.id) {
 const title = ref(flash.value?.title ?? 'New Play');
 const summary = ref(flash.value?.summary ?? '');
 const permissions = ref(flash.value?.permissions ?? []);
+const visibility = ref<'private' | 'public'>(flash.value?.visibility ?? 'public');
 const script = ref(flash.value?.script ?? PRESET_DEFAULT);
 
 function selectPreset(ev: MouseEvent) {
@@ -429,7 +429,11 @@ async function save() {
 			script: script.value,
 			visibility: visibility.value,
 		});
-		router.push('/play/' + created.id + '/edit');
+		router.push('/play/:id/edit', {
+			params: {
+				id: created.id,
+			},
+		});
 	}
 }
 

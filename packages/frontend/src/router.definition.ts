@@ -17,10 +17,6 @@ export const page = (loader: AsyncComponentLoader) => defineAsyncComponent({
 	errorComponent: MkError,
 });
 
-function chatPage(...args: Parameters<typeof page>) {
-	return $i?.policies.chatAvailability !== 'unavailable' ? page(...args) : page(() => import('@/pages/not-found.vue'));
-}
-
 export const ROUTE_DEF: RouteDef[] = [{
 	name: 'index',
 	path: '/',
@@ -52,25 +48,8 @@ export const ROUTE_DEF: RouteDef[] = [{
 }, {
 	path: '/clips/:clipId',
 	component: page(() => import('@/pages/clip.vue')),
-}
-// 	{
-// 	path: '/chat',
-// 	component: chatPage(() => import('@/pages/chat/home.vue')),
-// 	loginRequired: true,
-// }, {
-// 	path: '/chat/user/:userId',
-// 	component: chatPage(() => import('@/pages/chat/room.vue')),
-// 	loginRequired: true,
-// }, {
-// 	path: '/chat/room/:roomId',
-// 	component: chatPage(() => import('@/pages/chat/room.vue')),
-// 	loginRequired: true,
-// }, {
-// 	path: '/chat/messages/:messageId',
-// 	component: chatPage(() => import('@/pages/chat/message.vue')),
-// 	loginRequired: true,
-// },
-, {
+// Chatはioで無効化している。
+}, {
 	path: '/instance-info/:host',
 	component: page(() => import('@/pages/instance-info.vue')),
 }, {
@@ -208,6 +187,9 @@ export const ROUTE_DEF: RouteDef[] = [{
 }, {
 	path: '/signup-complete/:code',
 	component: page(() => import('@/pages/signup-complete.vue')),
+}, {
+	path: '/verify-email/:code',
+	component: page(() => import('@/pages/verify-email.vue')),
 }, {
 	path: '/announcements',
 	component: page(() => import('@/pages/announcements.vue')),
@@ -501,10 +483,6 @@ export const ROUTE_DEF: RouteDef[] = [{
 		name: 'performance',
 		component: page(() => import('@/pages/admin/performance.vue')),
 	}, {
-		path: '/server-rules',
-		name: 'server-rules',
-		component: page(() => import('@/pages/admin/server-rules.vue')),
-	}, {
 		path: '/invites',
 		name: 'invites',
 		component: page(() => import('@/pages/admin/invites.vue')),
@@ -612,4 +590,4 @@ export const ROUTE_DEF: RouteDef[] = [{
 }, {
 	path: '/:(*)',
 	component: page(() => import('@/pages/not-found.vue')),
-}] satisfies RouteDef[];
+}];

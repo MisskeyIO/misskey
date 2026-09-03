@@ -1141,6 +1141,9 @@ export type ClipsDeleteRequest = operations['clips___delete']['requestBody']['co
 export type ClipsFavoriteRequest = operations['clips___favorite']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
+export type ClipsListRequest = operations['clips___list']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
 export type ClipsListResponse = operations['clips___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
@@ -1660,6 +1663,7 @@ declare namespace entities {
         ClipsCreateResponse,
         ClipsDeleteRequest,
         ClipsFavoriteRequest,
+        ClipsListRequest,
         ClipsListResponse,
         ClipsMyFavoritesResponse,
         ClipsNotesRequest,
@@ -2059,6 +2063,7 @@ declare namespace entities {
         UsersUpdateMemoRequest,
         V2AdminEmojiListRequest,
         V2AdminEmojiListResponse,
+        VerifyEmailRequest,
         Error_2 as Error,
         UserLite,
         UserDetailedNotMeOnly,
@@ -2079,6 +2084,7 @@ declare namespace entities {
         NoteDraft,
         ScheduledNote,
         NoteReaction,
+        NoteReactionWithNote,
         NoteFavorite,
         Notification_2 as Notification,
         DriveFile,
@@ -2123,6 +2129,7 @@ declare namespace entities {
         MetaDetailedOnly,
         MetaDetailed,
         AbuseUserReport,
+        UserWebhook,
         SystemWebhook,
         AbuseReportNotificationRecipient,
         ChatMessage,
@@ -2769,7 +2776,7 @@ export type ModerationLog = {
     id: ID;
     createdAt: DateString;
     userId: User['id'];
-    user: UserDetailedNotMe | null;
+    user: UserDetailedNotMe;
 } & ({
     type: 'updateServerSettings';
     info: ModerationLogPayloads['updateServerSettings'];
@@ -2938,6 +2945,9 @@ export type ModerationLog = {
 } | {
     type: 'deleteChatRoom';
     info: ModerationLogPayloads['deleteChatRoom'];
+} | {
+    type: 'updateProxyAccountDescription';
+    info: ModerationLogPayloads['updateProxyAccountDescription'];
 });
 
 // @public (undocumented)
@@ -3240,10 +3250,14 @@ export type ModerationLogPayloads = {
         roomId: string;
         room: ChatRoom;
     };
+    updateProxyAccountDescription: {
+        before: string | null;
+        after: string | null;
+    };
 };
 
 // @public (undocumented)
-export const moderationLogTypes: readonly ["updateServerSettings", "suspend", "unsuspend", "updateUserName", "updateUserNote", "addCustomEmoji", "updateCustomEmoji", "deleteCustomEmoji", "assignRole", "unassignRole", "createRole", "updateRole", "deleteRole", "clearQueue", "promoteQueue", "deleteDriveFile", "deleteNote", "createGlobalAnnouncement", "createUserAnnouncement", "updateGlobalAnnouncement", "updateUserAnnouncement", "deleteGlobalAnnouncement", "deleteUserAnnouncement", "resetPassword", "regenerateUserToken", "suspendRemoteInstance", "unsuspendRemoteInstance", "updateRemoteInstanceNote", "markSensitiveDriveFile", "unmarkSensitiveDriveFile", "resolveAbuseReport", "forwardAbuseReport", "updateAbuseReportNote", "createInvitation", "createAd", "updateAd", "deleteAd", "createIndieAuthClient", "updateIndieAuthClient", "deleteIndieAuthClient", "createSSOServiceProvider", "updateSSOServiceProvider", "deleteSSOServiceProvider", "createAvatarDecoration", "updateAvatarDecoration", "deleteAvatarDecoration", "unsetUserAvatar", "unsetUserBanner", "unsetUserMutualBanner", "createSystemWebhook", "updateSystemWebhook", "deleteSystemWebhook", "createAbuseReportNotificationRecipient", "updateAbuseReportNotificationRecipient", "deleteAbuseReportNotificationRecipient", "deleteAccount", "deletePage", "deleteFlash", "deleteGalleryPost", "deleteChatRoom"];
+export const moderationLogTypes: readonly ["updateServerSettings", "suspend", "unsuspend", "updateUserName", "updateUserNote", "addCustomEmoji", "updateCustomEmoji", "deleteCustomEmoji", "assignRole", "unassignRole", "createRole", "updateRole", "deleteRole", "clearQueue", "promoteQueue", "deleteDriveFile", "deleteNote", "createGlobalAnnouncement", "createUserAnnouncement", "updateGlobalAnnouncement", "updateUserAnnouncement", "deleteGlobalAnnouncement", "deleteUserAnnouncement", "resetPassword", "regenerateUserToken", "suspendRemoteInstance", "unsuspendRemoteInstance", "updateRemoteInstanceNote", "markSensitiveDriveFile", "unmarkSensitiveDriveFile", "resolveAbuseReport", "forwardAbuseReport", "updateAbuseReportNote", "createInvitation", "createAd", "updateAd", "deleteAd", "createIndieAuthClient", "updateIndieAuthClient", "deleteIndieAuthClient", "createSSOServiceProvider", "updateSSOServiceProvider", "deleteSSOServiceProvider", "createAvatarDecoration", "updateAvatarDecoration", "deleteAvatarDecoration", "unsetUserAvatar", "unsetUserBanner", "unsetUserMutualBanner", "createSystemWebhook", "updateSystemWebhook", "deleteSystemWebhook", "createAbuseReportNotificationRecipient", "updateAbuseReportNotificationRecipient", "deleteAbuseReportNotificationRecipient", "deleteAccount", "deletePage", "deleteFlash", "deleteGalleryPost", "deleteChatRoom", "updateProxyAccountDescription"];
 
 // @public (undocumented)
 export type MuteCreateRequest = operations['mute___create']['requestBody']['content']['application/json'];
@@ -3286,6 +3300,9 @@ export type NoteFavorite = components['schemas']['NoteFavorite'];
 
 // @public (undocumented)
 export type NoteReaction = components['schemas']['NoteReaction'];
+
+// @public (undocumented)
+export type NoteReactionWithNote = components['schemas']['NoteReactionWithNote'];
 
 // @public (undocumented)
 export type NotesChildrenRequest = operations['notes___children']['requestBody']['content']['application/json'];
@@ -3604,7 +3621,7 @@ export type PromoReadRequest = operations['promo___read']['requestBody']['conten
 export type PureRenote = Omit<Note, 'renote' | 'renoteId' | 'reply' | 'replyId' | 'text' | 'cw' | 'files' | 'fileIds' | 'poll'> & AllNullRecord<Pick<Note, 'text'>> & AllNullOrOptionalRecord<Pick<Note, 'reply' | 'replyId' | 'cw' | 'poll'>> & {
     files: [];
     fileIds: [];
-} & NonNullableRecord<Pick<Note, 'renote' | 'renoteId'>>;
+} & NonNullableRecord<Pick<Note, 'renoteId'>> & Pick<Note, 'renote'>;
 
 // @public (undocumented)
 export type QueueCount = components['schemas']['QueueCount'];
@@ -4219,10 +4236,16 @@ export type UsersStatsResponse = operations['users___stats']['responses']['200']
 export type UsersUpdateMemoRequest = operations['users___update-memo']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
+export type UserWebhook = components['schemas']['UserWebhook'];
+
+// @public (undocumented)
 export type V2AdminEmojiListRequest = operations['v2___admin___emoji___list']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 export type V2AdminEmojiListResponse = operations['v2___admin___emoji___list']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+export type VerifyEmailRequest = operations['verify-email']['requestBody']['content']['application/json'];
 
 // (No @packageDocumentation comment for this package)
 

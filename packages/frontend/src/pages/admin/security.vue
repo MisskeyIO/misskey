@@ -151,6 +151,43 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</div>
 					</MkFolder>
 				</SearchMarker>
+
+				<SearchMarker v-slot="slotProps" :keywords="['indieAuth', 'client']">
+					<MkFolder :defaultOpen="slotProps.isParentOfTarget">
+						<template #label><SearchLabel>IndieAuth Clients</SearchLabel></template>
+
+						<div class="_gaps">
+							<MkButton primary rounded @click="indieAuthAddNew"><i class="ti ti-plus"></i> New</MkButton>
+							<MkFolder v-for="(client, index) in indieAuthClients" :key="`${indieAuthTimestamp}-${index}-${client.createdAt ? client.id : 'new'}`" :defaultOpen="!client.createdAt">
+								<template #label>{{ client.name || client.id }}</template>
+								<template #icon>
+									<i v-if="client.id" class="ti ti-key"></i>
+									<i v-else class="ti ti-plus"></i>
+								</template>
+								<template v-if="client.name && client.id" #caption>{{ client.id }}</template>
+
+								<div class="_gaps_m">
+									<MkInput v-model="client.id" :disabled="!!client.createdAt">
+										<template #label>Client ID</template>
+									</MkInput>
+									<MkInput v-model="client.name">
+										<template #label>Name</template>
+									</MkInput>
+									<MkTextarea v-model="client.redirectUris">
+										<template #label>Redirect URIs</template>
+									</MkTextarea>
+									<div class="buttons _buttons">
+										<MkButton primary rounded @click="indieAuthSave(client)"><i class="ti ti-device-floppy"></i> Save</MkButton>
+										<MkButton v-if="client.createdAt" warn @click="indieAuthDelete(client)"><i class="ti ti-trash"></i> Delete</MkButton>
+									</div>
+								</div>
+							</MkFolder>
+							<MkButton v-if="indieAuthHasMore" :class="$style.more" :disabled="!indieAuthHasMore" primary rounded @click="indieAuthFetch()">
+								<i class="ti ti-reload"></i>{{ i18n.ts.more }}
+							</MkButton>
+						</div>
+					</MkFolder>
+				</SearchMarker>
 			</div>
 		</SearchMarker>
 	</div>

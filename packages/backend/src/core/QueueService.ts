@@ -7,6 +7,7 @@ import { randomUUID, createHash } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import type { IActivity } from '@/core/activitypub/type.js';
 import type { MiDriveFile } from '@/models/DriveFile.js';
+import type { MiNoteDraft } from '@/models/NoteDraft.js';
 import type { MiScheduledNote } from '@/models/ScheduledNote.js';
 import type { MiAbuseUserReport } from '@/models/AbuseUserReport.js';
 import type { MiWebhook, WebhookEventTypes } from '@/models/Webhook.js';
@@ -30,6 +31,7 @@ import type {
 	DbQueue,
 	DeliverQueue,
 	EndedPollNotificationQueue,
+	PostScheduledNoteQueue,
 	InboxQueue,
 	ObjectStorageQueue,
 	RelationshipQueue,
@@ -43,6 +45,7 @@ import type * as Bull from 'bullmq';
 export const QUEUE_TYPES = [
 	'system',
 	'endedPollNotification',
+	'postScheduledNote',
 	'deliver',
 	'inbox',
 	'db',
@@ -51,6 +54,30 @@ export const QUEUE_TYPES = [
 	'userWebhookDeliver',
 	'systemWebhookDeliver',
 ] as const;
+
+export function getPostScheduledNoteJobId(draftId: MiNoteDraft['id'], scheduledAt: Date | number): string {
+	const scheduledAtMs = typeof scheduledAt === 'number' ? scheduledAt : scheduledAt.getTime();
+	return `scheduled-note-${draftId}-${scheduledAtMs}`;
+}
+
+export const POST_SCHEDULED_NOTE_ATTEMPTS = 8;
+
+export function getPostScheduledNoteJobOptions(draftId: MiNoteDraft['id'], scheduledAt: Date, now = Date.now()): Bull.JobsOptions {
+	return {
+		jobId: getPostScheduledNoteJobId(draftId, scheduledAt),
+		delay: Math.max(scheduledAt.getTime() - now, 0),
+		attempts: POST_SCHEDULED_NOTE_ATTEMPTS,
+		backoff: {
+			type: 'exponential',
+			delay: 30 * 1000,
+		},
+		removeOnComplete: true,
+		removeOnFail: {
+			age: 3600 * 24 * 7,
+			count: 100,
+		},
+	};
+}
 
 const REPEATABLE_SYSTEM_JOB_DEF = [{
 	name: 'tickCharts',
@@ -94,6 +121,7 @@ export class QueueService {
 
 		@Inject('queue:system') public systemQueue: SystemQueue,
 		@Inject('queue:endedPollNotification') public endedPollNotificationQueue: EndedPollNotificationQueue,
+		@Inject('queue:postScheduledNote') public postScheduledNoteQueue: PostScheduledNoteQueue,
 		@Inject('queue:deliver') public deliverQueue: DeliverQueue,
 		@Inject('queue:inbox') public inboxQueue: InboxQueue,
 		@Inject('queue:db') public dbQueue: DbQueue,
@@ -494,6 +522,20 @@ export class QueueService {
 	}
 
 	@bindThis
+	public createPostScheduledNoteJob(draftId: MiNoteDraft['id'], scheduledAt: Date) {
+		const scheduledAtMs = scheduledAt.getTime();
+		return this.postScheduledNoteQueue.add('postScheduledNote', {
+			noteDraftId: draftId,
+			scheduledAt: scheduledAtMs,
+		}, getPostScheduledNoteJobOptions(draftId, scheduledAt));
+	}
+
+	@bindThis
+	public removePostScheduledNoteJob(draftId: MiNoteDraft['id'], scheduledAt: Date) {
+		return this.postScheduledNoteQueue.remove(getPostScheduledNoteJobId(draftId, scheduledAt));
+	}
+
+	@bindThis
 	public createFollowJob(followings: { from: ThinUser, to: ThinUser, requestId?: string, silent?: boolean, withReplies?: boolean }[]) {
 		const jobs = followings.map(rel => this.generateRelationshipJobData('follow', rel));
 		return this.relationshipQueue.addBulk(jobs);
@@ -632,6 +674,7 @@ export class QueueService {
 		switch (type) {
 			case 'system': return this.systemQueue;
 			case 'endedPollNotification': return this.endedPollNotificationQueue;
+			case 'postScheduledNote': return this.postScheduledNoteQueue;
 			case 'deliver': return this.deliverQueue;
 			case 'inbox': return this.inboxQueue;
 			case 'db': return this.dbQueue;

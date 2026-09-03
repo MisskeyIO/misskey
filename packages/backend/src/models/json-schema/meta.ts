@@ -207,7 +207,7 @@ export const packedMetaLiteSchema = {
 					},
 					isSensitive: {
 						type: 'boolean',
-						optional: false, nullable: false,
+						optional: true, nullable: false,
 					},
 				},
 			},

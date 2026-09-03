@@ -34,7 +34,7 @@ export class MiAd {
 	@Column('varchar', {
 		length: 32, nullable: false,
 	})
-	public place: string;
+	public place: 'square' | 'horizontal' | 'horizontal-big' | 'vertical';
 
 	// 今は使われていないが将来的に活用される可能性はある
 	@Column('varchar', {
@@ -71,10 +71,12 @@ export class MiAd {
 		length: 8192, nullable: false,
 	})
 	public memo: string;
+
 	@Column('integer', {
 		default: 0, nullable: false,
 	})
 	public dayOfWeek: number;
+
 	constructor(data: Partial<MiAd>) {
 		if (data == null) return;
 

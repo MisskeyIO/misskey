@@ -57,6 +57,7 @@ export class FlashEntityService {
 			summary: flash.summary,
 			script: flash.script,
 			visibility: flash.visibility,
+			permissions: flash.permissions,
 			likedCount: flash.likedCount,
 			isLiked: isLiked,
 		};

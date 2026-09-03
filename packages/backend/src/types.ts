@@ -19,13 +19,14 @@ import type { MiNote } from '@/models/Note.js';
  * quote - 投稿が引用Renoteされた
  * reaction - 投稿にリアクションされた
  * pollEnded - 自分のアンケートもしくは自分が投票したアンケートが終了した
+ * scheduledNotePosted - 予約したノートが投稿された
+ * scheduledNotePostFailed - 予約したノートの投稿に失敗した
  * receiveFollowRequest - フォローリクエストされた
  * followRequestAccepted - 自分の送ったフォローリクエストが承認された
  * roleAssigned - ロールが付与された
  * chatRoomInvitationReceived - チャットルームに招待された
  * achievementEarned - 実績を獲得
  * noteScheduled - 予約投稿が予約された
- * scheduledNotePosted - 予約投稿が投稿された
  * scheduledNoteError - 予約投稿がエラーになった
  * sensitiveFlagAssigned - センシティブフラグが付与された
  * exportCompleted - エクスポートが完了
@@ -43,6 +44,8 @@ export const notificationTypes = [
 	'quote',
 	'reaction',
 	'pollEnded',
+	'scheduledNotePosted',
+	'scheduledNotePostFailed',
 	'receiveFollowRequest',
 	'followRequestAccepted',
 	'roleAssigned',
@@ -51,7 +54,6 @@ export const notificationTypes = [
 	'exportCompleted',
 	'login',
 	'noteScheduled',
-	'scheduledNotePosted',
 	'scheduledNoteError',
 	'sensitiveFlagAssigned',
 	'createToken',
@@ -406,6 +408,7 @@ export type ModerationLogPayloads = {
 	unsetUserMutualLink: {
 		userId: string;
 		userUsername: string;
+		userHost: string | null;
 		userMutualLinkSections: { name: string | null; mutualLinks: { id: string; url: string; fileId: string; description: string | null; imgSrc: string; }[]; }[] | []
 	};
 	createSystemWebhook: {
@@ -475,8 +478,8 @@ export type MinimumUser = {
 };
 
 export type NoteCreateOption = {
+	id?: MiNote['id'];
 	createdAt?: Date | null;
-	scheduledAt?: Date | null;
 	name?: string | null;
 	text?: string | null;
 	reply?: MiNote | null;

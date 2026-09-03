@@ -51,6 +51,9 @@ export const meta = {
 			rp: {
 				type: 'object',
 				properties: {
+					name: {
+						type: 'string',
+					},
 					id: {
 						type: 'string',
 						optional: true,

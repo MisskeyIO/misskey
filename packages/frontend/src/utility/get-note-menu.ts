@@ -25,6 +25,11 @@ import { prefer } from '@/preferences.js';
 import { getPluginHandlers } from '@/plugin.js';
 import { globalEvents } from '@/events.js';
 
+const isInBrowserTranslationAvailable = (
+	'LanguageDetector' in window &&
+	'Translator' in window
+);
+
 export async function getNoteClipMenu(props: {
 	note: Misskey.entities.Note;
 	currentClip?: Misskey.entities.Clip;
@@ -251,7 +256,7 @@ export function getNoteMenu(props: {
 	function togglePin(pin: boolean): void {
 		os.apiWithDialog(pin ? 'i/pin' : 'i/unpin', {
 			noteId: appearNote.id,
-		}, undefined, undefined, undefined, {
+		}, undefined, {
 			'72dab508-c64d-498f-8740-a8eec1ba385a': {
 				text: i18n.ts.pinLimitExceeded,
 			},
@@ -290,13 +295,48 @@ export function getNoteMenu(props: {
 
 	async function translate(): Promise<void> {
 		if (props.translation.value != null) return;
-		props.translating.value = true;
-		const res = await misskeyApi('notes/translate', {
-			noteId: appearNote.id,
-			targetLang: miLocalStorage.getItem('lang') ?? navigator.language,
-		});
-		props.translating.value = false;
-		props.translation.value = res;
+		if (prefer.s['experimental.enableWebTranslatorApi'] && isInBrowserTranslationAvailable && appearNote.text != null) {
+			props.translating.value = true;
+			try {
+				// @ts-expect-error 実験的なAPIなので型定義がない
+				const detector = await LanguageDetector.create();
+				const langResult = await detector.detect(appearNote.text);
+				let localStorageLang = miLocalStorage.getItem('lang');
+				if (localStorageLang != null) {
+					localStorageLang = localStorageLang.split('-')[0];
+				}
+
+				// 翻訳元と翻訳先の言語が同じ場合はTranslatorがthrowするのでそのまま返す
+				if (langResult[0]?.detectedLanguage === localStorageLang || langResult[0]?.detectedLanguage === navigator.language) {
+					props.translation.value = {
+						sourceLang: langResult[0]?.detectedLanguage ?? 'unknown',
+						text: appearNote.text,
+					};
+					return;
+				}
+
+				// @ts-expect-error 実験的なAPIなので型定義がない
+				const translator = await Translator.create({
+					sourceLanguage: langResult[0]?.detectedLanguage,
+					targetLanguage: localStorageLang ?? navigator.language,
+				});
+				const translated = await translator.translate(appearNote.text);
+				props.translation.value = {
+					sourceLang: langResult[0]?.detectedLanguage ?? 'unknown',
+					text: translated,
+				};
+			} finally {
+				props.translating.value = false;
+			}
+		} else if ($i?.policies.canUseTranslator && instance.translatorAvailable) {
+			props.translating.value = true;
+			const res = await misskeyApi('notes/translate', {
+				noteId: appearNote.id,
+				targetLang: miLocalStorage.getItem('lang') ?? navigator.language,
+			});
+			props.translating.value = false;
+			props.translation.value = res;
+		}
 	}
 
 	const menuItems: MenuItem[] = [];
@@ -351,7 +391,7 @@ export function getNoteMenu(props: {
 			});
 		}
 
-		if ($i.policies.canUseTranslator && instance.translatorAvailable) {
+		if ((prefer.s['experimental.enableWebTranslatorApi'] && isInBrowserTranslationAvailable) || ($i.policies.canUseTranslator && instance.translatorAvailable)) {
 			menuItems.push({
 				icon: 'ti ti-language-hiragana',
 				text: i18n.ts.translate,
@@ -436,19 +476,23 @@ export function getNoteMenu(props: {
 						channelChildMenu.push({
 							icon: 'ti ti-pinned-off',
 							text: i18n.ts.unpin,
-							action: () => os.apiWithDialog('channels/update', {
-								channelId: appearNote.channel!.id,
-								pinnedNoteIds: channel.pinnedNoteIds.filter(id => id !== appearNote.id),
-							}),
+							action: async () => {
+								await os.apiWithDialog('channels/update', {
+									channelId: appearNote.channel!.id,
+									pinnedNoteIds: channel.pinnedNoteIds.filter(id => id !== appearNote.id),
+								});
+							},
 						});
 					} else {
 						channelChildMenu.push({
 							icon: 'ti ti-pin',
 							text: i18n.ts.pin,
-							action: () => os.apiWithDialog('channels/update', {
-								channelId: appearNote.channel!.id,
-								pinnedNoteIds: [...channel.pinnedNoteIds, appearNote.id],
-							}),
+							action: async () => {
+								await os.apiWithDialog('channels/update', {
+									channelId: appearNote.channel!.id,
+									pinnedNoteIds: [...channel.pinnedNoteIds, appearNote.id],
+								});
+							},
 						});
 					}
 					return channelChildMenu;

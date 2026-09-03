@@ -15,6 +15,7 @@ import { SendEmailProcessorService } from '@/queue/processors/SendEmailProcessor
 import { UserWebhookDeliverProcessorService } from './processors/UserWebhookDeliverProcessorService.js';
 import { SystemWebhookDeliverProcessorService } from './processors/SystemWebhookDeliverProcessorService.js';
 import { EndedPollNotificationProcessorService } from './processors/EndedPollNotificationProcessorService.js';
+import { PostScheduledNoteProcessorService } from './processors/PostScheduledNoteProcessorService.js';
 import { DeliverProcessorService } from './processors/DeliverProcessorService.js';
 import { InboxProcessorService } from './processors/InboxProcessorService.js';
 import { DeleteDriveFilesProcessorService } from './processors/DeleteDriveFilesProcessorService.js';
@@ -91,6 +92,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 	private relationshipQueueWorkers: Bull.Worker[];
 	private objectStorageQueueWorker: Bull.Worker;
 	private endedPollNotificationQueueWorker: Bull.Worker;
+	private postScheduledNoteQueueWorker: Bull.Worker;
 
 	constructor(
 		@Inject(DI.config)
@@ -99,6 +101,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		private userWebhookDeliverProcessorService: UserWebhookDeliverProcessorService,
 		private systemWebhookDeliverProcessorService: SystemWebhookDeliverProcessorService,
 		private endedPollNotificationProcessorService: EndedPollNotificationProcessorService,
+		private postScheduledNoteProcessorService: PostScheduledNoteProcessorService,
 		private deliverProcessorService: DeliverProcessorService,
 		private inboxProcessorService: InboxProcessorService,
 		private deleteDriveFilesProcessorService: DeleteDriveFilesProcessorService,
@@ -550,10 +553,27 @@ export class QueueProcessorService implements OnApplicationShutdown {
 			});
 		}
 		//#endregion
+
+		//#region post scheduled note
+		{
+			this.postScheduledNoteQueueWorker = new Bull.Worker(QUEUE.POST_SCHEDULED_NOTE, async (job) => {
+				if (this.config.sentryForBackend) {
+					return Sentry.startSpan({ name: 'Queue: PostScheduledNote' }, () => this.postScheduledNoteProcessorService.process(job));
+				} else {
+					return this.postScheduledNoteProcessorService.process(job);
+				}
+			}, {
+				...baseQueueOptions(this.config.redisForSystemQueue, this.config.bullmqWorkerOptions, QUEUE.POST_SCHEDULED_NOTE),
+				autorun: false,
+			});
+		}
+		//#endregion
 	}
 
 	@bindThis
 	public async start(): Promise<void> {
+		await this.checkMissingScheduledNoteProcessorService.process();
+
 		await Promise.all([
 			this.systemQueueWorker.run(),
 			this.dbQueueWorker.run(),
@@ -564,6 +584,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 			this.relationshipQueueWorkers.map(worker => worker.run()),
 			this.objectStorageQueueWorker.run(),
 			this.endedPollNotificationQueueWorker.run(),
+			this.postScheduledNoteQueueWorker.run(),
 		]);
 	}
 
@@ -579,6 +600,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 			this.relationshipQueueWorkers.map(worker => worker.close()),
 			this.objectStorageQueueWorker.close(),
 			this.endedPollNotificationQueueWorker.close(),
+			this.postScheduledNoteQueueWorker.close(),
 		]);
 	}
 

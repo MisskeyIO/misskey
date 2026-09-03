@@ -140,16 +140,16 @@ const windowEl = useTemplateRef('windowEl');
 const name = ref<string>(props.emoji ? props.emoji.name : '');
 const category = ref<string>(props.emoji?.category ? props.emoji.category : '');
 const aliases = ref<string>(props.emoji ? props.emoji.aliases.join(' ') : '');
-const createdAt = ref<string | null>(props.emoji ? props.emoji.createdAt : null);
-const updatedAt = ref<string | null>(props.emoji ? props.emoji.updatedAt : null);
+const createdAt = ref<string | null>(props.emoji?.createdAt ?? null);
+const updatedAt = ref<string | null>(props.emoji?.updatedAt ?? null);
 const license = ref<string>(props.emoji?.license ? props.emoji.license : '');
 const isSensitive = ref(props.emoji ? props.emoji.isSensitive : false);
 const localOnly = ref(props.emoji ? props.emoji.localOnly : false);
-const requestedBy = ref(props.emoji ? props.emoji.requestedBy : '');
-const memo = ref(props.emoji ? props.emoji.memo : '');
-const roleIdsThatCanBeUsedThisEmojiAsReaction = ref(props.emoji ? props.emoji.roleIdsThatCanBeUsedThisEmojiAsReaction : []);
+const requestedBy = ref(props.emoji?.requestedBy ?? '');
+const memo = ref(props.emoji?.memo ?? '');
+const roleIdsThatCanBeUsedThisEmojiAsReaction = ref(props.emoji?.roleIdsThatCanBeUsedThisEmojiAsReaction ?? []);
 const rolesThatCanBeUsedThisEmojiAsReaction = ref<Misskey.entities.Role[]>([]);
-const roleIdsThatCanNotBeUsedThisEmojiAsReaction = ref(props.emoji ? props.emoji.roleIdsThatCanNotBeUsedThisEmojiAsReaction : []);
+const roleIdsThatCanNotBeUsedThisEmojiAsReaction = ref(props.emoji?.roleIdsThatCanNotBeUsedThisEmojiAsReaction ?? []);
 const rolesThatCanNotBeUsedThisEmojiAsReaction = ref<Misskey.entities.Role[]>([]);
 const file = ref<Misskey.entities.DriveFile>();
 
@@ -180,11 +180,12 @@ async function addRole(type: boolean) {
 	const roles = await misskeyApi('admin/roles/list');
 	const currentRoleIds = type ? rolesThatCanBeUsedThisEmojiAsReaction.value.map(x => x.id) : rolesThatCanNotBeUsedThisEmojiAsReaction.value.map(x => x.id);
 
-	const { canceled, result: role } = await os.select({
-		items: roles.filter(r => r.isPublic).filter(r => !currentRoleIds.includes(r.id)).map(r => ({ text: r.name, value: r })),
+	const { canceled, result: roleId } = await os.select({
+		items: roles.filter(r => r.isPublic).filter(r => !currentRoleIds.includes(r.id)).map(r => ({ label: r.name, value: r.id })),
 	});
-	if (canceled || role == null) return;
+	if (canceled || roleId == null) return;
 
+	const role = roles.find(r => r.id === roleId)!;
 	if (type) rolesThatCanBeUsedThisEmojiAsReaction.value.push(role);
 	else rolesThatCanNotBeUsedThisEmojiAsReaction.value.push(role);
 }
@@ -205,6 +206,7 @@ async function done() {
 		requestedBy: requestedBy.value,
 		memo: memo.value,
 		roleIdsThatCanBeUsedThisEmojiAsReaction: rolesThatCanBeUsedThisEmojiAsReaction.value.map(x => x.id),
+		roleIdsThatCanNotBeUsedThisEmojiAsReaction: rolesThatCanNotBeUsedThisEmojiAsReaction.value.map(x => x.id),
 		fileId: file.value ? file.value.id : undefined,
 	};
 

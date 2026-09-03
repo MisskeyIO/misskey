@@ -33,7 +33,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<span v-else-if="okButtonDisabledReason === 'invalid'" v-text="i18n.tsx._dialog.invalid({ current: inputValue ?? 'NaN' })"/>
 				</template>
 			</MkInput>
-			<MkTextarea v-if="input.type === 'textarea'" v-model="inputValue" :placeholder="input.placeholder || undefined" :autocomplete="input.autocomplete">
+			<MkTextarea v-if="input.type === 'textarea'" v-model="textareaInputValue" :placeholder="input.placeholder || undefined" :autocomplete="input.autocomplete">
 				<template #label>{{ input.placeholder }}</template>
 				<template #caption>
 					<span v-if="okButtonDisabledReason === 'charactersExceeded'" v-text="i18n.tsx._dialog.charactersExceeded({ current: (inputValue as string)?.length ?? 0, max: input.maxLength ?? 'NaN' })"/>
@@ -44,16 +44,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</template>
 			</MkTextarea>
 		</template>
-		<MkSelect v-if="select" v-model="selectedValue" autofocus>
-			<template v-if="select.items">
-				<template v-for="item in select.items">
-					<optgroup v-if="'sectionTitle' in item" :label="item.sectionTitle">
-						<option v-for="subItem in item.items" :value="subItem.value">{{ subItem.text }}</option>
-					</optgroup>
-					<option v-else :value="item.value">{{ item.text }}</option>
-				</template>
-			</template>
-		</MkSelect>
+		<MkSelect v-if="select" v-model="selectedValue" :items="selectDef" autofocus></MkSelect>
 		<MkSwitch v-if="switchLabel" v-model="switchValue" style="display: flex; margin: 1em 0; justify-content: center;">{{ switchLabel }}</MkSwitch>
 		<details v-if="details" class="_acrylic" style="margin: 1em 0;">
 			<summary>{{ i18n.ts.details }}</summary>
@@ -78,6 +69,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref, useTemplateRef, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import type { InputHTMLAttributes } from 'vue';
+import type { ComponentExposed } from 'vue-component-type-helpers';
 import MkModal from '@/components/MkModal.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkInput from '@/components/MkInput.vue';
@@ -85,6 +77,8 @@ import MkSelect from '@/components/MkSelect.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
 import MkKeyValue from '@/components/MkKeyValue.vue';
+import type { MkSelectItem, OptionValue } from '@/components/MkSelect.vue';
+import { useMkSelect } from '@/composables/use-mkselect.js';
 import { i18n } from '@/i18n.js';
 
 type Input = {
@@ -99,17 +93,9 @@ type Input = {
 	step?: InputHTMLAttributes['step'];
 };
 
-type SelectItem = {
-	value: any;
-	text: string;
-};
-
 type Select = {
-	items: (SelectItem | {
-		sectionTitle: string;
-		items: SelectItem[];
-	})[];
-	default: string | null;
+	items: MkSelectItem[];
+	default: OptionValue | null;
 };
 
 type Result = string | number | true | null;
@@ -161,10 +147,13 @@ const emit = defineEmits<{
 }>();
 
 const modal = useTemplateRef('modal');
-const inputComponent = useTemplateRef<InstanceType<typeof MkInput>>('inputComponent');
+const inputComponent = useTemplateRef<ComponentExposed<typeof MkInput>>('inputComponent');
 
 const inputValue = ref<string | number | null>(props.input?.default ?? null);
-const selectedValue = ref(props.select?.default ?? null);
+const textareaInputValue = computed<string | null>({
+	get: () => inputValue.value == null ? null : String(inputValue.value),
+	set: value => { inputValue.value = value; },
+});
 const switchValue = ref<boolean>(false);
 
 const sec = ref(props.okWaitDuration);
@@ -197,7 +186,7 @@ const okButtonDisabledReason = computed<null | 'charactersExceeded' | 'character
 				return 'invalid';
 			}
 
-			if (inputComponent.value && !inputComponent.value.inputEl.validity.valid) {
+			if (inputComponent.value?.inputEl && !inputComponent.value.inputEl.validity.valid) {
 				return 'invalid';
 			}
 		}
@@ -215,6 +204,14 @@ const okButtonDisabledReason = computed<null | 'charactersExceeded' | 'character
 	}
 
 	return null;
+});
+
+const {
+	def: selectDef,
+	model: selectedValue,
+} = useMkSelect({
+	items: computed(() => props.select?.items ?? []),
+	initialValue: props.select?.default ?? null,
 });
 
 // overload function を使いたいので lint エラーを無視する
@@ -240,10 +237,6 @@ function cancel() {
 	done(true);
 }
 
-function onKeydown(evt: KeyboardEvent) {
-	if (evt.key === 'Escape') cancel();
-}
-
 function onInputKeydown(evt: KeyboardEvent) {
 	if (evt.key === 'Enter' && !okDisabled.value && okButtonDisabledReason.value === null) {
 		evt.preventDefault();
@@ -252,28 +245,27 @@ function onInputKeydown(evt: KeyboardEvent) {
 	}
 }
 
-watch(okWaitInitiated, () => {
+let waitTimer: number | undefined;
+
+function resetWaitTimer() {
+	if (waitTimer !== undefined) window.clearInterval(waitTimer);
 	sec.value = props.okWaitDuration;
-});
+	if (!okWaitInitiated.value || sec.value <= 0) return;
 
-onMounted(() => {
-	window.document.addEventListener('keydown', onKeydown);
+	waitTimer = window.setInterval(() => {
+		sec.value--;
+		if (sec.value <= 0 && waitTimer !== undefined) {
+			window.clearInterval(waitTimer);
+			waitTimer = undefined;
+		}
+	}, 1000);
+}
 
-	sec.value = props.okWaitDuration;
-	if (sec.value > 0) {
-		const waitTimer = window.setInterval(() => {
-			if (!okWaitInitiated.value) return;
-
-			if (sec.value < 0) {
-				window.clearInterval(waitTimer);
-			}
-			sec.value = sec.value - 1;
-		}, 1000);
-	}
-});
+watch(okWaitInitiated, resetWaitTimer);
+onMounted(resetWaitTimer);
 
 onBeforeUnmount(() => {
-	window.document.removeEventListener('keydown', onKeydown);
+	if (waitTimer !== undefined) window.clearInterval(waitTimer);
 });
 </script>
 

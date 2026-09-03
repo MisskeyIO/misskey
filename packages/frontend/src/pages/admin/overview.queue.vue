@@ -38,10 +38,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { markRaw, onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import XChart from './overview.queue.chart.vue';
-import type { ApQueueDomain } from '@/pages/admin/queue.vue';
 import number from '@/filters/number.js';
 import { useStream } from '@/stream.js';
 import { genId } from '@/utility/id.js';
+
+type ApQueueDomain = 'deliver' | 'inbox';
 
 const connection = markRaw(useStream().useChannel('queueStats'));
 
@@ -64,10 +65,10 @@ function onStats(stats: Misskey.entities.QueueStats) {
 	delayed.value = stats[props.domain].delayed;
 	waiting.value = stats[props.domain].waiting;
 
-	chartProcess.value.pushData(stats[props.domain].activeSincePrevTick);
-	chartActive.value.pushData(stats[props.domain].active);
-	chartDelayed.value.pushData(stats[props.domain].delayed);
-	chartWaiting.value.pushData(stats[props.domain].waiting);
+	chartProcess.value?.pushData(stats[props.domain].activeSincePrevTick);
+	chartActive.value?.pushData(stats[props.domain].active);
+	chartDelayed.value?.pushData(stats[props.domain].delayed);
+	chartWaiting.value?.pushData(stats[props.domain].waiting);
 }
 
 function onStatsLog(statsLog: Misskey.entities.QueueStatsLog) {
@@ -83,10 +84,10 @@ function onStatsLog(statsLog: Misskey.entities.QueueStatsLog) {
 		dataWaiting.push(stats[props.domain].waiting);
 	}
 
-	chartProcess.value.setData(dataProcess);
-	chartActive.value.setData(dataActive);
-	chartDelayed.value.setData(dataDelayed);
-	chartWaiting.value.setData(dataWaiting);
+	chartProcess.value?.setData(dataProcess);
+	chartActive.value?.setData(dataActive);
+	chartDelayed.value?.setData(dataDelayed);
+	chartWaiting.value?.setData(dataWaiting);
 }
 
 onMounted(() => {

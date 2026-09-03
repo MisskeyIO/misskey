@@ -20,6 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, inject, onMounted, useTemplateRef, watch } from 'vue';
 import * as Misskey from 'misskey-js';
+import { getUnicodeEmojiOrNull } from '@@/js/emojilist.js';
 import MkCustomEmojiDetailedDialog from './MkCustomEmojiDetailedDialog.vue';
 import type { MenuItem } from '@/types/menu.js';
 import XDetails from '@/components/MkReactionsViewer.details.vue';
@@ -58,15 +59,11 @@ const emit = defineEmits<
 const buttonEl = useTemplateRef('buttonEl');
 const remoteReactionRegExp = /@\w/;
 
-const isCustomEmoji = computed(() => props.reaction.includes(':'));
 const emojiName = computed(() => props.reaction.replace(/:/g, '').replace(/@\./, ''));
-const emoji = computed(() => isCustomEmoji.value ? customEmojisMap.get(emojiName.value) : null);
+const emoji = computed(() => customEmojisMap.get(emojiName.value) ?? getUnicodeEmojiOrNull(props.reaction));
 
 const canToggle = computed(() => {
-	return !remoteReactionRegExp.test(props.reaction) && $i && (
-		!isCustomEmoji.value
-		|| (emoji.value && checkReactionPermissions($i, props.note, emoji.value))
-	);
+	return !remoteReactionRegExp.test(props.reaction) && $i != null && emoji.value != null && checkReactionPermissions($i, props.note, emoji.value);
 });
 const canGetInfo = computed(() => !remoteReactionRegExp.test(props.reaction) && props.reaction.includes(':'));
 const isLocalCustomEmoji = props.reaction[0] === ':' && props.reaction.includes('@.');

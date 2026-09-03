@@ -105,6 +105,12 @@ export class NoteDraftEntityService implements OnModuleInit {
 		const packed: Packed<'NoteDraft'> = await awaitAll({
 			id: noteDraft.id,
 			createdAt: this.idService.parse(noteDraft.id).date.toISOString(),
+			scheduledAt: noteDraft.scheduledAt?.getTime() ?? null,
+			isActuallyScheduled: noteDraft.isActuallyScheduled,
+			scheduledFailureReason: noteDraft.scheduledFailureReason,
+			noExtractMentions: noteDraft.noExtractMentions,
+			noExtractHashtags: noteDraft.noExtractHashtags,
+			noExtractEmojis: noteDraft.noExtractEmojis,
 			userId: noteDraft.userId,
 			user: packedUsers?.get(noteDraft.userId) ?? this.userEntityService.pack(noteDraft.user ?? noteDraft.userId, me),
 			text: text,
@@ -113,15 +119,14 @@ export class NoteDraftEntityService implements OnModuleInit {
 			localOnly: noteDraft.localOnly,
 			dimension: noteDraft.dimension,
 			lang: noteDraft.lang,
-			scheduledAt: noteDraft.scheduledAt?.toISOString() ?? null,
 			reactionAcceptance: noteDraft.reactionAcceptance,
-			visibleUserIds: noteDraft.visibility === 'specified' ? noteDraft.visibleUserIds : undefined,
-			hashtag: noteDraft.hashtag ?? undefined,
+			visibleUserIds: noteDraft.visibleUserIds,
+			hashtag: noteDraft.hashtag,
 			fileIds: noteDraft.fileIds,
 			files: packedFiles != null ? this.packAttachedFiles(noteDraft.fileIds, packedFiles, me) : this.driveFileEntityService.packManyByIds(noteDraft.fileIds, me),
 			replyId: noteDraft.replyId,
 			renoteId: noteDraft.renoteId,
-			channelId: noteDraft.channelId ?? undefined,
+			channelId: noteDraft.channelId,
 			channel: channel ? {
 				id: channel.id,
 				name: channel.name,
@@ -130,6 +135,12 @@ export class NoteDraftEntityService implements OnModuleInit {
 				allowRenoteToExternal: channel.allowRenoteToExternal,
 				userId: channel.userId,
 			} : undefined,
+			poll: noteDraft.hasPoll ? {
+				choices: noteDraft.pollChoices,
+				multiple: noteDraft.pollMultiple,
+				expiresAt: noteDraft.pollExpiresAt?.toISOString(),
+				expiredAfter: noteDraft.pollExpiredAfter == null ? null : Number(noteDraft.pollExpiredAfter),
+			} : null,
 
 			...(opts.detail ? {
 				reply: noteDraft.replyId ? nullIfEntityNotFound(this.noteEntityService.pack(noteDraft.replyId, me, {
@@ -141,13 +152,6 @@ export class NoteDraftEntityService implements OnModuleInit {
 					detail: true,
 					skipHide: opts.skipHide,
 				})) : undefined,
-
-				poll: noteDraft.hasPoll ? {
-					choices: noteDraft.pollChoices,
-					multiple: noteDraft.pollMultiple,
-					expiresAt: noteDraft.pollExpiresAt?.toISOString(),
-					expiredAfter: noteDraft.pollExpiredAfter == null ? null : Number(noteDraft.pollExpiredAfter),
-				} : undefined,
 			} : {} ),
 		});
 

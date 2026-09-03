@@ -145,7 +145,7 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	mutualLinkLimit: 3,
 	chatAvailability: 'available',
 	uploadableFileTypes: [
-		'text/plain',
+		'text/*',
 		'application/json',
 		'image/*',
 		'video/*',

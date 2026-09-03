@@ -19,8 +19,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkInfo v-if="user.host == null && user.username.includes('.')">{{ i18n.ts.isSystemAccount }}</MkInfo>
 
 					<div :key="user.id" class="main _panel">
-						<div class="banner-container" :style="style">
-							<div ref="bannerEl" class="banner" :style="style"></div>
+						<div ref="bannerEl" class="banner-container">
+							<div class="banner" :style="style"></div>
 							<div class="fade"></div>
 							<div class="title">
 								<MkUserName class="name" :user="user" :nowrap="true"/>
@@ -94,7 +94,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<div :class="$style.mutualLinks">
 									<div v-for="mutualLink in section.mutualLinks.slice(0, $i.policies.mutualLinkLimit)" :key="mutualLink.id">
 										<MkLink :hideIcon="true" :url="mutualLink.url">
-											<img :class="$style.mutualLinkImg" :src="mutualLink.imgSrc" :alt="mutualLink.description"/>
+											<img :class="$style.mutualLinkImg" :src="mutualLink.imgSrc" :alt="mutualLink.description ?? ''"/>
 										</MkLink>
 									</div>
 								</div>
@@ -106,7 +106,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<div :class="$style.mutualLinks">
 									<div v-for="mutualLink in section.mutualLinks" :key="mutualLink.id">
 										<MkLink :hideIcon="true" :url="mutualLink.url">
-											<img :class="$style.mutualLinkImg" :src="mutualLink.imgSrc" :alt="mutualLink.description"/>
+											<img :class="$style.mutualLinkImg" :src="mutualLink.imgSrc" :alt="mutualLink.description ?? ''"/>
 										</MkLink>
 									</div>
 								</div>
@@ -222,9 +222,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </component>
 </template>
 <script lang="ts" setup>
-import { defineAsyncComponent, computed, onMounted, onUnmounted, nextTick, watch, ref } from 'vue';
+import { defineAsyncComponent, computed, onMounted, onUnmounted, onActivated, onDeactivated, nextTick, watch, ref, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
-import { getScrollPosition } from '@@/js/scroll.js';
+import { getScrollContainer } from '@@/js/scroll.js';
 import MkNote from '@/components/MkNote.vue';
 import MkFollowButton from '@/components/MkFollowButton.vue';
 import MkAccountMoved from '@/components/MkAccountMoved.vue';
@@ -288,11 +288,10 @@ const router = useRouter();
 
 const user = ref(props.user);
 const userSkebStatus = ref<Misskey.Endpoints['users/get-skeb-status']['res'] | null>(null);
-const parallaxAnimationId = ref<null | number>(null);
 const narrow = ref<null | boolean>(null);
-const rootEl = ref<null | HTMLElement>(null);
-const bannerEl = ref<null | HTMLElement>(null);
-const memoTextareaEl = ref<null | HTMLElement>(null);
+const rootEl = useTemplateRef('rootEl');
+const bannerEl = useTemplateRef('bannerEl');
+const memoTextareaEl = useTemplateRef('memoTextareaEl');
 const memoDraft = ref(props.user.memo);
 const isEditingMemo = ref(false);
 const moderationNote = ref(props.user.moderationNote ?? '');
@@ -332,24 +331,6 @@ async function fetchMovedFromLog() {
 	}
 
 	movedFromLog.value = await misskeyApi('admin/show-user-account-move-logs', { movedToId: props.user.id });
-}
-
-function parallaxLoop() {
-	parallaxAnimationId.value = window.requestAnimationFrame(parallaxLoop);
-	parallax();
-}
-
-function parallax() {
-	const banner = bannerEl.value;
-	if (banner == null) return;
-
-	const top = getScrollPosition(rootEl.value);
-
-	if (top < 0) return;
-
-	const z = 1.75; // 奥行き(小さいほど奥)
-	const pos = -(top / z);
-	banner.style.backgroundPosition = `center calc(50% - ${pos}px)`;
 }
 
 function showMemoTextarea() {
@@ -423,8 +404,38 @@ async function reload() {
 	// TODO
 }
 
+let bannerParallaxResizeObserver: ResizeObserver | null = null;
+
+function calcBannerParallax() {
+	if (!bannerEl.value || !CSS.supports('view-timeline-inset', 'auto 100px')) return;
+	const elRect = bannerEl.value.getBoundingClientRect();
+	const scrollEl = getScrollContainer(bannerEl.value);
+	const scrollPosition = scrollEl?.scrollTop ?? window.scrollY;
+	const scrollContainerHeight = scrollEl?.clientHeight ?? window.innerHeight;
+	const scrollContainerTop = scrollEl?.getBoundingClientRect().top ?? 0;
+	const top = scrollPosition + elRect.top - scrollContainerTop;
+	const bottom = scrollContainerHeight - top;
+	bannerEl.value.style.setProperty('--bannerParallaxInset', `auto ${bottom}px`);
+}
+
+function initCalcBannerParallax() {
+	const scrollEl = bannerEl.value ? getScrollContainer(bannerEl.value) : null;
+	if (scrollEl != null && CSS.supports('view-timeline-inset', 'auto 100px')) {
+		bannerParallaxResizeObserver = new ResizeObserver(() => {
+			calcBannerParallax();
+		});
+		bannerParallaxResizeObserver.observe(scrollEl);
+	}
+}
+
+function disposeBannerParallaxResizeObserver() {
+	if (bannerParallaxResizeObserver) {
+		bannerParallaxResizeObserver.disconnect();
+		bannerParallaxResizeObserver = null;
+	}
+}
+
 onMounted(() => {
-	window.requestAnimationFrame(parallaxLoop);
 	narrow.value = rootEl.value!.clientWidth < 1000;
 
 	if (props.user.birthday) {
@@ -443,15 +454,22 @@ onMounted(() => {
 		fetchMovedFromLog();
 	}
 	nextTick(() => {
+		calcBannerParallax();
 		adjustMemoTextarea();
 	});
+
+	initCalcBannerParallax();
 });
 
-onUnmounted(() => {
-	if (parallaxAnimationId.value) {
-		window.cancelAnimationFrame(parallaxAnimationId.value);
+onActivated(() => {
+	if (bannerEl.value) {
+		calcBannerParallax();
+		initCalcBannerParallax();
 	}
 });
+
+onUnmounted(disposeBannerParallaxResizeObserver);
+onDeactivated(disposeBannerParallaxResizeObserver);
 </script>
 
 <style lang="scss" scoped>
@@ -476,18 +494,19 @@ onUnmounted(() => {
 
 				> .banner-container {
 					position: relative;
-					height: 250px;
+					--bannerHeight: 250px;
+					height: var(--bannerHeight);
 					overflow: clip;
-					background-size: cover;
-					background-position: center;
 
 					> .banner {
+						width: 100%;
 						height: 100%;
-						background-color: #4c5e6d;
 						background-size: cover;
-						background-position: center;
-						box-shadow: 0 0 128px rgba(0, 0, 0, 0.5) inset;
-						will-change: background-position;
+						background-color: #4c5e6d;
+						background-repeat: repeat-y;
+						background-position-x: center;
+						background-position-y: 50%;
+						will-change: background-position-y;
 					}
 
 					> .fade {
@@ -781,7 +800,8 @@ onUnmounted(() => {
 		> .main {
 			> .profile > .main {
 				> .banner-container {
-					height: 140px;
+					--bannerHeight: 140px;
+					height: var(--bannerHeight);
 
 					> .fade {
 						display: none;
@@ -842,6 +862,35 @@ onUnmounted(() => {
 				}
 			}
 		}
+	}
+}
+
+@supports (view-timeline-name: --name) {
+	.ftskorzw {
+		> .main {
+			> .profile > .main {
+				> .banner-container {
+					view-timeline-name: --bannerParallax;
+					view-timeline-inset: var(--bannerParallaxInset, auto);
+					view-timeline-axis: block;
+
+					> .banner {
+						animation: bannerParallaxKeyframes linear both;
+						animation-timeline: --bannerParallax;
+						animation-range: cover;
+					}
+				}
+			}
+		}
+	}
+}
+
+@keyframes bannerParallaxKeyframes {
+	from {
+		background-position-y: 50%;
+	}
+	to {
+		background-position-y: calc(50% + var(--bannerHeight, 250px) / 3);
 	}
 }
 </style>

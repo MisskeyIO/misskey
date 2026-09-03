@@ -5,7 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import { In } from 'typeorm';
+import { EntityNotFoundError, In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { FollowRequestsRepository, NotesRepository, MiUser, UsersRepository } from '@/models/_.js';
 import { awaitAll } from '@/misc/prelude/await-all.js';
@@ -22,8 +22,20 @@ import type { OnModuleInit } from '@nestjs/common';
 import type { UserEntityService } from './UserEntityService.js';
 import type { NoteEntityService } from './NoteEntityService.js';
 import type { ScheduledNoteEntityService } from './ScheduledNoteEntityService.js';
+import type { NoteDraftEntityService } from './NoteDraftEntityService.js';
 
-const NOTE_REQUIRED_NOTIFICATION_TYPES = new Set(['note', 'mention', 'reply', 'renote', 'renote:grouped', 'quote', 'reaction', 'reaction:grouped', 'pollEnded', 'scheduledNotePosted'] as (typeof groupedNotificationTypes[number])[]);
+const NOTE_REQUIRED_NOTIFICATION_TYPES = new Set([
+	'note',
+	'mention',
+	'reply',
+	'renote',
+	'renote:grouped',
+	'quote',
+	'reaction',
+	'reaction:grouped',
+	'pollEnded',
+	'scheduledNotePosted',
+] as (typeof groupedNotificationTypes[number])[]);
 
 @Injectable()
 export class NotificationEntityService implements OnModuleInit {
@@ -31,6 +43,7 @@ export class NotificationEntityService implements OnModuleInit {
 	private noteEntityService: NoteEntityService;
 	private roleEntityService: RoleEntityService;
 	private scheduledNoteEntityService: ScheduledNoteEntityService;
+	private noteDraftEntityService: NoteDraftEntityService;
 	private chatEntityService: ChatEntityService;
 
 	constructor(
@@ -54,6 +67,7 @@ export class NotificationEntityService implements OnModuleInit {
 		this.noteEntityService = this.moduleRef.get('NoteEntityService');
 		this.roleEntityService = this.moduleRef.get('RoleEntityService');
 		this.scheduledNoteEntityService = this.moduleRef.get('ScheduledNoteEntityService');
+		this.noteDraftEntityService = this.moduleRef.get('NoteDraftEntityService');
 		this.chatEntityService = this.moduleRef.get('ChatEntityService');
 	}
 
@@ -93,6 +107,14 @@ export class NotificationEntityService implements OnModuleInit {
 		const draftIfNeed = needsDraft ? this.scheduledNoteEntityService.pack(notification.draftId, { id: meId }) : undefined;
 		// if the draft has been deleted, don't show this notification
 		if (needsDraft && !draftIfNeed) return null;
+
+		const needsNoteDraft = notification.type === 'scheduledNotePostFailed';
+		const noteDraftIfNeed = needsNoteDraft ? await this.noteDraftEntityService.pack(notification.noteDraftId, { id: meId }).catch(err => {
+			if (err instanceof EntityNotFoundError) return null;
+			throw err;
+		}) : undefined;
+		// 削除済みの下書きは通知に表示しない
+		if (needsNoteDraft && !noteDraftIfNeed) return null;
 
 		const needsUser = 'notifierId' in notification;
 		const userIfNeed = needsUser ? (
@@ -178,6 +200,7 @@ export class NotificationEntityService implements OnModuleInit {
 			...(userIfNeed != null ? { user: userIfNeed } : {}),
 			...(noteIfNeed != null ? { note: noteIfNeed } : {}),
 			...(draftIfNeed != null ? { draft: draftIfNeed } : {}),
+			...(noteDraftIfNeed != null ? { noteDraft: noteDraftIfNeed } : {}),
 			...(notification.type === 'reaction' ? {
 				reaction: notification.reaction,
 			} : {}),

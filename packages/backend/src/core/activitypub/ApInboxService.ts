@@ -50,8 +50,8 @@ export class ApInboxService {
 		@Inject(DI.config)
 		private config: Config,
 
-		@Inject(DI.redisForTimelines)
-		private redisForTimelines: Redis.Redis,
+		@Inject(DI.redis)
+		private redisClient: Redis.Redis,
 
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
@@ -318,7 +318,7 @@ export class ApInboxService {
 		// アナウンス先をブロックしてたら中断
 		if (!this.utilityService.isFederationAllowedUri(uri)) return 'skip: blocked host';
 
-		const unlock = await acquireApObjectLock(this.redisForTimelines, uri);
+		const unlock = await acquireApObjectLock(this.redisClient, uri);
 
 		try {
 			// 既に同じURIを持つものが登録されていないかチェック
@@ -450,7 +450,7 @@ export class ApInboxService {
 			}
 		}
 
-		const unlock = await acquireApObjectLock(this.redisForTimelines, uri);
+		const unlock = await acquireApObjectLock(this.redisClient, uri);
 
 		try {
 			const exist = await this.apNoteService.fetchNote(note);
@@ -545,7 +545,7 @@ export class ApInboxService {
 	private async deleteNote(actor: MiRemoteUser, uri: string): Promise<string> {
 		this.logger.info(`Deleting the Note: ${uri}`);
 
-		const unlock = await acquireApObjectLock(this.redisForTimelines, uri);
+		const unlock = await acquireApObjectLock(this.redisClient, uri);
 
 		try {
 			const note = await this.apDbResolverService.getNoteFromApId(uri);
@@ -812,7 +812,7 @@ export class ApInboxService {
 			return 'ok: Question updated';
 		} else if (additionalCc && isPost(object)) {
 			const uri = getApId(object);
-			const unlock = await acquireApObjectLock(this.redisForTimelines, uri);
+			const unlock = await acquireApObjectLock(this.redisClient, uri);
 
 			try {
 				const exist = await this.apNoteService.fetchNote(object);

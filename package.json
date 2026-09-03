@@ -66,12 +66,9 @@
     "cssnano": "catalog:",
     "esbuild": "catalog:",
     "execa": "catalog:",
-    "fast-glob": "catalog:",
-    "glob": "catalog:",
     "ignore-walk": "catalog:",
     "js-yaml": "catalog:",
     "postcss": "catalog:",
-    "postcss-preset-env": "catalog:",
     "terser": "catalog:",
     "typescript": "catalog:"
   },

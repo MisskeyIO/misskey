@@ -5241,6 +5241,10 @@ export interface Locale extends ILocale {
      */
     "repositoryUrlDescription": string;
     /**
+     * リポジトリを公開していない場合、代わりにtarballを提供する必要があります。詳細は.config/example.ymlを参照してください。
+     */
+    "repositoryUrlOrTarballRequired": string;
+    /**
      * フィードバック
      */
     "feedback": string;
@@ -11713,6 +11717,36 @@ export interface Locale extends ILocale {
              */
             "reportAutoResolved": string;
         };
+        "_systemEvents": {
+            /**
+             * ユーザーから通報があったとき
+             */
+            "abuseReport": string;
+            /**
+             * ユーザーからの通報を処理したとき
+             */
+            "abuseReportResolved": string;
+            /**
+             * ユーザーが作成されたとき
+             */
+            "userCreated": string;
+            /**
+             * モデレーターが一定期間非アクティブになったとき
+             */
+            "inactiveModeratorsWarning": string;
+            /**
+             * モデレーターが一定期間非アクティブだったため、システムにより招待制へと変更されたとき
+             */
+            "inactiveModeratorsInvitationOnlyChanged": string;
+        };
+        /**
+         * Webhookを削除しますか？
+         */
+        "deleteConfirm": string;
+        /**
+         * スイッチの右にあるボタンをクリックするとダミーのデータを使用したテスト用Webhookを送信できます。
+         */
+        "testRemarks": string;
     };
     "_abuse": {
         "_resolver": {
@@ -11777,36 +11811,6 @@ export interface Locale extends ILocale {
          * リソルバー
          */
         "resolver": string;
-        "_systemEvents": {
-            /**
-             * ユーザーから通報があったとき
-             */
-            "abuseReport": string;
-            /**
-             * ユーザーからの通報を処理したとき
-             */
-            "abuseReportResolved": string;
-            /**
-             * ユーザーが作成されたとき
-             */
-            "userCreated": string;
-            /**
-             * モデレーターが一定期間非アクティブになったとき
-             */
-            "inactiveModeratorsWarning": string;
-            /**
-             * モデレーターが一定期間非アクティブだったため、システムにより招待制へと変更されたとき
-             */
-            "inactiveModeratorsInvitationOnlyChanged": string;
-        };
-        /**
-         * Webhookを削除しますか？
-         */
-        "deleteConfirm": string;
-        /**
-         * スイッチの右にあるボタンをクリックするとダミーのデータを使用したテスト用Webhookを送信できます。
-         */
-        "testRemarks": string;
     };
     "_abuseReport": {
         "_notificationRecipient": {

@@ -9,7 +9,6 @@ import { readFile } from 'node:fs/promises';
 import { Injectable } from '@nestjs/common';
 import type { NSFWJS, PredictionType } from 'nsfwjs';
 import { Mutex } from 'async-mutex';
-import { sharpBmp } from '@misskey-dev/sharp-read-bmp';
 import fetch from 'node-fetch';
 import { bindThis } from '@/decorators.js';
 import type Logger from '@/logger.js';
@@ -34,7 +33,7 @@ export class AiService {
 	}
 
 	@bindThis
-	public async detectSensitive(path: string, mime: string): Promise<PredictionType[] | null> {
+	public async detectSensitive(source: string | Buffer): Promise<PredictionType[] | null> {
 		try {
 			if (isSupportedCpu === undefined) {
 				isSupportedCpu = await this.computeIsSupportedCpu();
@@ -57,14 +56,8 @@ export class AiService {
 				});
 			}
 
-			const sharp = await sharpBmp(path, mime);
-			const { data, info } = await sharp
-				.resize(299, 299, { fit: 'inside' })
-				.removeAlpha()
-				.raw({ depth: 'uchar' })
-				.toBuffer({ resolveWithObject: true });
-
-			const image = tf.tensor3d(data, [info.height, info.width, info.channels], 'bool');
+			const buffer = source instanceof Buffer ? source : await readFile(source);
+			const image = await tf.node.decodeImage(buffer, 3) as any;
 			try {
 				return await this.model.classify(image);
 			} finally {

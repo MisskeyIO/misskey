@@ -209,12 +209,14 @@ export async function login(token: AccountWithToken['token'], redirect?: string)
 	unisonReload();
 }
 
-export async function switchAccount(host: string, id: string) {
+export async function switchAccount(host: string, id: string, initialUsername?: string) {
 	const token = store.s.accountTokens[host + '/' + id];
 	if (token) {
 		login(token);
 	} else {
-		await popup(defineAsyncComponent(() => import('@/components/MkSigninDialog.vue')), {}, {
+		await popup(defineAsyncComponent(() => import('@/components/MkSigninDialog.vue')), {
+			initialUsername,
+		}, {
 			done: async (res: Misskey.entities.SigninFlowResponse & { finished: true }) => {
 				login(res.i);
 			},
@@ -239,7 +241,7 @@ export async function openAccountMenu(opts: {
 			return;
 		}
 		if (found) {
-			await switchAccount(found.host, found.id);
+			await switchAccount(found.host, found.id, found.username);
 		}
 	}
 
@@ -279,7 +281,7 @@ export async function openAccountMenu(opts: {
 						if (a.token) {
 							switchAccountWithToken(a.token);
 						} else {
-							switchAccount(a.host, a.id);
+							switchAccount(a.host, a.id, a.username);
 						}
 					},
 				});

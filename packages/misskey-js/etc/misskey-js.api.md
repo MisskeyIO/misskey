@@ -1393,6 +1393,10 @@ export type Endpoints = Overwrite<Endpoints_2, {
             };
         };
     };
+    'clear-browser-cache': {
+        req: EmptyRequest;
+        res: EmptyResponse;
+    };
 }>;
 
 // @public (undocumented)
@@ -3536,7 +3540,7 @@ export { Notification_2 as Notification }
 export type NotificationsCreateRequest = operations['notifications___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-export const notificationTypes: readonly ["note", "follow", "mention", "reply", "renote", "quote", "reaction", "pollVote", "pollEnded", "receiveFollowRequest", "followRequestAccepted", "groupInvited", "app", "roleAssigned", "chatRoomInvitationReceived", "achievementEarned", "noteScheduled", "scheduledNotePosted", "scheduledNoteError"];
+export const notificationTypes: readonly ["note", "follow", "mention", "reply", "renote", "quote", "reaction", "pollEnded", "receiveFollowRequest", "followRequestAccepted", "roleAssigned", "chatRoomInvitationReceived", "achievementEarned", "exportCompleted", "login", "noteScheduled", "scheduledNotePosted", "scheduledNoteError", "sensitiveFlagAssigned", "createToken", "app", "test"];
 
 // @public (undocumented)
 export function nyaize(text: string): string;
@@ -3831,6 +3835,9 @@ export type RoleLite = components['schemas']['RoleLite'];
 export type RolePolicies = components['schemas']['RolePolicies'];
 
 // @public (undocumented)
+export const rolePolicies: readonly ["gtlAvailable", "ltlAvailable", "canPublicNote", "canScheduleNote", "scheduleNoteLimit", "scheduleNoteMaxDays", "canInitiateConversation", "canCreateContent", "canUpdateContent", "canDeleteContent", "canPurgeAccount", "canUpdateAvatar", "canUpdateBanner", "mentionLimit", "canInvite", "inviteLimit", "inviteLimitCycle", "inviteExpirationTime", "canManageCustomEmojis", "canManageAvatarDecorations", "canSearchNotes", "canSearchUsers", "canUseTranslator", "canUseDriveFileInSoundSettings", "canUseReaction", "canHideAds", "driveCapacityMb", "maxFileSizeMb", "alwaysMarkNsfw", "canUpdateBioMedia", "skipNsfwDetection", "pinLimit", "antennaLimit", "antennaNotesLimit", "wordMuteLimit", "webhookLimit", "clipLimit", "noteEachClipsLimit", "userListLimit", "userEachUserListsLimit", "rateLimitFactor", "avatarDecorationLimit", "canImportAntennas", "canImportBlocking", "canImportFollowing", "canImportMuting", "canImportUserLists", "mutualLinkSectionLimit", "mutualLinkLimit", "chatAvailability", "uploadableFileTypes", "noteDraftLimit", "watermarkAvailable"];
+
+// @public (undocumented)
 export type RolesListResponse = operations['roles___list']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
@@ -3924,6 +3931,7 @@ export type SignupRequest = {
     'g-recaptcha-response'?: string | null;
     'turnstile-response'?: string | null;
     'm-captcha-response'?: string | null;
+    'testcaptcha-response'?: string | null;
 };
 
 // @public (undocumented)

@@ -13769,6 +13769,7 @@ export interface operations {
                     feedbackUrl?: string | null;
                     impressumUrl?: string | null;
                     privacyPolicyUrl?: string | null;
+                    inquiryUrl?: string | null;
                     enableIpLogging?: boolean;
                     enableActiveEmailValidation?: boolean;
                     enableVerifymailApi?: boolean;

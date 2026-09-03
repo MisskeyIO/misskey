@@ -166,6 +166,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 		<hr>
 
+		<MkButton @click="forceCloudBackup">Force cloud backup</MkButton>
+
+		<hr>
+
 		<FormSlot>
 			<MkButton danger @click="migrate"><i class="ti ti-refresh"></i> {{ i18n.ts.migrateOldSettings }}</MkButton>
 			<template #caption>{{ i18n.ts.migrateOldSettings_description }}</template>
@@ -198,6 +202,7 @@ import { signout } from '@/signout.js';
 import { migrateOldSettings } from '@/pref-migrate.js';
 import { hideAllTips as _hideAllTips, resetAllTips as _resetAllTips } from '@/tips.js';
 import { suggestReload } from '@/utility/reload-suggest.js';
+import { cloudBackup } from '@/preferences/utility.js';
 
 const $i = ensureSignin();
 
@@ -279,6 +284,11 @@ function resetAllTips() {
 
 function hideAllTips() {
 	_hideAllTips();
+	os.success();
+}
+
+async function forceCloudBackup() {
+	await cloudBackup();
 	os.success();
 }
 

@@ -16,7 +16,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import type { notificationTypes as notificationTypes_typeReferenceOnly } from '@@/js/const.js';
+import type { notificationTypes as notificationTypes_typeReferenceOnly } from 'misskey-js';
 import { useWidgetPropsManager } from './widget.js';
 import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from './widget.js';
 import type { FormWithDefault, GetFormResultType } from '@/utility/form.js';

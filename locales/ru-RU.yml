@@ -1216,6 +1216,7 @@ privacyPolicyUrl: "Ссылка на Политику Конфиденциаль
 tosAndPrivacyPolicy: "Условия использования и политика конфиденциальности"
 avatarDecorations: "Украшения для аватара"
 attach: "Прикрепить"
+detachAll: "Убрать всё"
 angle: "Угол"
 flip: "Переворот"
 showAvatarDecorations: "Показать украшения для аватара"
@@ -1254,7 +1255,7 @@ clipNoteLimitExceeded: "К этому клипу больше нельзя до�
 performance: "Производительность"
 modified: "Изменено"
 signinWithPasskey: "Войдите в систему, используя свой пароль"
-unknownWebAuthnKey: "Не известный ключ "
+unknownWebAuthnKey: "Неизвестный ключ"
 passkeyVerificationFailed: "Ошибка проверка ключа доступа "
 messageToFollower: "Сообщение подписчикам"
 testCaptchaWarning: "Эта функция предназначена для тестирования CAPTCHA. <strong>Не использовать это в рабочей среде</strong>"
@@ -1269,8 +1270,11 @@ availableRoles: "Доступные роли"
 federationDisabled: "Федерация отключена для этого сервера. Вы не можете взаимодействовать с пользователями на других серверах."
 draft: "Черновик"
 markAsSensitiveConfirm: "Отметить контент как чувствительный?"
+preferences: "Основное"
 resetToDefaultValue: "Сбросить настройки до стандартных"
+syncBetweenDevices: "Синхронизировать между устройствами"
 postForm: "Форма отправки"
+textCount: "Количество символов"
 information: "Описание"
 inMinutes: "мин"
 inDays: "сут"
@@ -1282,6 +1286,11 @@ _chat:
   send: "Отправить"
 _settings:
   webhook: "Вебхук"
+  preferencesBanner: "Вы можете настроить общее поведение клиента по вашим предпочтениям"
+  timelineAndNote: "Лента и заметки"
+  _chat:
+    showSenderName: "Показывать имя отправителя"
+    sendOnEnter: "Использовать Enter для отправки"
 _delivery:
   stop: "Заморожено"
   _type:
@@ -1530,7 +1539,7 @@ _achievements:
       description: "Нажато здесь"
     _justPlainLucky:
       title: "Чистая удача"
-      description: "Может достаться с вероятностью 0,01% каждые 10 секунд."
+      description: "Может достаться с вероятностью 0,005% каждые 10 секунд."
     _setNameToSyuilo:
       title: "Комплекс бога"
       description: "Установлено «syuilo» в качестве имени"
@@ -1558,6 +1567,12 @@ _achievements:
       title: "Brain Diver"
       description: "Опубликована ссылка на песню «Brain Diver»"
       flavor: "Мисски-Мисски Ла-Ту-Ма"
+    _bubbleGameExplodingHead:
+      title: "🤯"
+      description: "Самый большой объект в Bubble game"
+    _bubbleGameDoubleExplodingHead:
+      title: "Двойной🤯"
+      description: "Два самых больших объекта в Bubble game одновременно!"
 _role:
   new: "Новая роль"
   edit: "Изменить роль"

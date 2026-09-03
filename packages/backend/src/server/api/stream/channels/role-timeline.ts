@@ -3,32 +3,32 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Scope } from '@nestjs/common';
+import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { bindThis } from '@/decorators.js';
 import { RoleService } from '@/core/RoleService.js';
-import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import type { GlobalEvents } from '@/core/GlobalEventService.js';
 import type { JsonObject } from '@/misc/json-value.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
-import Channel, { type MiChannelService } from '../channel.js';
+import Channel, { type ChannelRequest } from '../channel.js';
+import { REQUEST } from '@nestjs/core';
 
 @Injectable({ scope: Scope.TRANSIENT })
 export class RoleTimelineChannel extends Channel {
 	public readonly chName = 'roleTimeline';
-	public static readonly shouldShare = false;
-	public static readonly requireCredential = false as const;
+	public static shouldShare = false;
+	public static requireCredential = false as const;
 	private roleId: string;
 	private minimize: boolean;
 
 	constructor(
-		private roleService: RoleService,
-		private noteEntityService: NoteEntityService,
+		@Inject(REQUEST)
+		request: ChannelRequest,
 
-		id: string,
-		connection: Channel['connection'],
-		dimension?: number | null,
+		private noteEntityService: NoteEntityService,
+		private roleService: RoleService,
 	) {
-		super(id, connection, dimension);
+		super(request);
 		//this.onNote = this.onNote.bind(this);
 	}
 
@@ -103,29 +103,5 @@ export class RoleTimelineChannel extends Channel {
 	public dispose() {
 		// Unsubscribe events
 		this.subscriber.off(`roleTimelineStream:${this.roleId}`, this.onEvent);
-	}
-}
-
-@Injectable()
-export class RoleTimelineChannelService implements MiChannelService<false> {
-	public readonly shouldShare = RoleTimelineChannel.shouldShare;
-	public readonly requireCredential = RoleTimelineChannel.requireCredential;
-	public readonly kind = RoleTimelineChannel.kind;
-
-	constructor(
-		private roleService: RoleService,
-		private noteEntityService: NoteEntityService,
-	) {
-	}
-
-	@bindThis
-	public create(id: string, connection: Channel['connection'], dimension?: number | null): RoleTimelineChannel {
-		return new RoleTimelineChannel(
-			this.roleService,
-			this.noteEntityService,
-			id,
-			connection,
-			dimension,
-		);
 	}
 }

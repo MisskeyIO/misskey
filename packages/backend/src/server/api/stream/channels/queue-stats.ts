@@ -16,11 +16,14 @@ const ev = new Xev();
 @Injectable({ scope: Scope.TRANSIENT })
 export class QueueStatsChannel extends Channel {
 	public readonly chName = 'queueStats';
-	public static readonly shouldShare = true;
-	public static readonly requireCredential = false as const;
+	public static shouldShare = true;
+	public static requireCredential = false as const;
 
-	constructor(id: string, connection: Channel['connection']) {
-		super(id, connection, null);
+	constructor(
+		@Inject(REQUEST)
+		request: ChannelRequest,
+	) {
+		super(request);
 		//this.onStats = this.onStats.bind(this);
 		//this.onMessage = this.onMessage.bind(this);
 	}
@@ -56,24 +59,5 @@ export class QueueStatsChannel extends Channel {
 	@bindThis
 	public dispose() {
 		ev.removeListener('queueStats', this.onStats);
-	}
-}
-
-@Injectable()
-export class QueueStatsChannelService implements MiChannelService<false> {
-	public readonly shouldShare = QueueStatsChannel.shouldShare;
-	public readonly requireCredential = QueueStatsChannel.requireCredential;
-	public readonly kind = QueueStatsChannel.kind;
-
-	constructor(
-	) {
-	}
-
-	@bindThis
-	public create(id: string, connection: Channel['connection'], dimension?: number | null): QueueStatsChannel {
-		return new QueueStatsChannel(
-			id,
-			connection,
-		);
 	}
 }

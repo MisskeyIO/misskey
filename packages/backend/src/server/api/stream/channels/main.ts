@@ -14,9 +14,9 @@ import { REQUEST } from '@nestjs/core';
 @Injectable({ scope: Scope.TRANSIENT })
 export class MainChannel extends Channel {
 	public readonly chName = 'main';
-	public static readonly shouldShare = true;
-	public static readonly requireCredential = true as const;
-	public static readonly kind = 'read:account';
+	public static shouldShare = true;
+	public static requireCredential = true as const;
+	public static kind = 'read:account';
 
 	constructor(
 		@Inject(REQUEST)
@@ -24,7 +24,7 @@ export class MainChannel extends Channel {
 
 		private noteEntityService: NoteEntityService,
 	) {
-		super(id, connection, null);
+		super(request);
 	}
 
 	@bindThis
@@ -43,7 +43,6 @@ export class MainChannel extends Channel {
 							skipLanguageCheck: true,
 							viewerDimension: null,
 						});
-
 						data.body.note = note;
 					}
 					break;
@@ -58,7 +57,6 @@ export class MainChannel extends Channel {
 							skipLanguageCheck: true,
 							viewerDimension: null,
 						});
-
 						data.body = note;
 					}
 					break;
@@ -67,26 +65,5 @@ export class MainChannel extends Channel {
 
 			this.send(data.type, data.body);
 		});
-	}
-}
-
-@Injectable()
-export class MainChannelService implements MiChannelService<true> {
-	public readonly shouldShare = MainChannel.shouldShare;
-	public readonly requireCredential = MainChannel.requireCredential;
-	public readonly kind = MainChannel.kind;
-
-	constructor(
-		private noteEntityService: NoteEntityService,
-	) {
-	}
-
-	@bindThis
-	public create(id: string, connection: Channel['connection'], dimension?: number | null): MainChannel {
-		return new MainChannel(
-			this.noteEntityService,
-			id,
-			connection,
-		);
 	}
 }

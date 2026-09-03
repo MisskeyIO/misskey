@@ -20,7 +20,7 @@ import type Connection from './Connection.js';
 export default abstract class Channel {
 	protected connection: Connection;
 	public id: string;
-	public dimension: number | null = null;
+	public dimension: number | null;
 	public abstract readonly chName: string;
 	public static readonly shouldShare: boolean;
 	public static readonly requireCredential: boolean;
@@ -66,14 +66,6 @@ export default abstract class Channel {
 		return this.connection.mutingChannels;
 	}
 
-	protected setDimension(value: number | null | undefined): void {
-		if (value === null || value === undefined) {
-			this.dimension = null;
-			return;
-		}
-		this.dimension = this.connection.normalizeDimension(value);
-	}
-
 	protected get subscriber() {
 		return this.connection.subscriber;
 	}
@@ -107,10 +99,10 @@ export default abstract class Channel {
 		return this.connection.canUseNoteJsonCache(note);
 	}
 
-	constructor(id: string, connection: Connection, dimension?: number | null) {
-		this.id = id;
-		this.connection = connection;
-		this.setDimension(dimension);
+	constructor(request: ChannelRequest) {
+		this.id = request.id;
+		this.connection = request.connection;
+		this.dimension = request.dimension ?? null;
 	}
 
 	public send(payload: { type: string, body: JsonValue }): void;
@@ -127,7 +119,7 @@ export default abstract class Channel {
 		});
 	}
 
-	public abstract init(params: JsonObject): Promise<void> | void;
+	public abstract init(params: JsonObject): void;
 
 	public dispose?(): void;
 
@@ -137,6 +129,7 @@ export default abstract class Channel {
 export interface ChannelRequest {
 	id: string,
 	connection: Connection,
+	dimension?: number | null,
 }
 
 export interface ChannelConstructor<T extends boolean> {
@@ -144,5 +137,4 @@ export interface ChannelConstructor<T extends boolean> {
 	shouldShare: boolean;
 	requireCredential: T;
 	kind: T extends true ? string : string | null | undefined;
-	create: (id: string, connection: Connection, dimension?: number | null) => Channel;
-};
+}

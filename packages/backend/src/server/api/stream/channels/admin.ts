@@ -12,9 +12,9 @@ import { REQUEST } from '@nestjs/core';
 @Injectable({ scope: Scope.TRANSIENT })
 export class AdminChannel extends Channel {
 	public readonly chName = 'admin';
-	public static readonly shouldShare = true;
-	public static readonly requireCredential = true as const;
-	public static readonly kind = 'read:admin:stream';
+	public static shouldShare = true;
+	public static requireCredential = true as const;
+	public static kind = 'read:admin:stream';
 
 	constructor(
 		@Inject(REQUEST)
@@ -29,25 +29,5 @@ export class AdminChannel extends Channel {
 		this.subscriber.on(`adminStream:${this.user!.id}`, data => {
 			this.send(data);
 		});
-	}
-}
-
-@Injectable()
-export class AdminChannelService implements MiChannelService<true> {
-	public readonly shouldShare = AdminChannel.shouldShare;
-	public readonly requireCredential = AdminChannel.requireCredential;
-	public readonly kind = AdminChannel.kind;
-
-	constructor(
-	) {
-	}
-
-	@bindThis
-	public create(id: string, connection: Channel['connection'], dimension?: number | null): AdminChannel {
-		return new AdminChannel(
-			id,
-			connection,
-			null,
-		);
 	}
 }

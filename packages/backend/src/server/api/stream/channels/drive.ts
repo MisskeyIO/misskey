@@ -12,9 +12,9 @@ import { REQUEST } from '@nestjs/core';
 @Injectable({ scope: Scope.TRANSIENT })
 export class DriveChannel extends Channel {
 	public readonly chName = 'drive';
-	public static readonly shouldShare = true;
-	public static readonly requireCredential = true as const;
-	public static readonly kind = 'read:account';
+	public static shouldShare = true;
+	public static requireCredential = true as const;
+	public static kind = 'read:account';
 
 	constructor(
 		@Inject(REQUEST)
@@ -29,25 +29,5 @@ export class DriveChannel extends Channel {
 		this.subscriber.on(`driveStream:${this.user!.id}`, data => {
 			this.send(data);
 		});
-	}
-}
-
-@Injectable()
-export class DriveChannelService implements MiChannelService<true> {
-	public readonly shouldShare = DriveChannel.shouldShare;
-	public readonly requireCredential = DriveChannel.requireCredential;
-	public readonly kind = DriveChannel.kind;
-
-	constructor(
-	) {
-	}
-
-	@bindThis
-	public create(id: string, connection: Channel['connection'], dimension?: number | null): DriveChannel {
-		return new DriveChannel(
-			id,
-			connection,
-			null,
-		);
 	}
 }

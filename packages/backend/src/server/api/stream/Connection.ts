@@ -7,6 +7,7 @@ import * as WebSocket from 'ws';
 import type { MiUser } from '@/models/User.js';
 import type { MiMeta } from '@/models/_.js';
 import type { MiAccessToken } from '@/models/AccessToken.js';
+import type { Packed } from '@/misc/json-schema.js';
 import { NotificationService } from '@/core/NotificationService.js';
 import { bindThis } from '@/decorators.js';
 import { CacheService } from '@/core/CacheService.js';
@@ -14,11 +15,12 @@ import { MiFollowing, MiUserProfile } from '@/models/_.js';
 import type { GlobalEvents, StreamEventEmitter } from '@/core/GlobalEventService.js';
 import { ChannelFollowingService } from '@/core/ChannelFollowingService.js';
 import { ChannelMutingService } from '@/core/ChannelMutingService.js';
-import type { JsonObject, JsonValue } from '@/misc/json-value.js';
 import { RoleService } from '@/core/RoleService.js';
 import { normalizeDimension } from '@/misc/dimension.js';
 import { isNoteCacheableForVisitor } from '@/misc/is-note-cacheable-for-visitor.js';
-import type { ChannelsService } from './ChannelsService.js';
+import { DI } from '@/di-symbols.js';
+import type { JsonObject, JsonValue } from '@/misc/json-value.js';
+import { isJsonObject } from '@/misc/json-value.js';
 import type { EventEmitter } from 'events';
 import type Channel from './channel.js';
 import type { ChannelConstructor } from './channel.js';
@@ -36,7 +38,6 @@ import { RoleTimelineChannel } from '@/server/api/stream/channels/role-timeline.
 import { AntennaChannel } from '@/server/api/stream/channels/antenna.js';
 import { ChannelChannel } from '@/server/api/stream/channels/channel.js';
 import { DriveChannel } from '@/server/api/stream/channels/drive.js';
-import { ServerStatsChannel } from '@/server/api/stream/channels/server-stats.js';
 import { QueueStatsChannel } from '@/server/api/stream/channels/queue-stats.js';
 import { AdminChannel } from '@/server/api/stream/channels/admin.js';
 import { ChatUserChannel } from '@/server/api/stream/channels/chat-user.js';
@@ -76,9 +77,10 @@ export default class Connection {
 		private roleService: RoleService,
 		private channelFollowingService: ChannelFollowingService,
 		private channelMutingService: ChannelMutingService,
+		@Inject(DI.meta)
 		private meta: MiMeta,
-		user: MiUser | null | undefined,
-		token: MiAccessToken | null | undefined,
+		@Inject(REQUEST)
+		request: ConnectionRequest,
 	) {
 		if (request.user) this.user = request.user;
 		if (request.token) this.token = request.token;
@@ -290,8 +292,15 @@ export default class Connection {
 			return;
 		}
 
+		const contextId = ContextIdFactory.create();
 		const dimension = typeof params?.dimension === 'number' ? params.dimension : null;
-		const ch: Channel = channelService.create(id, this, this.normalizeDimension(dimension) ?? 0);
+		this.moduleRef.registerRequestByContextId<ChannelRequest>({
+			id: id,
+			connection: this,
+			dimension: this.normalizeDimension(dimension) ?? 0,
+		}, contextId);
+		const ch: Channel = await this.moduleRef.create<Channel>(channelConstructor, contextId);
+
 		this.channels.push(ch);
 		ch.init(params ?? {});
 
@@ -316,7 +325,6 @@ export default class Connection {
 			case 'antenna': return AntennaChannel;
 			case 'channel': return ChannelChannel;
 			case 'drive': return DriveChannel;
-			case 'serverStats': return ServerStatsChannel;
 			case 'queueStats': return QueueStatsChannel;
 			case 'admin': return AdminChannel;
 			case 'chatUser': return ChatUserChannel;

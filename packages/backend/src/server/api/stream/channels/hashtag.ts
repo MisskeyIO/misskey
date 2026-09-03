@@ -16,19 +16,17 @@ import { REQUEST } from '@nestjs/core';
 @Injectable({ scope: Scope.TRANSIENT })
 export class HashtagChannel extends Channel {
 	public readonly chName = 'hashtag';
-	public static readonly shouldShare = false;
-	public static readonly requireCredential = false as const;
+	public static shouldShare = false;
+	public static requireCredential = false as const;
 	private q: string[][];
 
 	constructor(
 		@Inject(REQUEST)
 		request: ChannelRequest,
 
-		id: string,
-		connection: Channel['connection'],
-		dimension?: number | null,
+		private noteEntityService: NoteEntityService,
 	) {
-		super(id, connection, dimension);
+		super(request);
 		//this.onNote = this.onNote.bind(this);
 	}
 
@@ -77,27 +75,5 @@ export class HashtagChannel extends Channel {
 	public dispose() {
 		// Unsubscribe events
 		this.subscriber.off('notesStream', this.onNote);
-	}
-}
-
-@Injectable()
-export class HashtagChannelService implements MiChannelService<false> {
-	public readonly shouldShare = HashtagChannel.shouldShare;
-	public readonly requireCredential = HashtagChannel.requireCredential;
-	public readonly kind = HashtagChannel.kind;
-
-	constructor(
-		private noteEntityService: NoteEntityService,
-	) {
-	}
-
-	@bindThis
-	public create(id: string, connection: Channel['connection'], dimension?: number | null): HashtagChannel {
-		return new HashtagChannel(
-			this.noteEntityService,
-			id,
-			connection,
-			dimension,
-		);
 	}
 }

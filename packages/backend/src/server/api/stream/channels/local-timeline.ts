@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import { bindThis } from '@/decorators.js';
+import { Inject, Injectable, Scope } from '@nestjs/common';
 import type { Packed } from '@/misc/json-schema.js';
 import { MetaService } from '@/core/MetaService.js';
-import { RoleService } from '@/core/RoleService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { bindThis } from '@/decorators.js';
+import { RoleService } from '@/core/RoleService.js';
 import { isQuotePacked, isRenotePacked } from '@/misc/is-renote.js';
 import type { JsonObject } from '@/misc/json-value.js';
 import Channel, { type ChannelRequest } from '../channel.js';
@@ -17,8 +17,8 @@ import { REQUEST } from '@nestjs/core';
 @Injectable({ scope: Scope.TRANSIENT })
 export class LocalTimelineChannel extends Channel {
 	public readonly chName = 'localTimeline';
-	public static readonly shouldShare = false;
-	public static readonly requireCredential = false as const;
+	public static shouldShare = false as const;
+	public static requireCredential = false as const;
 	private withRenotes: boolean;
 	private withReplies: boolean;
 	private withFiles: boolean;
@@ -31,12 +31,8 @@ export class LocalTimelineChannel extends Channel {
 		private metaService: MetaService,
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
-
-		id: string,
-		connection: Channel['connection'],
-		dimension?: number | null,
 	) {
-		super(id, connection, dimension);
+		super(request);
 		//this.onNote = this.onNote.bind(this);
 	}
 
@@ -124,31 +120,5 @@ export class LocalTimelineChannel extends Channel {
 	public dispose() {
 		// Unsubscribe events
 		this.subscriber.off('notesStream', this.onNote);
-	}
-}
-
-@Injectable()
-export class LocalTimelineChannelService implements MiChannelService<false> {
-	public readonly shouldShare = LocalTimelineChannel.shouldShare;
-	public readonly requireCredential = LocalTimelineChannel.requireCredential;
-	public readonly kind = LocalTimelineChannel.kind;
-
-	constructor(
-		private metaService: MetaService,
-		private roleService: RoleService,
-		private noteEntityService: NoteEntityService,
-	) {
-	}
-
-	@bindThis
-	public create(id: string, connection: Channel['connection'], dimension?: number | null): LocalTimelineChannel {
-		return new LocalTimelineChannel(
-			this.metaService,
-			this.roleService,
-			this.noteEntityService,
-			id,
-			connection,
-			dimension,
-		);
 	}
 }

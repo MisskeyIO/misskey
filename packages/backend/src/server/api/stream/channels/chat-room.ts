@@ -25,7 +25,7 @@ export class ChatRoomChannel extends Channel {
 
 		private chatService: ChatService,
 	) {
-		super(id, connection, null);
+		super(request);
 	}
 
 	@bindThis
@@ -55,26 +55,5 @@ export class ChatRoomChannel extends Channel {
 	@bindThis
 	public dispose() {
 		this.subscriber.off(`chatRoomStream:${this.roomId}`, this.onEvent);
-	}
-}
-
-@Injectable()
-export class ChatRoomChannelService implements MiChannelService<true> {
-	public readonly shouldShare = ChatRoomChannel.shouldShare;
-	public readonly requireCredential = ChatRoomChannel.requireCredential;
-	public readonly kind = ChatRoomChannel.kind;
-
-	constructor(
-		private chatService: ChatService,
-	) {
-	}
-
-	@bindThis
-	public create(id: string, connection: Channel['connection'], dimension?: number | null): ChatRoomChannel {
-		return new ChatRoomChannel(
-			this.chatService,
-			id,
-			connection,
-		);
 	}
 }

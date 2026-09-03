@@ -11,10 +11,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<img v-if="kawaiiMode" src="/client-assets/kawaii/misskey-io.png" alt="" :class="$style.instanceIconAlt"/>
 				<img v-else :src="instance.iconUrl || '/favicon.ico'" alt="" :class="$style.instanceIcon" style="viewTransitionName: navbar-serverIcon;"/>
 			</button>
-			<button v-if="!iconOnly" v-tooltip.noDelay.right="i18n.ts.realtimeMode" class="_button" :class="[$style.realtimeMode, store.r.realtimeMode.value ? $style.on : null]" @click="toggleRealtimeMode">
-				<i v-if="store.r.realtimeMode.value" class="ti ti-bolt ti-fw"></i>
-				<i v-else class="ti ti-bolt-off ti-fw"></i>
-			</button>
 		</div>
 		<div :class="$style.middle">
 			<MkA v-tooltip.noDelay.right="i18n.ts.timeline" :class="$style.item" :activeClass="$style.active" to="/" exact>
@@ -54,10 +50,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div :class="$style.bottom">
 			<button v-if="showWidgetButton" v-tooltip.noDelay.right="i18n.ts.widgets" class="_button" :class="[$style.widget]" @click="() => emit('widgetButtonClick')">
 				<i class="ti ti-apps ti-fw"></i>
-			</button>
-			<button v-if="iconOnly" v-tooltip.noDelay.right="i18n.ts.realtimeMode" class="_button" :class="[$style.realtimeMode, store.r.realtimeMode.value ? $style.on : null]" @click="toggleRealtimeMode">
-				<i v-if="store.r.realtimeMode.value" class="ti ti-bolt ti-fw"></i>
-				<i v-else class="ti ti-bolt-off ti-fw"></i>
 			</button>
 			<button v-tooltip.noDelay.right="i18n.ts.note" class="_button" :class="[$style.post]" data-cy-open-post-form @click="() => { os.post(); }">
 				<i class="ti ti-pencil ti-fw" :class="$style.postIcon"></i><span :class="$style.postText">{{ i18n.ts.note }}</span>
@@ -159,20 +151,6 @@ function toggleIconOnly() {
 	} else {
 		store.set('menuDisplay', iconOnly.value ? 'sideFull' : 'sideIcon');
 	}
-}
-
-function toggleRealtimeMode(ev: MouseEvent) {
-	os.popupMenu([{
-		type: 'label',
-		text: i18n.ts.realtimeMode,
-	}, {
-		text: store.s.realtimeMode ? i18n.ts.turnItOff : i18n.ts.turnItOn,
-		icon: store.s.realtimeMode ? 'ti ti-bolt-off' : 'ti ti-bolt',
-		action: () => {
-			store.set('realtimeMode', !store.s.realtimeMode);
-			window.location.reload();
-		},
-	}], ev.currentTarget ?? ev.target);
 }
 
 async function openAccountMenu(ev: MouseEvent) {
@@ -434,16 +412,6 @@ function menuEdit() {
 		width: 85%;
 	}
 
-	.realtimeMode {
-		display: inline-block;
-		width: var(--top-height);
-		margin-left: auto;
-
-		&.on {
-			color: var(--MI_THEME-accent);
-		}
-	}
-
 	.bottom {
 		position: sticky;
 		bottom: 0;
@@ -676,18 +644,6 @@ function menuEdit() {
 		width: 100%;
 		height: 52px;
 		text-align: center;
-	}
-
-	.realtimeMode {
-		display: block;
-		position: relative;
-		width: 100%;
-		height: 52px;
-		text-align: center;
-
-		&.on {
-			color: var(--MI_THEME-accent);
-		}
 	}
 
 	.post {

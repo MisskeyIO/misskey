@@ -45,7 +45,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { onUnmounted, onMounted, computed, useTemplateRef, TransitionGroup, markRaw, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import { notificationTypes } from 'misskey-js';
-import { useInterval } from '@@/js/use-interval.js';
 import { useDocumentVisibility } from '@@/js/use-document-visibility.js';
 import { getScrollContainer, scrollToTop } from '@@/js/scroll.js';
 import XNotification from '@/components/MkNotification.vue';
@@ -54,7 +53,6 @@ import { useStream } from '@/stream.js';
 import { i18n } from '@/i18n.js';
 import MkPullToRefresh from '@/components/MkPullToRefresh.vue';
 import { prefer } from '@/preferences.js';
-import { store } from '@/store.js';
 import { isSeparatorNeeded, getSeparatorInfo } from '@/utility/timeline-date-separate.js';
 import { filterMutedNotification } from '@/utility/filter-muted-notification.js';
 import type { IPaginator } from '@/utility/paginator.js';
@@ -92,24 +90,6 @@ function getNotificationSeparatorInfo(index: number) {
 	const current = displayedNotifications.value[index];
 	if (!previous || !current || !isSeparatorNeeded(previous.createdAt, current.createdAt)) return null;
 	return getSeparatorInfo(previous.createdAt, current.createdAt);
-}
-
-const MIN_POLLING_INTERVAL = 1000 * 10;
-const POLLING_INTERVAL =
-	prefer.s.pollingInterval === 1 ? MIN_POLLING_INTERVAL * 1.5 * 1.5 :
-	prefer.s.pollingInterval === 2 ? MIN_POLLING_INTERVAL * 1.5 :
-	prefer.s.pollingInterval === 3 ? MIN_POLLING_INTERVAL :
-	MIN_POLLING_INTERVAL;
-
-if (!store.s.realtimeMode) {
-	useInterval(async () => {
-		paginator.fetchNewer({
-			toQueue: false,
-		});
-	}, POLLING_INTERVAL, {
-		immediate: false,
-		afterMounted: true,
-	});
 }
 
 function isTop() {
@@ -158,9 +138,7 @@ watch(visibility, () => {
 function onNotification(notification: Misskey.entities.Notification) {
 	const isMuted = props.excludeTypes?.some(type => type === notification.type) ?? false;
 	if (isMuted || window.document.visibilityState === 'visible') {
-		if (store.s.realtimeMode) {
-			useStream().send('readNotification');
-		}
+		useStream().send('readNotification');
 	}
 
 	if (!isMuted && filterMutedNotification(notification)) {
@@ -187,11 +165,9 @@ onMounted(() => {
 		}, { immediate: false, deep: true });
 	}
 
-	if (store.s.realtimeMode) {
-		connection = useStream().useChannel('main');
-		connection.on('notification', onNotification);
-		connection.on('notificationFlushed', reload);
-	}
+	connection = useStream().useChannel('main');
+	connection.on('notification', onNotification);
+	connection.on('notificationFlushed', reload);
 });
 
 onUnmounted(() => {

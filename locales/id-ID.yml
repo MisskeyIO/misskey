@@ -1310,7 +1310,6 @@ _chat:
   chatWithThisUser: "Obrolan pengguna"
 _settings:
   webhook: "Webhook"
-  contentsUpdateFrequency: "Frekuensi pembaruan konten"
 _preferencesProfile:
   profileName: "Nama profil"
 _abuseUserReport:

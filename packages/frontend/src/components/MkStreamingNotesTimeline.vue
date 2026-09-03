@@ -61,7 +61,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, watch, onUnmounted, provide, useTemplateRef, TransitionGroup, onMounted, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
-import { useInterval } from '@@/js/use-interval.js';
 import { useDocumentVisibility } from '@@/js/use-document-visibility.js';
 import { getScrollContainer, scrollToTop } from '@@/js/scroll.js';
 import type { BasicTimelineType } from '@/timelines.js';
@@ -75,7 +74,6 @@ import type { DeepPartial } from '@/utility/merge.js';
 import { $i } from '@/i.js';
 import { instance } from '@/instance.js';
 import { prefer } from '@/preferences.js';
-import { store } from '@/store.js';
 import MkNote from '@/components/MkNote.vue';
 import { i18n } from '@/i18n.js';
 import { useGlobalEvent } from '@/events.js';
@@ -277,31 +275,6 @@ let adInsertionCounter = 0;
 const notVisibleNoteData: StreamNote[] = [];
 const pendingNoteFetches = new Map<string, Promise<void>>();
 
-const MIN_POLLING_INTERVAL = 1000 * 10;
-const POLLING_INTERVAL =
-	prefer.s.pollingInterval === 1 ? MIN_POLLING_INTERVAL * 1.5 * 1.5 :
-	prefer.s.pollingInterval === 2 ? MIN_POLLING_INTERVAL * 1.5 :
-	prefer.s.pollingInterval === 3 ? MIN_POLLING_INTERVAL :
-	MIN_POLLING_INTERVAL;
-
-if (!store.s.realtimeMode) {
-	// TODO: 先頭のノートの作成日時が1日以上前であれば流速が遅いTLと見做してインターバルを通常より延ばす
-	useInterval(async () => {
-		paginator.fetchNewer({
-			toQueue: !isTop() || isPausingUpdate,
-		});
-	}, POLLING_INTERVAL, {
-		immediate: false,
-		afterMounted: true,
-	});
-
-	useGlobalEvent('notePosted', (note) => {
-		paginator.fetchNewer({
-			toQueue: !isTop() || isPausingUpdate,
-		});
-	});
-}
-
 useGlobalEvent('noteDeleted', (noteId) => {
 	paginator.removeItem(noteId);
 });
@@ -434,7 +407,7 @@ async function loadUnloadedNotes() {
 	}
 }
 
-const stream = store.s.realtimeMode ? useStream() : null;
+const stream = useStream();
 
 const connections = {
 	antenna: null as Misskey.IChannelConnection<Misskey.Channels['antenna']> | null,
@@ -449,7 +422,6 @@ const connections = {
 };
 
 function connectChannel() {
-	if (stream == null) return;
 	const dimension = props.dimension ?? prefer.r.dimension.value;
 
 	if (props.src === 'antenna') {
@@ -552,15 +524,11 @@ function disconnectChannel() {
 	}
 }
 
-if (store.s.realtimeMode) {
-	connectChannel();
-}
+connectChannel();
 
 watch(() => [props.list, props.antenna, props.channel, props.role, props.withRenotes, props.dimension], () => {
-	if (store.s.realtimeMode) {
-		disconnectChannel();
-		connectChannel();
-	}
+	disconnectChannel();
+	connectChannel();
 });
 watch(() => props.withSensitive, reloadTimeline);
 

@@ -111,7 +111,7 @@ export async function getNoteClipMenu(props: {
 			const { canceled, result } = await os.form(i18n.ts.createNewClip, {
 				name: {
 					type: 'string',
-					default: null,
+					default: null as string | null,
 					label: i18n.ts.name,
 				},
 				description: {
@@ -201,6 +201,7 @@ export function getNoteMenu(props: {
 	//
 	// const appearNote = isRenote ? props.note.renote as Misskey.entities.Note : props.note;
 	const appearNote = getAppearNote(props.note);
+	const link = appearNote.url ?? appearNote.uri;
 
 	const cleanups = [] as (() => void)[];
 
@@ -210,6 +211,7 @@ export function getNoteMenu(props: {
 			text: isAprilFoolsDay() ? i18n.ts.deleteNotWash + '\n' + i18n.ts.noteDeleteConfirm : i18n.ts.noteDeleteConfirm,
 		}).then(({ canceled }) => {
 			if (canceled) return;
+			if ($i == null) return;
 
 			if (isAprilFoolsDay() && !isMute()) {
 				playUrl('/client-assets/sounds/flush.mp3', { volume: store.s.sound_masterVolume });
@@ -233,6 +235,7 @@ function delEdit(): void {
 			text: i18n.ts.deleteAndEditConfirm,
 		}).then(({ canceled }) => {
 			if (canceled) return;
+			if ($i == null) return;
 
 			misskeyApi('notes/delete', {
 				noteId: appearNote.id,
@@ -348,18 +351,18 @@ function delEdit(): void {
 			action: copyContent,
 		}, getCopyNoteLinkMenu(appearNote, i18n.ts.copyLink));
 
-		if (appearNote.url || appearNote.uri) {
+		if (link) {
 			menuItems.push({
 				icon: 'ti ti-link',
 				text: i18n.ts.copyRemoteLink,
 				action: () => {
-					copyToClipboard(appearNote.url ?? appearNote.uri);
+					copyToClipboard(link);
 				},
 			}, {
 				icon: 'ti ti-external-link',
 				text: i18n.ts.showOnRemote,
 				action: () => {
-					window.open(appearNote.url ?? appearNote.uri, '_blank', 'noopener');
+					window.open(link, '_blank', 'noopener');
 				},
 			});
 		} else {
@@ -506,18 +509,18 @@ function delEdit(): void {
 			action: copyContent,
 		}, getCopyNoteLinkMenu(appearNote, i18n.ts.copyLink));
 
-		if (appearNote.url || appearNote.uri) {
+		if (link != null) {
 			menuItems.push({
 				icon: 'ti ti-link',
 				text: i18n.ts.copyRemoteLink,
 				action: () => {
-					copyToClipboard(appearNote.url ?? appearNote.uri);
+					copyToClipboard(link);
 				},
 			}, {
 				icon: 'ti ti-external-link',
 				text: i18n.ts.showOnRemote,
 				action: () => {
-					window.open(appearNote.url ?? appearNote.uri, '_blank', 'noopener');
+					window.open(link, '_blank', 'noopener');
 				},
 			});
 		} else {
@@ -668,7 +671,7 @@ export function getRenoteMenu(props: {
 					});
 				}
 			},
-		}, (props.mock) ? undefined : {
+		}, ...(props.mock ? [] : [{
 			text: i18n.ts.quote,
 			icon: 'ti ti-quote',
 			action: () => {
@@ -677,7 +680,7 @@ export function getRenoteMenu(props: {
 					initialDimension: postFormDimension,
 				});
 			},
-		}]);
+		}])]);
 
 		normalExternalChannelRenoteItems.push({
 			type: 'parent',

@@ -22,6 +22,16 @@ export const meta = {
 		items: {
 			type: 'object',
 			properties: {
+				id: {
+					type: 'string',
+					format: 'id',
+					nullable: false, optional: false,
+				},
+				createdAt: {
+					type: 'string',
+					format: 'date-time',
+					nullable: false, optional: false,
+				},
 				name: {
 					type: 'string',
 					nullable: false, optional: false,
@@ -77,8 +87,11 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 				}))
 				.take(ps.limit);
 
-			return await query.getMany();
+			const resolvers = await query.getMany();
+			return resolvers.map(resolver => ({
+				...resolver,
+				createdAt: resolver.createdAt.toISOString(),
+			}));
 		});
 	}
 }
-

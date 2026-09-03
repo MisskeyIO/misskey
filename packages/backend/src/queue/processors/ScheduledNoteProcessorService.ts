@@ -59,8 +59,20 @@ export class ScheduledNoteProcessorService {
 		}
 
 		try {
+			const pollExpiresAt = draft.draft.poll?.expiresAt as unknown;
+			const poll = draft.draft.poll ? {
+				...draft.draft.poll,
+				expiresAt: draft.draft.poll.expiredAfter != null
+					? new Date(Date.now() + draft.draft.poll.expiredAfter)
+					: pollExpiresAt == null
+						? null
+						: pollExpiresAt instanceof Date
+							? pollExpiresAt
+							: new Date(pollExpiresAt as string),
+			} : undefined;
 			const note = (await this.noteCreateService.create(draft.user, {
 				...draft.draft,
+				poll,
 				createdAt: new Date(),
 				scheduledAt: null,
 			})) as MiNote;

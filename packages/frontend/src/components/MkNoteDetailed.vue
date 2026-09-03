@@ -188,7 +188,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkNoteSub v-for="note in replies" :key="note.id" :note="note" :class="$style.reply" :detail="true"/>
 		</div>
 		<div v-else-if="tab === 'renotes'" :class="$style.tab_renotes">
-			<MkPagination :pagination="renotesPagination" :disableAutoLoad="true">
+			<MkPagination :paginator="renotesPaginator">
 				<template #default="{ items }">
 					<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); grid-gap: 12px;">
 						<MkA v-for="item in items" :key="item.id" :to="userPage(item.user)">
@@ -209,7 +209,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<i :class="!mutedReactions.includes(reactionTabTypeTrimLocal) ? 'ti ti-mood-off' : 'ti ti-mood-happy'"/>
 				{{ !mutedReactions.includes(reactionTabTypeTrimLocal) ? i18n.ts.muteThisReaction : i18n.ts.unmuteThisReaction }}
 			</MkButton>
-			<MkPagination v-if="reactionTabType" :key="reactionTabType" :pagination="reactionsPagination" :disableAutoLoad="true">
+			<MkPagination v-if="reactionTabType" :key="reactionTabType" :paginator="reactionsPaginator">
 				<template #default="{ items }">
 					<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); grid-gap: 12px;">
 						<MkA v-for="item in items" :key="item.id" :to="userPage(item.user)">
@@ -233,7 +233,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, onMounted, provide, ref, useTemplateRef } from 'vue';
+import { computed, inject, markRaw, onMounted, provide, ref, useTemplateRef } from 'vue';
 import * as mfm from 'mfm-js';
 import * as Misskey from 'misskey-js';
 import { isLink } from '@@/js/is-link.js';
@@ -279,6 +279,7 @@ import { prefer } from '@/preferences.js';
 import { DI } from '@/di.js';
 import { globalEvents, useGlobalEvent } from '@/events.js';
 import { store } from '@/store.js';
+import { Paginator } from '@/utility/paginator.js';
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note;
@@ -370,21 +371,19 @@ const tab = ref(props.initialTab);
 const reactionTabType = ref<string | null>(null);
 const reactionTabTypeTrimLocal = computed(() => reactionTabType.value?.replace('@.', '') ?? null);
 
-const renotesPagination = computed(() => ({
-	endpoint: 'notes/renotes',
+const renotesPaginator = markRaw(new Paginator('notes/renotes', {
 	limit: 10,
 	params: {
 		noteId: appearNote.id,
 	},
 }));
 
-const reactionsPagination = computed(() => ({
-	endpoint: 'notes/reactions',
+const reactionsPaginator = markRaw(new Paginator('notes/reactions', {
 	limit: 10,
-	params: {
+	computedParams: computed(() => ({
 		noteId: appearNote.id,
 		type: reactionTabType.value,
-	},
+	})),
 }));
 
 useTooltip(renoteButton, async (showing) => {
@@ -397,12 +396,14 @@ useTooltip(renoteButton, async (showing) => {
 
 	if (users.length < 1) return;
 
-	await os.popup(MkUsersTooltip, {
+	const { dispose } = os.popup(MkUsersTooltip, {
 		showing,
 		users,
 		count: appearNote.renoteCount,
-		targetElement: renoteButton.value,
-	}, {}, 'closed');
+		targetElement: renoteButton.value!,
+	}, {
+		closed: () => dispose(),
+	});
 });
 
 if (appearNote.reactionAcceptance === 'likeOnly') {
@@ -417,13 +418,15 @@ if (appearNote.reactionAcceptance === 'likeOnly') {
 
 		if (users.length < 1) return;
 
-		await os.popup(MkReactionsViewerDetails, {
+		const { dispose } = os.popup(MkReactionsViewerDetails, {
 			showing,
 			reaction: '❤️',
 			users,
 			count: $appearNote.reactionCount,
 			targetElement: reactButton.value!,
-		}, {}, 'closed');
+		}, {
+			closed: () => dispose(),
+		});
 	});
 }
 
@@ -471,7 +474,9 @@ async function react(): Promise<void> {
 			const rect = el.getBoundingClientRect();
 			const x = rect.left + (el.offsetWidth / 2);
 			const y = rect.top + (el.offsetHeight / 2);
-			os.popup(MkRippleEffect, { x, y }, {}, 'end');
+			const { dispose } = os.popup(MkRippleEffect, { x, y }, {
+				end: () => dispose(),
+			});
 		}
 	} else {
 		blur();

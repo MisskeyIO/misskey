@@ -252,9 +252,6 @@ export const PREF_DEF = definePreferences({
 	showFixedPostFormInChannel: {
 		default: false,
 	},
-	autoloadDrafts: {
-		default: true,
-	},
 	enableInfiniteScroll: {
 		default: true,
 	},

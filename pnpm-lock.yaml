@@ -1006,6 +1006,9 @@ patchedDependencies:
   pg-pool@3.11.0:
     hash: 6d954e10807f00f67c089296284047a885a21a88c12aa94d468af1fbce839ebf
     path: patches/pg-pool@3.11.0.patch
+  typeorm:
+    hash: 36ce94a0f9593aeec7705a385f4576968686ffa3151cbb1a018797fecf3d637e
+    path: patches/typeorm.patch
 
 importers:
 
@@ -1486,7 +1489,7 @@ importers:
         version: 4.2.0
       typeorm:
         specifier: 'catalog:'
-        version: 0.3.28(ioredis@5.9.2)(pg-native@3.5.2)(pg-query-stream@4.12.0(pg@8.18.0(pg-native@3.5.2)))(pg@8.18.0(pg-native@3.5.2))
+        version: 0.3.28(patch_hash=36ce94a0f9593aeec7705a385f4576968686ffa3151cbb1a018797fecf3d637e)(ioredis@5.9.2)(pg-native@3.5.2)(pg-query-stream@4.12.0(pg@8.18.0(pg-native@3.5.2)))(pg@8.18.0(pg-native@3.5.2))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -24214,7 +24217,7 @@ snapshots:
 
   typedarray@0.0.6: {}
 
-  typeorm@0.3.28(ioredis@5.9.2)(pg-native@3.5.2)(pg-query-stream@4.12.0(pg@8.18.0(pg-native@3.5.2)))(pg@8.18.0(pg-native@3.5.2)):
+  typeorm@0.3.28(patch_hash=36ce94a0f9593aeec7705a385f4576968686ffa3151cbb1a018797fecf3d637e)(ioredis@5.9.2)(pg-native@3.5.2)(pg-query-stream@4.12.0(pg@8.18.0(pg-native@3.5.2)))(pg@8.18.0(pg-native@3.5.2)):
     dependencies:
       '@sqltools/formatter': 1.2.5
       ansis: 4.2.0

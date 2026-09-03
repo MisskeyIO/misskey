@@ -34,6 +34,8 @@ export const paramDef = {
 		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
 		sinceId: { type: 'string', format: 'misskey:id' },
 		untilId: { type: 'string', format: 'misskey:id' },
+		sinceDate: { type: 'integer' },
+		untilDate: { type: 'integer' },
 		visibility: { type: 'string' },
 	},
 	required: [],
@@ -56,7 +58,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				.select('following.followeeId')
 				.where('following.followerId = :followerId', { followerId: me.id });
 
-			const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId)
+			const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere(':meIdAsList <@ note.mentions') // このmeIdAsListパラメータはqueryServiceのgenerateVisibilityQueryでセットされる
 				.orderBy('CONCAT(note.id)', 'DESC') // Avoid scanning primary key index
 				.innerJoinAndSelect('note.user', 'user')

@@ -48,6 +48,7 @@ import { MiMeta } from '@/models/Meta.js';
 import { MiModerationLog } from '@/models/ModerationLog.js';
 import { MiMuting } from '@/models/Muting.js';
 import { MiNote } from '@/models/Note.js';
+import { MiNoteDraft } from '@/models/NoteDraft.js';
 import { MiNoteLanguage } from '@/models/NoteLanguage.js';
 import { MiScheduledNote } from '@/models/ScheduledNote.js';
 import { MiNoteFavorite } from '@/models/NoteFavorite.js';
@@ -135,6 +136,7 @@ export {
 	MiMuting,
 	MiRenoteMuting,
 	MiNote,
+	MiNoteDraft,
 	MiNoteLanguage,
 	MiScheduledNote,
 	MiNoteFavorite,
@@ -221,6 +223,7 @@ export type ModerationLogsRepository = Repository<MiModerationLog> & MiRepositor
 export type MutingsRepository = Repository<MiMuting> & MiRepository<MiMuting>;
 export type RenoteMutingsRepository = Repository<MiRenoteMuting> & MiRepository<MiRenoteMuting>;
 export type NotesRepository = Repository<MiNote> & MiRepository<MiNote>;
+export type NoteDraftsRepository = Repository<MiNoteDraft> & MiRepository<MiNoteDraft>;
 export type NoteLanguagesRepository = Repository<MiNoteLanguage> & MiRepository<MiNoteLanguage>;
 export type ScheduledNotesRepository = Repository<MiScheduledNote>;
 export type NoteFavoritesRepository = Repository<MiNoteFavorite> & MiRepository<MiNoteFavorite>;

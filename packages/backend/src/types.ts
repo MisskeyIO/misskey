@@ -69,6 +69,8 @@ export const obsoleteNotificationTypes = ['pollVote', 'groupInvited'] as const;
 
 export const noteVisibilities = ['public', 'home', 'followers', 'specified'] as const;
 
+export const noteReactionAcceptances = ['likeOnly', 'likeOnlyForRemote', 'nonSensitiveOnly', 'nonSensitiveOnlyForLocalLikeOnlyForRemote', null] as const;
+
 export const mutedNoteReasons = ['word', 'manual', 'spam', 'other'] as const;
 
 export const followingVisibilities = ['public', 'followers', 'private'] as const;
@@ -480,7 +482,7 @@ export type NoteCreateOption = {
 	reply?: MiNote | null;
 	renote?: MiNote | null;
 	files?: MiDriveFile[] | null;
-	poll?: IPoll | null;
+	poll?: (IPoll & { expiredAfter?: number | null }) | null;
 	localOnly?: boolean | null;
 	dimension?: number | null;
 	reactionAcceptance?: MiNote['reactionAcceptance'];

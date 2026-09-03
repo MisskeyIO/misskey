@@ -11,7 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div v-else-if="tab === 'users'" class="_spacer" style="--MI_SPACER-w: 1200px;">
 		<div class="_gaps_s">
 			<div v-if="role">{{ role.description }}</div>
-			<MkUserList v-if="visible" :pagination="users" :extractor="(item) => item.user"/>
+			<MkUserList v-if="visible" :paginator="usersPaginator" :extractor="(item) => item.user"/>
 			<MkResult v-else-if="!visible" type="empty" :text="i18n.ts.nothing"/>
 		</div>
 	</div>
@@ -30,7 +30,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, watch, ref } from 'vue';
+import { computed, watch, ref, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
 import type { PageHeaderItem } from '@/types/page-header.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
@@ -44,6 +44,7 @@ import { selectDimension } from '@/utility/dimension.js';
 import { claimAchievement } from '@/utility/achievements.js';
 import { prefer } from '@/preferences.js';
 import MkStreamingNotesTimeline from '@/components/MkStreamingNotesTimeline.vue';
+import { Paginator } from '@/utility/paginator.js';
 
 const props = withDefaults(defineProps<{
 	roleId: string;
@@ -102,12 +103,11 @@ function saveTlDimension(value: number | null): void {
 	store.set('tl', out);
 }
 
-const users = computed(() => ({
-	endpoint: 'roles/users' as const,
+const usersPaginator = markRaw(new Paginator('roles/users', {
 	limit: 30,
-	params: {
+	computedParams: computed(() => ({
 		roleId: props.roleId,
-	},
+	})),
 }));
 
 const headerTabs = computed(() => [{

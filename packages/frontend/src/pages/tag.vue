@@ -6,9 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <PageWithHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs">
 	<div class="_spacer" style="--MI_SPACER-w: 800px;">
-		<MkNotesTimeline v-if="tab === 'all'" ref="tlComponent" :pagination="pagination"/>
-		<MkNotesTimeline v-else-if="tab === 'localOnly'" ref="tlComponent" :pagination="localOnlyPagination"/>
-		<MkNotesTimeline v-else-if="tab === 'withFiles'" ref="tlComponent" :pagination="withFilesPagination"/>
+		<MkNotesTimeline :paginator="paginator"/>
 	</div>
 	<template v-if="$i" #footer>
 		<div :class="$style.footer">
@@ -21,7 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, useTemplateRef } from 'vue';
+import { computed, markRaw, ref } from 'vue';
 import MkNotesTimeline from '@/components/MkNotesTimeline.vue';
 import MkButton from '@/components/MkButton.vue';
 import { definePage } from '@/page.js';
@@ -29,6 +27,7 @@ import { i18n } from '@/i18n.js';
 import { $i } from '@/i.js';
 import { store } from '@/store.js';
 import * as os from '@/os.js';
+import { Paginator } from '@/utility/paginator.js';
 
 const tab = ref('all');
 
@@ -36,33 +35,14 @@ const props = defineProps<{
 	tag: string;
 }>();
 
-const pagination = {
-	endpoint: 'notes/search-by-tag' as const,
+const paginator = markRaw(new Paginator('notes/search-by-tag', {
 	limit: 10,
-	params: computed(() => ({
+	computedParams: computed(() => ({
 		tag: props.tag,
+		local: tab.value === 'localOnly' ? true : undefined,
+		withFiles: tab.value === 'withFiles' ? true : undefined,
 	})),
-};
-
-const tlComponent = useTemplateRef('tlComponent');
-
-const localOnlyPagination = {
-	endpoint: 'notes/search-by-tag' as const,
-	limit: 10,
-	params: computed(() => ({
-		tag: props.tag,
-		local: true,
-	})),
-};
-
-const withFilesPagination = {
-	endpoint: 'notes/search-by-tag' as const,
-	limit: 10,
-	params: computed(() => ({
-		tag: props.tag,
-		withFiles: true,
-	})),
-};
+}));
 
 async function post() {
 	store.set('postFormHashtags', props.tag);
@@ -70,7 +50,7 @@ async function post() {
 	await os.post();
 	store.set('postFormHashtags', '');
 	store.set('postFormWithHashtags', false);
-	tlComponent.value?.reload();
+	paginator.reload();
 }
 
 const headerActions = [];

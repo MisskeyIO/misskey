@@ -87,6 +87,8 @@ export type RolePolicies = {
 	mutualLinkLimit: number;
 	chatAvailability: 'available' | 'readonly' | 'unavailable';
 	uploadableFileTypes: string[];
+	noteDraftLimit: number;
+	watermarkAvailable: boolean;
 };
 
 export const DEFAULT_POLICIES: RolePolicies = {
@@ -146,6 +148,8 @@ export const DEFAULT_POLICIES: RolePolicies = {
 		'video/*',
 		'audio/*',
 	],
+	noteDraftLimit: 10,
+	watermarkAvailable: true,
 };
 
 @Injectable()
@@ -511,6 +515,8 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				}
 				return [...set];
 			}),
+			noteDraftLimit: calc('noteDraftLimit', vs => Math.max(...vs)),
+			watermarkAvailable: calc('watermarkAvailable', vs => vs.some(v => v === true)),
 		};
 
 		return this.applyInlinePolicies(aggregated, inlinePolicies);

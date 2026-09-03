@@ -355,7 +355,7 @@ export const packedNotificationSchema = {
 			},
 			draft: {
 				type: 'object',
-				ref: 'NoteDraft',
+				ref: 'ScheduledNote',
 				optional: false, nullable: false,
 			},
 		},
@@ -385,7 +385,7 @@ export const packedNotificationSchema = {
 			},
 			draft: {
 				type: 'object',
-				ref: 'NoteDraft',
+				ref: 'ScheduledNote',
 				optional: false, nullable: false,
 			},
 		},

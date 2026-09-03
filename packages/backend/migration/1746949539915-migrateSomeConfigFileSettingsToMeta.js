@@ -4,7 +4,7 @@
  */
 
 import fs from 'node:fs';
-import { compiledConfigFilePath } from '../built/config.js';
+import { compiledConfigFilePath } from '../src-js/config.js';
 
 export class MigrateSomeConfigFileSettingsToMeta1746949539915 {
     name = 'MigrateSomeConfigFileSettingsToMeta1746949539915'

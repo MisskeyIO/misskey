@@ -7,7 +7,7 @@ const base = require('./jest.config.cjs')
 
 module.exports = {
 	...base,
-	globalSetup: '<rootDir>/test-server/entry.mjs',
+	globalSetup: '<rootDir>/built-test/entry.js',
 	setupFilesAfterEnv: ['<rootDir>/test/jest.setup.ts'],
 	testMatch: [
 		'<rootDir>/test/e2e/**/*.ts',

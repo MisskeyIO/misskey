@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { execSync } from 'node:child_process';
+
+const __dirname = import.meta.dirname;
 
 const rootPackageJsonPath = path.resolve(__dirname, '../package.json');
 const misskeyJsPackageJsonPath = path.resolve(__dirname, '../packages/misskey-js/package.json');

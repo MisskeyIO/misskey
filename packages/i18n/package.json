@@ -36,8 +36,7 @@
 		"esbuild": "catalog:",
 		"execa": "catalog:",
 		"nodemon": "catalog:",
-		"tsx": "catalog:",
-		"typescript": "catalog:"
+		"tsx": "catalog:"
 	},
 	"dependencies": {
 		"js-yaml": "catalog:"

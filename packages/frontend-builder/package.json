@@ -14,8 +14,7 @@
 		"@types/node": "catalog:",
 		"@typescript-eslint/eslint-plugin": "catalog:",
 		"@typescript-eslint/parser": "catalog:",
-		"rollup": "catalog:",
-		"typescript": "catalog:"
+		"rollup": "catalog:"
 	},
 	"dependencies": {
 		"estree-walker": "catalog:",

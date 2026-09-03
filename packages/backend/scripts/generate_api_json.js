@@ -5,7 +5,6 @@
 
 import { writeFileSync, existsSync } from 'node:fs';
 import { execa } from 'execa';
-import { writeFileSync, existsSync } from 'node:fs';
 
 async function main() {
 	if (!process.argv.includes('--no-build')) {

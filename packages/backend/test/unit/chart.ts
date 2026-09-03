@@ -63,7 +63,6 @@ describe('Chart', () => {
 		});
 
 		await db.initialize();
-
 		const logger = coreLogger.createSubLogger('chart'); // TODO: モックにする
 		testChart = new TestChart(db, redisForTimelines, logger);
 		testGroupedChart = new TestGroupedChart(db, redisForTimelines, logger);
@@ -71,8 +70,9 @@ describe('Chart', () => {
 		testIntersectionChart = new TestIntersectionChart(db, redisForTimelines, logger);
 
 		clock = lolex.install({
+			// https://github.com/sinonjs/sinon/issues/2620
+			toFake: Object.keys(lolex.timers).filter((key) => !['nextTick', 'queueMicrotask'].includes(key)) as lolex.FakeMethod[],
 			now: new Date(Date.UTC(2000, 0, 1, 0, 0, 0)),
-			toFake: ['Date'],
 			shouldClearNativeTimers: true,
 		});
 	});

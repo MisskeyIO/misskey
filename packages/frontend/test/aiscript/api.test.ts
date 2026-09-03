@@ -80,9 +80,9 @@ describe('AiScript common API', () => {
 	});
 
 	describe('readline', () => {
-		afterEach(() => {
-			vi.clearAllMocks();
+		beforeEach(() => {
 			vi.restoreAllMocks();
+			vi.clearAllMocks();
 		});
 
 		test.sequential('ok', async () => {
@@ -177,9 +177,9 @@ describe('AiScript common API', () => {
 	});
 
 	describe('dialog', () => {
-		afterEach(() => {
-			vi.clearAllMocks();
+		beforeEach(() => {
 			vi.restoreAllMocks();
+			vi.clearAllMocks();
 		});
 
 		test.sequential('ok', async () => {
@@ -217,9 +217,9 @@ describe('AiScript common API', () => {
 	});
 
 	describe('confirm', () => {
-		afterEach(() => {
-			vi.clearAllMocks();
+		beforeEach(() => {
 			vi.restoreAllMocks();
+			vi.clearAllMocks();
 		});
 
 		test.sequential('ok', async () => {
@@ -275,9 +275,9 @@ describe('AiScript common API', () => {
 	});
 
 	describe('api', () => {
-		afterEach(() => {
-			vi.clearAllMocks();
+		beforeEach(() => {
 			vi.restoreAllMocks();
+			vi.clearAllMocks();
 			misskeyApiMock.mockReset();
 		});
 

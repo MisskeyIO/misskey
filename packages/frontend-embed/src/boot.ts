@@ -6,6 +6,12 @@
 // https://vitejs.dev/config/build-options.html#build-modulepreload
 import 'vite/modulepreload-polyfill';
 
+if (import.meta.env.DEV) {
+	await import('@tabler/icons-webfont/dist/tabler-icons.scss');
+} else {
+	await import('icons-subsetter/built/tabler-icons-frontendEmbed.css');
+}
+
 import '@/style.scss';
 import { createApp, defineAsyncComponent } from 'vue';
 import defaultLightTheme from '@@/themes/l-light.json5';

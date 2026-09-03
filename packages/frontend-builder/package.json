@@ -19,6 +19,7 @@
 	},
 	"dependencies": {
 		"estree-walker": "catalog:",
+		"i18n": "workspace:*",
 		"magic-string": "catalog:",
 		"vite": "catalog:"
 	}

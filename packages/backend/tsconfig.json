@@ -25,12 +25,17 @@
 		"emitDecoratorMetadata": true,
 		"resolveJsonModule": true,
 		"isolatedModules": true,
+		"jsx": "react-jsx",
+		"jsxImportSource": "@kitajs/html",
 		"rootDir": "./src",
 		"baseUrl": "./",
 		"paths": {
 			"@/*": ["./src/*"]
 		},
 		"outDir": "./built",
+		"plugins": [
+			{"name": "@kitajs/ts-html-plugin"}
+		],
 		"types": [
 			"node"
 		],
@@ -44,7 +49,8 @@
 	},
 	"compileOnSave": false,
 	"include": [
-		"./src/**/*.ts"
+		"./src/**/*.ts",
+		"./src/**/*.tsx"
 	],
 	"exclude": [
 		"./src/**/*.test.ts"

@@ -54,8 +54,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const jobs = await this.inboxQueue.getJobs(['delayed']);
-
-			const res = new Map<string, number>();
+			const counts = new Map<string, number>();
 
 			for (const job of jobs) {
 				let host: string;
@@ -67,15 +66,12 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					continue;
 				}
 
-				const found = res.get(host);
-				if (found) {
-					res.set(host, found + 1);
-				} else {
-					res.set(host, 1);
-				}
+				counts.set(host, (counts.get(host) ?? 0) + 1);
 			}
 
-			return Array.from(res.entries()).sort((a, b) => b[1] - a[1]);
+			const res = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+
+			return res;
 		});
 	}
 }

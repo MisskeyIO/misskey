@@ -10,9 +10,9 @@ import { randomUUID } from 'node:crypto';
 import { inspect } from 'node:util';
 import WebSocket, { ClientOptions } from 'ws';
 import fetch, { Headers, RequestInit } from 'node-fetch';
-import { DataSource } from 'typeorm';
-import { JSDOM } from 'jsdom';
 import * as Redis from 'ioredis';
+import * as htmlParser from 'node-html-parser';
+import { DataSource } from 'typeorm';
 import { type Response } from 'node-fetch';
 import Fastify from 'fastify';
 import request from 'supertest';
@@ -497,7 +497,7 @@ export function makeStreamCatcher<T>(
 
 export type SimpleGetResponse = {
 	status: number,
-	body: any | JSDOM | null,
+	body: any | null,
 	type: string | null,
 	location: string | null
 };
@@ -528,7 +528,7 @@ export const simpleGet = async (path: string, accept = '*/*', cookie: any = unde
 
 	const body =
 		jsonTypes.includes(res.headers.get('content-type') ?? '') ? await res.json() :
-		htmlTypes.includes(res.headers.get('content-type') ?? '') ? new JSDOM(await res.text()) :
+		htmlTypes.includes(res.headers.get('content-type') ?? '') ? htmlParser.parse(await res.text()) :
 		await bodyExtractor(res);
 
 	return {

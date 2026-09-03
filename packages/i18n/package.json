@@ -1,0 +1,45 @@
+{
+	"name": "i18n",
+	"type": "module",
+	"private": true,
+	"main": "./built/index.js",
+	"types": "./built/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./built/index.d.ts",
+			"import": "./built/index.js"
+		},
+		"./const": {
+			"types": "./built/const.d.ts",
+			"import": "./built/const.js"
+		}
+	},
+	"scripts": {
+		"generate": "tsx scripts/generateLocaleInterface.ts",
+		"verify": "tsx scripts/verify.ts",
+		"build": "tsx ./build.ts",
+		"watch": "nodemon -w package.json -e json --exec \"tsx ./build.ts --watch\"",
+		"tsd": "tsd",
+		"typecheck": "tsc --noEmit",
+		"lint": "pnpm typecheck && pnpm eslint",
+		"lint:fix": "pnpm eslint --fix"
+	},
+	"files": [
+		"built"
+	],
+	"devDependencies": {
+		"@types/js-yaml": "catalog:",
+		"@types/node": "catalog:",
+		"@typescript-eslint/eslint-plugin": "catalog:",
+		"@typescript-eslint/parser": "catalog:",
+		"chokidar": "catalog:",
+		"esbuild": "catalog:",
+		"execa": "catalog:",
+		"nodemon": "catalog:",
+		"tsx": "catalog:",
+		"typescript": "catalog:"
+	},
+	"dependencies": {
+		"js-yaml": "catalog:"
+	}
+}

@@ -107,7 +107,6 @@ export class MiAnnouncement {
 
 	@ManyToOne(type => MiUser, {
 		onDelete: 'CASCADE',
-		createForeignKeyConstraints: false,
 	})
 	@JoinColumn()
 	public user: MiUser | null;

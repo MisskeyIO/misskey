@@ -107,6 +107,7 @@ export class MiPage {
 	})
 	public visibility: 'public' | 'private';
 
+	// 旧DBとの互換列。公開範囲の判定には使わない。
 	@Index()
 	@Column({
 		...id(),

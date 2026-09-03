@@ -929,7 +929,7 @@ async function saveServerDraft(options: {
 			visibility: visibility.value,
 			localOnly: localOnly.value,
 			hashtag: withHashtags.value && hashtags.value.trim() !== '' ? hashtags.value : null,
-			...(files.value.length > 0 ? { fileIds: files.value.map(f => f.id) } : {}),
+			fileIds: files.value.map(f => f.id),
 			poll: poll.value,
 			visibleUserIds: visibility.value === 'specified' ? visibleUsers.value.map(x => x.id) : [],
 			renoteId: renoteTargetNote.value?.id ?? quoteId.value ?? null,

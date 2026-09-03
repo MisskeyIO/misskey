@@ -4,7 +4,7 @@
  */
 
 import { randomUUID, randomBytes } from 'node:crypto';
-import { dirname } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as fs from 'node:fs';
 import { Inject, Injectable } from '@nestjs/common';
@@ -87,12 +87,27 @@ import type { FastifyError, FastifyInstance, FastifyPluginOptions, FastifyReply 
 const _filename = fileURLToPath(import.meta.url);
 const _dirname = dirname(_filename);
 
-const staticAssets = `${_dirname}/../../../assets/`;
-const clientAssets = `${_dirname}/../../../../frontend/assets/`;
-const assets = `${_dirname}/../../../../../built/_frontend_dist_/`;
-const swAssets = `${_dirname}/../../../../../built/_sw_dist_/`;
-const frontendViteOut = `${_dirname}/../../../../../built/_frontend_vite_/`;
-// const frontendEmbedViteOut = `${_dirname}/../../../../../built/_frontend_embed_vite_/`;
+let rootDir = _dirname;
+// 見つかるまで上に遡る
+while (!fs.existsSync(resolve(rootDir, 'packages'))) {
+	const parentDir = dirname(rootDir);
+	if (parentDir === rootDir) {
+		throw new Error('Cannot find root directory');
+	}
+	rootDir = parentDir;
+}
+
+const backendRootDir = resolve(rootDir, 'packages/backend');
+const frontendRootDir = resolve(rootDir, 'packages/frontend');
+
+const staticAssets = resolve(backendRootDir, 'assets');
+const clientAssets = resolve(frontendRootDir, 'assets');
+const assets = resolve(rootDir, 'built/_frontend_dist_');
+const swAssets = resolve(rootDir, 'built/_sw_dist_');
+const fluentEmojisDir = resolve(rootDir, 'fluent-emojis/dist');
+const twemojiDir = resolve(backendRootDir, 'node_modules/@discordapp/twemoji/dist/svg');
+const frontendViteOut = resolve(rootDir, 'built/_frontend_vite_');
+// const frontendEmbedViteOut = resolve(rootDir, 'built/_frontend_embed_vite_');
 
 @Injectable()
 export class ClientServerService {

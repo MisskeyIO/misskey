@@ -19,6 +19,7 @@ import { ImageProcessingService } from '@/core/ImageProcessingService.js';
 import { InternalStorageService } from '@/core/InternalStorageService.js';
 import { IdService } from '@/core/IdService.js';
 import { LoggerService } from '@/core/LoggerService.js';
+import type { UtilityService } from '@/core/UtilityService.js';
 import { VideoProcessingService } from '@/core/VideoProcessingService.js';
 import { loadConfig, type Config } from '@/config.js';
 import { MiDriveFile } from '@/models/DriveFile.js';
@@ -151,7 +152,7 @@ describe('FileServerService', () => {
 			detectSensitive: async () => null,
 		} as unknown as AiService;
 		const fileInfoService = new FileInfoService(aiService, loggerService);
-		const httpRequestService = new HttpRequestService(config);
+		const httpRequestService = new HttpRequestService(config, {} as UtilityService);
 		const downloadService = new DownloadService(config, httpRequestService, loggerService);
 		const imageProcessingService = new ImageProcessingService();
 		const videoProcessingService = new VideoProcessingService(config, imageProcessingService);
@@ -527,7 +528,7 @@ describe('FileServerService', () => {
 			expect(res.headers['cache-control']).toBe('max-age=31536000, immutable');
 		});
 
-		test('GET /files/:key thumbnail は mediaProxy/static.webp にリダイレクトする', async () => {
+		test('GET /files/:key thumbnail は mediaProxy/static にリダイレクトする', async () => {
 			const accessKey = randomString();
 			const thumbnailKey = randomString();
 			await insertDriveFile({
@@ -546,11 +547,11 @@ describe('FileServerService', () => {
 
 			expect(res.statusCode).toBe(301);
 			expect(res.headers['cache-control']).toBe('max-age=31536000, immutable');
-			expect(res.headers.location).toContain(`${config.mediaProxy}/static.webp`);
+			expect(res.headers.location).toContain(`${config.mediaProxy}/static/`);
 			expect(res.headers.location).toContain('static=1');
 		});
 
-		test('GET /files/:key webpublic svg は mediaProxy/svg.webp にリダイレクトする', async () => {
+		test('GET /files/:key webpublic svg は mediaProxy/svg にリダイレクトする', async () => {
 			const accessKey = randomString();
 			const webpublicKey = randomString();
 			await insertDriveFile({
@@ -570,7 +571,7 @@ describe('FileServerService', () => {
 
 			expect(res.statusCode).toBe(301);
 			expect(res.headers['cache-control']).toBe('max-age=31536000, immutable');
-			expect(res.headers.location).toContain(`${config.mediaProxy}/svg.webp`);
+			expect(res.headers.location).toContain(`${config.mediaProxy}/svg/`);
 		});
 	});
 
@@ -594,10 +595,9 @@ describe('FileServerService', () => {
 				url: '/proxy/path-part?url=https%3A%2F%2Fexample.com%2Fimg.png&static=1',
 			});
 
-			expect(res.statusCode).toBe(301);
+			expect(res.statusCode).toBe(302);
 			expect(res.headers['cache-control']).toBe('public, max-age=259200');
-			expect(res.headers.location).toContain('https://media-proxy.test/');
-			expect(res.headers.location).toContain('url=https%3A%2F%2Fexample.com%2Fimg.png');
+			expect(res.headers.location).toContain('https://media-proxy.test/redirect/example.com%2Fimg.png');
 			expect(res.headers.location).toContain('static=1');
 			expect(res.headers['content-security-policy']).toBe('default-src \'none\'; img-src \'self\'; media-src \'self\'; style-src \'unsafe-inline\'');
 		});

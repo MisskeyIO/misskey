@@ -27,7 +27,7 @@ export class MiApp {
 	})
 	public userId: MiUser['id'] | null;
 
-	@ManyToOne(type => MiUser, {
+	@ManyToOne(() => MiUser, {
 		onDelete: 'SET NULL',
 		nullable: true,
 	})

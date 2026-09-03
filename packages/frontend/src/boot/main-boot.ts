@@ -30,6 +30,7 @@ import { updateCurrentAccountPartial } from '@/accounts.js';
 import { signout } from '@/signout.js';
 import { migrateOldSettings } from '@/pref-migrate.js';
 import { unisonReload } from '@/utility/unison-reload.js';
+import { isBirthday } from '@/utility/is-birthday.js';
 
 export async function mainBoot() {
 	const { isClientUpdated, lastVersion } = await common(async () => {
@@ -138,12 +139,8 @@ export async function mainBoot() {
 		const m = now.getMonth() + 1;
 		const d = now.getDate();
 
-		if ($i.birthday) {
-			const bm = parseInt($i.birthday.split('-')[1]);
-			const bd = parseInt($i.birthday.split('-')[2]);
-			if (m === bm && d === bd) {
-				claimAchievement('loggedInOnBirthday');
-			}
+		if (isBirthday($i, now)) {
+			claimAchievement('loggedInOnBirthday');
 		}
 
 		if (m === 1 && d === 1) {

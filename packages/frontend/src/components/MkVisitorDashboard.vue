@@ -110,7 +110,7 @@ function signup() {
 	}, {}, 'closed');
 }
 
-function showMenu(ev: MouseEvent) {
+function showMenu(ev: PointerEvent) {
 	openInstanceMenu(ev);
 }
 </script>

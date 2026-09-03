@@ -44,6 +44,7 @@ import * as Misskey from 'misskey-js';
 import { notePage } from '@/filters/note.js';
 import { i18n } from '@/i18n.js';
 import { prefer } from '@/preferences.js';
+import { shouldHideFileByDefault, canRevealFile } from '@/utility/sensitive-file.js';
 import bytes from '@/filters/bytes.js';
 import { requestSensitiveContentConsent, sensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 import { pleaseLogin } from '@/utility/please-login.js';

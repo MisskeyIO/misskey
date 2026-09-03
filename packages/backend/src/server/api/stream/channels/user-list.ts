@@ -3,21 +3,23 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DI } from '@/di-symbols.js';
-import { bindThis } from '@/decorators.js';
+import { Inject, Injectable, Scope } from '@nestjs/common';
 import type { MiUserListMembership, UserListMembershipsRepository, UserListsRepository } from '@/models/_.js';
 import type { Packed } from '@/misc/json-schema.js';
 import { RoleService } from '@/core/RoleService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { DI } from '@/di-symbols.js';
+import { bindThis } from '@/decorators.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import type { JsonObject } from '@/misc/json-value.js';
-import Channel, { type MiChannelService } from '../channel.js';
+import Channel, { type ChannelRequest } from '../channel.js';
+import { REQUEST } from '@nestjs/core';
 
-class UserListChannel extends Channel {
+@Injectable({ scope: Scope.TRANSIENT })
+export class UserListChannel extends Channel {
 	public readonly chName = 'userList';
-	public static readonly shouldShare = false;
-	public static readonly requireCredential = false as const;
+	public static shouldShare = false;
+	public static requireCredential = false as const;
 	private listId: string;
 	private membershipsMap: Record<string, Pick<MiUserListMembership, 'withReplies'> | undefined> = {};
 	private listUsersClock: NodeJS.Timeout;
@@ -26,15 +28,19 @@ class UserListChannel extends Channel {
 	private minimize: boolean;
 
 	constructor(
+		@Inject(DI.userListsRepository)
 		private userListsRepository: UserListsRepository,
+
+		@Inject(DI.userListMembershipsRepository)
 		private userListMembershipsRepository: UserListMembershipsRepository,
+
+		@Inject(REQUEST)
+		request: ChannelRequest,
+
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
-
-		id: string,
-		connection: Channel['connection'],
 	) {
-		super(id, connection, null);
+		super(request);
 		//this.updateListUsers = this.updateListUsers.bind(this);
 		//this.onNote = this.onNote.bind(this);
 	}
@@ -156,36 +162,5 @@ class UserListChannel extends Channel {
 		this.subscriber.off('notesStream', this.onNote);
 
 		clearInterval(this.listUsersClock);
-	}
-}
-
-@Injectable()
-export class UserListChannelService implements MiChannelService<false> {
-	public readonly shouldShare = UserListChannel.shouldShare;
-	public readonly requireCredential = UserListChannel.requireCredential;
-	public readonly kind = UserListChannel.kind;
-
-	constructor(
-		@Inject(DI.userListsRepository)
-		private userListsRepository: UserListsRepository,
-
-		@Inject(DI.userListMembershipsRepository)
-		private userListMembershipsRepository: UserListMembershipsRepository,
-
-		private roleService: RoleService,
-		private noteEntityService: NoteEntityService,
-	) {
-	}
-
-	@bindThis
-	public create(id: string, connection: Channel['connection'], dimension?: number | null): UserListChannel {
-		return new UserListChannel(
-			this.userListsRepository,
-			this.userListMembershipsRepository,
-			this.roleService,
-			this.noteEntityService,
-			id,
-			connection,
-		);
 	}
 }

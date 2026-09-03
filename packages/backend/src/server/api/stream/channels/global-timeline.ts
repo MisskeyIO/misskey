@@ -3,34 +3,35 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import { bindThis } from '@/decorators.js';
+import { Inject, Injectable, Scope } from '@nestjs/common';
 import type { Packed } from '@/misc/json-schema.js';
 import { MetaService } from '@/core/MetaService.js';
-import { RoleService } from '@/core/RoleService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { bindThis } from '@/decorators.js';
+import { RoleService } from '@/core/RoleService.js';
 import { isRenotePacked, isQuotePacked } from '@/misc/is-renote.js';
 import type { JsonObject } from '@/misc/json-value.js';
-import Channel, { type MiChannelService } from '../channel.js';
+import Channel, { type ChannelRequest } from '../channel.js';
+import { REQUEST } from '@nestjs/core';
 
-class GlobalTimelineChannel extends Channel {
+@Injectable({ scope: Scope.TRANSIENT })
+export class GlobalTimelineChannel extends Channel {
 	public readonly chName = 'globalTimeline';
-	public static readonly shouldShare = false;
-	public static readonly requireCredential = false as const;
+	public static shouldShare = false;
+	public static requireCredential = false as const;
 	private withRenotes: boolean;
 	private withFiles: boolean;
 	private minimize: boolean;
 
 	constructor(
+		@Inject(REQUEST)
+		request: ChannelRequest,
+
 		private metaService: MetaService,
 		private roleService: RoleService,
 		private noteEntityService: NoteEntityService,
-
-		id: string,
-		connection: Channel['connection'],
-		dimension?: number | null,
 	) {
-		super(id, connection, dimension);
+		super(request);
 		//this.onNote = this.onNote.bind(this);
 	}
 
@@ -116,31 +117,5 @@ class GlobalTimelineChannel extends Channel {
 	public dispose() {
 		// Unsubscribe events
 		this.subscriber.off('notesStream', this.onNote);
-	}
-}
-
-@Injectable()
-export class GlobalTimelineChannelService implements MiChannelService<false> {
-	public readonly shouldShare = GlobalTimelineChannel.shouldShare;
-	public readonly requireCredential = GlobalTimelineChannel.requireCredential;
-	public readonly kind = GlobalTimelineChannel.kind;
-
-	constructor(
-		private metaService: MetaService,
-		private roleService: RoleService,
-		private noteEntityService: NoteEntityService,
-	) {
-	}
-
-	@bindThis
-	public create(id: string, connection: Channel['connection'], dimension?: number | null): GlobalTimelineChannel {
-		return new GlobalTimelineChannel(
-			this.metaService,
-			this.roleService,
-			this.noteEntityService,
-			id,
-			connection,
-			dimension,
-		);
 	}
 }

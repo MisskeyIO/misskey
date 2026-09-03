@@ -73,7 +73,7 @@ export class UserSuspendService {
 		});
 
 		(async () => {
-			await this.postUnsuspend(user).catch(e => {});
+			await this.postUnsuspend(user).catch(_ => {});
 		})();
 	}
 

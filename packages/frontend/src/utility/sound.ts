@@ -122,7 +122,7 @@ export async function loadAudio(url: string, options?: { useCache?: boolean; }) 
 
 	try {
 		response = await window.fetch(url);
-	} catch (err) {
+	} catch (_) {
 		return;
 	}
 

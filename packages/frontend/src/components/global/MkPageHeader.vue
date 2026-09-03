@@ -6,10 +6,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <div v-if="show" ref="el" :class="[$style.root]">
 	<div :class="[$style.upper, { [$style.slim]: narrow, [$style.thin]: thin_ }]">
-		<div v-if="!thin_ && narrow && props.displayMyAvatar && $i" class="_button" :class="$style.buttonsLeft" @click="openAccountMenu">
+		<div v-if="!thin_ && narrow && props.displayMyAvatar && $i" class="_button" @click="openAccountMenu">
 			<MkAvatar :class="$style.avatar" :user="$i"/>
 		</div>
-		<div v-else-if="!thin_ && narrow && !hideTitle" :class="[$style.buttons, $style.buttonsLeft]"></div>
+		<div v-else-if="!thin_ && narrow && !hideTitle" :class="$style.buttons"></div>
 
 		<template v-if="pageMetadata">
 			<div v-if="!hideTitle" :class="$style.titleContainer" @click="top">
@@ -64,7 +64,6 @@ export type PageHeaderProps = {
 import { onMounted, onUnmounted, ref, inject, useTemplateRef, computed } from 'vue';
 import { scrollToTop } from '@@/js/scroll.js';
 import XTabs from './MkPageHeader.tabs.vue';
-import { globalEvents } from '@/events.js';
 import { getAccountMenu } from '@/accounts.js';
 import { $i } from '@/i.js';
 import { DI } from '@/di.js';
@@ -75,7 +74,7 @@ const props = withDefaults(defineProps<PageHeaderProps>(), {
 });
 
 const emit = defineEmits<{
-	(ev: 'update:tab', key: string);
+	(ev: 'update:tab', key: string): void;
 }>();
 
 //const viewId = inject(DI.viewId);
@@ -108,7 +107,7 @@ const top = () => {
 	}
 };
 
-async function openAccountMenu(ev: MouseEvent) {
+async function openAccountMenu(ev: PointerEvent) {
 	const menuItems = await getAccountMenu({
 		withExtraOperation: true,
 	});

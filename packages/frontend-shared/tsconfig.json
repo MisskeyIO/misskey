@@ -19,7 +19,6 @@
 		"noImplicitReturns": true,
 		"esModuleInterop": true,
 		"verbatimModuleSyntax": true,
-		"baseUrl": ".",
 		"paths": {
 			"@/*": ["./*"],
 			"@@/*": ["./*"]

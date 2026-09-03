@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/MisskeyIO/misskey.git"
   },
-  "packageManager": "pnpm@10.28.2+sha512.41872f037ad22f7348e3b1debbaf7e867cfd448f2726d9cf74c08f19507c31d2c8e7a11525b983febc2df640b5438dee6023ebb1f84ed43cc2d654d2bc326264",
+  "packageManager": "pnpm@10.29.3",
   "workspaces": [
     "packages/i18n",
     "packages/icons-subsetter",
@@ -23,7 +23,7 @@
   "private": true,
   "scripts": {
     "compile-config": "cd packages/backend && pnpm compile-config",
-    "build-pre": "node ./scripts/build-pre.js",
+    "build-pre": "node scripts/build-pre.mjs",
     "build-assets": "node ./scripts/build-assets.mjs",
     "build": "pnpm build-pre && pnpm -r build && pnpm build-assets",
     "build-storybook": "pnpm --filter frontend build-storybook",
@@ -40,7 +40,7 @@
     "migrateandstart:docker": "pnpm migrate && pnpm start:docker",
     "watch": "pnpm dev",
     "dev": "node scripts/dev.mjs",
-    "lint": "pnpm -r lint",
+    "lint": "pnpm --no-bail -r lint",
     "cy:open": "pnpm cypress open --config-file=cypress.config.ts",
     "cy:run": "pnpm cypress run",
     "e2e": "pnpm start-server-and-test start:test http://localhost:61812 cy:run",
@@ -49,8 +49,8 @@
     "jest-and-coverage": "cd packages/backend && pnpm jest-and-coverage",
     "test": "pnpm -r test",
     "test-and-coverage": "pnpm -r test-and-coverage",
-    "clean": "node ./scripts/clean.js",
-    "clean-all": "node ./scripts/clean-all.js",
+    "clean": "node scripts/clean.mjs",
+    "clean-all": "node scripts/clean-all.mjs",
     "cleanall": "pnpm clean-all",
     "enforce-catalog": "node ./scripts/enforce-catalog.mjs"
   },
@@ -69,8 +69,7 @@
     "ignore-walk": "catalog:",
     "js-yaml": "catalog:",
     "postcss": "catalog:",
-    "terser": "catalog:",
-    "typescript": "catalog:"
+    "terser": "catalog:"
   },
   "devDependencies": {
     "@eslint/js": "catalog:",
@@ -79,13 +78,15 @@
     "@types/node": "catalog:",
     "@typescript-eslint/eslint-plugin": "catalog:",
     "@typescript-eslint/parser": "catalog:",
+    "@typescript/native-preview": "catalog:",
     "cross-env": "catalog:",
     "cypress": "catalog:",
     "eslint": "catalog:",
     "globals": "catalog:",
     "ncp": "catalog:",
     "pnpm": "catalog:",
-    "start-server-and-test": "catalog:"
+    "start-server-and-test": "catalog:",
+    "typescript": "catalog:"
   },
   "optionalDependencies": {
     "@tensorflow/tfjs-core": "catalog:"

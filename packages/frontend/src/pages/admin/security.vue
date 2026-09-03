@@ -25,11 +25,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<div class="_gaps_m">
 							<div><SearchText>{{ i18n.ts._sensitiveMediaDetection.description }}</SearchText></div>
 
-							<MkRadios v-model="sensitiveMediaDetectionForm.state.sensitiveMediaDetection">
-								<option value="none">{{ i18n.ts.none }}</option>
-								<option value="all">{{ i18n.ts.all }}</option>
-								<option value="local">{{ i18n.ts.localOnly }}</option>
-								<option value="remote">{{ i18n.ts.remoteOnly }}</option>
+							<MkRadios
+								v-model="sensitiveMediaDetectionForm.state.sensitiveMediaDetection"
+								:options="[
+									{ value: 'none', label: i18n.ts.none },
+									{ value: 'all', label: i18n.ts.all },
+									{ value: 'local', label: i18n.ts.localOnly },
+									{ value: 'remote', label: i18n.ts.remoteOnly },
+								]"
+							>
 							</MkRadios>
 
 							<SearchMarker :keywords="['sensitivity']">
@@ -210,20 +214,26 @@ SPDX-License-Identifier: AGPL-3.0-only
 									<MkInput v-model="service.name">
 										<template #label>Name</template>
 									</MkInput>
-									<MkRadios v-model="service.type" :disabled="!!service.createdAt">
-										<option value="jwt">JWT</option>
-										<option value="saml">SAML</option>
-									</MkRadios>
+									<MkRadios
+										v-model="service.type"
+										:options="[
+											{ value: 'jwt', label: 'JWT', disabled: !!service.createdAt },
+											{ value: 'saml', label: 'SAML', disabled: !!service.createdAt },
+										]"
+									/>
 									<MkInput v-model="service.issuer">
 										<template #label>Issuer</template>
 									</MkInput>
 									<MkTextarea v-model="service.audience">
 										<template #label>Audience</template>
 									</MkTextarea>
-									<MkRadios v-model="service.binding">
-										<option value="post">POST</option>
-										<option value="redirect">Redirect</option>
-									</MkRadios>
+									<MkRadios
+										v-model="service.binding"
+										:options="[
+											{ value: 'post', label: 'POST' },
+											{ value: 'redirect', label: 'Redirect' },
+										]"
+									/>
 									<MkInput v-model="service.acsUrl">
 										<template #label>Assertion Consumer Service URL</template>
 									</MkInput>

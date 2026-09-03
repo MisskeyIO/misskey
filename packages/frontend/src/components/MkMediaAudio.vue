@@ -95,6 +95,7 @@ import { pleaseLogin } from '@/utility/please-login.js';
 import { sensitiveContentConsent, requestSensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 import { $i, iAmModerator } from '@/i.js';
 import { prefer } from '@/preferences.js';
+import { canRevealFile, shouldHideFileByDefault } from '@/utility/sensitive-file.js';
 
 const MkAudioVisualizer = defineAsyncComponent(() => import('@/components/MkAudioVisualizer.vue'));
 const props = defineProps<{

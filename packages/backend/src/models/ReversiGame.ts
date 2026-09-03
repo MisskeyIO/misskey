@@ -34,7 +34,7 @@ export class MiReversiGame {
 	@Column(id())
 	public user1Id: MiUser['id'];
 
-	@ManyToOne(type => MiUser, {
+	@ManyToOne(() => MiUser, {
 		onDelete: 'CASCADE',
 	})
 	@JoinColumn()
@@ -43,7 +43,7 @@ export class MiReversiGame {
 	@Column(id())
 	public user2Id: MiUser['id'];
 
-	@ManyToOne(type => MiUser, {
+	@ManyToOne(() => MiUser, {
 		onDelete: 'CASCADE',
 	})
 	@JoinColumn()

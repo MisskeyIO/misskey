@@ -58,7 +58,7 @@ function back() {
 	history.back();
 }
 */
-function onContextmenu(ev: MouseEvent) {
+function onContextmenu(ev: PointerEvent) {
 	if (!ev.target) return;
 
 	if (isLink(ev.target as HTMLElement)) return;

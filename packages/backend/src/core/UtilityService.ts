@@ -5,7 +5,6 @@
 
 import { URL, domainToASCII } from 'node:url';
 import { isIP } from 'node:net';
-import punycode from 'punycode.js';
 import psl from 'psl';
 import RE2 from 're2';
 import semver from 'semver';
@@ -123,7 +122,7 @@ export class UtilityService {
 
 	@bindThis
 	public normalizeHost(host: string): string {
-		return punycode.toASCII(host.toLowerCase());
+		return domainToASCII(host.toLowerCase());
 	}
 
 	@bindThis

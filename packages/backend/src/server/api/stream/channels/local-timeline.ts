@@ -54,7 +54,7 @@ class LocalTimelineChannel extends Channel {
 
 	@bindThis
 	private async onNote(sourceNote: Packed<'Note'>) {
-		let note = sourceNote;
+		const note = sourceNote;
 		if (note.user.host !== null) return;
 		if (note.visibility !== 'public') return;
 		if (note.channelId != null) return;

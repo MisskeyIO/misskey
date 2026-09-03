@@ -46,7 +46,7 @@ class RoleTimelineChannel extends Channel {
 	@bindThis
 	private async onEvent(data: GlobalEvents['roleTimeline']['payload']) {
 		if (data.type === 'note') {
-			let note = data.body;
+			const note = data.body;
 
 			if (!(await this.roleService.isExplorable({ id: this.roleId }))) {
 				return;

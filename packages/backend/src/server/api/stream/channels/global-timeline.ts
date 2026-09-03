@@ -52,7 +52,7 @@ class GlobalTimelineChannel extends Channel {
 
 	@bindThis
 	private async onNote(sourceNote: Packed<'Note'>) {
-		let note = sourceNote;
+		const note = sourceNote;
 		if (note.visibility !== 'public') return;
 		if (note.channelId != null) return;
 		if (note.user.requireSigninToViewContents && this.user == null) return;

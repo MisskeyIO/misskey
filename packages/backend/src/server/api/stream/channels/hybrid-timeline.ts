@@ -55,7 +55,7 @@ class HybridTimelineChannel extends Channel {
 
 	@bindThis
 	private async onNote(sourceNote: Packed<'Note'>) {
-		let note = sourceNote;
+		const note = sourceNote;
 		const isMe = this.user!.id === note.userId;
 
 		// チャンネルの投稿ではなく、自分自身の投稿 または

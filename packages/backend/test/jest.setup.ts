@@ -6,6 +6,7 @@
 import { initTestDb, sendEnvResetRequest } from './utils.js';
 
 beforeAll(async () => {
-	await initTestDb(false);
+	// 前のアプリを停止してからschemaを作り直す。
 	await sendEnvResetRequest();
+	await initTestDb(false);
 });

@@ -79,7 +79,7 @@ export class ServerService implements OnApplicationShutdown {
 	@bindThis
 	public async launch(): Promise<void> {
 		const fastify = Fastify({
-			trustProxy: this.config.trustProxy ?? true,
+			trustProxy: this.config.trustProxy,
 			logger: false,
 			routerOptions: {
 				maxParamLength: 1024,

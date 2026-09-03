@@ -19,9 +19,8 @@
     }
   },
   "scripts": {
-    "build": "pnpm run build:tsc",
-    "build:tsc": "tsc --outDir built --declaration true --declarationMap true",
-    "watch": "nodemon -w src -e ts,js,cjs,mjs,json --exec \"pnpm run build\"",
+    "build": "node ./build.js",
+    "watch": "nodemon -w package.json -e json --exec \"node ./build.js --watch\"",
     "tsd": "tsd",
     "api": "pnpm api-extractor run --local --verbose",
     "api-prod": "pnpm api-extractor run --verbose",
@@ -46,7 +45,7 @@
     "@vitest/coverage-v8": "catalog:",
     "esbuild": "catalog:",
     "eslint": "catalog:",
-    "glob": "catalog:",
+    "execa": "catalog:",
     "ncp": "catalog:",
     "nodemon": "catalog:",
     "tsd": "catalog:",
@@ -59,8 +58,6 @@
   ],
   "dependencies": {
     "@simplewebauthn/browser": "catalog:",
-    "@swc/cli": "catalog:",
-    "@swc/core": "catalog:",
     "eventemitter3": "catalog:"
   }
 }

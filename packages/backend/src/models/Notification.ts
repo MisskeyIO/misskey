@@ -105,11 +105,6 @@ export type MiNotification = {
 	createdAt: string;
 	draftId: MiScheduledNote['id'];
 } | {
-	type: 'scheduledNotePosted';
-	id: string;
-	createdAt: string;
-	noteId: MiNote['id'];
-} | {
 	type: 'scheduledNoteError';
 	id: string;
 	createdAt: string;

@@ -27,7 +27,6 @@ import type { MiNote } from '@/models/Note.js';
  * chatRoomInvitationReceived - チャットルームに招待された
  * achievementEarned - 実績を獲得
  * noteScheduled - 予約投稿が予約された
- * scheduledNotePosted - 予約投稿が投稿された
  * scheduledNoteError - 予約投稿がエラーになった
  * sensitiveFlagAssigned - センシティブフラグが付与された
  * exportCompleted - エクスポートが完了
@@ -55,7 +54,6 @@ export const notificationTypes = [
 	'exportCompleted',
 	'login',
 	'noteScheduled',
-	'scheduledNotePosted',
 	'scheduledNoteError',
 	'sensitiveFlagAssigned',
 	'createToken',

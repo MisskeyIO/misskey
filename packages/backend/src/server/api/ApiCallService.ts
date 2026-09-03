@@ -8,7 +8,6 @@ import * as fs from 'node:fs';
 import * as stream from 'node:stream/promises';
 import { Transform } from 'node:stream';
 import { Inject, Injectable } from '@nestjs/common';
-import * as Sentry from '@sentry/node';
 import { DI } from '@/di-symbols.js';
 import { getIpHash } from '@/misc/get-ip-hash.js';
 import type { MiLocalUser, MiUser } from '@/models/User.js';
@@ -57,6 +56,7 @@ export class ApiCallService implements OnApplicationShutdown {
 	private logger: Logger;
 	private userIpHistories: Map<MiUser['id'], Set<string>>;
 	private userIpHistoriesClearIntervalId: NodeJS.Timeout;
+	private Sentry: typeof import('@sentry/node') | null = null;
 
 	constructor(
 		@Inject(DI.config)
@@ -75,6 +75,12 @@ export class ApiCallService implements OnApplicationShutdown {
 		this.userIpHistoriesClearIntervalId = setInterval(() => {
 			this.userIpHistories.clear();
 		}, 1000 * 60 * 60);
+
+		if (this.config.sentryForBackend) {
+			import('@sentry/node').then((Sentry) => {
+				this.Sentry = Sentry;
+			});
+		}
 	}
 
 	#sendApiError(reply: FastifyReply, err: ApiError): void {
@@ -168,8 +174,8 @@ export class ApiCallService implements OnApplicationShutdown {
 				},
 			});
 
-			if (this.config.sentryForBackend) {
-				Sentry.captureMessage(`Internal error occurred in ${ep.name}: ${err.message}`, {
+			if (this.Sentry != null) {
+				this.Sentry.captureMessage(`Internal error occurred in ${ep.name}: ${err.message}`, {
 					level: 'error',
 					user: {
 						id: userId,
@@ -424,17 +430,19 @@ export class ApiCallService implements OnApplicationShutdown {
 		if (ep.meta.secure && !isSecure) {
 			throw new ApiError(accessDenied);
 		}
-
 		const bypassRateLimit = this.config.bypassRateLimit?.some(({
 			header,
 			value,
 		}) => request.headers[header] === value) ?? false;
 		if (ep.meta.limit && !bypassRateLimit) {
-			// koa will automatically load the `X-Forwarded-For` header if `proxy: true` is configured in the app.
-			let limitActor: string;
+			let limitActor: string | null = null;
 			if (user) {
 				limitActor = user.id;
-			} else {
+			} else if (this.config.enableIpRateLimit) {
+				if (process.env.NODE_ENV === 'production' && (request.ip === '::1' || request.ip === '127.0.0.1')) {
+					this.logger.warn('Recieved API request from localhost IP address for rate limiting in production environment. This is likely due to an improper trustProxy setting in the config file.');
+				}
+
 				limitActor = getIpHash(request.ip);
 			}
 
@@ -447,7 +455,7 @@ export class ApiCallService implements OnApplicationShutdown {
 			// TODO: 毎リクエスト計算するのもあれだしキャッシュしたい
 			const factor = user ? (await this.roleService.getUserPolicies(user.id)).rateLimitFactor : 1;
 
-			if (factor > 0) {
+			if (limitActor != null && factor > 0) {
 				// Rate limit
 				const rateLimit = await this.rateLimiterService.limit(limit as IEndpointMeta['limit'] & { key: NonNullable<string> }, limitActor, factor);
 				if (rateLimit != null) {
@@ -570,8 +578,8 @@ export class ApiCallService implements OnApplicationShutdown {
 		}
 
 		// API invoking
-		if (this.config.sentryForBackend) {
-			return await Sentry.startSpan({
+		if (this.Sentry != null) {
+			return await this.Sentry.startSpan({
 				name: 'API: ' + ep.name,
 			}, () => ep.exec(data, user, token, attachmentFile, request.ip, request.headers)
 				.catch((err: Error) => this.#onExecError(ep, data, err, user?.id))

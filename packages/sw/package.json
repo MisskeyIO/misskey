@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "esbuild": "catalog:",
+    "i18n": "workspace:*",
     "idb-keyval": "catalog:",
     "misskey-js": "workspace:*"
   },

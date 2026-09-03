@@ -52,6 +52,7 @@
     "execa": "catalog:",
     "exifreader": "catalog:",
     "frontend-shared": "workspace:*",
+    "i18n": "workspace:*",
     "idb-keyval": "catalog:",
     "insert-text-at-cursor": "catalog:",
     "ios-haptics": "catalog:",

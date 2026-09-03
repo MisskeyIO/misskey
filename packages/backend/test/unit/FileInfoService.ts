@@ -44,7 +44,6 @@ describe('FileInfoService', () => {
 				GlobalModule,
 			],
 			providers: [
-				LoggerService,
 				AiService,
 				LoggerService,
 				FileInfoService,

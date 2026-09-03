@@ -50,9 +50,6 @@ export class ApInboxService {
 		@Inject(DI.config)
 		private config: Config,
 
-		@Inject(DI.meta)
-		private meta: MiMeta,
-
 		@Inject(DI.redisForTimelines)
 		private redisForTimelines: Redis.Redis,
 

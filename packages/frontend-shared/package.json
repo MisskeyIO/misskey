@@ -35,6 +35,7 @@
   ],
   "dependencies": {
     "@tabler/icons-webfont": "catalog:",
+    "i18n": "workspace:*",
     "misskey-js": "workspace:*",
     "vue": "catalog:"
   }

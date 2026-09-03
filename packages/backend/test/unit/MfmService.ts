@@ -16,37 +16,32 @@ describe('MfmService', () => {
 	describe('toHtml', () => {
 		test('br', () => {
 			const input = 'foo\nbar\nbaz';
-			const output = '<p><span>foo<br>bar<br>baz</span></p>';
+			const output = 'foo<br />bar<br />baz';
 			assert.equal(mfmService.toHtml(mfm.parse(input)), output);
 		});
 
 		test('br alt', () => {
 			const input = 'foo\r\nbar\rbaz';
-			const output = '<p><span>foo<br>bar<br>baz</span></p>';
+			const output = 'foo<br />bar<br />baz';
 			assert.equal(mfmService.toHtml(mfm.parse(input)), output);
 		});
 
 		test('Do not generate unnecessary span', () => {
 			const input = 'foo $[tada bar]';
-			const output = '<p>foo <i>bar</i></p>';
+			const output = 'foo <i>bar</i>';
 			assert.equal(mfmService.toHtml(mfm.parse(input)), output);
 		});
 
 		test('escape', () => {
 			const input = '```\n<p>Hello, world!</p>\n```';
-			const output = '<p><pre><code>&lt;p&gt;Hello, world!&lt;/p&gt;</code></pre></p>';
+			const output = '<pre><code>&lt;p&gt;Hello, world!&lt;/p&gt;</code></pre>';
 			assert.equal(mfmService.toHtml(mfm.parse(input)), output);
 		});
 
-		test('additionalAppenders', () => {
+		test('extraHtml', () => {
 			const input = 'foo';
-			const output = '<p>foo<span class="x">bar</span></p>';
-			assert.equal(mfmService.toHtml(mfm.parse(input), [], [(doc, body) => {
-				const span = doc.createElement('span');
-				span.className = 'x';
-				span.textContent = 'bar';
-				body.appendChild(span);
-			}]), output);
+			const output = 'foo<span class="x">bar</span>';
+			assert.equal(mfmService.toHtml(mfm.parse(input), [], '<span class="x">bar</span>'), output);
 		});
 	});
 

@@ -18,6 +18,7 @@ describe('Admin security settings', () => {
 		});
 
 		cy.login('admin', 'pass');
+		cy.get('[data-cy-signin]', { timeout: 30000 }).should('not.exist');
 		cy.visit('/admin/security');
 	});
 

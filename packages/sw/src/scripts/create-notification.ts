@@ -334,7 +334,7 @@ export async function createEmptyNotification(): Promise<void> {
 				{
 					action: 'markAllAsRead',
 					title: i18n.ts.markAllAsRead,
-			},
+				},
 				{
 					action: 'settings',
 					title: i18n.ts.notificationSettings,

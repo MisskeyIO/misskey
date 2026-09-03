@@ -164,8 +164,8 @@ describe('Webリソース', () => {
 		}));
 
 		describe(' has entry such ', () => {
-			beforeEach(() => {
-				post(alice, { text: '**a**' });
+			beforeEach(async () => {
+				await post(alice, { text: '**a**' });
 			});
 
 			test('MFMを含まない。', async () => {

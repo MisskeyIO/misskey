@@ -194,6 +194,11 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			.then(x => x.map(x => x.id));
 		if (mutedChannelIds.length > 0) {
 			query.andWhere(new Brackets(qb => {
+				qb
+					.where('note.channelId IS NULL')
+					.orWhere('note.channelId NOT IN (:...mutedChannelIds)', { mutedChannelIds });
+			}))
+			.andWhere(new Brackets(qb => {
 				qb.orWhere('note.renoteChannelId IS NULL')
 					.orWhere('note.renoteChannelId NOT IN (:...mutedChannelIds)', { mutedChannelIds });
 			}));

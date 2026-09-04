@@ -15,7 +15,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<span class="state">
 						<span v-if="suspended" class="suspended">Suspended</span>
 						<span v-if="silenced" class="silenced">Silenced</span>
+						<span v-if="limited" class="limited">Limited</span>
 						<span v-if="moderator" class="moderator">Moderator</span>
+						<span v-if="deleted" class="deleted">Deleted</span>
 					</span>
 				</div>
 			</div>
@@ -55,42 +57,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label>{{ i18n.ts.moderationNote }}</template>
 				<template #caption>{{ i18n.ts.moderationNoteDescription }}</template>
 			</MkTextarea>
-
-			<!--
-				<FormSection>
-					<template #label>ActivityPub</template>
-
-					<div class="_gaps_m">
-						<div style="display: flex; flex-direction: column; gap: 1em;">
-							<MkKeyValue v-if="user.host" oneline>
-								<template #key>{{ i18n.ts.instanceInfo }}</template>
-								<template #value><MkA :to="`/instance-info/${user.host}`" class="_link">{{ user.host }} <i class="ti ti-chevron-right"></i></MkA></template>
-							</MkKeyValue>
-							<MkKeyValue v-else oneline>
-								<template #key>{{ i18n.ts.instanceInfo }}</template>
-								<template #value>(Local user)</template>
-							</MkKeyValue>
-							<MkKeyValue oneline>
-								<template #key>{{ i18n.ts.updatedAt }}</template>
-								<template #value><MkTime v-if="user.lastFetchedAt" mode="detail" :time="user.lastFetchedAt"/><span v-else>N/A</span></template>
-							</MkKeyValue>
-							<MkKeyValue v-if="ap" oneline>
-								<template #key>Type</template>
-								<template #value><span class="_monospace">{{ ap.type }}</span></template>
-							</MkKeyValue>
-						</div>
-
-						<MkButton v-if="user.host != null" @click="updateRemoteUser"><i class="ti ti-refresh"></i> {{ i18n.ts.updateRemoteUser }}</MkButton>
-
-						<MkFolder>
-							<template #label>Raw</template>
-
-							<MkObjectView v-if="ap" tall :value="ap">
-							</MkObjectView>
-						</MkFolder>
-					</div>
-				</FormSection>
-			-->
 
 			<FormSection v-if="!isSystem">
 				<div class="_gaps">
@@ -229,6 +195,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 				<div v-if="expandedRoleIds.includes(role.id)" :class="$style.roleItemSub">
 					<div>Assigned: <MkTime :time="info.roleAssigns.find(a => a.roleId === role.id)!.createdAt" mode="detail"/></div>
+					<div v-if="info.roleAssigns.find(a => a.roleId === role.id)!.memo">Memo: {{ info.roleAssigns.find(a => a.roleId === role.id)!.memo }}</div>
 					<div v-if="info.roleAssigns.find(a => a.roleId === role.id)!.expiresAt">Period: {{ new Date(info.roleAssigns.find(a => a.roleId === role.id)!.expiresAt!).toLocaleString() }}</div>
 					<div v-else>Period: {{ i18n.ts.indefinitely }}</div>
 				</div>
@@ -253,7 +220,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<i v-else-if="announcement.icon === 'success'" class="ti ti-check" style="color: var(--MI_THEME-success);"></i>
 							</span>
 							<span>{{ announcement.title }}</span>
-							<span v-if="announcement.reads > 0" style="margin-left: auto; opacity: 0.7;">{{ i18n.ts.messageRead }}</span>
+							<span v-if="announcement.reads > 0" style="margin-left: auto; opacity: 0.7;">{{ i18n.ts.messageRead }} <span v-if="announcement.lastReadAt">(<MkTime :time="announcement.lastReadAt" mode="absolute"/>)</span></span>
 						</div>
 					</div>
 				</template>
@@ -278,6 +245,34 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkChart class="chart" :src="chartSrc" span="day" :limit="90" :args="{ user, withoutAll: true }" :detailed="true"></MkChart>
 				</div>
 			</div>
+		</div>
+
+		<div v-else-if="tab === 'activitypub'" class="_gaps_m">
+			<div style="display: flex; flex-direction: column; gap: 1em;">
+				<MkKeyValue v-if="user.host" oneline>
+					<template #key>{{ i18n.ts.instanceInfo }}</template>
+					<template #value><MkA :to="`/instance-info/${user.host}`" class="_link">{{ user.host }} <i class="ti ti-chevron-right"></i></MkA></template>
+				</MkKeyValue>
+				<MkKeyValue v-else oneline>
+					<template #key>{{ i18n.ts.instanceInfo }}</template>
+					<template #value>(Local user)</template>
+				</MkKeyValue>
+				<MkKeyValue oneline>
+					<template #key>{{ i18n.ts.updatedAt }}</template>
+					<template #value><MkTime v-if="user.lastFetchedAt" mode="detail" :time="user.lastFetchedAt"/><span v-else>N/A</span></template>
+				</MkKeyValue>
+				<MkKeyValue v-if="ap" oneline>
+					<template #key>Type</template>
+					<template #value><span class="_monospace">{{ ap.type }}</span></template>
+				</MkKeyValue>
+			</div>
+
+			<MkButton v-if="user.host != null" @click="updateRemoteUser"><i class="ti ti-refresh"></i> {{ i18n.ts.updateRemoteUser }}</MkButton>
+
+			<MkFolder>
+				<template #label>Raw</template>
+				<MkObjectView v-if="ap" tall :value="ap"/>
+			</MkFolder>
 		</div>
 
 		<div v-else-if="tab === 'raw'" class="_gaps_m">
@@ -347,7 +342,9 @@ const ips = ref(result.ips);
 const ap = ref<Misskey.entities.ApGetResponse | null>(null);
 const moderator = ref(info.value.isModerator);
 const silenced = ref(info.value.isSilenced);
+const limited = ref(info.value.isLimited);
 const suspended = ref(info.value.isSuspended);
+const deleted = ref(info.value.isDeleted);
 const isSystem = ref(user.value.host == null && user.value.username.includes('.'));
 const moderationNote = ref(info.value.moderationNote);
 const filesPaginator = markRaw(new Paginator('admin/drive/files', {
@@ -523,7 +520,9 @@ async function refreshUser() {
 	ips.value = result.ips;
 	moderator.value = info.value.isModerator;
 	silenced.value = info.value.isSilenced;
+	limited.value = info.value.isLimited;
 	suspended.value = info.value.isSuspended;
+	deleted.value = info.value.isDeleted;
 	isSystem.value = user.value.host == null && user.value.username.includes('.');
 	moderationNote.value = info.value.moderationNote;
 	resetInlinePoliciesFromInfo(info.value.inlinePolicies);
@@ -768,7 +767,7 @@ watch(user, () => {
 	}).then(res => {
 		ap.value = res;
 	});
-});
+}, { immediate: true });
 
 const headerActions = computed(() => []);
 
@@ -893,17 +892,7 @@ definePage(() => ({
 				border-color: var(--MI_THEME-success);
 			}
 
-			> .silenced {
-				color: var(--MI_THEME-warn);
-				border-color: var(--MI_THEME-warn);
-			}
-
 			> .limited {
-				color: var(--MI_THEME-error);
-				border-color: var(--MI_THEME-error);
-			}
-
-			> .suspended {
 				color: var(--MI_THEME-error);
 				border-color: var(--MI_THEME-error);
 			}

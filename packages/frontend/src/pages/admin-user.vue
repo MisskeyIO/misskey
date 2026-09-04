@@ -110,6 +110,68 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</div>
 					</MkFolder>
 
+					<MkFolder v-if="iAmAdmin">
+						<template #icon><i class="ti ti-adjustments"></i></template>
+						<template #label>{{ i18n.ts.inlinePolicies }}</template>
+						<div class="_gaps">
+							<MkInfo>{{ i18n.ts.inlinePoliciesDescription }}</MkInfo>
+
+							<div v-for="(policy, index) in inlinePoliciesForm" :key="policy.id ?? index" :class="$style.inlinePolicyRow">
+								<MkSelect
+									:modelValue="policy.policy"
+									:items="inlinePolicyOptionsDef"
+									:class="$style.inlinePolicyField"
+									@update:modelValue="value => onChangeInlinePolicy(index, value)"
+								/>
+
+								<MkSelect
+									:modelValue="policy.operation"
+									:items="inlinePolicyOperationDef"
+									:class="$style.inlinePolicyField"
+									:disabled="policyValueType(policy.policy) !== 'number'"
+									@update:modelValue="value => policy.operation = value"
+								/>
+
+								<div :class="$style.inlinePolicyValue">
+									<MkSwitch
+										v-if="policyValueType(policy.policy) === 'boolean'"
+										:modelValue="policy.value === true"
+										@update:modelValue="value => policy.value = value"
+									>
+										{{ i18n.ts.value }}
+									</MkSwitch>
+									<MkInput
+										v-else-if="policyValueType(policy.policy) === 'number'"
+										:modelValue="typeof policy.value === 'number' ? policy.value : 0"
+										type="number"
+										@update:modelValue="value => policy.value = value"
+									/>
+									<MkSelect
+										v-else-if="policy.policy === 'chatAvailability'"
+										:modelValue="chatAvailabilityValue(policy.value)"
+										:items="chatAvailabilityDef"
+										@update:modelValue="value => policy.value = value"
+									/>
+									<MkInput
+										v-else
+										:modelValue="typeof policy.value === 'string' ? policy.value : ''"
+										@update:modelValue="value => policy.value = value"
+									/>
+								</div>
+
+								<MkInput v-model="policy.memo" :placeholder="i18n.ts.memo" :class="$style.inlinePolicyMemo"/>
+								<MkButton inline danger @click="removeInlinePolicy(index)"><i class="ti ti-trash"></i></MkButton>
+							</div>
+
+							<MkButton inline @click="addInlinePolicy"><i class="ti ti-plus"></i> {{ i18n.ts.inlinePolicyAdd }}</MkButton>
+
+							<div class="_buttons">
+								<MkButton primary :disabled="!inlinePoliciesDirty" @click="saveInlinePolicies"><i class="ti ti-device-floppy"></i> {{ i18n.ts.save }}</MkButton>
+								<MkButton :disabled="!inlinePoliciesDirty" @click="resetInlinePolicies"><i class="ti ti-restore"></i> {{ i18n.ts.reset }}</MkButton>
+							</div>
+						</div>
+					</MkFolder>
+
 					<MkFolder>
 						<template #icon><i class="ti ti-password"></i></template>
 						<template #label>IP</template>
@@ -220,6 +282,7 @@ import MkButton from '@/components/MkButton.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import MkKeyValue from '@/components/MkKeyValue.vue';
 import MkSelect from '@/components/MkSelect.vue';
+import MkInput from '@/components/MkInput.vue';
 import MkFileListForAdmin from '@/components/MkFileListForAdmin.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import * as os from '@/os.js';
@@ -291,6 +354,39 @@ const announcementsPaginator = markRaw(new Paginator('admin/announcements/list',
 }));
 const expandedRoleIds = ref<(typeof info.value.roles[number]['id'])[]>([]);
 
+type InlinePolicy = Misskey.entities.AdminRolesUpdateInlinePoliciesRequest['policies'][number];
+type InlinePolicyName = InlinePolicy['policy'];
+type InlinePolicyOperation = NonNullable<InlinePolicy['operation']>;
+type InlinePolicyValue = Exclude<InlinePolicy['value'], undefined>;
+type InlinePolicyForm = {
+	id?: string | null;
+	policy: InlinePolicyName;
+	operation: InlinePolicyOperation;
+	value: InlinePolicyValue;
+	memo: string | null;
+};
+
+const inlinePoliciesForm = ref<InlinePolicyForm[]>([]);
+const inlinePoliciesInitial = ref<InlinePolicyForm[]>([]);
+const inlinePolicyNames = computed(() => Object.keys(info.value.policies)
+	.filter(policy => policy !== 'uploadableFileTypes') as InlinePolicyName[]);
+const inlinePolicyOptionsDef = computed(() => inlinePolicyNames.value.map(policy => ({
+	label: policy,
+	value: policy,
+})));
+const inlinePolicyOperationDef = [{
+	label: i18n.ts.inlinePolicyOperationSet,
+	value: 'set',
+}, {
+	label: i18n.ts.inlinePolicyOperationIncrement,
+	value: 'increment',
+}] satisfies { label: string; value: InlinePolicyOperation }[];
+const chatAvailabilityOptions = ['available', 'readonly', 'unavailable'] as const;
+const chatAvailabilityDef = chatAvailabilityOptions.map(value => ({ label: value, value }));
+const inlinePoliciesDirty = computed(() => JSON.stringify(inlinePoliciesForm.value) !== JSON.stringify(inlinePoliciesInitial.value));
+
+resetInlinePoliciesFromInfo(info.value.inlinePolicies);
+
 function _fetch_() {
 	return Promise.all([misskeyApi('users/show', {
 		userId: props.userId,
@@ -303,6 +399,92 @@ function _fetch_() {
 		info: _info,
 		ips: _ips,
 	}));
+}
+
+function isInlinePolicyName(policy: string): policy is InlinePolicyName {
+	return inlinePolicyNames.value.includes(policy as InlinePolicyName);
+}
+
+function normalizeInlinePolicies(policies: typeof info.value.inlinePolicies): InlinePolicyForm[] {
+	return policies.flatMap(policy => {
+		if (!isInlinePolicyName(policy.policy)) return [];
+
+		return [{
+			id: policy.id,
+			policy: policy.policy,
+			operation: policy.operation === 'increment' ? 'increment' : 'set',
+			value: normalizedInlineValue(policy.policy, policy.value),
+			memo: policy.memo,
+		}];
+	});
+}
+
+function resetInlinePoliciesFromInfo(policies: typeof info.value.inlinePolicies) {
+	inlinePoliciesForm.value = normalizeInlinePolicies(policies);
+	inlinePoliciesInitial.value = structuredClone(inlinePoliciesForm.value);
+}
+
+function policyValueType(policy: InlinePolicyName): 'boolean' | 'number' | 'string' {
+	return typeof info.value.policies[policy] as 'boolean' | 'number' | 'string';
+}
+
+function chatAvailabilityValue(value: unknown): typeof chatAvailabilityOptions[number] {
+	return typeof value === 'string' && chatAvailabilityOptions.includes(value as typeof chatAvailabilityOptions[number])
+		? value as typeof chatAvailabilityOptions[number]
+		: chatAvailabilityOptions[0];
+}
+
+function normalizedInlineValue(policy: InlinePolicyName, value: unknown): InlinePolicyValue {
+	const type = policyValueType(policy);
+
+	if (type === 'boolean') return typeof value === 'boolean' ? value : false;
+	if (type === 'number') return typeof value === 'number' && Number.isFinite(value) ? value : 0;
+	if (policy === 'chatAvailability') return chatAvailabilityValue(value);
+	return typeof value === 'string' ? value : '';
+}
+
+function onChangeInlinePolicy(index: number, policy: InlinePolicyName) {
+	const row = inlinePoliciesForm.value.at(index);
+	if (row == null) return;
+
+	row.policy = policy;
+	row.operation = policyValueType(policy) === 'number' ? row.operation : 'set';
+	row.value = normalizedInlineValue(policy, row.value);
+}
+
+function addInlinePolicy() {
+	const policy = inlinePolicyNames.value.at(0);
+	if (policy == null) return;
+
+	inlinePoliciesForm.value.push({
+		policy,
+		operation: 'set',
+		value: normalizedInlineValue(policy, undefined),
+		memo: null,
+	});
+}
+
+function removeInlinePolicy(index: number) {
+	inlinePoliciesForm.value.splice(index, 1);
+}
+
+function resetInlinePolicies() {
+	inlinePoliciesForm.value = structuredClone(inlinePoliciesInitial.value);
+}
+
+async function saveInlinePolicies() {
+	const policies: InlinePolicy[] = inlinePoliciesForm.value.map(policy => ({
+		policy: policy.policy,
+		operation: policyValueType(policy.policy) === 'number' ? policy.operation : 'set',
+		value: normalizedInlineValue(policy.policy, policy.value),
+		memo: policy.memo,
+	}));
+
+	await os.apiWithDialog('admin/roles/update-inline-policies', {
+		userId: user.value.id,
+		policies,
+	});
+	await refreshUser();
 }
 
 watch(moderationNote, async () => {
@@ -320,6 +502,7 @@ async function refreshUser() {
 	suspended.value = info.value.isSuspended;
 	isSystem.value = user.value.host == null && user.value.username.includes('.');
 	moderationNote.value = info.value.moderationNote;
+	resetInlinePoliciesFromInfo(info.value.inlinePolicies);
 }
 
 async function updateRemoteUser() {

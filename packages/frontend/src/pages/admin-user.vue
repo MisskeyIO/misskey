@@ -96,8 +96,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div class="_gaps">
 					<MkSwitch v-model="suspended" @update:modelValue="toggleSuspend">{{ i18n.ts.suspend }}</MkSwitch>
 
-					<div>
-						<MkButton v-if="user.host == null" inline style="margin-right: 8px;" @click="resetPassword"><i class="ti ti-key"></i> {{ i18n.ts.resetPassword }}</MkButton>
+					<div v-if="user.host == null" class="_buttons">
+						<MkButton @click="resetPassword"><i class="ti ti-key"></i> {{ i18n.ts.resetPassword }}</MkButton>
+						<MkButton danger @click="regenerateLoginToken"><i class="ti ti-refresh"></i> {{ i18n.ts.regenerateLoginToken }}</MkButton>
 					</div>
 
 					<MkFolder>
@@ -185,11 +186,33 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</template>
 					</MkFolder>
 
-					<div>
-						<MkButton v-if="iAmModerator" inline danger style="margin-right: 8px;" @click="unsetUserAvatar"><i class="ti ti-user-circle"></i> {{ i18n.ts.unsetUserAvatar }}</MkButton>
-						<MkButton v-if="iAmModerator" inline danger @click="unsetUserBanner"><i class="ti ti-photo"></i> {{ i18n.ts.unsetUserBanner }}</MkButton>
+					<div v-if="iAmModerator" class="_buttons">
+						<MkButton danger @click="updateUserName"><i class="ti ti-user-edit"></i> {{ i18n.ts.changeUserName }}</MkButton>
+						<MkButton danger @click="unsetUserAvatar"><i class="ti ti-user-circle"></i> {{ i18n.ts.unsetUserAvatar }}</MkButton>
+						<MkButton danger @click="unsetUserBanner"><i class="ti ti-photo"></i> {{ i18n.ts.unsetUserBanner }}</MkButton>
 					</div>
-					<MkButton v-if="$i.isAdmin" inline danger @click="deleteAccount">{{ i18n.ts.deleteAccount }}</MkButton>
+
+					<MkFolder v-if="iAmModerator && user.mutualLinkSections.some(section => section.mutualLinks.length > 0)">
+						<template #icon><i class="ti ti-link"></i></template>
+						<template #label>{{ i18n.ts._profile.mutualLinksEdit }}</template>
+						<div v-for="(mutualLinkSection, sectionIndex) in user.mutualLinkSections" :key="sectionIndex">
+							<div v-for="mutualLink in mutualLinkSection.mutualLinks" :key="mutualLink.id" :class="$style.fields">
+								<p>{{ mutualLink.url }}</p>
+								<img :class="$style.mutualLinkImg" :src="mutualLink.imgSrc" :alt="mutualLink.description ?? ''"/>
+								<p>{{ mutualLink.description }}</p>
+								<MkButton inline danger @click="unsetUserMutualLink(mutualLink.id)"><i class="ti ti-link"></i> {{ i18n.ts.unsetUserMutualLink }}</MkButton>
+							</div>
+						</div>
+					</MkFolder>
+
+					<MkFolder v-if="iAmAdmin">
+						<template #icon><i class="ti ti-user-x"></i></template>
+						<template #label>{{ i18n.ts.deleteAccount }}</template>
+						<div class="_buttons">
+							<MkButton danger @click="deleteAccount(true)"><i class="ti ti-user-x"></i> {{ i18n.ts.deleteAccount }}</MkButton>
+							<MkButton danger @click="deleteAccount(false)"><i class="ti ti-file-shredder"></i> {{ i18n.ts.deleteAccount }} ({{ i18n.ts.all }})</MkButton>
+						</div>
+					</MkFolder>
 				</div>
 			</FormSection>
 		</div>
@@ -238,6 +261,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 
 		<div v-else-if="tab === 'drive'" class="_gaps">
+			<MkButton v-if="iAmModerator" inline danger @click="deleteAllFiles"><i class="ti ti-trash"></i> {{ i18n.ts.deleteAllFiles }}</MkButton>
 			<MkFileListForAdmin :paginator="filesPaginator" viewMode="grid"/>
 		</div>
 
@@ -541,7 +565,7 @@ async function regenerateLoginToken() {
 	}).then(refreshUser);
 }
 
-async function toggleSuspend(v) {
+async function toggleSuspend(v: boolean) {
 	const confirm = await os.confirm({
 		type: 'warning',
 		text: v ? i18n.ts.suspendConfirm : i18n.ts.unsuspendConfirm,

@@ -3,19 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { fileURLToPath } from 'node:url';
-import { dirname } from 'node:path';
 import { readFile } from 'node:fs/promises';
-import { Injectable } from '@nestjs/common';
-import type { NSFWJS, PredictionType } from 'nsfwjs';
+import { pathToFileURL } from 'node:url';
+import { resolve } from 'node:path';
+import { Injectable, Inject } from '@nestjs/common';
 import { Mutex } from 'async-mutex';
 import fetch from 'node-fetch';
+import { DI } from '@/di-symbols.js';
 import { bindThis } from '@/decorators.js';
 import type Logger from '@/logger.js';
 import { LoggerService } from '@/core/LoggerService.js';
-
-const _filename = fileURLToPath(import.meta.url);
-const _dirname = dirname(_filename);
+import type { Config } from '@/config.js';
+import type { NSFWJS, PredictionType } from 'nsfwjs/core';
 
 const REQUIRED_CPU_FLAGS_X64 = ['avx2', 'fma'];
 let isSupportedCpu: undefined | boolean = undefined;
@@ -23,12 +22,17 @@ let isSupportedCpu: undefined | boolean = undefined;
 @Injectable()
 export class AiService {
 	private logger: Logger;
+	private readonly modelDir: string;
 	private model: NSFWJS;
 	private modelLoadMutex: Mutex = new Mutex();
 
 	constructor(
+		@Inject(DI.config)
+		private config: Config,
 		private loggerService: LoggerService,
 	) {
+		const md = resolve(this.config.rootDir, 'packages/backend/nsfw-model');
+		this.modelDir = md.endsWith('/') ? md : md + '/';
 		this.logger = this.loggerService.getLogger('ai');
 	}
 
@@ -48,10 +52,10 @@ export class AiService {
 			tf.env().global.fetch = fetch;
 
 			if (this.model == null) {
-				const nsfw = await import('nsfwjs');
+				const nsfw = await import('nsfwjs/core');
 				await this.modelLoadMutex.runExclusive(async () => {
 					if (this.model == null) {
-						this.model = await nsfw.load(`file://${_dirname}/../../nsfw-model/`, { size: 299 });
+						this.model = await nsfw.load(pathToFileURL(this.modelDir).toString(), { size: 299 });
 					}
 				});
 			}

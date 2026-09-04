@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { describe, expect, test } from '@jest/globals';
+import { describe, expect, test } from 'vitest';
 import type { Config } from '@/config.js';
 import type { CommonData } from '@/server/web/views/_.js';
 import { SsoPage } from '@/server/web/views/sso.js';

@@ -1,0 +1,159 @@
+diff --git a/built/index.d.ts b/built/index.d.ts
+index 3171e26cece6a7288f1b56328f8d73553a95bf7c..442083192970318ccfa97663fc7b6575409f051e 100644
+--- a/built/index.d.ts
++++ b/built/index.d.ts
+@@ -70,6 +70,7 @@ type GeneralScrapingOptions = {
+   lang?: string | null;
+   userAgent?: string;
+   followRedirects?: boolean;
++  maxRedirects?: number;
+   responseTimeout?: number;
+   operationTimeout?: number;
+   contentLengthLimit?: number;
+@@ -94,6 +95,7 @@ type SummalyOptions = {
+    * Whether follow redirects
+    */
+   followRedirects?: boolean;
++  maxRedirects?: number;
+   /**
+    * Custom Plugins
+    */
+diff --git a/built/index.js b/built/index.js
+index d5e75d963a68cbc5fdc078d9ed6c244f95b1abdf..6f6d7bc3d4bf804a3d8864f82c4571a60f34702c 100644
+--- a/built/index.js
++++ b/built/index.js
+@@ -5,7 +5,6 @@ import * as cheerio from "cheerio";
+ import escapeRegExp from "escape-regexp";
+ import ipaddr from "ipaddr.js";
+ import * as iconv from "iconv-lite";
+-import { detect } from "chardet";
+ //#region \0rolldown/runtime.js
+ var __defProp = Object.defineProperty;
+ var __exportAll = (all, no_symbols) => {
+@@ -70,13 +69,13 @@ const regCharset = /* @__PURE__ */ new RegExp(/charset\s*=\s*["']?([\w-]+)/, "i"
+ * @param body Body in Buffer
+ * @returns encoding
+ */
+-function detectEncoding(body) {
+-	const detected = detect(body);
+-	if (detected) {
+-		const encoding = toEncoding(detected);
++function detectEncoding(body, contentType) {
++	const matchContentType = contentType?.match(regCharset);
++	if (matchContentType) {
++		const encoding = toEncoding(matchContentType[1]);
+ 		if (encoding != null) return encoding;
+ 	}
+-	const matchMeta = body.toString().match(regCharset);
++	const matchMeta = Buffer.from(body).toString("ascii").match(regCharset);
+ 	if (matchMeta) {
+ 		const candicate = matchMeta[1];
+ 		const encoding = toEncoding(candicate);
+@@ -104,7 +103,7 @@ let agent = {};
+ function setAgent(_agent) {
+ 	agent = _agent || {};
+ }
+-const DEFAULT_BOT_UA = `SummalyBot/5.3.0`;
++const DEFAULT_BOT_UA = `Mozilla/5.0 (compatible; SummalyBot/5.3.0)`;
+ function getGotOptions(url, opts) {
+ 	return {
+ 		url,
+@@ -115,6 +114,7 @@ function getGotOptions(url, opts) {
+ 		},
+ 		typeFilter: /^(text\/html|application\/xhtml\+xml)/,
+ 		followRedirects: opts?.followRedirects,
++		maxRedirects: opts?.maxRedirects,
+ 		responseTimeout: opts?.responseTimeout,
+ 		operationTimeout: opts?.operationTimeout,
+ 		contentLengthLimit: opts?.contentLengthLimit,
+@@ -126,7 +126,7 @@ async function scpaping(url, opts) {
+ 		...getGotOptions(url, opts),
+ 		method: "GET"
+ 	});
+-	const encoding = detectEncoding(response.rawBody);
++	const encoding = detectEncoding(response.rawBody, response.headers["content-type"]);
+ 	const body = toUtf8(response.rawBody, encoding);
+ 	return {
+ 		body,
+@@ -151,6 +151,7 @@ async function head(url) {
+ async function getResponse(args) {
+ 	const timeout = args.responseTimeout ?? 2e4;
+ 	const operationTimeout = args.operationTimeout ?? 6e4;
++	const maxRedirects = args.followRedirects === false ? 0 : args.maxRedirects ?? 3;
+ 	const abort = new AbortController();
+ 	const res = await receiveResponse({
+ 		req: got(args.url, {
+@@ -166,7 +167,8 @@ async function getResponse(args) {
+ 				send: timeout,
+ 				request: operationTimeout
+ 			},
+-			followRedirect: args.followRedirects,
++			followRedirect: maxRedirects > 0,
++			maxRedirects,
+ 			agent,
+ 			http2: false,
+ 			retry: { limit: 0 },
+@@ -185,6 +187,7 @@ async function getResponse(args) {
+ 		if (ip.kind() === "ipv6" && ip.isIPv4MappedAddress()) ip = ip.toIPv4Address();
+ 		if (ip.range() !== "unicast") throw new StatusError(`Private IP rejected ${res.ip}`, 400, "Private IP Rejected");
+ 	}
++	if (res.statusCode < 200 || res.statusCode >= 300) throw new StatusError(`${res.statusCode} ${res.statusMessage ?? "Unknown"}`, res.statusCode, res.statusMessage);
+ 	const contentType = res.headers["content-type"];
+ 	if (args.typeFilter && !contentType?.match(args.typeFilter)) throw new Error(`Rejected by type filter ${contentType}`);
+ 	const contentLength = res.headers["content-length"];
+@@ -277,6 +280,7 @@ async function general(_url, opts) {
+ 		lang: lang || void 0,
+ 		userAgent: opts?.userAgent,
+ 		followRedirects: opts?.followRedirects,
++		maxRedirects: opts?.maxRedirects,
+ 		responseTimeout: opts?.responseTimeout,
+ 		operationTimeout: opts?.operationTimeout,
+ 		contentLengthLimit: opts?.contentLengthLimit,
+@@ -460,6 +464,7 @@ const plugins = [
+ const summalyDefaultOptions = {
+ 	lang: null,
+ 	followRedirects: true,
++	maxRedirects: 3,
+ 	plugins: []
+ };
+ /**
+@@ -467,10 +472,11 @@ const summalyDefaultOptions = {
+ */
+ const summaly = async (url, options) => {
+ 	if (options?.agent) setAgent(options.agent);
+-	const opts = Object.assign(summalyDefaultOptions, options);
++	const opts = { ...summalyDefaultOptions, ...options };
++	if (opts.followRedirects === false) opts.maxRedirects = 0;
+ 	const plugins$1 = plugins.concat(opts.plugins || []);
+ 	let actualUrl = url;
+-	if (opts.followRedirects) try {
++	if (opts.maxRedirects > 0) try {
+ 		const timeout = opts.responseTimeout ?? 2e4;
+ 		const operationTimeout = opts.operationTimeout ?? 6e4;
+ 		actualUrl = await got.head(url, {
+@@ -490,11 +496,17 @@ const summaly = async (url, options) => {
+ 			},
+ 			agent,
+ 			http2: false,
++			followRedirect: true,
++			maxRedirects: opts.maxRedirects,
+ 			retry: { limit: 0 }
+ 		}).then((res) => res.url);
+ 	} catch {
+ 		actualUrl = url;
+ 	}
++	if (actualUrl !== url) {
++		opts.followRedirects = false;
++		opts.maxRedirects = 0;
++	}
+ 	const _url = new URL(actualUrl);
+ 	const match = plugins$1.filter((plugin) => plugin.test(_url))[0];
+ 	const scrapingOptions = {
+@@ -502,6 +514,7 @@ const summaly = async (url, options) => {
+ 		userAgent: opts.userAgent,
+ 		responseTimeout: opts.responseTimeout,
+ 		followRedirects: opts.followRedirects,
++		maxRedirects: opts.maxRedirects,
+ 		operationTimeout: opts.operationTimeout,
+ 		contentLengthLimit: opts.contentLengthLimit,
+ 		contentLengthRequired: opts.contentLengthRequired

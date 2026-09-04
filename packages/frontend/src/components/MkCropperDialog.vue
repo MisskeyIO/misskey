@@ -34,6 +34,7 @@ import * as Misskey from 'misskey-js';
 import Cropper from 'cropperjs';
 import tinycolor from 'tinycolor2';
 import MkModalWindow from '@/components/MkModalWindow.vue';
+import { themeManager } from '@/theme.js';
 import { i18n } from '@/i18n.js';
 
 const props = defineProps<{
@@ -104,10 +105,10 @@ onMounted(() => {
 	cropper = new Cropper(imgEl.value, {
 	});
 
-	const computedStyle = getComputedStyle(window.document.documentElement);
+	const themeValue = themeManager.currentCompiledTheme!;
 
 	const selection = cropper.getCropperSelection()!;
-	selection.themeColor = tinycolor(computedStyle.getPropertyValue('--MI_THEME-accent')).toHexString();
+	selection.themeColor = tinycolor(themeValue.accent).toHexString();
 	if (props.aspectRatio != null) selection.aspectRatio = props.aspectRatio;
 	selection.initialAspectRatio = props.aspectRatio ?? 1;
 	selection.outlined = true;

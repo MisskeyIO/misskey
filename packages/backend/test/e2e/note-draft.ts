@@ -7,6 +7,7 @@ process.env.NODE_ENV = 'test';
 
 import * as assert from 'node:assert';
 import { setTimeout } from 'node:timers/promises';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import type { INestApplicationContext } from '@nestjs/common';
 import type * as misskey from 'misskey-js';
 import { api, castAsError, sendEnvUpdateRequest, signup, startJobQueue } from '../utils.js';

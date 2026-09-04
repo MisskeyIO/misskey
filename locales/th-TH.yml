@@ -1336,7 +1336,7 @@ markAsSensitiveConfirm: "ต้องการตั้งค่าสื่อ�
 unmarkAsSensitiveConfirm: "ต้องการยกเลิกการระบุว่าสื่อนี้มีเนื้อหาละเอียดอ่อนหรือไม่?"
 preferences: "การตั้งค่าสภาพแวดล้อม"
 accessibility: "การช่วยการเข้าถึง"
-preferencesProfile: "โปรไฟล์การกำหนดค่า"
+preferencesProfile: "โปรไฟล์ของการตั้งค่า"
 copyPreferenceId: "คัดลือก ID การตั้งค่า"
 resetToDefaultValue: "คืนค่าเป็นค่าเริ่มต้น"
 overrideByAccount: "เขียนทับด้วยบัญชี"
@@ -1346,10 +1346,10 @@ skip: "ข้าม"
 restore: "กู้คืน"
 syncBetweenDevices: "ซิงค์ระหว่างอุปกรณ์"
 preferenceSyncConflictTitle: "การตั้งค่ามีอยู่บนเซิร์ฟเวอร์"
-preferenceSyncConflictText: "การตั้งค่าที่เปิดใช้งานการซิงค์จะบันทึกค่าลงในเซิร์ฟเวอร์ อย่างไรก็ดี พบว่ามีค่าการตั้งค่านี้ที่เคยบันทึกไว้ในเซิร์ฟเวอร์แล้ว ต้องการดำเนินการอย่างไร?"
+preferenceSyncConflictText: "รายการตั้งค่าที่เปิดการซิงก์จะถูกบันทึกลงเซิร์ฟเวอร์ แต่รายการตั้งค่านี้ได้ถูกบันทึกลงเซิร์ฟเวอร์ไว้อยู่แล้ว ต้องการดำเนินการอย่างไร?"
 preferenceSyncConflictChoiceMerge: "รวมเข้าด้วยกัน"
-preferenceSyncConflictChoiceServer: "เขียนทับด้วยค่าการตั้งค่าเซิร์ฟเวอร์"
-preferenceSyncConflictChoiceDevice: "เขียนทับด้วยค่าการตั้งค่าอุปกรณ์"
+preferenceSyncConflictChoiceServer: "เขียนทับด้วยค่าการตั้งค่าของเซิร์ฟเวอร์"
+preferenceSyncConflictChoiceDevice: "เขียนทับด้วยค่าการตั้งค่าของอุปกรณ์"
 preferenceSyncConflictChoiceCancel: "ยกเลิกการเปิดใช้งานการซิงค์"
 paste: "วาง"
 emojiPalette: "จานสีเอโมจิ"
@@ -1408,6 +1408,7 @@ frame: "เฟรม"
 presets: "พรีเซ็ต"
 zeroPadding: "ห่างเป็น 0"
 nothingToConfigure: "ไม่มีอะไรให้ต้ังค่า"
+viewRenotedChannel: "แสดงช่องที่ถูกรีโน้ต"
 _imageEditing:
   _vars:
     caption: "แคปชั่นของไฟล์"
@@ -2093,6 +2094,7 @@ _role:
     canSearchNotes: "การใช้การค้นหาโน้ต"
     canSearchUsers: "ค้นหาผู้ใช้"
     canUseTranslator: "การใช้งานแปล"
+    canCreateChannel: "สร้างช่องใหม่"
     avatarDecorationLimit: "จำนวนของตกแต่งไอคอนสูงสุดที่สามารถติดตั้งได้"
     canImportAntennas: "อนุญาตให้นำเข้าเสาอากาศ"
     canImportBlocking: "อนุญาตให้นำเข้าการบล็อก"
@@ -2132,7 +2134,7 @@ _sensitiveMediaDetection:
   sensitivityDescription: "เมื่อความไวต่ำ Misdetection (ผลบวกลวง) จะลดลง, เมื่อความไวสูง Missed detection (ผลลบลวง) จะลดลง"
   setSensitiveFlagAutomatically: "ทำเครื่องหมายว่ามีเนื้อหาละเอียดอ่อน"
   setSensitiveFlagAutomaticallyDescription: "ผลลัพธ์ของการตรวจจับภายในนั้นจะยังคงอยู่ ถึงแม้ว่าจะปิดตัวเลือกนี้"
-  analyzeVideos: "เปิดใช้งานวิเคราะห์ของวิดีโอ"
+  analyzeVideos: "เปิดใช้งานวิเคราะห์วิดีโอ"
   analyzeVideosDescription: "การวิเคราะห์วิดีโอนอกเหนือจากรูปภาพนั้น การทำสิ่งนี้จะทำให้เพิ่มภาระบนเซิร์ฟเวอร์เล็กน้อย"
 _emailUnavailable:
   used: "ที่อยู่อีเมลนี้ได้ถูกใช้ไปแล้ว"
@@ -2580,7 +2582,7 @@ _widgetOptions:
     period: "ระยะเวลา"
 _cw:
   hide: "ซ่อน"
-  show: "โหลดเพิ่มเติม"
+  show: "ดูเพิ่มเติม"
   chars: "{count} ตัวอักษร"
   files: "{count} ไฟล์"
 _poll:
@@ -3023,7 +3025,7 @@ _externalResourceInstaller:
       description: "เกิดปัญหาระหว่างการติดตั้งธีม กรุณาลองอีกครั้ง. รายละเอียดข้อผิดพลาดสามารถดูได้ในคอนโซล Javascript"
 _dataSaver:
   _media:
-    title: "โหลดสื่อ"
+    title: "ปิดใช้งานการโหลดสื่ออัตโนมัติ"
     description: "กันไม่ให้ภาพและวิดีโอโหลดโดยอัตโนมัติ แตะรูปภาพ/วิดีโอที่ซ่อนอยู่เพื่อโหลด"
   _avatar:
     title: "ปิดใช้งานภาพเคลื่อนไหวของไอคอนประจำตัว"
@@ -3105,7 +3107,7 @@ _urlPreviewSetting:
   summaryProxyDescription: "สร้างการแสดงตัวอย่างด้วย summary Proxy แทนที่จะใช้เนื้อหา Misskey"
   summaryProxyDescription2: "พารามิเตอร์ต่อไปนี้จะถูกใช้เป็นสตริงการสืบค้นเพื่อเชื่อมต่อกับพร็อกซี หากฝั่งพร็อกซีไม่รองรับการตั้งค่าเหล่านี้จะถูกละเว้น"
 _mediaControls:
-  pip: "รูปภาพในรูปภาม"
+  pip: "ภาพซ้อนภาพ (PiP)"
   playbackRate: "ความเร็วในการเล่น"
   loop: "เล่นวนซ้ำ"
 _contextMenu:
@@ -3395,6 +3397,8 @@ _imageEffector:
     threshold: "เทรชโฮลด์"
     centerX: "กลาง X"
     centerY: "กลาง Y"
+    density: "ความหนาทึบ"
+    zoomLinesOutlineThickness: "ความหนาของเงาเส้น"
     zoomLinesMaskSize: "ขนาดพื้นที่ตรงกลาง"
     circle: "ทรงกลม"
 drafts: "ร่าง"

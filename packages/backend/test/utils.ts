@@ -16,9 +16,9 @@ import { DataSource } from 'typeorm';
 import { type Response } from 'node-fetch';
 import Fastify from 'fastify';
 import request from 'supertest';
-import type * as misskey from 'misskey-js';
 import { entities } from '@/postgres.js';
 import { loadConfig } from '@/config.js';
+import type * as misskey from 'misskey-js';
 import { DEFAULT_POLICIES } from '@/core/RoleService.js';
 import { validateContentTypeSetAsActivityPub } from '@/core/activitypub/misc/validator.js';
 import { ApiError } from '@/server/api/error.js';
@@ -211,7 +211,7 @@ export const page = async (user: UserToken, page: Partial<misskey.entities.Page>
 			},
 		],
 		eyeCatchingImageId: null,
-		font: 'sans-serif' as FIXME,
+		font: 'sans-serif' as any,
 		hideTitleWhenPinned: false,
 		visibility: 'public',
 		name: '1678594845072',
@@ -275,7 +275,7 @@ export const role = async (user: UserToken, role: Partial<misskey.entities.Role>
 		condFormula: {
 			id: 'ebef1684-672d-49b6-ad82-1b3ec3784f85',
 			type: 'isRemote',
-		} as FIXME,
+		} as any,
 		description: '',
 		displayOrder: 0,
 		iconUrl: null,
@@ -310,23 +310,20 @@ type NamedBlob = Blob & { name: string };
 
 const hasBlobName = (blob?: Blob): blob is NamedBlob => {
 	if (blob == null) return false;
-	const candidate = blob as Blob & { name?: unknown };
-	return typeof candidate.name === 'string' && candidate.name.length > 0;
+	const name = (blob as Blob & { name?: unknown }).name;
+	return typeof name === 'string' && name.length > 0;
 };
 
 const buildHeadersFromResponse = (rawHeaders: Record<string, string | string[] | undefined>): Headers => {
-	const result = new Headers();
+	const headers = new Headers();
 	for (const [key, value] of Object.entries(rawHeaders)) {
-		if (value == null) continue;
 		if (Array.isArray(value)) {
-			for (const entry of value) {
-				result.append(key, entry);
-			}
-			continue;
+			for (const entry of value) headers.append(key, entry);
+		} else if (value != null) {
+			headers.append(key, value);
 		}
-		result.append(key, value);
 	}
-	return result;
+	return headers;
 };
 
 /**
@@ -343,37 +340,30 @@ export const uploadFile = async (user?: UserToken, { path, name, blob }: UploadO
 		: isAbsolute(path.toString())
 			? new URL(path)
 			: new URL(path, new URL('resources/', import.meta.url));
-	const uploadFilename = hasBlobName(blob) ? blob.name! : basename(absPath.toString());
-	const baseUrl = `http://127.0.0.1:${port}`;
 
-	const req = request(baseUrl)
+	const uploadFilename = hasBlobName(blob) ? blob.name : basename(absPath.toString());
+	const req = request(`http://127.0.0.1:${port}`)
 		.post('/api/drive/files/create')
 		.set('Accept', 'application/json');
 
 	if (user) req.set('Authorization', `Bearer ${user.token}`);
-
 	if (blob) {
-		const blobBuffer = Buffer.from(await blob.arrayBuffer());
-		req.attach('file', blobBuffer, {
+		req.attach('file', Buffer.from(await blob.arrayBuffer()), {
 			filename: uploadFilename,
 			contentType: blob.type || 'application/octet-stream',
 		});
 	} else {
 		req.attach('file', createReadStream(absPath), uploadFilename);
 	}
-
 	req.field('force', 'true');
 	if (name) req.field('name', name);
 
 	const res = await req;
-	const responseBody = res.status !== 204
-		? res.body as misskey.Endpoints['drive/files/create']['res']
-		: null;
-
+	const body = res.status !== 204 ? res.body as misskey.Endpoints['drive/files/create']['res'] : null;
 	return {
 		status: res.status,
 		headers: buildHeadersFromResponse(res.headers as Record<string, string | string[] | undefined>),
-		body: responseBody,
+		body,
 	};
 };
 
@@ -472,15 +462,17 @@ export function makeStreamCatcher<T>(
 	cond: (message: Record<string, any>) => boolean,
 	extractor: (message: Record<string, any>) => T,
 	timeout = 60 * 1000): Promise<T> {
-	let ws: WebSocket;
-	const p = new Promise<T>(async (resolve) => {
-		ws = await connectStream(user, channel, (msg) => {
+	let ws: WebSocket | undefined;
+	const p = new Promise<T>((resolve, reject) => {
+		void connectStream(user, channel, (msg) => {
 			if (cond(msg)) {
 				resolve(extractor(msg));
 			}
-		});
+		}).then(socket => {
+			ws = socket;
+		}, reject);
 	}).finally(() => {
-		ws.close();
+		ws?.close();
 	});
 
 	return timeoutPromise(p, timeout);
@@ -564,12 +556,12 @@ export async function testPaginationConsistency<Entity extends { id: string, cre
 		/*
 		// 1. sinceId/DateとuntilId/Dateで両端を指定して取得した結果が期待通りになっていること
 		if (ordering === 'desc') {
-			const end = expected[expected.length - 1];
+			const end = expected.at(-1)!;
 			let last = await fetchEntities(rangeToParam({ limit, since: end }));
 			const actual: Entity[] = [];
 			while (last.length !== 0) {
 				actual.push(...last);
-				last = await fetchEntities(rangeToParam({ limit, until: last[last.length - 1], since: end }));
+				last = await fetchEntities(rangeToParam({ limit, until: last.at(-1), since: end }));
 			}
 			actual.push(end);
 			assert.deepStrictEqual(
@@ -584,7 +576,7 @@ export async function testPaginationConsistency<Entity extends { id: string, cre
 			const actual: Entity[] = [];
 			while (last.length !== 0) {
 				actual.push(...last);
-				last = await fetchEntities(rangeToParam({ limit, since: last[last.length - 1] }));
+				last = await fetchEntities(rangeToParam({ limit, since: last.at(-1) }));
 			}
 			assert.deepStrictEqual(
 				actual.map(({ id, createdAt }) => id + ':' + createdAt),
@@ -598,7 +590,7 @@ export async function testPaginationConsistency<Entity extends { id: string, cre
 			const actual: Entity[] = [];
 			while (last.length !== 0) {
 				actual.push(...last);
-				last = await fetchEntities(rangeToParam({ limit, until: last[last.length - 1] }));
+				last = await fetchEntities(rangeToParam({ limit, until: last.at(-1) }));
 			}
 			assert.deepStrictEqual(
 				actual.map(({ id, createdAt }) => id + ':' + createdAt),
@@ -686,7 +678,7 @@ export async function captureWebhook<T = SystemWebhookPayload>(postAction: () =>
 	const fastify = Fastify();
 
 	let timeoutHandle: NodeJS.Timeout | null = null;
-	const result = await new Promise<string>(async (resolve, reject) => {
+	const result = await new Promise<string>((resolve, reject) => {
 		fastify.all('/', async (req, res) => {
 			if (timeoutHandle) {
 				clearTimeout(timeoutHandle);
@@ -698,19 +690,16 @@ export async function captureWebhook<T = SystemWebhookPayload>(postAction: () =>
 			resolve(body);
 		});
 
-		await fastify.listen({ port });
+		void fastify.listen({ port }).then(() => {
+			timeoutHandle = setTimeout(() => {
+				void fastify.close().then(() => reject(new Error('timeout')), reject);
+			}, 3000);
 
-		timeoutHandle = setTimeout(async () => {
+			return postAction();
+		}).catch(async (error) => {
 			await fastify.close();
-			reject(new Error('timeout'));
-		}, 3000);
-
-		try {
-			await postAction();
-		} catch (e) {
-			await fastify.close();
-			reject(e);
-		}
+			reject(error);
+		});
 	});
 
 	await fastify.close();

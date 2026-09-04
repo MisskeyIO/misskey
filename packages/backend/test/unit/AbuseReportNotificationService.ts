@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { afterAll, afterEach, beforeAll, beforeEach, describe, jest, test } from '@jest/globals';
+import { describe, expect, beforeAll, afterAll, beforeEach, afterEach, test, vi } from 'vitest';
+import type { Mocked } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { randomString } from '../utils.js';
 import { AbuseReportNotificationService } from '@/core/AbuseReportNotificationService.js';
@@ -43,10 +44,9 @@ describe('AbuseReportNotificationService', () => {
 	let systemWebhooksRepository: SystemWebhooksRepository;
 	let abuseReportNotificationRecipientRepository: AbuseReportNotificationRecipientRepository;
 	let idService: IdService;
-	let roleService: jest.Mocked<RoleService>;
-	let emailService: jest.Mocked<EmailService>;
-	let webhookService: jest.Mocked<SystemWebhookService>;
-	let queueService: jest.Mocked<QueueService>;
+	let roleService: Mocked<RoleService>;
+	let webhookService: Mocked<SystemWebhookService>;
+	let queueService: Mocked<QueueService>;
 
 	// --------------------------------------------------------------------------------------
 
@@ -109,10 +109,10 @@ describe('AbuseReportNotificationService', () => {
 					AbuseReportNotificationService,
 					IdService,
 					{
-						provide: RoleService, useFactory: () => ({ getModeratorIds: jest.fn() }),
+						provide: RoleService, useFactory: () => ({ getModeratorIds: vi.fn() }),
 					},
 					{
-						provide: SystemWebhookService, useFactory: () => ({ enqueueSystemWebhook: jest.fn() }),
+						provide: SystemWebhookService, useFactory: () => ({ enqueueSystemWebhook: vi.fn() }),
 					},
 					{
 						provide: UserEntityService, useFactory: () => ({
@@ -121,19 +121,19 @@ describe('AbuseReportNotificationService', () => {
 						}),
 					},
 					{
-						provide: EmailService, useFactory: () => ({ sendEmail: jest.fn() }),
+						provide: EmailService, useFactory: () => ({ sendEmail: vi.fn() }),
 					},
 					{
-						provide: MetaService, useFactory: () => ({ fetch: jest.fn() }),
+						provide: MetaService, useFactory: () => ({ fetch: vi.fn() }),
 					},
 					{
 						provide: ModerationLogService, useFactory: () => ({ log: () => Promise.resolve() }),
 					},
 					{
-						provide: GlobalEventService, useFactory: () => ({ publishAdminStream: jest.fn() }),
+						provide: GlobalEventService, useFactory: () => ({ publishAdminStream: vi.fn() }),
 					},
 					{
-						provide: QueueService, useFactory: () => ({ createSendEmailJob: jest.fn() }),
+						provide: QueueService, useFactory: () => ({ createSendEmailJob: vi.fn() }),
 					},
 				],
 			})
@@ -146,10 +146,9 @@ describe('AbuseReportNotificationService', () => {
 
 		service = app.get(AbuseReportNotificationService);
 		idService = app.get(IdService);
-		roleService = app.get(RoleService) as jest.Mocked<RoleService>;
-		emailService = app.get<EmailService>(EmailService) as jest.Mocked<EmailService>;
-		webhookService = app.get<SystemWebhookService>(SystemWebhookService) as jest.Mocked<SystemWebhookService>;
-		queueService = app.get<QueueService>(QueueService) as jest.Mocked<QueueService>;
+		roleService = app.get(RoleService) as Mocked<RoleService>;
+		webhookService = app.get<SystemWebhookService>(SystemWebhookService) as Mocked<SystemWebhookService>;
+		queueService = app.get<QueueService>(QueueService) as Mocked<QueueService>;
 
 		app.enableShutdownHooks();
 	});

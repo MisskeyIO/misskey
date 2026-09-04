@@ -237,6 +237,7 @@ export const rolePolicies = [
 	'canUseDriveFileInSoundSettings',
 	'canUseReaction',
 	'canHideAds',
+	'canCreateChannel',
 	'driveCapacityMb',
 	'maxFileSizeMb',
 	'alwaysMarkNsfw',

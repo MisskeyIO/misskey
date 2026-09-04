@@ -1,5 +1,5 @@
-import type { ModerationLogPayloads } from './consts.js';
-import type {
+import { ModerationLogPayloads } from './consts.js';
+import {
 	Announcement,
 	EmojiDetailed,
 	MeDetailed,
@@ -10,7 +10,12 @@ import type {
 	User,
 	UserDetailedNotMe,
 } from './autogen/models.js';
-import type { AuthenticationResponseJSON, PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/browser';
+import type {
+	AuthenticationResponseJSON,
+	RegistrationResponseJSON,
+	PublicKeyCredentialCreationOptionsJSON,
+	PublicKeyCredentialRequestOptionsJSON,
+} from '@simplewebauthn/browser';
 
 export * from './autogen/entities.js';
 export * from './autogen/models.js';
@@ -60,14 +65,8 @@ export type ModerationLog = {
 	type: 'unsuspend';
 	info: ModerationLogPayloads['unsuspend'];
 } | {
-	type: 'updateUserName';
-	info: ModerationLogPayloads['updateUserName'];
-} | {
 	type: 'updateUserNote';
 	info: ModerationLogPayloads['updateUserNote'];
-} | {
-	type: 'updateInlinePolicies';
-	info: ModerationLogPayloads['updateInlinePolicies'];
 } | {
 	type: 'addCustomEmoji';
 	info: ModerationLogPayloads['addCustomEmoji'];
@@ -126,9 +125,6 @@ export type ModerationLog = {
 	type: 'resetPassword';
 	info: ModerationLogPayloads['resetPassword'];
 } | {
-	type: 'regenerateUserToken';
-	info: ModerationLogPayloads['regenerateUserToken'];
-} | {
 	type: 'suspendRemoteInstance';
 	info: ModerationLogPayloads['suspendRemoteInstance'];
 } | {
@@ -156,24 +152,6 @@ export type ModerationLog = {
 	type: 'deleteAd';
 	info: ModerationLogPayloads['deleteAd'];
 } | {
-	type: 'createIndieAuthClient';
-	info: ModerationLogPayloads['createIndieAuthClient'];
-} | {
-	type: 'updateIndieAuthClient';
-	info: ModerationLogPayloads['updateIndieAuthClient'];
-} | {
-	type: 'deleteIndieAuthClient';
-	info: ModerationLogPayloads['deleteIndieAuthClient'];
-} | {
-	type: 'createSSOServiceProvider';
-	info: ModerationLogPayloads['createSSOServiceProvider'];
-} | {
-	type: 'updateSSOServiceProvider';
-	info: ModerationLogPayloads['updateSSOServiceProvider'];
-} | {
-	type: 'deleteSSOServiceProvider';
-	info: ModerationLogPayloads['deleteSSOServiceProvider'];
-} | {
 	type: 'createAvatarDecoration';
 	info: ModerationLogPayloads['createAvatarDecoration'];
 } | {
@@ -197,9 +175,6 @@ export type ModerationLog = {
 } | {
 	type: 'unsetUserBanner';
 	info: ModerationLogPayloads['unsetUserBanner'];
-} | {
-	type: 'unsetUserMutualLink';
-	info: ModerationLogPayloads['unsetUserMutualLink'];
 } | {
 	type: 'createSystemWebhook';
 	info: ModerationLogPayloads['createSystemWebhook'];
@@ -237,6 +212,24 @@ export type ModerationLog = {
 	type: 'updateProxyAccountDescription';
 	info: ModerationLogPayloads['updateProxyAccountDescription'];
 });
+
+export type ServerStats = {
+	cpu: number;
+	mem: {
+		used: number;
+		active: number;
+	};
+	net: {
+		rx: number;
+		tx: number;
+	};
+	fs: {
+		r: number;
+		w: number;
+	}
+};
+
+export type ServerStatsLog = ServerStats[];
 
 export type QueueStats = {
 	deliver: {
@@ -334,6 +327,15 @@ export type SigninWithPasskeyInitResponse = {
 
 export type SigninWithPasskeyResponse = {
 	signinResponse: SigninFlowResponse & { finished: true };
+};
+
+export type I2faRegisterKeyResponse = PublicKeyCredentialCreationOptionsJSON;
+
+export type I2faKeyDoneRequest = {
+	password: string;
+	token?: string | null;
+	name: string;
+	credential: RegistrationResponseJSON;
 };
 
 type Values<T extends Record<PropertyKey, unknown>> = T[keyof T];

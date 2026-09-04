@@ -28,7 +28,7 @@ import { i18n } from '@/i18n.js';
 
 import MkButton from '@/components/MkButton.vue';
 
-import type { AuthenticationResponseJSON, PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/browser';
+import type { PublicKeyCredentialRequestOptionsJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser';
 
 const props = defineProps<{
 	credentialRequest: PublicKeyCredentialRequestOptionsJSON;

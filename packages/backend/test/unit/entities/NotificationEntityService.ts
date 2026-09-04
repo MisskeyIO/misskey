@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { describe, expect, jest, test } from '@jest/globals';
+import { describe, expect, vi, test } from 'vitest';
 import { EntityNotFoundError } from 'typeorm';
 import { NotificationEntityService } from '@/core/entities/NotificationEntityService.js';
 import type { MiNotification } from '@/models/Notification.js';
 
 function createService(packNoteDraft: (_id: string, _me: { id: string }) => Promise<unknown>) {
 	const moduleRef = {
-		get: jest.fn((name: string) => name === 'NoteDraftEntityService' ? { pack: packNoteDraft } : {}),
+		get: vi.fn((name: string) => name === 'NoteDraftEntityService' ? { pack: packNoteDraft } : {}),
 	};
 	const service = new NotificationEntityService(
 		moduleRef as never,
@@ -33,7 +33,7 @@ const notification: MiNotification = {
 describe('NotificationEntityService', () => {
 	test('投稿失敗通知へ下書きを含める', async () => {
 		const noteDraft = { id: 'draft-id' };
-		const packNoteDraft = jest.fn(async (_id: string, _me: { id: string }) => noteDraft);
+		const packNoteDraft = vi.fn(async (_id: string, _me: { id: string }) => noteDraft);
 		const service = createService(packNoteDraft);
 
 		await expect(service.pack(notification, 'user-id', { checkValidNotifier: false })).resolves.toEqual({
@@ -46,7 +46,7 @@ describe('NotificationEntityService', () => {
 	});
 
 	test('削除済み下書きの通知を除外する', async () => {
-		const packNoteDraft = jest.fn(async (_id: string, _me: { id: string }) => {
+		const packNoteDraft = vi.fn(async (_id: string, _me: { id: string }) => {
 			throw new EntityNotFoundError('NoteDraft', { id: notification.noteDraftId });
 		});
 		const service = createService(packNoteDraft);

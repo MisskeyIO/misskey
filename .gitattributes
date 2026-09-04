@@ -6,3 +6,4 @@
 *.blend -diff -text
 *.afdesign -diff -text
 * text=auto eol=lf
+*.patch whitespace=-space-before-tab

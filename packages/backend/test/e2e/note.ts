@@ -3,15 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { Repository } from 'typeorm';
+import type { Repository } from "typeorm";
 
 process.env.NODE_ENV = 'test';
 
 import * as assert from 'assert';
-import type * as misskey from 'misskey-js';
+import { describe, beforeAll, afterAll, test } from 'vitest';
 import { MiNote } from '@/models/Note.js';
 import { MAX_NOTE_TEXT_LENGTH } from '@/const.js';
 import { api, castAsError, initTestDb, post, role, sendEnvUpdateRequest, signup, uploadFile, uploadUrl } from '../utils.js';
+import type * as misskey from 'misskey-js';
 
 describe('Note', () => {
 	let Notes: Repository<MiNote>;
@@ -765,7 +766,7 @@ describe('Note', () => {
 			assert.strictEqual(castAsError(note2.body).error.code, 'CONTAINS_PROHIBITED_WORDS');
 		});
 
-		test('禁止ワードを含む投稿はエラーになる (リモート)', async () => {
+		test('禁止ワードを含んでるリモートノートもエラーになる', async () => {
 			const prohibited = await api('admin/update-meta', {
 				prohibitedWords: [
 					'test',
@@ -776,12 +777,12 @@ describe('Note', () => {
 
 			await new Promise(x => setTimeout(x, 2));
 
-			const note3 = await api('notes/create', {
+			const note1 = await api('notes/create', {
 				text: 'hogetesthuge',
 			}, tom);
 
-			assert.strictEqual(note3.status, 400);
-			assert.strictEqual(castAsError(note3.body).error.code, 'CONTAINS_PROHIBITED_WORDS');
+			assert.strictEqual(note1.status, 400);
+			assert.strictEqual(castAsError(note1.body).error.code, 'CONTAINS_PROHIBITED_WORDS');
 		});
 
 		test('メンションの数が上限を超えるとエラーになる', async () => {

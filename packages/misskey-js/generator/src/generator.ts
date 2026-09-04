@@ -415,7 +415,7 @@ async function main() {
 	await generateEndpoints(openApiDocs, typeFileName, entitiesFileName, endpointFileName);
 
 	const apiClientWarningFileName = `${generatePath}/apiClientJSDoc.ts`;
-	await generateApiClientJSDoc(openApiDocs, '../api.ts', endpointFileName, apiClientWarningFileName);
+	await generateApiClientJSDoc(openApiDocs, '../api.ts', '../api.types.ts', apiClientWarningFileName);
 }
 
 main();

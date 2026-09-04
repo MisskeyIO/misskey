@@ -4,9 +4,7 @@
  */
 
 import { randomUUID, randomBytes } from 'node:crypto';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import * as fs from 'node:fs';
+import { resolve } from 'node:path';
 import { Inject, Injectable } from '@nestjs/common';
 import ms from 'ms';
 import sharp from 'sharp';
@@ -28,6 +26,7 @@ import type {
 	EndedPollNotificationQueue,
 	InboxQueue,
 	ObjectStorageQueue,
+	PostScheduledNoteQueue,
 	RelationshipQueue,
 	SystemQueue,
 	UserWebhookDeliverQueue,
@@ -52,7 +51,6 @@ import type {
 	UserProfilesRepository,
 	UsersRepository,
 } from '@/models/_.js';
-import type Logger from '@/logger.js';
 import { handleRequestRedirectToOmitSearch } from '@/misc/fastify-hook-handlers.js';
 import { htmlSafeJsonStringify } from '@/misc/json-stringify-html-safe.js';
 import { bindThis } from '@/decorators.js';
@@ -76,6 +74,7 @@ import { GalleryPostPage } from './views/gallery-post.js';
 import { ChannelPage } from './views/channel.js';
 import { ReversiGamePage } from './views/reversi-game.js';
 import { AnnouncementPage } from './views/announcement.js';
+import { BaseEmbed } from './views/base-embed.js';
 import { InfoCardPage } from './views/info-card.js';
 import { BiosPage } from './views/bios.js';
 import { CliPage } from './views/cli.js';
@@ -84,34 +83,16 @@ import { ErrorPage } from './views/error.js';
 
 import type { FastifyError, FastifyInstance, FastifyPluginOptions, FastifyReply } from 'fastify';
 
-const _filename = fileURLToPath(import.meta.url);
-const _dirname = dirname(_filename);
-
-let rootDir = _dirname;
-// 見つかるまで上に遡る
-while (!fs.existsSync(resolve(rootDir, 'packages'))) {
-	const parentDir = dirname(rootDir);
-	if (parentDir === rootDir) {
-		throw new Error('Cannot find root directory');
-	}
-	rootDir = parentDir;
-}
-
-const backendRootDir = resolve(rootDir, 'packages/backend');
-const frontendRootDir = resolve(rootDir, 'packages/frontend');
-
-const staticAssets = resolve(backendRootDir, 'assets');
-const clientAssets = resolve(frontendRootDir, 'assets');
-const assets = resolve(rootDir, 'built/_frontend_dist_');
-const swAssets = resolve(rootDir, 'built/_sw_dist_');
-const fluentEmojisDir = resolve(rootDir, 'fluent-emojis/dist');
-const twemojiDir = resolve(backendRootDir, 'node_modules/@discordapp/twemoji/dist/svg');
-const frontendViteOut = resolve(rootDir, 'built/_frontend_vite_');
-// const frontendEmbedViteOut = resolve(rootDir, 'built/_frontend_embed_vite_');
-
 @Injectable()
 export class ClientServerService {
-	private logger: Logger;
+	private readonly staticAssets: string;
+	private readonly clientAssets: string;
+	private readonly assets: string;
+	private readonly swAssets: string;
+	private readonly fluentEmojiDir: string;
+	private readonly twemojiDir: string;
+	private readonly frontendViteOut: string;
+	private readonly frontendEmbedViteOut: string;
 
 	constructor(
 		@Inject(DI.config)
@@ -167,6 +148,7 @@ export class ClientServerService {
 
 		@Inject('queue:system') public systemQueue: SystemQueue,
 		@Inject('queue:endedPollNotification') public endedPollNotificationQueue: EndedPollNotificationQueue,
+		@Inject('queue:postScheduledNote') public postScheduledNoteQueue: PostScheduledNoteQueue,
 		@Inject('queue:deliver') public deliverQueue: DeliverQueue,
 		@Inject('queue:inbox') public inboxQueue: InboxQueue,
 		@Inject('queue:db') public dbQueue: DbQueue,
@@ -176,6 +158,16 @@ export class ClientServerService {
 		@Inject('queue:systemWebhookDeliver') public systemWebhookDeliverQueue: SystemWebhookDeliverQueue,
 	) {
 		//this.createServer = this.createServer.bind(this);
+		const backendRootdir = resolve(this.config.rootDir, 'packages/backend');
+		const frontendRootdir = resolve(this.config.rootDir, 'packages/frontend');
+		this.staticAssets = resolve(backendRootdir, 'assets');
+		this.clientAssets = resolve(frontendRootdir, 'assets');
+		this.assets = resolve(this.config.rootDir, 'built/_frontend_dist_');
+		this.swAssets = resolve(this.config.rootDir, 'built/_sw_dist_');
+		this.fluentEmojiDir = resolve(backendRootdir, 'node_modules/@misskey-dev/emoji-assets/built/fluent-emoji');
+		this.twemojiDir = resolve(backendRootdir, 'node_modules/@misskey-dev/emoji-assets/built/twemoji');
+		this.frontendViteOut = resolve(this.config.rootDir, 'built/_frontend_vite_');
+		this.frontendEmbedViteOut = resolve(this.config.rootDir, 'built/_frontend_embed_vite_');
 	}
 
 	@bindThis
@@ -285,6 +277,7 @@ export class ClientServerService {
 			queues: [
 				this.systemQueue,
 				this.endedPollNotificationQueue,
+				this.postScheduledNoteQueue,
 				...this.deliverQueue.queues,
 				...this.inboxQueue.queues,
 				...this.relationshipQueue.queues,
@@ -331,22 +324,22 @@ export class ClientServerService {
 
 		//#region vite assets
 		if (this.config.frontendEmbedManifestExists) {
-			console.log(`[ClientServerService] Using built frontend vite assets. ${frontendViteOut}`);
+			this.clientLoggerService.logger.info(`[ClientServerService] Using built frontend vite assets. ${this.frontendViteOut}`);
 			fastify.register((fastify, options, done) => {
 				fastify.register(fastifyStatic, {
-					root: frontendViteOut,
+					root: this.frontendViteOut,
 					prefix: '/vite/',
 					maxAge: ms('30 days'),
 					immutable: true,
 					decorateReply: false,
 				});
-				// fastify.register(fastifyStatic, {
-				// 	root: frontendEmbedViteOut,
-				// 	prefix: '/embed_vite/',
-				// 	maxAge: ms('30 days'),
-				// 	immutable: true,
-				// 	decorateReply: false,
-				// });
+				fastify.register(fastifyStatic, {
+					root: this.frontendEmbedViteOut,
+					prefix: '/embed_vite/',
+					maxAge: ms('30 days'),
+					immutable: true,
+					decorateReply: false,
+				});
 				fastify.addHook('onRequest', handleRequestRedirectToOmitSearch);
 				done();
 			});
@@ -361,44 +354,43 @@ export class ClientServerService {
 				rewritePrefix: '/vite',
 			});
 
-			// const embedPort = (process.env.EMBED_VITE_PORT ?? '5174');
-			// fastify.register(fastifyProxy, {
-			// 	upstream: urlOriginWithoutPort + ':' + embedPort,
-			// 	prefix: '/embed_vite',
-			// 	rewritePrefix: '/embed_vite',
-			// });
+			const embedPort = (process.env.EMBED_VITE_PORT ?? '5174');
+			fastify.register(fastifyProxy, {
+				upstream: urlOriginWithoutPort + ':' + embedPort,
+				prefix: '/embed_vite',
+				rewritePrefix: '/embed_vite',
+			});
 		}
 		//#endregion
 
 		//#region static assets
 
 		fastify.register(fastifyStatic, {
-			root: staticAssets,
+			root: this.staticAssets,
 			prefix: '/static-assets/',
 			maxAge: ms('7 days'),
 			decorateReply: false,
 		});
 
 		fastify.register(fastifyStatic, {
-			root: clientAssets,
+			root: this.clientAssets,
 			prefix: '/client-assets/',
 			maxAge: ms('7 days'),
 			decorateReply: false,
 		});
 
 		fastify.register(fastifyStatic, {
-			root: assets,
+			root: this.assets,
 			prefix: '/assets/',
 			maxAge: ms('7 days'),
 			decorateReply: false,
 		});
-
 		fastify.get('/favicon.ico', async (request, reply) => {
-			return reply.sendFile('/favicon.ico', staticAssets);
+			return reply.sendFile('/favicon.ico', this.staticAssets);
 		});
 
 		fastify.get('/apple-touch-icon.png', async (request, reply) => {
-			return reply.sendFile('/apple-touch-icon.png', staticAssets);
+			return reply.sendFile('/apple-touch-icon.png', this.staticAssets);
 		});
 
 		fastify.get<{ Params: { path: string } }>('/fluent-emoji/:path(.*)', async (request, reply) => {
@@ -411,7 +403,7 @@ export class ClientServerService {
 
 			reply.header('Content-Security-Policy', 'default-src \'none\'; style-src \'unsafe-inline\'');
 
-			return reply.sendFile(path, fluentEmojisDir, {
+			return reply.sendFile(path, this.fluentEmojiDir, {
 				maxAge: ms('30 days'),
 			});
 		});
@@ -426,7 +418,7 @@ export class ClientServerService {
 
 			reply.header('Content-Security-Policy', 'default-src \'none\'; style-src \'unsafe-inline\'');
 
-			return reply.sendFile(path, twemojiDir, {
+			return reply.sendFile(path, this.twemojiDir, {
 				maxAge: ms('30 days'),
 			});
 		});
@@ -440,7 +432,7 @@ export class ClientServerService {
 			}
 
 			const mask = await sharp(
-				`${twemojiDir}/${path.replace('.png', '')}.svg`,
+				`${this.twemojiDir}/${path.replace('.png', '')}.svg`,
 				{ density: 1000 },
 			)
 				.resize(488, 488)
@@ -476,7 +468,7 @@ export class ClientServerService {
 
 		// ServiceWorker
 		fastify.get('/sw.js', async (request, reply) => {
-			return await reply.sendFile('/sw.js', swAssets, {
+			return await reply.sendFile('/sw.js', this.swAssets, {
 				maxAge: ms('10 minutes'),
 			});
 		});
@@ -485,14 +477,41 @@ export class ClientServerService {
 		fastify.get('/manifest.json', async (request, reply) => await this.manifestHandler(reply));
 
 		// Embed Javascript
-		// fastify.get('/embed.js', async (request, reply) => {
-		// 	return await reply.sendFile('/embed.js', staticAssets, {
-		// 		maxAge: ms('1 day'),
-		// 	});
-		// });
+		fastify.get('/embed.js', async (request, reply) => {
+			return await reply.sendFile('/embed.js', this.staticAssets, {
+				maxAge: ms('1 day'),
+			});
+		});
 
 		fastify.get('/robots.txt', async (request, reply) => {
-			return await reply.sendFile('/robots.txt', staticAssets);
+			const disallowedPaths = [
+				'/settings',
+				'/admin',
+				'/custom-emojis-manager',
+				'/avatar-decorations',
+				'/share',
+				'/my',
+				'/api',
+				'/inbox',
+				'/oauth',
+				'/proxy',
+				'/url',
+			];
+
+			if (this.meta.ugcVisibilityForVisitor === 'none') {
+				disallowedPaths.push(
+					'/@',
+					'/notes',
+				);
+			}
+
+			let content = `User-agent: *\n`;
+			content += disallowedPaths.map((path) => `Disallow: ${path}`).join('\n') + '\n';
+			content += 'Allow: /\n';
+			content += '\n# todo: sitemap\n';
+
+			reply.header('Content-Type', 'text/plain; charset=utf-8');
+			return await reply.send(content);
 		});
 
 		// OpenSearch XML
@@ -985,81 +1004,84 @@ export class ClientServerService {
 		//#endregion
 
 		//#region embed pages
-		// fastify.get<{ Params: { user: string; } }>('/embed/user-timeline/:user', async (request, reply) => {
-		// 	reply.removeHeader('X-Frame-Options');
-		//
-		// 	const user = await this.usersRepository.findOneBy({
-		// 		id: request.params.user,
-		// 	});
-		//
-		// 	if (user == null) return;
-		// 	if (user.host != null) return;
-		//
-		// 	const _user = await this.userEntityService.pack(user, null);
-		//
-		// 	reply.header('Cache-Control', 'public, max-age=3600');
-		// 	return await reply.view('base-embed', {
-		// 		title: this.meta.name ?? 'Misskey',
-		// 		...await this.generateCommonPugData(this.meta),
-		// 		embedCtx: htmlSafeJsonStringify({
-		// 			user: _user,
-		// 		}),
-		// 	});
-		// });
-		//
-		// fastify.get<{ Params: { note: string; } }>('/embed/notes/:note', async (request, reply) => {
-		// 	reply.removeHeader('X-Frame-Options');
-		//
-		// 	const note = await this.notesRepository.findOneBy({
-		// 		id: request.params.note,
-		// 	});
-		//
-		// 	if (note == null) return;
-		// 	if (['specified', 'followers'].includes(note.visibility)) return;
-		// 	if (note.userHost != null) return;
-		//
-		// 	const _note = await this.noteEntityService.pack(note, null, { detail: true });
-		//
-		// 	reply.header('Cache-Control', 'public, max-age=3600');
-		// 	return await reply.view('base-embed', {
-		// 		title: this.meta.name ?? 'Misskey',
-		// 		...await this.generateCommonPugData(this.meta),
-		// 		embedCtx: htmlSafeJsonStringify({
-		// 			note: _note,
-		// 		}),
-		// 	});
-		// });
-		//
-		// fastify.get<{ Params: { clip: string; } }>('/embed/clips/:clip', async (request, reply) => {
-		// 	reply.removeHeader('X-Frame-Options');
-		//
-		// 	const clip = await this.clipsRepository.findOneBy({
-		// 		id: request.params.clip,
-		// 	});
-		//
-		// 	if (clip == null) return;
-		//
-		// 	const _clip = await this.clipEntityService.pack(clip, null);
-		//
-		// 	reply.header('Cache-Control', 'public, max-age=3600');
-		// 	return await reply.view('base-embed', {
-		// 		title: this.meta.name ?? 'Misskey',
-		// 		...await this.generateCommonPugData(this.meta),
-		// 		embedCtx: htmlSafeJsonStringify({
-		// 			clip: _clip,
-		// 		}),
-		// 	});
-		// });
-		//
-		// fastify.get('/embed/*', async (request, reply) => {
-		// 	reply.removeHeader('X-Frame-Options');
-		//
-		// 	reply.header('Cache-Control', 'public, max-age=3600');
-		// 	return await reply.view('base-embed', {
-		// 		title: this.meta.name ?? 'Misskey',
-		// 		...await this.generateCommonPugData(this.meta),
-		// 	});
-		// });
+		fastify.get<{ Params: { user: string; } }>('/embed/user-timeline/:user', async (request, reply) => {
+			reply.removeHeader('X-Frame-Options');
+
+			const user = await this.usersRepository.findOneBy({
+				id: request.params.user,
+			});
+
+			if (user == null) return;
+			if (user.host != null) return;
+
+			const _user = await this.userEntityService.pack(user, null);
+
+			reply.header('Cache-Control', 'public, max-age=3600');
+			return await HtmlTemplateService.replyHtml(reply, BaseEmbed({
+				title: this.meta.name ?? 'Misskey',
+				...await this.htmlTemplateService.getCommonData(),
+				embedCtxJson: htmlSafeJsonStringify({
+					user: _user,
+				}),
+			}));
+		});
+
+		fastify.get<{ Params: { note: string; } }>('/embed/notes/:note', async (request, reply) => {
+			reply.removeHeader('X-Frame-Options');
+
+			const note = await this.notesRepository.findOne({
+				where: {
+					id: request.params.note,
+				},
+				relations: ['user', 'reply', 'renote'],
+			});
+
+			if (note == null) return;
+			if (['specified', 'followers'].includes(note.visibility)) return;
+			if (note.userHost != null) return;
+
+			const _note = await this.noteEntityService.pack(note, null, { detail: true });
+
+			reply.header('Cache-Control', 'public, max-age=3600');
+			return await HtmlTemplateService.replyHtml(reply, BaseEmbed({
+				title: this.meta.name ?? 'Misskey',
+				...await this.htmlTemplateService.getCommonData(),
+				embedCtxJson: htmlSafeJsonStringify({
+					note: _note,
+				}),
+			}));
+		});
+
+		fastify.get<{ Params: { clip: string; } }>('/embed/clips/:clip', async (request, reply) => {
+			reply.removeHeader('X-Frame-Options');
+
+			const clip = await this.clipsRepository.findOneBy({
+				id: request.params.clip,
+			});
+
+			if (clip == null) return;
+
+			const _clip = await this.clipEntityService.pack(clip, null);
+
+			reply.header('Cache-Control', 'public, max-age=3600');
+			return await HtmlTemplateService.replyHtml(reply, BaseEmbed({
+				title: this.meta.name ?? 'Misskey',
+				...await this.htmlTemplateService.getCommonData(),
+				embedCtxJson: htmlSafeJsonStringify({
+					clip: _clip,
+				}),
+			}));
+		});
+
+		fastify.get('/embed/*', async (request, reply) => {
+			reply.removeHeader('X-Frame-Options');
+
+			reply.header('Cache-Control', 'public, max-age=3600');
+			return await HtmlTemplateService.replyHtml(reply, BaseEmbed({
+				title: this.meta.name ?? 'Misskey',
+				...await this.htmlTemplateService.getCommonData(),
+			}));
+		});
 
 		fastify.get('/_info_card_', async (request, reply) => {
 			reply.removeHeader('X-Frame-Options');

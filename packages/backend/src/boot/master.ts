@@ -12,7 +12,7 @@ import { coreLogger } from '@/logger.js';
 import { loadConfig } from '@/config.js';
 import type { Config } from '@/config.js';
 import { envOption } from '@/env.js';
-import { jobQueue, server } from './common.js';
+import { initExtraThreadPool, jobQueue, server } from './common.js';
 
 const bootLogger = coreLogger.createSubLogger('boot', 'magenta', false);
 
@@ -60,6 +60,8 @@ export async function masterMain() {
 	}
 
 	bootLogger.succ('Misskey initialized');
+
+	initExtraThreadPool(config);
 
 	if (config.sentryForBackend) {
 		const Sentry = await import('@sentry/node');

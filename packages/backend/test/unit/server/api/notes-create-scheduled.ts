@@ -3,29 +3,29 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { describe, expect, jest, test } from '@jest/globals';
+import { describe, expect, vi, test } from 'vitest';
 import NotesCreateEndpoint from '@/server/api/endpoints/notes/create.js';
 
 function dependencies(idempotent: string | null = null, reservationResult: 'OK' | null = 'OK') {
 	const draft = { id: 'draftid', userId: 'userid' };
 	const redis = {
-		get: jest.fn(async (_key: string) => idempotent),
-		set: jest.fn(async (_key: string, _value: string, _mode: string, _ttl: number, _condition?: string) => reservationResult),
-		unlinkIf: jest.fn(async (_key: string, _value: string) => 1),
+		get: vi.fn(async (_key: string) => idempotent),
+		set: vi.fn(async (_key: string, _value: string, _mode: string, _ttl: number, _condition?: string) => reservationResult),
+		unlinkIf: vi.fn(async (_key: string, _value: string) => 1),
 	};
-	const notesRepository = { findOneBy: jest.fn(async (_where: unknown) => null) };
-	const noteCreateService = { fetchAndCreate: jest.fn() };
+	const notesRepository = { findOneBy: vi.fn(async (_where: unknown) => null) };
+	const noteCreateService = { fetchAndCreate: vi.fn() };
 	const noteDraftService = {
-		get: jest.fn(async (_me: unknown, _id: string) => idempotent === draft.id ? draft : null),
-		getByIdempotencyKey: jest.fn(async (_me: unknown, _key: string) => null as typeof draft | null),
-		create: jest.fn(async (_me: unknown, _data: unknown, _draftId?: string) => draft),
+		get: vi.fn(async (_me: unknown, _id: string) => idempotent === draft.id ? draft : null),
+		getByIdempotencyKey: vi.fn(async (_me: unknown, _key: string) => null as typeof draft | null),
+		create: vi.fn(async (_me: unknown, _data: unknown, _draftId?: string) => draft),
 	};
 	const endpoint = new NotesCreateEndpoint(
 		redis as never,
 		notesRepository as never,
 		{ gen: () => draft.id } as never,
-		{ getLogger: () => ({ error: jest.fn() }) } as never,
-		{ pack: jest.fn() } as never,
+		{ getLogger: () => ({ error: vi.fn() }) } as never,
+		{ pack: vi.fn() } as never,
 		noteCreateService as never,
 		noteDraftService as never,
 	);

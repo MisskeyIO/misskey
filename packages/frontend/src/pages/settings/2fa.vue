@@ -48,11 +48,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 							{{ i18n.ts._2fa.securityKeyInfo }}
 						</MkInfo>
 
-						<MkInfo v-if="!webAuthnSupported()" warn>
+						<MkInfo v-if="!browserSupportsWebAuthn()" warn>
 							{{ i18n.ts._2fa.securityKeyNotSupported }}
 						</MkInfo>
 
-						<MkInfo v-else-if="webAuthnSupported() && !$i.twoFactorEnabled" warn>
+						<MkInfo v-else-if="browserSupportsWebAuthn() && !$i.twoFactorEnabled" warn>
 							{{ i18n.ts._2fa.registerTOTPBeforeKey }}
 						</MkInfo>
 
@@ -84,7 +84,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { browserSupportsWebAuthn as webAuthnSupported, startRegistration } from '@simplewebauthn/browser';
+import { browserSupportsWebAuthn, startRegistration } from '@simplewebauthn/browser';
+import * as Misskey from 'misskey-js';
 import MkButton from '@/components/MkButton.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
@@ -156,7 +157,7 @@ function renewTOTP(): void {
 	});
 }
 
-async function unregisterKey(key): Promise<void> {
+async function unregisterKey(key: NonNullable<Misskey.entities.MeDetailedOnly['securityKeysList']>[number]): Promise<void> {
 	const confirm = await os.confirm({
 		type: 'question',
 		title: i18n.ts._2fa.removeKey,
@@ -179,7 +180,7 @@ async function unregisterKey(key): Promise<void> {
 		}));
 }
 
-async function renameKey(key): Promise<void> {
+async function renameKey(key: NonNullable<Misskey.entities.MeDetailedOnly['securityKeysList']>[number]): Promise<void> {
 	const name = await os.inputText({
 		title: i18n.ts.rename,
 		default: key.name,
@@ -232,7 +233,7 @@ async function addSecurityKey() {
 		token: auth2.result.token,
 		name: name.result,
 		// @ts-expect-error API schemaではWebAuthnの型を完全に表現できない
-		credential,
+		credential: credential,
 	});
 }
 

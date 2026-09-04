@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { afterAll, afterEach, beforeAll, describe, expect, test } from '@jest/globals';
+import { afterAll, afterEach, beforeAll, describe, expect, test, vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
-import type { Index, MeiliSearch } from 'meilisearch';
+import type { Index, Meilisearch } from 'meilisearch';
 import { type Config, loadConfig } from '@/config.js';
 import { GlobalModule } from '@/GlobalModule.js';
 import { CoreModule } from '@/core/CoreModule.js';
@@ -65,7 +65,7 @@ describe('SearchService', () => {
 		},
 	};
 
-	async function buildContext(configOverride?: Config): Promise<TestContext> {
+	async function buildContext(configOverride?: Config, opensearchOverride?: object): Promise<TestContext> {
 		const builder = Test.createTestingModule({
 			imports: [
 				GlobalModule,
@@ -75,6 +75,9 @@ describe('SearchService', () => {
 
 		if (configOverride) {
 			builder.overrideProvider(DI.config).useValue(configOverride);
+		}
+		if (opensearchOverride) {
+			builder.overrideProvider(DI.opensearch).useValue(opensearchOverride);
 		}
 
 		const app = await builder.compile();
@@ -416,7 +419,7 @@ describe('SearchService', () => {
 
 	describe('meilisearch', () => {
 		let ctx: TestContext;
-		let meilisearch: MeiliSearch;
+		let meilisearch: Meilisearch;
 		let meilisearchIndex: Index;
 		let meiliConfig: Config;
 
@@ -438,7 +441,7 @@ describe('SearchService', () => {
 			};
 
 			ctx = await buildContext(meiliConfig);
-			meilisearch = ctx.app.get(DI.meilisearch) as MeiliSearch;
+			meilisearch = ctx.app.get(DI.meilisearch) as Meilisearch;
 			meilisearchIndex = meilisearch.index(`${meiliConfig.meilisearch!.index}---notes`);
 
 			const settingsTask = await meilisearchIndex.updateSettings(meilisearchSettings);
@@ -479,5 +482,64 @@ describe('SearchService', () => {
 		});
 
 		defineSearchNoteTests(() => ctx, { supportsFollowersVisibility: false, sinceIdOrder: 'desc' });
+	});
+
+	describe('opensearch', () => {
+		let ctx: TestContext;
+		const search = vi.fn();
+		let idField: string;
+
+		beforeAll(async () => {
+			const baseConfig = loadConfig();
+			idField = `${baseConfig.host}_id`;
+			ctx = await buildContext({
+				...baseConfig,
+				fulltextSearch: {
+					provider: 'opensearch',
+				},
+				opensearch: {
+					host: '127.0.0.1',
+					port: '9200',
+					user: '',
+					pass: '',
+					index: 'test-search-service',
+				},
+			}, { search });
+		});
+
+		afterAll(async () => {
+			await ctx.app.close();
+		});
+
+		afterEach(async () => {
+			await cleanupContext(ctx);
+			search.mockReset();
+		});
+
+		test('外部indexが返したIDをDB側の公開条件で絞り込む', async () => {
+			const me = await createUser(ctx, { username: 'me', usernameLower: 'me', host: null });
+			const author = await createUser(ctx, { username: 'author', usernameLower: 'author', host: null });
+			const mutedRemote = await createUser(ctx, { username: 'muted-remote', usernameLower: 'muted-remote', host: 'muted.example' });
+			await ctx.userProfilesRepository.update({ userId: me.id }, { mutedInstances: ['muted.example'] });
+
+			const publicNote = await createNote(ctx, author, { visibility: 'public' });
+			const homeNote = await createNote(ctx, author, { visibility: 'home' });
+			const followersNote = await createNote(ctx, author, { visibility: 'followers' });
+			const specifiedNote = await createNote(ctx, author, { visibility: 'specified', visibleUserIds: [me.id] });
+			const mutedInstanceNote = await createNote(ctx, mutedRemote, { visibility: 'public' });
+			await createFollowing(ctx, me, author);
+
+			search.mockResolvedValue({
+				body: {
+					hits: {
+						hits: [publicNote, homeNote, followersNote, specifiedNote, mutedInstanceNote]
+							.map(note => ({ _source: { [idField]: note.id } })),
+					},
+				},
+			});
+
+			const result = await ctx.service.searchNote('hello', me, {}, { limit: 10 });
+			expect(result.map(note => note.id).sort()).toEqual([publicNote.id, homeNote.id].sort());
+		});
 	});
 });

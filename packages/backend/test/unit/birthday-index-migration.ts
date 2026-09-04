@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { describe, expect, test } from '@jest/globals';
+import { describe, expect, test } from 'vitest';
 import { BirthdayIndex1767169026317 } from '../../migration/1767169026317-birthday-index.js';
 
 const legacyIndex = {

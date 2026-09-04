@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div class="_gaps_m">
-	<div :class="$style.banner" :style="{ backgroundImage: `url(${ instance.bannerUrl })` }">
+	<div :class="$style.banner" :style="{ backgroundImage: instance.bannerUrl ? `url(${ instance.bannerUrl })` : undefined }">
 		<div style="overflow: clip;">
 			<img v-if="kawaiiMode" src="/client-assets/kawaii/misskey.png" alt="" :class="$style.bannerIconAlt"/>
 			<img v-else :src="instance.iconUrl ?? '/favicon.ico'" alt="" :class="$style.bannerIcon"/>

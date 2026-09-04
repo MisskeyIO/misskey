@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { URL } from 'node:url';
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import httpSignature from '@peertube/http-signature';
 import * as Bull from 'bullmq';
@@ -12,7 +13,7 @@ import { FetchInstanceMetadataService } from '@/core/FetchInstanceMetadataServic
 import InstanceChart from '@/core/chart/charts/instance.js';
 import ApRequestChart from '@/core/chart/charts/ap-request.js';
 import FederationChart from '@/core/chart/charts/federation.js';
-import { getApId } from '@/core/activitypub/type.js';
+import { getApId, isActor, isDelete } from '@/core/activitypub/type.js';
 import type { IActivity } from '@/core/activitypub/type.js';
 import type { MiRemoteUser } from '@/models/User.js';
 import type { MiUserPublickey } from '@/models/UserPublickey.js';
@@ -20,7 +21,7 @@ import { ApDbResolverService } from '@/core/activitypub/ApDbResolverService.js';
 import { StatusError } from '@/misc/status-error.js';
 import { UtilityService } from '@/core/UtilityService.js';
 import { ApPersonService } from '@/core/activitypub/models/ApPersonService.js';
-import { JsonLdService } from '@/core/activitypub/JsonLdService.js';
+import { JsonLdError, JsonLdService } from '@/core/activitypub/JsonLdService.js';
 import { ApInboxService } from '@/core/activitypub/ApInboxService.js';
 import { bindThis } from '@/decorators.js';
 import { IdentifiableError } from '@/misc/identifiable-error.js';
@@ -72,17 +73,32 @@ export class InboxProcessorService implements OnApplicationShutdown {
 		this.logger.debug(JSON.stringify(info, null, 2));
 		//#endregion
 
-		const host = this.utilityService.extractHost(signature.keyId);
+		const host = this.utilityService.toPuny(new URL(signature.keyId).hostname);
 
-		// ブロックしてたら中断
-		const meta = this.meta;
-		if (this.utilityService.isItemListedIn(host, meta.blockedHosts)) {
+		if (!this.utilityService.isFederationAllowedHost(host)) {
 			return `Blocked request: ${host}`;
 		}
 
 		const keyIdLower = signature.keyId.toLowerCase();
 		if (keyIdLower.startsWith('acct:')) {
 			return `Old keyId is no longer supported. ${keyIdLower}`;
+		}
+
+		{
+			let userExistenceCheckApId: string | null = null;
+
+			// 存在しないActorに対するActorのDeleteアクティビティは無視する。
+			// actorとobjectが同じならばそれはActorに違いない
+			if (isDelete(activity) && typeof activity.object === 'object' && (isActor(activity.object) || getApId(activity.actor) === getApId(activity.object))) {
+				userExistenceCheckApId = getApId(activity.object);
+			}
+
+			if (userExistenceCheckApId != null) {
+				const user = await this.apDbResolverService.getUserFromApId(userExistenceCheckApId);
+				if (user == null) {
+					return `skip: user not found for delete activity. ${getApId(userExistenceCheckApId)}`;
+				}
+			}
 		}
 
 		// HTTP-Signature keyIdを元にDBから取得
@@ -99,9 +115,9 @@ export class InboxProcessorService implements OnApplicationShutdown {
 				// 対象が4xxならスキップ
 				if (err instanceof StatusError) {
 					if (!err.isRetryable) {
-						throw new Bull.UnrecoverableError(`skip: Ignored deleted actors on both ends ${activity.actor} - ${err.statusCode}`);
+						throw new Bull.UnrecoverableError(`skip: Ignored deleted actors on both ends ${getApId(activity.actor)} - ${err.statusCode}`);
 					}
-					throw new Error(`Error in actor ${activity.actor} - ${err.statusCode}`);
+					throw new Error(`Error in actor ${getApId(activity.actor)} - ${err.statusCode}`);
 				}
 			}
 		}
@@ -120,7 +136,7 @@ export class InboxProcessorService implements OnApplicationShutdown {
 		const httpSignatureValidated = httpSignature.verifySignature(signature, authUser.key.keyPem);
 
 		// また、signatureのsignerは、activity.actorと一致する必要がある
-		if (!httpSignatureValidated || authUser.user.uri !== activity.actor) {
+		if (!httpSignatureValidated || authUser.user.uri !== getApId(activity.actor)) {
 			// 一致しなくても、でもLD-Signatureがありそうならそっちも見る
 			const activitySignature = activity.signature;
 			if (activitySignature) {
@@ -147,32 +163,49 @@ export class InboxProcessorService implements OnApplicationShutdown {
 
 				const jsonLd = this.jsonLdService.use();
 
-				// LD-Signature検証
-				const verified = await jsonLd.verifyRsaSignature2017(activity, authUser.key.keyPem).catch(() => false);
-				if (!verified) {
-					throw new Bull.UnrecoverableError('skip: LD-Signatureの検証に失敗しました');
-				}
-
-				// アクティビティを正規化
 				delete activity.signature;
 				try {
 					activity = await jsonLd.compact(activity) as IActivity;
-				} catch (e) {
-					throw new Bull.UnrecoverableError(`skip: failed to compact activity: ${e}`);
+				} catch (error) {
+					throw new Bull.UnrecoverableError(`skip: failed to compact activity: ${error}`);
 				}
+				try {
+					jsonLd.checkForForbiddenDirectives(activity);
+				} catch (error) {
+					throw new Bull.UnrecoverableError(`skip: ${error}`);
+				}
+				//#region Log
+				const compactedInfo = Object.assign({}, activity);
+				delete compactedInfo['@context'];
+				this.logger.debug(`compacted: ${JSON.stringify(compactedInfo, null, 2)}`);
+				//#endregion
 
-				// TODO: 元のアクティビティと非互換な形に正規化される場合は転送をスキップする
-				// https://github.com/mastodon/mastodon/blob/664b0ca/app/services/activitypub/process_collection_service.rb#L24-L29
 				activity.signature = activitySignature;
 
-				// もう一度actorチェック
-				if (authUser.user.uri !== activity.actor) {
-					throw new Bull.UnrecoverableError(`skip: LD-Signature user(${authUser.user.uri}) !== activity.actor(${activity.actor})`);
+				jsonLd.freeze();
+
+				// LD-Signature検証
+				let verified;
+				try {
+					verified = await jsonLd.verifyRsaSignature2017(activity, authUser.key.keyPem);
+					if (!verified) {
+						throw new Bull.UnrecoverableError('skip: LD-Signatureの検証に失敗しました');
+					}
+				} catch (error) {
+					if (error instanceof JsonLdError) {
+						throw new Bull.UnrecoverableError(`skip: encountered a JSON-LD error while verifying signature: ${error}`);
+					} else {
+						throw error;
+					}
 				}
 
-				// ブロックしてたら中断
+				// もう一度actorチェック
+				if (authUser.user.uri !== getApId(activity.actor)) {
+					throw new Bull.UnrecoverableError(`skip: LD-Signature user(${authUser.user.uri}) !== activity.actor(${getApId(activity.actor)})`);
+				}
+
 				const ldHost = this.utilityService.extractHost(authUser.user.uri);
-				if (this.utilityService.isItemListedIn(ldHost, meta.blockedHosts)) {
+				if (!this.utilityService.isFederationAllowedHost(ldHost)) {
 					throw new Bull.UnrecoverableError(`Blocked request: ${ldHost}`);
 				}
 			} else {
@@ -223,17 +256,19 @@ export class InboxProcessorService implements OnApplicationShutdown {
 			}
 		} catch (e) {
 			if (e instanceof IdentifiableError) {
-				if ([
-					'e11b3a16-f543-4885-8eb1-66cad131dbfd',
-					'689ee33f-f97c-479a-ac49-1b9f8140af99',
-					'9f466dab-c856-48cd-9e65-ff90ff750580',
-					'85ab9bd7-3a41-4530-959d-f07073900109',
-					'd450b8a9-48e4-4dab-ae36-f4db763fda7c',
-				].includes(e.id)) {
-					return e.message;
-				}
-				if (e.id === 'd450b8a9-48e4-4dab-ae36-f4db763fda7c') { // invalid Note
-					return e.message;
+				switch (e.id) {
+					case 'e11b3a16-f543-4885-8eb1-66cad131dbfd':
+						return e.message;
+					case '689ee33f-f97c-479a-ac49-1b9f8140af99':
+						return 'blocked notes with prohibited words';
+					case '85ab9bd7-3a41-4530-959d-f07073900109':
+						return 'actor has been suspended';
+					case 'd450b8a9-48e4-4dab-ae36-f4db763fda7c': // invalid Note
+						return e.message;
+					case '9f466dab-c856-48cd-9e65-ff90ff750580':
+						return 'note contains too many mentions';
+					case '09d79f9e-64f1-4316-9cfa-e75c4d091574': // Instance is blocked
+						return 'skip: blocked instance';
 				}
 			}
 			throw e;

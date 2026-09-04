@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { getDeliverTargetDimensions } from '@/misc/dimension.js';
 import type { MiNoteWithDimension } from '@/models/Note.js';
 

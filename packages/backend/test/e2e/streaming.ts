@@ -6,7 +6,8 @@
 process.env.NODE_ENV = 'test';
 
 import * as assert from 'assert';
-import { setTimeout } from 'node:timers/promises';
+import { setTimeout as delay } from 'node:timers/promises';
+import { describe, beforeAll, test } from 'vitest';
 import { WebSocket } from 'ws';
 import { MiFollowing } from '@/models/Following.js';
 import { api, channel, connectStream, createAppToken, initTestDb, port, post, sendEnvUpdateRequest, signup, waitFire } from '../utils.js';
@@ -140,7 +141,7 @@ describe('Streaming', () => {
 				const followersNote = await post(kyoko, { text: 'full followers', visibility: 'followers' });
 				const specifiedNote = await post(kyoko, { text: 'full specified', visibility: 'specified', visibleUserIds: [ayano.id] });
 
-				await setTimeout(1000);
+				await delay(1000);
 				ws.close();
 
 				const find = (id: string) => received.find(note => note.id === id);
@@ -169,7 +170,7 @@ describe('Streaming', () => {
 				}, { minimize: true, dimension: 1000 });
 
 				const note = await post(kyoko, { text: 'minimized dimension', visibility: 'public', dimension: 1000 });
-				await setTimeout(1000);
+				await delay(1000);
 				ws.close();
 
 				const streamed = received.find(item => item.id === note.id);
@@ -186,7 +187,7 @@ describe('Streaming', () => {
 				}, { channelId: testChannel.id, minimize: true });
 
 				const note = await post(ayano, { text: 'minimized channel', channelId: testChannel.id });
-				await setTimeout(1000);
+				await delay(1000);
 				ws.close();
 
 				const streamed = received.find(item => item.id === note.id);
@@ -205,6 +206,50 @@ describe('Streaming', () => {
 				assert.strictEqual(fired, true);
 			});
 
+			test('次元を指定すると一致する投稿だけが流れる', async () => {
+				const [viewer, posterDim1, posterDim0] = await Promise.all([signup(), signup(), signup()]);
+
+				await api('following/create', { userId: posterDim1.id }, viewer);
+				await api('following/create', { userId: posterDim0.id }, viewer);
+				await delay(1000);
+
+				const received: misskey.entities.Note[] = [];
+				const ws = await connectStream(viewer, 'homeTimeline', (msg) => {
+					if (msg.type === 'note') received.push(msg.body);
+				}, { minimize: false, dimension: 1 });
+
+				await api('notes/create', { text: 'dim1-note', dimension: 1 }, posterDim1);
+				await api('notes/create', { text: 'dim0-note', dimension: 0 }, posterDim0);
+
+				await delay(1000);
+				ws.close();
+
+				assert.strictEqual(received.some(note => note.text === 'dim1-note'), true);
+				assert.strictEqual(received.some(note => note.text === 'dim0-note'), false);
+			});
+
+			test('次元がnullなら投稿を絞り込まない', async () => {
+				const [viewer, posterDim1, posterDim0] = await Promise.all([signup(), signup(), signup()]);
+
+				await api('following/create', { userId: posterDim1.id }, viewer);
+				await api('following/create', { userId: posterDim0.id }, viewer);
+				await delay(1000);
+
+				const received: misskey.entities.Note[] = [];
+				const ws = await connectStream(viewer, 'homeTimeline', (msg) => {
+					if (msg.type === 'note') received.push(msg.body);
+				}, { minimize: false, dimension: null });
+
+				await api('notes/create', { text: 'dim1-note', dimension: 1 }, posterDim1);
+				await api('notes/create', { text: 'dim0-note', dimension: 0 }, posterDim0);
+
+				await delay(1000);
+				ws.close();
+
+				assert.strictEqual(received.some(note => note.text === 'dim1-note'), true);
+				assert.strictEqual(received.some(note => note.text === 'dim0-note'), true);
+			});
+
 			test('自分の visibility: followers な投稿が流れる', async () => {
 				const fired = await waitFire(
 					ayano, 'homeTimeline',	// ayano:Home
@@ -217,7 +262,7 @@ describe('Streaming', () => {
 
 			test('フォローしているユーザーの投稿が流れる', async () => {
 				const fired = await waitFire(
-					ayano, 'homeTimeline',		// ayano:home
+					ayano, 'homeTimeline',	// ayano:home
 					() => api('notes/create', { text: 'foo' }, kyoko),	// kyoko posts
 					msg => msg.type === 'note' && msg.body.userId === kyoko.id,	// wait kyoko
 				);
@@ -225,57 +270,9 @@ describe('Streaming', () => {
 				assert.strictEqual(fired, true);
 			});
 
-			test('dimension filtering applies to streaming timelines', async () => {
-				const [viewer, posterDim1, posterDim0] = await Promise.all([signup(), signup(), signup()]);
-
-				await api('following/create', { userId: posterDim1.id }, viewer);
-				await api('following/create', { userId: posterDim0.id }, viewer);
-				await setTimeout(1000);
-
-				const received: misskey.entities.Note[] = [];
-				const ws = await connectStream(viewer, 'homeTimeline', (msg) => {
-					if (msg.type === 'note') {
-						received.push(msg.body);
-					}
-				}, { minimize: false, dimension: 1 });
-
-				await api('notes/create', { text: 'dim1-note', dimension: 1 }, posterDim1);
-				await api('notes/create', { text: 'dim0-note', dimension: 0 }, posterDim0);
-
-				await setTimeout(1000);
-				ws.close();
-
-				assert.strictEqual(received.some(note => note.text === 'dim1-note'), true);
-				assert.strictEqual(received.some(note => note.text === 'dim0-note'), false);
-			});
-
-			test('dimension null does not filter streaming timelines', async () => {
-				const [viewer, posterDim1, posterDim0] = await Promise.all([signup(), signup(), signup()]);
-
-				await api('following/create', { userId: posterDim1.id }, viewer);
-				await api('following/create', { userId: posterDim0.id }, viewer);
-				await setTimeout(1000);
-
-				const received: misskey.entities.Note[] = [];
-				const ws = await connectStream(viewer, 'homeTimeline', (msg) => {
-					if (msg.type === 'note') {
-						received.push(msg.body);
-					}
-				}, { minimize: false, dimension: null });
-
-				await api('notes/create', { text: 'dim1-note', dimension: 1 }, posterDim1);
-				await api('notes/create', { text: 'dim0-note', dimension: 0 }, posterDim0);
-
-				await setTimeout(1000);
-				ws.close();
-
-				assert.strictEqual(received.some(note => note.text === 'dim1-note'), true);
-				assert.strictEqual(received.some(note => note.text === 'dim0-note'), true);
-			});
-
 			test('フォローしているユーザーの visibility: followers な投稿が流れる', async () => {
 				const fired = await waitFire(
-					ayano, 'homeTimeline',		// ayano:home
+					ayano, 'homeTimeline',	// ayano:home
 					() => api('notes/create', { text: 'foo', visibility: 'followers' }, kyoko),	// kyoko posts
 					msg => msg.type === 'note' && msg.body.userId === kyoko.id,	// wait kyoko
 				);
@@ -287,9 +284,9 @@ describe('Streaming', () => {
 				const note = await post(kyoko, { text: 'foo', visibility: 'followers' });
 
 				const fired = await waitFire(
-					ayano, 'homeTimeline',		// ayano:home
+					ayano, 'homeTimeline',	// ayano:home
 					() => api('notes/create', { text: 'bar', visibility: 'followers', replyId: note.id }, kyoko),	// kyoko posts
-					msg => msg.type === 'note' && msg.body.userId === kyoko.id && msg.body.reply.text === 'foo',
+					msg => msg.type === 'note' && msg.body.userId === kyoko.id && msg.body.replyId === note.id,
 				);
 
 				assert.strictEqual(fired, true);
@@ -691,7 +688,7 @@ describe('Streaming', () => {
 
 			test('withReplies = falseでフォローしてる人によるリプライが流れない', async () => {
 				const fired = await waitFire(
-					ayano, 'globalTimeline',		// ayano:Global
+					ayano, 'globalTimeline',	// ayano:Global
 					() => api('notes/create', { text: 'foo', replyId: kanakoNote.id }, kyoko),	// kyoko posts
 					msg => msg.type === 'note' && msg.body.userId === kyoko.id,	// wait kyoko
 				);
@@ -842,11 +839,10 @@ describe('Streaming', () => {
 			const application = await createAppToken(ayano, []);
 			const application2 = await createAppToken(ayano, ['read:account']);
 			const socket = new WebSocket(`ws://127.0.0.1:${port}/streaming?i=${application}`);
-			const established = await new Promise<boolean>(async (resolve, reject) => {
+			const established = await new Promise<boolean>((resolve, reject) => {
 				socket.on('error', () => resolve(false));
 				socket.on('unexpected-response', () => resolve(false));
-				await setTimeout(3000);
-				resolve(true);
+				setTimeout(() => resolve(true), 3000);
 			});
 
 			socket.close();

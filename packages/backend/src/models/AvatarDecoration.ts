@@ -43,4 +43,9 @@ export class MiAvatarDecoration {
 		array: true, length: 128, default: '{}',
 	})
 	public roleIdsThatCanBeUsedThisDecoration: string[];
+
+	@Column('varchar', {
+		length: 128, nullable: true,
+	})
+	public category: string | null;
 }

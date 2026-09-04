@@ -337,6 +337,8 @@ import type {
 	FollowingDeleteResponse,
 	FollowingInvalidateRequest,
 	FollowingInvalidateResponse,
+	FollowingListRequest,
+	FollowingListResponse,
 	FollowingRequestsAcceptRequest,
 	FollowingRequestsCancelRequest,
 	FollowingRequestsCancelResponse,
@@ -867,6 +869,7 @@ export type Endpoints = {
 	'following/create': { req: FollowingCreateRequest; res: FollowingCreateResponse };
 	'following/delete': { req: FollowingDeleteRequest; res: FollowingDeleteResponse };
 	'following/invalidate': { req: FollowingInvalidateRequest; res: FollowingInvalidateResponse };
+	'following/list': { req: FollowingListRequest; res: FollowingListResponse };
 	'following/requests/accept': { req: FollowingRequestsAcceptRequest; res: EmptyResponse };
 	'following/requests/cancel': { req: FollowingRequestsCancelRequest; res: FollowingRequestsCancelResponse };
 	'following/requests/list': { req: FollowingRequestsListRequest; res: FollowingRequestsListResponse };

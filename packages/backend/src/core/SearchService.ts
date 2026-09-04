@@ -17,7 +17,7 @@ import { QueryService } from '@/core/QueryService.js';
 import { IdService } from '@/core/IdService.js';
 import type Logger from '@/logger.js';
 import { LoggerService } from '@/core/LoggerService.js';
-import type { Index, MeiliSearch } from 'meilisearch';
+import type { Index, Meilisearch } from 'meilisearch';
 import type { Client as OpenSearch } from '@opensearch-project/opensearch';
 
 type K = string;
@@ -88,7 +88,7 @@ export class SearchService {
 		private config: Config,
 
 		@Inject(DI.meilisearch)
-		private meilisearch: MeiliSearch | null,
+		private meilisearch: Meilisearch | null,
 
 		@Inject(DI.opensearch)
 		private opensearch: OpenSearch | null,
@@ -273,7 +273,7 @@ export class SearchService {
 				return this.searchNoteByLike(q, me, opts, pagination);
 			}
 			case 'meilisearch': {
-				return this.searchNoteByMeiliSearch(q, me, opts, pagination);
+				return this.searchNoteByMeilisearch(q, me, opts, pagination);
 			}
 			case 'opensearch': {
 				return this.searchNoteByOpenSearch(q, me, opts, pagination);
@@ -360,9 +360,9 @@ export class SearchService {
 			.leftJoinAndSelect('renote.user', 'renoteUser');
 
 		query.where('note.id IN (:...noteIds)', { noteIds });
+		query.andWhere('note.visibility IN (:...searchableVisibilities)', { searchableVisibilities: ['public', 'home'] });
 
-		this.queryService.generateBlockedHostQueryForNote(query);
-		this.queryService.generateSuspendedUserQueryForNote(query);
+		this.queryService.generateBaseNoteFilteringQuery(query, me);
 
 		const notes = (await query.getMany()).filter(note => {
 			if (me && isUserRelated(note, userIdsWhoBlockingMe)) return false;
@@ -416,14 +416,14 @@ export class SearchService {
 	}
 
 	@bindThis
-	private async searchNoteByMeiliSearch(
+	private async searchNoteByMeilisearch(
 		q: string,
 		me: MiUser | null,
 		opts: SearchOpts,
 		pagination: SearchPagination,
 	): Promise<MiNote[]> {
 		if (!this.meilisearch || !this.meilisearchNoteIndex) {
-			throw new Error('MeiliSearch is not available');
+			throw new Error('Meilisearch is not available');
 		}
 
 		const filter: Q = {

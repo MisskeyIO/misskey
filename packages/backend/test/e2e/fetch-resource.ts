@@ -6,6 +6,7 @@
 process.env.NODE_ENV = 'test';
 
 import * as assert from 'assert';
+import { beforeAll, beforeEach, describe, test } from 'vitest';
 import { api, channel, clip, galleryPost, page, play, post, relativeFetch, signup, simpleGet, uploadFile } from '../utils.js';
 import type { SimpleGetResponse } from '../utils.js';
 import type * as misskey from 'misskey-js';
@@ -112,7 +113,7 @@ describe('Webリソース', () => {
 		{ path: '/bios', type: HTML },
 		{ path: '/cli', type: HTML },
 		{ path: '/flush', type: HTML },
-		{ path: '/robots.txt', type: 'text/plain; charset=utf-8' },
+		{ path: '/robots.txt', type: 'text/plain; charset=UTF-8' },
 		{ path: '/favicon.ico', type: 'image/vnd.microsoft.icon' },
 		{ path: '/opensearch.xml', type: 'application/opensearchdescription+xml' },
 		{ path: '/apple-touch-icon.png', type: 'image/png' },

@@ -68,8 +68,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, ref, shallowRef, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
-import { browserSupportsWebAuthn as webAuthnSupported } from '@simplewebauthn/browser';
-import type { AuthenticationResponseJSON, PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/browser';
+import { browserSupportsWebAuthn } from '@simplewebauthn/browser';
+import type { PublicKeyCredentialRequestOptionsJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser';
 import type { OpenOnRemoteOptions } from '@/utility/please-login.js';
 import type { PwResponse } from '@/components/MkSignin.password.vue';
 import XPassword from '@/components/MkSignin.password.vue';
@@ -116,7 +116,7 @@ const passkeyContext = ref('');
 const doingPasskeyFromInputPage = ref(false);
 
 function onPasskeyLogin(): void {
-	if (webAuthnSupported()) {
+	if (browserSupportsWebAuthn()) {
 		doingPasskeyFromInputPage.value = true;
 		waiting.value = true;
 		misskeyApi('signin-with-passkey', {})
@@ -135,8 +135,8 @@ function onPasskeyDone(credential: AuthenticationResponseJSON): void {
 	waiting.value = true;
 
 	if (doingPasskeyFromInputPage.value) {
-		misskeyApi<Misskey.entities.SigninWithPasskeyResponse>('signin-with-passkey', {
-			credential,
+		misskeyApi('signin-with-passkey', {
+			credential: credential,
 			context: passkeyContext.value,
 		}).then((res) => {
 			if (res.signinResponse == null) {
@@ -150,7 +150,7 @@ function onPasskeyDone(credential: AuthenticationResponseJSON): void {
 		tryLogin({
 			username: username,
 			password: password.value,
-			credential,
+			credential: credential,
 		});
 	}
 }
@@ -256,7 +256,7 @@ async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>): Promi
 					break;
 				}
 				case 'passkey': {
-					if (webAuthnSupported()) {
+					if (browserSupportsWebAuthn()) {
 						credentialRequest.value = res.authRequest;
 						page.value = 'passkey';
 					} else {

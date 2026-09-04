@@ -15,7 +15,7 @@ import type { GtagConsentParams } from '@/types/gtag';
 import widgets from '@/widgets/index.js';
 import directives from '@/directives/index.js';
 import components from '@/components/index.js';
-import { applyTheme } from '@/theme.js';
+import { themeManager } from '@/theme.js';
 import { isDeviceDarkmode } from '@/utility/is-device-darkmode.js';
 import { i18n } from '@/i18n.js';
 import { refreshCurrentAccount, login, updateCurrentAccountPartial } from '@/accounts.js';
@@ -207,7 +207,7 @@ export async function common(createVue: () => Promise<App<Element>>) {
 
 	// NOTE: この処理は必ずクライアント更新チェック処理より後に来ること(テーマ再構築のため)
 	// NOTE: この処理は必ずダークモード判定処理より後に来ること(初回のテーマ適用のため)
-	// NOTE: この処理は必ずサーバーテーマ適用処理より後に来ること(二重applyTheme発火を防ぐため)
+	// NOTE: この処理は必ずサーバーテーマ適用処理より後に来ること(二重発火を防ぐため)
 	// see: https://github.com/misskey-dev/misskey/issues/16562
 	watch(store.r.darkMode, (darkMode) => {
 		const theme = (() => {
@@ -218,7 +218,7 @@ export async function common(createVue: () => Promise<App<Element>>) {
 			}
 		})();
 
-		applyTheme(theme);
+		themeManager.updateTheme(theme);
 	}, { immediate: true });
 
 	window.document.documentElement.dataset.colorScheme = store.s.darkMode ? 'dark' : 'light';
@@ -226,13 +226,13 @@ export async function common(createVue: () => Promise<App<Element>>) {
 	if (!isSafeMode) {
 		watch(prefer.r.darkTheme, (theme) => {
 			if (store.s.darkMode) {
-				applyTheme(theme ?? defaultDarkTheme);
+				themeManager.updateTheme(theme ?? defaultDarkTheme);
 			}
 		});
 
 		watch(prefer.r.lightTheme, (theme) => {
 			if (!store.s.darkMode) {
-				applyTheme(theme ?? defaultLightTheme);
+				themeManager.updateTheme(theme ?? defaultLightTheme);
 			}
 		});
 	}

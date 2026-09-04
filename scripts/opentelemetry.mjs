@@ -4,24 +4,23 @@ import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentation
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
-import { Resource } from '@opentelemetry/resources';
+import { defaultResource, resourceFromAttributes } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 
-// Enable diagnostic logging at info level
-// Useful during development to verify telemetry pipeline initialization
+// 初期化状況を確認できるよう診断ログを有効にする
 if (process.env.OTEL_LOG_LEVEL) {
   diag.setLogger(new DiagConsoleLogger(), DiagLogLevel[process.env.OTEL_LOG_LEVEL.toUpperCase()] ?? DiagLogLevel.INFO);
 } else {
   diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.INFO);
 }
 
-// Allow overriding OTLP endpoint; defaults assume a Signoz collector service
+// 既定ではSignoz Collectorへ送信する
 const collectorEndpoint = process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://signoz-otel-collector:4318';
 
 const traceExporter = new OTLPTraceExporter({ url: `${collectorEndpoint}/v1/traces` });
 const metricExporter = new OTLPMetricExporter({ url: `${collectorEndpoint}/v1/metrics` });
 
-// Enrich resource metadata so traces/metrics can be tied back to the originating pod
+// traceとmetricを送信元Podへ紐づける
 const resourceAttributes = {
   [SemanticResourceAttributes.SERVICE_NAME]: process.env.OTEL_SERVICE_NAME || 'misskey',
   [SemanticResourceAttributes.SERVICE_NAMESPACE]: process.env.OTEL_SERVICE_NAMESPACE,
@@ -36,20 +35,19 @@ const filteredAttributes = Object.fromEntries(
 );
 
 const sdk = new NodeSDK({
-  resource: Resource.default().merge(new Resource(filteredAttributes)),
+  resource: defaultResource().merge(resourceFromAttributes(filteredAttributes)),
   traceExporter,
   metricReader: new PeriodicExportingMetricReader({ exporter: metricExporter }),
   instrumentations: [getNodeAutoInstrumentations()],
 });
 
-sdk.start()
-  .then(() => {
-    console.log('OpenTelemetry auto-instrumentation initialized');
-  })
-  .catch((error) => {
-    console.error('Error initializing OpenTelemetry', error);
-    console.warn('WARNING: Application is running without telemetry. If telemetry is critical for your deployment, please investigate the initialization error above.');
-  });
+try {
+  sdk.start();
+  console.log('OpenTelemetry auto-instrumentation initialized');
+} catch (error) {
+  console.error('Error initializing OpenTelemetry', error);
+  console.warn('WARNING: Application is running without telemetry. If telemetry is critical for your deployment, please investigate the initialization error above.');
+}
 
 process.once('SIGTERM', () => {
   sdk.shutdown()

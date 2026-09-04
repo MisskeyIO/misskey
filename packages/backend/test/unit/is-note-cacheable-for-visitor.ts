@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { isNoteCacheableForVisitor } from '@/misc/is-note-cacheable-for-visitor.js';
 import type { Packed } from '@/misc/json-schema.js';
 

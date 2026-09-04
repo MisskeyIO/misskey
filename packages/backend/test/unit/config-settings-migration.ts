@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { describe, expect, jest, test } from '@jest/globals';
+import { describe, expect, vi, test } from 'vitest';
 import { MigrateSomeConfigFileSettingsToMeta1746949539915 } from '../../migration/1746949539915-migrateSomeConfigFileSettingsToMeta.js';
 
 class MockQueryRunner {
@@ -24,7 +24,7 @@ describe('config settings migration', () => {
 		['稼働済みDBの旧既定値', true, {}, ['false', 'true', 'true']],
 		['新規DBの公式既定値', false, {}, ['true', 'true', 'true']],
 	] as const)('%sを保持する', async (_label, hasMeta, config, expected) => {
-		jest.spyOn(MigrateSomeConfigFileSettingsToMeta1746949539915, 'loadCompiledConfig').mockReturnValue(config);
+		vi.spyOn(MigrateSomeConfigFileSettingsToMeta1746949539915, 'loadCompiledConfig').mockReturnValue(config);
 		const runner = new MockQueryRunner(hasMeta);
 
 		await new MigrateSomeConfigFileSettingsToMeta1746949539915().up(runner);

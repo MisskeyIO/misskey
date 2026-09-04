@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { describe, expect, jest, test } from '@jest/globals';
+import { describe, expect, vi, test } from 'vitest';
 import type * as Bull from 'bullmq';
 import { NOTE_CREATE_PERMANENT_ERROR_IDS } from '@/core/NoteCreateService.js';
 import { getPostScheduledNoteJobId, getPostScheduledNoteJobOptions, POST_SCHEDULED_NOTE_ATTEMPTS } from '@/core/QueueService.js';
@@ -20,11 +20,11 @@ import ScheduledNoteListEndpoint from '@/server/api/endpoints/notes/scheduled/li
 function queryBuilder(result: unknown): any {
 	const builder: any = {};
 	for (const method of ['update', 'delete', 'set', 'where', 'andWhere', 'setParameter', 'returning', 'leftJoinAndSelect', 'orderBy', 'addOrderBy', 'offset', 'limit']) {
-		builder[method] = jest.fn(() => builder);
+		builder[method] = vi.fn(() => builder);
 	}
-	builder.execute = jest.fn(async () => result);
-	builder.getOne = jest.fn(async () => result);
-	builder.getMany = jest.fn(async () => result);
+	builder.execute = vi.fn(async () => result);
+	builder.getOne = vi.fn(async () => result);
+	builder.getMany = vi.fn(async () => result);
 	return builder;
 }
 
@@ -78,22 +78,22 @@ function postProcessor(options: {
 	fetchAndCreate: (user: unknown, data: unknown) => Promise<{ id: string }>;
 	existingNote?: { id: string; userId: string } | null;
 }) {
-	const createQueryBuilder = jest.fn();
+	const createQueryBuilder = vi.fn();
 	for (const builder of options.builders) createQueryBuilder.mockReturnValueOnce(builder);
 	const noteDraftsRepository = {
 		createQueryBuilder,
-		findOne: jest.fn(async () => options.draft),
+		findOne: vi.fn(async () => options.draft),
 	};
-	const notesRepository = { findOneBy: jest.fn(async () => options.existingNote ?? null) };
-	const noteCreateService = { fetchAndCreate: jest.fn(options.fetchAndCreate) };
-	const notificationService = { createNotificationAsync: jest.fn(async (_userId: string, _type: string, _data: unknown) => undefined) };
-	const logger = { warn: jest.fn() };
+	const notesRepository = { findOneBy: vi.fn(async () => options.existingNote ?? null) };
+	const noteCreateService = { fetchAndCreate: vi.fn(options.fetchAndCreate) };
+	const notificationService = { createNotificationAsync: vi.fn(async (_userId: string, _type: string, _data: unknown) => undefined) };
+	const logger = { warn: vi.fn() };
 	const service = new PostScheduledNoteProcessorService(
 		noteDraftsRepository as never,
 		notesRepository as never,
 		noteCreateService as never,
 		notificationService as never,
-		{ gen: jest.fn(() => 'candidate-id'), parse: jest.fn(() => ({ date: new Date(1_000) })) } as never,
+		{ gen: vi.fn(() => 'candidate-id'), parse: vi.fn(() => ({ date: new Date(1_000) })) } as never,
 		{ logger: { createSubLogger: () => logger } } as never,
 	);
 
@@ -130,17 +130,17 @@ describe('PostScheduledNoteProcessorService', () => {
 	test('staleな予約世代は投稿しない', async () => {
 		const claim = queryBuilder({ affected: 0 });
 		const noteDraftsRepository = {
-			createQueryBuilder: jest.fn(() => claim),
-			findOne: jest.fn(),
+			createQueryBuilder: vi.fn(() => claim),
+			findOne: vi.fn(),
 		};
-		const noteCreateService = { fetchAndCreate: jest.fn() };
+		const noteCreateService = { fetchAndCreate: vi.fn() };
 		const service = new PostScheduledNoteProcessorService(
 			noteDraftsRepository as never,
-			{ findOneBy: jest.fn() } as never,
+			{ findOneBy: vi.fn() } as never,
 			noteCreateService as never,
-			{ createNotificationAsync: jest.fn() } as never,
-			{ gen: jest.fn(() => 'candidate-id'), parse: jest.fn() } as never,
-			{ logger: { createSubLogger: () => ({ warn: jest.fn() }) } } as never,
+			{ createNotificationAsync: vi.fn() } as never,
+			{ gen: vi.fn(() => 'candidate-id'), parse: vi.fn() } as never,
+			{ logger: { createSubLogger: () => ({ warn: vi.fn() }) } } as never,
 		);
 
 		await service.process({ data: { noteDraftId: 'draft-id', scheduledAt: 1_000 } } as Bull.Job<PostScheduledNoteJobData>);
@@ -154,20 +154,20 @@ describe('PostScheduledNoteProcessorService', () => {
 		const complete = queryBuilder({ affected: 1 });
 		const noteDraft = draft();
 		const noteDraftsRepository = {
-			createQueryBuilder: jest.fn()
+			createQueryBuilder: vi.fn()
 				.mockReturnValueOnce(claim)
 				.mockReturnValueOnce(complete),
-			findOne: jest.fn(async () => noteDraft),
+			findOne: vi.fn(async () => noteDraft),
 		};
-		const noteCreateService = { fetchAndCreate: jest.fn(async (_user: unknown, _data: unknown) => ({ id: noteDraft.reservedNoteId })) };
-		const notificationService = { createNotificationAsync: jest.fn(async (_userId: string, _type: string, _data: unknown) => undefined) };
+		const noteCreateService = { fetchAndCreate: vi.fn(async (_user: unknown, _data: unknown) => ({ id: noteDraft.reservedNoteId })) };
+		const notificationService = { createNotificationAsync: vi.fn(async (_userId: string, _type: string, _data: unknown) => undefined) };
 		const service = new PostScheduledNoteProcessorService(
 			noteDraftsRepository as never,
-			{ findOneBy: jest.fn() } as never,
+			{ findOneBy: vi.fn() } as never,
 			noteCreateService as never,
 			notificationService as never,
-			{ gen: jest.fn(() => 'candidate-id'), parse: jest.fn(() => ({ date: new Date(1_000) })) } as never,
-			{ logger: { createSubLogger: () => ({ warn: jest.fn() }) } } as never,
+			{ gen: vi.fn(() => 'candidate-id'), parse: vi.fn(() => ({ date: new Date(1_000) })) } as never,
+			{ logger: { createSubLogger: () => ({ warn: vi.fn() }) } } as never,
 		);
 
 		await service.process({ data: { noteDraftId: noteDraft.id, scheduledAt: 1_000 } } as Bull.Job<PostScheduledNoteJobData>);
@@ -260,19 +260,19 @@ describe('CheckMissingScheduledNoteProcessorService', () => {
 			.mockResolvedValueOnce([draft({ scheduledAt })])
 			.mockResolvedValueOnce([]);
 		const postScheduledNoteQueue = {
-			getJobState: jest.fn(async () => 'failed'),
-			remove: jest.fn(async (_jobId: string) => 1),
+			getJobState: vi.fn(async () => 'failed'),
+			remove: vi.fn(async (_jobId: string) => 1),
 		};
 		const queueService = {
 			postScheduledNoteQueue,
-			createPostScheduledNoteJob: jest.fn(async (_draftId: string, _scheduledAt: Date) => undefined),
+			createPostScheduledNoteJob: vi.fn(async (_draftId: string, _scheduledAt: Date) => undefined),
 		};
 		const service = new CheckMissingScheduledNoteProcessorService(
 			{} as never,
 			{} as never,
-			{ createQueryBuilder: jest.fn(() => drafts) } as never,
+			{ createQueryBuilder: vi.fn(() => drafts) } as never,
 			queueService as never,
-			{ logger: { createSubLogger: () => ({ info: jest.fn(), warn: jest.fn() }) } } as never,
+			{ logger: { createSubLogger: () => ({ info: vi.fn(), warn: vi.fn() }) } } as never,
 		);
 
 		await service['recoverNoteDraftSchedules']();
@@ -288,10 +288,10 @@ describe('CheckMissingScheduledNoteProcessorService', () => {
 		const drafts = queryBuilder([]);
 		const service = new CheckMissingScheduledNoteProcessorService(
 			{} as never,
-			{ createQueryBuilder: jest.fn(() => drafts) } as never,
+			{ createQueryBuilder: vi.fn(() => drafts) } as never,
 			{} as never,
 			{} as never,
-			{ logger: { createSubLogger: () => ({ info: jest.fn(), warn: jest.fn() }) } } as never,
+			{ logger: { createSubLogger: () => ({ info: vi.fn(), warn: vi.fn() }) } } as never,
 		);
 
 		await service['recoverLegacySchedules']();
@@ -303,13 +303,13 @@ describe('CheckMissingScheduledNoteProcessorService', () => {
 describe('旧予約との分離', () => {
 	test('旧workerは移行台帳のある行を投稿しない', async () => {
 		const drafts = queryBuilder(null);
-		const noteCreateService = { create: jest.fn() };
+		const noteCreateService = { create: vi.fn() };
 		const service = new ScheduledNoteProcessorService(
 			{} as never,
-			{ createQueryBuilder: jest.fn(() => drafts) } as never,
+			{ createQueryBuilder: vi.fn(() => drafts) } as never,
 			{} as never,
 			noteCreateService as never,
-			{ logger: { createSubLogger: () => ({ info: jest.fn(), warn: jest.fn() }) } } as never,
+			{ logger: { createSubLogger: () => ({ info: vi.fn(), warn: vi.fn() }) } } as never,
 		);
 
 		await service['processLocked']({ data: { draftId: 'legacy-id' } } as Bull.Job);
@@ -320,8 +320,8 @@ describe('旧予約との分離', () => {
 
 	test('旧一覧はmarkerと移行台帳を除外する', async () => {
 		const drafts = queryBuilder([]);
-		const repository = { createQueryBuilder: jest.fn(() => drafts) };
-		const packService = { packMany: jest.fn(async () => []) };
+		const repository = { createQueryBuilder: vi.fn(() => drafts) };
+		const packService = { packMany: vi.fn(async () => []) };
 		const endpoint = new ScheduledNoteListEndpoint(repository as never, packService as never);
 
 		await endpoint.exec({ limit: 10, offset: 0 }, { id: 'user-id' } as never, null);
@@ -338,11 +338,11 @@ describe('旧予約との分離', () => {
 		const select = queryBuilder(draft);
 		const remove = queryBuilder({ affected: 1 });
 		const repository = {
-			createQueryBuilder: jest.fn()
+			createQueryBuilder: vi.fn()
 				.mockReturnValueOnce(select)
 				.mockReturnValueOnce(remove),
 		};
-		const queueService = { systemQueue: { remove: jest.fn(async (_jobId: string) => 1) } };
+		const queueService = { systemQueue: { remove: vi.fn(async (_jobId: string) => 1) } };
 		const endpoint = new ScheduledNoteCancelEndpoint(repository as never, queueService as never);
 
 		await endpoint.exec({ draftId: draft.id }, { id: 'user-id' } as never, null);

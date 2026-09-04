@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { describe, expect, test } from '@jest/globals';
+import { describe, expect, test } from 'vitest';
 import { fileURLToPath } from 'node:url';
 import { DataSource } from 'typeorm';
 import * as migrationModule from '../../migration/1788391179000-migrate-legacy-scheduled-notes.js';
@@ -220,7 +220,7 @@ describe('legacy scheduled note migration', () => {
 		await (dataSource as unknown as { buildMetadatas(): Promise<void> }).buildMetadatas();
 
 		expect(dataSource.migrations).toHaveLength(1);
-		expect(dataSource.migrations[0]).toBeInstanceOf(MigrateLegacyScheduledNotes1788391179000);
+		expect(dataSource.migrations[0]?.constructor.name).toBe(MigrateLegacyScheduledNotes1788391179000.name);
 	});
 
 	test('2025.4の既知fieldと明示的な抽出抑止をnote_draftへ変換する', () => {

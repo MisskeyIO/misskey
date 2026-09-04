@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { afterAll, afterEach, beforeAll, beforeEach, describe, jest, test } from '@jest/globals';
+import { describe, expect, test, beforeAll, beforeEach, afterEach, afterAll, vi } from 'vitest';
+import type { Mocked } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as lolex from '@sinonjs/fake-timers';
 import { addHours, addSeconds, subDays, subHours, subSeconds } from 'date-fns';
@@ -15,7 +16,6 @@ import { GlobalModule } from '@/GlobalModule.js';
 import { MetaService } from '@/core/MetaService.js';
 import { DI } from '@/di-symbols.js';
 import { QueueLoggerService } from '@/queue/QueueLoggerService.js';
-import { EmailService } from '@/core/EmailService.js';
 import { SystemWebhookService } from '@/core/SystemWebhookService.js';
 import { AnnouncementService } from '@/core/AnnouncementService.js';
 import { SystemWebhookEventType } from '@/models/SystemWebhook.js';
@@ -25,7 +25,7 @@ const baseDate = new Date(Date.UTC(2000, 11, 15, 12, 0, 0));
 
 describe('CheckModeratorsActivityProcessorService', () => {
 	let app: TestingModule;
-	let clock: lolex.InstalledClock;
+	let clock: lolex.Clock;
 	let service: CheckModeratorsActivityProcessorService;
 
 	// --------------------------------------------------------------------------------------
@@ -33,11 +33,10 @@ describe('CheckModeratorsActivityProcessorService', () => {
 	let usersRepository: UsersRepository;
 	let userProfilesRepository: UserProfilesRepository;
 	let idService: IdService;
-	let roleService: jest.Mocked<RoleService>;
-	let announcementService: jest.Mocked<AnnouncementService>;
-	let emailService: jest.Mocked<EmailService>;
-	let systemWebhookService: jest.Mocked<SystemWebhookService>;
-	let queueService: jest.Mocked<QueueService>;
+	let roleService: Mocked<RoleService>;
+	let announcementService: Mocked<AnnouncementService>;
+	let systemWebhookService: Mocked<SystemWebhookService>;
+	let queueService: Mocked<QueueService>;
 
 	let systemWebhook1: MiSystemWebhook;
 	let systemWebhook2: MiSystemWebhook;
@@ -96,36 +95,33 @@ describe('CheckModeratorsActivityProcessorService', () => {
 					CheckModeratorsActivityProcessorService,
 					IdService,
 					{
-						provide: RoleService, useFactory: () => ({ getModerators: jest.fn() }),
+						provide: RoleService, useFactory: () => ({ getModerators: vi.fn() }),
 					},
 					{
-						provide: MetaService, useFactory: () => ({ fetch: jest.fn() }),
+						provide: MetaService, useFactory: () => ({ fetch: vi.fn() }),
 					},
 					{
-						provide: AnnouncementService, useFactory: () => ({ create: jest.fn() }),
-					},
-					{
-						provide: EmailService, useFactory: () => ({ sendEmail: jest.fn() }),
+						provide: AnnouncementService, useFactory: () => ({ create: vi.fn() }),
 					},
 					{
 						provide: SystemWebhookService, useFactory: () => ({
-							fetchActiveSystemWebhooks: jest.fn(),
-							enqueueSystemWebhook: jest.fn(),
+							fetchActiveSystemWebhooks: vi.fn(),
+							enqueueSystemWebhook: vi.fn(),
 						}),
+					},
+					{
+						provide: QueueService, useFactory: () => ({ createSendEmailJob: vi.fn() }),
 					},
 					{
 						provide: QueueLoggerService, useFactory: () => ({
 							logger: ({
 								createSubLogger: () => ({
-									info: jest.fn(),
-									warn: jest.fn(),
-									succ: jest.fn(),
+									info: vi.fn(),
+									warn: vi.fn(),
+									succ: vi.fn(),
 								}),
 							}),
 						}),
-					},
-					{
-						provide: QueueService, useFactory: () => ({ createSendEmailJob: jest.fn() }),
 					},
 				],
 			})
@@ -136,21 +132,18 @@ describe('CheckModeratorsActivityProcessorService', () => {
 
 		service = app.get(CheckModeratorsActivityProcessorService);
 		idService = app.get(IdService);
-		roleService = app.get(RoleService) as jest.Mocked<RoleService>;
-		announcementService = app.get(AnnouncementService) as jest.Mocked<AnnouncementService>;
-		emailService = app.get(EmailService) as jest.Mocked<EmailService>;
-		systemWebhookService = app.get(SystemWebhookService) as jest.Mocked<SystemWebhookService>;
-		queueService = app.get(QueueService) as jest.Mocked<QueueService>;
+		roleService = app.get(RoleService) as Mocked<RoleService>;
+		announcementService = app.get(AnnouncementService) as Mocked<AnnouncementService>;
+		systemWebhookService = app.get(SystemWebhookService) as Mocked<SystemWebhookService>;
+		queueService = app.get(QueueService) as Mocked<QueueService>;
 
 		app.enableShutdownHooks();
 	});
 
 	beforeEach(async () => {
 		clock = lolex.install({
-			// https://github.com/sinonjs/sinon/issues/2620
-			toFake: Object.keys(lolex.timers).filter((key) => !['nextTick', 'queueMicrotask'].includes(key)) as lolex.FakeMethod[],
+			toFake: ['Date'],
 			now: new Date(baseDate),
-			shouldClearNativeTimers: true,
 		});
 
 		systemWebhook1 = crateSystemWebhook({ on: ['inactiveModeratorsWarning'] });

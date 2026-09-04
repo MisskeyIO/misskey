@@ -26,6 +26,7 @@ import { i18n } from '@/i18n.js';
 import { definePage } from '@/page.js';
 import MkButton from '@/components/MkButton.vue';
 import * as config from '@@/js/config.js';
+import { iAmAdmin } from '@/i.js';
 
 export type ApQueueDomain = 'deliver' | 'inbox';
 
@@ -55,14 +56,14 @@ function promoteAllQueues() {
 	});
 }
 
-const headerActions = computed(() => [{
+const headerActions = computed(() => iAmAdmin ? [{
 	asFullButton: true,
 	icon: 'ti ti-external-link',
 	text: i18n.ts.dashboard,
 	handler: () => {
 		window.open(config.url + '/queue', '_blank', 'noopener');
 	},
-}]);
+}] : []);
 
 const headerTabs = computed(() => [{
 	key: 'deliver',

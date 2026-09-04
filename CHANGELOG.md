@@ -8,6 +8,7 @@
 ### Server
 - Fix: キュー監視画面に予約投稿キューを追加
 - Fix: Backendのbundleから任意依存の`pg-native`を除外
+- Fix: HTTPヘッダーと登録確認コードをログで伏せ字にするよう修正
 
 
 ## 2026.5.4

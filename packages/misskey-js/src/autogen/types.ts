@@ -5858,7 +5858,7 @@ export type components = {
         MetaDetailed: components['schemas']['MetaLite'] & components['schemas']['MetaDetailedOnly'];
         MetaClientOptions: {
             /** @enum {string} */
-            entrancePageStyle: 'classic' | 'simple';
+            entrancePageStyle: 'classic' | 'simple' | 'special';
             showTimelineForVisitor: boolean;
             showActivitiesForVisitor: boolean;
         };
@@ -13845,7 +13845,7 @@ export interface operations {
                     defaultDarkTheme?: string | null;
                     clientOptions?: {
                         /** @enum {string} */
-                        entrancePageStyle?: 'classic' | 'simple';
+                        entrancePageStyle?: 'classic' | 'simple' | 'special';
                         showTimelineForVisitor?: boolean;
                         showActivitiesForVisitor?: boolean;
                     };

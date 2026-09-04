@@ -16,13 +16,13 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 WORKDIR /misskey
 
-COPY --link pnpm-lock.yaml ./
+COPY --link ["pnpm-lock.yaml", "pnpm-workspace.yaml", "./"]
 COPY --link patches ./patches
-RUN npm install -g pnpm@10
+RUN npm install -g pnpm@11.1.2
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
 	pnpm fetch --ignore-scripts
 
-COPY --link ["pnpm-workspace.yaml", "package.json", "./"]
+COPY --link package.json ./
 COPY --link ["scripts", "./scripts"]
 COPY --link ["patches", "./patches"]
 COPY --link ["packages/backend/package.json", "./packages/backend/"]
@@ -54,13 +54,13 @@ RUN apt-get update \
 
 WORKDIR /misskey
 
-COPY --link pnpm-lock.yaml ./
+COPY --link ["pnpm-lock.yaml", "pnpm-workspace.yaml", "./"]
 COPY --link patches ./patches
-RUN npm install -g pnpm@10 && mkdir -p /root/.local/share/pnpm/.tools
+RUN npm install -g pnpm@11.1.2 && mkdir -p /root/.local/share/pnpm/.tools
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
 	pnpm fetch --ignore-scripts
 
-COPY --link ["pnpm-workspace.yaml", "package.json", "./"]
+COPY --link package.json ./
 COPY --link ["scripts", "./scripts"]
 COPY --link ["patches", "./patches"]
 COPY --link ["packages/backend/package.json", "./packages/backend/"]
@@ -94,7 +94,7 @@ WORKDIR /misskey
 
 COPY --chown=misskey:misskey pnpm-lock.yaml ./
 COPY --chown=misskey:misskey patches ./patches
-RUN npm install -g pnpm@10
+RUN npm install -g pnpm@11.1.2
 
 COPY --chown=misskey:misskey --from=target-builder /root/.local/share/pnpm/.tools ./.local/share/pnpm/.tools
 COPY --chown=misskey:misskey --from=target-builder /misskey/node_modules ./node_modules

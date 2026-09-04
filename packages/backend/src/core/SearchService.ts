@@ -360,9 +360,9 @@ export class SearchService {
 			.leftJoinAndSelect('renote.user', 'renoteUser');
 
 		query.where('note.id IN (:...noteIds)', { noteIds });
+		query.andWhere('note.visibility IN (:...searchableVisibilities)', { searchableVisibilities: ['public', 'home'] });
 
-		this.queryService.generateBlockedHostQueryForNote(query);
-		this.queryService.generateSuspendedUserQueryForNote(query);
+		this.queryService.generateBaseNoteFilteringQuery(query, me);
 
 		const notes = (await query.getMany()).filter(note => {
 			if (me && isUserRelated(note, userIdsWhoBlockingMe)) return false;

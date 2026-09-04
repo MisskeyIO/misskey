@@ -442,7 +442,7 @@ function normalizeInlinePolicies(policies: typeof info.value.inlinePolicies): In
 
 function resetInlinePoliciesFromInfo(policies: typeof info.value.inlinePolicies) {
 	inlinePoliciesForm.value = normalizeInlinePolicies(policies);
-	inlinePoliciesInitial.value = structuredClone(inlinePoliciesForm.value);
+	inlinePoliciesInitial.value = JSON.parse(JSON.stringify(inlinePoliciesForm.value));
 }
 
 function policyValueType(policy: InlinePolicyName): 'boolean' | 'number' | 'string' {
@@ -490,7 +490,7 @@ function removeInlinePolicy(index: number) {
 }
 
 function resetInlinePolicies() {
-	inlinePoliciesForm.value = structuredClone(inlinePoliciesInitial.value);
+	inlinePoliciesForm.value = JSON.parse(JSON.stringify(inlinePoliciesInitial.value));
 }
 
 async function saveInlinePolicies() {

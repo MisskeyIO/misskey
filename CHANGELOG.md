@@ -2,6 +2,7 @@
 
 ### General
 - Fix: Dockerワークフローでブランチ名とタグ名を安全に扱うよう修正
+- Fix: Docker buildで利用するpnpmをlockfileと同じ版へ更新
 
 ### Client
 - Fix: 管理者向けユーザー画面のインラインポリシー編集と管理操作を復元
@@ -11,6 +12,7 @@
 - Fix: 移行前の予約投稿が失敗した場合に内容と理由を表示
 
 ### Server
+- Fix: clean環境でも設定移行migrationを読み込めるよう修正
 - Fix: OpenSearchの検索結果を公開・ホーム投稿だけに限定
 - Fix: キュー監視画面に予約投稿キューを追加
 - Fix: Backendのbundleから任意依存の`pg-native`を除外

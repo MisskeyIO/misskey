@@ -51,11 +51,14 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Prepare image metadata
         shell: bash
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
         run: |
           set -euo pipefail
 
-          ref_type="${{ github.ref_type }}"
-          ref_name="$(echo ${{ github.ref_name }} | sed -e 's/\//-/g')"
+          ref_type="${REF_TYPE}"
+          ref_name="${REF_NAME//\//-}"
 
           branch_name="main"
           case "${ref_type}" in

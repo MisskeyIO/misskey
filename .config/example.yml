@@ -280,7 +280,7 @@ fulltextSearch:
 #───┘ File storage (Drive) configuration └──────────────────────
 
 #s3:
-#  baseUrl: s3.example.com
+#  baseUrl: https://s3.example.com
 #  bucket: example-bucket
 #  prefix: example-prefix
 #  endpoint: s3.example.com

@@ -43,7 +43,7 @@ export default class Logger {
 			level: envOption.verbose ? 'debug' : 'info',
 			depthLimit: 8,
 			edgeLimit: 128,
-			redact: ['context.password', 'context.token'],
+			redact: ['headers', 'code', 'context.password', 'context.token'],
 			enabled: !envOption.quiet || envOption.logJson,
 			timestamp: envOption.withLogTime || envOption.logJson ? pino.stdTimeFunctions.isoTime : false,
 			messageKey: 'message',

@@ -2,6 +2,7 @@
 
 ### General
 - Fix: Dockerワークフローでブランチ名とタグ名を安全に扱うよう修正
+- Fix: Docker buildで利用するpnpmをlockfileと同じ版へ更新
 
 ### Client
 - Fix: 管理者向けユーザー画面のインラインポリシー編集と管理操作を復元

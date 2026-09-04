@@ -9,12 +9,13 @@ process.env.NODE_ENV = 'test';
 
 import { setTimeout } from 'node:timers/promises';
 import * as assert from 'assert';
-import { api, castAsError, initTestDb, signup, successfulApiCall, uploadFile } from '../utils.js';
-import type * as misskey from 'misskey-js';
+import { afterAll, beforeAll, afterEach, describe, test } from 'vitest';
 import { loadConfig } from '@/config.js';
 import { MiRepository, MiUser, UsersRepository, miRepository } from '@/models/_.js';
 import { secureRndstr } from '@/misc/secure-rndstr.js';
 import { jobQueue } from '@/boot/common.js';
+import { api, castAsError, initTestDb, signup, successfulApiCall, uploadFile } from '../utils.js';
+import type * as misskey from 'misskey-js';
 
 describe('Account Move', () => {
 	let jq: INestApplicationContext;
@@ -460,9 +461,6 @@ describe('Account Move', () => {
 			assert.ok(res.body);
 			assert.strictEqual(castAsError(res.body).error.code, 'YOUR_ACCOUNT_MOVED');
 			assert.strictEqual(castAsError(res.body).error.id, '56f20ec9-fd06-4fa5-841b-edd6d7d4fa31');
-			// assert.strictEqual((res.body! as FIXME as { error: misskey.api.APIError }).error.code, 'YOUR_ACCOUNT_MOVED');
-			// assert.strictEqual((res.body! as FIXME as { error: misskey.api.APIError }).error.id, '56f20ec9-fd06-4fa5-841b-edd6d7d4fa31');
-		// TODO
 		});
 
 		test('Prohibit updating alsoKnownAs after moving', async () => {

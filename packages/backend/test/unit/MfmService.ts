@@ -5,13 +5,22 @@
 
 import * as assert from 'assert';
 import * as mfm from 'mfm-js';
+import { beforeAll, describe, test } from 'vitest';
+import { Test } from '@nestjs/testing';
 
+import { CoreModule } from '@/core/CoreModule.js';
 import { MfmService } from '@/core/MfmService.js';
+import { GlobalModule } from '@/GlobalModule.js';
 
 describe('MfmService', () => {
-	const mfmService = new MfmService({
-		url: 'https://example.com',
-	} as any);
+	let mfmService: MfmService;
+
+	beforeAll(async () => {
+		const app = await Test.createTestingModule({
+			imports: [GlobalModule, CoreModule],
+		}).compile();
+		mfmService = app.get<MfmService>(MfmService);
+	});
 
 	describe('toHtml', () => {
 		test('br', () => {

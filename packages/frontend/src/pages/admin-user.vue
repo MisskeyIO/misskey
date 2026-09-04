@@ -15,7 +15,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<span class="state">
 						<span v-if="suspended" class="suspended">Suspended</span>
 						<span v-if="silenced" class="silenced">Silenced</span>
+						<span v-if="limited" class="limited">Limited</span>
 						<span v-if="moderator" class="moderator">Moderator</span>
+						<span v-if="deleted" class="deleted">Deleted</span>
 					</span>
 				</div>
 			</div>
@@ -56,48 +58,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #caption>{{ i18n.ts.moderationNoteDescription }}</template>
 			</MkTextarea>
 
-			<!--
-				<FormSection>
-					<template #label>ActivityPub</template>
-
-					<div class="_gaps_m">
-						<div style="display: flex; flex-direction: column; gap: 1em;">
-							<MkKeyValue v-if="user.host" oneline>
-								<template #key>{{ i18n.ts.instanceInfo }}</template>
-								<template #value><MkA :to="`/instance-info/${user.host}`" class="_link">{{ user.host }} <i class="ti ti-chevron-right"></i></MkA></template>
-							</MkKeyValue>
-							<MkKeyValue v-else oneline>
-								<template #key>{{ i18n.ts.instanceInfo }}</template>
-								<template #value>(Local user)</template>
-							</MkKeyValue>
-							<MkKeyValue oneline>
-								<template #key>{{ i18n.ts.updatedAt }}</template>
-								<template #value><MkTime v-if="user.lastFetchedAt" mode="detail" :time="user.lastFetchedAt"/><span v-else>N/A</span></template>
-							</MkKeyValue>
-							<MkKeyValue v-if="ap" oneline>
-								<template #key>Type</template>
-								<template #value><span class="_monospace">{{ ap.type }}</span></template>
-							</MkKeyValue>
-						</div>
-
-						<MkButton v-if="user.host != null" @click="updateRemoteUser"><i class="ti ti-refresh"></i> {{ i18n.ts.updateRemoteUser }}</MkButton>
-
-						<MkFolder>
-							<template #label>Raw</template>
-
-							<MkObjectView v-if="ap" tall :value="ap">
-							</MkObjectView>
-						</MkFolder>
-					</div>
-				</FormSection>
-			-->
-
 			<FormSection v-if="!isSystem">
 				<div class="_gaps">
 					<MkSwitch v-model="suspended" @update:modelValue="toggleSuspend">{{ i18n.ts.suspend }}</MkSwitch>
 
-					<div>
-						<MkButton v-if="user.host == null" inline style="margin-right: 8px;" @click="resetPassword"><i class="ti ti-key"></i> {{ i18n.ts.resetPassword }}</MkButton>
+					<div v-if="user.host == null" class="_buttons">
+						<MkButton @click="resetPassword"><i class="ti ti-key"></i> {{ i18n.ts.resetPassword }}</MkButton>
+						<MkButton danger @click="regenerateLoginToken"><i class="ti ti-refresh"></i> {{ i18n.ts.regenerateLoginToken }}</MkButton>
 					</div>
 
 					<MkFolder>
@@ -106,6 +73,68 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<div class="_gaps">
 							<div v-for="policy in Object.keys(info.policies)" :key="policy">
 								{{ policy }} ... {{ info.policies[policy as keyof typeof info.policies] }}
+							</div>
+						</div>
+					</MkFolder>
+
+					<MkFolder v-if="iAmAdmin">
+						<template #icon><i class="ti ti-adjustments"></i></template>
+						<template #label>{{ i18n.ts.inlinePolicies }}</template>
+						<div class="_gaps">
+							<MkInfo>{{ i18n.ts.inlinePoliciesDescription }}</MkInfo>
+
+							<div v-for="(policy, index) in inlinePoliciesForm" :key="policy.id ?? index" :class="$style.inlinePolicyRow">
+								<MkSelect
+									:modelValue="policy.policy"
+									:items="inlinePolicyOptionsDef"
+									:class="$style.inlinePolicyField"
+									@update:modelValue="value => onChangeInlinePolicy(index, value)"
+								/>
+
+								<MkSelect
+									:modelValue="policy.operation"
+									:items="inlinePolicyOperationDef"
+									:class="$style.inlinePolicyField"
+									:disabled="policyValueType(policy.policy) !== 'number'"
+									@update:modelValue="value => policy.operation = value"
+								/>
+
+								<div :class="$style.inlinePolicyValue">
+									<MkSwitch
+										v-if="policyValueType(policy.policy) === 'boolean'"
+										:modelValue="policy.value === true"
+										@update:modelValue="value => policy.value = value"
+									>
+										{{ i18n.ts.value }}
+									</MkSwitch>
+									<MkInput
+										v-else-if="policyValueType(policy.policy) === 'number'"
+										:modelValue="typeof policy.value === 'number' ? policy.value : 0"
+										type="number"
+										@update:modelValue="value => policy.value = value"
+									/>
+									<MkSelect
+										v-else-if="policy.policy === 'chatAvailability'"
+										:modelValue="chatAvailabilityValue(policy.value)"
+										:items="chatAvailabilityDef"
+										@update:modelValue="value => policy.value = value"
+									/>
+									<MkInput
+										v-else
+										:modelValue="typeof policy.value === 'string' ? policy.value : ''"
+										@update:modelValue="value => policy.value = value"
+									/>
+								</div>
+
+								<MkInput v-model="policy.memo" :placeholder="i18n.ts.memo" :class="$style.inlinePolicyMemo"/>
+								<MkButton inline danger @click="removeInlinePolicy(index)"><i class="ti ti-trash"></i></MkButton>
+							</div>
+
+							<MkButton inline @click="addInlinePolicy"><i class="ti ti-plus"></i> {{ i18n.ts.inlinePolicyAdd }}</MkButton>
+
+							<div class="_buttons">
+								<MkButton primary :disabled="!inlinePoliciesDirty" @click="saveInlinePolicies"><i class="ti ti-device-floppy"></i> {{ i18n.ts.save }}</MkButton>
+								<MkButton :disabled="!inlinePoliciesDirty" @click="resetInlinePolicies"><i class="ti ti-restore"></i> {{ i18n.ts.reset }}</MkButton>
 							</div>
 						</div>
 					</MkFolder>
@@ -123,17 +152,39 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</template>
 					</MkFolder>
 
-					<div>
-						<MkButton v-if="iAmModerator" inline danger style="margin-right: 8px;" @click="unsetUserAvatar"><i class="ti ti-user-circle"></i> {{ i18n.ts.unsetUserAvatar }}</MkButton>
-						<MkButton v-if="iAmModerator" inline danger @click="unsetUserBanner"><i class="ti ti-photo"></i> {{ i18n.ts.unsetUserBanner }}</MkButton>
+					<div v-if="iAmModerator" class="_buttons">
+						<MkButton danger @click="updateUserName"><i class="ti ti-user-edit"></i> {{ i18n.ts.changeUserName }}</MkButton>
+						<MkButton danger @click="unsetUserAvatar"><i class="ti ti-user-circle"></i> {{ i18n.ts.unsetUserAvatar }}</MkButton>
+						<MkButton danger @click="unsetUserBanner"><i class="ti ti-photo"></i> {{ i18n.ts.unsetUserBanner }}</MkButton>
 					</div>
-					<MkButton v-if="$i.isAdmin" inline danger @click="deleteAccount">{{ i18n.ts.deleteAccount }}</MkButton>
+
+					<MkFolder v-if="iAmModerator && user.mutualLinkSections.some(section => section.mutualLinks.length > 0)">
+						<template #icon><i class="ti ti-link"></i></template>
+						<template #label>{{ i18n.ts._profile.mutualLinksEdit }}</template>
+						<div v-for="(mutualLinkSection, sectionIndex) in user.mutualLinkSections" :key="sectionIndex">
+							<div v-for="mutualLink in mutualLinkSection.mutualLinks" :key="mutualLink.id" :class="$style.fields">
+								<p>{{ mutualLink.url }}</p>
+								<img :class="$style.mutualLinkImg" :src="mutualLink.imgSrc" :alt="mutualLink.description ?? ''"/>
+								<p>{{ mutualLink.description }}</p>
+								<MkButton inline danger @click="unsetUserMutualLink(mutualLink.id)"><i class="ti ti-link"></i> {{ i18n.ts.unsetUserMutualLink }}</MkButton>
+							</div>
+						</div>
+					</MkFolder>
+
+					<MkFolder v-if="iAmAdmin">
+						<template #icon><i class="ti ti-user-x"></i></template>
+						<template #label>{{ i18n.ts.deleteAccount }}</template>
+						<div class="_buttons">
+							<MkButton danger @click="deleteAccount(true)"><i class="ti ti-user-x"></i> {{ i18n.ts.deleteAccount }}</MkButton>
+							<MkButton danger @click="deleteAccount(false)"><i class="ti ti-file-shredder"></i> {{ i18n.ts.deleteAccount }} ({{ i18n.ts.all }})</MkButton>
+						</div>
+					</MkFolder>
 				</div>
 			</FormSection>
 		</div>
 
 		<div v-else-if="tab === 'roles'" class="_gaps">
-			<MkButton v-if="user.host == null" primary rounded @click="assignRole"><i class="ti ti-plus"></i> {{ i18n.ts.assign }}</MkButton>
+			<MkButton primary rounded @click="assignRole"><i class="ti ti-plus"></i> {{ i18n.ts.assign }}</MkButton>
 
 			<div v-for="role in info.roles" :key="role.id">
 				<div :class="$style.roleItemMain">
@@ -144,6 +195,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 				<div v-if="expandedRoleIds.includes(role.id)" :class="$style.roleItemSub">
 					<div>Assigned: <MkTime :time="info.roleAssigns.find(a => a.roleId === role.id)!.createdAt" mode="detail"/></div>
+					<div v-if="info.roleAssigns.find(a => a.roleId === role.id)!.memo">Memo: {{ info.roleAssigns.find(a => a.roleId === role.id)!.memo }}</div>
 					<div v-if="info.roleAssigns.find(a => a.roleId === role.id)!.expiresAt">Period: {{ new Date(info.roleAssigns.find(a => a.roleId === role.id)!.expiresAt!).toLocaleString() }}</div>
 					<div v-else>Period: {{ i18n.ts.indefinitely }}</div>
 				</div>
@@ -168,7 +220,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<i v-else-if="announcement.icon === 'success'" class="ti ti-check" style="color: var(--MI_THEME-success);"></i>
 							</span>
 							<span>{{ announcement.title }}</span>
-							<span v-if="announcement.reads > 0" style="margin-left: auto; opacity: 0.7;">{{ i18n.ts.messageRead }}</span>
+							<span v-if="announcement.reads > 0" style="margin-left: auto; opacity: 0.7;">{{ i18n.ts.messageRead }} <span v-if="announcement.lastReadAt">(<MkTime :time="announcement.lastReadAt" mode="absolute"/>)</span></span>
 						</div>
 					</div>
 				</template>
@@ -176,6 +228,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 
 		<div v-else-if="tab === 'drive'" class="_gaps">
+			<MkButton v-if="iAmModerator" inline danger @click="deleteAllFiles"><i class="ti ti-trash"></i> {{ i18n.ts.deleteAllFiles }}</MkButton>
 			<MkFileListForAdmin :paginator="filesPaginator" viewMode="grid"/>
 		</div>
 
@@ -192,6 +245,34 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkChart class="chart" :src="chartSrc" span="day" :limit="90" :args="{ user, withoutAll: true }" :detailed="true"></MkChart>
 				</div>
 			</div>
+		</div>
+
+		<div v-else-if="tab === 'activitypub'" class="_gaps_m">
+			<div style="display: flex; flex-direction: column; gap: 1em;">
+				<MkKeyValue v-if="user.host" oneline>
+					<template #key>{{ i18n.ts.instanceInfo }}</template>
+					<template #value><MkA :to="`/instance-info/${user.host}`" class="_link">{{ user.host }} <i class="ti ti-chevron-right"></i></MkA></template>
+				</MkKeyValue>
+				<MkKeyValue v-else oneline>
+					<template #key>{{ i18n.ts.instanceInfo }}</template>
+					<template #value>(Local user)</template>
+				</MkKeyValue>
+				<MkKeyValue oneline>
+					<template #key>{{ i18n.ts.updatedAt }}</template>
+					<template #value><MkTime v-if="user.lastFetchedAt" mode="detail" :time="user.lastFetchedAt"/><span v-else>N/A</span></template>
+				</MkKeyValue>
+				<MkKeyValue v-if="ap" oneline>
+					<template #key>Type</template>
+					<template #value><span class="_monospace">{{ ap.type }}</span></template>
+				</MkKeyValue>
+			</div>
+
+			<MkButton v-if="user.host != null" @click="updateRemoteUser"><i class="ti ti-refresh"></i> {{ i18n.ts.updateRemoteUser }}</MkButton>
+
+			<MkFolder>
+				<template #label>Raw</template>
+				<MkObjectView v-if="ap" tall :value="ap"/>
+			</MkFolder>
 		</div>
 
 		<div v-else-if="tab === 'raw'" class="_gaps_m">
@@ -220,6 +301,7 @@ import MkButton from '@/components/MkButton.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import MkKeyValue from '@/components/MkKeyValue.vue';
 import MkSelect from '@/components/MkSelect.vue';
+import MkInput from '@/components/MkInput.vue';
 import MkFileListForAdmin from '@/components/MkFileListForAdmin.vue';
 import MkInfo from '@/components/MkInfo.vue';
 import * as os from '@/os.js';
@@ -260,7 +342,9 @@ const ips = ref(result.ips);
 const ap = ref<Misskey.entities.ApGetResponse | null>(null);
 const moderator = ref(info.value.isModerator);
 const silenced = ref(info.value.isSilenced);
+const limited = ref(info.value.isLimited);
 const suspended = ref(info.value.isSuspended);
+const deleted = ref(info.value.isDeleted);
 const isSystem = ref(user.value.host == null && user.value.username.includes('.'));
 const moderationNote = ref(info.value.moderationNote);
 const filesPaginator = markRaw(new Paginator('admin/drive/files', {
@@ -291,6 +375,39 @@ const announcementsPaginator = markRaw(new Paginator('admin/announcements/list',
 }));
 const expandedRoleIds = ref<(typeof info.value.roles[number]['id'])[]>([]);
 
+type InlinePolicy = Misskey.entities.AdminRolesUpdateInlinePoliciesRequest['policies'][number];
+type InlinePolicyName = InlinePolicy['policy'];
+type InlinePolicyOperation = NonNullable<InlinePolicy['operation']>;
+type InlinePolicyValue = Exclude<InlinePolicy['value'], undefined>;
+type InlinePolicyForm = {
+	id?: string | null;
+	policy: InlinePolicyName;
+	operation: InlinePolicyOperation;
+	value: InlinePolicyValue;
+	memo: string | null;
+};
+
+const inlinePoliciesForm = ref<InlinePolicyForm[]>([]);
+const inlinePoliciesInitial = ref<InlinePolicyForm[]>([]);
+const inlinePolicyNames = computed(() => Object.keys(info.value.policies)
+	.filter(policy => policy !== 'uploadableFileTypes') as InlinePolicyName[]);
+const inlinePolicyOptionsDef = computed(() => inlinePolicyNames.value.map(policy => ({
+	label: policy,
+	value: policy,
+})));
+const inlinePolicyOperationDef = [{
+	label: i18n.ts.inlinePolicyOperationSet,
+	value: 'set',
+}, {
+	label: i18n.ts.inlinePolicyOperationIncrement,
+	value: 'increment',
+}] satisfies { label: string; value: InlinePolicyOperation }[];
+const chatAvailabilityOptions = ['available', 'readonly', 'unavailable'] as const;
+const chatAvailabilityDef = chatAvailabilityOptions.map(value => ({ label: value, value }));
+const inlinePoliciesDirty = computed(() => JSON.stringify(inlinePoliciesForm.value) !== JSON.stringify(inlinePoliciesInitial.value));
+
+resetInlinePoliciesFromInfo(info.value.inlinePolicies);
+
 function _fetch_() {
 	return Promise.all([misskeyApi('users/show', {
 		userId: props.userId,
@@ -305,6 +422,92 @@ function _fetch_() {
 	}));
 }
 
+function isInlinePolicyName(policy: string): policy is InlinePolicyName {
+	return inlinePolicyNames.value.includes(policy as InlinePolicyName);
+}
+
+function normalizeInlinePolicies(policies: typeof info.value.inlinePolicies): InlinePolicyForm[] {
+	return policies.flatMap(policy => {
+		if (!isInlinePolicyName(policy.policy)) return [];
+
+		return [{
+			id: policy.id,
+			policy: policy.policy,
+			operation: policy.operation === 'increment' ? 'increment' : 'set',
+			value: normalizedInlineValue(policy.policy, policy.value),
+			memo: policy.memo,
+		}];
+	});
+}
+
+function resetInlinePoliciesFromInfo(policies: typeof info.value.inlinePolicies) {
+	inlinePoliciesForm.value = normalizeInlinePolicies(policies);
+	inlinePoliciesInitial.value = structuredClone(inlinePoliciesForm.value);
+}
+
+function policyValueType(policy: InlinePolicyName): 'boolean' | 'number' | 'string' {
+	return typeof info.value.policies[policy] as 'boolean' | 'number' | 'string';
+}
+
+function chatAvailabilityValue(value: unknown): typeof chatAvailabilityOptions[number] {
+	return typeof value === 'string' && chatAvailabilityOptions.includes(value as typeof chatAvailabilityOptions[number])
+		? value as typeof chatAvailabilityOptions[number]
+		: chatAvailabilityOptions[0];
+}
+
+function normalizedInlineValue(policy: InlinePolicyName, value: unknown): InlinePolicyValue {
+	const type = policyValueType(policy);
+
+	if (type === 'boolean') return typeof value === 'boolean' ? value : false;
+	if (type === 'number') return typeof value === 'number' && Number.isFinite(value) ? value : 0;
+	if (policy === 'chatAvailability') return chatAvailabilityValue(value);
+	return typeof value === 'string' ? value : '';
+}
+
+function onChangeInlinePolicy(index: number, policy: InlinePolicyName) {
+	const row = inlinePoliciesForm.value.at(index);
+	if (row == null) return;
+
+	row.policy = policy;
+	row.operation = policyValueType(policy) === 'number' ? row.operation : 'set';
+	row.value = normalizedInlineValue(policy, row.value);
+}
+
+function addInlinePolicy() {
+	const policy = inlinePolicyNames.value.at(0);
+	if (policy == null) return;
+
+	inlinePoliciesForm.value.push({
+		policy,
+		operation: 'set',
+		value: normalizedInlineValue(policy, undefined),
+		memo: null,
+	});
+}
+
+function removeInlinePolicy(index: number) {
+	inlinePoliciesForm.value.splice(index, 1);
+}
+
+function resetInlinePolicies() {
+	inlinePoliciesForm.value = structuredClone(inlinePoliciesInitial.value);
+}
+
+async function saveInlinePolicies() {
+	const policies: InlinePolicy[] = inlinePoliciesForm.value.map(policy => ({
+		policy: policy.policy,
+		operation: policyValueType(policy.policy) === 'number' ? policy.operation : 'set',
+		value: normalizedInlineValue(policy.policy, policy.value),
+		memo: policy.memo,
+	}));
+
+	await os.apiWithDialog('admin/roles/update-inline-policies', {
+		userId: user.value.id,
+		policies,
+	});
+	await refreshUser();
+}
+
 watch(moderationNote, async () => {
 	await misskeyApi('admin/update-user-note', { userId: user.value.id, text: moderationNote.value });
 	await refreshUser();
@@ -317,9 +520,12 @@ async function refreshUser() {
 	ips.value = result.ips;
 	moderator.value = info.value.isModerator;
 	silenced.value = info.value.isSilenced;
+	limited.value = info.value.isLimited;
 	suspended.value = info.value.isSuspended;
+	deleted.value = info.value.isDeleted;
 	isSystem.value = user.value.host == null && user.value.username.includes('.');
 	moderationNote.value = info.value.moderationNote;
+	resetInlinePoliciesFromInfo(info.value.inlinePolicies);
 }
 
 async function updateRemoteUser() {
@@ -358,7 +564,7 @@ async function regenerateLoginToken() {
 	}).then(refreshUser);
 }
 
-async function toggleSuspend(v) {
+async function toggleSuspend(v: boolean) {
 	const confirm = await os.confirm({
 		type: 'warning',
 		text: v ? i18n.ts.suspendConfirm : i18n.ts.unsuspendConfirm,
@@ -561,7 +767,7 @@ watch(user, () => {
 	}).then(res => {
 		ap.value = res;
 	});
-});
+}, { immediate: true });
 
 const headerActions = computed(() => []);
 
@@ -686,17 +892,7 @@ definePage(() => ({
 				border-color: var(--MI_THEME-success);
 			}
 
-			> .silenced {
-				color: var(--MI_THEME-warn);
-				border-color: var(--MI_THEME-warn);
-			}
-
 			> .limited {
-				color: var(--MI_THEME-error);
-				border-color: var(--MI_THEME-error);
-			}
-
-			> .suspended {
 				color: var(--MI_THEME-error);
 				border-color: var(--MI_THEME-error);
 			}

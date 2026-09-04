@@ -292,6 +292,7 @@ export function userDetailed(id = 'someuserid', username = 'miskist', host: enti
 			antennaNotesLimit: 0,
 			avatarDecorationLimit: 0,
 			canCreateContent: false,
+			canCreateChannel: false,
 			canDeleteContent: false,
 			canHideAds: false,
 			canImportAntennas: false,

@@ -19,3 +19,24 @@ updates:
     directory: "/"
     schedule:
       interval: daily
+    # 同じ版で更新する依存をまとめる。
+    groups:
+      aws-sdk:
+        patterns:
+          - "@aws-sdk/*"
+      nestjs:
+        patterns:
+          - "@nestjs/*"
+      slacc:
+        patterns:
+          - "slacc-*"
+      storybook:
+        patterns:
+          - "storybook*"
+          - "@storybook/*"
+      typescript-eslint:
+        patterns:
+          - "@typescript-eslint/*"
+      tensorflow:
+        patterns:
+          - "@tensorflow/*"

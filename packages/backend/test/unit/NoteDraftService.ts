@@ -3,40 +3,40 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { describe, expect, jest, test } from '@jest/globals';
+import { describe, expect, vi, test } from 'vitest';
 import { INVALID_SCHEDULED_NOTE_ID, NoteDraftService } from '@/core/NoteDraftService.js';
 import type { MiNoteDraft } from '@/models/NoteDraft.js';
 
 function updateQueryBuilder(updated: MiNoteDraft): any {
 	const builder: any = {};
 	for (const method of ['update', 'set', 'where', 'andWhere', 'returning']) {
-		builder[method] = jest.fn(() => builder);
+		builder[method] = vi.fn(() => builder);
 	}
-	builder.execute = jest.fn(async () => ({ raw: [updated], affected: 1 }));
+	builder.execute = vi.fn(async () => ({ raw: [updated], affected: 1 }));
 	return builder;
 }
 
 function serviceFor(current: MiNoteDraft, updated: MiNoteDraft, queueResult = 1) {
 	const builder = updateQueryBuilder(updated);
-	const notesRepository = { findOneBy: jest.fn(() => { throw new Error('参照を再検証してはいけません'); }) };
-	const driveFilesRepository = { createQueryBuilder: jest.fn(() => { throw new Error('参照を再検証してはいけません'); }) };
-	const channelsRepository = { findOneBy: jest.fn(() => { throw new Error('参照を再検証してはいけません'); }) };
-	const queueService = { removePostScheduledNoteJob: jest.fn(async (_draftId: string, _scheduledAt: Date) => queueResult) };
+	const notesRepository = { findOneBy: vi.fn(() => { throw new Error('参照を再検証してはいけません'); }) };
+	const driveFilesRepository = { createQueryBuilder: vi.fn(() => { throw new Error('参照を再検証してはいけません'); }) };
+	const channelsRepository = { findOneBy: vi.fn(() => { throw new Error('参照を再検証してはいけません'); }) };
+	const queueService = { removePostScheduledNoteJob: vi.fn(async (_draftId: string, _scheduledAt: Date) => queueResult) };
 	const service = new NoteDraftService(
 		{} as never,
 		{
-			findOneBy: jest.fn(async () => current),
-			createQueryBuilder: jest.fn(() => builder),
+			findOneBy: vi.fn(async () => current),
+			createQueryBuilder: vi.fn(() => builder),
 		} as never,
 		notesRepository as never,
 		{} as never,
 		driveFilesRepository as never,
 		channelsRepository as never,
-		{ getUserPolicies: jest.fn(async () => ({ canScheduleNote: true, scheduleNoteLimit: 10, scheduleNoteMaxDays: 3650 })) } as never,
+		{ getUserPolicies: vi.fn(async () => ({ canScheduleNote: true, scheduleNoteLimit: 10, scheduleNoteMaxDays: 3650 })) } as never,
 		{} as never,
 		{} as never,
 		queueService as never,
-		{ getLogger: () => ({ error: jest.fn() }) } as never,
+		{ getLogger: () => ({ error: vi.fn() }) } as never,
 	);
 	return { service, builder, notesRepository, driveFilesRepository, channelsRepository, queueService };
 }

@@ -1520,6 +1520,7 @@ frame: "프레임"
 presets: "프리셋"
 zeroPadding: "0으로 채우기"
 nothingToConfigure: "설정 항목이 없습니다."
+viewRenotedChannel: "리노트된 채널 보기"
 _imageEditing:
   _vars:
     caption: "파일 설명"
@@ -2270,6 +2271,7 @@ _role:
     canSearchUsers: "유저 검색 이용"
     canUseTranslator: "번역 기능의 사용"
     canUseDriveFileInSoundSettings: "사운드 설정에서 드라이브의 파일 사용 가능 여부"
+    canCreateChannel: "패널 생성"
     avatarDecorationLimit: "아바타 장식의 최대 붙임 개수"
     canUseReaction: "리액션 사용"
     mutualLinkSectionLimit: "서로링크 섹션의 최대 수"

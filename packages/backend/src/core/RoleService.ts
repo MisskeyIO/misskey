@@ -64,6 +64,7 @@ export type RolePolicies = {
 	canUseDriveFileInSoundSettings: boolean;
 	canUseReaction: boolean;
 	canHideAds: boolean;
+	canCreateChannel: boolean;
 	driveCapacityMb: number;
 	maxFileSizeMb: number;
 	alwaysMarkNsfw: boolean;
@@ -120,6 +121,7 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	canUseDriveFileInSoundSettings: false,
 	canUseReaction: true,
 	canHideAds: false,
+	canCreateChannel: true,
 	driveCapacityMb: 100,
 	maxFileSizeMb: 30,
 	alwaysMarkNsfw: false,
@@ -485,6 +487,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			canUseDriveFileInSoundSettings: calc('canUseDriveFileInSoundSettings', vs => vs.some(v => v === true)),
 			canUseReaction: calc('canUseReaction', vs => vs.some(v => v === true)),
 			canHideAds: calc('canHideAds', vs => vs.some(v => v === true)),
+			canCreateChannel: calc('canCreateChannel', vs => vs.some(v => v === true)),
 			driveCapacityMb: calc('driveCapacityMb', vs => Math.max(...vs)),
 			maxFileSizeMb: calc('maxFileSizeMb', vs => Math.max(...vs)),
 			alwaysMarkNsfw: calc('alwaysMarkNsfw', vs => vs.some(v => v === true)),
@@ -646,7 +649,8 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			roleId: In(administratorRoles.map(r => r.id)),
 		}) : [];
 		// TODO: isRootなアカウントも含める
-		return assigns.map(a => a.userId);
+		// Setを経由して重複を除去（ユーザIDは重複する可能性があるので）
+		return [...new Set(assigns.map(a => a.userId))].sort((x, y) => x.localeCompare(y));
 	}
 
 	@bindThis

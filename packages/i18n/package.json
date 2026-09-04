@@ -28,17 +28,17 @@
 		"built"
 	],
 	"devDependencies": {
-		"@types/js-yaml": "catalog:",
-		"@types/node": "catalog:",
-		"@typescript-eslint/eslint-plugin": "catalog:",
-		"@typescript-eslint/parser": "catalog:",
-		"chokidar": "catalog:",
-		"esbuild": "catalog:",
-		"execa": "catalog:",
-		"nodemon": "catalog:",
-		"tsx": "catalog:"
+		"@types/js-yaml": "4.0.9",
+		"@types/node": "24.12.2",
+		"@typescript-eslint/eslint-plugin": "8.59.2",
+		"@typescript-eslint/parser": "8.59.2",
+		"chokidar": "5.0.0",
+		"esbuild": "0.28.0",
+		"execa": "9.6.1",
+		"nodemon": "3.1.14",
+		"tsx": "4.21.0"
 	},
 	"dependencies": {
-		"js-yaml": "catalog:"
+		"js-yaml": "4.1.1"
 	}
 }

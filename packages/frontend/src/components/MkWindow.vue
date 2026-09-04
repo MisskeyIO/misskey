@@ -332,8 +332,9 @@ function onTopHandlePointerdown(evt: PointerEvent) {
 	if (main == null) return;
 
 	const base = getPositionY(evt);
-	const height = parseInt(getComputedStyle(main, '').height, 10);
-	const top = parseInt(getComputedStyle(main, '').top, 10);
+	const computedStyle = getComputedStyle(main, '');
+	const height = parseInt(computedStyle.height, 10);
+	const top = parseInt(computedStyle.top, 10);
 
 	// 動かした時
 	dragListen(me => {
@@ -361,8 +362,9 @@ function onRightHandlePointerdown(evt: PointerEvent) {
 	if (main == null) return;
 
 	const base = getPositionX(evt);
-	const width = parseInt(getComputedStyle(main, '').width, 10);
-	const left = parseInt(getComputedStyle(main, '').left, 10);
+	const computedStyle = getComputedStyle(main, '');
+	const width = parseInt(computedStyle.width, 10);
+	const left = parseInt(computedStyle.left, 10);
 	const browserWidth = window.innerWidth;
 
 	// 動かした時
@@ -388,8 +390,9 @@ function onBottomHandlePointerdown(evt: PointerEvent) {
 	if (main == null) return;
 
 	const base = getPositionY(evt);
-	const height = parseInt(getComputedStyle(main, '').height, 10);
-	const top = parseInt(getComputedStyle(main, '').top, 10);
+	const computedStyle = getComputedStyle(main, '');
+	const height = parseInt(computedStyle.height, 10);
+	const top = parseInt(computedStyle.top, 10);
 	const browserHeight = window.innerHeight;
 
 	// 動かした時
@@ -415,8 +418,9 @@ function onLeftHandlePointerdown(evt: PointerEvent) {
 	if (main == null) return;
 
 	const base = getPositionX(evt);
-	const width = parseInt(getComputedStyle(main, '').width, 10);
-	const left = parseInt(getComputedStyle(main, '').left, 10);
+	const computedStyle = getComputedStyle(main, '');
+	const width = parseInt(computedStyle.width, 10);
+	const left = parseInt(computedStyle.left, 10);
 
 	// 動かした時
 	dragListen(me => {

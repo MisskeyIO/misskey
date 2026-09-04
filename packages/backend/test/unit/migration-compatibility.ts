@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { describe, expect, test } from '@jest/globals';
+import { describe, expect, test } from 'vitest';
 import { SensitiveAd1757823175259 } from '../../migration/1757823175259-sensitive-ad.js';
 import { ScheduledPost1758677617888 } from '../../migration/1758677617888-scheduled-post.js';
 import { AddIsSensitiveToAd1765736186185 } from '../../migration/1765736186185-AddIsSensitiveToAd.js';

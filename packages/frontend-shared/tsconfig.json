@@ -1,15 +1,13 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
 	"compilerOptions": {
-		"target": "ESNext",
-		"module": "NodeNext",
+		"target": "ES2022",
+		"module": "nodenext",
 		"moduleResolution": "nodenext",
 		"declaration": true,
 		"declarationMap": true,
-		"sourceMap": true,
-		"sourceRoot": "/",
-		"inlineSources": true,
-		"outDir": "./js-built/",
+		"sourceMap": false,
+		"outDir": "./js-built",
 		"removeComments": true,
 		"resolveJsonModule": true,
 		"strict": true,
@@ -19,6 +17,7 @@
 		"noImplicitReturns": true,
 		"esModuleInterop": true,
 		"verbatimModuleSyntax": true,
+		"rootDir": "./js",
 		"paths": {
 			"@/*": ["./*"],
 			"@@/*": ["./*"]

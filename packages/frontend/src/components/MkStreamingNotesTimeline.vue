@@ -76,6 +76,7 @@ import { instance } from '@/instance.js';
 import { prefer } from '@/preferences.js';
 import MkNote from '@/components/MkNote.vue';
 import { i18n } from '@/i18n.js';
+import { DI } from '@/di.js';
 import { useGlobalEvent } from '@/events.js';
 import { isSeparatorNeeded, getSeparatorInfo } from '@/utility/timeline-date-separate.js';
 import { retryWithFibonacciBackoff } from '@/utility/retry.js';
@@ -110,7 +111,7 @@ const emit = defineEmits<{
 provide('inTimeline', true);
 provide('tl_withSensitive', computed(() => props.withSensitive));
 provide('tl_dimension', computed(() => props.dimension ?? prefer.r.dimension.value));
-provide('inChannel', computed(() => props.src === 'channel'));
+provide(DI.inChannel, computed(() => props.src === 'channel' ? props.channel ?? null : null));
 
 type TimelineItem = Misskey.entities.Note & {
 	_shouldInsertAd_?: boolean;

@@ -23,6 +23,8 @@ function rename(file: Misskey.entities.DriveFile) {
 		misskeyApi('drive/files/update', {
 			fileId: file.id,
 			name: name,
+		}).then(updated => {
+			globalEvents.emit('driveFilesUpdated', [updated]);
 		});
 	});
 }
@@ -36,6 +38,8 @@ async function describe(file: Misskey.entities.DriveFile) {
 			misskeyApi('drive/files/update', {
 				fileId: file.id,
 				comment: caption.length === 0 ? null : caption,
+			}).then(updated => {
+				globalEvents.emit('driveFilesUpdated', [updated]);
 			});
 		},
 		closed: () => dispose(),
@@ -48,6 +52,8 @@ function move(file: Misskey.entities.DriveFile) {
 		misskeyApi('drive/files/update', {
 			fileId: file.id,
 			folderId: folders[0] ? folders[0].id : null,
+		}).then(updated => {
+			globalEvents.emit('driveFilesUpdated', [updated]);
 		});
 	});
 }
@@ -56,6 +62,8 @@ function toggleSensitive(file: Misskey.entities.DriveFile) {
 	misskeyApi('drive/files/update', {
 		fileId: file.id,
 		isSensitive: !file.isSensitive,
+	}).then(updated => {
+		globalEvents.emit('driveFilesUpdated', [updated]);
 	}).catch(err => {
 		os.alert({
 			type: 'error',

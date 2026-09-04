@@ -8,7 +8,7 @@ import pino from 'pino';
 import pinoPretty from 'pino-pretty';
 import { bindThis } from '@/decorators.js';
 import { envOption } from './env.js';
-import type { KEYWORD } from 'color-convert/conversions.js';
+import type { Keyword } from 'color-convert';
 
 const pinoPrettyStream = pinoPretty({
 	levelFirst: false,
@@ -26,7 +26,7 @@ export default class Logger {
 	private readonly logger: pino.Logger;
 	private context: Record<string, any> = {};
 
-	constructor(domain: string | undefined, _color?: KEYWORD, _store = true, parentLogger?: Logger) {
+	constructor(domain: string | undefined, _color?: Keyword, _store = true, parentLogger?: Logger) {
 		if (parentLogger) {
 			this.domain = [parentLogger.domain, domain].filter(x => x).join('.') || undefined;
 			this.context = { ...JSON.parse(JSON.stringify(parentLogger.context)) };
@@ -59,7 +59,7 @@ export default class Logger {
 		return { cluster: cluster.isPrimary ? 'primary' : `worker#${cluster.worker!.id}`, ...this.context };
 	}
 
-	public createSubLogger(domain?: string, _color?: KEYWORD, _store = true): Logger {
+	public createSubLogger(domain?: string, _color?: Keyword, _store = true): Logger {
 		return new Logger(domain, _color, _store, this);
 	}
 

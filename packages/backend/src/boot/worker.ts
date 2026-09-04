@@ -4,17 +4,9 @@
  */
 
 import cluster from 'node:cluster';
-import fs from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { dirname } from 'node:path';
 import { envOption } from '@/env.js';
 import { loadConfig } from '@/config.js';
-import { jobQueue, server } from './common.js';
-
-const _filename = fileURLToPath(import.meta.url);
-const _dirname = dirname(_filename);
-
-const meta = JSON.parse(fs.readFileSync(`${_dirname}/../../../../built/meta.json`, 'utf-8'));
+import { initExtraThreadPool, jobQueue, server } from './common.js';
 
 /**
  * Init worker process
@@ -22,12 +14,14 @@ const meta = JSON.parse(fs.readFileSync(`${_dirname}/../../../../built/meta.json
 export async function workerMain() {
 	const config = loadConfig();
 
+	initExtraThreadPool(config);
+
 	if (config.sentryForBackend) {
 		const Sentry = await import('@sentry/node');
 		const { nodeProfilingIntegration } = await import('@sentry/profiling-node');
 
 		Sentry.init({
-			release: meta.version,
+			release: config.version,
 			integrations: [
 				...(config.sentryForBackend.enableNodeProfiling ? [nodeProfilingIntegration()] : []),
 			],

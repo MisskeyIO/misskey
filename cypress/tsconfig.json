@@ -1,9 +1,7 @@
 {
 	"compilerOptions": {
-		"target": "ESNext",
-		"module": "NodeNext",
-		"moduleResolution": "nodenext",
-		"lib": ["dom", "esnext"],
+		"lib": ["dom"],
+		"target": "esnext",
 		"types": ["cypress", "node"]
 	},
 	"include": ["./**/*.ts"]

@@ -5,7 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import RE2 from 're2';
-import type { SummalyResult } from '@misskey-dev/summaly/dist/summary.js';
+import type { SummalyResult } from '@misskey-dev/summaly';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { HttpRequestService } from '@/core/HttpRequestService.js';
@@ -133,7 +133,8 @@ export class UrlPreviewService {
 	}
 
 	private async fetchSummary(url: string, meta: MiMeta, lang?: string): Promise<SummalyResult> {
-		const agent = this.config.proxy
+		const useAgent = this.config.proxy || process.env.NODE_ENV === 'production';
+		const agent = useAgent
 			? {
 				http: this.httpRequestService.httpAgent,
 				https: this.httpRequestService.httpsAgent,
@@ -145,7 +146,7 @@ export class UrlPreviewService {
 		return summaly(url, {
 			followRedirects: this.meta.urlPreviewAllowRedirect,
 			lang: lang ?? 'ja-JP',
-			agent: agent,
+			agent,
 			userAgent: meta.urlPreviewUserAgent ?? undefined,
 			operationTimeout: meta.urlPreviewTimeout,
 			contentLengthLimit: meta.urlPreviewMaximumContentLength,

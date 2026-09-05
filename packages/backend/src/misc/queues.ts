@@ -29,6 +29,14 @@ export class Queues<DataType = any, ResultType = any, NameType extends string = 
 		await Promise.allSettled(this.queues.map(queue => queue.close()));
 	}
 
+	async pause(): Promise<void> {
+		await Promise.all(this.queues.map(queue => queue.pause()));
+	}
+
+	async resume(): Promise<void> {
+		await Promise.all(this.queues.map(queue => queue.resume()));
+	}
+
 	async getDelayed(start?: number, end?: number): Promise<Bull.Job<DataType, ResultType, NameType>[]> {
 		return (await Promise.allSettled(this.queues.map(queue => queue.getDelayed(start, end) as Promise<Bull.Job<DataType, ResultType, NameType>[]>)))
 			.filter((value): value is PromiseFulfilledResult<Bull.Job<DataType, ResultType, NameType>[]> => value.status === 'fulfilled')

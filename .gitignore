@@ -78,3 +78,6 @@ vite.config.local-dev.ts.timestamp-*
 
 # Cryptocurrency Spam
 tea.yaml
+
+# Affinity
+*.af~lock~

@@ -175,6 +175,12 @@ export class ActivityPubServerService {
 			}
 		}
 
+		const body = request.body;
+		if (typeof body !== 'object' || body == null || !('actor' in body) || body.actor == null) {
+			reply.code(400);
+			return;
+		}
+
 		const user = userId ? await this.usersRepository.findOneBy({
 			id: userId,
 			host: IsNull(),
@@ -793,6 +799,8 @@ export class ActivityPubServerService {
 			}
 
 			const acct = Acct.parse(request.params.acct);
+			// normalize acct host
+			if (this.utilityService.isSelfHost(acct.host)) acct.host = null;
 
 			const user = await this.usersRepository.findOneBy({
 				usernameLower: acct.username.toLowerCase(),

@@ -31,6 +31,7 @@ export class MiUserNotePining {
 	@JoinColumn()
 	public user: MiUser | null;
 
+	@Index()
 	@Column(id())
 	public noteId: MiNote['id'];
 

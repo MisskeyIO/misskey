@@ -317,7 +317,13 @@ export type AdminQueueDeliverDelayedResponse = operations['admin___queue___deliv
 export type AdminQueueInboxDelayedResponse = operations['admin___queue___inbox-delayed']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
+export type AdminQueuePauseRequest = operations['admin___queue___pause']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
 export type AdminQueuePromoteRequest = operations['admin___queue___promote']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
+export type AdminQueueResumeRequest = operations['admin___queue___resume']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 export type AdminQueueStatsResponse = operations['admin___queue___stats']['responses']['200']['content']['application/json'];
@@ -539,6 +545,9 @@ export type AntennasNotesRequest = operations['antennas___notes']['requestBody']
 
 // @public (undocumented)
 export type AntennasNotesResponse = operations['antennas___notes']['responses']['200']['content']['application/json'];
+
+// @public (undocumented)
+export type AntennasRemoveNoteRequest = operations['antennas___remove-note']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
 export type AntennasShowRequest = operations['antennas___show']['requestBody']['content']['application/json'];
@@ -1574,7 +1583,9 @@ declare namespace entities {
         AdminQueueClearRequest,
         AdminQueueDeliverDelayedResponse,
         AdminQueueInboxDelayedResponse,
+        AdminQueuePauseRequest,
         AdminQueuePromoteRequest,
+        AdminQueueResumeRequest,
         AdminQueueStatsResponse,
         AdminRegenerateUserTokenRequest,
         AdminRelaysAddRequest,
@@ -1645,6 +1656,7 @@ declare namespace entities {
         AntennasListResponse,
         AntennasNotesRequest,
         AntennasNotesResponse,
+        AntennasRemoveNoteRequest,
         AntennasShowRequest,
         AntennasShowResponse,
         AntennasUpdateRequest,

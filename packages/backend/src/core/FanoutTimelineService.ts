@@ -136,6 +136,11 @@ export class FanoutTimelineService {
 	}
 
 	@bindThis
+	public remove(name: FanoutTimelineName, id: string) {
+		return this.redisForTimelines.lrem('list:' + name, 1, id);
+	}
+
+	@bindThis
 	public buildDimensionTimelineName(name: FanoutTimelineName, dimension: number): FanoutTimelineDimensionName {
 		return `${name}:${dimension}` as FanoutTimelineDimensionName;
 	}

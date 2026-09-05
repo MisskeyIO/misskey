@@ -35,6 +35,7 @@ import { secureRndstr } from '@/misc/secure-rndstr.js';
 import { NotificationService } from '@/core/NotificationService.js';
 import { RoleCondFormulaValue } from '@/models/Role.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import type { Config } from '@/config.js';
 
 describe('RoleService', () => {
 	let app: TestingModule;
@@ -378,6 +379,26 @@ describe('RoleService', () => {
 
 			expect(result.canHideAds).toBe(true);
 			expect(result.driveCapacityMb).toBe(DEFAULT_POLICIES.driveCapacityMb + 50);
+		});
+
+		test.each([
+			{ operation: 'set', delta: 10 },
+			{ operation: 'set', delta: -10 },
+			{ operation: 'increment', delta: -5 },
+			{ operation: 'increment', delta: -20 },
+		] as const)('インライン設定後もアップロードのサーバー上限を守る: $operation $delta', async ({ operation, delta }) => {
+			const user = await createUser();
+			const serverMax = Math.floor(app.get<Config>(DI.config).maxFileSize / (1024 * 1024));
+			meta.policies = { maxFileSizeMb: serverMax + 10 };
+			await createInlinePolicy({
+				userId: user.id,
+				policy: 'maxFileSizeMb',
+				operation,
+				value: operation === 'set' ? serverMax + delta : delta,
+			});
+
+			const result = await roleService.getUserPolicies(user.id);
+			expect(result.maxFileSizeMb).toBe(Math.min(serverMax, serverMax + delta + (operation === 'increment' ? 10 : 0)));
 		});
 
 		test('内部イベントでインラインポリシーのキャッシュを更新する', async () => {

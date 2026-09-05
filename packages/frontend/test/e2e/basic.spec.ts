@@ -75,7 +75,7 @@ test.describe('After setup instance', () => {
 		await locateMkInput(page, 'signup-password-retype').fill('alice1234');
 		test.expect(await page.getByTestId('signup-submit').isDisabled()).toBeTruthy();
 		await locateMkInput(page, 'signup-invitation-code').fill('test-invitation-code');
-		test.expect(await page.getByTestId('signup-submit').isDisabled()).toBeFalsy();
+		await test.expect(page.getByTestId('signup-submit')).toBeEnabled();
 
 		const signupResponse = waitApiResponse(page, '/api/signup');
 		await page.getByTestId('signup-submit').click();
@@ -149,7 +149,7 @@ test.describe('After user signup', () => {
 		await locateMkInput(page, 'signin-username').fill('alice');
 		await page.keyboard.press('Enter');
 
-		await page.getByText('This account has been suspended due to').waitFor({ timeout: 10000 });
+		await page.getByText('アカウントが凍結されています', { exact: true }).waitFor({ timeout: 10000 });
 	});
 });
 

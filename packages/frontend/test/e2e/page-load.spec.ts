@@ -23,7 +23,7 @@ test.describe('配信済み画面の読み込み', () => {
 
 	// 共通部品の欠落を、画面固有の要素で検出する。
 	for (const [path, selector] of [
-		['/admin/emojis', '.ogwlenmc .local input'],
+		['/admin/emojis', '.ogwlenmc .local input[type="text"]'],
 		['/settings/profile', 'input[max="30"]'],
 		['/settings/security', 'img[src="/fluent-emoji/1f510.png"]'],
 		['/gallery', 'header .ti-comet'],

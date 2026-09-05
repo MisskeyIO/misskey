@@ -17,6 +17,7 @@ export type Keys = (
 	'lastUsed' |
 	'lang' |
 	'drafts' |
+	`postFormState:${string}` |
 	'hashtags' |
 	'colorScheme' |
 	'useSystemFont' |

@@ -542,7 +542,7 @@ async function resetPassword() {
 	if (confirm.canceled) {
 		return;
 	} else {
-		const { password } = await misskeyApi('admin/reset-password', {
+		const { password } = await os.apiWithDialog('admin/reset-password', {
 			userId: user.value.id,
 		});
 		os.alert({

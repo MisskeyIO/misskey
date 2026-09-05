@@ -73,7 +73,7 @@ export class PostScheduledNoteProcessorService {
 
 		const draft = await this.noteDraftsRepository.findOne({
 			where: { id: job.data.noteDraftId },
-			relations: ['user'],
+			relations: { user: true },
 		});
 		if (draft == null || draft.reservedNoteId == null) return;
 

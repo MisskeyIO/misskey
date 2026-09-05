@@ -39,6 +39,8 @@ export type SearchOpts = {
 	userId?: MiNote['userId'] | null;
 	channelId?: MiNote['channelId'] | null;
 	host?: string | null;
+	rangeStartAt?: number | null;
+	rangeEndAt?: number | null;
 };
 
 export type SearchPagination = {
@@ -304,6 +306,8 @@ export class SearchService {
 
 		if (pagination.untilId) esFilter.bool.must.push({ range: { createdAt: { lt: this.idService.parse(pagination.untilId).date.getTime() } } });
 		if (pagination.sinceId) esFilter.bool.must.push({ range: { createdAt: { gt: this.idService.parse(pagination.sinceId).date.getTime() } } });
+		if (opts.rangeStartAt != null) esFilter.bool.must.push({ range: { createdAt: { gte: opts.rangeStartAt } } });
+		if (opts.rangeEndAt != null) esFilter.bool.must.push({ range: { createdAt: { lte: opts.rangeEndAt } } });
 		if (opts.userId) esFilter.bool.must.push({ term: { userId: opts.userId } });
 		if (opts.channelId) esFilter.bool.must.push({ term: { channelId: opts.channelId } });
 		if (opts.host) {
@@ -409,6 +413,16 @@ export class SearchService {
 			}
 		}
 
+		if (opts.rangeStartAt != null) {
+			const date = this.idService.gen(opts.rangeStartAt - 1);
+			query.andWhere('note.id > :rangeStartAt', { rangeStartAt: date });
+		}
+
+		if (opts.rangeEndAt != null) {
+			const date = this.idService.gen(opts.rangeEndAt + 1);
+			query.andWhere('note.id < :rangeEndAt', { rangeEndAt: date });
+		}
+
 		this.queryService.generateVisibilityQuery(query, me);
 		this.queryService.generateBaseNoteFilteringQuery(query, me);
 
@@ -435,10 +449,20 @@ export class SearchService {
 			k: 'createdAt',
 			v: this.idService.parse(pagination.untilId).date.getTime(),
 		});
+		if (opts.rangeEndAt) filter.qs.push({
+			op: '<=',
+			k: 'createdAt',
+			v: opts.rangeEndAt,
+		});
 		if (pagination.sinceId) filter.qs.push({
 			op: '>',
 			k: 'createdAt',
 			v: this.idService.parse(pagination.sinceId).date.getTime(),
+		});
+		if (opts.rangeStartAt) filter.qs.push({
+			op: '>=',
+			k: 'createdAt',
+			v: opts.rangeStartAt,
 		});
 		if (opts.userId) filter.qs.push({ op: '=', k: 'userId', v: opts.userId });
 		if (opts.channelId) filter.qs.push({ op: '=', k: 'channelId', v: opts.channelId });

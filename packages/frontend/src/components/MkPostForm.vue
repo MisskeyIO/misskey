@@ -779,6 +779,7 @@ function clear() {
 	noExtractEmojis.value = false;
 	quoteId.value = null;
 	serverDraftId.value = null;
+	uploader.reset();
 }
 
 function onKeydown(ev: KeyboardEvent) {

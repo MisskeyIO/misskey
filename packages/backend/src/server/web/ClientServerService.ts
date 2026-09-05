@@ -538,7 +538,7 @@ export class ClientServerService {
 				img: this.meta.bannerUrl ?? undefined,
 				title: this.meta.name ?? 'Misskey',
 				desc: this.meta.description ?? undefined,
-				...await this.htmlTemplateService.getCommonData(),
+				...(await this.htmlTemplateService.getCommonData()),
 				...data,
 			}));
 		};
@@ -555,7 +555,7 @@ export class ClientServerService {
 				requireSigninToViewContents: false,
 			});
 
-			return user && await this.feedService.packFeed(user);
+			return user && (await this.feedService.packFeed(user));
 		};
 
 		// Atom
@@ -638,7 +638,7 @@ export class ClientServerService {
 					user: _user,
 					profile,
 					sub: request.params.sub,
-					...await this.htmlTemplateService.getCommonData(),
+					...(await this.htmlTemplateService.getCommonData()),
 					clientCtxJson: htmlSafeJsonStringify({
 						user: _user,
 					}),
@@ -674,7 +674,11 @@ export class ClientServerService {
 					id: request.params.note,
 					visibility: In(['public', 'home']),
 				},
-				relations: ['user', 'reply', 'renote'],
+				relations: {
+					user: true,
+					reply: true,
+					renote: true,
+				},
 			});
 
 			if (
@@ -718,7 +722,7 @@ export class ClientServerService {
 					id: request.params.note,
 					visibility: In(['public', 'home']),
 				},
-				relations: ['user', 'reply', 'renote'],
+				relations: { user: true, reply: true, renote: true },
 			});
 
 			if (note) {
@@ -946,7 +950,7 @@ export class ClientServerService {
 				reply.header('Cache-Control', 'public, max-age=15');
 				return await HtmlTemplateService.replyHtml(reply, ChannelPage({
 					channel: _channel,
-					...await this.htmlTemplateService.getCommonData(),
+					...(await this.htmlTemplateService.getCommonData()),
 				}));
 			} else {
 				return await renderBase(reply);
@@ -964,7 +968,7 @@ export class ClientServerService {
 				reply.header('Cache-Control', 'public, max-age=3600');
 				return await HtmlTemplateService.replyHtml(reply, ReversiGamePage({
 					reversiGame: _game,
-					...await this.htmlTemplateService.getCommonData(),
+					...(await this.htmlTemplateService.getCommonData()),
 				}));
 			} else {
 				return await renderBase(reply);
@@ -983,7 +987,7 @@ export class ClientServerService {
 				reply.header('Cache-Control', 'public, max-age=3600');
 				return await HtmlTemplateService.replyHtml(reply, AnnouncementPage({
 					announcement: _announcement,
-					...await this.htmlTemplateService.getCommonData(),
+					...(await this.htmlTemplateService.getCommonData()),
 				}));
 			} else {
 				return await renderBase(reply);
@@ -1019,7 +1023,7 @@ export class ClientServerService {
 			reply.header('Cache-Control', 'public, max-age=3600');
 			return await HtmlTemplateService.replyHtml(reply, BaseEmbed({
 				title: this.meta.name ?? 'Misskey',
-				...await this.htmlTemplateService.getCommonData(),
+				...(await this.htmlTemplateService.getCommonData()),
 				embedCtxJson: htmlSafeJsonStringify({
 					user: _user,
 				}),
@@ -1033,7 +1037,11 @@ export class ClientServerService {
 				where: {
 					id: request.params.note,
 				},
-				relations: ['user', 'reply', 'renote'],
+				relations: {
+					user: true,
+					reply: true,
+					renote: true,
+				},
 			});
 
 			if (note == null) return;
@@ -1045,7 +1053,7 @@ export class ClientServerService {
 			reply.header('Cache-Control', 'public, max-age=3600');
 			return await HtmlTemplateService.replyHtml(reply, BaseEmbed({
 				title: this.meta.name ?? 'Misskey',
-				...await this.htmlTemplateService.getCommonData(),
+				...(await this.htmlTemplateService.getCommonData()),
 				embedCtxJson: htmlSafeJsonStringify({
 					note: _note,
 				}),
@@ -1066,7 +1074,7 @@ export class ClientServerService {
 			reply.header('Cache-Control', 'public, max-age=3600');
 			return await HtmlTemplateService.replyHtml(reply, BaseEmbed({
 				title: this.meta.name ?? 'Misskey',
-				...await this.htmlTemplateService.getCommonData(),
+				...(await this.htmlTemplateService.getCommonData()),
 				embedCtxJson: htmlSafeJsonStringify({
 					clip: _clip,
 				}),
@@ -1079,7 +1087,7 @@ export class ClientServerService {
 			reply.header('Cache-Control', 'public, max-age=3600');
 			return await HtmlTemplateService.replyHtml(reply, BaseEmbed({
 				title: this.meta.name ?? 'Misskey',
-				...await this.htmlTemplateService.getCommonData(),
+				...(await this.htmlTemplateService.getCommonData()),
 			}));
 		});
 

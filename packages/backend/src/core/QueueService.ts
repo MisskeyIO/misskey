@@ -701,4 +701,14 @@ export class QueueService {
 			queue.clean(0, 0, state);
 		}
 	}
+
+	@bindThis
+	public async queuePause(queueType: typeof QUEUE_TYPES[number]) {
+		await this.getQueue(queueType).pause();
+	}
+
+	@bindThis
+	public async queueResume(queueType: typeof QUEUE_TYPES[number]) {
+		await this.getQueue(queueType).resume();
+	}
 }

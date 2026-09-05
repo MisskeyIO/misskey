@@ -65,6 +65,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<div v-if="user.host == null" class="_buttons">
 						<MkButton @click="resetPassword"><i class="ti ti-key"></i> {{ i18n.ts.resetPassword }}</MkButton>
 						<MkButton danger @click="regenerateLoginToken"><i class="ti ti-refresh"></i> {{ i18n.ts.regenerateLoginToken }}</MkButton>
+						<MkButton @click="unsetMfa"><i class="ti ti-shield"></i> {{ i18n.ts.unsetMfa }}</MkButton>
 					</div>
 
 					<MkFolder>
@@ -562,6 +563,20 @@ async function regenerateLoginToken() {
 	await os.apiWithDialog('admin/regenerate-user-token', {
 		userId: user.value.id,
 	}).then(refreshUser);
+}
+
+async function unsetMfa() {
+	const confirm = await os.confirm({
+		type: 'warning',
+		text: i18n.ts.unsetMfaConfirm,
+	});
+	if (confirm.canceled) {
+		return;
+	} else {
+		await os.apiWithDialog('admin/unset-mfa', {
+			userId: user.value.id,
+		});
+	}
 }
 
 async function toggleSuspend(v: boolean) {

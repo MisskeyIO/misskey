@@ -64,8 +64,10 @@ export class SigninWithPasskeyApiService {
 		const body = request.body;
 		const credential = body['credential'];
 
-		this.logger.setContext({ ip: request.ip, headers: request.headers, span: request.headers['x-client-transaction-id'] ?? randomUUID() });
-		this.logger.info('Requested to sign in with passkey.');
+		this.logger.info({
+			message: 'Requested to sign in with passkey.',
+			attributes: { ip: request.ip, headers: request.headers, span: request.headers['x-client-transaction-id'] ?? randomUUID() },
+		});
 
 		function error(status: number, error: { id: string }) {
 			reply.code(status);

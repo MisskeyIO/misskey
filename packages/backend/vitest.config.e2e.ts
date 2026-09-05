@@ -8,6 +8,12 @@ export default mergeConfig(
 			include: ['./test/e2e/**/*.ts'],
 			globalSetup: './built-test/entry.js',
 			setupFiles: ['./test/setup.e2e.ts'],
+			server: {
+				deps: {
+					// ビルド済みの起動コードを再変換して停止するのを防ぐ。
+					external: [/\/built-test\/entry\.js$/],
+				},
+			},
 		},
 	}),
 );

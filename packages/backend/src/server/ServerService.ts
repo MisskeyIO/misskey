@@ -23,6 +23,7 @@ import { appendQuery, omitHttps, query } from '@/misc/prelude/url.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
 import { LoggerService } from '@/core/LoggerService.js';
 import { bindThis } from '@/decorators.js';
+import { envOption } from '@/env.js';
 import { ActivityPubServerService } from './ActivityPubServerService.js';
 import { NodeinfoServerService } from './NodeinfoServerService.js';
 import { ApiServerService } from './api/ApiServerService.js';
@@ -34,6 +35,7 @@ import { OpenApiServerService } from './api/openapi/OpenApiServerService.js';
 import { OAuth2ProviderService } from './oauth/OAuth2ProviderService.js';
 import { JWTIdentifyProviderService } from './sso/JWTIdentifyProviderService.js';
 import { SAMLIdentifyProviderService } from './sso/SAMLIdentifyProviderService.js';
+import { registerHttpAccessLog } from './http-access-log.js';
 
 const _dirname = fileURLToPath(new URL('.', import.meta.url));
 
@@ -86,12 +88,22 @@ export class ServerService implements OnApplicationShutdown {
 			},
 		});
 		this.#fastify = fastify;
+		registerHttpAccessLog(fastify);
 
 		// HSTS
 		// 6months (15552000sec)
 		if (this.config.url.startsWith('https') && !this.config.disableHsts) {
 			fastify.addHook('onRequest', (request, reply, done) => {
 				reply.header('strict-transport-security', 'max-age=15552000; preload');
+				done();
+			});
+		}
+
+		// for test
+		if (envOption.enableCrossOriginIsolation) {
+			fastify.addHook('onRequest', (request, reply, done) => {
+				reply.header('Cross-Origin-Opener-Policy', 'same-origin');
+				reply.header('Cross-Origin-Embedder-Policy', 'credentialless');
 				done();
 			});
 		}

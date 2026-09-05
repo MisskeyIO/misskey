@@ -9,7 +9,7 @@
 // pnpm jest -- e2e/timelines.ts
 
 import * as assert from 'assert';
-import { describe, beforeAll, test } from 'vitest';
+import { describe, beforeAll, test, vi } from 'vitest';
 import { setTimeout } from 'node:timers/promises';
 import { entities } from 'misskey-js';
 import { Redis } from 'ioredis';
@@ -20,6 +20,8 @@ import { loadConfig } from '@/config.js';
 function genHost() {
 	return randomString() + '.example.com';
 }
+
+const waitForPushToTlOptions = { timeout: 3000, interval: 25 };
 
 let redisForTimelines: Redis;
 let root: SignupResponse;
@@ -108,28 +110,27 @@ describe('Timelines', () => {
 
 				const aliceNote = await post(alice, { text: 'hi', visibility: 'followers' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
-				assert.strictEqual(res.body.find(note => note.id === aliceNote.id)?.text, 'hi');
+					assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
+					assert.strictEqual(res.body.find(note => note.id === aliceNote.id)?.text, 'hi');
+				}, waitForPushToTlOptions);
 			});
 
 			test('フォローしているユーザーのノートが含まれる', async () => {
 				const [alice, bob, carol] = await Promise.all([signup(), signup(), signup()]);
 
 				await api('following/create', { userId: bob.id }, alice);
-				await setTimeout(250);
 				const bobNote = await post(bob, { text: 'hi' });
 				const carolNote = await post(carol, { text: 'hi' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
-				assert.strictEqual(res.body.some(note => note.id === carolNote.id), false);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === carolNote.id), false);
+				}, waitForPushToTlOptions);
 			});
 
 			describe('Language filter', () => {
@@ -174,24 +175,22 @@ describe('Timelines', () => {
 				const [alice, bob, carol] = await Promise.all([signup(), signup(), signup()]);
 
 				await api('following/create', { userId: bob.id }, alice);
-				await setTimeout(250);
 				const bobNote = await post(bob, { text: 'hi', visibility: 'followers' });
 				const carolNote = await post(carol, { text: 'hi' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
-				assert.strictEqual(res.body.find(note => note.id === bobNote.id)?.text, 'hi');
-				assert.strictEqual(res.body.some(note => note.id === carolNote.id), false);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.find(note => note.id === bobNote.id)?.text, 'hi');
+					assert.strictEqual(res.body.some(note => note.id === carolNote.id), false);
+				}, waitForPushToTlOptions);
 			});
 
 			test('withReplies: false でフォローしているユーザーの他人への返信が含まれない', async () => {
 				const [alice, bob, carol] = await Promise.all([signup(), signup(), signup()]);
 
 				await api('following/create', { userId: bob.id }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', replyId: carolNote.id });
 
@@ -210,16 +209,15 @@ describe('Timelines', () => {
 
 				await api('following/create', { userId: bob.id }, alice);
 				await api('following/update', { userId: bob.id, withReplies: true }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', replyId: carolNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
-				assert.strictEqual(res.body.some(note => note.id === carolNote.id), false);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === carolNote.id), false);
+				}, waitForPushToTlOptions);
 			});
 
 			test('withReplies: true でフォローしているユーザーの他人へのDM返信が含まれない', async () => {
@@ -227,7 +225,6 @@ describe('Timelines', () => {
 
 				await api('following/create', { userId: bob.id }, alice);
 				await api('following/update', { userId: bob.id, withReplies: true }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', replyId: carolNote.id, visibility: 'specified', visibleUserIds: [carol.id] });
 
@@ -245,7 +242,6 @@ describe('Timelines', () => {
 				await api('following/create', { userId: carol.id }, bob);
 				await api('following/create', { userId: bob.id }, alice);
 				await api('following/update', { userId: bob.id, withReplies: true }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi', visibility: 'followers' });
 				const bobNote = await post(bob, { text: 'hi', replyId: carolNote.id });
 
@@ -266,17 +262,16 @@ describe('Timelines', () => {
 				await api('following/create', { userId: carol.id }, alice);
 				await api('following/create', { userId: carol.id }, bob);
 				await api('following/update', { userId: bob.id, withReplies: true }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi', visibility: 'followers' });
 				const bobNote = await post(bob, { text: 'hi', replyId: carolNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
-				assert.strictEqual(res.body.some(note => note.id === carolNote.id), true);
-				assert.strictEqual(res.body.find(note => note.id === carolNote.id)?.text, 'hi');
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === carolNote.id), true);
+					assert.strictEqual(res.body.find(note => note.id === carolNote.id)?.text, 'hi');
+				}, waitForPushToTlOptions);
 			});
 
 			test('withReplies: true でフォローしているユーザーの自分の visibility: followers な投稿への返信が含まれる', async () => {
@@ -287,16 +282,15 @@ describe('Timelines', () => {
 				await api('following/create', { userId: bob.id }, alice);
 				await api('following/create', { userId: alice.id }, bob);
 				await api('following/update', { userId: bob.id, withReplies: true }, alice);
-				await setTimeout(250);
 				const aliceNote = await post(alice, { text: 'hi', visibility: 'followers' });
 				const bobNote = await post(bob, { text: 'hi', replyId: aliceNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
-				assert.strictEqual(res.body.some((note: any) => note.id === aliceNote.id), true);
+					assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some((note: any) => note.id === aliceNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('withReplies: true でフォローしているユーザーの行った別のフォローしているユーザーの投稿への visibility: specified な返信が含まれない', async () => {
@@ -305,32 +299,30 @@ describe('Timelines', () => {
 				await api('following/create', { userId: bob.id }, alice);
 				await api('following/create', { userId: carol.id }, alice);
 				await api('following/update', { userId: bob.id, withReplies: true }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', replyId: carolNote.id, visibility: 'specified', visibleUserIds: [carol.id] });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), false);
-				assert.strictEqual(res.body.some(note => note.id === carolNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), false);
+					assert.strictEqual(res.body.some(note => note.id === carolNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('withReplies: false でフォローしているユーザーのそのユーザー自身への返信が含まれる', async () => {
 				const [alice, bob] = await Promise.all([signup(), signup()]);
 
 				await api('following/create', { userId: bob.id }, alice);
-				await setTimeout(250);
 				const bobNote1 = await post(bob, { text: 'hi' });
 				const bobNote2 = await post(bob, { text: 'hi', replyId: bobNote1.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote1.id), true);
-				assert.strictEqual(res.body.some(note => note.id === bobNote2.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote1.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote2.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('withReplies: false でフォローしているユーザーからの自分への返信が含まれる', async () => {
@@ -339,16 +331,15 @@ describe('Timelines', () => {
 				const [alice, bob] = await Promise.all([signup(), signup()]);
 
 				await api('following/create', { userId: bob.id }, alice);
-				await setTimeout(250);
 				const aliceNote = await post(alice, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', replyId: aliceNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('自分の他人への返信が含まれる', async () => {
@@ -359,54 +350,51 @@ describe('Timelines', () => {
 				const bobNote = await post(bob, { text: 'hi' });
 				const aliceNote = await post(alice, { text: 'hi', replyId: bobNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), false);
-				assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), false);
+					assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('フォローしているユーザーの他人の投稿のリノートが含まれる', async () => {
 				const [alice, bob, carol] = await Promise.all([signup(), signup(), signup()]);
 
 				await api('following/create', { userId: bob.id }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const bobNote = await post(bob, { renoteId: carolNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
-				assert.strictEqual(res.body.some(note => note.id === carolNote.id), false);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === carolNote.id), false);
+				}, waitForPushToTlOptions);
 			});
 
 			test('[withRenotes: false] フォローしているユーザーの投稿が含まれる', async () => {
 				const [alice, bob, carol] = await Promise.all([signup(), signup(), signup()]);
 
 				await api('following/create', { userId: bob.id }, alice);
-				await setTimeout(250);
 				const bobNote = await post(bob, { text: 'hi' });
 				const carolNote = await post(carol, { text: 'hi' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/timeline', {
+						limit: 100,
+						withRenotes: false,
+					}, alice);
 
-				const res = await api('notes/timeline', {
-					limit: 100,
-					withRenotes: false,
-				}, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
-				assert.strictEqual(res.body.some(note => note.id === carolNote.id), false);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === carolNote.id), false);
+				}, waitForPushToTlOptions);
 			});
 
 			test('[withRenotes: false] フォローしているユーザーのファイルのみの投稿が含まれる', async () => {
 				const [alice, bob, carol] = await Promise.all([signup(), signup(), signup()]);
 
 				await api('following/create', { userId: bob.id }, alice);
-				await setTimeout(250);
 				const [bobFile, carolFile] = await Promise.all([
 					uploadUrl(bob, 'https://misskey.io/static-assets/icons/192.png'),
 					uploadUrl(carol, 'https://misskey.io/static-assets/icons/192.png'),
@@ -414,22 +402,21 @@ describe('Timelines', () => {
 				const bobNote = await post(bob, { fileIds: [bobFile.id] });
 				const carolNote = await post(carol, { fileIds: [carolFile.id] });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/timeline', {
+						limit: 100,
+						withRenotes: false,
+					}, alice);
 
-				const res = await api('notes/timeline', {
-					limit: 100,
-					withRenotes: false,
-				}, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
-				assert.strictEqual(res.body.some(note => note.id === carolNote.id), false);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === carolNote.id), false);
+				}, waitForPushToTlOptions);
 			});
 
 			test('[withRenotes: false] フォローしているユーザーの他人の投稿のリノートが含まれない', async () => {
 				const [alice, bob, carol] = await Promise.all([signup(), signup(), signup()]);
 
 				await api('following/create', { userId: bob.id }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const bobNote = await post(bob, { renoteId: carolNote.id });
 
@@ -447,25 +434,23 @@ describe('Timelines', () => {
 				const [alice, bob, carol] = await Promise.all([signup(), signup(), signup()]);
 
 				await api('following/create', { userId: bob.id }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', renoteId: carolNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/timeline', {
+						withRenotes: false,
+					}, alice);
 
-				const res = await api('notes/timeline', {
-					withRenotes: false,
-				}, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
-				assert.strictEqual(res.body.some(note => note.id === carolNote.id), false);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === carolNote.id), false);
+				}, waitForPushToTlOptions);
 			});
 
 			test('フォローしているユーザーの他人への visibility: specified なノートが含まれない', async () => {
 				const [alice, bob, carol] = await Promise.all([signup(), signup(), signup()]);
 
 				await api('following/create', { userId: bob.id }, alice);
-				await setTimeout(250);
 				const bobNote = await post(bob, { text: 'hi', visibility: 'specified', visibleUserIds: [carol.id] });
 
 				await waitForPushToTl();
@@ -480,7 +465,6 @@ describe('Timelines', () => {
 
 				await api('following/create', { userId: bob.id }, alice);
 				await api('mute/create', { userId: carol.id }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', renoteId: carolNote.id });
 
@@ -498,7 +482,6 @@ describe('Timelines', () => {
 				await api('following/create', { userId: bob.id }, alice);
 				await api('following/update', { userId: bob.id, withReplies: true }, alice);
 				await api('mute/create', { userId: carol.id }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', replyId: carolNote.id });
 
@@ -515,7 +498,6 @@ describe('Timelines', () => {
 
 				await api('following/create', { userId: bob.id }, alice);
 				await api('mute/create', { userId: carol.id }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const daveNote = await post(dave, { text: 'quote hi', renoteId: carolNote.id });
 				const bobNote = await post(bob, { renoteId: daveNote.id });
@@ -534,7 +516,6 @@ describe('Timelines', () => {
 
 				await api('following/create', { userId: bob.id }, alice);
 				await api('mute/create', { userId: carol.id }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const daveNote = await post(dave, { text: 'quote hi', replyId: carolNote.id });
 				const bobNote = await post(bob, { renoteId: daveNote.id });
@@ -556,11 +537,11 @@ describe('Timelines', () => {
 
 				const bobNote = await post(bob, { text: 'hi' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('フォローしているリモートユーザーの visibility: home なノートが含まれる', async () => {
@@ -571,18 +552,17 @@ describe('Timelines', () => {
 
 				const bobNote = await post(bob, { text: 'hi', visibility: 'home' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('[withFiles: true] フォローしているユーザーのファイル付きノートのみ含まれる', async () => {
 				const [alice, bob, carol] = await Promise.all([signup(), signup(), signup()]);
 
 				await api('following/create', { userId: bob.id }, alice);
-				await setTimeout(250);
 				const [bobFile, carolFile] = await Promise.all([
 					uploadUrl(bob, 'https://misskey.io/static-assets/icons/192.png'),
 					uploadUrl(carol, 'https://misskey.io/static-assets/icons/192.png'),
@@ -592,22 +572,21 @@ describe('Timelines', () => {
 				const carolNote1 = await post(carol, { text: 'hi' });
 				const carolNote2 = await post(carol, { fileIds: [carolFile.id] });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/timeline', { limit: 100, withFiles: true }, alice);
 
-				const res = await api('notes/timeline', { limit: 100, withFiles: true }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote1.id), false);
-				assert.strictEqual(res.body.some(note => note.id === bobNote2.id), true);
-				assert.strictEqual(res.body.some(note => note.id === carolNote1.id), false);
-				assert.strictEqual(res.body.some(note => note.id === carolNote2.id), false);
-			}, 1000 * 60);
+					assert.strictEqual(res.body.some(note => note.id === bobNote1.id), false);
+					assert.strictEqual(res.body.some(note => note.id === bobNote2.id), true);
+					assert.strictEqual(res.body.some(note => note.id === carolNote1.id), false);
+					assert.strictEqual(res.body.some(note => note.id === carolNote2.id), false);
+				}, waitForPushToTlOptions);
+			}, 1000 * 30);
 
 			test('フォローしているユーザーのチャンネル投稿が含まれない', async () => {
 				const [alice, bob] = await Promise.all([signup(), signup()]);
 
 				const channel = await api('channels/create', { name: 'channel' }, bob).then(x => x.body);
 				await api('following/create', { userId: bob.id }, alice);
-				await setTimeout(250);
 				const bobNote = await post(bob, { text: 'hi', channelId: channel.id });
 
 				await waitForPushToTl();
@@ -622,27 +601,26 @@ describe('Timelines', () => {
 
 				const aliceNote = await post(alice, { text: 'hi', visibility: 'specified' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
-				assert.strictEqual(res.body.find(note => note.id === aliceNote.id)?.text, 'hi');
+					assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
+					assert.strictEqual(res.body.find(note => note.id === aliceNote.id)?.text, 'hi');
+				}, waitForPushToTlOptions);
 			});
 
 			test('フォローしているユーザーの自身を visibleUserIds に指定した visibility: specified なノートが含まれる', async () => {
 				const [alice, bob] = await Promise.all([signup(), signup()]);
 
 				await api('following/create', { userId: bob.id }, alice);
-				await setTimeout(250);
 				const bobNote = await post(bob, { text: 'hi', visibility: 'specified', visibleUserIds: [alice.id] });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
-				assert.strictEqual(res.body.find(note => note.id === bobNote.id)?.text, 'hi');
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.find(note => note.id === bobNote.id)?.text, 'hi');
+				}, waitForPushToTlOptions);
 			});
 
 			test('フォローしていないユーザーの自身を visibleUserIds に指定した visibility: specified なノートが含まれない', async () => {
@@ -661,7 +639,6 @@ describe('Timelines', () => {
 				const [alice, bob, carol] = await Promise.all([signup(), signup(), signup()]);
 
 				await api('following/create', { userId: bob.id }, alice);
-				await setTimeout(250);
 				const bobNote = await post(bob, { text: 'hi', visibility: 'specified', visibleUserIds: [carol.id] });
 
 				await waitForPushToTl();
@@ -679,12 +656,12 @@ describe('Timelines', () => {
 				const bobNote = await post(bob, { text: 'hi', visibility: 'specified', visibleUserIds: [alice.id] });
 				const aliceNote = await post(alice, { text: 'ok', visibility: 'specified', visibleUserIds: [bob.id], replyId: bobNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
-				assert.strictEqual(res.body.find(note => note.id === aliceNote.id)?.text, 'ok');
+					assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
+					assert.strictEqual(res.body.find(note => note.id === aliceNote.id)?.text, 'ok');
+				}, waitForPushToTlOptions);
 			});
 
 			/* TODO
@@ -692,10 +669,11 @@ describe('Timelines', () => {
 				const [alice, bob] = await Promise.all([signup(), signup()]);
 				const aliceNote = await post(alice, { text: 'hi', visibility: 'specified', visibleUserIds: [bob.id] });
 				const bobNote = await post(bob, { text: 'ok', visibility: 'specified', visibleUserIds: [alice.id], replyId: aliceNote.id });
-				await waitForPushToTl();
-				const res = await api('notes/timeline', { limit: 100 }, alice);
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
-				assert.strictEqual(res.body.find(note => note.id === bobNote.id).text, 'ok');
+				await vi.waitFor(async () => {
+					const res = await api('notes/timeline', { limit: 100 }, alice);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.find(note => note.id === bobNote.id).text, 'ok');
+				}, waitForPushToTlOptions);
 			});
 			*/
 
@@ -738,11 +716,11 @@ describe('Timelines', () => {
 					const aliceNote = await post(alice, { text: 'hi' });
 					const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('notes/timeline', { limit: 100 }, alice);
 
-					const res = await api('notes/timeline', { limit: 100 }, alice);
-
-					assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+						assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+					}, waitForPushToTlOptions);
 				});
 
 				test('チャンネル未フォロー　＋　ユーザフォロー　＝　TLに流れない', async () => {
@@ -771,11 +749,11 @@ describe('Timelines', () => {
 					const aliceNote = await post(alice, { text: 'hi' });
 					const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('notes/timeline', { limit: 100 }, alice);
 
-					const res = await api('notes/timeline', { limit: 100 }, alice);
-
-					assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+						assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+					}, waitForPushToTlOptions);
 				});
 
 				test('チャンネル未フォロー　＋　ユーザ未フォロー　＋　チャンネルミュート　＝　TLに流れない', async () => {
@@ -889,11 +867,11 @@ describe('Timelines', () => {
 					const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 					const bobRenote = await renote(bobNote.id, bob);
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('notes/timeline', { limit: 100 }, alice);
 
-					const res = await api('notes/timeline', { limit: 100 }, alice);
-
-					assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+						assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+					}, waitForPushToTlOptions);
 				});
 
 				test('[チャンネル外リノート] チャンネルフォロー　＋　ユーザフォロー　＝　TLに流れる', async () => {
@@ -907,11 +885,11 @@ describe('Timelines', () => {
 					const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 					const bobRenote = await renote(bobNote.id, bob);
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('notes/timeline', { limit: 100 }, alice);
 
-					const res = await api('notes/timeline', { limit: 100 }, alice);
-
-					assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+						assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+					}, waitForPushToTlOptions);
 				});
 
 				test('[チャンネル外リノート] チャンネル未フォロー　＋　ユーザ未フォロー　＋　チャンネルミュート　＝　TLに流れない', async () => {
@@ -998,19 +976,19 @@ describe('Timelines', () => {
 				const bobNote = await post(bob, { text: 'I\'m Bob.' });
 				const carolNote = await post(carol, { text: 'I\'m Carol.' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					if (enableFanoutTimeline) {
+						// NOTE: notes/timeline だと DB へのフォールバックが効くので Redis を直接見て確かめる
+						assert.strictEqual(await redisForTimelines.exists(`list:homeTimeline:${bob.id}`), 1);
 
-				if (enableFanoutTimeline) {
-					// NOTE: notes/timeline だと DB へのフォールバックが効くので Redis を直接見て確かめる
-					assert.strictEqual(await redisForTimelines.exists(`list:homeTimeline:${bob.id}`), 1);
-
-					const bobHTL = await redisForTimelines.lrange(`list:homeTimeline:${bob.id}`, 0, -1);
-					assert.strictEqual(bobHTL.includes(aliceNote.id), true);
-					assert.strictEqual(bobHTL.includes(bobNote.id), true);
-					assert.strictEqual(bobHTL.includes(carolNote.id), false);
-				} else {
-					assert.strictEqual(await redisForTimelines.exists(`list:homeTimeline:${bob.id}`), 0);
-				}
+						const bobHTL = await redisForTimelines.lrange(`list:homeTimeline:${bob.id}`, 0, -1);
+						assert.strictEqual(bobHTL.includes(aliceNote.id), true);
+						assert.strictEqual(bobHTL.includes(bobNote.id), true);
+						assert.strictEqual(bobHTL.includes(carolNote.id), false);
+					} else {
+						assert.strictEqual(await redisForTimelines.exists(`list:homeTimeline:${bob.id}`), 0);
+					}
+				}, waitForPushToTlOptions);
 			});
 
 			test('FTT: リモートユーザーの HTL にはプッシュされない', async () => {
@@ -1023,10 +1001,10 @@ describe('Timelines', () => {
 				await post(alice, { text: 'I\'m Alice.' });
 				await post(bob, { text: 'I\'m Bob.' });
 
-				await waitForPushToTl();
-
-				// NOTE: notes/timeline だと DB へのフォールバックが効くので Redis を直接見て確かめる
-				assert.strictEqual(await redisForTimelines.exists(`list:homeTimeline:${bob.id}`), 0);
+				await vi.waitFor(async () => {
+					// NOTE: notes/timeline だと DB へのフォールバックが効くので Redis を直接見て確かめる
+					assert.strictEqual(await redisForTimelines.exists(`list:homeTimeline:${bob.id}`), 0);
+				}, waitForPushToTlOptions);
 			});
 
 			describe('凍結', () => {
@@ -1042,7 +1020,13 @@ describe('Timelines', () => {
 					bobNote = await post(bob, { text: 'yo' });
 					carolNote = await post(carol, { text: 'kon\'nichiwa' });
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('notes/timeline', { limit: 100 }, alice);
+
+						assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
+						assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+						assert.strictEqual(res.body.some(note => note.id === carolNote.id), true);
+					}, waitForPushToTlOptions);
 
 					await api('admin/suspend-user', { userId: carol.id }, root);
 					await setTimeout(100);
@@ -1083,7 +1067,15 @@ describe('Timelines', () => {
 					bobRenote = await post(bob, { renoteId: carolNote.id });
 					carolRenote = await post(carol, { renoteId: bobNote.id });
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('notes/timeline', { limit: 100 }, alice);
+
+						assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
+						assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+						assert.strictEqual(res.body.some(note => note.id === carolNote.id), true);
+						assert.strictEqual(res.body.some(note => note.id === bobRenote.id), true);
+						assert.strictEqual(res.body.some(note => note.id === carolRenote.id), true);
+					}, waitForPushToTlOptions);
 
 					await api('admin/suspend-user', { userId: carol.id }, root);
 					await setTimeout(100);
@@ -1126,7 +1118,13 @@ describe('Timelines', () => {
 					bobNote = await post(bob, { text: 'yo' });
 					carolNote = await post(carol, { text: 'kon\'nichiwa' });
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('notes/timeline', { limit: 100 }, alice);
+
+						assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
+						assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+						assert.strictEqual(res.body.some(note => note.id === carolNote.id), true);
+					}, waitForPushToTlOptions);
 
 					await api('admin/suspend-user', { userId: carol.id }, root);
 					await setTimeout(100);
@@ -1160,12 +1158,12 @@ describe('Timelines', () => {
 				const carolNote = await post(carol, { text: 'hi', visibility: 'home' });
 				const bobNote = await post(bob, { text: 'hi' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/local-timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/local-timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
-				assert.strictEqual(res.body.some(note => note.id === carolNote.id), false);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === carolNote.id), false);
+				}, waitForPushToTlOptions);
 			});
 
 			test('他人の他人への返信が含まれない', async () => {
@@ -1174,12 +1172,12 @@ describe('Timelines', () => {
 				const carolNote = await post(carol, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', replyId: carolNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/local-timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/local-timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), false);
-				assert.strictEqual(res.body.some(note => note.id === carolNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), false);
+					assert.strictEqual(res.body.some(note => note.id === carolNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('他人のその人自身への返信が含まれる', async () => {
@@ -1188,12 +1186,12 @@ describe('Timelines', () => {
 				const bobNote1 = await post(bob, { text: 'hi' });
 				const bobNote2 = await post(bob, { text: 'hi', replyId: bobNote1.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/local-timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/local-timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote1.id), true);
-				assert.strictEqual(res.body.some(note => note.id === bobNote2.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote1.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote2.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('チャンネル投稿が含まれない', async () => {
@@ -1226,32 +1224,30 @@ describe('Timelines', () => {
 				const [alice, bob, carol] = await Promise.all([signup(), signup(), signup()]);
 
 				await api('following/create', { userId: carol.id }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi', visibility: 'home' });
 				const bobNote = await post(bob, { text: 'hi' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/local-timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/local-timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
-				assert.strictEqual(res.body.some(note => note.id === carolNote.id), false);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === carolNote.id), false);
+				}, waitForPushToTlOptions);
 			});
 
 			test('ミュートしているユーザーのノートが含まれない', async () => {
 				const [alice, bob, carol] = await Promise.all([signup(), signup(), signup()]);
 
 				await api('mute/create', { userId: carol.id }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/local-timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/local-timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
-				assert.strictEqual(res.body.some(note => note.id === carolNote.id), false);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === carolNote.id), false);
+				}, waitForPushToTlOptions);
 			});
 
 			test('フォローしているユーザーが行ったミュートしているユーザーのリノートが含まれない', async () => {
@@ -1259,7 +1255,6 @@ describe('Timelines', () => {
 
 				await api('following/create', { userId: bob.id }, alice);
 				await api('mute/create', { userId: carol.id }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', renoteId: carolNote.id });
 
@@ -1277,7 +1272,6 @@ describe('Timelines', () => {
 				await api('following/create', { userId: bob.id }, alice);
 				await api('following/update', { userId: bob.id, withReplies: true }, alice);
 				await api('mute/create', { userId: carol.id }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', replyId: carolNote.id });
 
@@ -1293,7 +1287,6 @@ describe('Timelines', () => {
 				const [alice, bob, carol, dave] = await Promise.all([signup(), signup(), signup(), signup()]);
 
 				await api('mute/create', { userId: carol.id }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const daveNote = await post(dave, { text: 'quote hi', renoteId: carolNote.id });
 				const bobNote = await post(bob, { renoteId: daveNote.id });
@@ -1311,7 +1304,6 @@ describe('Timelines', () => {
 				const [alice, bob, carol, dave] = await Promise.all([signup(), signup(), signup(), signup()]);
 
 				await api('mute/create', { userId: carol.id }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const daveNote = await post(dave, { text: 'quote hi', replyId: carolNote.id });
 				const bobNote = await post(bob, { renoteId: daveNote.id });
@@ -1331,16 +1323,15 @@ describe('Timelines', () => {
 				const [alice, bob] = await Promise.all([signup(), signup()]);
 
 				await api('following/create', { userId: bob.id }, alice);
-				await setTimeout(250);
 				const aliceNote = await post(alice, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', replyId: aliceNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/local-timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/local-timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('withReplies: false でフォローしていないユーザーからの自分への返信が含まれる', async () => {
@@ -1348,16 +1339,15 @@ describe('Timelines', () => {
 
 				const [alice, bob] = await Promise.all([signup(), signup()]);
 
-				await setTimeout(250);
 				const aliceNote = await post(alice, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', replyId: aliceNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/local-timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/local-timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('[withReplies: true] 他人の他人への返信が含まれる', async () => {
@@ -1366,11 +1356,11 @@ describe('Timelines', () => {
 				const carolNote = await post(carol, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', replyId: carolNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/local-timeline', { limit: 100, withReplies: true }, alice);
 
-				const res = await api('notes/local-timeline', { limit: 100, withReplies: true }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('[withFiles: true] ファイル付きノートのみ含まれる', async () => {
@@ -1380,13 +1370,13 @@ describe('Timelines', () => {
 				const bobNote1 = await post(bob, { text: 'hi' });
 				const bobNote2 = await post(bob, { fileIds: [file.id] });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/local-timeline', { limit: 100, withFiles: true }, alice);
 
-				const res = await api('notes/local-timeline', { limit: 100, withFiles: true }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote1.id), false);
-				assert.strictEqual(res.body.some(note => note.id === bobNote2.id), true);
-			}, 1000 * 30);
+					assert.strictEqual(res.body.some(note => note.id === bobNote1.id), false);
+					assert.strictEqual(res.body.some(note => note.id === bobNote2.id), true);
+				}, waitForPushToTlOptions);
+			}, 1000 * 10);
 
 			describe('Channel', () => {
 				test('チャンネル未フォロー　＋　ユーザ未フォロー　＝　TLに流れない', async () => {
@@ -1530,11 +1520,11 @@ describe('Timelines', () => {
 					const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 					const bobRenote = await renote(bobNote.id, bob);
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('notes/local-timeline', { limit: 100 }, alice);
 
-					const res = await api('notes/local-timeline', { limit: 100 }, alice);
-
-					assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+						assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+					}, waitForPushToTlOptions);
 				});
 
 				test('[チャンネル外リノート] チャンネルフォロー　＋　ユーザ未フォロー　＝　TLに流れる', async () => {
@@ -1547,11 +1537,11 @@ describe('Timelines', () => {
 					const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 					const bobRenote = await renote(bobNote.id, bob);
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('notes/local-timeline', { limit: 100 }, alice);
 
-					const res = await api('notes/local-timeline', { limit: 100 }, alice);
-
-					assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+						assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+					}, waitForPushToTlOptions);
 				});
 
 				test('[チャンネル外リノート] チャンネル未フォロー　＋　ユーザフォロー　＝　TLに流れる', async () => {
@@ -1564,11 +1554,11 @@ describe('Timelines', () => {
 					const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 					const bobRenote = await renote(bobNote.id, bob);
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('notes/local-timeline', { limit: 100 }, alice);
 
-					const res = await api('notes/local-timeline', { limit: 100 }, alice);
-
-					assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+						assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+					}, waitForPushToTlOptions);
 				});
 
 				test('[チャンネル外リノート] チャンネルフォロー　＋　ユーザフォロー　＝　TLに流れる', async () => {
@@ -1582,11 +1572,11 @@ describe('Timelines', () => {
 					const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 					const bobRenote = await renote(bobNote.id, bob);
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('notes/local-timeline', { limit: 100 }, alice);
 
-					const res = await api('notes/local-timeline', { limit: 100 }, alice);
-
-					assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+						assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+					}, waitForPushToTlOptions);
 				});
 
 				test('[チャンネル外リノート] チャンネル未フォロー　＋　ユーザ未フォロー　＋　チャンネルミュート　＝　TLに流れない', async () => {
@@ -1669,11 +1659,11 @@ describe('Timelines', () => {
 
 				const bobNote = await post(bob, { text: 'hi' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('ローカルユーザーの visibility: home なノートが含まれない', async () => {
@@ -1692,14 +1682,13 @@ describe('Timelines', () => {
 				const [alice, bob] = await Promise.all([signup(), signup()]);
 
 				await api('following/create', { userId: bob.id }, alice);
-				await setTimeout(250);
 				const bobNote = await post(bob, { text: 'hi', visibility: 'home' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('withReplies: false でフォローしているユーザーからの自分への返信が含まれる', async () => {
@@ -1709,16 +1698,15 @@ describe('Timelines', () => {
 				const [alice, bob] = await Promise.all([signup(), signup()]);
 
 				await api('following/create', { userId: bob.id }, alice);
-				await setTimeout(250);
 				const aliceNote = await post(alice, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', replyId: aliceNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('withReplies: true でフォローしているユーザーの他人の visibility: followers な投稿への返信が含まれない', async () => {
@@ -1727,7 +1715,6 @@ describe('Timelines', () => {
 				await api('following/create', { userId: carol.id }, bob);
 				await api('following/create', { userId: bob.id }, alice);
 				await api('following/update', { userId: bob.id, withReplies: true }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi', visibility: 'followers' });
 				const bobNote = await post(bob, { text: 'hi', replyId: carolNote.id });
 
@@ -1749,17 +1736,16 @@ describe('Timelines', () => {
 				await api('following/create', { userId: carol.id }, alice);
 				await api('following/create', { userId: carol.id }, bob);
 				await api('following/update', { userId: bob.id, withReplies: true }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi', visibility: 'followers' });
 				const bobNote = await post(bob, { text: 'hi', replyId: carolNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
-				assert.strictEqual(res.body.some((note: any) => note.id === carolNote.id), true);
-				assert.strictEqual(res.body.find((note: any) => note.id === carolNote.id)?.text, 'hi');
+					assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some((note: any) => note.id === carolNote.id), true);
+					assert.strictEqual(res.body.find((note: any) => note.id === carolNote.id)?.text, 'hi');
+				}, waitForPushToTlOptions);
 			});
 
 			test('withReplies: true でフォローしているユーザーの自分の visibility: followers な投稿への返信が含まれる', async () => {
@@ -1771,16 +1757,15 @@ describe('Timelines', () => {
 				await api('following/create', { userId: bob.id }, alice);
 				await api('following/create', { userId: alice.id }, bob);
 				await api('following/update', { userId: bob.id, withReplies: true }, alice);
-				await setTimeout(250);
 				const aliceNote = await post(alice, { text: 'hi', visibility: 'followers' });
 				const bobNote = await post(bob, { text: 'hi', replyId: aliceNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
-				assert.strictEqual(res.body.some((note: any) => note.id === aliceNote.id), true);
+					assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some((note: any) => note.id === aliceNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('他人の他人への返信が含まれない', async () => {
@@ -1789,12 +1774,12 @@ describe('Timelines', () => {
 				const carolNote = await post(carol, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', replyId: carolNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), false);
-				assert.strictEqual(res.body.some(note => note.id === carolNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), false);
+					assert.strictEqual(res.body.some(note => note.id === carolNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('リモートユーザーのノートが含まれない', async () => {
@@ -1817,11 +1802,11 @@ describe('Timelines', () => {
 
 				const bobNote = await post(bob, { text: 'hi' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('フォローしているリモートユーザーの visibility: home なノートが含まれる', async () => {
@@ -1832,11 +1817,11 @@ describe('Timelines', () => {
 
 				const bobNote = await post(bob, { text: 'hi', visibility: 'home' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('withReplies: false でフォローしていないユーザーからの自分への返信が含まれる', async () => {
@@ -1845,16 +1830,15 @@ describe('Timelines', () => {
 
 				const [alice, bob] = await Promise.all([signup(), signup()]);
 
-				await setTimeout(250);
 				const aliceNote = await post(alice, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', replyId: aliceNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/local-timeline', { limit: 100 }, alice);
 
-				const res = await api('notes/local-timeline', { limit: 100 }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('[withReplies: true] 他人の他人への返信が含まれる', async () => {
@@ -1863,11 +1847,11 @@ describe('Timelines', () => {
 				const carolNote = await post(carol, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', replyId: carolNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/hybrid-timeline', { limit: 100, withReplies: true }, alice);
 
-				const res = await api('notes/hybrid-timeline', { limit: 100, withReplies: true }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('[withFiles: true] ファイル付きノートのみ含まれる', async () => {
@@ -1877,13 +1861,13 @@ describe('Timelines', () => {
 				const bobNote1 = await post(bob, { text: 'hi' });
 				const bobNote2 = await post(bob, { fileIds: [file.id] });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/hybrid-timeline', { limit: 100, withFiles: true }, alice);
 
-				const res = await api('notes/hybrid-timeline', { limit: 100, withFiles: true }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote1.id), false);
-				assert.strictEqual(res.body.some(note => note.id === bobNote2.id), true);
-			}, 1000 * 30);
+					assert.strictEqual(res.body.some(note => note.id === bobNote1.id), false);
+					assert.strictEqual(res.body.some(note => note.id === bobNote2.id), true);
+				}, waitForPushToTlOptions);
+			}, 1000 * 10);
 
 			describe('Channel', () => {
 				test('チャンネル未フォロー　＋　ユーザ未フォロー　＝　TLに流れない', async () => {
@@ -1910,11 +1894,11 @@ describe('Timelines', () => {
 					const aliceNote = await post(alice, { text: 'hi' });
 					const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
 
-					const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
-
-					assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+						assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+					}, waitForPushToTlOptions);
 				});
 
 				test('チャンネル未フォロー　＋　ユーザフォロー　＝　TLに流れない', async () => {
@@ -1943,11 +1927,11 @@ describe('Timelines', () => {
 					const aliceNote = await post(alice, { text: 'hi' });
 					const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
 
-					const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
-
-					assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+						assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+					}, waitForPushToTlOptions);
 				});
 
 				test('チャンネル未フォロー　＋　ユーザ未フォロー　＋　チャンネルミュート　＝　TLに流れない', async () => {
@@ -2027,11 +2011,11 @@ describe('Timelines', () => {
 					const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 					const bobRenote = await renote(bobNote.id, bob);
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
 
-					const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
-
-					assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+						assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+					}, waitForPushToTlOptions);
 				});
 
 				test('[チャンネル外リノート] チャンネルフォロー　＋　ユーザ未フォロー　＝　TLに流れる', async () => {
@@ -2044,11 +2028,11 @@ describe('Timelines', () => {
 					const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 					const bobRenote = await renote(bobNote.id, bob);
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
 
-					const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
-
-					assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+						assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+					}, waitForPushToTlOptions);
 				});
 
 				test('[チャンネル外リノート] チャンネル未フォロー　＋　ユーザフォロー　＝　TLに流れる', async () => {
@@ -2061,11 +2045,11 @@ describe('Timelines', () => {
 					const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 					const bobRenote = await renote(bobNote.id, bob);
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
 
-					const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
-
-					assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+						assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+					}, waitForPushToTlOptions);
 				});
 
 				test('[チャンネル外リノート] チャンネルフォロー　＋　ユーザフォロー　＝　TLに流れる', async () => {
@@ -2079,11 +2063,11 @@ describe('Timelines', () => {
 					const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 					const bobRenote = await renote(bobNote.id, bob);
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
 
-					const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
-
-					assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+						assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+					}, waitForPushToTlOptions);
 				});
 
 				test('[チャンネル外リノート] チャンネル未フォロー　＋　ユーザ未フォロー　＋　チャンネルミュート　＝　TLに流れない', async () => {
@@ -2177,11 +2161,17 @@ describe('Timelines', () => {
 					carolNote = await post(carol, { text: 'kon\'nichiwa' });
 					daveNote = await post(dave, { text: 'hello' });
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
+
+						assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
+						assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+						assert.strictEqual(res.body.some(note => note.id === carolNote.id), true);
+						assert.strictEqual(res.body.some(note => note.id === daveNote.id), true);
+					}, waitForPushToTlOptions);
 
 					await api('admin/suspend-user', { userId: carol.id }, root);
 					await api('admin/suspend-user', { userId: dave.id }, root);
-					await setTimeout(250);
 				});
 
 				test('凍結後に凍結されたユーザーのノートは見えなくなる', async () => {
@@ -2196,7 +2186,6 @@ describe('Timelines', () => {
 				test('凍結解除後に凍結されていたユーザーのノートは見えるようになる', async () => {
 					await api('admin/unsuspend-user', { userId: carol.id }, root);
 					await api('admin/unsuspend-user', { userId: dave.id }, root);
-					await setTimeout(250);
 
 					const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
 
@@ -2224,11 +2213,15 @@ describe('Timelines', () => {
 					carolNote = await post(carol, { text: 'kon\'nichiwa' });
 					elleNote = await post(elle, { text: 'hi there' });
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
+
+						assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
+						assert.strictEqual(res.body.some(note => note.id === elleNote.id), true);
+					}, waitForPushToTlOptions);
 
 					await api('admin/suspend-user', { userId: carol.id }, root);
 					await api('admin/suspend-user', { userId: elle.id }, root);
-					await setTimeout(250);
 				});
 
 				test('凍結後に凍結されたユーザーのノートは見えなくなる', async () => {
@@ -2242,7 +2235,6 @@ describe('Timelines', () => {
 				test('凍結解除後に凍結されていたユーザーのノートは見えるようになる', async () => {
 					await api('admin/unsuspend-user', { userId: carol.id }, root);
 					await api('admin/unsuspend-user', { userId: elle.id }, root);
-					await setTimeout(250);
 
 					const res = await api('notes/hybrid-timeline', { limit: 100 }, alice);
 
@@ -2259,14 +2251,13 @@ describe('Timelines', () => {
 
 				const list = await api('users/lists/create', { name: 'list' }, alice).then(res => res.body);
 				await api('users/lists/push', { listId: list.id, userId: bob.id }, alice);
-				await setTimeout(250);
 				const bobNote = await post(bob, { text: 'hi' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/user-list-timeline', { listId: list.id }, alice);
 
-				const res = await api('notes/user-list-timeline', { listId: list.id }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('リスインしているフォローしていないユーザーの visibility: home なノートが含まれる', async () => {
@@ -2274,14 +2265,13 @@ describe('Timelines', () => {
 
 				const list = await api('users/lists/create', { name: 'list' }, alice).then(res => res.body);
 				await api('users/lists/push', { listId: list.id, userId: bob.id }, alice);
-				await setTimeout(250);
 				const bobNote = await post(bob, { text: 'hi', visibility: 'home' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/user-list-timeline', { listId: list.id }, alice);
 
-				const res = await api('notes/user-list-timeline', { listId: list.id }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('リスインしているフォローしていないユーザーの visibility: followers なノートが含まれない', async () => {
@@ -2289,7 +2279,6 @@ describe('Timelines', () => {
 
 				const list = await api('users/lists/create', { name: 'list' }, alice).then(res => res.body);
 				await api('users/lists/push', { listId: list.id, userId: bob.id }, alice);
-				await setTimeout(250);
 				const bobNote = await post(bob, { text: 'hi', visibility: 'followers' });
 
 				await waitForPushToTl();
@@ -2304,7 +2293,6 @@ describe('Timelines', () => {
 
 				const list = await api('users/lists/create', { name: 'list' }, alice).then(res => res.body);
 				await api('users/lists/push', { listId: list.id, userId: bob.id }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', replyId: carolNote.id });
 
@@ -2320,16 +2308,15 @@ describe('Timelines', () => {
 
 				const list = await api('users/lists/create', { name: 'list' }, alice).then(res => res.body);
 				await api('users/lists/push', { listId: list.id, userId: bob.id }, alice);
-				await setTimeout(250);
 				const bobNote1 = await post(bob, { text: 'hi' });
 				const bobNote2 = await post(bob, { text: 'hi', replyId: bobNote1.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/user-list-timeline', { listId: list.id }, alice);
 
-				const res = await api('notes/user-list-timeline', { listId: list.id }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote1.id), true);
-				assert.strictEqual(res.body.some(note => note.id === bobNote2.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote1.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote2.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('withReplies: false でリスインしているフォローしていないユーザーからの自分への返信が含まれる', async () => {
@@ -2338,15 +2325,14 @@ describe('Timelines', () => {
 				const list = await api('users/lists/create', { name: 'list' }, alice).then(res => res.body);
 				await api('users/lists/push', { listId: list.id, userId: bob.id }, alice);
 				await api('users/lists/update-membership', { listId: list.id, userId: bob.id, withReplies: false }, alice);
-				await setTimeout(250);
 				const aliceNote = await post(alice, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', replyId: aliceNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/user-list-timeline', { listId: list.id }, alice);
 
-				const res = await api('notes/user-list-timeline', { listId: list.id }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('withReplies: false でリスインしているフォローしていないユーザーの他人への返信が含まれない', async () => {
@@ -2355,7 +2341,6 @@ describe('Timelines', () => {
 				const list = await api('users/lists/create', { name: 'list' }, alice).then(res => res.body);
 				await api('users/lists/push', { listId: list.id, userId: bob.id }, alice);
 				await api('users/lists/update-membership', { listId: list.id, userId: bob.id, withReplies: false }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', replyId: carolNote.id });
 
@@ -2372,15 +2357,14 @@ describe('Timelines', () => {
 				const list = await api('users/lists/create', { name: 'list' }, alice).then(res => res.body);
 				await api('users/lists/push', { listId: list.id, userId: bob.id }, alice);
 				await api('users/lists/update-membership', { listId: list.id, userId: bob.id, withReplies: true }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', replyId: carolNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/user-list-timeline', { listId: list.id }, alice);
 
-				const res = await api('notes/user-list-timeline', { listId: list.id }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('リスインしているフォローしているユーザーの visibility: home なノートが含まれる', async () => {
@@ -2389,14 +2373,13 @@ describe('Timelines', () => {
 				await api('following/create', { userId: bob.id }, alice);
 				const list = await api('users/lists/create', { name: 'list' }, alice).then(res => res.body);
 				await api('users/lists/push', { listId: list.id, userId: bob.id }, alice);
-				await setTimeout(250);
 				const bobNote = await post(bob, { text: 'hi', visibility: 'home' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/user-list-timeline', { listId: list.id }, alice);
 
-				const res = await api('notes/user-list-timeline', { listId: list.id }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('リスインしているフォローしているユーザーの visibility: followers なノートが含まれる', async () => {
@@ -2405,15 +2388,14 @@ describe('Timelines', () => {
 				await api('following/create', { userId: bob.id }, alice);
 				const list = await api('users/lists/create', { name: 'list' }, alice).then(res => res.body);
 				await api('users/lists/push', { listId: list.id, userId: bob.id }, alice);
-				await setTimeout(250);
 				const bobNote = await post(bob, { text: 'hi', visibility: 'followers' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/user-list-timeline', { listId: list.id }, alice);
 
-				const res = await api('notes/user-list-timeline', { listId: list.id }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
-				assert.strictEqual(res.body.find(note => note.id === bobNote.id)?.text, 'hi');
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.find(note => note.id === bobNote.id)?.text, 'hi');
+				}, waitForPushToTlOptions);
 			});
 
 			test('リスインしている自分の visibility: followers なノートが含まれる', async () => {
@@ -2421,15 +2403,14 @@ describe('Timelines', () => {
 
 				const list = await api('users/lists/create', { name: 'list' }, alice).then(res => res.body);
 				await api('users/lists/push', { listId: list.id, userId: alice.id }, alice);
-				await setTimeout(250);
 				const aliceNote = await post(alice, { text: 'hi', visibility: 'followers' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/user-list-timeline', { listId: list.id }, alice);
 
-				const res = await api('notes/user-list-timeline', { listId: list.id }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
-				assert.strictEqual(res.body.find(note => note.id === aliceNote.id)?.text, 'hi');
+					assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
+					assert.strictEqual(res.body.find(note => note.id === aliceNote.id)?.text, 'hi');
+				}, waitForPushToTlOptions);
 			});
 
 			test('リスインしているユーザーのチャンネルノートが含まれる', async () => {
@@ -2438,7 +2419,6 @@ describe('Timelines', () => {
 				const channel = await api('channels/create', { name: 'channel' }, bob).then(x => x.body);
 				const list = await api('users/lists/create', { name: 'list' }, alice).then(res => res.body);
 				await api('users/lists/push', { listId: list.id, userId: bob.id }, alice);
-				await setTimeout(250);
 				const bobNote = await post(bob, { text: 'hi', channelId: channel.id });
 
 				await waitForPushToTl();
@@ -2458,28 +2438,27 @@ describe('Timelines', () => {
 				const bobNote1 = await post(bob, { text: 'hi' });
 				const bobNote2 = await post(bob, { fileIds: [file.id] });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/user-list-timeline', { listId: list.id, withFiles: true }, alice);
 
-				const res = await api('notes/user-list-timeline', { listId: list.id, withFiles: true }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote1.id), false);
-				assert.strictEqual(res.body.some(note => note.id === bobNote2.id), true);
-			}, 1000 * 30);
+					assert.strictEqual(res.body.some(note => note.id === bobNote1.id), false);
+					assert.strictEqual(res.body.some(note => note.id === bobNote2.id), true);
+				}, waitForPushToTlOptions);
+			}, 1000 * 10);
 
 			test('リスインしているユーザーの自身宛ての visibility: specified なノートが含まれる', async () => {
 				const [alice, bob] = await Promise.all([signup(), signup()]);
 
 				const list = await api('users/lists/create', { name: 'list' }, alice).then(res => res.body);
 				await api('users/lists/push', { listId: list.id, userId: bob.id }, alice);
-				await setTimeout(250);
 				const bobNote = await post(bob, { text: 'hi', visibility: 'specified', visibleUserIds: [alice.id] });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('notes/user-list-timeline', { listId: list.id }, alice);
 
-				const res = await api('notes/user-list-timeline', { listId: list.id }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
-				assert.strictEqual(res.body.find(note => note.id === bobNote.id)?.text, 'hi');
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.find(note => note.id === bobNote.id)?.text, 'hi');
+				}, waitForPushToTlOptions);
 			});
 
 			test('リスインしているユーザーの自身宛てではない visibility: specified なノートが含まれない', async () => {
@@ -2488,7 +2467,6 @@ describe('Timelines', () => {
 				const list = await api('users/lists/create', { name: 'list' }, alice).then(res => res.body);
 				await api('users/lists/push', { listId: list.id, userId: bob.id }, alice);
 				await api('users/lists/push', { listId: list.id, userId: carol.id }, alice);
-				await setTimeout(250);
 				const bobNote = await post(bob, { text: 'hi', visibility: 'specified', visibleUserIds: [carol.id] });
 
 				await waitForPushToTl();
@@ -2696,11 +2674,11 @@ describe('Timelines', () => {
 					const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 					const bobRenote = await renote(bobNote.id, bob);
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('notes/user-list-timeline', { limit: 100, listId: list.id }, alice);
 
-					const res = await api('notes/user-list-timeline', { limit: 100, listId: list.id }, alice);
-
-					assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+						assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+					}, waitForPushToTlOptions);
 				});
 
 				test('[チャンネル外リノート] チャンネルフォロー　＋　リスインしてる　＝　TLに流れる', async () => {
@@ -2716,11 +2694,11 @@ describe('Timelines', () => {
 					const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 					const bobRenote = await renote(bobNote.id, bob);
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('notes/user-list-timeline', { limit: 100, listId: list.id }, alice);
 
-					const res = await api('notes/user-list-timeline', { limit: 100, listId: list.id }, alice);
-
-					assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+						assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+					}, waitForPushToTlOptions);
 				});
 
 				test('[チャンネル外リノート] チャンネル未フォロー　＋　リスインしてない　＋　チャンネルミュート　＝　TLに流れない', async () => {
@@ -2811,11 +2789,11 @@ describe('Timelines', () => {
 
 				const bobNote = await post(bob, { text: 'hi' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('users/notes', { userId: bob.id }, alice);
 
-				const res = await api('users/notes', { userId: bob.id }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('フォローしていないユーザーの visibility: followers なノートが含まれない', async () => {
@@ -2834,15 +2812,14 @@ describe('Timelines', () => {
 				const [alice, bob] = await Promise.all([signup(), signup()]);
 
 				await api('following/create', { userId: bob.id }, alice);
-				await setTimeout(250);
 				const bobNote = await post(bob, { text: 'hi', visibility: 'followers' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('users/notes', { userId: bob.id }, alice);
 
-				const res = await api('users/notes', { userId: bob.id }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
-				assert.strictEqual(res.body.find(note => note.id === bobNote.id)?.text, 'hi');
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.find(note => note.id === bobNote.id)?.text, 'hi');
+				}, waitForPushToTlOptions);
 			});
 
 			test('自身の visibility: followers なノートが含まれる', async () => {
@@ -2850,12 +2827,12 @@ describe('Timelines', () => {
 
 				const aliceNote = await post(alice, { text: 'hi', visibility: 'followers' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('users/notes', { userId: alice.id }, alice);
 
-				const res = await api('users/notes', { userId: alice.id }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
-				assert.strictEqual(res.body.find(note => note.id === aliceNote.id)?.text, 'hi');
+					assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
+					assert.strictEqual(res.body.find(note => note.id === aliceNote.id)?.text, 'hi');
+				}, waitForPushToTlOptions);
 			});
 
 			test('チャンネル投稿が含まれない', async () => {
@@ -2880,12 +2857,12 @@ describe('Timelines', () => {
 				const bobNote1 = await post(bob, { text: 'hi' });
 				const bobNote2 = await post(bob, { text: 'hi', replyId: carolNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('users/notes', { userId: bob.id }, alice);
 
-				const res = await api('users/notes', { userId: bob.id }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote1.id), true);
-				assert.strictEqual(res.body.some(note => note.id === bobNote2.id), false);
+					assert.strictEqual(res.body.some(note => note.id === bobNote1.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote2.id), false);
+				}, waitForPushToTlOptions);
 			});
 
 			test('[withReplies: true] 他人への返信が含まれる', async () => {
@@ -2895,12 +2872,12 @@ describe('Timelines', () => {
 				const bobNote1 = await post(bob, { text: 'hi' });
 				const bobNote2 = await post(bob, { text: 'hi', replyId: carolNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('users/notes', { userId: bob.id, withReplies: true }, alice);
 
-				const res = await api('users/notes', { userId: bob.id, withReplies: true }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote1.id), true);
-				assert.strictEqual(res.body.some(note => note.id === bobNote2.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote1.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote2.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('[withReplies: true] 他人への visibility: specified な返信が含まれない', async () => {
@@ -2910,12 +2887,12 @@ describe('Timelines', () => {
 				const bobNote1 = await post(bob, { text: 'hi' });
 				const bobNote2 = await post(bob, { text: 'hi', replyId: carolNote.id, visibility: 'specified' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('users/notes', { userId: bob.id, withReplies: true }, alice);
 
-				const res = await api('users/notes', { userId: bob.id, withReplies: true }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote1.id), true);
-				assert.strictEqual(res.body.some(note => note.id === bobNote2.id), false);
+					assert.strictEqual(res.body.some(note => note.id === bobNote1.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote2.id), false);
+				}, waitForPushToTlOptions);
 			});
 
 			test('[withFiles: true] ファイル付きノートのみ含まれる', async () => {
@@ -2925,13 +2902,13 @@ describe('Timelines', () => {
 				const bobNote1 = await post(bob, { text: 'hi' });
 				const bobNote2 = await post(bob, { fileIds: [file.id] });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('users/notes', { userId: bob.id, withFiles: true }, alice);
 
-				const res = await api('users/notes', { userId: bob.id, withFiles: true }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote1.id), false);
-				assert.strictEqual(res.body.some(note => note.id === bobNote2.id), true);
-			}, 1000 * 30);
+					assert.strictEqual(res.body.some(note => note.id === bobNote1.id), false);
+					assert.strictEqual(res.body.some(note => note.id === bobNote2.id), true);
+				}, waitForPushToTlOptions);
+			}, 1000 * 10);
 
 			test('[withChannelNotes: true] チャンネル投稿が含まれる', async () => {
 				const [alice, bob] = await Promise.all([signup(), signup()]);
@@ -2939,11 +2916,11 @@ describe('Timelines', () => {
 				const channel = await api('channels/create', { name: 'channel' }, bob).then(x => x.body);
 				const bobNote = await post(bob, { text: 'hi', channelId: channel.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('users/notes', { userId: bob.id, withChannelNotes: true }, alice);
 
-				const res = await api('users/notes', { userId: bob.id, withChannelNotes: true }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('[withChannelNotes: true] 他人が取得した場合センシティブチャンネル投稿が含まれない', async () => {
@@ -2965,18 +2942,17 @@ describe('Timelines', () => {
 				const channel = await api('channels/create', { name: 'channel', isSensitive: true }, bob).then(x => x.body);
 				const bobNote = await post(bob, { text: 'hi', channelId: channel.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('users/notes', { userId: bob.id, withChannelNotes: true }, bob);
 
-				const res = await api('users/notes', { userId: bob.id, withChannelNotes: true }, bob);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('ミュートしているユーザーに関連する投稿が含まれない', async () => {
 				const [alice, bob, carol] = await Promise.all([signup(), signup(), signup()]);
 
 				await api('mute/create', { userId: carol.id }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'hi', renoteId: carolNote.id });
 
@@ -2991,7 +2967,6 @@ describe('Timelines', () => {
 				const [alice, bob, carol, dave] = await Promise.all([signup(), signup(), signup(), signup()]);
 
 				await api('mute/create', { userId: carol.id }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const daveNote = await post(dave, { text: 'quote hi', renoteId: carolNote.id });
 				const bobNote = await post(bob, { renoteId: daveNote.id });
@@ -3008,7 +2983,6 @@ describe('Timelines', () => {
 
 				await api('following/create', { userId: bob.id }, alice);
 				await api('mute/create', { userId: carol.id }, alice);
-				await setTimeout(250);
 				const carolNote = await post(carol, { text: 'hi' });
 				const daveNote = await post(dave, { text: 'quote hi', replyId: carolNote.id });
 				const bobNote = await post(bob, { renoteId: daveNote.id });
@@ -3024,22 +2998,21 @@ describe('Timelines', () => {
 				const [alice, bob] = await Promise.all([signup(), signup()]);
 
 				await api('mute/create', { userId: bob.id }, alice);
-				await setTimeout(250);
 				const bobNote1 = await post(bob, { text: 'hi' });
 				const bobNote2 = await post(bob, { text: 'hi', replyId: bobNote1.id });
 				const bobNote3 = await post(bob, { text: 'hi', renoteId: bobNote1.id });
 				const bobNote4 = await post(bob, { renoteId: bobNote2.id });
 				const bobNote5 = await post(bob, { renoteId: bobNote3.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('users/notes', { userId: bob.id }, alice);
 
-				const res = await api('users/notes', { userId: bob.id }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === bobNote1.id), true);
-				assert.strictEqual(res.body.some(note => note.id === bobNote2.id), true);
-				assert.strictEqual(res.body.some(note => note.id === bobNote3.id), true);
-				assert.strictEqual(res.body.some(note => note.id === bobNote4.id), true);
-				assert.strictEqual(res.body.some(note => note.id === bobNote5.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote1.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote2.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote3.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote4.id), true);
+					assert.strictEqual(res.body.some(note => note.id === bobNote5.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('自身の visibility: specified なノートが含まれる', async () => {
@@ -3047,11 +3020,11 @@ describe('Timelines', () => {
 
 				const aliceNote = await post(alice, { text: 'hi', visibility: 'specified' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('users/notes', { userId: alice.id, withReplies: true }, alice);
 
-				const res = await api('users/notes', { userId: alice.id, withReplies: true }, alice);
-
-				assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
+					assert.strictEqual(res.body.some(note => note.id === aliceNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('visibleUserIds に指定されてない visibility: specified なノートが含まれない', async () => {
@@ -3102,11 +3075,11 @@ describe('Timelines', () => {
 					const aliceNote = await post(alice, { text: 'hi' });
 					const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('users/notes', { userId: bob.id, withChannelNotes: true }, alice);
 
-					const res = await api('users/notes', { userId: bob.id, withChannelNotes: true }, alice);
-
-					assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+						assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+					}, waitForPushToTlOptions);
 				});
 
 				test('チャンネルミュート　＝　TLに流れない', async () => {
@@ -3134,11 +3107,11 @@ describe('Timelines', () => {
 					const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 					const bobRenote = await renote(bobNote.id, bob);
 
-					await waitForPushToTl();
+					await vi.waitFor(async () => {
+						const res = await api('users/notes', { userId: bob.id, withChannelNotes: true }, alice);
 
-					const res = await api('users/notes', { userId: bob.id, withChannelNotes: true }, alice);
-
-					assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+						assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+					}, waitForPushToTlOptions);
 				});
 
 				test('[チャンネル外リノート] チャンネルミュート　＝　TLに流れない', async () => {
@@ -3169,12 +3142,12 @@ describe('Timelines', () => {
 				const aliceNote = await post(alice, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('channels/timeline', { channelId: channel.id }, alice);
 
-				const res = await api('channels/timeline', { channelId: channel.id }, alice);
-
-				assert.strictEqual(res.body.some((note: any) => note.id === aliceNote.id), false);
-				assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some((note: any) => note.id === aliceNote.id), false);
+					assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('閲覧中チャンネルとは別チャンネルのノートは含まれない', async() => {
@@ -3203,11 +3176,11 @@ describe('Timelines', () => {
 				const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 				const bobRenote = await post(bob, { channelId: channel.id, renoteId: bobNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('channels/timeline', { channelId: channel.id }, alice);
 
-				const res = await api('channels/timeline', { channelId: channel.id }, alice);
-
-				assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+					assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('閲覧中チャンネルとは別チャンネルからのリノートが含まれる', async() => {
@@ -3220,11 +3193,11 @@ describe('Timelines', () => {
 				const bobNote = await post(bob, { text: 'ok', channelId: channel2.id });
 				const bobRenote = await post(bob, { channelId: channel.id, renoteId: bobNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('channels/timeline', { channelId: channel.id }, alice);
 
-				const res = await api('channels/timeline', { channelId: channel.id }, alice);
-
-				assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+					assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('閲覧中チャンネルに自分の他人への返信が含まれる', async () => {
@@ -3235,11 +3208,11 @@ describe('Timelines', () => {
 				const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 				const aliceNote = await post(alice, { text: 'hi', replyId: bobNote.id, channelId: channel.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('channels/timeline', { channelId: channel.id }, alice);
 
-				const res = await api('channels/timeline', { channelId: channel.id }, alice);
-
-				assert.strictEqual(res.body.some((note: any) => note.id === aliceNote.id), true);
+					assert.strictEqual(res.body.some((note: any) => note.id === aliceNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('閲覧中チャンネルに他人の自分への返信が含まれる', async () => {
@@ -3250,11 +3223,11 @@ describe('Timelines', () => {
 				const aliceNote = await post(alice, { text: 'hi', channelId: channel.id });
 				const bobNote = await post(bob, { text: 'ok', replyId: aliceNote.id, channelId: channel.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('channels/timeline', { channelId: channel.id }, alice);
 
-				const res = await api('channels/timeline', { channelId: channel.id }, alice);
-
-				assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('閲覧中チャンネルにミュートしているユーザのノートは含まれない', async () => {
@@ -3302,12 +3275,12 @@ describe('Timelines', () => {
 				const aliceNote = await post(alice, { text: 'hi' });
 				const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('channels/timeline', { channelId: channel.id }, alice);
 
-				const res = await api('channels/timeline', { channelId: channel.id }, alice);
-
-				assert.strictEqual(res.body.some((note: any) => note.id === aliceNote.id), false);
-				assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+					assert.strictEqual(res.body.some((note: any) => note.id === aliceNote.id), false);
+					assert.strictEqual(res.body.some((note: any) => note.id === bobNote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('閲覧中チャンネルをミュートしていても、同チャンネルのリノートが含まれる', async () => {
@@ -3320,11 +3293,11 @@ describe('Timelines', () => {
 				const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 				const bobRenote = await post(bob, { channelId: channel.id, renoteId: bobNote.id });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('channels/timeline', { channelId: channel.id }, alice);
 
-				const res = await api('channels/timeline', { channelId: channel.id }, alice);
-
-				assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+					assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('閲覧中チャンネルをミュートしていても、同チャンネルのリプライが含まれる', async () => {
@@ -3337,11 +3310,11 @@ describe('Timelines', () => {
 				const bobNote = await post(bob, { text: 'ok', channelId: channel.id });
 				const bobRenote = await post(bob, { channelId: channel.id, replyId: bobNote.id, text: 'ho' });
 
-				await waitForPushToTl();
+				await vi.waitFor(async () => {
+					const res = await api('channels/timeline', { channelId: channel.id }, alice);
 
-				const res = await api('channels/timeline', { channelId: channel.id }, alice);
-
-				assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+					assert.strictEqual(res.body.some((note: any) => note.id === bobRenote.id), true);
+				}, waitForPushToTlOptions);
 			});
 
 			test('閲覧中チャンネルとは別チャンネルをミュートしているとき、そのチャンネルからのリノートは含まれない', async() => {

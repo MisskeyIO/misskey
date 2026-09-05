@@ -20,7 +20,7 @@ import { entity as TestGroupedChartEntity } from '@/core/chart/charts/entities/t
 import { entity as TestUniqueChartEntity } from '@/core/chart/charts/entities/test-unique.js';
 import { entity as TestIntersectionChartEntity } from '@/core/chart/charts/entities/test-intersection.js';
 import { loadConfig } from '@/config.js';
-import { coreLogger } from '@/logger.js';
+import Logger from '@/logger.js';
 
 describe('Chart', () => {
 	const config = loadConfig();
@@ -64,7 +64,7 @@ describe('Chart', () => {
 		});
 
 		await db.initialize();
-		const logger = coreLogger.createSubLogger('chart'); // TODO: モックにする
+		const logger = new Logger('chart'); // TODO: モックにする
 		testChart = new TestChart(db, redisForTimelines, logger);
 		testGroupedChart = new TestGroupedChart(db, redisForTimelines, logger);
 		testUniqueChart = new TestUniqueChart(db, redisForTimelines, logger);

@@ -126,6 +126,7 @@ export function misskeyApiGet<
 	endpoint: E,
 	data: P = {} as any,
 	initiator = 'misskey',
+	signal?: AbortSignal,
 ): Promise<_ResT> {
 	pendingApiRequestsCount.value++;
 
@@ -145,6 +146,7 @@ export function misskeyApiGet<
 				'Authorization': 'anonymous',
 				'X-Client-Transaction-Id': generateClientTransactionId(initiator),
 			},
+			signal,
 		}).then(res => {
 			if (instance.googleAnalyticsId) {
 				gtagTime({

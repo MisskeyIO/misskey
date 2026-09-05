@@ -18,7 +18,7 @@ WORKDIR /misskey
 
 COPY --link ["pnpm-lock.yaml", "pnpm-workspace.yaml", "./"]
 COPY --link patches ./patches
-RUN npm install -g pnpm@11.5.2
+RUN npm install -g pnpm@11.11.0
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
 	pnpm fetch --ignore-scripts
 
@@ -56,7 +56,7 @@ WORKDIR /misskey
 
 COPY --link ["pnpm-lock.yaml", "pnpm-workspace.yaml", "./"]
 COPY --link patches ./patches
-RUN npm install -g pnpm@11.5.2 && mkdir -p /root/.local/share/pnpm/.tools
+RUN npm install -g pnpm@11.11.0 && mkdir -p /root/.local/share/pnpm/.tools
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
 	pnpm fetch --ignore-scripts
 
@@ -94,7 +94,7 @@ WORKDIR /misskey
 
 COPY --chown=misskey:misskey pnpm-lock.yaml ./
 COPY --chown=misskey:misskey patches ./patches
-RUN npm install -g pnpm@11.5.2
+RUN npm install -g pnpm@11.11.0
 
 COPY --chown=misskey:misskey --from=target-builder /root/.local/share/pnpm/.tools ./.local/share/pnpm/.tools
 COPY --chown=misskey:misskey --from=target-builder /misskey/node_modules ./node_modules

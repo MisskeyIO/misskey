@@ -2357,7 +2357,7 @@ export type FlashUnlikeRequest = operations['flash___unlike']['requestBody']['co
 export type FlashUpdateRequest = operations['flash___update']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-export const followersVisibilities: readonly ["public", "followers", "private"];
+export const followersVisibilities: readonly ['public', 'followers', 'private'];
 
 // @public (undocumented)
 export type Following = components['schemas']['Following'];
@@ -2420,7 +2420,7 @@ export type FollowingUpdateRequest = operations['following___update']['requestBo
 export type FollowingUpdateResponse = operations['following___update']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
-export const followingVisibilities: readonly ["public", "followers", "private"];
+export const followingVisibilities: readonly ['public', 'followers', 'private'];
 
 // @public (undocumented)
 export type FollowRequest = components['schemas']['FollowRequest'];
@@ -3207,7 +3207,7 @@ export type ModerationLogPayloads = {
 };
 
 // @public (undocumented)
-export const moderationLogTypes: readonly ["updateServerSettings", "suspend", "unsuspend", "updateUserName", "updateUserNote", "updateInlinePolicies", "addCustomEmoji", "updateCustomEmoji", "deleteCustomEmoji", "assignRole", "unassignRole", "createRole", "updateRole", "deleteRole", "clearQueue", "promoteQueue", "deleteDriveFile", "deleteNote", "createGlobalAnnouncement", "createUserAnnouncement", "updateGlobalAnnouncement", "updateUserAnnouncement", "deleteGlobalAnnouncement", "deleteUserAnnouncement", "resetPassword", "regenerateUserToken", "suspendRemoteInstance", "unsuspendRemoteInstance", "updateRemoteInstanceNote", "markSensitiveDriveFile", "unmarkSensitiveDriveFile", "resolveAbuseReport", "forwardAbuseReport", "updateAbuseReportNote", "createInvitation", "createAd", "updateAd", "deleteAd", "createIndieAuthClient", "updateIndieAuthClient", "deleteIndieAuthClient", "createSSOServiceProvider", "updateSSOServiceProvider", "deleteSSOServiceProvider", "createAvatarDecoration", "updateAvatarDecoration", "deleteAvatarDecoration", "unsetMfa", "unsetUserAvatar", "unsetUserBanner", "unsetUserMutualLink", "createSystemWebhook", "updateSystemWebhook", "deleteSystemWebhook", "createAbuseReportNotificationRecipient", "updateAbuseReportNotificationRecipient", "deleteAbuseReportNotificationRecipient", "deleteAccount", "deletePage", "deleteFlash", "deleteGalleryPost", "deleteChatRoom", "updateProxyAccountDescription"];
+export const moderationLogTypes: readonly ['updateServerSettings', 'suspend', 'unsuspend', 'updateUserName', 'updateUserNote', 'updateInlinePolicies', 'addCustomEmoji', 'updateCustomEmoji', 'deleteCustomEmoji', 'assignRole', 'unassignRole', 'createRole', 'updateRole', 'deleteRole', 'clearQueue', 'promoteQueue', 'deleteDriveFile', 'deleteNote', 'createGlobalAnnouncement', 'createUserAnnouncement', 'updateGlobalAnnouncement', 'updateUserAnnouncement', 'deleteGlobalAnnouncement', 'deleteUserAnnouncement', 'resetPassword', 'regenerateUserToken', 'suspendRemoteInstance', 'unsuspendRemoteInstance', 'updateRemoteInstanceNote', 'markSensitiveDriveFile', 'unmarkSensitiveDriveFile', 'resolveAbuseReport', 'forwardAbuseReport', 'updateAbuseReportNote', 'createInvitation', 'createAd', 'updateAd', 'deleteAd', 'createIndieAuthClient', 'updateIndieAuthClient', 'deleteIndieAuthClient', 'createSSOServiceProvider', 'updateSSOServiceProvider', 'deleteSSOServiceProvider', 'createAvatarDecoration', 'updateAvatarDecoration', 'deleteAvatarDecoration', 'unsetMfa', 'unsetUserAvatar', 'unsetUserBanner', 'unsetUserMutualLink', 'createSystemWebhook', 'updateSystemWebhook', 'deleteSystemWebhook', 'createAbuseReportNotificationRecipient', 'updateAbuseReportNotificationRecipient', 'deleteAbuseReportNotificationRecipient', 'deleteAccount', 'deletePage', 'deleteFlash', 'deleteGalleryPost', 'deleteChatRoom', 'updateProxyAccountDescription'];
 
 // @public (undocumented)
 export type MuteCreateRequest = operations['mute___create']['requestBody']['content']['application/json'];
@@ -3216,7 +3216,7 @@ export type MuteCreateRequest = operations['mute___create']['requestBody']['cont
 export type MuteDeleteRequest = operations['mute___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-export const mutedNoteReasons: readonly ["word", "manual", "spam", "other"];
+export const mutedNoteReasons: readonly ['word', 'manual', 'spam', 'other'];
 
 // @public (undocumented)
 export type MuteListRequest = operations['mute___list']['requestBody']['content']['application/json'];
@@ -3479,7 +3479,7 @@ export type NoteUpdatedEvent = {
 });
 
 // @public (undocumented)
-export const noteVisibilities: readonly ["public", "home", "followers", "specified"];
+export const noteVisibilities: readonly ['public', 'home', 'followers', 'specified'];
 
 // @public (undocumented)
 type Notification_2 = components['schemas']['Notification'];
@@ -3489,7 +3489,7 @@ export { Notification_2 as Notification }
 export type NotificationsCreateRequest = operations['notifications___create']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
-export const notificationTypes: readonly ["note", "follow", "mention", "reply", "renote", "quote", "reaction", "pollEnded", "scheduledNotePosted", "scheduledNotePostFailed", "receiveFollowRequest", "followRequestAccepted", "app", "roleAssigned", "chatRoomInvitationReceived", "achievementEarned", "exportCompleted", "login", "noteScheduled", "scheduledNoteError", "sensitiveFlagAssigned", "createToken", "test"];
+export const notificationTypes: readonly ['note', 'follow', 'mention', 'reply', 'renote', 'quote', 'reaction', 'pollEnded', 'scheduledNotePosted', 'scheduledNotePostFailed', 'receiveFollowRequest', 'followRequestAccepted', 'app', 'roleAssigned', 'chatRoomInvitationReceived', 'achievementEarned', 'exportCompleted', 'login', 'noteScheduled', 'scheduledNoteError', 'sensitiveFlagAssigned', 'createToken', 'test'];
 
 // @public (undocumented)
 export function nyaize(text: string): string;
@@ -3555,7 +3555,7 @@ export type PartialRolePolicyOverride = Partial<{
 }>;
 
 // @public (undocumented)
-export const permissions: readonly ["read:account", "write:account", "read:blocks", "write:blocks", "read:drive", "write:drive", "read:favorites", "write:favorites", "read:following", "write:following", "read:messaging", "write:messaging", "read:mutes", "write:mutes", "write:notes", "read:notifications", "write:notifications", "read:reactions", "write:reactions", "write:votes", "read:pages", "write:pages", "write:page-likes", "read:page-likes", "read:user-groups", "write:user-groups", "read:channels", "write:channels", "read:gallery", "write:gallery", "read:gallery-likes", "write:gallery-likes", "read:flash", "write:flash", "read:flash-likes", "write:flash-likes", "read:admin:abuse-user-reports", "read:admin:abuse-report-resolvers", "write:admin:abuse-report-resolvers", "read:admin:index-stats", "read:admin:table-stats", "read:admin:user-ips", "read:admin:meta", "write:admin:reset-password", "write:admin:regenerate-user-token", "write:admin:resolve-abuse-user-report", "write:admin:send-email", "read:admin:show-moderation-log", "read:admin:show-account-move-log", "read:admin:show-user", "write:admin:suspend-user", "write:admin:unset-mfa", "write:admin:unset-user-avatar", "write:admin:unset-user-banner", "write:admin:unsuspend-user", "write:admin:meta", "write:admin:user-name", "write:admin:user-note", "write:admin:user-avatar", "write:admin:user-banner", "write:admin:user-mutual-link", "write:admin:roles", "read:admin:roles", "write:admin:relays", "read:admin:relays", "write:admin:invite-codes", "read:admin:invite-codes", "write:admin:announcements", "read:admin:announcements", "write:admin:avatar-decorations", "read:admin:avatar-decorations", "write:admin:federation", "write:admin:indie-auth", "read:admin:indie-auth", "write:admin:account", "read:admin:account", "write:admin:emoji", "read:admin:emoji", "write:admin:queue", "read:admin:queue", "write:admin:promo", "write:admin:drive", "read:admin:drive", "write:admin:sso", "read:admin:sso", "write:admin:ad", "read:admin:ad", "write:invite-codes", "read:invite-codes", "write:clip-favorite", "read:clip-favorite", "read:federation", "write:report-abuse", "write:chat", "read:chat"];
+export const permissions: readonly ['read:account', 'write:account', 'read:blocks', 'write:blocks', 'read:drive', 'write:drive', 'read:favorites', 'write:favorites', 'read:following', 'write:following', 'read:messaging', 'write:messaging', 'read:mutes', 'write:mutes', 'write:notes', 'read:notifications', 'write:notifications', 'read:reactions', 'write:reactions', 'write:votes', 'read:pages', 'write:pages', 'write:page-likes', 'read:page-likes', 'read:user-groups', 'write:user-groups', 'read:channels', 'write:channels', 'read:gallery', 'write:gallery', 'read:gallery-likes', 'write:gallery-likes', 'read:flash', 'write:flash', 'read:flash-likes', 'write:flash-likes', 'read:admin:abuse-user-reports', 'read:admin:abuse-report-resolvers', 'write:admin:abuse-report-resolvers', 'read:admin:index-stats', 'read:admin:table-stats', 'read:admin:user-ips', 'read:admin:meta', 'write:admin:reset-password', 'write:admin:regenerate-user-token', 'write:admin:resolve-abuse-user-report', 'write:admin:send-email', 'read:admin:show-moderation-log', 'read:admin:show-account-move-log', 'read:admin:show-user', 'write:admin:suspend-user', 'write:admin:unset-mfa', 'write:admin:unset-user-avatar', 'write:admin:unset-user-banner', 'write:admin:unsuspend-user', 'write:admin:meta', 'write:admin:user-name', 'write:admin:user-note', 'write:admin:user-avatar', 'write:admin:user-banner', 'write:admin:user-mutual-link', 'write:admin:roles', 'read:admin:roles', 'write:admin:relays', 'read:admin:relays', 'write:admin:invite-codes', 'read:admin:invite-codes', 'write:admin:announcements', 'read:admin:announcements', 'write:admin:avatar-decorations', 'read:admin:avatar-decorations', 'write:admin:federation', 'write:admin:indie-auth', 'read:admin:indie-auth', 'write:admin:account', 'read:admin:account', 'write:admin:emoji', 'read:admin:emoji', 'write:admin:queue', 'read:admin:queue', 'write:admin:promo', 'write:admin:drive', 'read:admin:drive', 'write:admin:sso', 'read:admin:sso', 'write:admin:ad', 'read:admin:ad', 'write:invite-codes', 'read:invite-codes', 'write:clip-favorite', 'read:clip-favorite', 'read:federation', 'write:report-abuse', 'write:chat', 'read:chat'];
 
 // @public (undocumented)
 export type PingResponse = operations['ping']['responses']['200']['content']['application/json'];
@@ -3599,7 +3599,7 @@ export type QueueStats = {
 export type QueueStatsLog = QueueStats[];
 
 // @public (undocumented)
-export const queueTypes: readonly ["system", "endedPollNotification", "postScheduledNote", "deliver", "inbox", "db", "relationship", "objectStorage", "userWebhookDeliver", "systemWebhookDeliver"];
+export const queueTypes: readonly ['system', 'endedPollNotification', 'postScheduledNote', 'deliver', 'inbox', 'db', 'relationship', 'objectStorage', 'userWebhookDeliver', 'systemWebhookDeliver'];
 
 // @public (undocumented)
 export type ReceivedAbuseReport = {
@@ -3787,7 +3787,7 @@ export type RoleLite = components['schemas']['RoleLite'];
 export type RolePolicies = components['schemas']['RolePolicies'];
 
 // @public (undocumented)
-export const rolePolicies: readonly ["gtlAvailable", "ltlAvailable", "canPublicNote", "canScheduleNote", "scheduleNoteLimit", "scheduleNoteMaxDays", "canInitiateConversation", "canCreateContent", "canUpdateContent", "canDeleteContent", "canPurgeAccount", "canUpdateAvatar", "canUpdateBanner", "mentionLimit", "canInvite", "inviteLimit", "inviteLimitCycle", "inviteExpirationTime", "canManageCustomEmojis", "canManageAvatarDecorations", "canSearchNotes", "canSearchUsers", "canUseTranslator", "canUseDriveFileInSoundSettings", "canUseReaction", "canHideAds", "canCreateChannel", "driveCapacityMb", "maxFileSizeMb", "alwaysMarkNsfw", "canUpdateBioMedia", "skipNsfwDetection", "pinLimit", "antennaLimit", "antennaNotesLimit", "wordMuteLimit", "webhookLimit", "clipLimit", "noteEachClipsLimit", "userListLimit", "userEachUserListsLimit", "rateLimitFactor", "avatarDecorationLimit", "canImportAntennas", "canImportBlocking", "canImportFollowing", "canImportMuting", "canImportUserLists", "mutualLinkSectionLimit", "mutualLinkLimit", "chatAvailability", "uploadableFileTypes", "noteDraftLimit", "watermarkAvailable"];
+export const rolePolicies: readonly ['gtlAvailable', 'ltlAvailable', 'canPublicNote', 'canScheduleNote', 'scheduleNoteLimit', 'scheduleNoteMaxDays', 'canInitiateConversation', 'canCreateContent', 'canUpdateContent', 'canDeleteContent', 'canPurgeAccount', 'canUpdateAvatar', 'canUpdateBanner', 'mentionLimit', 'canInvite', 'inviteLimit', 'inviteLimitCycle', 'inviteExpirationTime', 'canManageCustomEmojis', 'canManageAvatarDecorations', 'canSearchNotes', 'canSearchUsers', 'canUseTranslator', 'canUseDriveFileInSoundSettings', 'canUseReaction', 'canHideAds', 'canCreateChannel', 'driveCapacityMb', 'maxFileSizeMb', 'alwaysMarkNsfw', 'canUpdateBioMedia', 'skipNsfwDetection', 'pinLimit', 'antennaLimit', 'antennaNotesLimit', 'wordMuteLimit', 'webhookLimit', 'clipLimit', 'noteEachClipsLimit', 'userListLimit', 'userEachUserListsLimit', 'rateLimitFactor', 'avatarDecorationLimit', 'canImportAntennas', 'canImportBlocking', 'canImportFollowing', 'canImportMuting', 'canImportUserLists', 'mutualLinkSectionLimit', 'mutualLinkLimit', 'chatAvailability', 'uploadableFileTypes', 'noteDraftLimit', 'watermarkAvailable'];
 
 // @public (undocumented)
 export type RolesListResponse = operations['roles___list']['responses']['200']['content']['application/json'];

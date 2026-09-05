@@ -21,7 +21,7 @@ test.describe('設定からのキャッシュ削除', () => {
 		await expect(page.getByRole('button', { name: /Clear cache|キャッシュをクリア/ })).toBeVisible();
 	});
 
-	test('ログイン・下書き・設定を残し、再読み込み後に絵文字を二重取得しない', async ({ page }) => {
+	test('1.2万件の絵文字を更新し、ログイン・下書き・設定の保持と二重取得なしを確認する', async ({ page }) => {
 		const before = await page.evaluate(() => {
 			localStorage.setItem('drafts', JSON.stringify({ cacheTest: { text: '消してはいけない下書き' } }));
 			localStorage.setItem('customCss', '/* キャッシュ削除の保存確認 */');
@@ -35,7 +35,9 @@ test.describe('設定からのキャッシュ削除', () => {
 			};
 		});
 		expect(before.preferences).not.toBeNull();
-		const emojis = [{ aliases: [], name: 'cache_clear_test', category: null, url: `${BASE_URL}/favicon.ico` }];
+		const emojis = Array.from({ length: 12_103 }, (_, i) => ({
+			aliases: [], name: `cache_clear_test_${i}`, category: null, url: `${BASE_URL}/favicon.ico`,
+		}));
 		const emojiMethods: string[] = [];
 		await page.route('**/api/emojis**', async route => {
 			emojiMethods.push(route.request().method());
@@ -82,29 +84,30 @@ test.describe('設定からのキャッシュ削除', () => {
 		expect(storedEmojis).toEqual(emojis);
 	});
 
-	test('通信が止まっても待機を終えて再実行できる', async ({ page }) => {
+	test('10秒を超えても中断せず、処理が完了してから再読込する', async ({ page }) => {
 		let navigations = 0;
 		page.on('request', request => {
 			if (request.isNavigationRequest() && request.frame() === page.mainFrame()) navigations++;
 		});
-		// 応答を返さず、実際の待機期限を検査する。
-		await page.route('**/api/clear-browser-cache**', () => {});
-		const started = Date.now();
+		const response = Promise.withResolvers<void>();
+		await page.route('**/api/clear-browser-cache**', async route => {
+			await response.promise;
+			await route.continue();
+		});
+		await page.clock.install();
 		await Promise.all([
 			page.waitForRequest(request => new URL(request.url()).pathname === '/api/clear-browser-cache'),
 			page.getByRole('button', { name: /Clear cache|キャッシュをクリア/ }).click(),
 		]);
 		await expect(page.getByTestId('bg')).toBeVisible();
-		await expect(page.getByText(/Please try again later|もう一度お試しください。/)).toBeVisible({ timeout: 15_000 });
-		await expect(page.locator('body')).not.toHaveAttribute('inert');
-		expect(Date.now() - started).toBeLessThan(15_000);
+		await page.clock.fastForward(30_000);
+		await expect(page.getByText(/Please try again later|もう一度お試しください。/)).toHaveCount(0);
+		await expect(page.getByTestId('bg')).toBeVisible();
 		expect(navigations).toBe(0);
-		await page.getByTestId('modal-dialog-ok').click();
-		await page.unroute('**/api/clear-browser-cache**');
-		await Promise.all([
-			page.waitForEvent('framenavigated', frame => frame === page.mainFrame()),
-			page.getByRole('button', { name: /Clear cache|キャッシュをクリア/ }).click(),
-		]);
+		await page.clock.resume();
+		const navigated = page.waitForEvent('framenavigated', frame => frame === page.mainFrame());
+		response.resolve();
+		await navigated;
 		await expect(page.getByRole('button', { name: /Clear cache|キャッシュをクリア/ })).toBeVisible();
 		await expect(page.locator('body')).not.toHaveAttribute('inert');
 		expect(navigations).toBe(1);

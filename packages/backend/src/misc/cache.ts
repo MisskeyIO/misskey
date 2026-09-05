@@ -204,8 +204,6 @@ export class RedisSingleCache<T> {
 	}
 }
 
-// TODO: メモリ節約のためあまり参照されないキーを定期的に削除できるようにする？
-
 export class MemoryKVCache<T> {
 	/**
 	 * データを持つマップ
@@ -216,6 +214,7 @@ export class MemoryKVCache<T> {
 
 	constructor(
 		private readonly lifetime: number,
+		private readonly limit: number = Infinity,
 	) {}
 
 	@bindThis
@@ -224,6 +223,25 @@ export class MemoryKVCache<T> {
 	 * これを直接呼び出すべきではない。InternalEventなどで変更を全てのプロセス/マシンに通知するべき
 	 */
 	public set(key: string, value: T): void {
+		if (this.limit <= 0) {
+			throw new Error('Limit must be greater than 0');
+		}
+
+		if (this.limit !== Infinity) {
+			this.gc();
+
+			// 挿入順を更新して LRU を保つため、同一キーは一度削除する
+			this.cache.delete(key);
+
+			while (this.cache.size >= this.limit) {
+				const oldestKey = this.cache.keys().next().value;
+				if (oldestKey == null) {
+					throw new Error('Cache is empty but size exceeds the limit');
+				}
+				this.cache.delete(oldestKey);
+			}
+		}
+
 		this.cache.set(key, {
 			date: Date.now(),
 			value,
@@ -237,6 +255,11 @@ export class MemoryKVCache<T> {
 		if ((Date.now() - cached.date) > this.lifetime) {
 			this.cache.delete(key);
 			return undefined;
+		}
+		if (this.limit !== Infinity) {
+			// access 順を更新して LRU を保つ
+			this.cache.delete(key);
+			this.cache.set(key, cached);
 		}
 		return cached.value;
 	}

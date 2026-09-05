@@ -85,17 +85,15 @@ import { useTemplateRef, watch, computed, ref, onDeactivated, onActivated, onMou
 import * as Misskey from 'misskey-js';
 import type { MenuItem } from '@/types/menu.js';
 import type { Keymap } from '@/utility/hotkey.js';
-import { copyToClipboard } from '@/utility/copy-to-clipboard';
 import { i18n } from '@/i18n.js';
 import * as os from '@/os.js';
 import bytes from '@/filters/bytes.js';
 import { hms } from '@/filters/hms.js';
 import MkMediaRange from '@/components/MkMediaRange.vue';
-import { pleaseLogin } from '@/utility/please-login.js';
-import { sensitiveContentConsent, requestSensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
-import { $i, iAmModerator } from '@/i.js';
+import { sensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 import { prefer } from '@/preferences.js';
-import { canRevealFile, shouldHideFileByDefault } from '@/utility/sensitive-file.js';
+import { getFileMenu } from '@/utility/get-file-menu.js';
+import { canRevealFile, shouldHideFileByDefault, isFileBlocked } from '@/utility/sensitive-file.js';
 
 const MkAudioVisualizer = defineAsyncComponent(() => import('@/components/MkAudioVisualizer.vue'));
 const props = defineProps<{
@@ -103,7 +101,7 @@ const props = defineProps<{
 	user?: Misskey.entities.UserLite;
 }>();
 
-const blocked = computed(() => props.audio.isSensitive && sensitiveContentConsent.value === false);
+const blocked = computed(() => isFileBlocked(props.audio));
 
 const keymap = {
 	'up': {
@@ -156,12 +154,24 @@ const audioEl = useTemplateRef('audioEl');
 const audioVisualizer = ref<InstanceType<typeof MkAudioVisualizer>>();
 
 function calcHide(): boolean {
-	if (prefer.s.nsfw === 'force' || prefer.s.dataSaver.media) return true;
-	if (props.audio.isSensitive && sensitiveContentConsent.value !== true) return true;
-	return props.audio.isSensitive && prefer.s.nsfw !== 'ignore';
+	return shouldHideFileByDefault(props.audio);
 }
 
 const hide = ref(calcHide());
+
+watch(() => props.audio, () => {
+	hide.value = calcHide();
+}, { deep: true });
+
+watch(sensitiveContentConsent, () => {
+	if (props.audio.isSensitive && sensitiveContentConsent.value !== true) hide.value = true;
+});
+
+async function showHiddenContent(ev: MouseEvent) {
+	ev.preventDefault();
+	ev.stopPropagation();
+	if (hide.value && await canRevealFile(props.audio)) hide.value = false;
+}
 
 // Menu
 const menuShowing = ref(false);
@@ -206,71 +216,11 @@ function showMenu(ev: MouseEvent) {
 		{
 			type: 'divider',
 		},
-		{
-			text: i18n.ts.hide,
-			icon: 'ti ti-eye-off',
-			action: () => {
-				hide.value = true;
-			},
-		},
 	];
 
-	if ($i?.id === props.audio.userId || iAmModerator) {
-		menu.push({
-			type: 'divider',
-		});
-	}
-
-	if (iAmModerator) {
-		menu.push({
-			text: props.audio.isSensitive ? i18n.ts.unmarkAsSensitive : i18n.ts.markAsSensitive,
-			icon: props.audio.isSensitive ? 'ti ti-eye' : 'ti ti-eye-exclamation',
-			danger: true,
-			action: () => toggleSensitive(props.audio),
-		});
-
-		if ($i?.id !== props.audio.userId) {
-			menu.push({
-				type: 'link' as const,
-				text: i18n.ts._fileViewer.title,
-				icon: 'ti ti-info-circle',
-				to: `/admin/file/${props.audio.id}`,
-			});
-		}
-	}
-
-	const details: MenuItem[] = [];
-	if ($i?.id === props.audio.userId) {
-		details.push({
-			type: 'link',
-			text: i18n.ts._fileViewer.title,
-			icon: 'ti ti-info-circle',
-			to: `/my/drive/file/${props.audio.id}`,
-		});
-	}
-
-	if (iAmModerator) {
-		details.push({
-			type: 'link',
-			text: i18n.ts.moderation,
-			icon: 'ti ti-photo-exclamation',
-			to: `/admin/file/${props.audio.id}`,
-		});
-	}
-
-	if (details.length > 0) {
-		menu.push({ type: 'divider' }, ...details);
-	}
-
-	if (prefer.s.devMode) {
-		menu.push({ type: 'divider' }, {
-			icon: 'ti ti-hash',
-			text: i18n.ts.copyFileId,
-			action: () => {
-				copyToClipboard(props.audio.id);
-			},
-		});
-	}
+	menu.push(...getFileMenu(props.audio, (newState) => {
+		hide.value = newState;
+	}));
 
 	menuShowing.value = true;
 	os.popupMenu(menu, ev.currentTarget ?? ev.target, {
@@ -278,47 +228,6 @@ function showMenu(ev: MouseEvent) {
 		onClosing: () => {
 			menuShowing.value = false;
 		},
-	});
-}
-
-async function showHiddenContent(ev: MouseEvent) {
-	if (!hide.value) return;
-
-	ev.preventDefault();
-	ev.stopPropagation();
-
-	if (props.audio.isSensitive && !$i) {
-		await pleaseLogin();
-		return;
-	}
-
-	if (props.audio.isSensitive && sensitiveContentConsent.value !== true) {
-		const allowed = await requestSensitiveContentConsent();
-		if (!allowed) return;
-	}
-
-	if (props.audio.isSensitive && prefer.s.confirmWhenRevealingSensitiveMedia) {
-		const { canceled } = await os.confirm({
-			type: 'question',
-			text: i18n.ts.sensitiveMediaRevealConfirm,
-		});
-		if (canceled) return;
-	}
-
-	hide.value = false;
-}
-
-async function toggleSensitive(file: Misskey.entities.DriveFile) {
-	const { canceled } = await os.confirm({
-		type: 'warning',
-		text: file.isSensitive ? i18n.ts.unmarkAsSensitiveConfirm : i18n.ts.markAsSensitiveConfirm,
-	});
-
-	if (canceled) return;
-
-	os.apiWithDialog('drive/files/update', {
-		fileId: file.id,
-		isSensitive: !file.isSensitive,
 	});
 }
 

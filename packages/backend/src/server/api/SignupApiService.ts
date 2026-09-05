@@ -79,8 +79,10 @@ export class SignupApiService {
 		reply: FastifyReply,
 	) {
 		const logger = this.loggerService.getLogger('api:signup');
-		logger.setContext({ username: request.body.username, email: request.body.emailAddress, ip: request.ip, headers: request.headers, span: request.headers['x-client-transaction-id'] ?? randomUUID() });
-		logger.info('Requested to create user account.');
+		logger.info({
+			message: 'Requested to create user account.',
+			attributes: { username: request.body.username, email: request.body.emailAddress, ip: request.ip, headers: request.headers, span: request.headers['x-client-transaction-id'] ?? randomUUID() },
+		});
 
 		const body = request.body;
 
@@ -274,8 +276,10 @@ export class SignupApiService {
 	@bindThis
 	public async signupPending(request: FastifyRequest<{ Body: { code: string; } }>, reply: FastifyReply) {
 		const logger = this.loggerService.getLogger('api:signup:pending');
-		logger.setContext({ code: request.body.code, ip: request.ip, headers: request.headers });
-		logger.info('Requested to complete creating user account.');
+		logger.info({
+			message: 'Requested to complete creating user account.',
+			attributes: { ip: request.ip, headers: request.headers },
+		});
 
 		const body = request.body;
 

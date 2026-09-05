@@ -147,10 +147,26 @@ function createEmptyProfile(): PossiblyNonNormalizedPreferencesProfile {
 	};
 }
 
+function normalizePreferenceValue<K extends keyof PREF>(key: K, value: ValueOf<K>): ValueOf<K> {
+	if (key !== 'dataSaver' || value == null || typeof value !== 'object') return value;
+	const legacy = value as Partial<ValueOf<'dataSaver'>> & { urlPreview?: boolean };
+	if (typeof legacy.urlPreview !== 'boolean') return value;
+
+	// 旧設定はプレビュー全体ではなくサムネイルの節約設定。
+	const { urlPreview, ...dataSaver } = legacy;
+	return {
+		...dataSaver,
+		urlPreviewThumbnail: dataSaver.urlPreviewThumbnail ?? urlPreview,
+		disableUrlPreview: dataSaver.disableUrlPreview ?? false,
+	} as ValueOf<K>;
+}
+
 function normalizePreferences(preferences: PossiblyNonNormalizedPreferencesProfile['preferences'], account: { id: string } | null): PreferencesProfile['preferences'] {
 	const data = {} as Record<string, [scope: Scope, value: any, meta: ValueMeta][]>;
 	for (const key in PREF_DEF) {
-		const records = preferences[key];
+		const records = preferences[key]?.map(([scope, value, meta]): [Scope, any, ValueMeta] => [
+			scope, normalizePreferenceValue(key as keyof PREF, value), meta,
+		]);
 		if (records == null || records.length === 0) {
 			const v = getInitialPrefValue(key as keyof typeof PREF_DEF);
 			if (isAccountDependentKey(key as keyof typeof PREF_DEF)) {
@@ -368,7 +384,7 @@ export class PreferencesManager extends EventEmitter<PreferencesManagerEvents> {
 			const key = _key as keyof PREF;
 			const record = this.getMatchedRecordOf(key);
 			if (record[2].sync && Object.hasOwn(cloudValues, key) && cloudValues[key] !== undefined) {
-				const cloudValue = cloudValues[key];
+				const cloudValue = normalizePreferenceValue(key, cloudValues[key]);
 				if (!deepEqual(cloudValue, record[1])) {
 					this.rewriteRawState(key, cloudValue);
 					record[1] = cloudValue;
@@ -505,6 +521,7 @@ export class PreferencesManager extends EventEmitter<PreferencesManagerEvents> {
 		let newValue = record[1];
 
 		const existing = await this.io.cloudGet({ key, scope: record[0] });
+		if (existing != null) existing.value = normalizePreferenceValue(key, existing.value);
 		if (existing != null && !deepEqual(record[1], existing.value)) {
 			const resolvedValue = await resolveConflict(record[1], existing.value);
 			if (resolvedValue === undefined) return { enabled: false }; // canceled
@@ -548,6 +565,8 @@ export class PreferencesManager extends EventEmitter<PreferencesManagerEvents> {
 
 	public renameProfile(name: string) {
 		this.profile.name = name;
+		// TODO: バックアップのキーが名前ベースであることを考えると名前=IDであるから、idも再生成する方が自然かもしれない
+		// (将来名前ではなくIDをキーにするようになったとした場合、名前を変えたのにバックアップのキーが変わらないことになってしまう)
 		this.save();
 	}
 

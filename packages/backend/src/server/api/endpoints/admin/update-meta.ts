@@ -99,6 +99,10 @@ export const paramDef = {
 		sensitiveMediaDetectionSensitivity: { type: 'string', enum: ['medium', 'low', 'high', 'veryLow', 'veryHigh'] },
 		setSensitiveFlagAutomatically: { type: 'boolean' },
 		enableSensitiveMediaDetectionForVideos: { type: 'boolean' },
+		sensitiveMediaDetectionApiUrl: { type: 'string', nullable: true },
+		sensitiveMediaDetectionApiKey: { type: 'string', nullable: true },
+		sensitiveMediaDetectionTimeout: { type: 'integer', minimum: 1 },
+		sensitiveMediaDetectionMaxImagesPerRequest: { type: 'integer', minimum: 1 },
 		maintainerName: { type: 'string', nullable: true },
 		maintainerEmail: { type: 'string', nullable: true },
 		langs: {
@@ -204,6 +208,12 @@ export const paramDef = {
 			type: 'array', nullable: true, items: {
 				type: 'string',
 			},
+		},
+		urlPreviewSensitiveList: {
+			type: 'array', nullable: true,
+			items: {
+				type: 'string',
+			}
 		},
 		federation: {
 			type: 'string',
@@ -468,6 +478,22 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (ps.enableSensitiveMediaDetectionForVideos !== undefined) {
 				set.enableSensitiveMediaDetectionForVideos = ps.enableSensitiveMediaDetectionForVideos;
+			}
+
+			if (ps.sensitiveMediaDetectionApiUrl !== undefined) {
+				set.sensitiveMediaDetectionApiUrl = ps.sensitiveMediaDetectionApiUrl === '' ? null : ps.sensitiveMediaDetectionApiUrl;
+			}
+
+			if (ps.sensitiveMediaDetectionApiKey !== undefined) {
+				set.sensitiveMediaDetectionApiKey = ps.sensitiveMediaDetectionApiKey === '' ? null : ps.sensitiveMediaDetectionApiKey;
+			}
+
+			if (ps.sensitiveMediaDetectionTimeout !== undefined) {
+				set.sensitiveMediaDetectionTimeout = ps.sensitiveMediaDetectionTimeout;
+			}
+
+			if (ps.sensitiveMediaDetectionMaxImagesPerRequest !== undefined) {
+				set.sensitiveMediaDetectionMaxImagesPerRequest = ps.sensitiveMediaDetectionMaxImagesPerRequest;
 			}
 
 			if (ps.maintainerName !== undefined) {
@@ -754,6 +780,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (Array.isArray(ps.prohibitedWordsForNameOfUser)) {
 				set.prohibitedWordsForNameOfUser = ps.prohibitedWordsForNameOfUser.filter(Boolean);
+			}
+
+			if (Array.isArray(ps.urlPreviewSensitiveList)) {
+				set.urlPreviewSensitiveList = ps.urlPreviewSensitiveList.filter(Boolean);
 			}
 
 			if (ps.federation !== undefined) {

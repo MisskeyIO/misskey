@@ -11,28 +11,28 @@ packages:
   - packages/misskey-js/generator
   - packages/misskey-reversi
   - packages/misskey-bubble-game
+  - packages-private/*
 allowBuilds:
   '@nestjs/core': true
   '@parcel/watcher': true
   '@sentry/profiling-node': true
   '@sentry-internal/node-cpu-profiler': true
-  '@tensorflow/tfjs-node': true
+  '@sentry/node-cpu-profiler': true
   bufferutil: true
   canvas: true
   core-js: true
-  cypress: true
   esbuild: true
   libpq: true
   msgpackr-extract: true
   msw: true
   nice-napi: true
-  protobufjs: true
   re2: true
   sharp: true
   utf-8-validate: true
   v-code-diff: true
   vue-demi: true
   exifreader: false
+  protobufjs: false
 minimumReleaseAge: 10080 # delay 7days to mitigate supply-chain attack
 minimumReleaseAgeExclude:
   - '@misskey-dev/*'
@@ -54,26 +54,24 @@ minimumReleaseAgeExclude:
   - slacc-win32-arm64-msvc
   - slacc-win32-x64-msvc
   - '@typescript/native-preview*'
-  - pnpm
-  - esbuild # 脆弱性対応。そのうち消す
-  - '@esbuild/*' # 脆弱性対応。そのうち消す
-  - js-yaml # 脆弱性対応。そのうち消す
-  - vite # 脆弱性対応。そのうち消す
-  - form-data # 脆弱性対応。そのうち消す
-  - tar
+  - vite # そのうち消す
+  # Renovate security update: typeorm@1.1.0
+  - typeorm@1.1.0
+  # Renovate security update: @fastify/static@10.1.2
+  - "@fastify/static@10.1.2"
+  # Renovate security update: tar@7.5.21
+  - tar@7.5.21
+  # Renovate security update: js-yaml@5.2.2
+  - js-yaml@5.2.2
 overrides:
   '@aiscript-dev/aiscript-languageserver': '-'
   '@peculiar/asn1-ecc': 2.6.1
   '@peculiar/asn1-rsa': 2.6.1
   '@peculiar/asn1-schema': 2.6.0
   '@peculiar/asn1-x509': 2.6.1
-  '@tensorflow/tfjs': 4.22.0
-  '@tensorflow/tfjs-core': 4.22.0
-  '@tensorflow/tfjs-node': 4.22.0
+  'bullmq>ioredis': 5.11.1
   chokidar: 5.0.0
   lodash: 4.18.1
-  # Vueの初期化関数が欠ける不具合の修正版に揃える。
-  vite>rolldown: "1.1.2"
 
 patchedDependencies:
   '@misskey-dev/summaly@5.5.1': patches/@misskey-dev__summaly@5.5.1.patch

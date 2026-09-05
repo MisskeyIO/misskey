@@ -78,10 +78,12 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private loggerService: LoggerService,
 		private instanceEntityService: InstanceEntityService,
 	) {
-		super(meta, paramDef, async (ps, me, _token, _file, _cleanup, ip, headers) => {
+			super(meta, paramDef, async (ps, me, _token, _file, _cleanup, ip, headers) => {
 			const logger = this.loggerService.getLogger('api:federation:instances');
-			logger.setContext({ params: ps, userId: me?.id, ip, headers });
-			logger.info('Requested to fetch federated instances.');
+			logger.info({
+				message: 'Requested to fetch federated instances.',
+				attributes: { params: ps, userId: me?.id, ip, headers },
+			});
 
 			const query = this.instancesRepository.createQueryBuilder('instance');
 

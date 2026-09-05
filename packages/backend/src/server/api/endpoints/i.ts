@@ -53,8 +53,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const isSecure = token == null;
 
 			const logger = this.loggerService.getLogger('api:account:i');
-			logger.setContext({ userId: user.id, username: user.username, client: isSecure ? 'misskey' : 'app', ip, headers, span: (headers ? headers['x-client-transaction-id'] : undefined) ?? randomUUID() });
-			logger.info('Fetching account information');
+			logger.info({
+				message: 'Fetching account information',
+				attributes: { userId: user.id, username: user.username, client: isSecure ? 'misskey' : 'app', ip, headers, span: (headers ? headers['x-client-transaction-id'] : undefined) ?? randomUUID() },
+			});
 
 			const now = new Date();
 			const today = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;

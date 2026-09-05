@@ -34,7 +34,7 @@ export const serverErrorImageUrl = computed(() => instance.serverErrorImageUrl ?
 
 export const infoImageUrl = computed(() => instance.infoImageUrl ?? DEFAULT_INFO_IMAGE_URL);
 
-export async function fetchInstance(force = false): Promise<Misskey.entities.MetaDetailed> {
+export async function fetchInstance(force = false, signal?: AbortSignal): Promise<Misskey.entities.MetaDetailed> {
 	if (!force) {
 		const cachedAt = miLocalStorage.getItem('instanceCachedAt') ? parseInt(miLocalStorage.getItem('instanceCachedAt')!) : 0;
 
@@ -45,7 +45,7 @@ export async function fetchInstance(force = false): Promise<Misskey.entities.Met
 
 	const meta = await (force ? misskeyApi : misskeyApiGet)('meta', {
 		detail: true,
-	});
+	}, undefined, signal);
 
 	for (const [k, v] of Object.entries(meta)) {
 		(instance[k as keyof typeof meta] as any) = v;

@@ -129,7 +129,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { watch, nextTick, onMounted, onUnmounted, defineAsyncComponent, provide, shallowRef, ref, computed, useTemplateRef } from 'vue';
+import { watch, nextTick, onMounted, onUnmounted, defineAsyncComponent, provide, shallowRef, ref, reactive, computed, useTemplateRef } from 'vue';
 import * as mfm from 'mfm-js';
 import * as Misskey from 'misskey-js';
 import insertTextAtCursor from 'insert-text-at-cursor';
@@ -251,9 +251,9 @@ const imeText = ref('');
 const showingOptions = ref(false);
 const textAreaReadOnly = ref(false);
 const justEndedComposition = ref(false);
-const renoteTargetNote: ShallowRef<PostFormProps['renote'] | null> = shallowRef(props.renote);
-const replyTargetNote: ShallowRef<PostFormProps['reply'] | null> = shallowRef(props.reply);
-const targetChannel = shallowRef(props.channel);
+const renoteTargetNote: ShallowRef<PostFormProps['renote'] | null> = shallowRef(props.renote ?? null);
+const replyTargetNote: ShallowRef<PostFormProps['reply'] | null> = shallowRef(props.reply ?? null);
+const targetChannel = shallowRef(props.channel ?? null);
 
 const serverDraftId = ref<string | null>(null);
 const draftProcessing = ref(false);
@@ -763,6 +763,9 @@ function removeVisibleUser(id: string) {
 }
 
 function clear() {
+	removeFormState();
+	formStateReady = false;
+	formStateChanged = false;
 	text.value = '';
 	useCw.value = false;
 	cw.value = null;
@@ -780,6 +783,7 @@ function clear() {
 	quoteId.value = null;
 	serverDraftId.value = null;
 	uploader.reset();
+	nextTick(() => { formStateReady = true; });
 }
 
 function onKeydown(ev: KeyboardEvent) {
@@ -1115,8 +1119,11 @@ async function post(ev?: PointerEvent) {
 	}
 
 	const draftToDelete = serverDraftId.value;
+	saveFormState();
+	const submittedFormState = lastSavedFormState;
 	posting.value = true;
 	misskeyApi('notes/create', postData, token).then(() => {
+		removeFormState(submittedFormState);
 		if (props.freezeAfterPosted) {
 			posted.value = true;
 		} else {
@@ -1295,6 +1302,77 @@ function showActions(ev: PointerEvent) {
 }
 
 const postAccount = ref<Misskey.entities.UserDetailed | null>(null);
+
+// 明示保存の下書きとは別に、この端末の書きかけを保持する。
+const formState = reactive({
+	text, useCw, cw, visibility, localOnly, files, poll, visibleUsers,
+	quoteId, renoteTargetNote, replyTargetNote, targetChannel, reactionAcceptance,
+	dimension, postingLang, scheduledAt, noExtractMentions, noExtractHashtags, noExtractEmojis,
+	withHashtags, hashtags, serverDraftId,
+	postAccountId: computed(() => postAccount.value?.id ?? null),
+});
+const formStateKey = `postFormState:${JSON.stringify([
+	$i.id, props.channel?.id ?? null, props.reply?.id ?? null, props.renote?.id ?? null,
+])}` as const;
+const retainFormState = !props.instant && !props.mock && !props.mention && !props.specified && !props.initialNote
+	&& props.initialText == null && props.initialCw == null && props.initialFiles == null
+	&& props.initialVisibility == null && props.initialLocalOnly == null && props.initialVisibleUsers.length === 0;
+let formStateReady = false;
+let formStateChanged = false;
+let lastSavedFormState: string | null = null;
+
+function saveFormState() {
+	if (!retainFormState || !formStateReady || !formStateChanged || posted.value || draftProcessing.value) return;
+	try {
+		const value = JSON.stringify(formState);
+		if (value === lastSavedFormState) return;
+		miLocalStorage.setItem(formStateKey, value);
+		lastSavedFormState = value;
+	} catch {
+		console.warn('投稿フォームの書きかけを保持できませんでした。');
+	}
+}
+
+function removeFormState(expected = lastSavedFormState) {
+	if (!retainFormState || expected == null) return;
+	try {
+		// 送信待ちの間に別のフォームで書いた内容は消さない。
+		if (miLocalStorage.getItem(formStateKey) === expected) miLocalStorage.removeItem(formStateKey);
+		if (expected === lastSavedFormState) lastSavedFormState = null;
+	} catch {
+		console.warn('投稿フォームの保持内容を消去できませんでした。');
+	}
+}
+
+async function restoreFormState() {
+	if (!retainFormState) return;
+	try {
+		const saved = miLocalStorage.getItem(formStateKey);
+		if (saved == null) return;
+		const { postAccountId, ...state } = JSON.parse(saved) as typeof formState;
+		if (typeof state.text !== 'string' || !Array.isArray(state.files) || !Array.isArray(state.visibleUsers)
+			|| !Misskey.noteVisibilities.includes(state.visibility) || typeof state.localOnly !== 'boolean'
+			|| typeof state.dimension !== 'number') return;
+		let account: Misskey.entities.UserDetailed | null = null;
+		if (postAccountId != null) {
+			const stored = (await getAccounts()).find(x => x.host === host && x.id === postAccountId && x.token != null);
+			if (!stored?.user) return;
+			account = stored.user;
+		}
+		Object.assign(formState, state);
+		postAccount.value = account;
+		lastSavedFormState = saved;
+	} catch {
+		console.warn('投稿フォームの書きかけを復元できませんでした。');
+	}
+}
+
+watch(formState, () => {
+	if (!formStateReady) return;
+	formStateChanged = true;
+	saveFormState();
+}, { deep: true });
+watch(draftProcessing, (processing) => { if (!processing) saveFormState(); });
 
 async function openAccountMenu(ev: PointerEvent) {
 	if (props.mock) return;
@@ -1499,7 +1577,8 @@ onMounted(() => {
 	if (cwInputEl.value) autocompleteCwInput.value = new Autocomplete(cwInputEl.value, cw);
 	if (hashtagsInputEl.value) autocompleteHashtagsInput.value = new Autocomplete(hashtagsInputEl.value, hashtags);
 
-	nextTick(() => {
+	nextTick(async () => {
+		await restoreFormState();
 		// 削除して編集
 		if (props.initialNote) {
 			const init = props.initialNote;
@@ -1529,6 +1608,8 @@ onMounted(() => {
 			scheduledAt.value = null;
 			reactionAcceptance.value = init.reactionAcceptance;
 		}
+		await nextTick();
+		formStateReady = true;
 	});
 });
 
@@ -1542,6 +1623,7 @@ onUnmounted(() => {
 });
 
 async function canClose() {
+	if (draftProcessing.value) return false;
 	if (!uploader.allItemsUploaded.value) {
 		const { canceled } = await os.confirm({
 			type: 'question',
@@ -1552,6 +1634,7 @@ async function canClose() {
 		if (canceled) return false;
 	}
 
+	saveFormState();
 	return true;
 }
 

@@ -92,7 +92,9 @@ import type {
 	AdminQueueClearRequest,
 	AdminQueueDeliverDelayedResponse,
 	AdminQueueInboxDelayedResponse,
+	AdminQueuePauseRequest,
 	AdminQueuePromoteRequest,
+	AdminQueueResumeRequest,
 	AdminQueueStatsResponse,
 	AdminRegenerateUserTokenRequest,
 	AdminRelaysAddRequest,
@@ -163,6 +165,7 @@ import type {
 	AntennasListResponse,
 	AntennasNotesRequest,
 	AntennasNotesResponse,
+	AntennasRemoveNoteRequest,
 	AntennasShowRequest,
 	AntennasShowResponse,
 	AntennasUpdateRequest,
@@ -716,7 +719,9 @@ export type Endpoints = {
 	'admin/queue/clear': { req: AdminQueueClearRequest; res: EmptyResponse };
 	'admin/queue/deliver-delayed': { req: EmptyRequest; res: AdminQueueDeliverDelayedResponse };
 	'admin/queue/inbox-delayed': { req: EmptyRequest; res: AdminQueueInboxDelayedResponse };
+	'admin/queue/pause': { req: AdminQueuePauseRequest; res: EmptyResponse };
 	'admin/queue/promote': { req: AdminQueuePromoteRequest; res: EmptyResponse };
+	'admin/queue/resume': { req: AdminQueueResumeRequest; res: EmptyResponse };
 	'admin/queue/stats': { req: EmptyRequest; res: AdminQueueStatsResponse };
 	'admin/regenerate-user-token': { req: AdminRegenerateUserTokenRequest; res: EmptyResponse };
 	'admin/relays/add': { req: AdminRelaysAddRequest; res: AdminRelaysAddResponse };
@@ -766,6 +771,7 @@ export type Endpoints = {
 	'antennas/delete': { req: AntennasDeleteRequest; res: EmptyResponse };
 	'antennas/list': { req: EmptyRequest; res: AntennasListResponse };
 	'antennas/notes': { req: AntennasNotesRequest; res: AntennasNotesResponse };
+	'antennas/remove-note': { req: AntennasRemoveNoteRequest; res: EmptyResponse };
 	'antennas/show': { req: AntennasShowRequest; res: AntennasShowResponse };
 	'antennas/update': { req: AntennasUpdateRequest; res: AntennasUpdateResponse };
 	'ap/get': { req: ApGetRequest; res: ApGetResponse };

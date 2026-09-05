@@ -4,12 +4,13 @@
  */
 
 import { describe, test, assert, afterEach } from 'vitest';
-import { render, cleanup, type RenderResult } from '@testing-library/vue';
+import { render, cleanup, waitFor, type RenderResult } from '@testing-library/vue';
 import './init';
 import type { SummalyResult } from '@misskey-dev/summaly';
 import { components } from '@/components/index.js';
 import { directives } from '@/directives/index.js';
 import MkUrlPreview from '@/components/MkUrlPreview.vue';
+import MkYouTubePlayer from '@/components/MkYouTubePlayer.vue';
 
 describe('MkUrlPreview', () => {
 	const renderPreviewBy = async (summary: Partial<SummalyResult> & { url: string }): Promise<RenderResult> => {
@@ -143,6 +144,25 @@ describe('MkUrlPreview', () => {
 		});
 		assert.exists(iframe, 'iframe should exist');
 		assert.strictEqual(iframe?.getAttribute('allow'), 'autoplay;fullscreen');
+	});
+
+	test.each([
+		[undefined, 'autoplay;encrypted-media;fullscreen'],
+		[['autoplay', 'camera', 'fullscreen'], 'autoplay;fullscreen'],
+	])('別ウィンドウでも外部Summalyの権限を補完・制限する: %j', async (allow, expected) => {
+		const player = render(MkYouTubePlayer, {
+			props: {
+				urlOrSummalyResult: {
+					url: 'https://example.local',
+					player: { url: 'https://example.local/player', width: null, height: null, allow },
+				} as SummalyResult,
+			},
+			global: { directives, components, stubs: { MkWindow: { template: '<div><slot/></div>' } } },
+		});
+
+		await waitFor(() => {
+			assert.strictEqual(player.container.querySelector('iframe')?.getAttribute('allow'), expected);
+		});
 	});
 
 	test('Having a player width should keep the fixed aspect ratio', async () => {

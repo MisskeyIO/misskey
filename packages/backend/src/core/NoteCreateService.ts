@@ -343,7 +343,11 @@ export class NoteCreateService implements OnApplicationShutdown {
 			// Fetch renote to note
 			renote = await this.notesRepository.findOne({
 				where: { id: data.renoteId },
-				relations: ['user', 'renote', 'reply'],
+				relations: {
+					user: true,
+					renote: true,
+					reply: true,
+				},
 			});
 
 			if (renote == null) {
@@ -392,14 +396,14 @@ export class NoteCreateService implements OnApplicationShutdown {
 			// Fetch reply
 			reply = await this.notesRepository.findOne({
 				where: { id: data.replyId },
-				relations: ['user'],
+				relations: { user: true },
 			});
 
 			if (reply == null) {
 				throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.noSuchReply, 'No such reply target');
 			} else if (isRenote(reply) && !isQuote(reply)) {
 				throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.cannotReplyPureRenote, 'Cannot reply to pure renote');
-			} else if (!await this.noteEntityService.isVisibleForMe(reply, user.id)) {
+			} else if (!(await this.noteEntityService.isVisibleForMe(reply, user.id))) {
 				throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.cannotReplyInvisibleNote, 'No such reply target');
 			} else if (reply.visibility === 'specified' && data.visibility !== 'specified') {
 				throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.cannotExtendSpecifiedReply, 'Cannot reply to specified note with different visibility');
@@ -548,8 +552,10 @@ export class NoteCreateService implements OnApplicationShutdown {
 						throw new Error('Renote target is not public or home');
 					}
 
-					// Renote対象がfollowersならfollowersにする
-					data.visibility = 'followers';
+					// followers noteはfollowers以下にrenote可能
+					if (data.visibility === 'public' || data.visibility === 'home') {
+						data.visibility = 'followers';
+					}
 					break;
 				case 'specified':
 					// specified / direct noteはreject
@@ -614,7 +620,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 			emojis = data.apEmojis ?? extractCustomEmojisFromMfm(combinedTokens);
 
-			mentionedUsers = data.apMentions ?? await this.extractMentionedUsers(user, combinedTokens);
+			mentionedUsers = data.apMentions ?? (await this.extractMentionedUsers(user, combinedTokens));
 		}
 
 		if (inSilencedInstance) emojis = [];
@@ -663,7 +669,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 			}
 		}
 
-		if (mentionedUsers.length > 0 && mentionedUsers.length > policies.mentionLimit) {
+		const effectiveMentionCount = Math.max(mentionedUsers.length, data.apMentionRawCount ?? 0);
+		if (effectiveMentionCount > 0 && effectiveMentionCount > policies.mentionLimit) {
 			throw new IdentifiableError(NOTE_CREATE_PERMANENT_ERROR_IDS.tooManyMentions, `Notes including mentions are limited to ${policies.mentionLimit} users.`);
 		}
 
@@ -1172,13 +1179,13 @@ export class NoteCreateService implements OnApplicationShutdown {
 					followerHost: IsNull(),
 					isFollowerHibernated: false,
 				},
-				select: ['followerId', 'withReplies'],
+				select: { followerId: true, withReplies: true },
 			}),
 			this.userListMembershipsRepository.find({
 				where: {
 					userId: user.id,
 				},
-				select: ['userListId', 'userListUserId', 'withReplies'],
+				select: { userListId: true, userListUserId: true, withReplies: true },
 			}),
 		]);
 
@@ -1218,7 +1225,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 				where: {
 					followeeId: note.channelId,
 				},
-				select: ['followerId'],
+				select: { followerId: true },
 			});
 
 			for (const channelFollowing of channelFollowings) {
@@ -1308,7 +1315,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 				id: In(samples.map(x => x.followerId)),
 				lastActiveDate: LessThan(new Date(Date.now() - (1000 * 60 * 60 * 24 * 50))),
 			},
-			select: ['id'],
+			select: { id: true },
 		});
 
 		if (hibernatedUsers.length > 0) {

@@ -128,7 +128,7 @@ export class SigninApiService {
 
 		// Fetch user
 		const profile = await this.userProfilesRepository.findOne({
-			relations: ['user'],
+			relations: { user: true },
 			where: loginWithEmail ? {
 				email: username,
 				emailVerified: true,

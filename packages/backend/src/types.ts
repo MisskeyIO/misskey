@@ -109,6 +109,8 @@ export const moderationLogTypes = [
 	'deleteRole',
 	'clearQueue',
 	'promoteQueue',
+	'pauseQueue',
+	'resumeQueue',
 	'deleteDriveFile',
 	'deleteNote',
 	'createGlobalAnnouncement',
@@ -238,6 +240,8 @@ export type ModerationLogPayloads = {
 	};
 	clearQueue: Record<string, never>;
 	promoteQueue: Record<string, never>;
+	pauseQueue: Record<string, never>;
+	resumeQueue: Record<string, never>;
 	deleteDriveFile: {
 		fileId: string;
 		fileUserId: string | null;
@@ -494,6 +498,7 @@ export type NoteCreateOption = {
 	visibleUsers?: MinimumUser[] | null;
 	channel?: MiChannel | null;
 	apMentions?: MinimumUser[] | null;
+	apMentionRawCount?: number | null;
 	apHashtags?: string[] | null;
 	apEmojis?: string[] | null;
 	uri?: string | null;

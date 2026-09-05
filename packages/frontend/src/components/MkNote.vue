@@ -268,6 +268,7 @@ const tl_withSensitive = inject<Ref<boolean>>('tl_withSensitive', ref(true));
 const tl_dimension = inject<Ref<number | null>>('tl_dimension', ref(null));
 const inChannel = inject(DI.inChannel, null);
 const currentClip = inject<Ref<Misskey.entities.Clip> | null>('currentClip', null);
+const currentAntenna = inject<Ref<Misskey.entities.Antenna | null> | null>('currentAntenna', null);
 
 let note = deepClone(props.note);
 
@@ -612,6 +613,7 @@ function onContextmenu(ev: PointerEvent): void {
 			translating,
 			translation,
 			currentClip: currentClip?.value,
+			currentAntenna: currentAntenna?.value ?? undefined,
 			postFormDimension: tl_dimension.value ?? undefined,
 		});
 		os.contextMenu(menu, ev).then(focus).finally(cleanup);
@@ -628,6 +630,7 @@ function showMenu(): void {
 		translating,
 		translation,
 		currentClip: currentClip?.value,
+		currentAntenna: currentAntenna?.value ?? undefined,
 		postFormDimension: tl_dimension.value ?? undefined,
 	});
 	os.popupMenu(menu, menuButton.value).then(focus).finally(cleanup);

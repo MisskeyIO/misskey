@@ -100,7 +100,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 						}
 
 						const children = await this.driveFoldersRepository.find({
-							select: ['id'],
+							select: { id: true },
 							where: {
 								parentId: ancestorId,
 								userId: me.id,

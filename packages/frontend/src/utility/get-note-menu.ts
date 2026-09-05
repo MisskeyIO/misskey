@@ -278,8 +278,8 @@ export function getNoteMenu(props: {
 		});
 		if (canceled) return;
 
-		await os.apiWithDialog('antennas/remove-note', { antennaId: props.currentAntenna.id, noteId: appearNote.id });
-		globalEvents.emit('noteRemovedFromAntenna', props.currentAntenna.id, appearNote.id);
+		await os.apiWithDialog('antennas/remove-note', { antennaId: props.currentAntenna.id, noteId: props.note.id });
+		globalEvents.emit('noteRemovedFromAntenna', props.currentAntenna.id, props.note.id);
 	}
 
 	async function _promote(): Promise<void> {

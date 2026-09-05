@@ -23,7 +23,7 @@ export const meta = {
 		noSuchAntenna: {
 			message: 'No such antenna.',
 			code: 'NO_SUCH_ANTENNA',
-			id: '850926e0-fd3b-49b6-b69a-b28a5dbd82fe',
+			id: 'e70f4701-9107-4f8c-b845-d65a241a9db2',
 		},
 	},
 } as const;

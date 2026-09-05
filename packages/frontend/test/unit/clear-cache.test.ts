@@ -70,8 +70,8 @@ test('キャッシュだけを削除し、最新情報の取得後に再読込�
 	expect(mocks.del.mock.calls).toEqual([['emojis'], ['lastEmojisFetchedAt']]);
 	expect(mocks.api).toHaveBeenCalledOnce();
 	expect(mocks.api.mock.calls[0][0]).toBe('clear-browser-cache');
-	expect(mocks.fetchInstance).toHaveBeenCalledWith(true, expect.any(AbortSignal));
-	expect(mocks.fetchEmojis).toHaveBeenCalledWith(true, expect.any(AbortSignal));
+	expect(mocks.fetchInstance).toHaveBeenCalledWith(true);
+	expect(mocks.fetchEmojis).toHaveBeenCalledWith(true);
 	expect(mocks.reload).toHaveBeenCalledOnce();
 	expect(mocks.done).toHaveBeenCalledOnce();
 	expect(mocks.alert).not.toHaveBeenCalled();
@@ -89,18 +89,37 @@ test.each(['api', 'del', 'fetchInstance', 'fetchEmojis'] as const)('%sの失敗�
 	expect(mocks.reload).toHaveBeenCalledOnce();
 });
 
-test.each(['api', 'del', 'fetchInstance', 'fetchEmojis'] as const)('%sが応答しなくても10秒で操作へ戻る', async (stage) => {
+test('最新情報の片方が失敗しても、残りの保存が終わるまでは待機する', async () => {
+	let finishEmojis!: () => void;
+	mocks.fetchInstance.mockRejectedValueOnce(new Error('検査用'));
+	mocks.fetchEmojis.mockReturnValueOnce(new Promise<void>(resolve => { finishEmojis = resolve; }));
+	const clearing = clearCache();
+	await vi.advanceTimersByTimeAsync(0);
+	expect(mocks.done).not.toHaveBeenCalled();
+	expect(mocks.alert).not.toHaveBeenCalled();
+	expect(mocks.reload).not.toHaveBeenCalled();
+	finishEmojis();
+	await clearing;
+	expect(mocks.done).toHaveBeenCalledOnce();
+	expect(mocks.alert).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
+	expect(mocks.reload).not.toHaveBeenCalled();
+});
+
+test.each(['api', 'del', 'fetchInstance', 'fetchEmojis'] as const)('%sが10秒以上かかっても中断せず、実際の完了を待つ', async (stage) => {
+	const abort = vi.spyOn(AbortController.prototype, 'abort');
 	let release!: () => void;
 	mocks[stage].mockReturnValueOnce(new Promise<void>(resolve => { release = resolve; }));
 	const clearing = clearCache();
-	await vi.advanceTimersByTimeAsync(10_000);
-	expect(mocks.done).toHaveBeenCalledOnce();
-	await clearing;
-	expect(mocks.alert).toHaveBeenCalledOnce();
+	await vi.advanceTimersByTimeAsync(30_000);
+	expect(mocks.done).not.toHaveBeenCalled();
+	expect(mocks.alert).not.toHaveBeenCalled();
 	expect(mocks.reload).not.toHaveBeenCalled();
-	if (stage !== 'del') expect(mocks.api.mock.calls[0][3].aborted).toBe(true);
+	expect(abort).not.toHaveBeenCalled();
+	expect(vi.getTimerCount()).toBe(0);
 	release();
-	await vi.advanceTimersByTimeAsync(0);
-	if (stage === 'del') expect(mocks.api).not.toHaveBeenCalled();
-	expect(mocks.reload).not.toHaveBeenCalled();
+	await clearing;
+	expect(mocks.done).toHaveBeenCalledOnce();
+	expect(mocks.reload).toHaveBeenCalledOnce();
+	expect(mocks.alert).not.toHaveBeenCalled();
+	expect(abort).not.toHaveBeenCalled();
 });

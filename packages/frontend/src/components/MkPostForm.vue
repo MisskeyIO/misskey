@@ -766,8 +766,8 @@ function clear() {
 	text.value = '';
 	useCw.value = false;
 	cw.value = null;
-	visibility.value = store.s.rememberNoteVisibility ? store.s.visibility : store.s.defaultNoteVisibility;
-	localOnly.value = store.s.rememberNoteVisibility ? store.s.localOnly : store.s.defaultNoteLocalOnly;
+	visibility.value = prefer.s.rememberNoteVisibility ? store.s.visibility : prefer.s.defaultNoteVisibility;
+	localOnly.value = prefer.s.rememberNoteVisibility ? store.s.localOnly : prefer.s.defaultNoteLocalOnly;
 	postingLang.value = null;
 	dimension.value = props.initialDimension ?? store.r.tl.value?.dimensionBySrc?.[store.r.tl.value.src] ?? prefer.s.dimension;
 	files.value = [];

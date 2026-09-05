@@ -13,6 +13,7 @@ const envOption = {
 	withLogTime: false,
 	quiet: false,
 	disableRegistration: false,
+	enableCrossOriginIsolation: false,
 };
 
 for (const key of Object.keys(envOption) as (keyof typeof envOption)[]) {

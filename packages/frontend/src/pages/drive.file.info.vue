@@ -127,6 +127,7 @@ function postThis() {
 
 	os.post({
 		initialFiles: [file.value],
+		instant: true,
 	});
 }
 

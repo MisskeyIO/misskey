@@ -227,6 +227,22 @@ export const meta = {
 				type: 'boolean',
 				optional: false, nullable: false,
 			},
+			sensitiveMediaDetectionApiUrl: {
+				type: 'string',
+				optional: false, nullable: true,
+			},
+			sensitiveMediaDetectionApiKey: {
+				type: 'string',
+				optional: false, nullable: true,
+			},
+			sensitiveMediaDetectionTimeout: {
+				type: 'number',
+				optional: false, nullable: false,
+			},
+			sensitiveMediaDetectionMaxImagesPerRequest: {
+				type: 'number',
+				optional: false, nullable: false,
+			},
 			proxyAccountId: {
 				type: 'string',
 				optional: false, nullable: false,
@@ -489,6 +505,14 @@ export const meta = {
 				type: 'string',
 				optional: false, nullable: true,
 			},
+			urlPreviewSensitiveList: {
+				type: 'array',
+				optional: false, nullable: false,
+				items: {
+					type: 'string',
+					optional: false, nullable: false,
+				},
+			},
 			federation: {
 				type: 'string',
 				enum: ['all', 'specified', 'none'],
@@ -656,6 +680,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				sensitiveMediaDetectionSensitivity: instance.sensitiveMediaDetectionSensitivity,
 				setSensitiveFlagAutomatically: instance.setSensitiveFlagAutomatically,
 				enableSensitiveMediaDetectionForVideos: instance.enableSensitiveMediaDetectionForVideos,
+				sensitiveMediaDetectionApiUrl: instance.sensitiveMediaDetectionApiUrl,
+				sensitiveMediaDetectionApiKey: instance.sensitiveMediaDetectionApiKey,
+				sensitiveMediaDetectionTimeout: instance.sensitiveMediaDetectionTimeout,
+				sensitiveMediaDetectionMaxImagesPerRequest: instance.sensitiveMediaDetectionMaxImagesPerRequest,
 				proxyAccountId: proxy.id,
 				inquiryUrl: instance.inquiryUrl,
 				email: instance.email,
@@ -701,6 +729,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				urlPreviewRequireContentLength: instance.urlPreviewRequireContentLength,
 				urlPreviewUserAgent: instance.urlPreviewUserAgent,
 				urlPreviewSummaryProxyUrl: instance.urlPreviewSummaryProxyUrl,
+				urlPreviewSensitiveList: instance.urlPreviewSensitiveList,
 				federation: instance.federation,
 				federationHosts: instance.federationHosts,
 				prohibitedWordsForNameOfUser: instance.prohibitedWordsForNameOfUser,

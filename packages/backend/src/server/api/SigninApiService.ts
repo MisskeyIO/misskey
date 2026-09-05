@@ -80,8 +80,10 @@ export class SigninApiService {
 		reply: FastifyReply,
 	) {
 		const logger = this.loggerService.getLogger('api:signin');
-		logger.setContext({ username: request.body.username, ip: request.ip, headers: request.headers, span: request.headers['x-client-transaction-id'] ?? randomUUID() });
-		logger.info('Requested to sign in.');
+		logger.info({
+			message: 'Requested to sign in.',
+			attributes: { username: request.body.username, ip: request.ip, headers: request.headers, span: request.headers['x-client-transaction-id'] ?? randomUUID() },
+		});
 
 		const body = request.body;
 		const username = body['username'];

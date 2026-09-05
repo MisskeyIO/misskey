@@ -13,7 +13,6 @@ import { fileTypeFromFile } from 'file-type';
 import FFmpeg from 'fluent-ffmpeg';
 import isSvg from 'is-svg';
 import probeImageSize from 'probe-image-size';
-import { type PredictionType } from 'nsfwjs';
 import { sharpBmp } from '@misskey-dev/sharp-read-bmp';
 import { encode } from 'blurhash';
 import { createTempDir } from '@/misc/create-temp.js';
@@ -22,6 +21,7 @@ import { LoggerService } from '@/core/LoggerService.js';
 import type Logger from '@/logger.js';
 import { bindThis } from '@/decorators.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
+import type { Prediction } from '@/core/AiService.js';
 
 export type FileInfo = {
 	size: number;
@@ -192,7 +192,7 @@ export class FileInfoService {
 		let sensitive = false;
 		let porn = false;
 
-		function judgePrediction(result: readonly PredictionType[]): [sensitive: boolean, porn: boolean] {
+		function judgePrediction(result: readonly Prediction[]): [sensitive: boolean, porn: boolean] {
 			let sensitive = false;
 			let porn = false;
 
@@ -248,7 +248,8 @@ export class FileInfoService {
 					.format('image2')
 					.output(join(outDir, '%d.png'))
 					.outputOptions(['-vsync', '0']); // 可変フレームレートにすることで穴埋めをさせない
-				const results: ReturnType<typeof judgePrediction>[] = [];
+				// 判定対象フレームを選定して正規化済みバッファとして集め、外部サービスへまとめて送る。
+				const frameBuffers: Buffer[] = [];
 				let frameIndex = 0;
 				let targetIndex = 0;
 				let nextIndex = 1;
@@ -260,22 +261,27 @@ export class FileInfoService {
 						}
 						targetIndex = nextIndex;
 						nextIndex += index; // fibonacci sequence によってフレーム数制限を掛ける
-						const result = await this.aiService.detectSensitive(path);
-						if (result) {
-							results.push(judgePrediction(result));
-						}
+						frameBuffers.push(await fs.promises.readFile(path));
 					} finally {
 						fs.promises.unlink(path);
 					}
 				}
-				sensitive = results.filter(x => x[0]).length >= Math.ceil(results.length * sensitiveThreshold);
-				porn = results.filter(x => x[1]).length >= Math.ceil(results.length * sensitiveThresholdForPorn);
+				const predictions = await this.aiService.detectSensitiveMany(frameBuffers);
+				const results = predictions.filter((x): x is Prediction[] => x != null).map(x => judgePrediction(x));
+				// 判定に成功したフレームが 0 件のとき（接続先未設定・通信失敗等）は、
+				// Math.ceil(0) との比較が 0 >= 0 で真になり全動画がセンシティブ扱いになってしまうため、
+				// 1 件以上判定できたときのみ集約する（失敗時は非センシティブ扱い: misskey-dev/misskey#16804）。
+				if (results.length > 0) {
+					sensitive = results.filter(x => x[0]).length >= Math.ceil(results.length * sensitiveThreshold);
+					porn = results.filter(x => x[1]).length >= Math.ceil(results.length * sensitiveThresholdForPorn);
+				}
 			} finally {
 				disposeOutDir();
 			}
 		} else if (isMimeImage(mime, 'sharp-convertible-image-with-bmp')) {
 			/*
-			 * tfjs-nodeが扱える形式へ変換し、判定に必要な大きさへ揃える
+			 * 判定サービス側のデコーダは限られた画像形式しか受け付けないため、sharp で PNG に変換する
+			 * せっかくなので内部処理で使われる最大サイズの299x299に事前にリサイズする
 			 */
 			const png = await (await sharpBmp(source, mime))
 				.resize(299, 299, {

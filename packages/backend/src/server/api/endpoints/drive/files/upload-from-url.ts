@@ -72,8 +72,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		super(meta, paramDef, async (ps, me, _token, _file, _cleanup, ip, headers) => {
 			const logger = this.loggerService.getLogger('api:drive:files:upload-from-url');
 			const hash = createHash('sha256').update(`${ps.folderId}:${ps.url}:${ps.isSensitive}`).digest('base64');
-			logger.setContext({ userId: me.id, hash, ip, headers });
-			logger.info('Request to upload from URL.');
+			logger.info({
+				message: 'Request to upload from URL.',
+				attributes: { userId: me.id, hash, ip, headers },
+			});
 
 			const idempotent = process.env.FORCE_IGNORE_IDEMPOTENCY_FOR_TESTING !== 'true' ? await this.redisClient.get(`drive:files:upload-from-url:idempotent:${me.id}:${hash}`) : null;
 			if (idempotent === '_') { // 他のサーバーで処理中

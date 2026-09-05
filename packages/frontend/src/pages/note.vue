@@ -81,6 +81,12 @@ const clips = ref<Misskey.entities.Clip[]>();
 const hasSensitiveFiles = ref(false);
 const showPrev = ref<'user' | 'channel' | false>(false);
 const showNext = ref<'user' | 'channel' | false>(false);
+const initialTab = computed<'reactions' | 'replies' | 'renotes' | undefined>(() => {
+	if (['reactions', 'replies', 'renotes'].includes(props.initialTab ?? '')) {
+		return props.initialTab as 'reactions' | 'replies' | 'renotes';
+	}
+	return undefined;
+});
 const error = ref();
 
 const prevUserPaginator = markRaw(new Paginator('users/notes', {

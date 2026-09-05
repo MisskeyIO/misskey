@@ -1,5 +1,10 @@
+<!--
+SPDX-FileCopyrightText: syuilo and misskey-project
+SPDX-License-Identifier: AGPL-3.0-only
+-->
+
 <template>
-<MkInput v-model="password" :debounce="true" type="password" autocomplete="new-password" required data-cy-signup-password @update:modelValue="onChangePassword">
+<MkInput v-model="password" :debounce="true" type="password" autocomplete="new-password" required data-testid="signup-password" @update:modelValue="onChangePassword">
 	<template #label>
 		{{ label }} <a href="https://haveibeenpwned.com/Passwords" target="_blank" rel="nofollow noopener"><span :class="$style.hibpLogo">leak checked by <span>';--hibp?</span></span></a>
 	</template>
@@ -12,7 +17,7 @@
 		<span v-if="passwordStrength == 'high'" style="color: var(--MI_THEME-success)"><i class="ti ti-check ti-fw"></i> {{ i18n.ts.strongPassword }}</span>
 	</template>
 </MkInput>
-<MkInput v-model="retypedPassword" type="password" autocomplete="new-password" required data-cy-signup-password-retype @update:modelValue="onChangePasswordRetype">
+<MkInput v-model="retypedPassword" type="password" autocomplete="new-password" required data-testid="signup-password-retype" @update:modelValue="onChangePasswordRetype">
 	<template #label>{{ label }} ({{ i18n.ts.retype }})</template>
 	<template #prefix><i class="ti ti-lock"></i></template>
 	<template #caption>
@@ -158,4 +163,3 @@ function onChangePasswordRetype(): void {
 	}
 }
 </style>
-

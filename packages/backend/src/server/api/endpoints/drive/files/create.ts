@@ -125,16 +125,20 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			const logger = this.loggerService.getLogger('api:drive:files:create');
 
 			if (!file) {
-				logger.setContext({ userId: me.id, ip, headers });
-				logger.error('File is required but did not provided.');
+				logger.error({
+					message: 'File is required but did not provided.',
+					attributes: { userId: me.id, ip, headers },
+				});
 				throw new ApiError(meta.errors.invalidParam);
 			}
 
 			const calcHash = createHash('sha256').update(`${ps.folderId}:${ps.name}:${ps.isSensitive}`);
 			await stream.pipeline(fs.createReadStream(file.path, { encoding: 'binary', start: 0, end: 1024 * 1024 }), calcHash);
 			const hash = calcHash.digest('base64');
-			logger.setContext({ userId: me.id, hash, ip, headers });
-			logger.info('Request to create drive file.');
+			logger.info({
+				message: 'Request to create drive file.',
+				attributes: { userId: me.id, hash, ip, headers },
+			});
 
 			const idempotent = process.env.FORCE_IGNORE_IDEMPOTENCY_FOR_TESTING !== 'true' ? await this.redisClient.get(`drive:files:create:idempotent:${me.id}:${hash}`) : null;
 			if (idempotent === '_') { // 他のサーバーで処理中

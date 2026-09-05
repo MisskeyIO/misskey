@@ -43,24 +43,7 @@ afterEach(() => {
 	window.localStorage.clear();
 });
 
-test('最新情報は並列に取得し、両方の完了後にだけ再読込する', async () => {
-	let finishMeta!: () => void;
-	let finishEmojis!: () => void;
-	mocks.fetchInstance.mockReturnValueOnce(new Promise<void>(resolve => { finishMeta = resolve; }));
-	mocks.fetchEmojis.mockReturnValueOnce(new Promise<void>(resolve => { finishEmojis = resolve; }));
-	const clearing = clearCache();
-	await vi.advanceTimersByTimeAsync(0);
-	expect(mocks.fetchInstance).toHaveBeenCalledOnce();
-	expect(mocks.fetchEmojis).toHaveBeenCalledOnce();
-	finishMeta();
-	await vi.advanceTimersByTimeAsync(0);
-	expect(mocks.reload).not.toHaveBeenCalled();
-	finishEmojis();
-	await clearing;
-	expect(mocks.reload).toHaveBeenCalledOnce();
-});
-
-test('キャッシュだけを削除し、最新情報の取得後に再読込する', async () => {
+test('キャッシュだけを削除し、絵文字を再取得せずに再読込する', async () => {
 	const cached = ['instance', 'instanceCachedAt', 'emojis', 'lastEmojisFetchedAt', 'theme', 'themeId', 'themeCachedVersion'] as const;
 	const retained = ['account', 'drafts', 'preferences', 'gaConsent', 'sensitiveContentConsent'] as const;
 	for (const key of [...cached, ...retained]) miLocalStorage.setItem(key, '検査用');
@@ -71,14 +54,14 @@ test('キャッシュだけを削除し、最新情報の取得後に再読込�
 	expect(mocks.api).toHaveBeenCalledOnce();
 	expect(mocks.api.mock.calls[0][0]).toBe('clear-browser-cache');
 	expect(mocks.fetchInstance).toHaveBeenCalledWith(true);
-	expect(mocks.fetchEmojis).toHaveBeenCalledWith(true);
+	expect(mocks.fetchEmojis).not.toHaveBeenCalled();
 	expect(mocks.reload).toHaveBeenCalledOnce();
 	expect(mocks.done).toHaveBeenCalledOnce();
 	expect(mocks.alert).not.toHaveBeenCalled();
 	expect(vi.getTimerCount()).toBe(0);
 });
 
-test.each(['api', 'del', 'fetchInstance', 'fetchEmojis'] as const)('%sの失敗時は待機を閉じ、再試行できる', async (stage) => {
+test.each(['api', 'del', 'fetchInstance'] as const)('%sの失敗時は待機を閉じ、再試行できる', async (stage) => {
 	mocks[stage].mockRejectedValueOnce(new Error('検査用'));
 	await expect(clearCache()).resolves.toBeUndefined();
 	expect(mocks.done).toHaveBeenCalledOnce();
@@ -89,23 +72,7 @@ test.each(['api', 'del', 'fetchInstance', 'fetchEmojis'] as const)('%sの失敗�
 	expect(mocks.reload).toHaveBeenCalledOnce();
 });
 
-test('最新情報の片方が失敗しても、残りの保存が終わるまでは待機する', async () => {
-	let finishEmojis!: () => void;
-	mocks.fetchInstance.mockRejectedValueOnce(new Error('検査用'));
-	mocks.fetchEmojis.mockReturnValueOnce(new Promise<void>(resolve => { finishEmojis = resolve; }));
-	const clearing = clearCache();
-	await vi.advanceTimersByTimeAsync(0);
-	expect(mocks.done).not.toHaveBeenCalled();
-	expect(mocks.alert).not.toHaveBeenCalled();
-	expect(mocks.reload).not.toHaveBeenCalled();
-	finishEmojis();
-	await clearing;
-	expect(mocks.done).toHaveBeenCalledOnce();
-	expect(mocks.alert).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
-	expect(mocks.reload).not.toHaveBeenCalled();
-});
-
-test.each(['api', 'del', 'fetchInstance', 'fetchEmojis'] as const)('%sが10秒以上かかっても中断せず、実際の完了を待つ', async (stage) => {
+test.each(['api', 'del', 'fetchInstance'] as const)('%sが10秒以上かかっても中断せず、実際の完了を待つ', async (stage) => {
 	const abort = vi.spyOn(AbortController.prototype, 'abort');
 	let release!: () => void;
 	mocks[stage].mockReturnValueOnce(new Promise<void>(resolve => { release = resolve; }));

@@ -21,7 +21,7 @@ test.describe('設定からのキャッシュ削除', () => {
 		await expect(page.getByRole('button', { name: /Clear cache|キャッシュをクリア/ })).toBeVisible();
 	});
 
-	test('1.2万件の絵文字を更新し、ログイン・下書き・設定の保持と二重取得なしを確認する', async ({ page }) => {
+	test('再読込後に1.2万件の絵文字を一度だけ取得し、ログイン・下書き・設定を保持する', async ({ page }) => {
 		const before = await page.evaluate(() => {
 			localStorage.setItem('drafts', JSON.stringify({ cacheTest: { text: '消してはいけない下書き' } }));
 			localStorage.setItem('customCss', '/* キャッシュ削除の保存確認 */');
@@ -38,9 +38,13 @@ test.describe('設定からのキャッシュ削除', () => {
 		const emojis = Array.from({ length: 12_103 }, (_, i) => ({
 			aliases: [], name: `cache_clear_test_${i}`, category: null, url: `${BASE_URL}/favicon.ico`,
 		}));
-		const emojiMethods: string[] = [];
+		let navigated = false;
+		page.on('framenavigated', frame => {
+			if (frame === page.mainFrame()) navigated = true;
+		});
+		const emojiRequests: { method: string; afterNavigation: boolean }[] = [];
 		await page.route('**/api/emojis**', async route => {
-			emojiMethods.push(route.request().method());
+			emojiRequests.push({ method: route.request().method(), afterNavigation: navigated });
 			await route.fulfill({ json: { emojis } });
 		});
 		const cleared = page.waitForResponse(response => new URL(response.url()).pathname === '/api/clear-browser-cache');
@@ -63,7 +67,7 @@ test.describe('設定からのキャッシュ削除', () => {
 			};
 		});
 		expect(after).toEqual(before);
-		expect(emojiMethods).toEqual(['POST']);
+		expect(emojiRequests).toEqual([{ method: 'GET', afterNavigation: true }]);
 		const storedEmojis = await page.evaluate(() => new Promise((resolve, reject) => {
 			const request = indexedDB.open('keyval-store');
 			request.onerror = () => reject(request.error);
@@ -113,22 +117,20 @@ test.describe('設定からのキャッシュ削除', () => {
 		expect(navigations).toBe(1);
 	});
 
-	for (const endpoint of ['meta', 'emojis']) {
-		test(`${endpoint} の取得失敗時も画面を操作できる`, async ({ page }) => {
-			let navigations = 0;
-			page.on('request', request => {
-				if (request.isNavigationRequest() && request.frame() === page.mainFrame()) navigations++;
-			});
-			await page.route(`**/api/${endpoint}**`, route => route.fulfill({
-				status: 503,
-				json: { error: { message: 'キャッシュ削除の通信エラー検査', code: 'INTERNAL_ERROR' } },
-			}));
-			await page.getByRole('button', { name: /Clear cache|キャッシュをクリア/ }).click();
-			await expect(page.getByText(/Please try again later|もう一度お試しください。/)).toBeVisible();
-			await expect(page.locator('body')).not.toHaveAttribute('inert');
-			await page.getByTestId('modal-dialog-ok').click();
-			await page.getByRole('button', { name: /Clear cache|キャッシュをクリア/ }).click({ trial: true });
-			expect(navigations).toBe(0);
+	test('meta の取得失敗時も画面を操作できる', async ({ page }) => {
+		let navigations = 0;
+		page.on('request', request => {
+			if (request.isNavigationRequest() && request.frame() === page.mainFrame()) navigations++;
 		});
-	}
+		await page.route('**/api/meta**', route => route.fulfill({
+			status: 503,
+			json: { error: { message: 'キャッシュ削除の通信エラー検査', code: 'INTERNAL_ERROR' } },
+		}));
+		await page.getByRole('button', { name: /Clear cache|キャッシュをクリア/ }).click();
+		await expect(page.getByText(/Please try again later|もう一度お試しください。/)).toBeVisible();
+		await expect(page.locator('body')).not.toHaveAttribute('inert');
+		await page.getByTestId('modal-dialog-ok').click();
+		await page.getByRole('button', { name: /Clear cache|キャッシュをクリア/ }).click({ trial: true });
+		expect(navigations).toBe(0);
+	});
 });

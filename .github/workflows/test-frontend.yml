@@ -10,6 +10,7 @@ on:
       - host
     paths:
       - packages/frontend/**
+      - cypress/**
       # for permissions
       - packages/misskey-js/**
       # for e2e
@@ -20,6 +21,7 @@ on:
   pull_request:
     paths:
       - packages/frontend/**
+      - cypress/**
       # for permissions
       - packages/misskey-js/**
       # for e2e

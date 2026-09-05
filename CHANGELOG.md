@@ -3,6 +3,7 @@
 ### General
 - Fix: Dockerワークフローでブランチ名とタグ名を安全に扱うよう修正
 - Fix: Docker buildで利用するpnpmをlockfileと同じ版へ更新
+- Fix: Dockerのメモリ管理ライブラリを更新後のOSに合わせる
 
 ### Client
 - Fix: アンテナからRenoteを削除するときに元投稿を誤って対象にしないよう修正

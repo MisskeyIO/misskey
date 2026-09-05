@@ -5,6 +5,7 @@
 - Fix: Docker buildで利用するpnpmをlockfileと同じ版へ更新
 
 ### Client
+- Fix: アンテナからRenoteを削除するときに元投稿を誤って対象にしないよう修正
 - Fix: 管理者向けユーザー画面のインラインポリシー編集と管理操作を復元し、画面が開けない問題を修正
 - Fix: リモートユーザーへのロール付与入口を復元
 - Fix: キュー監視ダッシュボードの入口を管理者だけに限定
@@ -12,12 +13,51 @@
 - Fix: 移行前の予約投稿が失敗した場合に内容と理由を表示
 
 ### Server
+- Fix: 分割された全キューへ一時停止・再開を適用
 - Fix: clean環境でも設定移行migrationを読み込めるよう修正
 - Fix: OpenSearchの検索結果を公開・ホーム投稿だけに限定
 - Fix: キュー監視画面に予約投稿キューを追加
 - Fix: Backendのbundleから任意依存の`pg-native`を除外
 - Fix: HTTPヘッダーと登録確認コードをログで伏せ字にするよう修正
 
+
+## 2026.6.0
+
+### General
+- Feat: ジョブキュー管理画面からキューの一時停止/再開ができるように
+- Feat: アンテナのタイムラインから個別のノートを削除できるように
+- Feat: ノート検索で投稿日時の期間を条件に加えられるように(#16035)
+- Fix: コンパネからrootユーザーのパスワードをリセットしようとした際にエラーが通知されない問題を修正
+
+### Client
+- Enhance: ユーザーページのファイルタブでスクロール位置が保持されるように
+- Enhance: ドライブページでスクロール位置が保持されるように
+- Enhance: 絵文字のメニューから直接絵文字パレットに絵文字を追加できるように
+- Fix: URLプレビューのプレイヤーをウィンドウで開いたとき、プレイヤーが読み込まれるまでの間 `Invalid URL` と表示される問題を修正
+- Fix: 一部の実績が正しく表示されない問題を修正
+- Fix: アクセストークン発行時のダイアログのタイトルが「確認コード」となっているのを修正
+- Fix: 一部のUI要素の色が正しく表示されない問題を修正
+  (Cherry-picked from https://github.com/MisskeyIO/misskey/pull/1243)
+- Fix: 「D」キーでダークモードを切り替える際にsyncDeviceDarkModeのチェックがバイパスされる問題を修正
+- Fix: パスキー登録完了時の認証ダイアログの入力値が使われていない問題を修正
+- Fix: メンションのサジェスト時に表示されるアイコン表示が画像サイズ次第で崩れる問題を修正
+- Fix: ノートの下書きをリセットする際、未アップロードのファイルについては添付予定が解除されない問題を修正
+- Fix: 画像アップロード時、フレームのキャプション付与が正しく行われないことがある問題を修正
+
+### Server
+- Enhance: リモートノートクリーニングジョブのスキップ処理のパフォーマンス改善
+- Enhance: リモートノートクリーニングジョブの削除対象検索処理のパフォーマンス改善
+- Enhance: ActivityPub の画像添付に width/height を含めるように
+- Enhance: URLプレビューのデフォルトの User Agent に Misskey サーバーのURLを含めるように
+- Fix: backend バンドルで `@tensorflow/tfjs-node` を external に含めず、起動時に `@mapbox/node-pre-gyp` の `find()` が backend の package.json を誤検出して `is not node-pre-gyp ready` エラーを永続的に吐く問題を修正
+- Fix: MemoryKVCacheのキャッシュGC処理において、更新されたキャッシュが期限切れにならないことがある問題を修正
+- Fix: PerUserDriveChart がシステム所有ファイル (userId が null) の更新で `"group"` の非NULL制約違反によりクラッシュする問題を修正 (#17498)
+- Fix: センシティブメディア自動検出周りの依存関係・ファイルの解決に失敗する問題を修正
+- Fix: フォロワー限定投稿を指名投稿で引用した際に、引用した投稿の公開範囲が意図せず変更される問題を修正
+- Fix: `actor` を持たない不正なInboxアクティビティを受信した際に配送ジョブが `TypeError` でクラッシュする問題を修正 (受信時に検証して400で返し、ジョブを積まないように変更)
+- Fix: Startup and shutdown failures (port-in-use, socket permission denied, plugin timeouts, leaked WebSocket connections) are now reported through the misskey logger instead of an UnhandledPromiseRejectionWarning stack trace
+- Fix: リモートのノートに対するメンション数制限が、サーバーが解決できたユーザー数ベースで行われていた問題を修正
+- Fix: セキュリティに関する修正
 
 ## 2026.5.4
 
@@ -26,9 +66,6 @@
 
 ### Client
 - Fix: ビルドに失敗することがある問題を修正
-
-### Server
--
 
 
 ## 2026.5.3

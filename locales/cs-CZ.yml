@@ -1135,6 +1135,7 @@ inMinutes: "Minut"
 inDays: "Dnů"
 widgets: "Widgety"
 presets: "Předvolba"
+previewingThemeRestore: "Obnovit"
 _imageEditing:
   _vars:
     filename: "Název souboru"

@@ -317,6 +317,20 @@ describe('OAuth', () => {
 		assert.strictEqual(createResultBodyBob.createdNote.user.username, 'bob');
 	});
 
+	test('同じ認可画面の同時送信は一度だけ受理する', async () => {
+		const client = new AuthorizationCode(clientConfig);
+		const response = await fetch(client.authorizeURL(basicAuthParams));
+		assert.strictEqual(response.status, 200);
+		const { transactionId } = getMeta(await response.text());
+		assert.ok(transactionId);
+
+		const decisions = await Promise.all([
+			fetchDecision(transactionId, alice),
+			fetchDecision(transactionId, alice),
+		]);
+		assert.deepStrictEqual(decisions.map(decision => decision.status).sort(), [302, 403]);
+	});
+
 	// https://datatracker.ietf.org/doc/html/rfc7636.html
 	describe('PKCE', () => {
 		// https://datatracker.ietf.org/doc/html/rfc7636.html#section-4.4.1
@@ -396,6 +410,27 @@ describe('OAuth', () => {
 	// MUST deny the request and SHOULD revoke (when possible) all tokens
 	// previously issued based on that authorization code."
 	describe('Revoking authorization code', () => {
+		test('同時交換された認可コードから有効なトークンを残さない', async () => {
+			const { code_challenge, code_verifier } = await pkceChallenge(128);
+			const { client, code } = await fetchAuthorizationCode(alice, 'read:account', code_challenge);
+			const params = { code, redirect_uri, code_verifier } as AuthorizationTokenConfigExtended;
+			const results = await Promise.allSettled([client.getToken(params), client.getToken(params)]);
+			assert.ok(results.some(result => result.status === 'rejected'));
+
+			for (const result of results) {
+				if (result.status === 'rejected') {
+					assert.strictEqual((result.reason as GetTokenError).data.payload.error, 'invalid_grant');
+				} else {
+					const response = await fetch(new URL('/oauth/token/introspect', host), {
+						method: 'post',
+						body: new URLSearchParams({ token: result.value.token.access_token as string }),
+					});
+					assert.strictEqual(response.status, 200);
+					assert.deepStrictEqual(await response.json(), { active: false });
+				}
+			}
+		});
+
 		test('On success', async () => {
 			const { code_challenge, code_verifier } = await pkceChallenge(128);
 			const { client, code } = await fetchAuthorizationCode(alice, 'write:notes', code_challenge);
@@ -809,6 +844,118 @@ describe('OAuth', () => {
 		});
 	});
 
+	describe('Token endpoint', () => {
+		test('Accept JSON payload', async () => {
+			const { code_challenge, code_verifier } = await pkceChallenge(128);
+			const { code } = await fetchAuthorizationCode(alice, 'write:notes', code_challenge);
+
+			const response = await fetch(new URL('/oauth/token', host), {
+				method: 'post',
+				headers: {
+					'content-type': 'application/json',
+				},
+				body: JSON.stringify({
+					grant_type: 'authorization_code',
+					code,
+					client_id: clientConfig.client.id,
+					redirect_uri,
+					code_verifier,
+				}),
+			});
+
+			assert.strictEqual(response.status, 200);
+			const tokenResponse = await response.json() as {
+				access_token: string;
+				token_type: string;
+				scope: string;
+			};
+			assert.strictEqual(typeof tokenResponse.access_token, 'string');
+			assert.strictEqual(tokenResponse.token_type, 'Bearer');
+			assert.strictEqual(tokenResponse.scope, 'write:notes');
+		});
+
+		test('Accept x-www-form-urlencoded payload', async () => {
+			const { code_challenge, code_verifier } = await pkceChallenge(128);
+			const { code } = await fetchAuthorizationCode(alice, 'write:notes', code_challenge);
+
+			const response = await fetch(new URL('/oauth/token', host), {
+				method: 'post',
+				headers: {
+					'content-type': 'application/x-www-form-urlencoded',
+				},
+				body: new URLSearchParams({
+					grant_type: 'authorization_code',
+					code,
+					client_id: clientConfig.client.id,
+					redirect_uri,
+					code_verifier,
+				}),
+			});
+
+			assert.strictEqual(response.status, 200);
+			const tokenResponse = await response.json() as {
+				access_token: string;
+				token_type: string;
+				scope: string;
+			};
+			assert.strictEqual(typeof tokenResponse.access_token, 'string');
+			assert.strictEqual(tokenResponse.token_type, 'Bearer');
+			assert.strictEqual(tokenResponse.scope, 'write:notes');
+		});
+	});
+
+	describe('io SSO', () => {
+		test('登録したクライアント名と転送先を優先する', async () => {
+			const created = await api('admin/indie-auth/create', {
+				id: clientConfig.client.id,
+				name: '登録済みクライアント',
+				redirectUris: [redirect_uri2],
+			}, alice);
+			assert.strictEqual(created.status, 200);
+			try {
+				const client = new AuthorizationCode(clientConfig);
+				const response = await fetch(client.authorizeURL({ ...basicAuthParams, redirect_uri: redirect_uri2 }));
+				assert.strictEqual(response.status, 200);
+				assert.strictEqual(getMeta(await response.text()).clientName, '登録済みクライアント');
+				const rejected = await fetch(client.authorizeURL(basicAuthParams), { redirect: 'manual' });
+				await assertDirectError(rejected, 400, 'invalid_request');
+			} finally {
+				const deleted = await api('admin/indie-auth/delete', { id: clientConfig.client.id }, alice);
+				assert.strictEqual(deleted.status, 204);
+			}
+		});
+
+		test('発行したトークンで利用者情報と有効性を取得する', async () => {
+			const { code_challenge, code_verifier } = await pkceChallenge(128);
+			const { client, code } = await fetchAuthorizationCode(alice, 'read:account', code_challenge);
+			const token = await client.getToken({ code, redirect_uri, code_verifier } as AuthorizationTokenConfigExtended);
+			const accessToken = token.token.access_token as string;
+			const userinfo = await fetch(new URL('/oauth/api/userinfo', host), {
+				headers: { Authorization: `Bearer ${accessToken}` },
+			});
+			assert.strictEqual(userinfo.status, 200);
+			assert.strictEqual(userinfo.headers.get('cache-control'), 'no-store');
+			const user = await userinfo.json() as { sub: string; preferred_username: string };
+			assert.strictEqual(user.sub, alice.id);
+			assert.strictEqual(user.preferred_username, alice.username);
+
+			const introspection = await fetch(new URL('/oauth/token/introspect', host), {
+				method: 'post',
+				body: new URLSearchParams({ token: accessToken }),
+			});
+			assert.strictEqual(introspection.status, 200);
+			assert.strictEqual(introspection.headers.get('cache-control'), 'no-store');
+			const result = await introspection.json() as { active: boolean; user_id: string; client_id: string; scope: string };
+			assert.strictEqual(result.active, true);
+			assert.strictEqual(result.user_id, alice.id);
+			assert.strictEqual(result.client_id, clientConfig.client.id);
+			assert.strictEqual(result.scope, 'read:account');
+
+			const anonymous = await fetch(new URL('/oauth/api/userinfo', host));
+			assert.strictEqual(anonymous.status, 401);
+		});
+	});
+
 	describe('Client Information Discovery', () => {
 		// https://indieauth.spec.indieweb.org/#client-information-discovery
 		describe('JSON client metadata (11 July 2024)', () => {
@@ -1011,7 +1158,6 @@ describe('OAuth', () => {
 					await assertDirectError(response, 400, 'invalid_request');
 				});
 			});
-
 
 			test('Disallow loopback', async () => {
 				await sendEnvUpdateRequest({ key: 'MISSKEY_TEST_CHECK_IP_RANGE', value: '1' });

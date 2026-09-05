@@ -9,7 +9,7 @@ import { version, lang, apiUrl, isSafeMode } from '@@/js/config.js';
 import defaultLightTheme from '@@/themes/l-light.json5';
 import defaultDarkTheme from '@@/themes/d-green-lime.json5';
 import { storeBootloaderErrors } from '@@/js/store-boot-errors';
-import { createGtag, addGtag, consent as gtagConsent } from 'vue-gtag';
+import { addGtag, consent as gtagConsent } from 'vue-gtag';
 import type { App } from 'vue';
 import type { GtagConsentParams } from '@/types/gtag';
 import widgets from '@/widgets/index.js';
@@ -35,6 +35,7 @@ import { getDeviceId, setUserProperties } from '@/utility/tracking-user-properti
 import { $i } from '@/i.js';
 import { launchPlugins } from '@/plugin.js';
 import { mainRouter } from '@/router.js';
+import { createNiraxGtag } from '@/utility/create-nirax-gtag.js';
 import { getAutoPostingLang, getDefaultViewingLangs } from '@/utility/posting-language.js';
 
 export async function common(createVue: () => Promise<App<Element>>) {
@@ -334,19 +335,7 @@ export async function common(createVue: () => Promise<App<Element>>) {
 	directives(app);
 	components(app);
 	if (instance.googleAnalyticsId) {
-		app.use(createGtag( {
-			tagId: instance.googleAnalyticsId,
-			config: {
-				anonymize_ip: false,
-				send_page_view: true,
-			},
-			pageTracker: {
-				router: mainRouter,
-				useScreenview: true,
-			},
-			initMode: 'manual',
-			appName: `Misskey v${version}`,
-		}));
+		app.use(createNiraxGtag(mainRouter, instance.googleAnalyticsId, `Misskey v${version}`));
 
 		const gtagConsentParams = miLocalStorage.getItemAsJson('gtagConsent') as GtagConsentParams ?? {
 			ad_storage: 'denied',

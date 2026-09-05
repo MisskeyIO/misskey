@@ -6,7 +6,6 @@
 import { createApp, defineAsyncComponent, markRaw } from 'vue';
 import { ui } from '@@/js/config.js';
 import * as Misskey from 'misskey-js';
-import { compareVersions } from 'compare-versions';
 import { common } from './common.js';
 import type { Component } from 'vue';
 import type { Keymap } from '@/utility/hotkey.js';
@@ -28,12 +27,11 @@ import { addCustomEmoji, removeCustomEmojis, updateCustomEmojis } from '@/custom
 import { prefer } from '@/preferences.js';
 import { updateCurrentAccountPartial } from '@/accounts.js';
 import { signout } from '@/signout.js';
-import { migrateOldSettings } from '@/pref-migrate.js';
 import { unisonReload } from '@/utility/unison-reload.js';
 import { isBirthday } from '@/utility/is-birthday.js';
 
 export async function mainBoot() {
-	const { isClientUpdated, lastVersion } = await common(async () => {
+	const { isClientUpdated } = await common(async () => {
 		let uiStyle = ui;
 		const searchParams = new URLSearchParams(window.location.search);
 
@@ -68,14 +66,6 @@ export async function mainBoot() {
 
 	if (isClientUpdated && $i) {
 		await popup(defineAsyncComponent(() => import('@/components/MkUpdated.vue')), {}, {}, 'closed');
-
-		// prefereces migration
-		// TODO: そのうち消す
-		if (lastVersion && (compareVersions('2025.3.2-alpha.0', lastVersion) === 1)) {
-			console.log('Preferences migration');
-
-			migrateOldSettings();
-		}
 	}
 
 	try {

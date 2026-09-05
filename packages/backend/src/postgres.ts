@@ -105,7 +105,7 @@ pg.types.setTypeParser(20, Number);
 
 export const dbLogger = new MisskeyLogger('db');
 
-const sqlLogger = dbLogger.createSubLogger('sql', 'gray', false);
+const sqlLogger = dbLogger.createSubLogger('sql', 'gray');
 
 export type LoggerProps = {
 	disableQueryTruncation?: boolean;

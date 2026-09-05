@@ -3,136 +3,149 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import cluster from 'node:cluster';
-import pino from 'pino';
-import pinoPretty from 'pino-pretty';
 import { bindThis } from '@/decorators.js';
-import { envOption } from './env.js';
+import { logManager } from './logging/logging-runtime.js';
+import type { LogEntryInput, LogLevel, LoggerContext, LogWriteInput } from './logging/types.js';
 import type { Keyword } from 'color-convert';
 
-const pinoPrettyStream = pinoPretty({
-	levelFirst: false,
-	levelKey: 'level',
-	timestampKey: 'time',
-	messageKey: 'message',
-	errorLikeObjectKeys: ['e', 'err', 'error'],
-	ignore: 'severity,pid,hostname,cluster,important',
-	messageFormat: '@{cluster} | {message}',
-});
+// 旧APIのdataは表示用の任意値を受け取り、Errorや配列も既存呼び出しで使用されています。
+type LegacyData = Record<string, any> | null;
 
+/**
+ * ロガー名の階層と従来の公開APIを提供する薄い窓口です。
+ * 出力条件の判断や整形はLogManagerとLogBackendへ委譲します。
+ */
 // eslint-disable-next-line import/no-default-export
 export default class Logger {
-	private readonly domain: string | undefined;
-	private readonly logger: pino.Logger;
-	private context: Record<string, any> = {};
+	private context: readonly LoggerContext[];
 
-	constructor(domain: string | undefined, _color?: Keyword, _store = true, parentLogger?: Logger) {
-		if (parentLogger) {
-			this.domain = [parentLogger.domain, domain].filter(x => x).join('.') || undefined;
-			this.context = { ...JSON.parse(JSON.stringify(parentLogger.context)) };
-		} else {
-			this.domain = domain;
-		}
+	/** 指定した名前を起点とするLoggerを作成します。 */
+	constructor(context: string, color?: Keyword) {
+		this.context = [{
+			name: context,
+			color,
+		}];
+	}
 
-		this.logger = pino({
-			name: this.domain,
-			serializers: {
-				...pino.stdSerializers,
-				err: pino.stdSerializers.errWithCause,
+	/**
+	 * 現在のロガーを親として、下位の名前を持つLoggerを作成します。
+	 */
+	@bindThis
+	public createSubLogger(context: string, color?: Keyword): Logger {
+		const logger = new Logger(context, color);
+		logger.context = [...this.context, ...logger.context];
+		return logger;
+	}
+
+	/**
+	 * 従来APIの引数を共通形式へ変換し、LogManagerへ渡します。
+	 */
+	@bindThis
+	private log(level: LogLevel, message: string, data?: unknown, important = false, legacyLevel?: 'success', error?: unknown): void {
+		logManager.write({
+			level,
+			message,
+			context: this.context,
+			...(typeof error !== 'undefined' ? { error } : {}),
+			compatibility: {
+				legacyLevel,
+				important,
+				data,
 			},
-			level: envOption.verbose ? 'debug' : 'info',
-			depthLimit: 8,
-			edgeLimit: 128,
-			redact: ['headers', 'code', 'context.password', 'context.token'],
-			enabled: !envOption.quiet || envOption.logJson,
-			timestamp: envOption.withLogTime || envOption.logJson ? pino.stdTimeFunctions.isoTime : false,
-			messageKey: 'message',
-			errorKey: 'error',
-			formatters: {
-				level: (label, number) => ({ severity: label, level: number }),
-			},
-			mixin: () => this.mixin(),
-		}, !envOption.logJson ? pinoPrettyStream : undefined);
+		});
 	}
 
-	private mixin(): Record<string, any> {
-		return { cluster: cluster.isPrimary ? 'primary' : `worker#${cluster.worker!.id}`, ...this.context };
-	}
-
-	public createSubLogger(domain?: string, _color?: Keyword, _store = true): Logger {
-		return new Logger(domain, _color, _store, this);
-	}
-
-	public setContext(context: Record<string, any>): void {
-		this.context = { ...this.context, ...JSON.parse(JSON.stringify(context)) };
-	}
-
+	/** level別メソッドの構造化入力にlevelとLoggerのcontextを付けて渡します。 */
 	@bindThis
-	public error(x: string | Error, context?: Record<string, any> | null, important = false): void { // 実行を継続できない状況で使う
-		// eslint-disable-next-line no-param-reassign
-		if (context === null) context = undefined;
-		if (context?.error) context.error = pino.stdSerializers.errWithCause(context.error);
+	private logStructured(level: LogLevel, input: LogEntryInput): void {
+		this.write({
+			...input,
+			level,
+		});
+	}
 
+	/** 構造化ログをLoggerのcontext付きでLogManagerへ渡します。 */
+	@bindThis
+	public write(input: LogWriteInput): void {
+		logManager.write({
+			...input,
+			context: this.context,
+		});
+	}
+
+	/** 処理を継続できない状況を記録します。 */
+	public error(input: LogEntryInput): void;
+	public error(error: Error, data?: LegacyData, important?: boolean): void;
+	public error(message: string, data?: LegacyData, important?: boolean): void;
+	public error(errorOrMessage: string | Error, data?: LegacyData, important?: boolean): void;
+	@bindThis
+	public error(x: LogEntryInput | string | Error, data?: LegacyData, important = false): void {
 		if (x instanceof Error) {
-			// eslint-disable-next-line no-param-reassign
-			if (context?.error === undefined) context = { ...context, error: pino.stdSerializers.errWithCause(x) };
-
-			if (important) this.logger.fatal({ context, important }, x.toString());
-			else this.logger.error({ context, important }, x.toString());
-		} else if (typeof x === 'object') {
-			// eslint-disable-next-line no-param-reassign
-			if (context?.error === undefined) context = { ...context, error: pino.stdSerializers.errWithCause(x) };
-
-			if (important) this.logger.fatal({ context, important }, `${(x as any).message ?? (x as any).name ?? x}`);
-			else this.logger.error({ context, important }, `${(x as any).message ?? (x as any).name ?? x}`);
+			// エラー本体も第2引数へ残し、従来どおりスタックなどを確認できるようにします。
+			data = data ?? {};
+			data.e = x;
+			this.log('error', x.toString(), data, important, undefined, x);
+		} else if (typeof x === 'string') {
+			this.log('error', x, data, important);
 		} else {
-			if (important) this.logger.fatal({ context, important }, x);
-			else this.logger.error({ context, important }, x);
+			this.logStructured('error', x);
 		}
 	}
 
+	/** 処理は継続できるものの、改善が必要な状況を記録します。 */
+	public warn(input: LogEntryInput): void;
+	public warn(message: string): void;
+	public warn(message: string, data?: LegacyData, important?: boolean): void;
 	@bindThis
-	public warn(x: string | Error, context?: Record<string, any> | null, important = false): void { // 実行を継続できるが改善すべき状況で使う
-		// eslint-disable-next-line no-param-reassign
-		if (context === null) context = undefined;
-		if (context?.error) context.error = pino.stdSerializers.errWithCause(context.error);
-
-		if (x instanceof Error) {
-			// eslint-disable-next-line no-param-reassign
-			if (context?.error === undefined) context = { ...context, error: pino.stdSerializers.errWithCause(x) };
-
-			this.logger.warn({ context, important }, x.toString());
-		} else if (typeof x === 'object') {
-			// eslint-disable-next-line no-param-reassign
-			if (context?.error === undefined) context = { ...context, error: pino.stdSerializers.errWithCause(x) };
-
-			this.logger.warn({ context, important }, `${(x as any).message ?? (x as any).name ?? x}`);
+	public warn(inputOrMessage: LogEntryInput | string, data?: LegacyData, important = false): void {
+		if (typeof inputOrMessage === 'string') {
+			this.log('warn', inputOrMessage, data, important);
 		} else {
-			this.logger.warn({ context, important }, x);
+			this.logStructured('warn', inputOrMessage);
 		}
 	}
 
+	/** 処理が成功したことを、従来のDONE表示で記録します。 */
 	@bindThis
-	public succ(message: string, context?: Record<string, any> | null, important = false): void { // 何かに成功した状況で使う
-		if (context === null) context = undefined;
-
-		this.logger.info({ context, important }, message);
+	public succ(message: string, data?: Record<string, any> | null, important = false): void {
+		this.log('info', message, data, important, 'success');
 	}
 
+	/** 開発者向けの調査情報を記録します。 */
+	public debug(input: LogEntryInput): void;
+	public debug(message: string): void;
+	public debug(message: string, data?: LegacyData, important?: boolean): void;
 	@bindThis
-	public debug(message: string, context?: Record<string, any> | null, important = false): void { // デバッグ用に使う(開発者に必要だが利用者に不要な情報)
-		if (context === null) context = undefined;
-
-		this.logger.debug({ context, important }, message);
+	public debug(inputOrMessage: LogEntryInput | string, data?: LegacyData, important = false): void {
+		if (typeof inputOrMessage === 'string') {
+			this.log('debug', inputOrMessage, data, important);
+		} else {
+			this.logStructured('debug', inputOrMessage);
+		}
 	}
 
+	/** 通常の動作状況を記録します。 */
+	public info(input: LogEntryInput): void;
+	public info(message: string): void;
+	public info(message: string, data?: LegacyData, important?: boolean): void;
 	@bindThis
-	public info(message: string, context?: Record<string, any> | null, important = false): void { // それ以外
-		if (context === null) context = undefined;
+	public info(inputOrMessage: LogEntryInput | string, data?: LegacyData, important = false): void {
+		if (typeof inputOrMessage === 'string') {
+			this.log('info', inputOrMessage, data, important);
+		} else {
+			this.logStructured('info', inputOrMessage);
+		}
+	}
 
-		this.logger.info({ context, important }, message);
+	/** 致命的な状況を構造化ログとして記録します。 */
+	public fatal(input: LogEntryInput): void;
+	public fatal(message: string): void;
+	@bindThis
+	public fatal(inputOrMessage: LogEntryInput | string): void {
+		if (typeof inputOrMessage === 'string') {
+			this.logStructured('fatal', { message: inputOrMessage });
+		} else {
+			this.logStructured('fatal', inputOrMessage);
+		}
 	}
 }
-
-export const rootLogger = new Logger(undefined, undefined, false, undefined);
-export const coreLogger = rootLogger.createSubLogger('core', 'cyan');

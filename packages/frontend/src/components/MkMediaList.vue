@@ -20,8 +20,23 @@ SPDX-License-Identifier: AGPL-3.0-only
 			]"
 		>
 			<template v-for="media in previewableMediaList">
-				<XVideo v-if="media.type.startsWith('video')" :key="`video:${media.id}`" :class="$style.media" :video="media"/>
-				<XImage v-else-if="media.type.startsWith('image')" :key="`image:${media.id}`" :class="$style.media" class="image" :data-id="media.id" :image="media" :raw="raw"/>
+				<XVideo
+					v-if="media.type.startsWith('video')"
+					:key="`video:${media.id}`"
+					:class="$style.media"
+					:video="media"
+					@mediaClick="onMediaClick(media)"
+				/>
+				<XImage
+					v-else-if="media.type.startsWith('image')"
+					:key="`image:${media.id}`"
+					:marker="`${markerId}:${media.id}`"
+					:disableImageLink="true"
+					:class="$style.media"
+					:image="media"
+					:raw="raw"
+					@mediaClick="onMediaClick(media)"
+				/>
 			</template>
 		</div>
 	</div>
@@ -29,48 +44,30 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, useTemplateRef, watch } from 'vue';
+import { computed, markRaw, onMounted, watch, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
-import PhotoSwipeLightbox from 'photoswipe/lightbox';
-import PhotoSwipe from 'photoswipe';
-import 'photoswipe/style.css';
 import { FILE_TYPE_BROWSERSAFE } from '@@/js/const.js';
+import type { Content } from '@/components/MkLightbox.item.vue';
 import XBanner from '@/components/MkMediaBanner.vue';
 import XImage from '@/components/MkMediaImage.vue';
 import XVideo from '@/components/MkMediaVideo.vue';
 import * as os from '@/os.js';
-import { focusParent } from '@/utility/focus.js';
-import { sensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 import { prefer } from '@/preferences.js';
+import { genId } from '@/utility/id.js';
+import { isFileBlocked, canRevealFile } from '@/utility/sensitive-file.js';
+import { sensitiveContentConsent } from '@/utility/sensitive-content-consent.js';
 
 const props = defineProps<{
 	mediaList: Misskey.entities.DriveFile[];
-	user?: Misskey.entities.UserLite;
 	raw?: boolean;
+	user?: Misskey.entities.UserLite;
 }>();
 
 const gallery = useTemplateRef('gallery');
-const pswpZIndex = os.claimZIndex('middle');
-window.document.documentElement.style.setProperty('--mk-pswp-root-z-index', pswpZIndex.toString());
-const isBlocked = (media: Misskey.entities.DriveFile): boolean => media.isSensitive && sensitiveContentConsent.value === false;
-
-const bannerMediaList = computed(() => props.mediaList.filter(media => !previewable(media) && !isBlocked(media)));
-const previewableMediaList = computed(() => props.mediaList.filter(media => previewable(media) && !isBlocked(media)));
+const bannerMediaList = computed(() => props.mediaList.filter(media => !isFileBlocked(media) && !previewable(media)));
+const previewableMediaList = computed(() => props.mediaList.filter(media => !isFileBlocked(media) && previewable(media)));
 const count = computed(() => previewableMediaList.value.length);
-
-const pswpFiles = computed(() => previewableMediaList.value.filter(media => {
-	if (media.type === 'image/svg+xml') return true; // svgのwebpublicはpngなのでtrue
-	return media.type.startsWith('image') && FILE_TYPE_BROWSERSAFE.includes(media.type);
-}));
-let lightbox: PhotoSwipeLightbox | null = null;
-
-let activeEl: HTMLElement | null = null;
-
-const popstateHandler = (): void => {
-	if (lightbox?.pswp && lightbox.pswp.isOpen === true) {
-		lightbox.pswp.close();
-	}
-};
+const markerId = genId();
 
 async function calcAspectRatio() {
 	if (!gallery.value) return;
@@ -92,7 +89,7 @@ async function calcAspectRatio() {
 			gallery.value.style.aspectRatio = ratioMax(16 / 9);
 			break;
 		case '1_1':
-			gallery.value.style.aspectRatio = ratioMax(1);
+			gallery.value.style.aspectRatio = ratioMax(1 / 1);
 			break;
 		case '2_3':
 			gallery.value.style.aspectRatio = ratioMax(2 / 3);
@@ -103,126 +100,8 @@ async function calcAspectRatio() {
 	}
 }
 
-const buildLightbox = (): PhotoSwipeLightbox | null => {
-	if (!gallery.value) return null;
-	if (pswpFiles.value.length === 0) return null;
-
-	const lb = new PhotoSwipeLightbox({
-		dataSource: pswpFiles.value.map(media => {
-			const item = {
-				src: media.url,
-				w: media.properties.width,
-				h: media.properties.height,
-				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-				alt: media.comment || media.name,
-				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-				comment: media.comment || media.name,
-			};
-			if (media.properties.orientation != null && media.properties.orientation >= 5) {
-				[item.w, item.h] = [item.h, item.w];
-			}
-			return item;
-		}),
-		gallery: gallery.value,
-		mainClass: 'pswp',
-		children: '.image',
-		thumbSelector: '.image',
-		loop: false,
-		padding: window.innerWidth > 500 ? {
-			top: 32,
-			bottom: 90,
-			left: 32,
-			right: 32,
-		} : {
-			top: 0,
-			bottom: 78,
-			left: 0,
-			right: 0,
-		},
-		imageClickAction: 'close',
-		tapAction: 'close',
-		bgOpacity: 1,
-		showAnimationDuration: 100,
-		hideAnimationDuration: 100,
-		returnFocus: false,
-		pswpModule: PhotoSwipe,
-	});
-
-	lb.addFilter('itemData', (itemData) => {
-		// element is children
-		const { element } = itemData;
-
-		const id = element?.dataset.id;
-		const file = id != null ? pswpFiles.value.find(media => media.id === id) : null;
-		if (!file) return itemData;
-
-		itemData.src = file.url;
-		itemData.w = Number(file.properties.width);
-		itemData.h = Number(file.properties.height);
-		if (file.properties.orientation != null && file.properties.orientation >= 5) {
-			[itemData.w, itemData.h] = [itemData.h, itemData.w];
-		}
-		itemData.msrc = file.thumbnailUrl ?? undefined;
-		// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-		itemData.alt = file.comment || file.name;
-		// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-		itemData.comment = file.comment || file.name;
-		itemData.thumbCropped = true;
-
-		return itemData;
-	});
-
-	lb.on('uiRegister', () => {
-		lb.pswp?.ui?.registerElement({
-			name: 'altText',
-			className: 'pswp__alt-text-container',
-			appendTo: 'wrapper',
-			onInit: (el, pswp) => {
-				const textBox = window.document.createElement('p');
-				textBox.className = 'pswp__alt-text _acrylic';
-				el.appendChild(textBox);
-
-				pswp.on('change', () => {
-					textBox.textContent = pswp.currSlide?.data.comment;
-				});
-			},
-		});
-	});
-
-	lb.on('afterInit', () => {
-		activeEl = window.document.activeElement instanceof HTMLElement ? window.document.activeElement : null;
-		focusParent(activeEl, true, true);
-		lb.pswp?.element?.focus({
-			preventScroll: true,
-		});
-		window.history.pushState(null, '', '#pswp');
-	});
-
-	lb.on('destroy', () => {
-		focusParent(activeEl, true, false);
-		activeEl = null;
-		if (window.location.hash === '#pswp') {
-			window.history.back();
-		}
-	});
-
-	return lb;
-};
-
 onMounted(() => {
 	calcAspectRatio();
-
-	window.addEventListener('popstate', popstateHandler);
-
-	lightbox = buildLightbox();
-	lightbox?.init();
-});
-
-onUnmounted(() => {
-	window.removeEventListener('popstate', popstateHandler);
-	lightbox?.destroy();
-	lightbox = null;
-	activeEl = null;
 });
 
 const previewable = (file: Misskey.entities.DriveFile): boolean => {
@@ -231,27 +110,57 @@ const previewable = (file: Misskey.entities.DriveFile): boolean => {
 	return (file.type.startsWith('video') || file.type.startsWith('image')) && FILE_TYPE_BROWSERSAFE.includes(file.type);
 };
 
-const openGallery = () => {
-	if (pswpFiles.value.length === 0) return;
-	if (!lightbox) {
-		lightbox = buildLightbox();
-		lightbox?.init();
-	}
-	lightbox?.loadAndOpen(0);
-};
+watch(count, calcAspectRatio, { flush: 'post' });
 
-watch(count, () => {
-	calcAspectRatio();
-}, { flush: 'post' });
+async function onMediaClick(file: Misskey.entities.DriveFile) {
+	if (isFileBlocked(file)) return;
+	if (file.isSensitive && sensitiveContentConsent.value !== true && !(await canRevealFile(file))) return;
 
-watch(pswpFiles, () => {
-	if (lightbox?.pswp && lightbox.pswp.isOpen === true) {
-		lightbox.pswp.close();
+	if (prefer.s.imageNewTab) {
+		window.open(file.url, '_blank');
+		return;
 	}
-	lightbox?.destroy();
-	lightbox = buildLightbox();
-	lightbox?.init();
-}, { flush: 'post' });
+	openGallery(file.id, true);
+}
+
+async function openGallery(id?: string, alreadyRevealed = false) {
+	if (id == null) {
+		const firstImage = previewableMediaList.value[0];
+		if (firstImage == null) return;
+		id = firstImage.id;
+	}
+	const selected = previewableMediaList.value.find(media => media.id === id);
+	if (selected == null) return;
+	// キーボードから開く場合も、個別の表示確認を省略しない。
+	if (!alreadyRevealed && !(await canRevealFile(selected))) return;
+
+	const getElementByMarker = (marker: string) => {
+		if (gallery.value == null) return null;
+		const found = gallery.value.querySelector(`[data-marker="${marker}"]`) as HTMLElement | null;
+		if (found == null) return null;
+		return markRaw(found);
+	};
+
+	const contents = previewableMediaList.value.map<Content>(media => ({
+		id: media.id,
+		type: media.type.startsWith('video') ? 'video' : 'image',
+		url: media.url,
+		thumbnailUrl: media.thumbnailUrl,
+		width: media.properties.width,
+		height: media.properties.height,
+		filename: media.name,
+		file: media,
+		initiallyRevealed: media.id === id,
+		sourceElement: getElementByMarker(`${markerId}:${media.id}`),
+	}));
+
+	const { dispose } = await os.popupAsyncWithDialog(import('@/components/MkLightbox.vue').then(x => x.default), {
+		defaultIndex: contents.findIndex(conten => conten.id === id),
+		contents: contents,
+	}, {
+		closed: () => dispose(),
+	});
+}
 
 defineExpose({
 	openGallery,
@@ -344,6 +253,7 @@ defineExpose({
 .media {
 	overflow: hidden; // clipにするとバグる
 	border-radius: 8px;
+	cursor: zoom-in;
 }
 
 @container (min-width: 500px) {
@@ -358,43 +268,5 @@ defineExpose({
 			aspect-ratio: 1 / 1;
 		}
 	}
-}
-
-:global(.pswp) {
-	--pswp-root-z-index: var(--mk-pswp-root-z-index, 2000700) !important;
-	--pswp-bg: var(--MI_THEME-modalBg) !important;
-}
-</style>
-
-<style lang="scss">
-.pswp__bg {
-	background: var(--MI_THEME-modalBg);
-	backdrop-filter: var(--MI-modalBgFilter);
-}
-
-.pswp__alt-text-container {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-
-	position: absolute;
-	bottom: 20px;
-	left: 50%;
-	transform: translateX(-50%);
-
-	width: 75%;
-	max-width: 800px;
-}
-
-.pswp__alt-text {
-	color: var(--MI_THEME-fg);
-	margin: 0 auto;
-	text-align: center;
-	padding: var(--MI-margin);
-	border-radius: var(--MI-radius);
-	max-height: 8em;
-	overflow-y: auto;
-	text-shadow: var(--MI_THEME-bg) 0 0 10px, var(--MI_THEME-bg) 0 0 3px, var(--MI_THEME-bg) 0 0 3px;
-	white-space: pre-line;
 }
 </style>

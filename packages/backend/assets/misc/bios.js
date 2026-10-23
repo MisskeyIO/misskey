@@ -18,7 +18,6 @@ window.onload = async () => {
 			window.fetch(endpoint.indexOf('://') > -1 ? endpoint : `/api/${endpoint}`, {
 				method: 'POST',
 				body: JSON.stringify(data),
-				credentials: 'omit',
 				cache: 'no-cache'
 			}).then(async (res) => {
 				const body = res.status === 204 ? null : await res.json();

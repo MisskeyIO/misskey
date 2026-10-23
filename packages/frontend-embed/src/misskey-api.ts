@@ -32,7 +32,6 @@ export function misskeyApi<
 		window.fetch(`${apiUrl}/${endpoint}`, {
 			method: 'POST',
 			body: JSON.stringify(data),
-			credentials: 'omit',
 			cache: 'no-cache',
 			headers: {
 				'Content-Type': 'application/json',
@@ -78,7 +77,6 @@ export function misskeyApiGet<
 		// Send request
 		window.fetch(`${apiUrl}/${endpoint}?${query}`, {
 			method: 'GET',
-			credentials: 'omit',
 			cache: 'default',
 		}).then(async (res) => {
 			const body = res.status === 204 ? null : await res.json();

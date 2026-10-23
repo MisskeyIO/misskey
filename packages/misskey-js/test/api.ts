@@ -40,7 +40,6 @@ describe('API', () => {
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			credentials: 'omit',
 			cache: 'no-cache',
 			body: JSON.stringify({ i: 'TOKEN' }),
 		});
@@ -80,7 +79,6 @@ describe('API', () => {
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			credentials: 'omit',
 			cache: 'no-cache',
 			body: JSON.stringify({ noteId: 'aaaaa', i: 'TOKEN' }),
 		});
@@ -124,7 +122,6 @@ describe('API', () => {
 			method: 'POST',
 			body: expect.any(FormData),
 			headers: {},
-			credentials: 'omit',
 			cache: 'no-cache',
 		});
 
@@ -155,7 +152,6 @@ describe('API', () => {
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			credentials: 'omit',
 			cache: 'no-cache',
 			body: JSON.stringify({ token: 'aaa', password: 'aaa', i: 'TOKEN' }),
 		});

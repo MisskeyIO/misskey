@@ -109,7 +109,6 @@ export class APIClient {
 				headers: mediaType === 'multipart/form-data' ? {} : {
 					'Content-Type': mediaType,
 				},
-				credentials: 'omit',
 				cache: 'no-cache',
 			}).then(async (res) => {
 				const body = res.status === 204 ? null : await res.json();

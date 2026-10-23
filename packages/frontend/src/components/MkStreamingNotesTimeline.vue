@@ -304,9 +304,7 @@ function asNote(note: unknown): Misskey.entities.Note {
 }
 
 async function fetchNoteJson(id: string): Promise<Misskey.entities.Note> {
-	const response = await window.fetch(`/notes/${id}.json`, {
-		credentials: 'omit',
-	});
+	const response = await window.fetch(`/notes/${id}.json`);
 	if (!response.ok) {
 		throw new Error(`ノートJSONの取得に失敗しました: ${response.status}`);
 	}
